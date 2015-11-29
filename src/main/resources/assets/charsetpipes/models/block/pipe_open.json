@@ -1,0 +1,22 @@
+{
+  "elements": [
+    { "from": [ 4, 12, 4 ],
+      "to": [ 12, 16, 12 ],
+      "faces": {
+        "north": { "texture": "#pipe" },
+        "south": { "texture": "#pipe" },
+        "west":  { "texture": "#pipe" },
+        "east":  { "texture": "#pipe" }
+      }
+    },
+    { "from": [ 12, 16, 12 ],
+      "to": [ 4, 12, 4 ],
+      "faces": {
+        "north": { "texture": "#pipe" },
+        "south": { "texture": "#pipe" },
+        "west":  { "texture": "#pipe" },
+        "east":  { "texture": "#pipe" }
+      }
+    }
+  ]
+}

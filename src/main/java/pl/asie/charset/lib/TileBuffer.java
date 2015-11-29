@@ -1,10 +1,11 @@
 package pl.asie.charset.lib;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileBuffer {
 	private final TileEntity owner;
@@ -21,8 +22,8 @@ public class TileBuffer {
 		return owner;
 	}
 
-	public TileEntity getTileEntity(ForgeDirection side) {
-		if (side.ordinal() != 6) {
+	public TileEntity getTileEntity(EnumFacing side) {
+		if (side != null) {
 			if (tiles[side.ordinal()] != null && tiles[side.ordinal()].isInvalid()) {
 				updateSide(side, true);
 			}
@@ -33,11 +34,9 @@ public class TileBuffer {
 		}
 	}
 
-	private void updateSide(ForgeDirection direction, boolean force) {
+	private void updateSide(EnumFacing direction, boolean force) {
 		int i = direction.ordinal();
-		int x = owner.xCoord + direction.offsetX;
-		int y = owner.yCoord + direction.offsetY;
-		int z = owner.zCoord + direction.offsetZ;
+		BlockPos pos = owner.getPos().offset(direction);
 
 		if (!force) {
 			if (tiles[i] != null && !tiles[i].isInvalid()) {
@@ -45,25 +44,25 @@ public class TileBuffer {
 			}
 		}
 
-
 		tiles[i] = null;
 
 		if (world == null) {
-			world = owner.getWorldObj();
+			world = owner.getWorld();
 		}
 
-		if (!force && !world.blockExists(x, y, z)) {
+		if (!force && !world.isBlockLoaded(pos)) {
 			return;
 		}
 
-		Block block = world.getBlock(x, y, z);
-		if (block.hasTileEntity(world.getBlockMetadata(x, y, z))) {
-			tiles[i] = world.getTileEntity(x, y, z);
+		IBlockState state = world.getBlockState(pos);
+		Block block = state.getBlock();
+		if (block.hasTileEntity(state)) {
+			tiles[i] = world.getTileEntity(pos);
 		}
 	}
 
 	public void update(boolean force) {
-		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+		for (EnumFacing direction : EnumFacing.VALUES) {
 			updateSide(direction, force);
 		}
 	}

@@ -8,9 +8,9 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 
 import net.minecraft.tileentity.TileEntity;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 
+import pl.asie.charset.lib.DirectionUtils;
 import pl.asie.charset.lib.network.PacketTile;
 
 public class PacketItemUpdate extends PacketTile {
@@ -72,8 +72,8 @@ public class PacketItemUpdate extends PacketTile {
 		}
 
 		item.blocksSinceSync = 0;
-		item.input = ForgeDirection.getOrientation(dirs & 7);
-		item.output = ForgeDirection.getOrientation((dirs >> 3) & 7);
+		item.input = DirectionUtils.get(dirs & 7);
+		item.output = DirectionUtils.get((dirs >> 3) & 7);
 		item.reachedCenter = (flags & 0x01) != 0;
 		item.progress = progress;
 
@@ -97,7 +97,7 @@ public class PacketItemUpdate extends PacketTile {
 		super.writeData(buf);
 
 		buf.writeShort(item.id);
-		buf.writeByte(item.input.ordinal() | (item.output.ordinal() << 3));
+		buf.writeByte(DirectionUtils.ordinal(item.input) | (DirectionUtils.ordinal(item.output) << 3));
 		buf.writeByte((item.reachedCenter ? 0x01 : 0) | (item.isStuck() ? 0x02 : 0) | (syncStack ? 0x04 : 0));
 		buf.writeByte(item.progress);
 

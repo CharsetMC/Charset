@@ -1,0 +1,93 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "arrow": "charsetpipes:blocks/shifter_side",
+      "in": "charsetpipes:blocks/shifter_none",
+      "out": "charsetpipes:blocks/shifter_out"
+    },
+    "model": "charsetpipes:shifter",
+    "uvlock": false
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}],
+    "facing": {
+      "down": {"x": 180},
+      "up": {},
+      "north": {"x": 90},
+      "east": {"x": 90, "y": 90},
+      "south": {"x": 90, "y": 180},
+      "west": {"x": 90, "y": 270}
+    },
+    "extract": {
+      "false": {},
+      "true": {
+        "textures": {
+          "in": "charsetpipes:blocks/shifter_in"
+        }
+      }
+    },
+    "strength": {
+      "0": {},
+      "1": {
+        "textures": {
+          "arrow": "charsetpipes:blocks/shifter_side_weak"
+        }
+      },
+      "2": {
+        "textures": {
+          "arrow": "charsetpipes:blocks/shifter_side_on"
+        }
+      }
+    },
+    "down": {
+      "false": {},
+      "true": {
+        "textures": {
+          "down": "charsetpipes:blocks/shifter_in_filtered"
+        }
+      }
+    },
+    "up": {
+      "false": {},
+      "true": {
+        "textures": {
+          "up": "charsetpipes:blocks/shifter_in_filtered"
+        }
+      }
+    },
+    "north": {
+      "false": {},
+      "true": {
+        "textures": {
+          "north": "charsetpipes:blocks/shifter_in_filtered"
+        }
+      }
+    },
+    "south": {
+      "false": {},
+      "true": {
+        "textures": {
+          "south": "charsetpipes:blocks/shifter_in_filtered"
+        }
+      }
+    },
+    "west": {
+      "false": {},
+      "true": {
+        "textures": {
+          "west": "charsetpipes:blocks/shifter_in_filtered"
+        }
+      }
+    },
+    "east": {
+      "false": {},
+      "true": {
+        "textures": {
+          "east": "charsetpipes:blocks/shifter_in_filtered"
+        }
+      }
+    }
+  }
+}

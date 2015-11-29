@@ -1,60 +1,77 @@
 package pl.asie.charset.pipes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import pl.asie.charset.lib.PropertyConstants;
 
 public class BlockPipe extends BlockContainer {
-	private int ImmibisMicroblocks_TransformableBlockMarker;
-
-	// TODO
-	@SideOnly(Side.CLIENT)
-	public static IIcon[] icons;
-
 	public BlockPipe() {
 		super(Material.glass);
+		setUnlocalizedName("pipe");
+		setDefaultState(this.blockState.getBaseState());
 		setHardness(0.3F);
-		setBlockName("charset.pipe");
 	}
 
-	private TilePipe getTilePipe(World world, int x, int y, int z) {
-		TileEntity tileEntity = world.getTileEntity(x, y, z);
+	private TilePipe getTilePipe(IBlockAccess world, BlockPos pos) {
+		TileEntity tileEntity = world.getTileEntity(pos);
 		return tileEntity instanceof TilePipe ? (TilePipe) tileEntity : null;
 	}
 
 	private TilePipe removedPipeTile;
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, Block block, int m) {
-		if (!world.isRemote) {
-			removedPipeTile = getTilePipe(world, x, y, z);
+	public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+		TilePipe tilePipe = getTilePipe(world, pos);
+
+		if (tilePipe != null) {
+			return state
+					.withProperty(PropertyConstants.DOWN, tilePipe.connects(EnumFacing.DOWN))
+					.withProperty(PropertyConstants.UP, tilePipe.connects(EnumFacing.UP))
+					.withProperty(PropertyConstants.NORTH, tilePipe.connects(EnumFacing.NORTH))
+					.withProperty(PropertyConstants.SOUTH, tilePipe.connects(EnumFacing.SOUTH))
+					.withProperty(PropertyConstants.WEST, tilePipe.connects(EnumFacing.WEST))
+					.withProperty(PropertyConstants.EAST, tilePipe.connects(EnumFacing.EAST));
+		} else {
+			return state;
 		}
-		super.breakBlock(world, x, y, z, block, m);
 	}
 
 	@Override
-	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-		if (world.isRemote) {
-			return null;
+	public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		if (!world.isRemote) {
+			removedPipeTile = getTilePipe(world, pos);
 		}
+		super.breakBlock(world, pos, state);
+	}
 
+	@Override
+	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 		ret.add(new ItemStack(this));
 
-		TilePipe tilePipe = getTilePipe(world, x, y, z);
+		TilePipe tilePipe = getTilePipe(world, pos);
 		if (tilePipe == null && removedPipeTile != null) {
 			tilePipe = removedPipeTile;
-			if (tilePipe.xCoord != x || tilePipe.yCoord != y || tilePipe.zCoord != z || tilePipe.getWorldObj() != world) {
+			if (!tilePipe.getPos().equals(pos) || tilePipe.getWorld() != world) {
 				tilePipe = null;
 			}
 
@@ -73,11 +90,23 @@ public class BlockPipe extends BlockContainer {
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		TilePipe tilePipe = getTilePipe(world, x, y, z);
+	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
+		TilePipe tilePipe = getTilePipe(world, pos);
 		if (tilePipe != null) {
 			tilePipe.onNeighborBlockChange();
 		}
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getRenderType() {
+		return 3;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public EnumWorldBlockLayer getBlockLayer() {
+		return EnumWorldBlockLayer.CUTOUT;
 	}
 
 	@Override
@@ -86,32 +115,81 @@ public class BlockPipe extends BlockContainer {
 	}
 
 	@Override
-	public boolean renderAsNormalBlock() {
+	public boolean isFullCube() {
 		return false;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int meta) {
-		return icons[meta & 1];
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister register) {
-		icons = new IIcon[2];
-		icons[0] = register.registerIcon("charsetpipes:pipe");
-		icons[1] = register.registerIcon("charsetpipes:pipe_sided");
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int getRenderType() {
-		return ProxyClient.pipeRender.getRenderId();
 	}
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata) {
 		return new TilePipe();
+	}
+
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return 0;
+	}
+
+	@Override
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] {
+				PropertyConstants.DOWN,
+				PropertyConstants.UP,
+				PropertyConstants.NORTH,
+				PropertyConstants.SOUTH,
+				PropertyConstants.WEST,
+				PropertyConstants.EAST
+		});
+	}
+
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos pos, IBlockState state) {
+		setBlockBoundsBasedOnState(world, pos);
+		return super.getCollisionBoundingBox(world, pos, state);
+	}
+
+	@Override
+	public void setBlockBoundsBasedOnState(IBlockAccess world, BlockPos pos) {
+		setBlockBounds(BoundingBox.getBox(neighbors(world, pos)));
+	}
+
+	/**
+	 * @author Sangar, Vexatos, asie
+	 */
+	private static class BoundingBox {
+		private static final AxisAlignedBB[] bounds = new AxisAlignedBB[0x40];
+
+		static {
+			for (int mask = 0; mask < 0x40; ++mask) {
+				bounds[mask] = AxisAlignedBB.fromBounds(
+						((mask & (1 << 4)) != 0 ? 0 : 0.25),
+						((mask & (1 << 0)) != 0 ? 0 : 0.25),
+						((mask & (1 << 2)) != 0 ? 0 : 0.25),
+						((mask & (1 << 5)) != 0 ? 1 : 0.75),
+						((mask & (1 << 1)) != 0 ? 1 : 0.75),
+						((mask & (1 << 3)) != 0 ? 1 : 0.75)
+				);
+			}
+		}
+
+		private static AxisAlignedBB getBox(int msk) {
+			return bounds[msk];
+		}
+	}
+
+	private int neighbors(IBlockAccess world, BlockPos pos) {
+		int result = 0;
+		TilePipe pipe = getTilePipe(world, pos);
+		if (pipe != null) {
+			for (EnumFacing side : EnumFacing.VALUES) {
+				if (pipe.connects(side)) {
+					result |= 1 << side.ordinal();
+				}
+			}
+		}
+		return result;
+	}
+
+	protected void setBlockBounds(AxisAlignedBB bounds) {
+		setBlockBounds((float) bounds.minX, (float) bounds.minY, (float) bounds.minZ, (float) bounds.maxX, (float) bounds.maxY, (float) bounds.maxZ);
 	}
 }

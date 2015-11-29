@@ -4,19 +4,20 @@ import java.util.Iterator;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.ILockableContainer;
 
-public final class InventoryIterator implements Iterator<InventorySlot> {
+public final class InventorySlotIterator implements Iterator<InventorySlot> {
 	public final IInventory inv;
-	public final ForgeDirection side;
+	public final EnumFacing side;
 	private final int[] sides;
 	private int slot = 0;
 
-	public InventoryIterator(IInventory inv, ForgeDirection side) {
+	public InventorySlotIterator(IInventory inv, EnumFacing side) {
 		this.inv = inv;
 		this.side = side;
 		if (inv instanceof ISidedInventory) {
-			sides = ((ISidedInventory) inv).getAccessibleSlotsFromSide(side.ordinal());
+			sides = ((ISidedInventory) inv).getSlotsForFace(side);
 		} else {
 			sides = null;
 		}
@@ -24,6 +25,10 @@ public final class InventoryIterator implements Iterator<InventorySlot> {
 
 	@Override
 	public boolean hasNext() {
+		if (inv instanceof ILockableContainer && ((ILockableContainer) inv).isLocked()) {
+			return false;
+		}
+
 		return slot < (sides != null ? sides.length : inv.getSizeInventory());
 	}
 

@@ -1,7 +1,7 @@
 package pl.asie.charset.lib;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public interface IConnectable {
-	boolean connects(ForgeDirection side);
+	boolean connects(EnumFacing side);
 }

@@ -1,7 +1,6 @@
 package pl.asie.charset.lib.network;
 
 import java.util.EnumMap;
-import java.util.List;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
@@ -14,11 +13,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
-import cpw.mods.fml.common.network.FMLEmbeddedChannel;
-import cpw.mods.fml.common.network.FMLOutboundHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
+import net.minecraftforge.fml.common.network.FMLOutboundHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class PacketRegistry {
     private EnumMap<Side, FMLEmbeddedChannel> channels;
@@ -46,9 +45,9 @@ public class PacketRegistry {
     }
 
 	public void sendToWatching(Packet message, TileEntity tile) {
-		for (EntityPlayerMP player : (List<EntityPlayerMP>) MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
-			if (player.worldObj.provider.dimensionId == tile.getWorldObj().provider.dimensionId) {
-				if (((WorldServer) player.worldObj).getPlayerManager().isPlayerWatchingChunk(player, tile.xCoord >> 4, tile.zCoord >> 4)) {
+		for (EntityPlayerMP player : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+			if (player.worldObj.provider.getDimensionId() == tile.getWorld().provider.getDimensionId()) {
+				if (((WorldServer) player.worldObj).getPlayerManager().isPlayerWatchingChunk(player, tile.getPos().getX() >> 4, tile.getPos().getZ() >> 4)) {
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
 					channels.get(Side.SERVER).writeOutbound(message);
@@ -86,7 +85,8 @@ public class PacketRegistry {
     
 	public void sendToAllAround(Packet packet, TileEntity entity,
 			double d) {
-		this.sendToAllAround(packet, new TargetPoint(entity.getWorldObj().provider.dimensionId, entity.xCoord, entity.yCoord, entity.zCoord, d));
+		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),
+				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
 	}
 	
 	public void sendToAllAround(Packet packet, Entity entity,

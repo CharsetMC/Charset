@@ -12,17 +12,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.pipes.api.IShifter;
 
-public class TilePipe extends TileBase implements IConnectable {
-	private int ImmibisMicroblocks_TransformableTileEntityMarker;
-
+public class TilePipe extends TileBase implements IConnectable, ITickable {
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
@@ -31,16 +31,12 @@ public class TilePipe extends TileBase implements IConnectable {
 	public TilePipe() {
 	}
 
-	private boolean internalConnects(ForgeDirection side) {
-		if (!ImmibisMicroblocks_isSideOpen(side.ordinal())) {
-			return false;
-		}
-
+	private boolean internalConnects(EnumFacing side) {
 		TileEntity tile = getNeighbourTile(side);
 
 		if (tile instanceof IInventory) {
 			if (tile instanceof ISidedInventory) {
-				int[] slots = ((ISidedInventory) tile).getAccessibleSlotsFromSide(side.getOpposite().ordinal());
+				int[] slots = ((ISidedInventory) tile).getSlotsForFace(side.getOpposite());
 				if (slots == null || slots.length == 0) {
 					return false;
 				}
@@ -61,7 +57,7 @@ public class TilePipe extends TileBase implements IConnectable {
 	}
 
 	@Override
-	public boolean connects(ForgeDirection side) {
+	public boolean connects(EnumFacing side) {
 		if (internalConnects(side)) {
 			TileEntity tile = getNeighbourTile(side);
 			if (tile instanceof TilePipe && !((TilePipe) tile).internalConnects(side.getOpposite())) {
@@ -126,14 +122,16 @@ public class TilePipe extends TileBase implements IConnectable {
 	}
 
 	@Override
-	public void updateEntity() {
+	public void update() {
+		super.update();
+
 		if (neighborBlockChanged) {
 			updateShifters();
 			scheduleRenderUpdate();
 			neighborBlockChanged = false;
 		}
 
-		synchronized (this) {
+		synchronized (itemSet) {
 			Iterator<PipeItem> itemIterator = itemSet.iterator();
 			while (itemIterator.hasNext()) {
 				PipeItem p = itemIterator.next();
@@ -144,32 +142,28 @@ public class TilePipe extends TileBase implements IConnectable {
 		}
 	}
 
-	protected int getShifterStrength(ForgeDirection direction) {
-		return direction == ForgeDirection.UNKNOWN ? 0 : shifterDistance[direction.ordinal()];
+	protected int getShifterStrength(EnumFacing direction) {
+		return direction == null ? 0 : shifterDistance[direction.ordinal()];
 	}
 
-	private void updateShifterSide(ForgeDirection dir) {
+	private void updateShifterSide(EnumFacing dir) {
 		int i = dir.ordinal();
 		int oldDistance = shifterDistance[i];
 
-		if (shifterDistance[i] == 1 && getNearestShifterInternal(ForgeDirection.getOrientation(i)) != null) {
+		if (shifterDistance[i] == 1 && getNearestShifterInternal(dir) != null) {
 			return;
 		}
 
-		int x = xCoord;
-		int y = yCoord;
-		int z = zCoord;
+		BlockPos p = pos;
 		int dist = 0;
 		TileEntity tile;
 
-		while ((tile = worldObj.getTileEntity(x, y, z)) instanceof TilePipe) {
-			x -= dir.offsetX;
-			y -= dir.offsetY;
-			z -= dir.offsetZ;
+		while ((tile = worldObj.getTileEntity(p)) instanceof TilePipe) {
+			p = p.offset(dir.getOpposite());
 			dist++;
 
 			if (!((TilePipe) tile).connects(dir.getOpposite())) {
-				tile = worldObj.getTileEntity(x, y, z);
+				tile = worldObj.getTileEntity(p);
 				break;
 			}
 		}
@@ -189,16 +183,16 @@ public class TilePipe extends TileBase implements IConnectable {
 	}
 
 	private void updateShifters() {
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+		for (EnumFacing dir : EnumFacing.VALUES) {
 			updateShifterSide(dir);
 		}
 	}
 
-	private boolean isMatchingShifter(IShifter p, ForgeDirection dir, int dist) {
+	private boolean isMatchingShifter(IShifter p, EnumFacing dir, int dist) {
 		return p.getDirection() == dir && dist <= p.getShiftDistance();
 	}
 
-	private IShifter getNearestShifterInternal(ForgeDirection dir) {
+	private IShifter getNearestShifterInternal(EnumFacing dir) {
 		TileEntity tile;
 
 		switch (shifterDistance[dir.ordinal()]) {
@@ -208,11 +202,7 @@ public class TilePipe extends TileBase implements IConnectable {
 				tile = getNeighbourTile(dir.getOpposite());
 				break;
 			default:
-				tile = worldObj.getTileEntity(
-						xCoord - dir.offsetX * shifterDistance[dir.ordinal()],
-						yCoord - dir.offsetY * shifterDistance[dir.ordinal()],
-						zCoord - dir.offsetZ * shifterDistance[dir.ordinal()]
-				);
+				tile = worldObj.getTileEntity(pos.offset(dir.getOpposite(), shifterDistance[dir.ordinal()]));
 		}
 
 		if (tile instanceof IShifter && isMatchingShifter((IShifter) tile, dir, Integer.MAX_VALUE)) {
@@ -222,8 +212,8 @@ public class TilePipe extends TileBase implements IConnectable {
 		}
 	}
 
-	protected IShifter getNearestShifter(ForgeDirection dir) {
-		if (dir == ForgeDirection.UNKNOWN) {
+	protected IShifter getNearestShifter(EnumFacing dir) {
+		if (dir == null) {
 			return null;
 		} else if (shifterDistance[dir.ordinal()] == 0) {
 			return null;
@@ -243,7 +233,7 @@ public class TilePipe extends TileBase implements IConnectable {
 			return;
 		}
 
-		synchronized (this) {
+		synchronized (itemSet) {
 			Iterator<PipeItem> itemIterator = itemSet.iterator();
 			while (itemIterator.hasNext()) {
 				PipeItem p = itemIterator.next();
@@ -263,7 +253,7 @@ public class TilePipe extends TileBase implements IConnectable {
 		}
 	}
 
-	protected boolean injectItemInternal(PipeItem item, ForgeDirection dir, boolean simulate) {
+	protected boolean injectItemInternal(PipeItem item, EnumFacing dir, boolean simulate) {
 		if (item.isValid()) {
 			int stuckItems = 0;
 
@@ -291,7 +281,7 @@ public class TilePipe extends TileBase implements IConnectable {
 		}
 	}
 
-	public boolean injectItem(ItemStack stack, ForgeDirection direction, boolean simulate) {
+	public boolean injectItem(ItemStack stack, EnumFacing direction, boolean simulate) {
 		if (worldObj.isRemote || !connects(direction)) {
 			return false;
 		}
@@ -306,21 +296,11 @@ public class TilePipe extends TileBase implements IConnectable {
 	}
 
 	protected void scheduleRenderUpdate() {
-		worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+		worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
 	}
 
 	public void onNeighborBlockChange() {
 		neighborBlockChanged = true;
-	}
-
-	// IMMIBIS' MICROBLOCKS COMPAT
-
-	public boolean ImmibisMicroblocks_isSideOpen(int side) {
-		return true;
-	}
-
-	public void ImmibisMicroblocks_onMicroblocksChanged() {
-
 	}
 
 	public Collection<PipeItem> getPipeItems() {

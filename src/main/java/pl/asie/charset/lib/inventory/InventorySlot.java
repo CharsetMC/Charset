@@ -4,18 +4,18 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 
 public class InventorySlot {
-	public final ForgeDirection side;
+	public final EnumFacing side;
 	public final int slot;
 
 	private final IInventory inventory;
 	private final ISidedInventory sidedInventory;
 
-	public InventorySlot(IInventory inv, ForgeDirection side, int slot) {
+	public InventorySlot(IInventory inv, EnumFacing side, int slot) {
 		if (inv instanceof ISidedInventory) {
 			sidedInventory = (ISidedInventory) inv;
 		} else {
@@ -34,7 +34,7 @@ public class InventorySlot {
 		if (!inventory.isItemValidForSlot(slot, stack)) {
 			return false;
 		}
-		if (sidedInventory != null && !sidedInventory.canInsertItem(slot, stack, side.ordinal())) {
+		if (sidedInventory != null && !sidedInventory.canInsertItem(slot, stack, side)) {
 			return false;
 		}
 		if (!simulate) {
@@ -57,7 +57,7 @@ public class InventorySlot {
 			stack.stackSize += added.stackSize;
 			stack.stackSize = Math.min(stack.stackSize, Math.min(stack.getMaxStackSize(), inventory.getInventoryStackLimit()));
 
-			if (sidedInventory != null && !sidedInventory.canInsertItem(slot, stack, side.ordinal())) {
+			if (sidedInventory != null && !sidedInventory.canInsertItem(slot, stack, side)) {
 				return 0;
 			} else if (!inventory.isItemValidForSlot(slot, stack)) {
 				return 0;
@@ -87,7 +87,7 @@ public class InventorySlot {
 		}
 
 		if (sidedInventory != null) {
-			if (!sidedInventory.canExtractItem(slot, extracted, side.ordinal())) {
+			if (!sidedInventory.canExtractItem(slot, extracted, side)) {
 				return null;
 			}
 		}

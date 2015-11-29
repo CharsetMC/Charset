@@ -12,8 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
+import pl.asie.charset.lib.DirectionUtils;
 import pl.asie.charset.lib.ItemUtils;
 import pl.asie.charset.lib.inventory.InventoryUtils;
 import pl.asie.charset.pipes.api.IShifter;
@@ -29,13 +30,13 @@ public class PipeItem {
 	private TilePipe owner;
 	private boolean stuck;
 
-	protected ForgeDirection input, output = ForgeDirection.UNKNOWN;
+	protected EnumFacing input, output;
 	protected boolean reachedCenter;
 	protected ItemStack stack;
 	protected int progress;
 	protected int blocksSinceSync;
 
-	public PipeItem(TilePipe owner, ItemStack stack, ForgeDirection side) {
+	public PipeItem(TilePipe owner, ItemStack stack, EnumFacing side) {
 		this.id = nextId++;
 		this.owner = owner;
 		this.stack = stack;
@@ -78,23 +79,23 @@ public class PipeItem {
 	}
 
 	public float getX() {
-		return getTranslatedCoord(getDirection().offsetX);
+		return getTranslatedCoord(getDirection().getFrontOffsetX());
 	}
 
 	public float getY() {
-		return getTranslatedCoord(getDirection().offsetY);
+		return getTranslatedCoord(getDirection().getFrontOffsetY());
 	}
 
 	public float getZ() {
-		return getTranslatedCoord(getDirection().offsetZ);
+		return getTranslatedCoord(getDirection().getFrontOffsetZ());
 	}
 
 	public ItemStack getStack() {
 		return stack;
 	}
 
-	public ForgeDirection getDirection() {
-		return reachedCenter ? output : input.getOpposite();
+	public EnumFacing getDirection() {
+		return reachedCenter ? output : (input != null ? input.getOpposite() : null);
 	}
 
 	private boolean isCentered() {
@@ -103,7 +104,7 @@ public class PipeItem {
 
 	// This version takes priority into account (filtered shifters are
 	// prioritized over unfiltered shifters at the same distance).
-	private int getInternalShifterStrength(IShifter shifter, ForgeDirection dir) {
+	private int getInternalShifterStrength(IShifter shifter, EnumFacing dir) {
 		if (shifter == null) {
 			return 0;
 		} else {
@@ -116,7 +117,7 @@ public class PipeItem {
 		int minimumShifterDistance = Integer.MAX_VALUE;
 
 		// First, find the closest shifter affecting the item.
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+		for (EnumFacing dir : EnumFacing.VALUES) {
 			IShifter p = owner.getNearestShifter(dir);
 			int ps = getInternalShifterStrength(p, dir);
 			if (ps > 0 && ps < minimumShifterDistance
@@ -130,26 +131,22 @@ public class PipeItem {
 			if (progress <= CENTER_PROGRESS) {
 				calculateOutputDirection();
 			} else {
-				output = ForgeDirection.UNKNOWN;
+				output = null;
 			}
-		} else if (isCentered() && ( // This tries to detect change in shifter "air stream".
+		} else if (output != null && isCentered() && ( // This tries to detect change in shifter "air stream".
 					(!foundShifter && activeShifterDistance > 0)
 				||	(foundShifter && activeShifterDistance != minimumShifterDistance)
 				||	(foundShifter && activeShifterDistance != getInternalShifterStrength(owner.getNearestShifter(output), output))
 			)) {
 
-			TileEntity shifterTile = owner.getWorldObj().getTileEntity(
-					owner.xCoord - output.offsetX * activeShifterDistance,
-					owner.yCoord - output.offsetY * activeShifterDistance,
-					owner.zCoord - output.offsetZ * activeShifterDistance
-			);
+			TileEntity shifterTile = owner.getWorld().getTileEntity(owner.getPos().offset(output.getOpposite(), activeShifterDistance));
 
 			if (!(shifterTile instanceof IShifter) || !isShifterPushing((IShifter) shifterTile, output)) {
 				calculateOutputDirection();
 			}
 		}
 
-		if (output == ForgeDirection.UNKNOWN) {
+		if (output == null) {
 			// Never stuck when UNKNOWN, because the item will drop anyway.
 			stuck = false;
 		} else {
@@ -175,7 +172,7 @@ public class PipeItem {
 				progress += SPEED;
 			}
 		} else {
-			if (owner.getWorldObj().isRemote) {
+			if (owner.getWorld().isRemote) {
 				if (!stuck) {
 					progress += SPEED;
 				}
@@ -185,7 +182,7 @@ public class PipeItem {
 					return false;
 				}
 			} else {
-				ForgeDirection oldOutput = output;
+				EnumFacing oldOutput = output;
 				boolean oldStuck = stuck;
 
 				updateStuckFlag();
@@ -212,7 +209,7 @@ public class PipeItem {
 		TileEntity tile = owner.getNeighbourTile(output);
 		boolean foundInventory = false;
 
-		if (owner.getWorldObj().isRemote) {
+		if (owner.getWorld().isRemote) {
 			// Last resort security mechanism for stray packets.
 			blocksSinceSync++;
 
@@ -222,7 +219,7 @@ public class PipeItem {
 			return;
 		}
 
-		if (output != ForgeDirection.UNKNOWN) {
+		if (output != null) {
 			if (passToPipe(tile, output, false)) {
 				foundInventory = true;
 			} else {
@@ -237,8 +234,8 @@ public class PipeItem {
 		}
 	}
 
-	private boolean isValidDirection(ForgeDirection dir) {
-		if (dir == ForgeDirection.UNKNOWN || dir == null || !owner.connects(dir)) {
+	private boolean isValidDirection(EnumFacing dir) {
+		if (dir == null || !owner.connects(dir)) {
 			return false;
 		}
 
@@ -253,13 +250,9 @@ public class PipeItem {
 		return false;
 	}
 
-	private boolean canMoveDirection(ForgeDirection dir, boolean isPickingDirection) {
-		if (dir == ForgeDirection.UNKNOWN) {
-			return activeShifterDistance == 0;
-		}
-
+	private boolean canMoveDirection(EnumFacing dir, boolean isPickingDirection) {
 		if (dir == null) {
-			return false;
+			return activeShifterDistance == 0;
 		}
 
 		TileEntity tile = owner.getNeighbourTile(dir);
@@ -286,7 +279,7 @@ public class PipeItem {
 		return false;
 	}
 
-	private boolean isShifterPushing(IShifter p, ForgeDirection direction) {
+	private boolean isShifterPushing(IShifter p, EnumFacing direction) {
 		return p != null
 				&& p.getDirection() == direction
 				&& p.isShifting()
@@ -294,13 +287,13 @@ public class PipeItem {
 	}
 
 	private void calculateOutputDirection() {
-		List<ForgeDirection> directionList = new ArrayList<ForgeDirection>();
-		TObjectIntMap<ForgeDirection> directionStrength = new TObjectIntHashMap<ForgeDirection>();
+		List<EnumFacing> directionList = new ArrayList<EnumFacing>();
+		TObjectIntMap<EnumFacing> directionStrength = new TObjectIntHashMap<EnumFacing>();
 
 		activeShifterDistance = 0;
 
 		// Step 1: Make a list of all valid directions, as well as all shifters.
-		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+		for (EnumFacing direction : EnumFacing.VALUES) {
 			if (isValidDirection(direction)) {
 				directionList.add(direction);
 			}
@@ -316,10 +309,10 @@ public class PipeItem {
 		// A valid shifter is either one which pushes into a valid direction
 		// or one which has a shifter at equal strength pushing in the same
 		// axis (which lets you stop items).
- 		ForgeDirection pressureDir = ForgeDirection.UNKNOWN;
+ 		EnumFacing pressureDir = null;
 		int pressurePower = Integer.MAX_VALUE;
 
-		for (ForgeDirection direction : directionStrength.keySet()) {
+		for (EnumFacing direction : directionStrength.keySet()) {
 			int strength = directionStrength.get(direction);
 			if (strength < pressurePower) {
 				// We shift by one to have no distinction between filtered and unfiltered shifters
@@ -332,14 +325,14 @@ public class PipeItem {
 		}
 
 		// Step 3: Pick the next path.
-		if (pressureDir != ForgeDirection.UNKNOWN) {
+		if (pressureDir != null) {
 			// Step 3a: If there is a valid shifter, that becomes the
 			// "forced" direction.
 			activeShifterDistance = pressurePower;
 			this.output = pressureDir;
 			return;
 		} else {
-			ForgeDirection dir;
+			EnumFacing dir;
 			directionList.remove(input);
 			int i = 0;
 
@@ -354,11 +347,11 @@ public class PipeItem {
 				dir = directionList.get(0);
 				i = 1;
 			} else {
-				this.output = ForgeDirection.UNKNOWN;
+				this.output = null;
 				return;
 			}
 
-			ForgeDirection firstOutput = dir;
+			EnumFacing firstOutput = dir;
 
 			while (!canMoveDirection(dir, true) && i < directionList.size()) {
 				dir = directionList.get(i);
@@ -380,7 +373,7 @@ public class PipeItem {
 		progress = CENTER_PROGRESS;
 		this.reachedCenter = true;
 
-		if (owner.getWorldObj().isRemote) {
+		if (owner.getWorld().isRemote) {
 			return;
 		}
 
@@ -389,7 +382,7 @@ public class PipeItem {
 		ModCharsetPipes.packet.sendToAllAround(new PacketItemUpdate(owner, this, false), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
 	}
 
-	protected void reset(TilePipe owner, ForgeDirection input) {
+	protected void reset(TilePipe owner, EnumFacing input) {
 		this.owner = owner;
 		initializeFromEntrySide(input);
 
@@ -398,7 +391,7 @@ public class PipeItem {
 		calculateOutputDirection();
 	}
 
-	private boolean passToPipe(TileEntity tile, ForgeDirection dir, boolean simulate) {
+	private boolean passToPipe(TileEntity tile, EnumFacing dir, boolean simulate) {
 		if (tile instanceof TilePipe) {
 			if (((TilePipe) tile).injectItemInternal(this, dir.getOpposite(), simulate)) {
 				return true;
@@ -408,7 +401,7 @@ public class PipeItem {
 		return false;
 	}
 
-	private boolean addToInventory(TileEntity tile, ForgeDirection dir, boolean simulate) {
+	private boolean addToInventory(TileEntity tile, EnumFacing dir, boolean simulate) {
 		if (tile instanceof IInventory) {
 			int added = InventoryUtils.addStack((IInventory) tile, dir.getOpposite(), stack, simulate);
 			if (added > 0) {
@@ -423,12 +416,12 @@ public class PipeItem {
 	}
 
 	protected void dropItem(boolean useOutputDirection) {
-		ForgeDirection dir = ForgeDirection.UNKNOWN;
+		EnumFacing dir = null;
 
 		if (useOutputDirection) {
 			// Decide output direction
 			int directions = 0;
-			for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+			for (EnumFacing d : EnumFacing.VALUES) {
 				if (owner.connects(d)) {
 					directions++;
 					dir = d.getOpposite();
@@ -439,22 +432,22 @@ public class PipeItem {
 			}
 
 			if (directions >= 2) {
-				dir = ForgeDirection.UNKNOWN;
+				dir = null;
 			}
 		}
 
-		ItemUtils.spawnItemEntity(owner.getWorldObj(),
-				(double) owner.xCoord + 0.5 + dir.offsetX * 0.75,
-				(double) owner.yCoord + 0.5 + dir.offsetY * 0.75,
-				(double) owner.zCoord + 0.5 + dir.offsetZ * 0.75,
+		ItemUtils.spawnItemEntity(owner.getWorld(),
+				(double) owner.getPos().getX() + 0.5 + (dir != null ? dir.getFrontOffsetX() : 0) * 0.75,
+				(double) owner.getPos().getY() + 0.5 + (dir != null ? dir.getFrontOffsetY() : 0) * 0.75,
+				(double) owner.getPos().getZ() + 0.5 + (dir != null ? dir.getFrontOffsetZ() : 0) * 0.75,
 				stack, 0, 0, 0);
 
 		stack = null;
 	}
 
-	private void initializeFromEntrySide(ForgeDirection side) {
+	private void initializeFromEntrySide(EnumFacing side) {
 		this.input = side;
-		this.output = ForgeDirection.UNKNOWN;
+		this.output = null;
 		this.reachedCenter = false;
 		this.stuck = false;
 		this.progress = 0;
@@ -463,8 +456,8 @@ public class PipeItem {
 	public void readFromNBT(NBTTagCompound nbt) {
 		stack = ItemStack.loadItemStackFromNBT(nbt);
 		progress = nbt.getShort("p");
-		input = ForgeDirection.getOrientation(nbt.getByte("in"));
-		output = ForgeDirection.getOrientation(nbt.getByte("out"));
+		input = DirectionUtils.get(nbt.getByte("in"));
+		output = DirectionUtils.get(nbt.getByte("out"));
 		reachedCenter = nbt.getBoolean("reachedCenter");
 		if (nbt.hasKey("stuck")) {
 			stuck = nbt.getBoolean("stuck");
@@ -477,8 +470,8 @@ public class PipeItem {
 	public void writeToNBT(NBTTagCompound nbt) {
 		stack.writeToNBT(nbt);
 		nbt.setShort("p", (short) progress);
-		nbt.setByte("in", (byte) input.ordinal());
-		nbt.setByte("out", (byte) output.ordinal());
+		nbt.setByte("in", (byte) DirectionUtils.ordinal(input));
+		nbt.setByte("out", (byte) DirectionUtils.ordinal(output));
 		nbt.setBoolean("reachedCenter", reachedCenter);
 		if (stuck) {
 			nbt.setBoolean("stuck", stuck);
@@ -493,7 +486,7 @@ public class PipeItem {
 	}
 
 	public void setStuckFlagClient(boolean stuck) {
-		if (owner.getWorldObj().isRemote) {
+		if (owner.getWorld().isRemote) {
 			this.stuck = stuck;
 		}
 	}

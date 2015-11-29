@@ -4,12 +4,16 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class ProxyCommon {
+	public void registerItemModels() {
+
+	}
+
 	public void registerBlock(Block block, String name) {
 		GameRegistry.registerBlock(block, name);
 		block.setCreativeTab(ModCharsetLib.CREATIVE_TAB);

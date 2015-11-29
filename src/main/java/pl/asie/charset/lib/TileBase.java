@@ -2,7 +2,7 @@ package pl.asie.charset.lib;
 
 import net.minecraft.tileentity.TileEntity;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * Created by asie on 11/7/15.
@@ -14,15 +14,14 @@ public class TileBase extends TileEntity {
 
 	}
 
-	@Override
-	public void updateEntity() {
+	public void update() {
 		if (!initialized) {
 			initialize();
 			initialized = true;
 		}
 	}
 
-	public TileEntity getNeighbourTile(ForgeDirection side) {
-		return worldObj.getTileEntity(xCoord + side.offsetX, yCoord + side.offsetY, zCoord + side.offsetZ);
+	public TileEntity getNeighbourTile(EnumFacing side) {
+		return worldObj.getTileEntity(pos.offset(side));
 	}
 }

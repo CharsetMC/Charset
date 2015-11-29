@@ -2,7 +2,7 @@ package pl.asie.charset.lib.network;
 
 import io.netty.buffer.ByteBuf;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public abstract class Packet implements IMessage {
 	public abstract void readData(ByteBuf buf);

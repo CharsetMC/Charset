@@ -1,0 +1,103 @@
+{
+
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "pipe": "charsetpipes:blocks/pipe",
+      "particle": "charsetpipes:blocks/pipe"
+    },
+    "uvlock": false
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {
+        "model": "charsetpipes:pipe_item"
+      }
+    ],
+    "down": {
+      "false": {
+        "submodel": {
+          "down": {
+            "model": "charsetpipes:pipe_closed",
+            "x": 180
+          }
+        }
+      },
+      "true": {
+        "submodel": {
+          "down": {
+            "model": "charsetpipes:pipe_open",
+            "x": 180
+          }
+        }
+      }
+    },
+    "up": {
+      "false": {
+        "submodel": {
+          "up": {
+            "model": "charsetpipes:pipe_closed"
+          }
+        }
+      },
+      "true": {
+        "submodel": {
+          "up": {
+            "model": "charsetpipes:pipe_open"
+          }
+        }
+      }
+    },
+    "north": {
+      "false": {
+        "submodel": {
+          "north": { "model": "charsetpipes:pipe_closed", "x": 90 }
+        }
+      },
+      "true": {
+        "submodel": {
+          "north": { "model": "charsetpipes:pipe_open", "x": 90 }
+        }
+      }
+    },
+    "south": {
+      "false": {
+        "submodel": {
+          "south": { "model": "charsetpipes:pipe_closed", "x": 90, "y": 180 }
+        }
+      },
+      "true": {
+        "submodel": {
+          "south": { "model": "charsetpipes:pipe_open", "x": 90, "y": 180 }
+        }
+      }
+    },
+    "west": {
+      "false": {
+        "submodel": {
+          "west": { "model": "charsetpipes:pipe_closed", "x": 90, "y": 270 }
+        }
+      },
+      "true": {
+        "submodel": {
+          "west": { "model": "charsetpipes:pipe_open", "x": 90, "y": 270 }
+        }
+      }
+    },
+    "east": {
+      "false": {
+        "submodel": {
+          "east": { "model": "charsetpipes:pipe_closed", "x": 90, "y": 90 }
+        }
+      },
+      "true": {
+        "submodel": {
+          "east": { "model": "charsetpipes:pipe_open", "x": 90, "y": 90 }
+        }
+      }
+    }
+  }
+}

@@ -1,26 +1,25 @@
 package pl.asie.charset.pipes;
 
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.Item;
 
-import pl.asie.charset.lib.render.RendererPipeLikeBlock;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+
 import pl.asie.charset.pipes.client.RendererPipeTile;
-import pl.asie.charset.pipes.client.RendererShifterBlock;
 import pl.asie.charset.pipes.client.RendererShifterTile;
 
 public class ProxyClient extends ProxyCommon {
-	public static RendererPipeLikeBlock pipeRender;
-	public static RendererShifterBlock shifterRender;
+	@Override
+	public void registerItemModels() {
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModCharsetPipes.shifterBlock), 0,
+				new ModelResourceLocation("charsetpipes:shifter", "inventory"));
+		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(ModCharsetPipes.pipeBlock), 0,
+				new ModelResourceLocation("charsetpipes:pipe", "inventory"));
+	}
 
+	@Override
 	public void registerRenderers() {
-		RenderingRegistry.registerBlockHandler(pipeRender = new RendererPipeLikeBlock() {
-			@Override
-			public float getPipeThickness() {
-				return 0.5F;
-			}
-		});
-		RenderingRegistry.registerBlockHandler(shifterRender = new RendererShifterBlock());
-
 		ClientRegistry.bindTileEntitySpecialRenderer(TilePipe.class, new RendererPipeTile());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileShifter.class, new RendererShifterTile());
 	}

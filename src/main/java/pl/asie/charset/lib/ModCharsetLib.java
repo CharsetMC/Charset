@@ -3,14 +3,12 @@ package pl.asie.charset.lib;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
  * Created by asie on 11/12/15.
@@ -24,6 +22,8 @@ public class ModCharsetLib {
 	@SidedProxy(clientSide = "pl.asie.charset.lib.ProxyClient", serverSide = "pl.asie.charset.lib.ProxyCommon")
 	public static ProxyCommon proxy;
 
+	public static IconCharset charsetIconItem;
+
 	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs("charset") {
 		@Override
 		public Item getTabIconItem() {
@@ -31,18 +31,17 @@ public class ModCharsetLib {
 		}
 	};
 
-	protected static final IconCharset charsetIconItem = new IconCharset();
+
+	@Mod.EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		charsetIconItem = new IconCharset();
+		GameRegistry.registerItem(charsetIconItem, "icon");
+
+		proxy.registerItemModels();
+	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
-	}
-
-	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
-	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() == 1) {
-			charsetIconItem.registerIcons(event.map);
-		}
 	}
 }

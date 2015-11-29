@@ -9,26 +9,27 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 
 import pl.asie.charset.lib.ItemUtils;
 import pl.asie.charset.lib.TileBase;
-import pl.asie.charset.lib.inventory.InventoryIterator;
+import pl.asie.charset.lib.inventory.InventorySlotIterator;
 import pl.asie.charset.lib.inventory.InventorySlot;
 import pl.asie.charset.pipes.api.IShifter;
 
-public class TileShifter extends TileBase implements IShifter {
+public class TileShifter extends TileBase implements IShifter, ITickable {
 	private ItemStack[] filters = new ItemStack[6];
 	private int redstoneLevel;
 	private int ticker = ModCharsetPipes.RANDOM.nextInt(256);
 
-	public ForgeDirection getDirection() {
-		return ForgeDirection.getOrientation(getBlockMetadata());
+	public EnumFacing getDirection() {
+		return EnumFacing.getFront(getBlockMetadata());
 	}
 
 	@Override
 	public Mode getMode() {
-		ForgeDirection direction = getDirection();
+		EnumFacing direction = getDirection();
 		TileEntity input = getNeighbourTile(direction.getOpposite());
 
 		return input instanceof IInventory ? Mode.Extract : Mode.Push;
@@ -40,7 +41,7 @@ public class TileShifter extends TileBase implements IShifter {
 
 	public void setFilter(int side, ItemStack stack) {
 		filters[side] = stack;
-		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		worldObj.markBlockForUpdate(pos);
 	}
 
 	public int getRedstoneLevel() {
@@ -92,8 +93,8 @@ public class TileShifter extends TileBase implements IShifter {
 	}
 
 	@Override
-	public void updateEntity() {
-		super.updateEntity();
+	public void update() {
+		super.update();
 
 		if (worldObj.isRemote) {
 			return;
@@ -102,12 +103,12 @@ public class TileShifter extends TileBase implements IShifter {
 		ticker++;
 
 		if (ticker % 16 == 0 && redstoneLevel > 0) {
-			ForgeDirection direction = getDirection();
+			EnumFacing direction = getDirection();
 
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			TileEntity output = getNeighbourTile(direction);
 			if (input instanceof IInventory && output instanceof TilePipe) {
-				InventoryIterator iterator = new InventoryIterator((IInventory) input, direction);
+				InventorySlotIterator iterator = new InventorySlotIterator((IInventory) input, direction);
 				while (iterator.hasNext()) {
 					InventorySlot slot = iterator.next();
 					if (slot != null) {
@@ -136,13 +137,13 @@ public class TileShifter extends TileBase implements IShifter {
 	public Packet getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
 		writeToNBT(tag);
-		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 2, tag);
+		return new S35PacketUpdateTileEntity(pos, 2, tag);
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-		readFromNBT(pkt.func_148857_g());
-		worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
+		readFromNBT(pkt.getNbtCompound());
+		worldObj.markBlockRangeForRenderUpdate(pos, pos);
 	}
 
 	@Override
@@ -175,13 +176,13 @@ public class TileShifter extends TileBase implements IShifter {
 		int oldRedstoneLevel = redstoneLevel;
 
 		redstoneLevel = 0;
-		for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-			redstoneLevel = Math.max(redstoneLevel, worldObj.getIndirectPowerLevelTo(xCoord + d.offsetX, yCoord + d.offsetY, zCoord + d.offsetZ, d.ordinal()));
+		for (EnumFacing d : EnumFacing.VALUES) {
+			redstoneLevel = Math.max(redstoneLevel, worldObj.getRedstonePower(pos, d));
 		}
 
 		if (oldRedstoneLevel != redstoneLevel) {
-			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-			worldObj.notifyBlockChange(xCoord, yCoord, zCoord, getBlockType());
+			worldObj.markBlockForUpdate(pos);
+			worldObj.notifyBlockOfStateChange(pos, getBlockType());
 		}
 	}
 }

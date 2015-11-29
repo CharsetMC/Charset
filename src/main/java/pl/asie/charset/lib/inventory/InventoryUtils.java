@@ -6,7 +6,7 @@ import java.util.List;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public final class InventoryUtils {
 	public static final IStackFilter EMPTY_SLOT = new IStackFilter() {
@@ -27,18 +27,18 @@ public final class InventoryUtils {
 
 	}
 
-	public static boolean connects(IInventory inv, ForgeDirection side) {
+	public static boolean connects(IInventory inv, EnumFacing side) {
 		if (inv instanceof ISidedInventory) {
-			int[] slots = ((ISidedInventory) inv).getAccessibleSlotsFromSide(side.ordinal());
+			int[] slots = ((ISidedInventory) inv).getSlotsForFace(side);
 			return slots != null && slots.length > 0;
 		} else {
 			return true;
 		}
 	}
 
-	public static List<InventorySlot> getSlots(IInventory inv, ForgeDirection side, IStackFilter filter) {
+	public static List<InventorySlot> getSlots(IInventory inv, EnumFacing side, IStackFilter filter) {
 		ArrayList<InventorySlot> slots = new ArrayList<InventorySlot>();
-		InventoryIterator iterator = new InventoryIterator(inv, side);
+		InventorySlotIterator iterator = new InventorySlotIterator(inv, side);
 		while (iterator.hasNext()) {
 			InventorySlot slot = iterator.next();
 			if (filter.matches(slot.get())) {
@@ -48,8 +48,8 @@ public final class InventoryUtils {
 		return slots;
 	}
 
-	public static InventorySlot getSlot(IInventory inv, ForgeDirection side, IStackFilter filter) {
-		InventoryIterator iterator = new InventoryIterator(inv, side);
+	public static InventorySlot getSlot(IInventory inv, EnumFacing side, IStackFilter filter) {
+		InventorySlotIterator iterator = new InventorySlotIterator(inv, side);
 		while (iterator.hasNext()) {
 			InventorySlot slot = iterator.next();
 			if (filter.matches(slot.get())) {
@@ -59,9 +59,9 @@ public final class InventoryUtils {
 		return null;
 	}
 
-	public static int addStack(IInventory inv, ForgeDirection side, ItemStack stack, boolean simulate) {
+	public static int addStack(IInventory inv, EnumFacing side, ItemStack stack, boolean simulate) {
 		ItemStack toAdd = stack.copy();
-		InventoryIterator iterator = new InventoryIterator(inv, side);
+		InventorySlotIterator iterator = new InventorySlotIterator(inv, side);
 		while (iterator.hasNext() && toAdd.stackSize > 0) {
 			InventorySlot slot = iterator.next();
 			toAdd.stackSize -= slot.add(toAdd, simulate);

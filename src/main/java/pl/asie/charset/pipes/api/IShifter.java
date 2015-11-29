@@ -2,7 +2,7 @@ package pl.asie.charset.pipes.api;
 
 import net.minecraft.item.ItemStack;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public interface IShifter {
 	enum Mode {
@@ -11,7 +11,7 @@ public interface IShifter {
 	}
 
 	Mode getMode();
-	ForgeDirection getDirection();
+	EnumFacing getDirection();
 	int getShiftDistance();
 	boolean isShifting();
 	boolean hasFilter();
