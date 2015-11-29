@@ -1,0 +1,40 @@
+package pl.asie.charset.lib.network;
+
+import java.util.List;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageCodec;
+
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+
+@Sharable
+public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, Packet> {
+	private final PacketRegistry registry;
+
+    public PacketChannelHandler(PacketRegistry registry) {
+		this.registry = registry;
+    }
+
+	@Override
+	protected void encode(ChannelHandlerContext ctx, Packet msg,
+			List<Object> out) throws Exception {
+        ByteBuf buffer = Unpooled.buffer();
+		buffer.writeByte(registry.getPacketId(msg.getClass()));
+        msg.toBytes(buffer);
+        FMLProxyPacket proxy = new FMLProxyPacket(buffer, ctx.channel().attr(NetworkRegistry.FML_CHANNEL).get());
+        out.add(proxy);
+	}
+
+	@Override
+	protected void decode(ChannelHandlerContext ctx, FMLProxyPacket msg,
+			List<Object> out) throws Exception {
+        Packet newMsg = registry.instantiatePacket(msg.payload().readUnsignedByte());
+		if (newMsg != null) {
+			newMsg.fromBytes(msg.payload());
+		}
+	}
+}
