@@ -1,5 +1,8 @@
 package pl.asie.charset.lib;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 
@@ -30,10 +33,12 @@ public class ModCharsetLib {
 			return charsetIconItem;
 		}
 	};
-
+	public static Logger logger;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		logger = LogManager.getLogger(MODID);
+
 		charsetIconItem = new IconCharset();
 		GameRegistry.registerItem(charsetIconItem, "icon");
 

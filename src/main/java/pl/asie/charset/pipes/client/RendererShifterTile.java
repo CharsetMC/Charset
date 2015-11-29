@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -84,10 +83,6 @@ public class RendererShifterTile extends TileEntitySpecialRenderer {
 			TextureAtlasSprite textureatlassprite = null;
 
 			GlStateManager.scale(0.5F, 0.5F, 0.5F);
-
-			if (!this.itemRenderer.shouldRenderItemIn3D(entityitem.getEntityItem()) || filters[i].getItem() instanceof ItemSkull) {
-				//GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-			}
 
 			GlStateManager.pushAttrib();
 			RenderHelper.enableStandardItemLighting();

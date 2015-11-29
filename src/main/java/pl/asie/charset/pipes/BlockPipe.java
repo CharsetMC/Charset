@@ -26,7 +26,7 @@ import pl.asie.charset.lib.PropertyConstants;
 public class BlockPipe extends BlockContainer {
 	public BlockPipe() {
 		super(Material.glass);
-		setUnlocalizedName("pipe");
+		setUnlocalizedName("charset.pipe");
 		setDefaultState(this.blockState.getBaseState());
 		setHardness(0.3F);
 	}

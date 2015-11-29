@@ -29,7 +29,7 @@ public class BlockShifter extends BlockContainer {
 
 	public BlockShifter() {
 		super(Material.iron);
-		setUnlocalizedName("shifter");
+		setUnlocalizedName("charset.shifter");
 		setDefaultState(this.blockState.getBaseState().withProperty(PropertyConstants.FACING, EnumFacing.NORTH));
 		setHardness(0.5F);
 	}
