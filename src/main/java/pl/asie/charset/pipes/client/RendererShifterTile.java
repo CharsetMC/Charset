@@ -1,7 +1,5 @@
 package pl.asie.charset.pipes.client;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -12,10 +10,14 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+
+import net.minecraftforge.client.model.IPerspectiveAwareModel;
 
 import pl.asie.charset.pipes.TileShifter;
 
@@ -37,42 +39,47 @@ public class RendererShifterTile extends TileEntitySpecialRenderer {
 
 			EntityItem entityitem = new EntityItem(shifter.getWorld(), tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), filters[i]);
 			EnumFacing itemDir = EnumFacing.getFront(i);
+			boolean isBlock = this.itemRenderer.getItemModelMesher().getItemModel(filters[i]) instanceof IPerspectiveAwareModel.MapWrapper
+					&& filters[i].getItem() instanceof ItemBlock;
 
 			float translationConstant = 0.49375F;
 
 			entityitem.hoverStart = 0.0F;
 			GlStateManager.pushMatrix();
 			GlStateManager.disableLighting();
-			GL11.glTranslatef(translationConstant * itemDir.getFrontOffsetX(), translationConstant * itemDir.getFrontOffsetY(), translationConstant * itemDir.getFrontOffsetZ());
-			GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
-
+			GlStateManager.translate(
+					x + 0.5 + translationConstant * itemDir.getFrontOffsetX(),
+					y + 0.5 + translationConstant * itemDir.getFrontOffsetY(),
+					z + 0.5 + translationConstant * itemDir.getFrontOffsetZ()
+			);
+			
 			switch (itemDir) {
 				case NORTH:
-					GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+					GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
 					break;
 				case SOUTH:
 					break;
 				case WEST:
-					GL11.glRotatef(270.0F, 0.0F, 1.0F, 0.0F);
+					GlStateManager.rotate(270.0F, 0.0F, 1.0F, 0.0F);
 					break;
 				case EAST:
-					GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
+					GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
 					break;
 				case UP:
-					GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
-					GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
+					GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
+					GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
 					break;
 				case DOWN:
-					GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
-					GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
+					GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
+					GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
 					break;
 			}
 
-			if (filters[i].getItem() instanceof ItemBlock) {
-				GL11.glTranslatef(0, 0, -0.0625F);
-				GL11.glScalef(2.0F, 2.0F, 2.0F);
+			if (isBlock) {
+				GlStateManager.translate(0, 0, -0.0625F);
+				GlStateManager.scale(2.0F, 2.0F, 2.0F);
 			} else {
-				GL11.glScalef(1.33F, 1.33F, 1.33F);
+				GlStateManager.scale(1.33F, 1.33F, 1.33F);
 			}
 
 			int l = tileEntity.getWorld().getCombinedLight(tileEntity.getPos().offset(itemDir), 15);
@@ -90,8 +97,7 @@ public class RendererShifterTile extends TileEntitySpecialRenderer {
 			RenderHelper.disableStandardItemLighting();
 			GlStateManager.popAttrib();
 
-			if (textureatlassprite != null && textureatlassprite.getFrameCount() > 0)
-			{
+			if (textureatlassprite != null && textureatlassprite.getFrameCount() > 0) {
 				textureatlassprite.updateAnimation();
 			}
 

@@ -21,7 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.PropertyConstants;
-import pl.asie.charset.pipes.api.IShifter;
+import pl.asie.charset.api.pipes.IShifter;
 
 public class BlockShifter extends BlockContainer {
 	public static final PropertyBool EXTRACT = PropertyBool.create("extract");

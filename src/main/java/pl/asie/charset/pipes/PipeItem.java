@@ -14,10 +14,11 @@ import net.minecraft.tileentity.TileEntity;
 
 import net.minecraft.util.EnumFacing;
 
+import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.lib.DirectionUtils;
 import pl.asie.charset.lib.ItemUtils;
 import pl.asie.charset.lib.inventory.InventoryUtils;
-import pl.asie.charset.pipes.api.IShifter;
+import pl.asie.charset.api.pipes.IShifter;
 
 public class PipeItem {
 	public static final int MAX_PROGRESS = 128;
@@ -79,15 +80,15 @@ public class PipeItem {
 	}
 
 	public float getX() {
-		return getTranslatedCoord(getDirection().getFrontOffsetX());
+		return getDirection() != null ? getTranslatedCoord(getDirection().getFrontOffsetX()) : 0.5F;
 	}
 
 	public float getY() {
-		return getTranslatedCoord(getDirection().getFrontOffsetY());
+		return getDirection() != null ? getTranslatedCoord(getDirection().getFrontOffsetY()) : 0.5F;
 	}
 
 	public float getZ() {
-		return getTranslatedCoord(getDirection().getFrontOffsetZ());
+		return getDirection() != null ? getTranslatedCoord(getDirection().getFrontOffsetZ()) : 0.5F;
 	}
 
 	public ItemStack getStack() {
@@ -222,10 +223,10 @@ public class PipeItem {
 		if (output != null) {
 			if (passToPipe(tile, output, false)) {
 				foundInventory = true;
-			} else {
-				if (addToInventory(tile, output, false)) {
-					foundInventory = true;
-				}
+			} else if (passToInjectable(tile, output, false)) {
+				foundInventory = true;
+			} else if (addToInventory(tile, output, false)) {
+				foundInventory = true;
 			}
 		}
 
@@ -241,8 +242,8 @@ public class PipeItem {
 
 		TileEntity tile = owner.getNeighbourTile(dir);
 
-		if (tile instanceof TilePipe) {
-			return ((TilePipe) tile).connects(dir.getOpposite());
+		if (tile instanceof IItemInjectable) {
+			return ((IItemInjectable) tile).canInjectItems(dir.getOpposite());
 		} else if (tile instanceof IInventory) {
 			return InventoryUtils.connects((IInventory) tile, dir.getOpposite());
 		}
@@ -270,6 +271,10 @@ public class PipeItem {
 			if (passToPipe(tile, dir, true)) {
 				return true;
 			}
+		}
+
+		if (passToInjectable(tile, dir, true)) {
+			return true;
 		}
 
 		if (addToInventory(tile, dir, true)) {
@@ -389,6 +394,20 @@ public class PipeItem {
 		// Do an early calculation to aid the server side.
 		// Won't always be right, might be sometimes right.
 		calculateOutputDirection();
+	}
+
+	private boolean passToInjectable(TileEntity tile, EnumFacing dir, boolean simulate) {
+		if (tile instanceof IItemInjectable && !(tile instanceof TilePipe)) {
+			int added = ((IItemInjectable) tile).injectItem(stack, dir.getOpposite(), simulate);
+			if (added > 0) {
+				if (!simulate) {
+					stack.stackSize -= added;
+				}
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private boolean passToPipe(TileEntity tile, EnumFacing dir, boolean simulate) {

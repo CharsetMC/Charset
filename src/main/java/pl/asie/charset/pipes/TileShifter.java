@@ -16,7 +16,7 @@ import pl.asie.charset.lib.ItemUtils;
 import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.lib.inventory.InventorySlotIterator;
 import pl.asie.charset.lib.inventory.InventorySlot;
-import pl.asie.charset.pipes.api.IShifter;
+import pl.asie.charset.api.pipes.IShifter;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
 	private ItemStack[] filters = new ItemStack[6];
@@ -32,7 +32,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		EnumFacing direction = getDirection();
 		TileEntity input = getNeighbourTile(direction.getOpposite());
 
-		return input instanceof IInventory ? Mode.Extract : Mode.Push;
+		return input instanceof IInventory ? Mode.Extract : Mode.Shift;
 	}
 
 	public ItemStack[] getFilters() {
@@ -116,7 +116,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 						if (source != null && matches(source)) {
 							ItemStack stack = slot.remove(getRedstoneLevel() >= 8 ? source.stackSize : 1, true);
 							if (stack != null) {
-								if (((TilePipe) output).injectItem(stack, direction.getOpposite(), true)) {
+								if (((TilePipe) output).injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
 									stack = slot.remove(getRedstoneLevel() >= 8 ? source.stackSize : 1, false);
 									if (stack != null) {
 										((TilePipe) output).injectItem(stack, direction.getOpposite(), false);

@@ -18,11 +18,12 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
-@Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION)
+@Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
+	dependencies = "required-after:CharsetLib@" + ModCharsetPipes.VERSION)
 public class ModCharsetPipes {
 	public static final String MODID = "CharsetPipes";
 	public static final String NAME = "|";
-	public static final String VERSION = "0.1.0";
+	public static final String VERSION = "@VERSION@";
 	public static final Random RANDOM = new Random();
 
 	public static final double PIPE_TESR_DISTANCE = 64.0D;

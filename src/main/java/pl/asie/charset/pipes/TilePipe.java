@@ -1,7 +1,6 @@
 package pl.asie.charset.pipes;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -18,11 +17,12 @@ import net.minecraft.util.ITickable;
 
 import net.minecraftforge.fluids.IFluidHandler;
 
+import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.TileBase;
-import pl.asie.charset.pipes.api.IShifter;
+import pl.asie.charset.api.pipes.IShifter;
 
-public class TilePipe extends TileBase implements IConnectable, ITickable {
+public class TilePipe extends TileBase implements IConnectable, IItemInjectable, ITickable {
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
@@ -281,17 +281,23 @@ public class TilePipe extends TileBase implements IConnectable, ITickable {
 		}
 	}
 
-	public boolean injectItem(ItemStack stack, EnumFacing direction, boolean simulate) {
+	@Override
+	public boolean canInjectItems(EnumFacing side) {
+		return connects(side);
+	}
+
+	@Override
+	public int injectItem(ItemStack stack, EnumFacing direction, boolean simulate) {
 		if (worldObj.isRemote || !connects(direction)) {
-			return false;
+			return 0;
 		}
 
 		PipeItem item = new PipeItem(this, stack, direction);
 
 		if (injectItemInternal(item, direction, simulate)) {
-			return true;
+			return stack.stackSize;
 		} else {
-			return false;
+			return 0;
 		}
 	}
 
@@ -304,6 +310,6 @@ public class TilePipe extends TileBase implements IConnectable, ITickable {
 	}
 
 	public Collection<PipeItem> getPipeItems() {
-		return Collections.unmodifiableSet(itemSet);
+		return itemSet;
 	}
 }

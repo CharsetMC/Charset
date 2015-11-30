@@ -5,6 +5,7 @@ import java.util.Random;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
@@ -46,12 +47,7 @@ public class RendererPipeTile extends TileEntitySpecialRenderer {
 			}
 		}
 
-		// TODO: HACK
-		synchronized (tilePipe) {
-			/* if (tilePipe.getPipeItems().size() > 1) {
-				System.out.println("Rendering " + tilePipe.getPipeItems().size() + " items");
-			} */
-
+		synchronized (tilePipe.getPipeItems()) {
 			for (PipeItem item : tilePipe.getPipeItems()) {
 				EntityItem itemEntity = new EntityItem(tilePipe.getWorld(), tilePipe.getPos().getX(), tilePipe.getPos().getY(), tilePipe.getPos().getZ(), item.getStack());
 				itemEntity.hoverStart = 0;
@@ -70,6 +66,7 @@ public class RendererPipeTile extends TileEntitySpecialRenderer {
 				}
 
 				PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
+
 				switch (id.ordinal() >> 1) {
 					case 0:
 					case 1:
@@ -80,23 +77,12 @@ public class RendererPipeTile extends TileEntitySpecialRenderer {
 						break;
 				}
 
-				GL11.glPushMatrix();
-				/* if (item.getStack().getItem() instanceof ItemBlock) {
-					GL11.glTranslated(x + ix, y + iy - 0.25, z + iz);
-					if (item.getStack().stackSize > 20) {
-						GL11.glScalef(0.8F, 0.8F, 0.8F);
-					} else if (item.getStack().stackSize > 1) {
-
-					} else {
-						GL11.glScalef(1.33F, 1.33F, 1.33F);
-						GL11.glTranslated(0, -0.0825, 0);
-					}
-				} else { */
-				GL11.glTranslated(x + ix, y + iy - 0.25, z + iz);
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(x + ix, y + iy - 0.25, z + iz);
 
 				RENDER_ITEM.doRender(itemEntity, 0, 0, 0, 0.0f, 0.0f);
 
-				GL11.glPopMatrix();
+				GlStateManager.popMatrix();
 			}
 		}
 	}

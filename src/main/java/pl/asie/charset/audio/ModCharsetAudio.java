@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import pl.asie.charset.audio.util.AudioStreamManager;
 
-@Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION)
+//@Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION)
 public class ModCharsetAudio {
 	public static final String MODID = "CharsetAudio";
 	public static final String NAME = "♫";

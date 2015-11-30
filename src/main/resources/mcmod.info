@@ -1,0 +1,20 @@
+[
+	{
+		"modid": "CharsetLib",
+		"name": "‽",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"description": "Shared library mod",
+		"authorList": [ "asiekierka" ],
+		"url": "http://charset.asie.pl"
+	},
+	{
+		"modid": "CharsetPipes",
+		"name": "|",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"description": "Item transport system",
+		"authorList": [ "asiekierka" ],
+		"url": "http://charset.asie.pl"
+	}
+]
