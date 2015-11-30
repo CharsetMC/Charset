@@ -10,8 +10,6 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -82,7 +80,7 @@ public class RendererShifterTile extends TileEntitySpecialRenderer {
 				GlStateManager.scale(1.33F, 1.33F, 1.33F);
 			}
 
-			int l = tileEntity.getWorld().getCombinedLight(tileEntity.getPos().offset(itemDir), 15);
+			int l = tileEntity.getWorld().getCombinedLight(tileEntity.getPos().offset(itemDir), tileEntity.getWorld().getSkylightSubtracted());
 			int j = l % 65536;
 			int k = l / 65536;
 			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
