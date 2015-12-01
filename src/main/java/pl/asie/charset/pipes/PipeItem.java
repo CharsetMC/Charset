@@ -513,4 +513,8 @@ public class PipeItem {
 	public TilePipe getOwner() {
 		return owner;
 	}
+
+	public float getProgress() {
+		return (float) progress / MAX_PROGRESS;
+	}
 }

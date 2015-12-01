@@ -22,6 +22,6 @@ public class TileBase extends TileEntity {
 	}
 
 	public TileEntity getNeighbourTile(EnumFacing side) {
-		return worldObj.getTileEntity(pos.offset(side));
+		return side != null ? worldObj.getTileEntity(pos.offset(side)) : null;
 	}
 }

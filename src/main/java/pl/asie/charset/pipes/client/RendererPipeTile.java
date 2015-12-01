@@ -2,8 +2,6 @@ package pl.asie.charset.pipes.client;
 
 import java.util.Random;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
@@ -19,6 +17,7 @@ import pl.asie.charset.pipes.TilePipe;
 
 public class RendererPipeTile extends TileEntitySpecialRenderer {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
+	private static final float ITEM_RANDOM_OFFSET = 0.01F;
 
 	private static final RenderEntityItem RENDER_ITEM = new RenderEntityItem(Minecraft.getMinecraft().getRenderManager(), Minecraft.getMinecraft().getRenderItem()) {
 		@Override
@@ -55,7 +54,11 @@ public class RendererPipeTile extends TileEntitySpecialRenderer {
 				EnumFacing id = item.getDirection();
 				double ix, iy, iz;
 
-				if (id == null || item.isStuck() || (!item.hasReachedCenter() && item.getX() == 0.5F && item.getY() == 0.5F && item.getZ() == 0.5F)) {
+				if (id == null) {
+					ix = 0.5;
+					iy = 0.5;
+					iz = 0.5;
+				} else if (item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
 					ix = item.getX();
 					iy = item.getY();
 					iz = item.getZ();
@@ -65,16 +68,18 @@ public class RendererPipeTile extends TileEntitySpecialRenderer {
 					iz = item.getZ() + ((float) id.getFrontOffsetZ() * PipeItem.SPEED / PipeItem.MAX_PROGRESS * partialTicks);
 				}
 
-				PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
+				if (id != null) {
+					PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
 
-				switch (id.ordinal() >> 1) {
-					case 0:
-					case 1:
-						ix += PREDICTIVE_ITEM_RANDOM.nextDouble() * 0.01;
-						break;
-					case 2:
-						iz += PREDICTIVE_ITEM_RANDOM.nextDouble() * 0.01;
-						break;
+					switch (id.ordinal() >> 1) {
+						case 0:
+						case 1:
+							ix += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+							break;
+						case 2:
+							iz += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+							break;
+					}
 				}
 
 				GlStateManager.pushMatrix();
