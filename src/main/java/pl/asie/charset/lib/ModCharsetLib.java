@@ -16,8 +16,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 /**
  * Created by asie on 11/12/15.
  */
-@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = "http://charset.asie.pl/update.json")
+@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetLib {
+	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "CharsetLib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";

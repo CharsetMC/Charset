@@ -19,7 +19,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
-	dependencies = "required-after:CharsetLib@" + ModCharsetPipes.VERSION)
+	dependencies = "required-after:CharsetLib@" + ModCharsetPipes.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetPipes {
 	public static final String MODID = "CharsetPipes";
 	public static final String NAME = "|";

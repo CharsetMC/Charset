@@ -21,7 +21,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.lib.PropertyConstants;
+import pl.asie.charset.lib.refs.Properties;
 
 public class BlockPipe extends BlockContainer {
 	public BlockPipe() {
@@ -44,12 +44,12 @@ public class BlockPipe extends BlockContainer {
 
 		if (tilePipe != null) {
 			return state
-					.withProperty(PropertyConstants.DOWN, tilePipe.connects(EnumFacing.DOWN))
-					.withProperty(PropertyConstants.UP, tilePipe.connects(EnumFacing.UP))
-					.withProperty(PropertyConstants.NORTH, tilePipe.connects(EnumFacing.NORTH))
-					.withProperty(PropertyConstants.SOUTH, tilePipe.connects(EnumFacing.SOUTH))
-					.withProperty(PropertyConstants.WEST, tilePipe.connects(EnumFacing.WEST))
-					.withProperty(PropertyConstants.EAST, tilePipe.connects(EnumFacing.EAST));
+					.withProperty(Properties.DOWN, tilePipe.connects(EnumFacing.DOWN))
+					.withProperty(Properties.UP, tilePipe.connects(EnumFacing.UP))
+					.withProperty(Properties.NORTH, tilePipe.connects(EnumFacing.NORTH))
+					.withProperty(Properties.SOUTH, tilePipe.connects(EnumFacing.SOUTH))
+					.withProperty(Properties.WEST, tilePipe.connects(EnumFacing.WEST))
+					.withProperty(Properties.EAST, tilePipe.connects(EnumFacing.EAST));
 		} else {
 			return state;
 		}
@@ -132,12 +132,12 @@ public class BlockPipe extends BlockContainer {
 	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] {
-				PropertyConstants.DOWN,
-				PropertyConstants.UP,
-				PropertyConstants.NORTH,
-				PropertyConstants.SOUTH,
-				PropertyConstants.WEST,
-				PropertyConstants.EAST
+				Properties.DOWN,
+				Properties.UP,
+				Properties.NORTH,
+				Properties.SOUTH,
+				Properties.WEST,
+				Properties.EAST
 		});
 	}
 

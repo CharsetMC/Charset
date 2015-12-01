@@ -1,9 +1,9 @@
-package pl.asie.charset.lib;
+package pl.asie.charset.lib.refs;
 
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 
-public final class PropertyConstants {
+public final class Properties {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
 	public static final PropertyBool UP = PropertyBool.create("up");
@@ -13,7 +13,7 @@ public final class PropertyConstants {
 	public static final PropertyBool SOUTH = PropertyBool.create("south");
 	public static final PropertyBool WEST = PropertyBool.create("west");
 
-	private PropertyConstants() {
+	private Properties() {
 
 	}
 }

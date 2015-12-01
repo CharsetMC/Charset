@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.lib.PropertyConstants;
+import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.api.pipes.IShifter;
 
 public class BlockShifter extends BlockContainer {
@@ -30,7 +30,7 @@ public class BlockShifter extends BlockContainer {
 	public BlockShifter() {
 		super(Material.iron);
 		setUnlocalizedName("charset.shifter");
-		setDefaultState(this.blockState.getBaseState().withProperty(PropertyConstants.FACING, EnumFacing.NORTH));
+		setDefaultState(this.blockState.getBaseState().withProperty(Properties.FACING, EnumFacing.NORTH));
 		setHardness(0.5F);
 	}
 
@@ -69,12 +69,12 @@ public class BlockShifter extends BlockContainer {
 			return state
 					.withProperty(EXTRACT, shifter.getMode() == IShifter.Mode.Extract)
 					.withProperty(STRENGTH, shifter.getRedstoneLevel() >= 8 ? 2 : (shifter.getRedstoneLevel() > 0 ? 1 : 0))
-					.withProperty(PropertyConstants.DOWN, shifter.getFilters()[shiftedCoordinates[0]] != null)
-					.withProperty(PropertyConstants.UP, shifter.getFilters()[shiftedCoordinates[1]] != null)
-					.withProperty(PropertyConstants.NORTH, shifter.getFilters()[shiftedCoordinates[2]] != null)
-					.withProperty(PropertyConstants.SOUTH, shifter.getFilters()[shiftedCoordinates[3]] != null)
-					.withProperty(PropertyConstants.WEST, shifter.getFilters()[shiftedCoordinates[4]] != null)
-					.withProperty(PropertyConstants.EAST, shifter.getFilters()[shiftedCoordinates[5]] != null);
+					.withProperty(Properties.DOWN, shifter.getFilters()[shiftedCoordinates[0]] != null)
+					.withProperty(Properties.UP, shifter.getFilters()[shiftedCoordinates[1]] != null)
+					.withProperty(Properties.NORTH, shifter.getFilters()[shiftedCoordinates[2]] != null)
+					.withProperty(Properties.SOUTH, shifter.getFilters()[shiftedCoordinates[3]] != null)
+					.withProperty(Properties.WEST, shifter.getFilters()[shiftedCoordinates[4]] != null)
+					.withProperty(Properties.EAST, shifter.getFilters()[shiftedCoordinates[5]] != null);
 		} else {
 			return state;
 		}
@@ -139,31 +139,31 @@ public class BlockShifter extends BlockContainer {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IBlockState getStateForEntityRender(IBlockState state) {
-		return this.getDefaultState().withProperty(PropertyConstants.FACING, EnumFacing.UP);
+		return this.getDefaultState().withProperty(Properties.FACING, EnumFacing.UP);
 	}
 
 	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[]{
 				STRENGTH, EXTRACT,
-				PropertyConstants.FACING,
-				PropertyConstants.DOWN,
-				PropertyConstants.UP,
-				PropertyConstants.NORTH,
-				PropertyConstants.SOUTH,
-				PropertyConstants.WEST,
-				PropertyConstants.EAST
+				Properties.FACING,
+				Properties.DOWN,
+				Properties.UP,
+				Properties.NORTH,
+				Properties.SOUTH,
+				Properties.WEST,
+				Properties.EAST
 		});
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return this.getDefaultState().withProperty(PropertyConstants.FACING, EnumFacing.getFront(meta));
+		return this.getDefaultState().withProperty(Properties.FACING, EnumFacing.getFront(meta));
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(PropertyConstants.FACING).ordinal();
+		return state.getValue(Properties.FACING).ordinal();
 	}
 
 	@Override

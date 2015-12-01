@@ -18,9 +18,9 @@ import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import pl.asie.charset.api.lib.IItemInjectable;
+import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.TileBase;
-import pl.asie.charset.api.pipes.IShifter;
 
 public class TilePipe extends TileBase implements IConnectable, IItemInjectable, ITickable {
 	protected int[] shifterDistance = new int[6];
@@ -75,13 +75,15 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 		super.readFromNBT(nbt);
 
 		NBTTagList list = nbt.getTagList("items", 10);
-		itemSet.clear();
+		synchronized (itemSet) {
+			itemSet.clear();
 
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound compound = list.getCompoundTagAt(i);
-			PipeItem pipeItem = new PipeItem(this, compound);
-			if (pipeItem.isValid()) {
-				itemSet.add(pipeItem);
+			for (int i = 0; i < list.tagCount(); i++) {
+				NBTTagCompound compound = list.getCompoundTagAt(i);
+				PipeItem pipeItem = new PipeItem(this, compound);
+				if (pipeItem.isValid()) {
+					itemSet.add(pipeItem);
+				}
 			}
 		}
 
@@ -97,10 +99,12 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 
 		NBTTagList list = new NBTTagList();
 
-		for (PipeItem i : itemSet) {
-			NBTTagCompound cpd = new NBTTagCompound();
-			i.writeToNBT(cpd);
-			list.appendTag(cpd);
+		synchronized (itemSet) {
+			for (PipeItem i : itemSet) {
+				NBTTagCompound cpd = new NBTTagCompound();
+				i.writeToNBT(cpd);
+				list.appendTag(cpd);
+			}
 		}
 
 		nbt.setTag("items", list);
@@ -111,7 +115,9 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 	public void onChunkUnload() {
 		super.onChunkUnload();
 		if (worldObj.isRemote) {
-			itemSet.clear();
+			synchronized (itemSet) {
+				itemSet.clear();
+			}
 		}
 	}
 
@@ -249,7 +255,9 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 
 	protected void removeItemClientSide(PipeItem item) {
 		if (worldObj.isRemote) {
-			itemSet.remove(item);
+			synchronized (itemSet) {
+				itemSet.remove(item);
+			}
 		}
 	}
 
@@ -257,18 +265,23 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 		if (item.isValid()) {
 			int stuckItems = 0;
 
-			for (PipeItem p : itemSet) {
-				if (p.isStuck()) {
-					stuckItems++;
+			synchronized (itemSet) {
+				for (PipeItem p : itemSet) {
+					if (p.isStuck()) {
+						stuckItems++;
 
-					if (stuckItems >= 1) {
-						return false;
+						if (stuckItems >= 1) {
+							return false;
+						}
 					}
+				}
+
+				if (!simulate) {
+					itemSet.add(item);
 				}
 			}
 
 			if (!simulate) {
-				itemSet.add(item);
 				item.reset(this, dir);
 
 				if (!worldObj.isRemote) {
