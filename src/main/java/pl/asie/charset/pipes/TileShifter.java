@@ -177,7 +177,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 		redstoneLevel = 0;
 		for (EnumFacing d : EnumFacing.VALUES) {
-			redstoneLevel = Math.max(redstoneLevel, worldObj.getRedstonePower(pos, d));
+			redstoneLevel = Math.max(redstoneLevel, worldObj.getRedstonePower(pos.offset(d), d));
 		}
 
 		if (oldRedstoneLevel != redstoneLevel) {

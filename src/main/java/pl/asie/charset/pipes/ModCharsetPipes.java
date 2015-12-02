@@ -54,6 +54,7 @@ public class ModCharsetPipes {
 
 		packet = new PacketRegistry(ModCharsetPipes.MODID);
 		packet.registerPacket(0x01, PacketItemUpdate.class);
+		packet.registerPacket(0x02, PacketPipeSyncRequest.class);
 
 		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(shifterBlock),
 				"cPc",

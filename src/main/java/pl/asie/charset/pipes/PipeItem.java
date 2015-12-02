@@ -170,6 +170,12 @@ public class PipeItem {
 		}
 	}
 
+	protected void sendPacket(boolean syncStack) {
+		if (!owner.getWorld().isRemote) {
+			ModCharsetPipes.packet.sendToAllAround(new PacketItemUpdate(owner, this, syncStack), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+		}
+	}
+
 	public boolean move() {
 		if (!reachedCenter) {
 			boolean atCenter = (progress + SPEED) >= CENTER_PROGRESS;
@@ -205,7 +211,7 @@ public class PipeItem {
 				}
 
 				if (oldStuck != stuck || oldOutput != output) {
-					ModCharsetPipes.packet.sendToAllAround(new PacketItemUpdate(owner, this, false), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+					sendPacket(false);
 				}
 			}
 		}
@@ -215,7 +221,6 @@ public class PipeItem {
 
 	private void onItemEnd() {
 		TileEntity tile = owner.getNeighbourTile(output);
-		boolean foundInventory = false;
 
 		if (owner.getWorld().isRemote) {
 			// Last resort security mechanism for stray packets.
@@ -229,15 +234,18 @@ public class PipeItem {
 
 		if (output != null) {
 			if (passToPipe(tile, output, false)) {
-				foundInventory = true;
-			} else if (passToInjectable(tile, output, false)) {
-				foundInventory = true;
-			} else if (addToInventory(tile, output, false)) {
-				foundInventory = true;
+				// Pipe passing does not take into account stack size
+				// subtraction, as it re-uses the same object instance.
+				// Therefore, we need to quit here.
+				return;
+			} else {
+				if (!passToInjectable(tile, output, false)) {
+					addToInventory(tile, output, false);
+				}
 			}
 		}
 
-		if (!foundInventory && stack != null && stack.stackSize > 0) {
+		if (stack != null && stack.stackSize > 0) {
 			dropItem(true);
 		}
 	}
@@ -397,7 +405,7 @@ public class PipeItem {
 
 		calculateOutputDirection();
 		updateStuckFlag();
-		ModCharsetPipes.packet.sendToAllAround(new PacketItemUpdate(owner, this, false), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+		sendPacket(false);
 	}
 
 	protected void reset(TilePipe owner, EnumFacing input) {

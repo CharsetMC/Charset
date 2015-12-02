@@ -10,9 +10,6 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -29,6 +26,7 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
+	private byte initClient = 6;
 	private boolean neighborBlockChanged;
 
 	public TilePipe() {
@@ -84,18 +82,6 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 		}
 	}
 
-	@Override
-	public Packet getDescriptionPacket() {
-		NBTTagCompound tag = new NBTTagCompound();
-		writeItems(tag);
-		return new S35PacketUpdateTileEntity(pos, 2, tag);
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-		readItems(pkt.getNbtCompound());
-	}
-
 	private void readItems(NBTTagCompound nbt) {
 		NBTTagList list = nbt.getTagList("items", 10);
 		synchronized (itemSet) {
@@ -145,6 +131,10 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 
 	@Override
 	public void initialize() {
+		if (worldObj.isRemote) {
+			ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
+		}
+
 		updateShifters();
 		scheduleRenderUpdate();
 	}
@@ -307,10 +297,7 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 
 			if (!simulate) {
 				item.reset(this, dir);
-
-				if (!worldObj.isRemote) {
-					ModCharsetPipes.packet.sendToAllAround(new PacketItemUpdate(this, item, true), this, ModCharsetPipes.PIPE_TESR_DISTANCE);
-				}
+				item.sendPacket(true);
 			}
 			return true;
 		} else {
@@ -348,5 +335,12 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 
 	public Collection<PipeItem> getPipeItems() {
 		return itemSet;
+	}
+
+	protected void onSyncRequest() {
+		// TODO: HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
+		for (PipeItem p : itemSet) {
+			p.sendPacket(true);
+		}
 	}
 }
