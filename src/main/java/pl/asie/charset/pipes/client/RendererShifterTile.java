@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
@@ -21,7 +20,6 @@ import pl.asie.charset.pipes.TileShifter;
 
 public class RendererShifterTile extends TileEntitySpecialRenderer {
 	private final Minecraft mc = Minecraft.getMinecraft();
-	private final RenderManager renderManager = mc.getRenderManager();
 	private final RenderItem itemRenderer = mc.getRenderItem();
 
 	@Override

@@ -10,6 +10,9 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -73,7 +76,27 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
+		readItems(nbt);
 
+		shifterDistance = nbt.getIntArray("shifterDist");
+		if (shifterDistance == null || shifterDistance.length != 6) {
+			shifterDistance = new int[6];
+		}
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+		NBTTagCompound tag = new NBTTagCompound();
+		writeItems(tag);
+		return new S35PacketUpdateTileEntity(pos, 2, tag);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+		readItems(pkt.getNbtCompound());
+	}
+
+	private void readItems(NBTTagCompound nbt) {
 		NBTTagList list = nbt.getTagList("items", 10);
 		synchronized (itemSet) {
 			itemSet.clear();
@@ -86,17 +109,9 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 				}
 			}
 		}
-
-		shifterDistance = nbt.getIntArray("shifterDist");
-		if (shifterDistance == null || shifterDistance.length != 6) {
-			shifterDistance = new int[6];
-		}
 	}
 
-	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-
+	private void writeItems(NBTTagCompound nbt) {
 		NBTTagList list = new NBTTagList();
 
 		synchronized (itemSet) {
@@ -108,6 +123,13 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 		}
 
 		nbt.setTag("items", list);
+	}
+
+	@Override
+	public void writeToNBT(NBTTagCompound nbt) {
+		super.writeToNBT(nbt);
+		writeItems(nbt);
+
 		nbt.setIntArray("shifterDist", shifterDistance);
 	}
 
@@ -189,8 +211,10 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 	}
 
 	private void updateShifters() {
-		for (EnumFacing dir : EnumFacing.VALUES) {
-			updateShifterSide(dir);
+		if (!worldObj.isRemote) {
+			for (EnumFacing dir : EnumFacing.VALUES) {
+				updateShifterSide(dir);
+			}
 		}
 	}
 
