@@ -82,7 +82,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		for (int i = 0; i < 6; i++) {
 			if (filters[i] != null) {
 				filterCount++;
-				if (ItemUtils.isItemEqual(source, filters[i], true, false)) {
+				if (ItemUtils.equals(source, filters[i], false, filters[i].getHasSubtypes(), false)) {
 					matches = true;
 					break;
 				}

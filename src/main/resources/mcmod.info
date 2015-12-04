@@ -16,5 +16,14 @@
 		"description": "Item transport system",
 		"authorList": [ "asiekierka" ],
 		"url": "http://charset.asie.pl"
+	},
+	{
+		"modid": "CharsetTweaks",
+		"name": "*",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"description": "Miscellanous gameplay tweaks",
+		"authorList": [ "asiekierka" ],
+		"url": "http://charset.asie.pl"
 	}
 ]

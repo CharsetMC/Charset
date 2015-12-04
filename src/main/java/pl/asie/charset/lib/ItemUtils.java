@@ -9,8 +9,8 @@ public final class ItemUtils {
 		
 	}
 
-	public static boolean isItemEqual(ItemStack source, ItemStack target, boolean matchDamage, boolean matchNBT) {
-		if (source == null && target == null) {
+	public static boolean equals(ItemStack source, ItemStack target, boolean matchStackSize, boolean matchDamage, boolean matchNBT) {
+		if (source == target) {
 			return true;
 		} else if (source == null || target == null) {
 			return false;
@@ -19,15 +19,19 @@ public final class ItemUtils {
 				return false;
 			}
 
-			if (matchDamage && source.getHasSubtypes() && source.getItemDamage() != target.getItemDamage()) {
+			if (matchStackSize && source.stackSize != target.stackSize) {
+				return false;
+			}
+
+			if (matchDamage && source.getItemDamage() != target.getItemDamage()) {
 				return false;
 			}
 
 			if (matchNBT) {
-				if (source.getTagCompound() == null && target.getTagCompound() == null) {
-					return true;
-				} else if (source.getTagCompound() == null || target.getTagCompound() == null) {
-					return false;
+				if (source.getTagCompound() == null) {
+					return target.getTagCompound() == null || target.getTagCompound().hasNoTags();
+				} else if (target.getTagCompound() == null) {
+					return source.getTagCompound() == null || source.getTagCompound().hasNoTags();
 				} else if (!source.getTagCompound().equals(target.getTagCompound())) {
 					return false;
 				}

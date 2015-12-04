@@ -1,5 +1,7 @@
 package pl.asie.charset.lib;
 
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +25,9 @@ public class ModCharsetLib {
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
 
+	@Mod.Instance(value = ModCharsetLib.MODID)
+	public static ModCharsetLib instance;
+
 	@SidedProxy(clientSide = "pl.asie.charset.lib.ProxyClient", serverSide = "pl.asie.charset.lib.ProxyCommon")
 	public static ProxyCommon proxy;
 
@@ -36,9 +41,20 @@ public class ModCharsetLib {
 	};
 	public static Logger logger;
 
+	private File configurationDirectory;
+
+	public File getConfigFile(String filename) {
+		return new File(configurationDirectory, filename);
+	}
+
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(MODID);
+
+		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");
+		if (!configurationDirectory.exists()) {
+			configurationDirectory.mkdir();
+		}
 
 		charsetIconItem = new IconCharset();
 		GameRegistry.registerItem(charsetIconItem, "icon");
