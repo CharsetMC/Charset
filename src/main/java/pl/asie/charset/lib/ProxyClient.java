@@ -2,6 +2,7 @@ package pl.asie.charset.lib;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.Item;
 import net.minecraft.world.World;
 
 import net.minecraftforge.client.model.ModelLoader;
@@ -11,9 +12,8 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class ProxyClient extends ProxyCommon {
 	@Override
-	public void registerItemModels() {
-		ModelLoader.setCustomModelResourceLocation(ModCharsetLib.charsetIconItem, 0,
-				new ModelResourceLocation("charsetlib:icon", "inventory"));
+	public void registerItemModel(Item item, int meta, String name) {
+		ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(name, "inventory"));
 	}
 
 	@Override

@@ -36,7 +36,7 @@ import pl.asie.charset.lib.ItemUtils;
  */
 public class TweakAutoReplace extends Tweak {
 	public TweakAutoReplace() {
-		super("server", "autoReplace", "Automatically replaces broken items in the same column.", true);
+		super("tweaks", "autoReplace", "Automatically replaces broken items in the same column.", true);
 	}
 
 	@Override

@@ -45,7 +45,8 @@ public class ModCharsetPipes {
 		ModCharsetLib.proxy.registerBlock(shifterBlock, "shifter");
 		GameRegistry.registerTileEntity(TileShifter.class, "CharsetPipes:shifter");
 
-		proxy.registerItemModels();
+		ModCharsetLib.proxy.registerItemModel(pipeBlock, 0, "charsetpipes:pipe");
+		ModCharsetLib.proxy.registerItemModel(shifterBlock, 0, "charsetpipes:shifter");
     }
 
 	@EventHandler

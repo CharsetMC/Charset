@@ -28,6 +28,7 @@ public class ModCharsetTweaks {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 		tweakSet.add(new TweakAutoReplace());
+		tweakSet.add(new TweakGraphite());
 
 		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
 

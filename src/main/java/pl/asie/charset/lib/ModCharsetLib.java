@@ -59,7 +59,7 @@ public class ModCharsetLib {
 		charsetIconItem = new IconCharset();
 		GameRegistry.registerItem(charsetIconItem, "icon");
 
-		proxy.registerItemModels();
+		proxy.registerItemModel(charsetIconItem, 0, "charsetlib:icon");
 	}
 
 	@Mod.EventHandler
