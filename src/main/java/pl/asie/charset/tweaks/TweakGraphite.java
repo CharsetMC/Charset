@@ -1,6 +1,5 @@
 package pl.asie.charset.tweaks;
 
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,7 +16,7 @@ public class TweakGraphite extends Tweak {
 	private Item graphite;
 
 	public TweakGraphite() {
-		super("additions", "graphite", "Adds a graphite item crafted from charcoal which acts as black dye.", false);
+		super("additions", "graphite", "Adds a graphite item crafted from charcoal which acts as black dye.", true);
 	}
 
 	@Override
@@ -27,7 +26,7 @@ public class TweakGraphite extends Tweak {
 
 	@Override
 	public void preInit() {
-		graphite = new Item().setCreativeTab(CreativeTabs.tabMisc).setUnlocalizedName("charset.graphite");
+		graphite = new Item().setCreativeTab(ModCharsetLib.CREATIVE_TAB).setUnlocalizedName("charset.graphite");
 		GameRegistry.registerItem(graphite, "graphite");
 
 		ModCharsetLib.proxy.registerItemModel(graphite, 0, "charsettweaks:graphite");

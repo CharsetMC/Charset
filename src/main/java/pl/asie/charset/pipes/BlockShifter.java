@@ -3,7 +3,6 @@ package pl.asie.charset.pipes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockState;
@@ -20,8 +19,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.refs.Properties;
 
 public class BlockShifter extends BlockContainer {
 	public static final PropertyBool EXTRACT = PropertyBool.create("extract");
@@ -144,7 +143,7 @@ public class BlockShifter extends BlockContainer {
 
 	@Override
 	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[]{
+		return new BlockState(this,
 				STRENGTH, EXTRACT,
 				Properties.FACING,
 				Properties.DOWN,
@@ -153,7 +152,7 @@ public class BlockShifter extends BlockContainer {
 				Properties.SOUTH,
 				Properties.WEST,
 				Properties.EAST
-		});
+		);
 	}
 
 	@Override

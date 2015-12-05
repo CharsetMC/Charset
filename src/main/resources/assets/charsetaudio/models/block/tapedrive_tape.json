@@ -1,0 +1,10 @@
+{
+  "elements": [
+    { "from": [ 2, 4, 1 ],
+      "to": [ 14, 12, 32 ],
+      "faces": {
+        "north": { "texture": "#tape" }
+      }
+    }
+  ]
+}

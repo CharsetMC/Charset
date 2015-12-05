@@ -171,7 +171,7 @@ public class PipeItem {
 	}
 
 	protected void sendPacket(boolean syncStack) {
-		if (!owner.getWorld().isRemote) {
+		if (owner.getWorld() != null && !owner.getWorld().isRemote) {
 			ModCharsetPipes.packet.sendToAllAround(new PacketItemUpdate(owner, this, syncStack), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
 		}
 	}
@@ -307,7 +307,7 @@ public class PipeItem {
 	}
 
 	private void calculateOutputDirection() {
-		if (owner.getWorld().isRemote) {
+		if (owner.getWorld() == null || owner.getWorld().isRemote) {
 			return;
 		}
 

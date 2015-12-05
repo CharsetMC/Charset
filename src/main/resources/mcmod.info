@@ -9,6 +9,15 @@
 		"url": "http://charset.asie.pl"
 	},
 	{
+		"modid": "CharsetAudio",
+		"name": "♫",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"description": "Audio playback",
+		"authorList": [ "asiekierka" ],
+		"url": "http://charset.asie.pl"
+	},
+	{
 		"modid": "CharsetPipes",
 		"name": "|",
 		"version": "${version}",

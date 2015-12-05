@@ -2,6 +2,7 @@ package pl.asie.charset.lib.refs;
 
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.util.EnumFacing;
 
 public final class Properties {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");

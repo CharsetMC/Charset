@@ -7,12 +7,17 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
+import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
+import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
 
 @Mod(modid = ModCharsetTweaks.MODID, name = ModCharsetTweaks.NAME, version = ModCharsetTweaks.VERSION,
 	dependencies = "required-after:CharsetLib@" + ModCharsetTweaks.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -21,6 +26,11 @@ public class ModCharsetTweaks {
 	public static final String NAME = "*";
 	public static final String VERSION = "@VERSION@";
 
+	public static PacketRegistry packet;
+
+	@SidedProxy(clientSide = "pl.asie.charset.tweaks.ProxyClient", serverSide = "pl.asie.charset.tweaks.ProxyCommon")
+	public static pl.asie.charset.tweaks.ProxyCommon proxy;
+	
 	private Configuration configuration;
 
 	private final Set<Tweak> tweakSet = new HashSet<Tweak>();
@@ -29,6 +39,7 @@ public class ModCharsetTweaks {
     public void preInit(FMLPreInitializationEvent event) {
 		tweakSet.add(new TweakAutoReplace());
 		tweakSet.add(new TweakDoubleDoors());
+		tweakSet.add(new TweakDyeableMinecarts());
 		tweakSet.add(new TweakGraphite());
 
 		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
@@ -45,6 +56,10 @@ public class ModCharsetTweaks {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		packet = new PacketRegistry(ModCharsetTweaks.MODID);
+		packet.registerPacket(0x01, PacketMinecartUpdate.class);
+		packet.registerPacket(0x02, PacketMinecartRequest.class);
+
 		for (Tweak t : tweakSet) {
 			if (t.isEnabled()) {
 				t.init();

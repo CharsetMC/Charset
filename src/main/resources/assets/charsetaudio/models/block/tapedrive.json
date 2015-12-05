@@ -1,0 +1,25 @@
+{
+  "elements": [
+    { "from": [ 14, 10, 3 ],
+      "to": [ 2, 2, 0 ],
+      "faces": {
+        "down": { "texture": "#inside" },
+        "up": { "texture": "#inside" },
+        "north": { "texture": "#inside" },
+        "west":  { "texture": "#inside" },
+        "east":  { "texture": "#inside" }
+      }
+    },
+    { "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "down": { "texture": "#bottom", "cullface": "down" },
+        "up": { "texture": "#top", "cullface": "up" },
+        "north": { "texture": "#front", "cullface": "north" },
+        "south": { "texture": "#back", "cullface": "south" },
+        "west":  { "texture": "#left", "cullface": "west" },
+        "east":  { "texture": "#right", "cullface": "east" }
+      }
+    }
+  ]
+}

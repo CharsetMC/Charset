@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -131,14 +130,14 @@ public class BlockPipe extends BlockContainer {
 
 	@Override
 	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] {
+		return new BlockState(this,
 				Properties.DOWN,
 				Properties.UP,
 				Properties.NORTH,
 				Properties.SOUTH,
 				Properties.WEST,
 				Properties.EAST
-		});
+		);
 	}
 
 	@Override

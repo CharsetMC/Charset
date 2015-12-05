@@ -13,7 +13,11 @@ import net.minecraftforge.fml.relauncher.Side;
 public class ProxyClient extends ProxyCommon {
 	@Override
 	public void registerItemModel(Item item, int meta, String name) {
-		ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(name, "inventory"));
+		if (name.contains("#")) {
+			ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(name.split("#")[0], name.split("#")[1]));
+		} else {
+			ModelLoader.setCustomModelResourceLocation(item, meta, new ModelResourceLocation(name, "inventory"));
+		}
 	}
 
 	@Override
