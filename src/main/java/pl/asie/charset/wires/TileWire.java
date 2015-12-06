@@ -32,6 +32,10 @@ public class TileWire extends TileEntity implements ITickable {
 			return ordinal() >= 6 ? null : EnumFacing.getFront(ordinal());
 		}
 
+		public int meta() {
+			return this == FREESTANDING ? 1 : 0;
+		}
+
 		public static WireSide get(EnumFacing facing) {
 			return facing != null ? VALUES[facing.ordinal()] : FREESTANDING;
 		}
@@ -137,19 +141,14 @@ public class TileWire extends TileEntity implements ITickable {
 		int oldSignal = signalLevel;
 		int[] sl = new int[6];
 
-		System.out.println("BEGIN!");
-
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (providesSignal(facing)) {
 				sl[facing.ordinal()] = WireUtils.getSignalLevel(worldObj, pos.offset(facing), facing);
-				System.out.println("! " + sl[facing.ordinal()]);
 				if (sl[facing.ordinal()] > maxSignal) {
 					maxSignal = sl[facing.ordinal()];
 				}
 			}
 		}
-
-		System.out.println(": " + maxSignal);
 
 		if (maxSignal > signalLevel && maxSignal > 1) {
 			signalLevel = maxSignal - 1;
@@ -166,7 +165,10 @@ public class TileWire extends TileEntity implements ITickable {
 		if (signalLevel == 0) {
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				if (providesSignal(facing)) {
-					propagateNotify(facing);
+					TileEntity tileEntity = getNeighbourTile(facing);
+					if (!(tileEntity instanceof TileWire) || ((TileWire) tileEntity).signalLevel > 0) {
+						propagateNotify(facing);
+					}
 				}
 			}
 		} else {
@@ -216,7 +218,15 @@ public class TileWire extends TileEntity implements ITickable {
 		scheduleRenderUpdate();
 	}
 
-	public void setWire(WireSide side, boolean b) {
+	public boolean setWire(WireSide side, boolean b) {
+		if (!(b ^ hasWire(side))) {
+			return false;
+		}
+
+		if (side != WireSide.FREESTANDING && !WireUtils.canPlaceWire(worldObj, pos.offset(side.facing()), side.facing().getOpposite())) {
+			return false;
+		}
+
 		if (b) {
 			this.wireSet |= (1 << side.ordinal());
 		} else {
@@ -225,6 +235,8 @@ public class TileWire extends TileEntity implements ITickable {
 
 		scheduleConnectionUpdate();
 		scheduleRenderUpdate();
+
+		return true;
 	}
 
 	public void scheduleNeighborUpdate() {
@@ -248,6 +260,10 @@ public class TileWire extends TileEntity implements ITickable {
 		if (!getWorld().isRemote) {
 			scheduledConnectionUpdate = true;
 		}
+	}
+
+	protected boolean hasWires() {
+		return wireSet != 0;
 	}
 
 	public boolean hasWire(WireSide side) {

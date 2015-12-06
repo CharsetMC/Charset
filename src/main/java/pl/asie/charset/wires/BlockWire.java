@@ -1,16 +1,25 @@
 package pl.asie.charset.wires;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -21,18 +30,92 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.RayTraceUtils;
 
 public class BlockWire extends BlockContainer {
 	public BlockWire() {
 		super(Material.circuits);
+		this.setBlockBounds(0, 0, 0, 1.0f, 0.125f, 1.0f);
 		this.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
-		this.setBlockBounds(0.25F, 0.25F, 0.25F, 0.75F, 0.75F, 0.75F);
 		this.setUnlocalizedName("charset.wire");
+	}
+
+	@Override
+	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+		List<ItemStack> drops = new ArrayList<ItemStack>();
+		return drops;
+	}
+
+	@Override
+	public boolean isSideSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
+		return false;
 	}
 
 	private TileWire getWire(IBlockAccess world, BlockPos pos) {
 		TileEntity tileEntity = world.getTileEntity(pos);
 		return tileEntity instanceof TileWire ? (TileWire) tileEntity : null;
+	}
+
+	private List<AxisAlignedBB> getBoxList(World worldIn, BlockPos pos) {
+		TileWire wire = getWire(worldIn, pos);
+		List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
+
+		if (wire != null) {
+			// The freestanding box is reused for the potential bug
+			// when a wire container with no wires remains.
+
+			list.add(wire.hasWire(TileWire.WireSide.DOWN) ? new AxisAlignedBB(0, 0, 0, 1, 0.125, 1) : null);
+			list.add(wire.hasWire(TileWire.WireSide.UP) ? new AxisAlignedBB(0, 0.875, 0, 1, 1, 1) : null);
+			list.add(wire.hasWire(TileWire.WireSide.NORTH) ? new AxisAlignedBB(0, 0, 0, 1, 1, 0.125) : null);
+			list.add(wire.hasWire(TileWire.WireSide.SOUTH) ? new AxisAlignedBB(0, 0, 0.875, 1, 1, 1) : null);
+			list.add(wire.hasWire(TileWire.WireSide.WEST) ? new AxisAlignedBB(0, 0, 0, 0.125, 1, 1) : null);
+			list.add(wire.hasWire(TileWire.WireSide.EAST) ? new AxisAlignedBB(0.875, 0, 0, 1, 1, 1) : null);
+			list.add(wire.hasWire(TileWire.WireSide.FREESTANDING) || !wire.hasWires() ? new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625) : null);
+		}
+
+		return list;
+	}
+
+	@Override
+	public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end) {
+		RayTraceUtils.Result result = RayTraceUtils.getCollision(worldIn, pos, start, end, getBoxList(worldIn, pos));
+		return result.valid() ? result.hit : null;
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos) {
+		RayTraceUtils.Result result = RayTraceUtils.getCollision(worldIn, pos, Minecraft.getMinecraft().thePlayer, getBoxList(worldIn, pos));
+		return result.valid() ? result.box.offset(pos.getX(), pos.getY(), pos.getZ()) : super.getSelectedBoundingBox(worldIn, pos).expand(-0.85F, -0.85F, -0.85F);
+	}
+
+	@Override
+	public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+		TileWire wire = getWire(world, pos);
+
+		if (wire != null && wire.hasWires()) {
+			RayTraceUtils.Result r = RayTraceUtils.getCollision(world, pos, player, getBoxList(world, pos));
+
+			if (r.valid()) {
+				TileWire.WireSide side = TileWire.WireSide.VALUES[r.hit.subHit];
+				wire.setWire(side, false);
+				if (!player.capabilities.isCreativeMode) {
+					spawnAsEntity(world, pos, new ItemStack(Item.getItemFromBlock(this), 1, side.meta()));
+				}
+			}
+
+			if (wire.hasWires()) {
+				return false;
+			}
+		}
+
+		super.removedByPlayer(world, pos, player, willHarvest);
+		return true;
+	}
+
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+		return null;
 	}
 
 	@Override
@@ -87,20 +170,6 @@ public class BlockWire extends BlockContainer {
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (!world.isRemote) {
-			TileWire wire = getWire(world, pos);
-
-			if (wire != null) {
-				TileWire.WireSide sidew = player.getCurrentEquippedItem() != null ? TileWire.WireSide.FREESTANDING : TileWire.WireSide.get(side.getOpposite());
-				wire.setWire(sidew, !wire.hasWire(sidew));
-			}
-		}
-
-		return true;
-	}
-
-	@Override
 	@SideOnly(Side.CLIENT)
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
@@ -112,7 +181,7 @@ public class BlockWire extends BlockContainer {
 			TileWire wire = getWire(world, pos);
 
 			if (wire != null) {
-				return ((IExtendedBlockState) state).withProperty(TileWire.PROPERTY, (TileWire) wire);
+				return ((IExtendedBlockState) state).withProperty(TileWire.PROPERTY, wire);
 			}
 		}
 		return state;

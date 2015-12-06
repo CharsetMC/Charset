@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 public class RendererWire extends RendererWireBase {
@@ -20,6 +21,11 @@ public class RendererWire extends RendererWireBase {
 	@Override
 	public IBakedModel handleBlockState(IBlockState state) {
 		return renderers.get(0).handleBlockState(state);
+	}
+
+	@Override
+	public IBakedModel handleItemState(ItemStack stack) {
+		return renderers.get(0).handleItemState(stack);
 	}
 
 	@Override

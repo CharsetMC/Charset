@@ -141,6 +141,11 @@ public class BlockPipe extends BlockContainer {
 	}
 
 	@Override
+	public boolean isSideSolid(IBlockAccess world, BlockPos pos, EnumFacing side) {
+		return false;
+	}
+
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos pos, IBlockState state) {
 		setBlockBoundsBasedOnState(world, pos);
 		return super.getCollisionBoundingBox(world, pos, state);

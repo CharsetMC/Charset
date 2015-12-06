@@ -1,5 +1,7 @@
 package pl.asie.charset.wires;
 
+import net.minecraft.item.Item;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -29,9 +31,13 @@ public class ModCharsetWires {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 		wire = new BlockWire();
-		GameRegistry.registerBlock(wire, "wire");
+		GameRegistry.registerBlock(wire, ItemWire.class, "wire");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
+
+		for (int i = 0; i < 2 * 18; i++) {
+			ModCharsetLib.proxy.registerItemModel(Item.getItemFromBlock(wire), i, "charsetwires:wire");
+		}
     }
 
 	@EventHandler
