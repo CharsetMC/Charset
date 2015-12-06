@@ -19,8 +19,6 @@ public class ProxyClient extends ProxyCommon {
 
 		for (Render<? extends Entity> e : entityRenderMap.values()) {
 			if (e instanceof RenderMinecart) {
-				ModCharsetLib.logger.info("Patching " + e.getClass().getSimpleName());
-
 				Field f;
 
 				try {
