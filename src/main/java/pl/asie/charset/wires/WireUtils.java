@@ -12,6 +12,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import pl.asie.charset.wires.internal.IRedstoneEmitter;
+
 public final class WireUtils {
 	private static final Set<Block> WIRE_PLACEABLE = new HashSet<Block>();
 
@@ -39,11 +41,11 @@ public final class WireUtils {
 	public static int getSignalLevel(IBlockAccess world, BlockPos pos, EnumFacing side) {
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		if (block instanceof BlockWire) {
-			TileEntity tile = world.getTileEntity(pos);
-			if (tile instanceof TileWire) {
-				return ((TileWire) tile).getSignalLevel();
-			}
+		TileEntity tile = world.getTileEntity(pos);
+		if (tile instanceof TileWire) {
+			return ((TileWire) tile).getSignalLevel();
+		} else if (tile instanceof IRedstoneEmitter) {
+			return ((IRedstoneEmitter) tile).getSignalStrength(side);
 		} else {
 			int power = block.shouldCheckWeakPower(world, pos, side) ? block.getStrongPower(world, pos, state, side) : block.getWeakPower(world, pos, state, side);
 			if (power > 0) {

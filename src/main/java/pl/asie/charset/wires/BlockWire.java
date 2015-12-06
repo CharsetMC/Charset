@@ -11,7 +11,6 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -31,6 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.RayTraceUtils;
+import pl.asie.charset.wires.internal.WireLocation;
 
 public class BlockWire extends BlockContainer {
 	public BlockWire() {
@@ -44,6 +44,16 @@ public class BlockWire extends BlockContainer {
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> drops = new ArrayList<ItemStack>();
 		return drops;
+	}
+
+	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		super.breakBlock(worldIn, pos, state);
+
+		// Notify extended neighbors (corners!)
+		for (EnumFacing facing : EnumFacing.VALUES) {
+			worldIn.notifyNeighborsOfStateExcept(pos.offset(facing), state.getBlock(), facing.getOpposite());
+		}
 	}
 
 	@Override
@@ -62,15 +72,15 @@ public class BlockWire extends BlockContainer {
 
 		if (wire != null) {
 			// The freestanding box is reused for the potential bug
-			// when a wire container with no wires remains.
+			// when a wire container with no internal remains.
 
-			list.add(wire.hasWire(TileWire.WireSide.DOWN) ? new AxisAlignedBB(0, 0, 0, 1, 0.125, 1) : null);
-			list.add(wire.hasWire(TileWire.WireSide.UP) ? new AxisAlignedBB(0, 0.875, 0, 1, 1, 1) : null);
-			list.add(wire.hasWire(TileWire.WireSide.NORTH) ? new AxisAlignedBB(0, 0, 0, 1, 1, 0.125) : null);
-			list.add(wire.hasWire(TileWire.WireSide.SOUTH) ? new AxisAlignedBB(0, 0, 0.875, 1, 1, 1) : null);
-			list.add(wire.hasWire(TileWire.WireSide.WEST) ? new AxisAlignedBB(0, 0, 0, 0.125, 1, 1) : null);
-			list.add(wire.hasWire(TileWire.WireSide.EAST) ? new AxisAlignedBB(0.875, 0, 0, 1, 1, 1) : null);
-			list.add(wire.hasWire(TileWire.WireSide.FREESTANDING) || !wire.hasWires() ? new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625) : null);
+			list.add(wire.hasWire(WireLocation.DOWN) ? new AxisAlignedBB(0, 0, 0, 1, 0.125, 1) : null);
+			list.add(wire.hasWire(WireLocation.UP) ? new AxisAlignedBB(0, 0.875, 0, 1, 1, 1) : null);
+			list.add(wire.hasWire(WireLocation.NORTH) ? new AxisAlignedBB(0, 0, 0, 1, 1, 0.125) : null);
+			list.add(wire.hasWire(WireLocation.SOUTH) ? new AxisAlignedBB(0, 0, 0.875, 1, 1, 1) : null);
+			list.add(wire.hasWire(WireLocation.WEST) ? new AxisAlignedBB(0, 0, 0, 0.125, 1, 1) : null);
+			list.add(wire.hasWire(WireLocation.EAST) ? new AxisAlignedBB(0.875, 0, 0, 1, 1, 1) : null);
+			list.add(wire.hasWire(WireLocation.FREESTANDING) || !wire.hasWires() ? new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625) : null);
 		}
 
 		return list;
@@ -97,11 +107,7 @@ public class BlockWire extends BlockContainer {
 			RayTraceUtils.Result r = RayTraceUtils.getCollision(world, pos, player, getBoxList(world, pos));
 
 			if (r.valid()) {
-				TileWire.WireSide side = TileWire.WireSide.VALUES[r.hit.subHit];
-				wire.setWire(side, false);
-				if (!player.capabilities.isCreativeMode) {
-					spawnAsEntity(world, pos, new ItemStack(Item.getItemFromBlock(this), 1, side.meta()));
-				}
+				wire.dropWire(WireLocation.VALUES[r.hit.subHit], player);
 			}
 
 			if (wire.hasWires()) {

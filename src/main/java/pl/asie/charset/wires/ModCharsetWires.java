@@ -1,6 +1,7 @@
 package pl.asie.charset.wires;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -45,6 +47,12 @@ public class ModCharsetWires {
 		packet = new PacketRegistry(ModCharsetWires.MODID);
 
 		GameRegistry.registerTileEntity(TileWire.class, "CharsetWires:wire");
+
+		// Temporary recipes
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 16, 0),
+				"r r", "rir", "r r", 'r', "dustRedstone", 'i', "ingotIron"));
+		GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 0), new ItemStack(wire, 1, 1));
+		GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 1), new ItemStack(wire, 1, 0));
 	}
 
     @EventHandler

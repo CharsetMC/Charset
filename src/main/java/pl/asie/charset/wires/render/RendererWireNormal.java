@@ -19,6 +19,7 @@ import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.property.IExtendedBlockState;
 
+import pl.asie.charset.wires.internal.WireLocation;
 import pl.asie.charset.wires.ItemWire;
 import pl.asie.charset.wires.TileWire;
 
@@ -60,7 +61,7 @@ public class RendererWireNormal extends RendererWireBase {
 	}
 
 	private boolean wc(TileWire wire, EnumFacing dir) {
-		return wire == null ? (transform == ItemCameraTransforms.TransformType.THIRD_PERSON ? dir.getAxis() == EnumFacing.Axis.Y : false) : wire.connects(TileWire.WireSide.FREESTANDING, dir);
+		return wire == null ? (transform == ItemCameraTransforms.TransformType.THIRD_PERSON ? dir.getAxis() == EnumFacing.Axis.Y : true) : wire.connects(WireLocation.FREESTANDING, dir);
 	}
 
 	public void addWireFreestanding(TileWire wire, boolean lit, List<BakedQuad> quads) {
@@ -124,8 +125,8 @@ public class RendererWireNormal extends RendererWireBase {
 		}
 	}
 
-	public void addWire(TileWire wire, TileWire.WireSide side, boolean lit, List<BakedQuad> quads) {
-		if (side == TileWire.WireSide.FREESTANDING) {
+	public void addWire(TileWire wire, WireLocation side, boolean lit, List<BakedQuad> quads) {
+		if (side == WireLocation.FREESTANDING) {
 			addWireFreestanding(wire, lit, quads);
 			return;
 		}
@@ -136,10 +137,17 @@ public class RendererWireNormal extends RendererWireBase {
 		float maxH = width;
 		
 		boolean[] connectionMatrix = new boolean[] {
-				wire == null ? true : wire.connects(side, CONNECTION_DIRS[side.ordinal()][0]),
-				wire == null ? true : wire.connects(side, CONNECTION_DIRS[side.ordinal()][1]),
-				wire == null ? true : wire.connects(side, CONNECTION_DIRS[side.ordinal()][2]),
-				wire == null ? true : wire.connects(side, CONNECTION_DIRS[side.ordinal()][3])
+				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][0]),
+				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][1]),
+				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][2]),
+				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][3])
+		};
+
+		boolean[] cornerConnectionMatrix = new boolean[] {
+				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][0]),
+				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][1]),
+				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][2]),
+				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][3])
 		};
 
 		ModelRotation rot = ROTATIONS[side.ordinal()];
@@ -182,10 +190,10 @@ public class RendererWireNormal extends RendererWireBase {
 		);
 
 		// Side faces
-		Vector3f fromZ = new Vector3f(connectionMatrix[2] ? 0.0f : min, 0.0f, min);
-		Vector3f toZ = new Vector3f(connectionMatrix[3] ? 16.0f : max, 2.0f, min);
-		Vector3f fromX = new Vector3f(min, 0.0f, connectionMatrix[0] ? 0.0f : min);
-		Vector3f toX = new Vector3f(min, 2.0f, connectionMatrix[1] ? 16.0f : max);
+		Vector3f fromZ = new Vector3f(from.getX(), 0.0f, min);
+		Vector3f toZ = new Vector3f(to.getX(), 2.0f, min);
+		Vector3f fromX = new Vector3f(min, 0.0f, from.getZ());
+		Vector3f toX = new Vector3f(min, 2.0f, to.getZ());
 
 		quads.add(
 			faceBakery.makeBakedQuad(
@@ -278,7 +286,7 @@ public class RendererWireNormal extends RendererWireBase {
 		}
 
 		if (wire != null) {
-			for (TileWire.WireSide side : TileWire.WireSide.VALUES) {
+			for (WireLocation side : WireLocation.VALUES) {
 				if (wire.hasWire(side)) {
 					addWire(wire, side, wire.getSignalLevel() > 0, quads);
 				}
@@ -287,7 +295,7 @@ public class RendererWireNormal extends RendererWireBase {
 			if (ItemWire.isFreestanding(stack)) {
 				addWireFreestanding(null, false, quads);
 			} else {
-				addWire(null, TileWire.WireSide.DOWN, false, quads);
+				addWire(null, WireLocation.DOWN, false, quads);
 			}
 		}
 
