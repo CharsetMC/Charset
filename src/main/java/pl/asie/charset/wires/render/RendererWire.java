@@ -15,7 +15,10 @@ public class RendererWire extends RendererWireBase {
 	private final List<RendererWireBase> renderers = new ArrayList<RendererWireBase>();
 
 	public RendererWire() {
-		renderers.add(new RendererWireNormal("wire", 2));
+		renderers.add(new RendererWireNormal("wire", 2, 2));
+		//renderers.add(new RendererWireInsulated("insulated_wire", 4, 3));
+		//renderers.add(new RendererWireNormal("insulated_wire", 4, 3));
+		//renderers.add(new RendererWireNormal("bundled_wire", 6, 4));
 	}
 
 	@Override

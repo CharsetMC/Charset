@@ -61,6 +61,10 @@ public class TileWire extends TileEntity implements ITickable, IRedstoneWire {
 	private long cornerConnectionCache = 0;
 	private long anyConnectionCache = 0;
 
+	public int getRenderColor() {
+		return -1;
+	}
+
 	@Override
 	public void validate() {
 		super.validate();
