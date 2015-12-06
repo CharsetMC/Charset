@@ -77,6 +77,6 @@ public abstract class RendererWireBase implements ISmartBlockModel, ISmartItemMo
  	public Pair<IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
 		this.transform = cameraTransformType;
 		return new ImmutablePair<IBakedModel, Matrix4f>(this,
-				transformMap.containsKey(cameraTransformType) ? TRSRTransformation.identity().getMatrix() : transformMap.get(cameraTransformType).getMatrix());
+				transformMap.containsKey(cameraTransformType) ? transformMap.get(cameraTransformType).getMatrix() : TRSRTransformation.identity().getMatrix());
 	}
 }
