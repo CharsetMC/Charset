@@ -1,6 +1,7 @@
 package pl.asie.charset.wires;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -66,8 +67,8 @@ public class TileWire extends TileEntity implements ITickable {
 		return side != null ? worldObj.getTileEntity(pos.offset(side)) : null;
 	}
 
-	private boolean scheduledRenderUpdate, scheduledConnectionUpdate, scheduledNeighborUpdate;
-	private int wireSet = 0;
+	private boolean scheduledRenderUpdate, scheduledConnectionUpdate, scheduledNeighborUpdate, scheduledPropagationUpdate;
+	private int wireSet = 0, signalCache = 0, signalLevel = 0;
 	private long connectionCache = 0;
 
 	@Override
@@ -84,8 +85,13 @@ public class TileWire extends TileEntity implements ITickable {
 		}
 
 		if (scheduledNeighborUpdate) {
-			getWorld().notifyNeighborsRespectDebug(getPos(), getBlockType());
+			worldObj.notifyNeighborsRespectDebug(pos, getBlockType());
 			scheduledNeighborUpdate = false;
+		}
+
+		if (scheduledPropagationUpdate) {
+			propagate();
+			scheduledPropagationUpdate = false;
 		}
 
 		if (scheduledRenderUpdate) {
@@ -95,6 +101,89 @@ public class TileWire extends TileEntity implements ITickable {
 				getWorld().markBlockRangeForRenderUpdate(pos, pos);
 			}
 			scheduledRenderUpdate = false;
+		}
+	}
+
+	public boolean canProvideStrongPower(EnumFacing direction) {
+		return hasWire(WireSide.get(direction));
+	}
+
+	public boolean canProvideWeakPower(EnumFacing direction) {
+		if (!providesSignal(direction)) {
+			return false;
+		}
+
+		if (hasWire(WireSide.FREESTANDING)) {
+			return true;
+		}
+
+		if (hasWire(WireSide.get(direction.getOpposite()))) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public int getRedstoneLevel() {
+		return signalLevel > 0 ? 15 : 0;
+	}
+
+	public int getSignalLevel() {
+		return signalLevel;
+	}
+
+	protected void propagate() {
+		int maxSignal = 0;
+		int oldSignal = signalLevel;
+		int[] sl = new int[6];
+
+		System.out.println("BEGIN!");
+
+		for (EnumFacing facing : EnumFacing.VALUES) {
+			if (providesSignal(facing)) {
+				sl[facing.ordinal()] = WireUtils.getSignalLevel(worldObj, pos.offset(facing), facing);
+				System.out.println("! " + sl[facing.ordinal()]);
+				if (sl[facing.ordinal()] > maxSignal) {
+					maxSignal = sl[facing.ordinal()];
+				}
+			}
+		}
+
+		System.out.println(": " + maxSignal);
+
+		if (maxSignal > signalLevel && maxSignal > 1) {
+			signalLevel = maxSignal - 1;
+		} else {
+			signalLevel = 0;
+		}
+
+		if (signalLevel == oldSignal) {
+			return;
+		}
+
+		scheduleRenderUpdate();
+
+		if (signalLevel == 0) {
+			for (EnumFacing facing : EnumFacing.VALUES) {
+				if (providesSignal(facing)) {
+					propagateNotify(facing);
+				}
+			}
+		} else {
+			for (EnumFacing facing : EnumFacing.VALUES) {
+				if (providesSignal(facing) && sl[facing.ordinal()] < signalLevel - 1) {
+					propagateNotify(facing);
+				}
+			}
+		}
+	}
+
+	private void propagateNotify(EnumFacing facing) {
+		TileEntity nt = getNeighbourTile(facing);
+		if (nt instanceof TileWire) {
+			((TileWire) nt).propagate();
+		} else {
+			worldObj.notifyBlockOfStateChange(pos.offset(facing), getBlockType());
 		}
 	}
 
@@ -113,6 +202,7 @@ public class TileWire extends TileEntity implements ITickable {
 	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
+		tag.setShort("s", (short) signalLevel);
 		tag.setByte("w", (byte) wireSet);
 		tag.setLong("c", connectionCache);
 		return new S35PacketUpdateTileEntity(getPos(), getBlockMetadata(), tag);
@@ -122,6 +212,7 @@ public class TileWire extends TileEntity implements ITickable {
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 		wireSet = pkt.getNbtCompound().getByte("w");
 		connectionCache = pkt.getNbtCompound().getLong("c");
+		signalLevel = pkt.getNbtCompound().getShort("s");
 		scheduleRenderUpdate();
 	}
 
@@ -132,21 +223,21 @@ public class TileWire extends TileEntity implements ITickable {
 			this.wireSet &= ~(1 << side.ordinal());
 		}
 
-		scheduleGlobalUpdate();
-	}
-
-	public void scheduleGlobalUpdate() {
+		scheduleConnectionUpdate();
 		scheduleRenderUpdate();
-		scheduleNeighborUpdate();
-		scheduleConnectionUpdate();
-	}
-
-	public void onNeighborBlockChange() {
-		scheduleConnectionUpdate();
 	}
 
 	public void scheduleNeighborUpdate() {
 		scheduledNeighborUpdate = true;
+	}
+
+	public void onNeighborBlockChange() {
+		scheduleConnectionUpdate();
+		schedulePropagationUpdate();
+	}
+
+	public void schedulePropagationUpdate() {
+		scheduledPropagationUpdate = true;
 	}
 
 	public void scheduleRenderUpdate() {
@@ -192,6 +283,10 @@ public class TileWire extends TileEntity implements ITickable {
 				return true;
 			}
 		} else {
+			if (connectingBlock instanceof BlockRedstoneDiode && side != WireSide.DOWN) {
+				return false;
+			}
+
 			if (side == WireSide.FREESTANDING && !connectingBlock.isSideSolid(worldObj, connectingPos, direction.getOpposite())) {
 				return false;
 			}
@@ -204,22 +299,30 @@ public class TileWire extends TileEntity implements ITickable {
 		return false;
 	}
 
+	public boolean providesSignal(EnumFacing side) {
+		return (signalCache & (1 << side.ordinal())) != 0;
+ 	}
+
 	private void updateConnections() {
 		long oldConnectionCache = connectionCache;
 		connectionCache = 0;
+		signalCache = 0;
 
 		for (WireSide side : WireSide.VALUES) {
 			if (hasWire(side)) {
 				for (EnumFacing facing : EnumFacing.VALUES) {
 					if (connectsInternal(side, facing)) {
 						connectionCache |= (long) 1 << getConnectionIndex(side, facing);
+						signalCache |= 1 << facing.ordinal();
 					}
 				}
 			}
 		}
 
 		if (oldConnectionCache != connectionCache) {
-			scheduledRenderUpdate = true;
+			scheduleNeighborUpdate();
+			schedulePropagationUpdate();
+			scheduleRenderUpdate();
 		}
 	}
 

@@ -30,6 +30,11 @@ public class BlockWire extends BlockContainer {
 		this.setUnlocalizedName("charset.wire");
 	}
 
+	private TileWire getWire(IBlockAccess world, BlockPos pos) {
+		TileEntity tileEntity = world.getTileEntity(pos);
+		return tileEntity instanceof TileWire ? (TileWire) tileEntity : null;
+	}
+
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new TileWire();
@@ -51,21 +56,42 @@ public class BlockWire extends BlockContainer {
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
-		TileEntity tileEntity = world.getTileEntity(pos);
+	public int getStrongPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
+		TileWire wire = getWire(world, pos);
 
-		if (tileEntity instanceof TileWire) {
-			((TileWire) tileEntity).onNeighborBlockChange();
+		if (wire != null) {
+			return wire.canProvideStrongPower(side.getOpposite()) ? wire.getRedstoneLevel() : 0;
+		}
+
+		return 0;
+	}
+
+	@Override
+	public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
+		TileWire wire = getWire(world, pos);
+
+		if (wire != null) {
+			return wire.canProvideWeakPower(side.getOpposite()) ? wire.getRedstoneLevel() : 0;
+		}
+
+		return 0;
+	}
+
+	@Override
+	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
+		TileWire wire = getWire(world, pos);
+
+		if (wire != null) {
+			wire.onNeighborBlockChange();
 		}
 	}
 
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
-		TileEntity tileEntity = world.getTileEntity(pos);
+		if (!world.isRemote) {
+			TileWire wire = getWire(world, pos);
 
-		if (tileEntity instanceof TileWire) {
-			TileWire wire = (TileWire) tileEntity;
-			if (!world.isRemote) {
+			if (wire != null) {
 				TileWire.WireSide sidew = player.getCurrentEquippedItem() != null ? TileWire.WireSide.FREESTANDING : TileWire.WireSide.get(side.getOpposite());
 				wire.setWire(sidew, !wire.hasWire(sidew));
 			}
@@ -83,10 +109,10 @@ public class BlockWire extends BlockContainer {
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (state instanceof IExtendedBlockState) {
-			TileEntity tileEntity = world.getTileEntity(pos);
+			TileWire wire = getWire(world, pos);
 
-			if (tileEntity instanceof TileWire) {
-				return ((IExtendedBlockState) state).withProperty(TileWire.PROPERTY, (TileWire) tileEntity);
+			if (wire != null) {
+				return ((IExtendedBlockState) state).withProperty(TileWire.PROPERTY, (TileWire) wire);
 			}
 		}
 		return state;
@@ -95,5 +121,21 @@ public class BlockWire extends BlockContainer {
 	@Override
 	protected BlockState createBlockState() {
 		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[]{TileWire.PROPERTY});
+	}
+
+	@Override
+	public boolean canProvidePower() {
+		return true;
+	}
+
+	@Override
+	public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
+		TileWire wire = getWire(world, pos);
+
+		if (wire != null) {
+			return wire.providesSignal(side);
+		}
+
+		return false;
 	}
 }

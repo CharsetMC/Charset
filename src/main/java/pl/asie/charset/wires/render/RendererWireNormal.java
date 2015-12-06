@@ -278,7 +278,7 @@ public class RendererWireNormal extends RendererWireBase {
 		if (wire != null) {
 			for (TileWire.WireSide side : TileWire.WireSide.VALUES) {
 				if (wire.hasWire(side)) {
-					addWire(wire, side, false, quads);
+					addWire(wire, side, wire.getSignalLevel() > 0, quads);
 				}
 			}
 		}
