@@ -41,6 +41,17 @@ public class BlockWire extends BlockContainer {
 	}
 
 	@Override
+	public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player) {
+		TileWireContainer wire = getWire(world, pos);
+
+		if (wire != null) {
+			return new ItemStack(this, 1, wire.getItemMetadata(WireLocation.VALUES[target.subHit]));
+		}
+
+		return new ItemStack(this);
+	}
+
+	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> drops = new ArrayList<ItemStack>();
 		return drops;
@@ -61,26 +72,47 @@ public class BlockWire extends BlockContainer {
 		return false;
 	}
 
-	private TileWire getWire(IBlockAccess world, BlockPos pos) {
+	private TileWireContainer getWire(IBlockAccess world, BlockPos pos) {
 		TileEntity tileEntity = world.getTileEntity(pos);
-		return tileEntity instanceof TileWire ? (TileWire) tileEntity : null;
+		return tileEntity instanceof TileWireContainer ? (TileWireContainer) tileEntity : null;
 	}
 
 	private List<AxisAlignedBB> getBoxList(World worldIn, BlockPos pos) {
-		TileWire wire = getWire(worldIn, pos);
+		TileWireContainer wire = getWire(worldIn, pos);
 		List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
 
+		boolean noWires;
+
 		if (wire != null) {
+			noWires = !wire.hasWires();
 			// The freestanding box is reused for the potential bug
 			// when a wire container with no internal remains.
 
-			list.add(wire.hasWire(WireLocation.DOWN) ? new AxisAlignedBB(0, 0, 0, 1, 0.125, 1) : null);
-			list.add(wire.hasWire(WireLocation.UP) ? new AxisAlignedBB(0, 0.875, 0, 1, 1, 1) : null);
-			list.add(wire.hasWire(WireLocation.NORTH) ? new AxisAlignedBB(0, 0, 0, 1, 1, 0.125) : null);
-			list.add(wire.hasWire(WireLocation.SOUTH) ? new AxisAlignedBB(0, 0, 0.875, 1, 1, 1) : null);
-			list.add(wire.hasWire(WireLocation.WEST) ? new AxisAlignedBB(0, 0, 0, 0.125, 1, 1) : null);
-			list.add(wire.hasWire(WireLocation.EAST) ? new AxisAlignedBB(0.875, 0, 0, 1, 1, 1) : null);
-			list.add(wire.hasWire(WireLocation.FREESTANDING) || !wire.hasWires() ? new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625) : null);
+			list.add(wire.hasWire(WireLocation.DOWN) ? new AxisAlignedBB(0, 0, 0, 1, WireUtils.getWireHitboxHeight(wire, WireLocation.DOWN), 1) : null);
+			list.add(wire.hasWire(WireLocation.UP) ? new AxisAlignedBB(0, 1 - WireUtils.getWireHitboxHeight(wire, WireLocation.UP), 0, 1, 1, 1) : null);
+			list.add(wire.hasWire(WireLocation.NORTH) ? new AxisAlignedBB(0, 0, 0, 1, 1, WireUtils.getWireHitboxHeight(wire, WireLocation.NORTH)) : null);
+			list.add(wire.hasWire(WireLocation.SOUTH) ? new AxisAlignedBB(0, 0, 1 - WireUtils.getWireHitboxHeight(wire, WireLocation.SOUTH), 1, 1, 1) : null);
+			list.add(wire.hasWire(WireLocation.WEST) ? new AxisAlignedBB(0, 0, 0, WireUtils.getWireHitboxHeight(wire, WireLocation.WEST), 1, 1) : null);
+			list.add(wire.hasWire(WireLocation.EAST) ? new AxisAlignedBB(1 - WireUtils.getWireHitboxHeight(wire, WireLocation.EAST), 0, 0, 1, 1, 1) : null);
+			if (wire.hasWire(WireLocation.FREESTANDING)) {
+				switch (wire.getWireType(WireLocation.FREESTANDING).type()) {
+					case NORMAL:
+					case INSULATED:
+						list.add(new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625));
+						break;
+					case BUNDLED:
+						list.add(new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
+						break;
+				}
+			} else {
+				list.add(null);
+			}
+		} else {
+			noWires = true;
+		}
+
+		if (noWires) {
+			list.add(new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625));
 		}
 
 		return list;
@@ -101,7 +133,7 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-		TileWire wire = getWire(world, pos);
+		TileWireContainer wire = getWire(world, pos);
 
 		if (wire != null && wire.hasWires()) {
 			RayTraceUtils.Result r = RayTraceUtils.getCollision(world, pos, player, getBoxList(world, pos));
@@ -126,7 +158,7 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileWire();
+		return new TileWireContainer();
 	}
 
 	@Override
@@ -146,10 +178,10 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	public int getStrongPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
-		TileWire wire = getWire(world, pos);
+		TileWireContainer wire = getWire(world, pos);
 
 		if (wire != null) {
-			return wire.canProvideStrongPower(side.getOpposite()) ? wire.getRedstoneLevel() : 0;
+			return wire.canProvideStrongPower(side.getOpposite()) ? wire.getRedstoneLevel(side.getOpposite()) : 0;
 		}
 
 		return 0;
@@ -157,10 +189,10 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
-		TileWire wire = getWire(world, pos);
+		TileWireContainer wire = getWire(world, pos);
 
 		if (wire != null) {
-			return wire.canProvideWeakPower(side.getOpposite()) ? wire.getRedstoneLevel() : 0;
+			return wire.canProvideWeakPower(side.getOpposite()) ? wire.getRedstoneLevel(side.getOpposite()) : 0;
 		}
 
 		return 0;
@@ -168,7 +200,7 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
-		TileWire wire = getWire(world, pos);
+		TileWireContainer wire = getWire(world, pos);
 
 		if (wire != null) {
 			wire.onNeighborBlockChange();
@@ -184,10 +216,10 @@ public class BlockWire extends BlockContainer {
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (state instanceof IExtendedBlockState) {
-			TileWire wire = getWire(world, pos);
+			TileWireContainer wire = getWire(world, pos);
 
 			if (wire != null) {
-				return ((IExtendedBlockState) state).withProperty(TileWire.PROPERTY, wire);
+				return ((IExtendedBlockState) state).withProperty(TileWireContainer.PROPERTY, wire);
 			}
 		}
 		return state;
@@ -195,7 +227,7 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	protected BlockState createBlockState() {
-		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[]{TileWire.PROPERTY});
+		return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[]{TileWireContainer.PROPERTY});
 	}
 
 	@Override
@@ -205,9 +237,9 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
-		TileWire wire = getWire(world, pos);
+		TileWireContainer wire = getWire(world, pos);
 
-		if (wire != null) {
+		if (wire != null && side != null /* vanilla redstone */) {
 			return wire.providesSignal(side);
 		}
 

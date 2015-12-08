@@ -29,7 +29,7 @@ public class ItemWire extends ItemBlock {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 18 * 2; i++) {
 			subItems.add(new ItemStack(itemIn, 1, i));
 		}
 	}
@@ -78,8 +78,8 @@ public class ItemWire extends ItemBlock {
 
 		if (blockN instanceof BlockWire) {
 			TileEntity tileEntity = world.getTileEntity(pos);
-			if (tileEntity instanceof TileWire) {
-				if (((TileWire) tileEntity).setWire(wpSide, true)) {
+			if (tileEntity instanceof TileWireContainer) {
+				if (((TileWireContainer) tileEntity).addWire(wpSide, stack.getItemDamage())) {
 					stack.stackSize--;
 					return true;
 				}
@@ -88,7 +88,7 @@ public class ItemWire extends ItemBlock {
 			pos = pos.offset(side);
 		}
 
-		if (!WireUtils.canPlaceWire(world, pos.offset(pSide), pSide.getOpposite())) {
+		if (!isFreestanding(stack) && !WireUtils.canPlaceWire(world, pos.offset(pSide), pSide.getOpposite())) {
 			return false;
 		}
 
@@ -99,7 +99,7 @@ public class ItemWire extends ItemBlock {
 				world.setTileEntity(pos, tileEntity);
 			}
 
-			((TileWire) tileEntity).setWire(wpSide, true);
+			((TileWireContainer) tileEntity).addWire(wpSide, stack.getItemDamage());
 
 			return true;
 		} else {

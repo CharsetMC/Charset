@@ -11,16 +11,43 @@ import net.minecraft.client.resources.model.ModelRotation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 
+import net.minecraftforge.client.model.IColoredBakedQuad;
+
 public class FaceBakeryWire extends FaceBakery {
 	public int uvScale = 1;
 	public int uvOffset = 0;
 
-	private TextureAtlasSprite sprite;
+	private int getFaceShadeColor(int tintIndex, EnumFacing facing) {
+		int r = tintIndex >> 16;
+		int g = (tintIndex >> 8) & 255;
+		int b = tintIndex & 255;
+		float f = this.getFaceBrightness(facing);
+
+		r = MathHelper.clamp_int((int)((float) r * f), 0, 255);
+		g = MathHelper.clamp_int((int)((float) g * f), 0, 255);
+		b = MathHelper.clamp_int((int)((float) b * f), 0, 255);
+		return -16777216 | b << 16 | g << 8 | r;
+	}
+
+	private float getFaceBrightness(EnumFacing facing) {
+		switch (facing) {
+			case DOWN:
+				return 0.5F;
+			case UP:
+				return 1.0F;
+			case NORTH:
+			case SOUTH:
+				return 0.8F;
+			case WEST:
+			case EAST:
+				return 0.6F;
+			default:
+				return 1.0F;
+		}
+	}
 
 	public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex, float[] uv,
 									TextureAtlasSprite icon, EnumFacing facing, ModelRotation rot, boolean uvLocked) {
-		sprite = icon;
-
 		if (!uvLocked && uvScale > 1) {
 			float ox = (uvOffset % uvScale) * (16.0f / uvScale);
 			float oy = (uvOffset / uvScale) * (16.0f / uvScale);
@@ -30,11 +57,19 @@ public class FaceBakeryWire extends FaceBakery {
 			uv[3] = uv[3] / (float) uvScale + oy;
 		}
 
-		return makeBakedQuad(
+		 BakedQuad quad = makeBakedQuad(
 				min, max,
 				new BlockPartFace(null, tintIndex, "", new BlockFaceUV(uv, 0)),
 				icon, facing, rot, null, uvLocked, true
 		);
+
+		if (tintIndex == -1) {
+			return quad;
+		} else {
+			int[] data = quad.getVertexData();
+			data[3] = data[10] = data[17] = data[24] = getFaceShadeColor(tintIndex, rot.rotate(facing));
+			return new IColoredBakedQuad.ColoredBakedQuad(data, tintIndex, quad.getFace());
+		}
 	}
 
 	private void func_178401_a(int p_178401_1_, int[] p_178401_2_, EnumFacing facing, BlockFaceUV p_178401_4_, TextureAtlasSprite p_178401_5_)

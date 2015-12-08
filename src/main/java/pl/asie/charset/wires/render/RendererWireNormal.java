@@ -1,6 +1,5 @@
 package pl.asie.charset.wires.render;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,13 +10,12 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.model.ModelRotation;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
-import net.minecraftforge.common.property.IExtendedBlockState;
-
-import pl.asie.charset.wires.ItemWire;
-import pl.asie.charset.wires.TileWire;
+import pl.asie.charset.wires.TileWireContainer;
+import pl.asie.charset.wires.WireType;
 import pl.asie.charset.wires.internal.WireLocation;
 
 /**
@@ -58,11 +56,18 @@ public class RendererWireNormal extends RendererWireBase {
 		return Collections.emptyList();
 	}
 
-	private int getRenderColor(TileWire wire) {
-		return wire != null ? wire.getRenderColor() : -1;
+	private int getRenderColor(TileWireContainer wire, WireLocation loc) {
+		if (wire != null) {
+			return wire.getRenderColor(loc);
+		} else if (stack != null) {
+			WireType t = WireType.VALUES[stack.getItemDamage() >> 1];
+			return t.type() == WireType.Type.INSULATED ? EnumDyeColor.byMetadata(t.color()).getMapColor().colorValue : -1;
+		} else {
+			return -1;
+		}
 	}
 
-	private boolean wc(TileWire wire, EnumFacing dir) {
+	private boolean wc(TileWireContainer wire, EnumFacing dir) {
 		return wire == null ? (transform == ItemCameraTransforms.TransformType.THIRD_PERSON ? dir.getAxis() == EnumFacing.Axis.Y : true) : wire.connects(WireLocation.FREESTANDING, dir);
 	}
 
@@ -70,7 +75,7 @@ public class RendererWireNormal extends RendererWireBase {
 		return 4;
 	}
 
-	protected TextureAtlasSprite getIcon(boolean isCrossed, boolean lit) {
+	protected TextureAtlasSprite getIcon(boolean isCrossed, boolean lit, boolean isEdge, EnumFacing side) {
 		return icons[(isCrossed ? 0 : 1) + (lit ? 2 : 0)];
 	}
 
@@ -78,7 +83,7 @@ public class RendererWireNormal extends RendererWireBase {
 
 	}
 
-	public void addWireFreestanding(TileWire wire, boolean lit, List<BakedQuad> quads) {
+	public void addWireFreestanding(TileWireContainer wire, boolean lit, List<BakedQuad> quads) {
 		float min = 8.0f - (width / 2);
 		float max = 8.0f + (width / 2);
 		Vector3f minX = new Vector3f(min, wc(wire, EnumFacing.DOWN) ? 0.0f : min, wc(wire, EnumFacing.NORTH) ? 0.0f : min);
@@ -97,8 +102,8 @@ public class RendererWireNormal extends RendererWireBase {
 
 			quads.add(
 				faceBakery.makeBakedQuad(
-					minX, maxX, getRenderColor(wire), new float[] {minX.getZ(), minX.getY(), maxX.getZ(), maxX.getY()},
-					getIcon(true, lit), i == 0 ? EnumFacing.WEST : EnumFacing.EAST,
+					minX, maxX, getRenderColor(wire, WireLocation.FREESTANDING), new float[] {minX.getZ(), minX.getY(), maxX.getZ(), maxX.getY()},
+					getIcon(true, lit, false, i == 0 ? EnumFacing.WEST : EnumFacing.EAST), i == 0 ? EnumFacing.WEST : EnumFacing.EAST,
 					ModelRotation.X0_Y0, true
 				)
 			);
@@ -107,8 +112,8 @@ public class RendererWireNormal extends RendererWireBase {
 
 			quads.add(
 				faceBakery.makeBakedQuad(
-					minY, maxY, getRenderColor(wire), new float[]{minY.getX(), minY.getZ(), maxY.getX(), maxY.getZ()},
-					getIcon(true, lit), i == 0 ? EnumFacing.DOWN : EnumFacing.UP,
+					minY, maxY, getRenderColor(wire, WireLocation.FREESTANDING), new float[]{minY.getX(), minY.getZ(), maxY.getX(), maxY.getZ()},
+					getIcon(true, lit, false, i == 0 ? EnumFacing.DOWN : EnumFacing.UP), i == 0 ? EnumFacing.DOWN : EnumFacing.UP,
 					ModelRotation.X0_Y0, true
 				)
 			);
@@ -117,8 +122,8 @@ public class RendererWireNormal extends RendererWireBase {
 
 			quads.add(
 				faceBakery.makeBakedQuad(
-					minZ, maxZ, getRenderColor(wire), new float[]{minZ.getX(), minZ.getY(), maxZ.getX(), maxZ.getY()},
-					getIcon(true, lit), i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH,
+					minZ, maxZ, getRenderColor(wire, WireLocation.FREESTANDING), new float[]{minZ.getX(), minZ.getY(), maxZ.getX(), maxZ.getY()},
+					getIcon(true, lit, false, i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH), i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH,
 					ModelRotation.X0_Y0, true
 				)
 			);
@@ -146,8 +151,8 @@ public class RendererWireNormal extends RendererWireBase {
 				quads.add(
 						faceBakery.makeBakedQuad(
 								new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
-								getRenderColor(wire), new float[] {min, min, max, max},
-								getIcon(false, lit), EnumFacing.DOWN, ROTATIONS[f.ordinal()], false
+								getRenderColor(wire, WireLocation.FREESTANDING), new float[] {min, min, max, max},
+								getIcon(false, lit, true, f), EnumFacing.DOWN, ROTATIONS[f.ordinal()], false
 						)
 				);
 			}
@@ -156,7 +161,7 @@ public class RendererWireNormal extends RendererWireBase {
 		configureRenderer(false, 0);
 	}
 
-	public void addWire(TileWire wire, WireLocation side, boolean lit, List<BakedQuad> quads) {
+	public void addWire(TileWireContainer wire, WireLocation side, boolean lit, List<BakedQuad> quads) {
 		if (side == WireLocation.FREESTANDING) {
 			addWireFreestanding(wire, lit, quads);
 			return;
@@ -207,8 +212,8 @@ public class RendererWireNormal extends RendererWireBase {
 		quads.add(
 				faceBakery.makeBakedQuad(
 						from, to,
-						getRenderColor(wire), new float[] {from.getX(), from.getZ(), to.getX(), to.getZ()},
-						getIcon(true, lit), EnumFacing.UP,
+						getRenderColor(wire, side), new float[] {from.getX(), from.getZ(), to.getX(), to.getZ()},
+						getIcon(true, lit, false, EnumFacing.UP), EnumFacing.UP,
 						rot, true
 				)
 		);
@@ -218,8 +223,8 @@ public class RendererWireNormal extends RendererWireBase {
 		quads.add(
 				faceBakery.makeBakedQuad(
 						from, to,
-						getRenderColor(wire), new float[] {from.getX(), from.getZ(), to.getX(), to.getZ()},
-						getIcon(true, lit), EnumFacing.DOWN, rot, true
+						getRenderColor(wire, side), new float[] {from.getX(), from.getZ(), to.getX(), to.getZ()},
+						getIcon(true, lit, false, EnumFacing.DOWN), EnumFacing.DOWN, rot, true
 				)
 		);
 
@@ -234,16 +239,16 @@ public class RendererWireNormal extends RendererWireBase {
 		quads.add(
 			faceBakery.makeBakedQuad(
 				fromX, toX,
-				getRenderColor(wire), new float[] {fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-				getIcon(false, lit), EnumFacing.WEST, rot, false
+				getRenderColor(wire, side), new float[] {fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
+				getIcon(false, lit, false, EnumFacing.WEST), EnumFacing.WEST, rot, false
 			)
 		);
 
 		quads.add(
 			faceBakery.makeBakedQuad(
 				fromZ, toZ,
-				getRenderColor(wire), new float[] {fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-				getIcon(false, lit), EnumFacing.NORTH, rot, false
+				getRenderColor(wire, side), new float[] {fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
+				getIcon(false, lit, false, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
 			)
 		);
 
@@ -256,31 +261,28 @@ public class RendererWireNormal extends RendererWireBase {
 		quads.add(
 			faceBakery.makeBakedQuad(
 				fromX, toX,
-				getRenderColor(wire), new float[] {fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-				getIcon(false, lit), EnumFacing.EAST, rot, false
+				getRenderColor(wire, side), new float[] {fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
+				getIcon(false, lit, false, EnumFacing.EAST), EnumFacing.EAST, rot, false
 			)
 		);
 
 		quads.add(
 			faceBakery.makeBakedQuad(
 				fromZ, toZ,
-				getRenderColor(wire), new float[] {fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-				getIcon(false, lit), EnumFacing.SOUTH, rot, false
+				getRenderColor(wire, side), new float[] {fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
+				getIcon(false, lit, false, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
 			)
 		);
 
 		// Edge faces
-		configureRenderer(true, 0);
-
 		float[] edgeUV = new float[] {min, minH, max, maxH};
-		TextureAtlasSprite edgeIcon = getIcon(true, lit);
 
 		if (connectionMatrix[0]) {
 			quads.add(
 				faceBakery.makeBakedQuad(
 					new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
-					getRenderColor(wire), edgeUV,
-					edgeIcon, EnumFacing.NORTH, rot, false
+					getRenderColor(wire, side), edgeUV,
+					getIcon(false, lit, true, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
 				)
 			);
 		}
@@ -289,8 +291,8 @@ public class RendererWireNormal extends RendererWireBase {
 			quads.add(
 				faceBakery.makeBakedQuad(
 					new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
-					getRenderColor(wire), edgeUV,
-					edgeIcon, EnumFacing.SOUTH, rot, false
+					getRenderColor(wire, side), edgeUV,
+						getIcon(false, lit, true, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
 				)
 			);
 		}
@@ -299,8 +301,8 @@ public class RendererWireNormal extends RendererWireBase {
 			quads.add(
 				faceBakery.makeBakedQuad(
 					new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
-					getRenderColor(wire), edgeUV,
-					edgeIcon, EnumFacing.WEST, rot, false
+					getRenderColor(wire, side), edgeUV,
+						getIcon(false, lit, true, EnumFacing.WEST), EnumFacing.WEST, rot, false
 				)
 			);
 		}
@@ -309,39 +311,16 @@ public class RendererWireNormal extends RendererWireBase {
 			quads.add(
 				faceBakery.makeBakedQuad(
 					new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
-					getRenderColor(wire), edgeUV,
-					edgeIcon, EnumFacing.EAST, rot, false
+					getRenderColor(wire, side), edgeUV,
+						getIcon(false, lit, true, EnumFacing.EAST), EnumFacing.EAST, rot, false
 				)
 			);
 		}
-
-		configureRenderer(false, 0);
 	}
-
 
 	@Override
 	public List<BakedQuad> getGeneralQuads() {
-		List<BakedQuad> quads = new ArrayList<BakedQuad>();
-		TileWire wire = null;
-		if (state instanceof IExtendedBlockState) {
-			wire = ((IExtendedBlockState) state).getValue(TileWire.PROPERTY);
-		}
-
-		if (wire != null) {
-			for (WireLocation side : WireLocation.VALUES) {
-				if (wire.hasWire(side)) {
-					addWire(wire, side, wire.getSignalLevel() > 0, quads);
-				}
-			}
-		} else if (stack != null) {
-			if (ItemWire.isFreestanding(stack)) {
-				addWireFreestanding(null, false, quads);
-			} else {
-				addWire(null, WireLocation.DOWN, false, quads);
-			}
-		}
-
-		return quads;
+		return null;
 	}
 
 	@Override

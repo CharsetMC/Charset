@@ -1,12 +1,14 @@
 package pl.asie.charset.wires.render;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -19,6 +21,8 @@ import net.minecraftforge.client.model.TRSRTransformation;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import pl.asie.charset.wires.TileWireContainer;
+import pl.asie.charset.wires.internal.WireLocation;
 
 /**
  * Created by asie on 12/5/15.
@@ -51,9 +55,17 @@ public abstract class RendererWireBase implements ISmartBlockModel, ISmartItemMo
 		return this;
 	}
 
+	public void addWireFreestanding(TileWireContainer wire, boolean lit, List<BakedQuad> quads) {
+
+	}
+
+	public void addWire(TileWireContainer wire, WireLocation side, boolean lit, List<BakedQuad> quads) {
+
+	}
+
 	@Override
 	public boolean isAmbientOcclusion() {
-		return true;
+		return false;
 	}
 
 	@Override

@@ -6,13 +6,11 @@ import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import pl.asie.charset.wires.internal.IRedstoneEmitter;
+import pl.asie.charset.wires.internal.WireLocation;
 
 public final class WireUtils {
 	private static final Set<Block> WIRE_PLACEABLE = new HashSet<Block>();
@@ -27,6 +25,19 @@ public final class WireUtils {
 
 	}
 
+	public static float getWireHitboxHeight(TileWireContainer tile, WireLocation loc) {
+		switch (tile.getWireType(loc).type()) {
+			case NORMAL:
+				return 0.125f;
+			case INSULATED:
+				return 0.1875f;
+			case BUNDLED:
+				return 0.25f;
+		}
+
+		return 0.125f;
+	}
+
 	public static boolean canPlaceWire(World world, BlockPos pos, EnumFacing side) {
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
@@ -36,23 +47,5 @@ public final class WireUtils {
 		}
 
 		return block.isSideSolid(world, pos, side);
-	}
-
-	public static int getSignalLevel(IBlockAccess world, BlockPos pos, EnumFacing side) {
-		IBlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-		TileEntity tile = world.getTileEntity(pos);
-		if (tile instanceof TileWire) {
-			return ((TileWire) tile).getSignalLevel();
-		} else if (tile instanceof IRedstoneEmitter) {
-			return ((IRedstoneEmitter) tile).getSignalStrength(side);
-		} else {
-			int power = block.shouldCheckWeakPower(world, pos, side) ? block.getStrongPower(world, pos, state, side) : block.getWeakPower(world, pos, state, side);
-			if (power > 0) {
-				return 255;
-			}
-		}
-
-		return 0;
 	}
 }

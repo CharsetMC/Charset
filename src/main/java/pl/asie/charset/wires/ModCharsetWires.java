@@ -46,7 +46,7 @@ public class ModCharsetWires {
 	public void init(FMLInitializationEvent event) {
 		packet = new PacketRegistry(ModCharsetWires.MODID);
 
-		GameRegistry.registerTileEntity(TileWire.class, "CharsetWires:wire");
+		GameRegistry.registerTileEntity(TileWireContainer.class, "CharsetWires:wire");
 
 		// Temporary recipes
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 16, 0),
