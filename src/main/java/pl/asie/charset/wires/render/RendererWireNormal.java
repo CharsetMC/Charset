@@ -75,7 +75,11 @@ public class RendererWireNormal extends RendererWireBase {
 		return 4;
 	}
 
-	protected TextureAtlasSprite getIcon(boolean isCrossed, boolean lit, boolean isEdge, EnumFacing side) {
+	protected final TextureAtlasSprite getIcon(boolean isCrossed, boolean lit, boolean isEdge, EnumFacing side) {
+		return getIcon(isCrossed, lit, isEdge, false, side);
+	}
+
+	protected TextureAtlasSprite getIcon(boolean isCrossed, boolean lit, boolean isEdge, boolean isCrossroads, EnumFacing side) {
 		return icons[(isCrossed ? 0 : 1) + (lit ? 2 : 0)];
 	}
 
@@ -144,21 +148,20 @@ public class RendererWireNormal extends RendererWireBase {
 			}
 		}
 
-		configureRenderer(true, 0);
+		configureRenderer(false, 0);
 
 		for (EnumFacing f : EnumFacing.VALUES) {
 			if (wc(wire, f)) {
 				quads.add(
 						faceBakery.makeBakedQuad(
 								new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
-								getRenderColor(wire, WireLocation.FREESTANDING), new float[] {min, min, max, max},
-								getIcon(false, lit, true, f), EnumFacing.DOWN, ROTATIONS[f.ordinal()], false
+								getRenderColor(wire, WireLocation.FREESTANDING),
+								f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[] {max, min, min, max} : new float[] {min, min, max, max},
+								getIcon(false, lit, true, f), EnumFacing.DOWN, ROTATIONS[f.ordinal()], true
 						)
 				);
 			}
 		}
-
-		configureRenderer(false, 0);
 	}
 
 	public void addWire(TileWireContainer wire, WireLocation side, boolean lit, List<BakedQuad> quads) {
@@ -236,19 +239,23 @@ public class RendererWireNormal extends RendererWireBase {
 		Vector3f fromX = new Vector3f(min, 0.0f, from.getZ());
 		Vector3f toX = new Vector3f(min, height, to.getZ());
 
+		// Should we render a faux side wire on this side? (For bundled)
+		boolean crossroadsX = connectionMatrix[2] && !connectionMatrix[3];
+		boolean crossroadsZ = connectionMatrix[0] && !connectionMatrix[1];
+
 		quads.add(
 			faceBakery.makeBakedQuad(
 				fromX, toX,
 				getRenderColor(wire, side), new float[] {fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-				getIcon(false, lit, false, EnumFacing.WEST), EnumFacing.WEST, rot, false
+				getIcon(false, lit, cmc == 1, crossroadsX, EnumFacing.WEST), EnumFacing.WEST, rot, false
 			)
 		);
 
 		quads.add(
 			faceBakery.makeBakedQuad(
 				fromZ, toZ,
-				getRenderColor(wire, side), new float[] {fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-				getIcon(false, lit, false, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
+				getRenderColor(wire, side), new float[] {toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
+				getIcon(false, lit, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
 			)
 		);
 
@@ -261,8 +268,8 @@ public class RendererWireNormal extends RendererWireBase {
 		quads.add(
 			faceBakery.makeBakedQuad(
 				fromX, toX,
-				getRenderColor(wire, side), new float[] {fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-				getIcon(false, lit, false, EnumFacing.EAST), EnumFacing.EAST, rot, false
+				getRenderColor(wire, side), new float[] {toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
+				getIcon(false, lit, cmc == 2, crossroadsX, EnumFacing.EAST), EnumFacing.EAST, rot, false
 			)
 		);
 
@@ -270,7 +277,7 @@ public class RendererWireNormal extends RendererWireBase {
 			faceBakery.makeBakedQuad(
 				fromZ, toZ,
 				getRenderColor(wire, side), new float[] {fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-				getIcon(false, lit, false, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
+				getIcon(false, lit, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
 			)
 		);
 

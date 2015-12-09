@@ -11,26 +11,28 @@ public class RendererWireBundled extends RendererWireInsulated {
 	}
 
 	@Override
-	protected void configureRenderer(boolean isTop, int cmc) {
-		faceBakery.uvScale = isTop ? 4 : 1;
-		faceBakery.uvOffset = cmc;
+	protected int getIconArraySize() {
+		return 5;
 	}
 
 	@Override
-	protected TextureAtlasSprite getIcon(boolean isCrossed, boolean lit, boolean isEdge, EnumFacing side) {
+	protected TextureAtlasSprite getIcon(boolean isCrossed, boolean lit, boolean isEdge, boolean isCrossroads, EnumFacing side) {
 		if (isCrossed) {
 			return icons[0];
 		} else if (isEdge) {
-			return icons[2];
+			return icons[1];
+		} else if (isCrossroads && side.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE) {
+			return icons[4];
 		} else {
-			return icons[side.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 3 : 1];
+			return icons[2 | (side.ordinal() & 1)];
 		}
 	}
 
 	public void loadTextures(TextureMap map) {
 		icons[0] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_cross"));
-		icons[1] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_side_nw"));
-		icons[2] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_edge"));
+		icons[1] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_edge"));
+		icons[2] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_side_nw"));
 		icons[3] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_side_se"));
+		icons[4] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_side_se_wire"));
 	}
 }

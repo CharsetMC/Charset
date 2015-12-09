@@ -1,5 +1,7 @@
 package pl.asie.charset.wires;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -11,6 +13,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.lib.ModCharsetLib;
@@ -51,8 +54,28 @@ public class ModCharsetWires {
 		// Temporary recipes
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 16, 0),
 				"r r", "rir", "r r", 'r', "dustRedstone", 'i', "ingotIron"));
-		GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 0), new ItemStack(wire, 1, 1));
-		GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 1), new ItemStack(wire, 1, 0));
+
+		for (int i = 0; i < 16; i++) {
+			OreDictionary.registerOre("charsetWireInsulated", new ItemStack(wire, 1, (i + 1) << 1));
+			OreDictionary.registerOre("charsetWireInsulatedFreestanding", new ItemStack(wire, 1, (i + 1) << 1));
+
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 8, 2 + (i << 1)),
+					"ddd", "dwd", "ddd", 'd', new ItemStack(wire, 1, 0), 'w', new ItemStack(Blocks.wool, 1, i)));
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 8, 3 + (i << 1)),
+					"ddd", "dwd", "ddd", 'd', new ItemStack(wire, 1, 1), 'w', new ItemStack(Blocks.wool, 1, i)));
+		}
+
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 1, 34),
+				"sws", "www", "sws", 'w', "charsetWireInsulated", 's', Items.string
+				));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 1, 35),
+				"sws", "www", "sws", 'w', "charsetWireInsulatedFreestanding", 's', Items.string
+		));
+
+		for (int i = 0; i < 18; i++) {
+			GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 0 + (i << 1)), new ItemStack(wire, 1, 1 + (i << 1)));
+			GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 1 + (i << 1)), new ItemStack(wire, 1, 0 + (i << 1)));
+		}
 	}
 
     @EventHandler
