@@ -19,14 +19,20 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.wires.internal.IRedstoneWire;
-import pl.asie.charset.wires.internal.WireLocation;
+import pl.asie.charset.api.wires.IBundledEmitter;
+import pl.asie.charset.api.wires.IBundledUpdatable;
+import pl.asie.charset.api.wires.IConnectable;
+import pl.asie.charset.api.wires.IRedstoneEmitter;
+import pl.asie.charset.api.wires.IRedstoneUpdatable;
+import pl.asie.charset.api.wires.IWire;
+import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.logic.Wire;
 import pl.asie.charset.wires.logic.WireBundled;
 import pl.asie.charset.wires.logic.WireInsulated;
 import pl.asie.charset.wires.logic.WireNormal;
 
-public class TileWireContainer extends TileEntity implements ITickable, IRedstoneWire {
+public class TileWireContainer extends TileEntity implements ITickable, IWire, IBundledEmitter, IBundledUpdatable, IRedstoneEmitter, IRedstoneUpdatable {
 	public static final Property PROPERTY = new Property();
 
 	private static class Property implements IUnlistedProperty<TileWireContainer> {
@@ -55,8 +61,8 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		}
 	}
 
-	public WireType getWireType(WireLocation side) {
-		return wires[side.ordinal()] != null ? wires[side.ordinal()].type : WireType.NORMAL;
+	public WireKind getWireKind(WireFace side) {
+		return wires[side.ordinal()] != null ? wires[side.ordinal()].type : WireKind.NORMAL;
 	}
 
 	public TileEntity getNeighbourTile(EnumFacing side) {
@@ -67,7 +73,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 	private boolean scheduledRenderUpdate, scheduledConnectionUpdate, scheduledNeighborUpdate, scheduledPropagationUpdate;
 
 	@SideOnly(Side.CLIENT)
-	public int getRenderColor(WireLocation loc) {
+	public int getRenderColor(WireFace loc) {
 		return wires[loc.ordinal()].getRenderColor();
 	}
 
@@ -108,7 +114,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 	}
 
 	public boolean canProvideStrongPower(EnumFacing direction) {
-		return hasWire(WireLocation.get(direction), WireType.NORMAL);
+		return hasWire(WireFace.get(direction), WireKind.NORMAL);
 	}
 
 	public boolean canProvideWeakPower(EnumFacing direction) {
@@ -116,26 +122,26 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 			return false;
 		}
 
-		if (hasWire(WireLocation.FREESTANDING)) {
+		if (hasWire(WireFace.CENTER)) {
 			return true;
 		}
 
-		if (hasWire(WireLocation.get(direction.getOpposite()))) {
+		if (hasWire(WireFace.get(direction.getOpposite()))) {
 			return false;
 		}
 
 		return true;
 	}
 
-	public int getItemMetadata(WireLocation loc) {
-		return ((wires[loc.ordinal()] != null ? wires[loc.ordinal()].type.ordinal() : 0) << 1) | (loc == WireLocation.FREESTANDING ? 1 : 0);
+	public int getItemMetadata(WireFace loc) {
+		return ((wires[loc.ordinal()] != null ? wires[loc.ordinal()].type.ordinal() : 0) << 1) | (loc == WireFace.CENTER ? 1 : 0);
 	}
 
-	public boolean canConnectInternal(WireLocation from, WireLocation to) {
+	public boolean canConnectInternal(WireFace from, WireFace to) {
 		return wires[to.ordinal()] != null && wires[to.ordinal()].type.connects(wires[from.ordinal()].type);
 	}
 
-	public boolean canConnectExternal(WireLocation from, WireLocation to) {
+	public boolean canConnectExternal(WireFace from, WireFace to) {
 		EnumFacing direction = to.facing();
 
 		BlockPos connectingPos = pos.offset(direction);
@@ -148,16 +154,21 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 			if (wc.wires[from.ordinal()] != null && wc.wires[from.ordinal()].type.connects(wires[from.ordinal()].type)) {
 				return true;
 			}
+		} else if (connectingTile instanceof IConnectable) {
+			IConnectable tc = (IConnectable) connectingTile;
+			if (tc.canConnect(getWireType(from), from, direction.getOpposite())) {
+				return true;
+			}
 		} else {
-			if (connectingBlock instanceof BlockRedstoneDiode && from != WireLocation.DOWN) {
+			if (connectingBlock instanceof BlockRedstoneDiode && from != WireFace.DOWN) {
 				return false;
 			}
 
-			if (from == WireLocation.FREESTANDING && !connectingBlock.isSideSolid(worldObj, connectingPos, direction.getOpposite())) {
+			if (from == WireFace.CENTER && !connectingBlock.isSideSolid(worldObj, connectingPos, direction.getOpposite())) {
 				return false;
 			}
 
-			if (connectingBlock.canConnectRedstone(worldObj, connectingPos, direction.getOpposite())) {
+			if (connectingBlock.canProvidePower() && connectingBlock.canConnectRedstone(worldObj, connectingPos, direction.getOpposite())) {
 				return true;
 			}
 		}
@@ -165,7 +176,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return false;
 	}
 
-	public int getInsulatedSignalLevel(WireLocation side, int i) {
+	public int getInsulatedSignalLevel(WireFace side, int i) {
 		if (wires[side.ordinal()] != null) {
 			switch (wires[side.ordinal()].type.type()) {
 				case BUNDLED:
@@ -177,9 +188,23 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 
 		return 0;
 	}
-	public int getBundledSignalLevel(WireLocation side, int i) {
+
+	public byte getInsulatedRedstoneLevel(WireFace side, int i) {
 		if (wires[side.ordinal()] != null) {
-			if (wires[side.ordinal()].type.type() == WireType.Type.INSULATED) {
+			switch (wires[side.ordinal()].type.type()) {
+				case BUNDLED:
+					return wires[side.ordinal()].getBundledRedstoneLevel(i);
+				default:
+					return (byte) wires[side.ordinal()].getRedstoneLevel();
+			}
+		}
+
+		return 0;
+	}
+
+	public int getBundledSignalLevel(WireFace side, int i) {
+		if (wires[side.ordinal()] != null) {
+			if (wires[side.ordinal()].type.type() == WireType.INSULATED) {
 				return wires[side.ordinal()].type.color() == i ? wires[side.ordinal()].getSignalLevel() : 0;
 			} else {
 				return wires[side.ordinal()].getBundledSignalLevel(i);
@@ -189,11 +214,24 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return 0;
 	}
 
-	public int getSignalLevel(WireLocation side) {
+	public byte getBundledRedstoneLevel(WireFace side, int i) {
+		if (wires[side.ordinal()] != null) {
+			if (wires[side.ordinal()].type.type() == WireType.INSULATED) {
+				return wires[side.ordinal()].type.color() == i ? (byte) wires[side.ordinal()].getRedstoneLevel() : 0;
+			} else {
+				return wires[side.ordinal()].getBundledRedstoneLevel(i);
+			}
+		}
+
+		return 0;
+	}
+
+
+	public int getSignalLevel(WireFace side) {
 		return wires[side.ordinal()] != null ? wires[side.ordinal()].getSignalLevel() : 0;
 	}
 
-	public int getRedstoneLevel(WireLocation side) {
+	public int getRedstoneLevel(WireFace side) {
 		return wires[side.ordinal()] != null ? wires[side.ordinal()].getRedstoneLevel() : 0;
 	}
 
@@ -209,7 +247,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return signal;
 	}
 
-	public boolean canConnectCorner(WireLocation from, WireLocation to) {
+	public boolean canConnectCorner(WireFace from, WireFace to) {
 		EnumFacing side = from.facing();
 		EnumFacing direction = to.facing();
 
@@ -232,11 +270,14 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return false;
 	}
 
-	protected boolean dropWire(WireLocation side, EntityPlayer player) {
+	protected boolean dropWire(WireFace side, EntityPlayer player) {
 		if (removeWire(side)) {
 			if (player == null || !player.capabilities.isCreativeMode) {
 				Block.spawnAsEntity(worldObj, pos, new ItemStack(Item.getItemFromBlock(getBlockType()), 1, getItemMetadata(side)));
 			}
+
+			scheduleConnectionUpdate();
+			scheduleRenderUpdate();
 
 			return true;
 		} else {
@@ -254,7 +295,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return false;
 	}
 
-	public void updateWireLocation(WireLocation loc) {
+	public void updateWireLocation(WireFace loc) {
 		if (wires[loc.ordinal()] != null) {
 			wires[loc.ordinal()].propagate();
 		}
@@ -269,9 +310,9 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 	}
 
 	private void updateConnections() {
-		for (WireLocation side : WireLocation.VALUES) {
+		for (WireFace side : WireFace.VALUES) {
 			if (wires[side.ordinal()] != null) {
-				if (side != WireLocation.FREESTANDING && !WireUtils.canPlaceWire(worldObj, pos.offset(side.facing()), side.facing().getOpposite())) {
+				if (side != WireFace.CENTER && !WireUtils.canPlaceWire(worldObj, pos.offset(side.facing()), side.facing().getOpposite())) {
 					dropWire(side, null);
 					scheduleNeighborUpdate();
 					continue;
@@ -299,11 +340,11 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return false;
 	}
 
-	public boolean hasWire(WireLocation side, WireType type) {
+	public boolean hasWire(WireFace side, WireKind type) {
 		return wires[side.ordinal()] != null && wires[side.ordinal()].type == type;
 	}
 
-	public boolean hasWire(WireLocation side) {
+	public boolean hasWire(WireFace side) {
 		return wires[side.ordinal()] != null;
 	}
 
@@ -316,7 +357,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		for (int i = 0; i < 7; i++) {
 			if (tag.hasKey("wire" + i)) {
 				NBTTagCompound cpd = tag.getCompoundTag("wire" + i);
-				wires[i] = createWire(WireLocation.VALUES[i], cpd.getByte("id"));
+				wires[i] = createWire(WireFace.VALUES[i], cpd.getByte("id"));
 				wires[i].readFromNBT(cpd);
 			}
 		}
@@ -349,7 +390,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		scheduleRenderUpdate();
 	}
 
-	public boolean removeWire(WireLocation side) {
+	public boolean removeWire(WireFace side) {
 		if (!hasWire(side)) {
 			return false;
 		}
@@ -361,12 +402,12 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return true;
 	}
 
-	public boolean addWire(WireLocation side, int meta) {
+	public boolean addWire(WireFace side, int meta) {
 		if (hasWire(side)) {
 			return false;
 		}
 
-		if (side != WireLocation.FREESTANDING && !WireUtils.canPlaceWire(worldObj, pos.offset(side.facing()), side.facing().getOpposite())) {
+		if (side != WireFace.CENTER && !WireUtils.canPlaceWire(worldObj, pos.offset(side.facing()), side.facing().getOpposite())) {
 			return false;
 		}
 
@@ -378,13 +419,13 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		return true;
 	}
 
-	private Wire createWire(WireLocation side, int meta) {
+	private Wire createWire(WireFace side, int meta) {
 		if (meta >= 1 && meta < 17) {
-			return new WireInsulated(WireType.insulated(meta - 1), side, this);
+			return new WireInsulated(WireKind.insulated(meta - 1), side, this);
 		} else if (meta == 17) {
-			return new WireBundled(WireType.BUNDLED, side, this);
+			return new WireBundled(WireKind.BUNDLED, side, this);
 		} else {
-			return new WireNormal(WireType.NORMAL, side, this);
+			return new WireNormal(WireKind.NORMAL, side, this);
 		}
 	}
 
@@ -411,41 +452,47 @@ public class TileWireContainer extends TileEntity implements ITickable, IRedston
 		}
 	}
 
-	public boolean connects(WireLocation side, EnumFacing direction) {
+	public boolean connects(WireFace side, EnumFacing direction) {
 		return wires[side.ordinal()] != null ? wires[side.ordinal()].connects(direction) : null;
 	}
 
-	public boolean connectsAny(WireLocation side, EnumFacing direction) {
+	public boolean connectsAny(WireFace side, EnumFacing direction) {
 		return wires[side.ordinal()] != null ? wires[side.ordinal()].connectsAny(direction) : null;
 	}
 
-	public boolean connectsCorner(WireLocation side, EnumFacing direction) {
+	public boolean connectsCorner(WireFace side, EnumFacing direction) {
 		return wires[side.ordinal()] != null ? wires[side.ordinal()].connectsCorner(direction) : null;
 	}
 
 	// API
 	@Override
-	public int getSignalStrength(EnumFacing direction) {
-		return providesSignal(direction) ? getRedstoneLevel(direction) : 0;
+	public WireType getWireType(WireFace location) {
+		return hasWire(location) ? wires[location.ordinal()].type.type() : null;
 	}
 
 	@Override
-	public void onRedstoneInputChanged() {
+	public int getInsulatedColor(WireFace location) {
+		return getWireType(location) == WireType.INSULATED ? wires[location.ordinal()].type.color() : -1;
+	}
+
+	@Override
+	public byte[] getBundledSignal(WireFace face, EnumFacing toDirection) {
+		Wire wire = wires[face.ordinal()];
+		return wire instanceof WireBundled ? ((WireBundled) wire).getBundledSignal() : null;
+	}
+
+	@Override
+	public void onBundledInputChanged(EnumFacing face) {
 		schedulePropagationUpdate();
 	}
 
 	@Override
-	public int getSignalStrength(WireLocation side, EnumFacing direction) {
-		return connects(side, direction) ? getRedstoneLevel(side) : 0;
+	public int getRedstoneSignal(WireFace face, EnumFacing toDirection) {
+		return connects(face, toDirection) ? getRedstoneLevel(face) : 0;
 	}
 
 	@Override
-	public boolean wireConnected(WireLocation side, EnumFacing direction) {
-		return connects(side, direction);
-	}
-
-	@Override
-	public boolean wireConnectedCorner(WireLocation side, EnumFacing direction) {
-		return connectsCorner(side, direction);
+	public void onRedstoneInputChanged(EnumFacing face) {
+		schedulePropagationUpdate();
 	}
 }

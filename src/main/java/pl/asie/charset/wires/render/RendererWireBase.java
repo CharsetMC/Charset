@@ -22,7 +22,7 @@ import net.minecraftforge.client.model.TRSRTransformation;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import pl.asie.charset.wires.TileWireContainer;
-import pl.asie.charset.wires.internal.WireLocation;
+import pl.asie.charset.api.wires.WireFace;
 
 /**
  * Created by asie on 12/5/15.
@@ -59,7 +59,7 @@ public abstract class RendererWireBase implements ISmartBlockModel, ISmartItemMo
 
 	}
 
-	public void addWire(TileWireContainer wire, WireLocation side, boolean lit, List<BakedQuad> quads) {
+	public void addWire(TileWireContainer wire, WireFace side, boolean lit, List<BakedQuad> quads) {
 
 	}
 

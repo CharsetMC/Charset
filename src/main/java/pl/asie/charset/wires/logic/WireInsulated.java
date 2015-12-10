@@ -1,16 +1,21 @@
 package pl.asie.charset.wires.logic;
 
 import pl.asie.charset.wires.TileWireContainer;
-import pl.asie.charset.wires.WireType;
-import pl.asie.charset.wires.internal.WireLocation;
+import pl.asie.charset.wires.WireKind;
+import pl.asie.charset.api.wires.WireFace;
 
 public class WireInsulated extends WireNormal {
-	public WireInsulated(WireType type, WireLocation location, TileWireContainer container) {
+	public WireInsulated(WireKind type, WireFace location, TileWireContainer container) {
 		super(type, location, container);
 	}
 
 	@Override
-	protected int getSignalLevel(TileWireContainer container, WireLocation location) {
+	protected int getSignalLevel(TileWireContainer container, WireFace location) {
 		return container.getInsulatedSignalLevel(location, type.color());
+	}
+
+	@Override
+	protected byte getRedstoneLevel(TileWireContainer container, WireFace location) {
+		return container.getInsulatedRedstoneLevel(location, type.color());
 	}
 }

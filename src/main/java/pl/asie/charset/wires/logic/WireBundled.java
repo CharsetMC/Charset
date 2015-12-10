@@ -10,14 +10,17 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.api.wires.IBundledEmitter;
+import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.wires.TileWireContainer;
-import pl.asie.charset.wires.WireType;
-import pl.asie.charset.wires.internal.WireLocation;
+import pl.asie.charset.wires.WireKind;
+import pl.asie.charset.api.wires.WireFace;
 
 public class WireBundled extends Wire {
 	private int[] signalLevel = new int[16];
+	private byte[] signalValue = new byte[16];
 
-	public WireBundled(WireType type, WireLocation location, TileWireContainer container) {
+	public WireBundled(WireKind type, WireFace location, TileWireContainer container) {
 		super(type, location, container);
 	}
 
@@ -31,6 +34,13 @@ public class WireBundled extends Wire {
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		signalLevel = nbt.getIntArray("s");
+		if (signalLevel == null || signalLevel.length != 16) {
+			signalLevel = new int[16];
+		}
+		signalValue = nbt.getByteArray("v");
+		if (signalValue == null || signalValue.length != 16) {
+			signalValue = new byte[16];
+		}
 	}
 
 	@Override
@@ -45,59 +55,89 @@ public class WireBundled extends Wire {
 			System.out.println("--- B! PROPAGATE " + container.getPos().toString() + " " + location.name() + " ---");
 		}
 
+		byte[][] nValues = new byte[6][];
+
+		for (EnumFacing facing : EnumFacing.VALUES) {
+			if (connectsExternal(facing)) {
+				TileEntity tile = container.getNeighbourTile(facing);
+				if (tile instanceof IBundledEmitter && !(tile instanceof IWire)) {
+					nValues[facing.ordinal()] = ((IBundledEmitter) tile).getBundledSignal(location, facing.getOpposite());
+				}
+			}
+		}
+
 		for (int i = 0; i < 16; i++) {
 			int maxSignal = 0;
 			int oldSignal = signalLevel[i];
+			byte oldValue = signalValue[i];
 			int[] neighborLevel = new int[7];
+			byte[] neighborValue = new byte[7];
+			byte maxValue = 0;
 
 			if (internalConnections > 0) {
-				for (WireLocation location : WireLocation.VALUES) {
+				for (WireFace location : WireFace.VALUES) {
 					if (connectsInternal(location)) {
 						neighborLevel[location.ordinal()] = container.getBundledSignalLevel(location, i);
+						neighborValue[location.ordinal()] = container.getBundledRedstoneLevel(location, i);
 					}
 				}
 			}
 
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				if (connectsExternal(facing)) {
-					TileEntity tile = container.getNeighbourTile(facing);
+					if (nValues[facing.ordinal()] != null && nValues[facing.ordinal()][i] > 0) {
+						neighborLevel[facing.ordinal()] = 255;
+						neighborValue[facing.ordinal()] = nValues[facing.ordinal()][i];
+					} else {
+						TileEntity tile = container.getNeighbourTile(facing);
 
-					if (tile instanceof TileWireContainer) {
-						neighborLevel[facing.ordinal()] = ((TileWireContainer) tile).getBundledSignalLevel(location, i);
+						if (tile instanceof TileWireContainer) {
+							neighborLevel[facing.ordinal()] = ((TileWireContainer) tile).getBundledSignalLevel(location, i);
+							neighborValue[facing.ordinal()] = ((TileWireContainer) tile).getBundledRedstoneLevel(location, i);
+						}
 					}
 				} else if (connectsCorner(facing)) {
 					BlockPos cornerPos = container.getPos().offset(facing).offset(location.facing());
 					TileEntity tile = container.getWorld().getTileEntity(cornerPos);
 
 					if (tile instanceof TileWireContainer) {
-						neighborLevel[facing.ordinal()] = ((TileWireContainer) tile).getBundledSignalLevel(WireLocation.get(facing.getOpposite()), i);
+						neighborLevel[facing.ordinal()] = ((TileWireContainer) tile).getBundledSignalLevel(WireFace.get(facing.getOpposite()), i);
+						neighborValue[facing.ordinal()] = ((TileWireContainer) tile).getBundledRedstoneLevel(WireFace.get(facing.getOpposite()), i);
 					}
 				}
 			}
 
 			for (int j = 0; j < 7; j++) {
-				maxSignal = Math.max(maxSignal, neighborLevel[j]);
+				byte v = (byte) Math.min(neighborValue[j], 15);
+				if (v > maxValue || (maxValue > 0 && v == maxValue && neighborLevel[j] > maxSignal)) {
+					maxSignal = neighborLevel[j];
+					maxValue = v;
+				}
 			}
 
 			if (DEBUG) {
 				System.out.println("[" + i + "] Levels: " + Arrays.toString(neighborLevel));
 			}
 
+			int newSignal = 0;
+			signalValue[i] = 0;
+
 			if (maxSignal > signalLevel[i] && maxSignal > 1) {
-				signalLevel[i] = maxSignal - 1;
-			} else {
-				signalLevel[i] = 0;
+				newSignal = maxSignal - 1;
+				signalValue[i] = maxValue;
 			}
 
-			if (signalLevel[i] == oldSignal) {
+			signalLevel[i] = newSignal;
+
+			if (newSignal == oldSignal && signalValue[i] == oldValue) {
 				continue;
 			}
 
-			if (signalLevel[i] == 0) {
-				for (WireLocation nLoc : WireLocation.VALUES) {
+			if (newSignal == 0) {
+				for (WireFace nLoc : WireFace.VALUES) {
 					if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] > 0) {
 						container.updateWireLocation(nLoc);
-					} else if (nLoc != WireLocation.FREESTANDING) {
+					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing();
 
 						if (connectsExternal(facing)) {
@@ -113,18 +153,18 @@ public class WireBundled extends Wire {
 					}
 				}
 			} else {
-				for (WireLocation nLoc : WireLocation.VALUES) {
-					if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] < signalLevel[i] - 1) {
+				for (WireFace nLoc : WireFace.VALUES) {
+					if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] < newSignal - 1) {
 						container.updateWireLocation(nLoc);
-					} else if (nLoc != WireLocation.FREESTANDING) {
+					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing();
 
 						if (connectsExternal(facing)) {
-							if (neighborLevel[facing.ordinal()] < signalLevel[i] - 1) {
+							if (neighborLevel[facing.ordinal()] < newSignal - 1) {
 								propagateNotify(facing);
 							}
 						} else if (connectsCorner(facing)) {
-							if (neighborLevel[facing.ordinal()] < signalLevel[i] - 1) {
+							if (neighborLevel[facing.ordinal()] < newSignal - 1) {
 								propagateNotifyCorner(location.facing(), facing);
 							}
 						}
@@ -140,6 +180,11 @@ public class WireBundled extends Wire {
 	}
 
 	@Override
+	public byte getBundledRedstoneLevel(int i) {
+		return signalValue[i & 15];
+	}
+
+	@Override
 	public int getSignalLevel() {
 		return 0;
 	}
@@ -147,5 +192,9 @@ public class WireBundled extends Wire {
 	@Override
 	public int getRedstoneLevel() {
 		return 0;
+	}
+
+	public byte[] getBundledSignal() {
+		return signalValue;
 	}
 }

@@ -11,20 +11,21 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.api.wires.IBundledUpdatable;
+import pl.asie.charset.api.wires.IRedstoneUpdatable;
+import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.wires.TileWireContainer;
-import pl.asie.charset.wires.WireType;
-import pl.asie.charset.wires.internal.IRedstoneUpdatable;
-import pl.asie.charset.wires.internal.WireLocation;
+import pl.asie.charset.wires.WireKind;
 
 public abstract class Wire {
 	protected static final boolean DEBUG = false;
 
-	public final WireType type;
-	public final WireLocation location;
+	public final WireKind type;
+	public final WireFace location;
 	public final TileWireContainer container;
 	protected byte internalConnections, externalConnections, cornerConnections;
 
-	public Wire(WireType type, WireLocation location, TileWireContainer container) {
+	public Wire(WireKind type, WireFace location, TileWireContainer container) {
 		this.type = type;
 		this.location = location;
 		this.container = container;
@@ -43,20 +44,20 @@ public abstract class Wire {
 	public void writeToNBT(NBTTagCompound nbt) {
 		nbt.setByte("iC", internalConnections);
 		nbt.setByte("eC", externalConnections);
-		if (location != WireLocation.FREESTANDING) {
+		if (location != WireFace.CENTER) {
 			nbt.setByte("cC", cornerConnections);
 		}
 	}
 
 	public void updateConnections() {
-		Set<WireLocation> validSides = EnumSet.noneOf(WireLocation.class);
+		Set<WireFace> validSides = EnumSet.noneOf(WireFace.class);
 
-		for (WireLocation facing : WireLocation.VALUES) {
+		for (WireFace facing : WireFace.VALUES) {
 			if (facing == location) {
 				continue;
 			}
 
-			if (facing != WireLocation.FREESTANDING && location != WireLocation.FREESTANDING && location.facing().getAxis() == facing.facing().getAxis()) {
+			if (facing != WireFace.CENTER && location != WireFace.CENTER && location.facing().getAxis() == facing.facing().getAxis()) {
 				continue;
 			}
 
@@ -64,16 +65,15 @@ public abstract class Wire {
 		}
 
 		int oldConnectionCache = internalConnections << 12 | externalConnections << 6 | cornerConnections;
-
 		internalConnections = externalConnections = cornerConnections = 0;
 
-		for (WireLocation facing : validSides) {
+		for (WireFace facing : validSides) {
 			if (container.canConnectInternal(location, facing)) {
 				internalConnections |= 1 << facing.ordinal();
-			} else if (facing != WireLocation.FREESTANDING) {
+			} else if (facing != WireFace.CENTER) {
 				if (container.canConnectExternal(location, facing)) {
 					externalConnections |= 1 << facing.ordinal();
-				} else if (location != WireLocation.FREESTANDING && container.canConnectCorner(location, facing)) {
+				} else if (location != WireFace.CENTER && container.canConnectCorner(location, facing)) {
 					cornerConnections |= 1 << facing.ordinal();
 				}
 			}
@@ -96,22 +96,20 @@ public abstract class Wire {
 		}
 	}
 
-	protected void propagateNotifyDelayed(EnumFacing facing) {
-		container.getWorld().scheduleBlockUpdate(container.getPos().offset(facing), container.getBlockType(), 1, 0);
-	}
-
 	protected void propagateNotify(EnumFacing facing) {
 		TileEntity nt = container.getNeighbourTile(facing);
 		if (nt instanceof TileWireContainer) {
 			((TileWireContainer) nt).updateWireLocation(location);
+		} else if (nt instanceof IBundledUpdatable) {
+			((IBundledUpdatable) nt).onBundledInputChanged(facing.getOpposite());
 		} else if (nt instanceof IRedstoneUpdatable) {
-			((IRedstoneUpdatable) nt).onRedstoneInputChanged();
+			((IRedstoneUpdatable) nt).onRedstoneInputChanged(facing.getOpposite());
 		} else {
 			container.getWorld().notifyBlockOfStateChange(container.getPos().offset(facing), container.getBlockType());
 		}
 	}
 
-	public boolean connectsInternal(WireLocation side) {
+	public boolean connectsInternal(WireFace side) {
 		return (internalConnections & (1 << side.ordinal())) != 0;
 	}
 
@@ -137,6 +135,10 @@ public abstract class Wire {
 	}
 
 	public int getBundledSignalLevel(int i) {
+		return 0;
+	}
+
+	public byte getBundledRedstoneLevel(int i) {
 		return 0;
 	}
 }

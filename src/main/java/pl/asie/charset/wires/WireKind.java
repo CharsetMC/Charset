@@ -1,6 +1,8 @@
 package pl.asie.charset.wires;
 
-public enum WireType {
+import pl.asie.charset.api.wires.WireType;
+
+public enum WireKind {
 	NORMAL(0, 0),
 	INSULATED_0(1, 0),
 	INSULATED_1(1, 1),
@@ -20,35 +22,29 @@ public enum WireType {
 	INSULATED_15(1, 15),
 	BUNDLED(2, 0);
 
-	public enum Type {
-		NORMAL,
-		INSULATED,
-		BUNDLED
-	}
-
-	public static final WireType[] VALUES = values();
-	private static final WireType[] insulatedTypes = new WireType[16];
-	private final Type type;
+	public static final WireKind[] VALUES = values();
+	private static final WireKind[] insulatedTypes = new WireKind[16];
+	private final WireType type;
 	private final int color;
 
 	static {
-		for (WireType type : values()) {
-			if (type.type() == Type.INSULATED) {
+		for (WireKind type : values()) {
+			if (type.type() == WireType.INSULATED) {
 				insulatedTypes[type.color()] = type;
 			}
 		}
 	}
 
-	WireType(int type, int color) {
-		this.type = Type.values()[type];
+	WireKind(int type, int color) {
+		this.type = WireType.values()[type];
 		this.color = color;
 	}
 
-	public static WireType insulated(int color) {
+	public static WireKind insulated(int color) {
 		return insulatedTypes[color];
 	}
 
-	public Type type() {
+	public WireType type() {
 		return type;
 	}
 
@@ -56,14 +52,14 @@ public enum WireType {
 		return color;
 	}
 
-	public boolean connects(WireType type2) {
+	public boolean connects(WireKind type2) {
 		switch (type) {
 			case NORMAL:
-				return type2.type != Type.BUNDLED;
+				return type2.type != WireType.BUNDLED;
 			case INSULATED:
-				return type2.type != Type.INSULATED || type2.color == color;
+				return type2.type != WireType.INSULATED || type2.color == color;
 			case BUNDLED:
-				return type2.type != Type.NORMAL;
+				return type2.type != WireType.NORMAL;
 		}
 
 		return false;

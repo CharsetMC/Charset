@@ -28,9 +28,9 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.RayTraceUtils;
-import pl.asie.charset.wires.internal.WireLocation;
 
 public class BlockWire extends BlockContainer {
 	public BlockWire() {
@@ -45,7 +45,7 @@ public class BlockWire extends BlockContainer {
 		TileWireContainer wire = getWire(world, pos);
 
 		if (wire != null) {
-			return new ItemStack(this, 1, wire.getItemMetadata(WireLocation.VALUES[target.subHit]));
+			return new ItemStack(this, 1, wire.getItemMetadata(WireFace.VALUES[target.subHit]));
 		}
 
 		return new ItemStack(this);
@@ -88,14 +88,14 @@ public class BlockWire extends BlockContainer {
 			// The freestanding box is reused for the potential bug
 			// when a wire container with no internal remains.
 
-			list.add(wire.hasWire(WireLocation.DOWN) ? new AxisAlignedBB(0, 0, 0, 1, WireUtils.getWireHitboxHeight(wire, WireLocation.DOWN), 1) : null);
-			list.add(wire.hasWire(WireLocation.UP) ? new AxisAlignedBB(0, 1 - WireUtils.getWireHitboxHeight(wire, WireLocation.UP), 0, 1, 1, 1) : null);
-			list.add(wire.hasWire(WireLocation.NORTH) ? new AxisAlignedBB(0, 0, 0, 1, 1, WireUtils.getWireHitboxHeight(wire, WireLocation.NORTH)) : null);
-			list.add(wire.hasWire(WireLocation.SOUTH) ? new AxisAlignedBB(0, 0, 1 - WireUtils.getWireHitboxHeight(wire, WireLocation.SOUTH), 1, 1, 1) : null);
-			list.add(wire.hasWire(WireLocation.WEST) ? new AxisAlignedBB(0, 0, 0, WireUtils.getWireHitboxHeight(wire, WireLocation.WEST), 1, 1) : null);
-			list.add(wire.hasWire(WireLocation.EAST) ? new AxisAlignedBB(1 - WireUtils.getWireHitboxHeight(wire, WireLocation.EAST), 0, 0, 1, 1, 1) : null);
-			if (wire.hasWire(WireLocation.FREESTANDING)) {
-				switch (wire.getWireType(WireLocation.FREESTANDING).type()) {
+			list.add(wire.hasWire(WireFace.DOWN) ? new AxisAlignedBB(0, 0, 0, 1, WireUtils.getWireHitboxHeight(wire, WireFace.DOWN), 1) : null);
+			list.add(wire.hasWire(WireFace.UP) ? new AxisAlignedBB(0, 1 - WireUtils.getWireHitboxHeight(wire, WireFace.UP), 0, 1, 1, 1) : null);
+			list.add(wire.hasWire(WireFace.NORTH) ? new AxisAlignedBB(0, 0, 0, 1, 1, WireUtils.getWireHitboxHeight(wire, WireFace.NORTH)) : null);
+			list.add(wire.hasWire(WireFace.SOUTH) ? new AxisAlignedBB(0, 0, 1 - WireUtils.getWireHitboxHeight(wire, WireFace.SOUTH), 1, 1, 1) : null);
+			list.add(wire.hasWire(WireFace.WEST) ? new AxisAlignedBB(0, 0, 0, WireUtils.getWireHitboxHeight(wire, WireFace.WEST), 1, 1) : null);
+			list.add(wire.hasWire(WireFace.EAST) ? new AxisAlignedBB(1 - WireUtils.getWireHitboxHeight(wire, WireFace.EAST), 0, 0, 1, 1, 1) : null);
+			if (wire.hasWire(WireFace.CENTER)) {
+				switch (wire.getWireKind(WireFace.CENTER).type()) {
 					case NORMAL:
 					case INSULATED:
 						list.add(new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625));
@@ -139,7 +139,7 @@ public class BlockWire extends BlockContainer {
 			RayTraceUtils.Result r = RayTraceUtils.getCollision(world, pos, player, getBoxList(world, pos));
 
 			if (r.valid()) {
-				wire.dropWire(WireLocation.VALUES[r.hit.subHit], player);
+				wire.dropWire(WireFace.VALUES[r.hit.subHit], player);
 			}
 
 			if (wire.hasWires()) {
@@ -237,10 +237,12 @@ public class BlockWire extends BlockContainer {
 
 	@Override
 	public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
-		TileWireContainer wire = getWire(world, pos);
+		if (side != null) {
+			TileWireContainer wire = getWire(world, pos);
 
-		if (wire != null && side != null /* vanilla redstone */) {
-			return wire.providesSignal(side);
+			if (wire != null) {
+				return wire.providesSignal(side);
+			}
 		}
 
 		return false;

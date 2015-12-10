@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.wires.internal.WireLocation;
+import pl.asie.charset.api.wires.WireFace;
 
 public class ItemWire extends ItemBlock {
 	public ItemWire(Block block) {
@@ -71,7 +71,7 @@ public class ItemWire extends ItemBlock {
 		}
 
 		EnumFacing pSide = side.getOpposite();
-		WireLocation wpSide = isFreestanding(stack) ? WireLocation.FREESTANDING : WireLocation.get(pSide);
+		WireFace wpSide = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(pSide);
 
 		state = world.getBlockState(pos);
 		blockN = state.getBlock();

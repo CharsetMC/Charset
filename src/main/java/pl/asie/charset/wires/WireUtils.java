@@ -10,7 +10,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import pl.asie.charset.wires.internal.WireLocation;
+import pl.asie.charset.api.wires.WireFace;
 
 public final class WireUtils {
 	private static final Set<Block> WIRE_PLACEABLE = new HashSet<Block>();
@@ -25,8 +25,8 @@ public final class WireUtils {
 
 	}
 
-	public static float getWireHitboxHeight(TileWireContainer tile, WireLocation loc) {
-		switch (tile.getWireType(loc).type()) {
+	public static float getWireHitboxHeight(TileWireContainer tile, WireFace loc) {
+		switch (tile.getWireKind(loc).type()) {
 			case NORMAL:
 				return 0.125f;
 			case INSULATED:
