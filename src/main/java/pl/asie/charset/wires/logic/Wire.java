@@ -41,7 +41,7 @@ public abstract class Wire {
 		cornerConnections = nbt.getByte("cC");
 	}
 
-	public void writeToNBT(NBTTagCompound nbt) {
+	public void writeToNBT(NBTTagCompound nbt, boolean isPacket) {
 		nbt.setByte("iC", internalConnections);
 		nbt.setByte("eC", externalConnections);
 		if (location != WireFace.CENTER) {

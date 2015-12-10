@@ -2,6 +2,7 @@ package pl.asie.charset.wires;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneDiode;
+import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -81,6 +82,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	public void validate() {
 		super.validate();
 		scheduleConnectionUpdate();
+		schedulePropagationUpdate();
 	}
 
 	@Override
@@ -160,7 +162,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 				return true;
 			}
 		} else {
-			if (connectingBlock instanceof BlockRedstoneDiode && from != WireFace.DOWN) {
+			if ((connectingBlock instanceof BlockRedstoneDiode || connectingBlock instanceof BlockRedstoneWire) && from != WireFace.DOWN) {
 				return false;
 			}
 
@@ -366,12 +368,17 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
+		writeToNBT(tag, false);
+	}
+
+	private void writeToNBT(NBTTagCompound tag, boolean isPacket) {
+		super.writeToNBT(tag);
 
 		for (int i = 0; i < 7; i++) {
 			if (wires[i] != null) {
 				NBTTagCompound cpd = new NBTTagCompound();
 				cpd.setByte("id", (byte) wires[i].type.ordinal());
-				wires[i].writeToNBT(cpd);
+				wires[i].writeToNBT(cpd, isPacket);
 				tag.setTag("wire" + i, cpd);
 			}
 		}
@@ -380,7 +387,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
-		writeToNBT(tag);
+		writeToNBT(tag, true);
 		return new S35PacketUpdateTileEntity(getPos(), getBlockMetadata(), tag);
 	}
 

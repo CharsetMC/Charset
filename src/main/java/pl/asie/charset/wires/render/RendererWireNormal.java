@@ -290,12 +290,13 @@ public class RendererWireNormal extends RendererWireBase {
 
 		// Edge faces
 		float[] edgeUV = new float[] {min, minH, max, maxH};
+		float[] edgeUVFlipped = new float[] {max, minH, min, maxH};
 
 		if (connectionMatrix[0]) {
 			quads.add(
 				faceBakery.makeBakedQuad(
 					new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
-					getRenderColor(wire, side), edgeUV,
+					getRenderColor(wire, side), edgeUVFlipped,
 					getIcon(false, lit, true, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
 				)
 			);
@@ -325,7 +326,7 @@ public class RendererWireNormal extends RendererWireBase {
 			quads.add(
 				faceBakery.makeBakedQuad(
 					new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
-					getRenderColor(wire, side), edgeUV,
+					getRenderColor(wire, side), edgeUVFlipped,
 						getIcon(false, lit, true, EnumFacing.EAST), EnumFacing.EAST, rot, false
 				)
 			);

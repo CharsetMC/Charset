@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -47,10 +48,14 @@ public class WireNormal extends Wire {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-		nbt.setShort("s", (short) signalLevel);
-		nbt.setByte("v", signalValue);
+	public void writeToNBT(NBTTagCompound nbt, boolean isPacket) {
+		super.writeToNBT(nbt, isPacket);
+		if (!isPacket) {
+			nbt.setShort("s", (short) signalLevel);
+		}
+		if (!isPacket || type == WireKind.NORMAL) {
+			nbt.setByte("v", signalValue);
+		}
 	}
 
 	protected int getSignalLevel(TileWireContainer container, WireFace location) {
@@ -73,7 +78,6 @@ public class WireNormal extends Wire {
 		byte oldValue = signalValue;
 		int[] neighborLevel = new int[7];
 		byte[] neighborValue = new byte[7];
-		int neighbor = 0;
 
 		if (internalConnections > 0) {
 			for (WireFace location : WireFace.VALUES) {
@@ -111,7 +115,7 @@ public class WireNormal extends Wire {
 
 				if (i > 0) {
 					neighborValue[facing.ordinal()] = (byte) i;
-					neighborLevel[facing.ordinal()] = 255;
+					neighborLevel[facing.ordinal()] = -1;
 				}
 			} else if (connectsExternal(facing)) {
 				TileEntity tile = container.getNeighbourTile(facing);
@@ -134,9 +138,13 @@ public class WireNormal extends Wire {
 							? block.getStrongPower(container.getWorld(), pos, state, facing)
 							: block.getWeakPower(container.getWorld(), pos, state, facing);
 
+					if (block == Blocks.redstone_wire) {
+						power--;
+					}
+
 					if (power > 0) {
 						neighborValue[facing.ordinal()] = (byte) power;
-						neighborLevel[facing.ordinal()] = 255;
+						neighborLevel[facing.ordinal()] = -1;
 					}
 				}
 			} else if (connectsCorner(facing)) {
@@ -151,11 +159,22 @@ public class WireNormal extends Wire {
 		}
 
 		for (int i = 0; i < 7; i++) {
-			byte v = (byte) Math.min(neighborValue[i], 15);
-			if (v > maxValue || (maxValue > 0 && v == maxValue && neighborLevel[i] > maxSignal)) {
-				neighbor = i;
-				maxSignal = neighborLevel[i];
-				maxValue = v;
+			if (neighborLevel[i] > 1) {
+				byte v = (byte) Math.min(neighborValue[i], 15);
+				if (v > maxValue || (maxValue > 0 && v == maxValue && neighborLevel[i] > maxSignal)) {
+					maxSignal = neighborLevel[i];
+					maxValue = v;
+				}
+			}
+		}
+
+		for (int i = 0; i < 7; i++) {
+			if (neighborLevel[i] == -1) {
+				byte v = (byte) Math.min(neighborValue[i], 15);
+				if (v >= maxValue) {
+					maxSignal = 255;
+					maxValue = v;
+				}
 			}
 		}
 
@@ -172,50 +191,48 @@ public class WireNormal extends Wire {
 			System.out.println("Switch: " + oldSignal + ", " + oldValue + " -> " + signalLevel + ", " + signalValue);
 		}
 
-		if (signalLevel == 0) {
-			for (WireFace nLoc : WireFace.VALUES) {
-				if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] > 0) {
-					container.updateWireLocation(nLoc);
-				} else if (nLoc != WireFace.CENTER) {
-					EnumFacing facing = nLoc.facing();
+		if (signalLevel != oldSignal || signalValue != oldValue) {
+			if (signalLevel == 0) {
+				for (WireFace nLoc : WireFace.VALUES) {
+					if (connectsInternal(nLoc) && (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue)) {
+						container.updateWireLocation(nLoc);
+					} else if (nLoc != WireFace.CENTER) {
+						EnumFacing facing = nLoc.facing();
 
-					if (connectsExternal(facing)) {
-						TileEntity tileEntity = container.getNeighbourTile(facing);
-						if (!(tileEntity instanceof TileWireContainer) || neighborLevel[facing.ordinal()] > 0) {
-							propagateNotify(facing);
-						}
-					} else if (connectsCorner(facing)) {
-						if (neighborLevel[facing.ordinal()] > 0) {
+						if (connectsExternal(facing)) {
+							TileEntity tileEntity = container.getNeighbourTile(facing);
+							if (!(tileEntity instanceof TileWireContainer) || neighborLevel[facing.ordinal()] > 0 || neighborValue[facing.ordinal()] != signalValue) {
+								propagateNotify(facing);
+							}
+						} else if (connectsCorner(facing) && (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue)) {
 							propagateNotifyCorner(location.facing(), facing);
 						}
 					}
 				}
-			}
-		} else {
-			for (WireFace nLoc : WireFace.VALUES) {
-				if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] < signalLevel - 1) {
-					container.updateWireLocation(nLoc);
-				} else if (nLoc != WireFace.CENTER) {
-					EnumFacing facing = nLoc.facing();
+			} else {
+				for (WireFace nLoc : WireFace.VALUES) {
+					if (neighborLevel[nLoc.ordinal()] < signalLevel - 1 || neighborValue[nLoc.ordinal()] != signalValue) {
+						if (connectsInternal(nLoc)) {
+							container.updateWireLocation(nLoc);
+						} else if (nLoc != WireFace.CENTER) {
+							EnumFacing facing = nLoc.facing();
 
-					if (connectsExternal(facing)) {
-						if (neighborLevel[facing.ordinal()] < signalLevel - 1) {
-							propagateNotify(facing);
-						}
-					} else if (connectsCorner(facing)) {
-						if (neighborLevel[facing.ordinal()] < signalLevel - 1) {
-							propagateNotifyCorner(location.facing(), facing);
+							if (connectsExternal(facing)) {
+								propagateNotify(facing);
+							} else if (connectsCorner(facing)) {
+								propagateNotifyCorner(location.facing(), facing);
+							}
 						}
 					}
 				}
 			}
-		}
 
-		if (type == WireKind.NORMAL) {
-			container.scheduleRenderUpdate();
+			if (type == WireKind.NORMAL) {
+				container.scheduleRenderUpdate();
 
-			if (location != WireFace.CENTER) {
-				propagateNotify(location.facing());
+				if (location != WireFace.CENTER) {
+					container.getWorld().notifyNeighborsOfStateExcept(container.getPos().offset(location.facing()), container.getBlockType(), location.facing().getOpposite());
+				}
 			}
 		}
 	}

@@ -55,7 +55,7 @@ public class ItemWire extends ItemBlock {
 		if (isFreestanding(stack)) {
 			name = StatCollector.translateToLocal("tile.charset.wire.freestanding") + " " + name;
 		}
-		
+
 		return name;
 	}
 

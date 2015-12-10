@@ -44,9 +44,12 @@ public class WireBundled extends Wire {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-		nbt.setIntArray("s", signalLevel);
+	public void writeToNBT(NBTTagCompound nbt, boolean isPacket) {
+		super.writeToNBT(nbt, isPacket);
+		if (!isPacket) {
+			nbt.setIntArray("s", signalLevel);
+			nbt.setByteArray("v", signalValue);
+		}
 	}
 
 	@Override

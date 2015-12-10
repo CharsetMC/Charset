@@ -241,7 +241,7 @@ public class BlockWire extends BlockContainer {
 			TileWireContainer wire = getWire(world, pos);
 
 			if (wire != null) {
-				return wire.providesSignal(side);
+				return wire.providesSignal(side.getOpposite());
 			}
 		}
 
