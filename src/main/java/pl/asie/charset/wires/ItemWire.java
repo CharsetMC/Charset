@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -36,11 +37,26 @@ public class ItemWire extends ItemBlock {
 
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		String t = StatCollector.translateToLocal("tile.charset.wire.name");
-		if (isFreestanding(stack)) {
-			t = StatCollector.translateToLocal("tile.charset.wire.freestanding") + " " + t;
+		WireKind kind = WireKind.VALUES[stack.getItemDamage() >> 1];
+		String name = "";
+
+		switch (kind.type()) {
+			case NORMAL:
+				name = StatCollector.translateToLocal("tile.charset.wire.name");
+				break;
+			case INSULATED:
+				name = StatCollector.translateToLocal("charset.color." + EnumDyeColor.byMetadata(kind.color()).getUnlocalizedName()) + " " + StatCollector.translateToLocal("tile.charset.wire.insulated.name");
+				break;
+			case BUNDLED:
+				name = StatCollector.translateToLocal("tile.charset.wire.bundled.name");
+				break;
 		}
-		return t;
+
+		if (isFreestanding(stack)) {
+			name = StatCollector.translateToLocal("tile.charset.wire.freestanding") + " " + name;
+		}
+		
+		return name;
 	}
 
 	@Override
