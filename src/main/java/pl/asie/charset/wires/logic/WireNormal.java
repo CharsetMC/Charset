@@ -73,7 +73,7 @@ public class WireNormal extends Wire {
 		}
 
 		int maxSignal = 0;
-		byte maxValue = 0;
+		// [bundled] byte maxValue = 0;
 		int oldSignal = signalLevel;
 		byte oldValue = signalValue;
 		int[] neighborLevel = new int[7];
@@ -83,7 +83,7 @@ public class WireNormal extends Wire {
 			for (WireFace location : WireFace.VALUES) {
 				if (connectsInternal(location)) {
 					neighborLevel[location.ordinal()] = getSignalLevel(container, location);
-					neighborValue[location.ordinal()] = getRedstoneLevel(container, location);
+					// [bundled] neighborValue[location.ordinal()] = getRedstoneLevel(container, location);
 				}
 			}
 		}
@@ -114,19 +114,19 @@ public class WireNormal extends Wire {
 				}
 
 				if (i > 0) {
-					neighborValue[facing.ordinal()] = (byte) i;
-					neighborLevel[facing.ordinal()] = -1;
+					// [bundled] neighborValue[facing.ordinal()] = (byte) i;
+					neighborLevel[facing.ordinal()] = 255;
 				}
 			} else if (connectsExternal(facing)) {
 				TileEntity tile = container.getNeighbourTile(facing);
 
 				if (tile instanceof TileWireContainer) {
 					neighborLevel[facing.ordinal()] = getSignalLevel((TileWireContainer) tile, location);
-					neighborValue[facing.ordinal()] = getRedstoneLevel((TileWireContainer) tile, location);
+					// [bundled] neighborValue[facing.ordinal()] = getRedstoneLevel((TileWireContainer) tile, location);
 				} else if (tile instanceof IRedstoneEmitter) {
 					int value = ((IRedstoneEmitter) tile).getRedstoneSignal(location, facing.getOpposite());
 					if (value > 0) {
-						neighborValue[facing.ordinal()] = (byte) value;
+						// [bundled] neighborValue[facing.ordinal()] = (byte) value;
 						neighborLevel[facing.ordinal()] = 255;
 					}
 				} else {
@@ -143,8 +143,8 @@ public class WireNormal extends Wire {
 					}
 
 					if (power > 0) {
-						neighborValue[facing.ordinal()] = (byte) power;
-						neighborLevel[facing.ordinal()] = -1;
+						// [bundled] neighborValue[facing.ordinal()] = (byte) power;
+						neighborLevel[facing.ordinal()] = 255;
 					}
 				}
 			} else if (connectsCorner(facing)) {
@@ -152,7 +152,7 @@ public class WireNormal extends Wire {
 				TileEntity tile = container.getWorld().getTileEntity(cornerPos);
 
 				if (tile instanceof TileWireContainer) {
-					neighborValue[facing.ordinal()] = getRedstoneLevel((TileWireContainer) tile, WireFace.get(facing.getOpposite()));
+					// [bundled] neighborValue[facing.ordinal()] = getRedstoneLevel((TileWireContainer) tile, WireFace.get(facing.getOpposite()));
 					neighborLevel[facing.ordinal()] = getSignalLevel((TileWireContainer) tile, WireFace.get(facing.getOpposite()));
 				}
 			}
@@ -160,27 +160,17 @@ public class WireNormal extends Wire {
 
 		for (int i = 0; i < 7; i++) {
 			if (neighborLevel[i] > 1) {
-				byte v = (byte) Math.min(neighborValue[i], 15);
-				if (v > maxValue || (maxValue > 0 && v == maxValue && neighborLevel[i] > maxSignal)) {
+				// [bundled] byte v = (byte) Math.min(neighborValue[i], 15);
+				if (neighborLevel[i] > maxSignal) {
 					maxSignal = neighborLevel[i];
-					maxValue = v;
-				}
-			}
-		}
-
-		for (int i = 0; i < 7; i++) {
-			if (neighborLevel[i] == -1) {
-				byte v = (byte) Math.min(neighborValue[i], 15);
-				if (v >= maxValue) {
-					maxSignal = 255;
-					maxValue = v;
+					// [bundled] maxValue = v;
 				}
 			}
 		}
 
 		if (maxSignal > signalLevel && maxSignal > 1) {
 			signalLevel = maxSignal - 1;
-			signalValue = maxValue;
+			signalValue = 15;
 		} else {
 			signalLevel = 0;
 			signalValue = 0;
@@ -194,8 +184,10 @@ public class WireNormal extends Wire {
 		if (signalLevel != oldSignal || signalValue != oldValue) {
 			if (signalLevel == 0) {
 				for (WireFace nLoc : WireFace.VALUES) {
-					if (connectsInternal(nLoc) && (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue)) {
-						container.updateWireLocation(nLoc);
+					if (connectsInternal(nLoc)) {
+						if (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue) {
+							container.updateWireLocation(nLoc);
+						}
 					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing();
 
@@ -204,14 +196,16 @@ public class WireNormal extends Wire {
 							if (!(tileEntity instanceof TileWireContainer) || neighborLevel[facing.ordinal()] > 0 || neighborValue[facing.ordinal()] != signalValue) {
 								propagateNotify(facing);
 							}
-						} else if (connectsCorner(facing) && (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue)) {
-							propagateNotifyCorner(location.facing(), facing);
+						} else if (connectsCorner(facing)) {
+							if (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue) {
+								propagateNotifyCorner(location.facing(), facing);
+							}
 						}
 					}
 				}
 			} else {
 				for (WireFace nLoc : WireFace.VALUES) {
-					if (neighborLevel[nLoc.ordinal()] < signalLevel - 1 || neighborValue[nLoc.ordinal()] != signalValue) {
+					if (neighborLevel[nLoc.ordinal()] < signalLevel - 1 || neighborLevel[nLoc.ordinal()] > signalLevel + 1 || neighborValue[nLoc.ordinal()] != signalValue) {
 						if (connectsInternal(nLoc)) {
 							container.updateWireLocation(nLoc);
 						} else if (nLoc != WireFace.CENTER) {

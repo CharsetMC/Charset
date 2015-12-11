@@ -17,12 +17,12 @@ import net.minecraft.util.ITickable;
 
 import net.minecraftforge.fluids.IFluidHandler;
 
-import pl.asie.charset.api.lib.IItemInjectable;
+import pl.asie.charset.api.pipes.IPipe;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.TileBase;
 
-public class TilePipe extends TileBase implements IConnectable, IItemInjectable, ITickable {
+public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable {
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
@@ -339,8 +339,49 @@ public class TilePipe extends TileBase implements IConnectable, IItemInjectable,
 
 	protected void onSyncRequest() {
 		// TODO: HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
-		for (PipeItem p : itemSet) {
-			p.sendPacket(true);
+		synchronized (itemSet) {
+			for (PipeItem p : itemSet) {
+				p.sendPacket(true);
+			}
 		}
+	}
+
+	@Override
+	public ItemStack getTravellingStack(EnumFacing side) {
+		float targetError = 1000f;
+		PipeItem targetItem = null;
+
+		synchronized (itemSet) {
+			for (PipeItem p : itemSet) {
+				float error;
+
+				if (side == null) {
+					error = Math.abs(p.getProgress() - 0.5f);
+
+					if (error > 0.25f) {
+						continue;
+					}
+				} else {
+					if (p.getProgress() <= 0.25f && side == p.getDirection().getOpposite()) {
+						error = Math.abs(p.getProgress() - 0.125f);
+					} else if (p.getProgress() >= 0.75f && side == p.getDirection()) {
+						error = Math.abs(p.getProgress() - 0.875f);
+					} else {
+						continue;
+					}
+
+					if (error > 0.125f) {
+						continue;
+					}
+				}
+
+				if (error < targetError) {
+					targetError = error;
+					targetItem = p;
+				}
+			}
+		}
+
+		return targetItem != null ? targetItem.getStack() : null;
 	}
 }
