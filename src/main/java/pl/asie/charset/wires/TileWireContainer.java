@@ -273,9 +273,11 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	}
 
 	protected boolean dropWire(WireFace side, EntityPlayer player) {
+		int wireMeta = getItemMetadata(side);
+		
 		if (removeWire(side)) {
 			if (player == null || !player.capabilities.isCreativeMode) {
-				Block.spawnAsEntity(worldObj, pos, new ItemStack(Item.getItemFromBlock(getBlockType()), 1, getItemMetadata(side)));
+				Block.spawnAsEntity(worldObj, pos, new ItemStack(Item.getItemFromBlock(getBlockType()), 1, wireMeta));
 			}
 
 			scheduleConnectionUpdate();
