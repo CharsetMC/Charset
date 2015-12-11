@@ -10,6 +10,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -38,6 +39,18 @@ public class BlockWire extends BlockContainer {
 		this.setBlockBounds(0, 0, 0, 1.0f, 0.125f, 1.0f);
 		this.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 		this.setUnlocalizedName("charset.wire");
+	}
+
+	@Override
+	public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+		TileWireContainer wire = getWire(world, pos);
+
+		if (wire != null && wire.hasWire(WireFace.CENTER)) {
+			AxisAlignedBB centerBox = getCenterCollisionBox(wire.getWireKind(WireFace.CENTER)).addCoord(pos.getX(), pos.getY(), pos.getZ());
+			if (mask.intersectsWith(centerBox)) {
+				list.add(centerBox);
+			}
+		}
 	}
 
 	@Override
@@ -77,6 +90,31 @@ public class BlockWire extends BlockContainer {
 		return tileEntity instanceof TileWireContainer ? (TileWireContainer) tileEntity : null;
 	}
 
+	private AxisAlignedBB getCenterCollisionBox(WireKind kind) {
+		switch (kind.type()) {
+			case NORMAL:
+				return new AxisAlignedBB(0.4375, 0.4375, 0.4375, 0.5625, 0.5625, 0.5625);
+			case INSULATED:
+				return new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625);
+			case BUNDLED:
+				return new AxisAlignedBB(0.3125, 0.3125, 0.3125, 0.6875, 0.6875, 0.6875);
+			default:
+				return null;
+		}
+	}
+
+	private AxisAlignedBB getCenterBox(WireKind kind) {
+		switch (kind.type()) {
+			case NORMAL:
+			case INSULATED:
+				return new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625);
+			case BUNDLED:
+				return new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
+			default:
+				return null;
+		}
+	}
+
 	private List<AxisAlignedBB> getBoxList(World worldIn, BlockPos pos) {
 		TileWireContainer wire = getWire(worldIn, pos);
 		List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
@@ -95,15 +133,7 @@ public class BlockWire extends BlockContainer {
 			list.add(wire.hasWire(WireFace.WEST) ? new AxisAlignedBB(0, 0, 0, WireUtils.getWireHitboxHeight(wire, WireFace.WEST), 1, 1) : null);
 			list.add(wire.hasWire(WireFace.EAST) ? new AxisAlignedBB(1 - WireUtils.getWireHitboxHeight(wire, WireFace.EAST), 0, 0, 1, 1, 1) : null);
 			if (wire.hasWire(WireFace.CENTER)) {
-				switch (wire.getWireKind(WireFace.CENTER).type()) {
-					case NORMAL:
-					case INSULATED:
-						list.add(new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625));
-						break;
-					case BUNDLED:
-						list.add(new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
-						break;
-				}
+				list.add(getCenterBox(wire.getWireKind(WireFace.CENTER)));
 			} else {
 				list.add(null);
 			}
@@ -177,11 +207,16 @@ public class BlockWire extends BlockContainer {
 	}
 
 	@Override
+	public boolean shouldCheckWeakPower(IBlockAccess world, BlockPos pos, EnumFacing side) {
+		return false;
+	}
+
+	@Override
 	public int getStrongPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
 		TileWireContainer wire = getWire(world, pos);
 
 		if (wire != null) {
-			return wire.canProvideStrongPower(side.getOpposite()) ? wire.getRedstoneLevel(side.getOpposite()) : 0;
+			return wire.canProvideStrongPower(side.getOpposite()) ? wire.getStrongRedstoneLevel(side.getOpposite()) : 0;
 		}
 
 		return 0;
@@ -192,7 +227,7 @@ public class BlockWire extends BlockContainer {
 		TileWireContainer wire = getWire(world, pos);
 
 		if (wire != null) {
-			return wire.canProvideWeakPower(side.getOpposite()) ? wire.getRedstoneLevel(side.getOpposite()) : 0;
+			return wire.canProvideWeakPower(side.getOpposite()) ? wire.getWeakRedstoneLevel(side.getOpposite()) : 0;
 		}
 
 		return 0;

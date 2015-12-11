@@ -64,4 +64,17 @@ public enum WireKind {
 
 		return false;
 	}
+
+	public int height() {
+		switch (type) {
+			case NORMAL:
+				return 2;
+			case INSULATED:
+				return 3;
+			case BUNDLED:
+				return 4;
+		}
+
+		return 0;
+	}
 }

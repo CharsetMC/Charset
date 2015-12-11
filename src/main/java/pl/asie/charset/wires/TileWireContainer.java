@@ -5,6 +5,7 @@ import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -88,48 +89,48 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	@Override
 	public void update() {
 		if (scheduledConnectionUpdate) {
-			updateConnections();
 			scheduledConnectionUpdate = false;
+			updateConnections();
 		}
 
 		if (scheduledNeighborUpdate) {
+			scheduledNeighborUpdate = false;
 			worldObj.notifyNeighborsRespectDebug(pos, getBlockType());
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				worldObj.notifyNeighborsOfStateExcept(pos.offset(facing), getBlockType(), facing.getOpposite());
 			}
-			scheduledNeighborUpdate = false;
 		}
 
 		if (scheduledPropagationUpdate) {
-			onWireUpdate(null);
 			scheduledPropagationUpdate = false;
+			onWireUpdate(null);
 		}
 
 		if (scheduledRenderUpdate) {
+			scheduledRenderUpdate = false;
 			if (!worldObj.isRemote) {
 				getWorld().markBlockForUpdate(pos);
 			} else {
 				getWorld().markBlockRangeForRenderUpdate(pos, pos);
 			}
-			scheduledRenderUpdate = false;
 		}
 	}
 
 	public boolean canProvideStrongPower(EnumFacing direction) {
-		return hasWire(WireFace.get(direction), WireKind.NORMAL);
+		return Blocks.redstone_wire.canProvidePower() && hasWire(WireFace.get(direction), WireKind.NORMAL);
 	}
 
 	public boolean canProvideWeakPower(EnumFacing direction) {
+		if (hasWire(WireFace.get(direction), WireKind.NORMAL)) {
+			return true;
+		}
+
 		if (!providesSignal(direction)) {
 			return false;
 		}
 
 		if (hasWire(WireFace.CENTER)) {
 			return true;
-		}
-
-		if (hasWire(WireFace.get(direction.getOpposite()))) {
-			return false;
 		}
 
 		return true;
@@ -237,8 +238,12 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 		return wires[side.ordinal()] != null ? wires[side.ordinal()].getRedstoneLevel() : 0;
 	}
 
-	public int getRedstoneLevel(EnumFacing direction) {
-		int signal = 0;
+	public int getStrongRedstoneLevel(EnumFacing direction) {
+		return getRedstoneLevel(WireFace.get(direction));
+	}
+
+	public int getWeakRedstoneLevel(EnumFacing direction) {
+		int signal = getRedstoneLevel(WireFace.get(direction));
 
 		for (Wire w : wires) {
 			if (w != null && w.connects(direction)) {
@@ -274,7 +279,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 
 	protected boolean dropWire(WireFace side, EntityPlayer player) {
 		int wireMeta = getItemMetadata(side);
-		
+
 		if (removeWire(side)) {
 			if (player == null || !player.capabilities.isCreativeMode) {
 				Block.spawnAsEntity(worldObj, pos, new ItemStack(Item.getItemFromBlock(getBlockType()), 1, wireMeta));
@@ -352,13 +357,12 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 		return wires[side.ordinal()] != null;
 	}
 
-
-
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
 
 		for (int i = 0; i < 7; i++) {
+			wires[i] = null;
 			if (tag.hasKey("wire" + i)) {
 				NBTTagCompound cpd = tag.getCompoundTag("wire" + i);
 				wires[i] = createWire(WireFace.VALUES[i], cpd.getByte("id"));

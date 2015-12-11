@@ -3,8 +3,8 @@ package pl.asie.charset.wires.logic;
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -138,11 +138,10 @@ public class WireNormal extends Wire {
 							? block.getStrongPower(container.getWorld(), pos, state, facing)
 							: block.getWeakPower(container.getWorld(), pos, state, facing);
 
-					if (block == Blocks.redstone_wire) {
-						power--;
-					}
-
 					if (power > 0) {
+						if (block instanceof BlockRedstoneWire && oldSignal > 0) {
+							continue;
+						}
 						// [bundled] neighborValue[facing.ordinal()] = (byte) power;
 						neighborLevel[facing.ordinal()] = 255;
 					}
@@ -181,51 +180,53 @@ public class WireNormal extends Wire {
 			System.out.println("Switch: " + oldSignal + ", " + oldValue + " -> " + signalLevel + ", " + signalValue);
 		}
 
-		if (signalLevel != oldSignal || signalValue != oldValue) {
-			if (signalLevel == 0) {
-				for (WireFace nLoc : WireFace.VALUES) {
-					if (connectsInternal(nLoc)) {
-						if (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue) {
-							container.updateWireLocation(nLoc);
-						}
-					} else if (nLoc != WireFace.CENTER) {
-						EnumFacing facing = nLoc.facing();
-
-						if (connectsExternal(facing)) {
-							TileEntity tileEntity = container.getNeighbourTile(facing);
-							if (!(tileEntity instanceof TileWireContainer) || neighborLevel[facing.ordinal()] > 0 || neighborValue[facing.ordinal()] != signalValue) {
-								propagateNotify(facing);
-							}
-						} else if (connectsCorner(facing)) {
-							if (neighborLevel[nLoc.ordinal()] > 0 || neighborValue[nLoc.ordinal()] != signalValue) {
-								propagateNotifyCorner(location.facing(), facing);
-							}
-						}
+		if (signalLevel == 0) {
+			for (WireFace nLoc : WireFace.VALUES) {
+				if (connectsInternal(nLoc)) {
+					if (neighborLevel[nLoc.ordinal()] > 0) {
+						container.updateWireLocation(nLoc);
 					}
-				}
-			} else {
-				for (WireFace nLoc : WireFace.VALUES) {
-					if (neighborLevel[nLoc.ordinal()] < signalLevel - 1 || neighborLevel[nLoc.ordinal()] > signalLevel + 1 || neighborValue[nLoc.ordinal()] != signalValue) {
-						if (connectsInternal(nLoc)) {
-							container.updateWireLocation(nLoc);
-						} else if (nLoc != WireFace.CENTER) {
-							EnumFacing facing = nLoc.facing();
+				} else if (nLoc != WireFace.CENTER) {
+					EnumFacing facing = nLoc.facing();
 
-							if (connectsExternal(facing)) {
-								propagateNotify(facing);
-							} else if (connectsCorner(facing)) {
-								propagateNotifyCorner(location.facing(), facing);
-							}
+					if (connectsExternal(facing)) {
+						TileEntity tileEntity = container.getNeighbourTile(facing);
+						if (!(tileEntity instanceof TileWireContainer) || neighborLevel[facing.ordinal()] > 0) {
+							propagateNotify(facing);
+						}
+					} else if (connectsCorner(facing)) {
+						if (neighborLevel[nLoc.ordinal()] > 0) {
+							propagateNotifyCorner(location.facing(), facing);
 						}
 					}
 				}
 			}
+		} else {
+			for (WireFace nLoc : WireFace.VALUES) {
+				if (neighborLevel[nLoc.ordinal()] < signalLevel - 1) {
+					if (connectsInternal(nLoc)) {
+						container.updateWireLocation(nLoc);
+					} else if (nLoc != WireFace.CENTER) {
+						EnumFacing facing = nLoc.facing();
 
-			if (type == WireKind.NORMAL) {
+						if (connectsExternal(facing)) {
+							propagateNotify(facing);
+						} else if (connectsCorner(facing)) {
+							propagateNotifyCorner(location.facing(), facing);
+						}
+					}
+				}
+			}
+		}
+
+		if (type == WireKind.NORMAL) {
+			if (oldValue != signalValue) {
 				container.scheduleRenderUpdate();
 
 				if (location != WireFace.CENTER) {
-					container.getWorld().notifyNeighborsOfStateExcept(container.getPos().offset(location.facing()), container.getBlockType(), location.facing().getOpposite());
+					BlockPos uPos = container.getPos().offset(location.facing());
+					container.getWorld().notifyBlockOfStateChange(uPos, container.getBlockType());
+					container.getWorld().notifyNeighborsOfStateExcept(uPos, container.getBlockType(), location.facing().getOpposite());
 				}
 			}
 		}

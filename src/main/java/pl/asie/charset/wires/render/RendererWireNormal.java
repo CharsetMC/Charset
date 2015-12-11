@@ -94,15 +94,33 @@ public class RendererWireNormal extends RendererWireBase {
 
 	}
 
+	private boolean isCenterEdge(TileWireContainer wire, WireFace side) {
+		return wire.getWireType(side) != wire.getWireType(WireFace.CENTER);
+	}
+
+	private float getCL(TileWireContainer wire, WireFace side) {
+		float h = wire != null && wire.hasWire(side) ? wire.getWireKind(side).height() : 0;
+
+		if (wire != null && isCenterEdge(wire, side)) {
+			h = 0;
+		}
+
+		if (!wc(wire, side.facing())) {
+			h = 8.0f - (width / 2);
+		}
+
+		return side.facing().getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;
+	}
+
 	public void addWireFreestanding(TileWireContainer wire, boolean lit, List<BakedQuad> quads) {
 		float min = 8.0f - (width / 2);
 		float max = 8.0f + (width / 2);
-		Vector3f minX = new Vector3f(min, wc(wire, EnumFacing.DOWN) ? 0.0f : min, wc(wire, EnumFacing.NORTH) ? 0.0f : min);
-		Vector3f maxX = new Vector3f(min, wc(wire, EnumFacing.UP) ? 16.0f : max, wc(wire, EnumFacing.SOUTH) ? 16.0f : max);
-		Vector3f minY = new Vector3f(wc(wire, EnumFacing.WEST) ? 0.0f : min, min, wc(wire, EnumFacing.NORTH) ? 0.0f : min);
-		Vector3f maxY = new Vector3f(wc(wire, EnumFacing.EAST) ? 16.0f : max, min, wc(wire, EnumFacing.SOUTH) ? 16.0f : max);
-		Vector3f minZ = new Vector3f(wc(wire, EnumFacing.WEST) ? 0.0f : min, wc(wire, EnumFacing.DOWN) ? 0.0f : min, min);
-		Vector3f maxZ = new Vector3f(wc(wire, EnumFacing.EAST) ? 16.0f : max, wc(wire, EnumFacing.UP) ? 16.0f : max, min);
+		Vector3f minX = new Vector3f(min, getCL(wire, WireFace.DOWN), getCL(wire, WireFace.NORTH));
+		Vector3f maxX = new Vector3f(min, getCL(wire, WireFace.UP), getCL(wire, WireFace.SOUTH));
+		Vector3f minY = new Vector3f(getCL(wire, WireFace.WEST), min, getCL(wire, WireFace.NORTH));
+		Vector3f maxY = new Vector3f(getCL(wire, WireFace.EAST), min, getCL(wire, WireFace.SOUTH));
+		Vector3f minZ = new Vector3f(getCL(wire, WireFace.WEST), getCL(wire, WireFace.DOWN), min);
+		Vector3f maxZ = new Vector3f(getCL(wire, WireFace.EAST), getCL(wire, WireFace.UP), min);
 
 		int cmcX = (wc(wire, EnumFacing.UP) ? 8 : 0) | (wc(wire, EnumFacing.DOWN) ? 4 : 0) | (wc(wire, EnumFacing.NORTH) ? 2 : 0) | (wc(wire, EnumFacing.SOUTH) ? 1 : 0);
 		int cmcY = (wc(wire, EnumFacing.NORTH) ? 4 : 0) | (wc(wire, EnumFacing.SOUTH) ? 8 : 0) | (wc(wire, EnumFacing.WEST) ? 2 : 0) | (wc(wire, EnumFacing.EAST) ? 1 : 0);
