@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.api.wires.IRedstoneEmitter;
+import pl.asie.charset.api.wires.IRedstoneUpdatable;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.BlockWire;
@@ -78,6 +79,27 @@ public class WireNormal extends Wire {
 		byte oldValue = signalValue;
 		int[] neighborLevel = new int[7];
 		byte[] neighborValue = new byte[7];
+
+		if (type == WireKind.NORMAL) {
+			if (location != WireFace.CENTER) {
+				EnumFacing facing = location.facing();
+
+				BlockPos pos = container.getPos().offset(facing);
+				IBlockState state = container.getWorld().getBlockState(pos);
+				Block block = state.getBlock();
+
+				int power = block.shouldCheckWeakPower(container.getWorld(), pos, facing)
+						? block.getStrongPower(container.getWorld(), pos, state, facing)
+						: block.getWeakPower(container.getWorld(), pos, state, facing);
+
+				if (power > 0) {
+					if (!(block instanceof BlockRedstoneWire && oldSignal > 0)) {
+						// [bundled] neighborValue[facing.ordinal()] = (byte) power;
+						neighborLevel[facing.ordinal()] = 255;
+					}
+				}
+			}
+		}
 
 		if (internalConnections > 0) {
 			for (WireFace location : WireFace.VALUES) {
@@ -198,6 +220,11 @@ public class WireNormal extends Wire {
 						if (neighborLevel[nLoc.ordinal()] > 0) {
 							propagateNotifyCorner(location.facing(), facing);
 						}
+					} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing()) {
+						TileEntity nt = container.getNeighbourTile(facing);
+						if (!(nt instanceof IRedstoneUpdatable)) {
+							container.getWorld().notifyBlockOfStateChange(container.getPos().offset(facing), container.getBlockType());
+						}
 					}
 				}
 			}
@@ -213,6 +240,11 @@ public class WireNormal extends Wire {
 							propagateNotify(facing);
 						} else if (connectsCorner(facing)) {
 							propagateNotifyCorner(location.facing(), facing);
+						} else if (type == WireKind.NORMAL) {
+							TileEntity nt = container.getNeighbourTile(facing);
+							if (!(nt instanceof IRedstoneUpdatable)) {
+								container.getWorld().notifyBlockOfStateChange(container.getPos().offset(facing), container.getBlockType());
+							}
 						}
 					}
 				}
@@ -225,7 +257,6 @@ public class WireNormal extends Wire {
 
 				if (location != WireFace.CENTER) {
 					BlockPos uPos = container.getPos().offset(location.facing());
-					container.getWorld().notifyBlockOfStateChange(uPos, container.getBlockType());
 					container.getWorld().notifyNeighborsOfStateExcept(uPos, container.getBlockType(), location.facing().getOpposite());
 				}
 			}

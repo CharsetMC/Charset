@@ -5,7 +5,6 @@ import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -117,23 +116,32 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	}
 
 	public boolean canProvideStrongPower(EnumFacing direction) {
-		return Blocks.redstone_wire.canProvidePower() && hasWire(WireFace.get(direction), WireKind.NORMAL);
+		return hasWire(WireFace.get(direction), WireKind.NORMAL);
 	}
 
 	public boolean canProvideWeakPower(EnumFacing direction) {
-		if (hasWire(WireFace.get(direction), WireKind.NORMAL)) {
-			return true;
-		}
-
-		if (!providesSignal(direction)) {
+		WireType onFaceType = getWireType(WireFace.get(direction));
+		if (onFaceType != null && onFaceType != WireType.NORMAL) {
 			return false;
 		}
 
-		if (hasWire(WireFace.CENTER)) {
-			return true;
+		for (WireFace face : WireFace.VALUES) {
+			if (face.facing() == direction.getOpposite()) {
+				continue;
+			}
+
+			if (hasWire(face)) {
+				if (getWireType(face) == WireType.NORMAL) {
+					return true;
+				}
+
+				if (connects(face, direction)) {
+					return true;
+				}
+			}
 		}
 
-		return true;
+		return false;
 	}
 
 	public int getItemMetadata(WireFace loc) {
@@ -246,7 +254,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 		int signal = getRedstoneLevel(WireFace.get(direction));
 
 		for (Wire w : wires) {
-			if (w != null && w.connects(direction)) {
+			if (w != null && (w.connects(direction) || (w.type == WireKind.NORMAL && w.location.facing() != direction.getOpposite()))) {
 				signal = Math.max(signal, w.getRedstoneLevel());
 			}
 		}
