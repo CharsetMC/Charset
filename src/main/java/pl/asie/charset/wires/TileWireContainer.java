@@ -170,7 +170,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 			if (tc.canConnect(getWireType(from), from, direction.getOpposite())) {
 				return true;
 			}
-		} else {
+		} else if (getWireType(from) != WireType.BUNDLED) {
 			if ((connectingBlock instanceof BlockRedstoneDiode || connectingBlock instanceof BlockRedstoneWire) && from != WireFace.DOWN) {
 				return false;
 			}
