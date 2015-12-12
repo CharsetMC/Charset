@@ -102,7 +102,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 
 		if (scheduledPropagationUpdate) {
 			scheduledPropagationUpdate = false;
-			onWireUpdate(null);
+			onWireUpdate(null, -1);
 		}
 
 		if (scheduledRenderUpdate) {
@@ -312,16 +312,16 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 		return false;
 	}
 
-	public void updateWireLocation(WireFace loc) {
+	public void updateWireLocation(WireFace loc, int color) {
 		if (wires[loc.ordinal()] != null) {
-			wires[loc.ordinal()].propagate();
+			wires[loc.ordinal()].propagate(color);
 		}
 	}
 
-	public void onWireUpdate(EnumFacing side) {
+	public void onWireUpdate(EnumFacing side, int color) {
 		for (Wire w : wires) {
 			if (w != null && (side == null || w.connects(side))) {
-				w.propagate();
+				w.propagate(color);
 			}
 		}
 	}

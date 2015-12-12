@@ -31,7 +31,7 @@ public abstract class Wire {
 		this.container = container;
 	}
 
-	public abstract void propagate();
+	public abstract void propagate(int color);
 	public abstract int getSignalLevel();
 	public abstract int getRedstoneLevel();
 
@@ -88,18 +88,18 @@ public abstract class Wire {
 		}
 	}
 
-	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction) {
+	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction, int color) {
 		BlockPos cornerPos = container.getPos().offset(side).offset(direction);
 		TileEntity tile = container.getWorld().getTileEntity(cornerPos);
 		if (tile instanceof TileWireContainer) {
-			((TileWireContainer) tile).onWireUpdate(null);
+			((TileWireContainer) tile).onWireUpdate(null, color);
 		}
 	}
 
-	protected void propagateNotify(EnumFacing facing) {
+	protected void propagateNotify(EnumFacing facing, int color) {
 		TileEntity nt = container.getNeighbourTile(facing);
 		if (nt instanceof TileWireContainer) {
-			((TileWireContainer) nt).updateWireLocation(location);
+			((TileWireContainer) nt).updateWireLocation(location, color);
 		} else if (nt instanceof IBundledUpdatable) {
 			((IBundledUpdatable) nt).onBundledInputChanged(facing.getOpposite());
 		} else if (nt instanceof IRedstoneUpdatable) {

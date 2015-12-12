@@ -68,7 +68,7 @@ public class WireNormal extends Wire {
 	}
 
 	@Override
-	public void propagate() {
+	public void propagate(int color) {
 		if (DEBUG) {
 			System.out.println("--- PROPAGATE " + container.getPos().toString() + " " + location.name() + " ---");
 		}
@@ -206,7 +206,7 @@ public class WireNormal extends Wire {
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (connectsInternal(nLoc)) {
 					if (neighborLevel[nLoc.ordinal()] > 0) {
-						container.updateWireLocation(nLoc);
+						container.updateWireLocation(nLoc, type.color());
 					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing();
@@ -214,11 +214,11 @@ public class WireNormal extends Wire {
 					if (connectsExternal(facing)) {
 						TileEntity tileEntity = container.getNeighbourTile(facing);
 						if (!(tileEntity instanceof TileWireContainer) || neighborLevel[facing.ordinal()] > 0) {
-							propagateNotify(facing);
+							propagateNotify(facing, type.color());
 						}
 					} else if (connectsCorner(facing)) {
 						if (neighborLevel[nLoc.ordinal()] > 0) {
-							propagateNotifyCorner(location.facing(), facing);
+							propagateNotifyCorner(location.facing(), facing, type.color());
 						}
 					} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing()) {
 						TileEntity nt = container.getNeighbourTile(facing);
@@ -232,15 +232,15 @@ public class WireNormal extends Wire {
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (neighborLevel[nLoc.ordinal()] < signalLevel - 1) {
 					if (connectsInternal(nLoc)) {
-						container.updateWireLocation(nLoc);
+						container.updateWireLocation(nLoc, type.color());
 					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing();
 
 						if (connectsExternal(facing)) {
-							propagateNotify(facing);
+							propagateNotify(facing, type.color());
 						} else if (connectsCorner(facing)) {
-							propagateNotifyCorner(location.facing(), facing);
-						} else if (type == WireKind.NORMAL) {
+							propagateNotifyCorner(location.facing(), facing, type.color());
+						} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing()) {
 							TileEntity nt = container.getNeighbourTile(facing);
 							if (!(nt instanceof IRedstoneUpdatable)) {
 								container.getWorld().notifyBlockOfStateChange(container.getPos().offset(facing), container.getBlockType());
