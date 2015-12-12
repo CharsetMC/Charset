@@ -26,7 +26,6 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
-	private byte initClient = 6;
 	private boolean neighborBlockChanged;
 
 	public TilePipe() {

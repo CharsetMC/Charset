@@ -343,6 +343,12 @@ public class PipeItem {
 		// Step 3: Pick the next path.
 		for (EnumFacing dir : pressureList) {
 			if (canMoveDirection(dir, true)) {
+				// Pressurizer prioritizing valid direction, move.
+				this.output = dir;
+				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
+				return;
+			} else if (owner.getShifterStrength(dir) == owner.getShifterStrength(dir.getOpposite())) {
+				// Pressurizers freezing an item in place.
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
 				return;
