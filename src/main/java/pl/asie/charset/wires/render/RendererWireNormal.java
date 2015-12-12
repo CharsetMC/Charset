@@ -189,6 +189,171 @@ public class RendererWireNormal extends RendererWireBase {
 		}
 	}
 
+	public void addCorner(TileWireContainer wire, WireFace side, EnumFacing dir, boolean lit, List<BakedQuad> quads) {
+		ModelRotation rot = ROTATIONS[side.ordinal()];
+		float min = 8.0f - (width / 2);
+		float max = 8.0f + (width / 2);
+
+		// Edge faces
+
+		float[] edgeUV = new float[] {min, 0, max, height};
+		float[] edgeUVFlipped = new float[] {max, 0, min, height};
+
+		if (dir == EnumFacing.NORTH) {
+			float[] topUV = new float[] {min, 16 - height, max, 16};
+
+			configureRenderer(true, 15);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, 0, -height), new Vector3f(max, height, -height),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(true, lit, true, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, height, -height), new Vector3f(max, height, 0),
+							getRenderColor(wire, side), topUV,
+							getIcon(true, lit, true, EnumFacing.UP), EnumFacing.UP, rot, false
+					)
+			);
+
+			configureRenderer(false, 0);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, 0, -height), new Vector3f(min, height, 0),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(false, lit, false, EnumFacing.WEST), EnumFacing.WEST, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(max, 0, -height), new Vector3f(max, height, 0),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(false, lit, false, EnumFacing.EAST), EnumFacing.EAST, rot, false
+					)
+			);
+		} else if (dir == EnumFacing.SOUTH) {
+			float[] topUV = new float[] {min, 0, max, height};
+
+			configureRenderer(true, 15);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, 0, 16 + height), new Vector3f(max, height, 16 + height),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(true, lit, true, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, height, 16), new Vector3f(max, height, 16 + height),
+							getRenderColor(wire, side), topUV,
+							getIcon(true, lit, true, EnumFacing.UP), EnumFacing.UP, rot, false
+					)
+			);
+
+			configureRenderer(false, 0);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, 0, 16), new Vector3f(min, height, 16 + height),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(false, lit, false, EnumFacing.WEST), EnumFacing.WEST, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(max, 0, 16), new Vector3f(max, height, 16 + height),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(false, lit, false, EnumFacing.EAST), EnumFacing.EAST, rot, false
+					)
+			);
+		} else if (dir == EnumFacing.WEST) {
+			float[] topUV = new float[] {16 - height, min, 16, max};
+
+			configureRenderer(true, 15);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(-height, height, min), new Vector3f(0, height, max),
+							getRenderColor(wire, side), topUV,
+							getIcon(true, lit, true, EnumFacing.UP), EnumFacing.UP, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(-height, 0, min), new Vector3f(-height, height, max),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(true, lit, true, EnumFacing.WEST), EnumFacing.WEST, rot, false
+					)
+			);
+
+			configureRenderer(false, 0);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(-height, 0, min), new Vector3f(0, height, min),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(false, lit, false, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(-height, 0, max), new Vector3f(0, height, max),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(false, lit, false, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
+					)
+			);
+		} else if (dir == EnumFacing.EAST) {
+			float[] topUV = new float[] {0, min, height, max};
+
+			configureRenderer(true, 15);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(16, height, min), new Vector3f(16 + height, height, max),
+							getRenderColor(wire, side), topUV,
+							getIcon(true, lit, true, EnumFacing.UP), EnumFacing.UP, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(16 + height, 0, min), new Vector3f(16 + height, height, max),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(true, lit, true, EnumFacing.EAST), EnumFacing.EAST, rot, false
+					)
+			);
+
+			configureRenderer(false, 0);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(16, 0, min), new Vector3f(16 + height, height, min),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(false, lit, false, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
+					)
+			);
+
+			quads.add(
+					faceBakery.makeBakedQuad(
+							new Vector3f(16, 0, max), new Vector3f(16 + height, height, max),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(false, lit, false, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
+					)
+			);
+		}
+	}
+
 	public void addWire(TileWireContainer wire, WireFace side, boolean lit, List<BakedQuad> quads) {
 		if (side == WireFace.CENTER) {
 			addWireFreestanding(wire, lit, quads);
@@ -348,6 +513,12 @@ public class RendererWireNormal extends RendererWireBase {
 						getIcon(false, lit, true, EnumFacing.EAST), EnumFacing.EAST, rot, false
 				)
 			);
+		}
+
+		for (int i = 0; i < 4; i++) {
+			if (cornerConnectionMatrix[i]) {
+				addCorner(wire, side, CONNECTION_DIRS[0][i], lit, quads);
+			}
 		}
 	}
 

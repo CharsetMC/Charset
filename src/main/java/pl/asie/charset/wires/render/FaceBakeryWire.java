@@ -1,7 +1,5 @@
 package pl.asie.charset.wires.render;
 
-import java.util.Arrays;
-
 import org.lwjgl.util.vector.Vector3f;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -48,15 +46,18 @@ public class FaceBakeryWire extends FaceBakery {
 		}
 	}
 
-	public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex, float[] uv,
+	public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex, float[] uvOrig,
 									TextureAtlasSprite icon, EnumFacing facing, ModelRotation rot, boolean uvLocked) {
+		float[] uv = uvOrig;
 		if (!uvLocked && uvScale > 1) {
 			float ox = (uvOffset % uvScale) * (16.0f / uvScale);
 			float oy = (uvOffset / uvScale) * (16.0f / uvScale);
-			uv[0] = uv[0] / (float) uvScale + ox;
-			uv[1] = uv[1] / (float) uvScale + oy;
-			uv[2] = uv[2] / (float) uvScale + ox;
-			uv[3] = uv[3] / (float) uvScale + oy;
+			uv = new float[] {
+				uv[0] / (float) uvScale + ox,
+				uv[1] / (float) uvScale + oy,
+				uv[2] / (float) uvScale + ox,
+				uv[3] / (float) uvScale + oy
+			};
 		}
 
 		 BakedQuad quad = makeBakedQuad(
