@@ -132,10 +132,6 @@ public class WireBundled extends Wire {
 
 			signalLevel[i] = newSignal;
 
-			if (newSignal == oldSignal && signalValue[i] == oldValue) {
-				continue;
-			}
-
 			if (newSignal == 0) {
 				for (WireFace nLoc : WireFace.VALUES) {
 					if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] > 0) {
@@ -157,17 +153,15 @@ public class WireBundled extends Wire {
 				}
 			} else {
 				for (WireFace nLoc : WireFace.VALUES) {
-					if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] < newSignal - 1) {
-						container.updateWireLocation(nLoc);
-					} else if (nLoc != WireFace.CENTER) {
-						EnumFacing facing = nLoc.facing();
+					if (neighborLevel[nLoc.ordinal()] < newSignal - 1 || neighborLevel[nLoc.ordinal()] > newSignal + 1) {
+						if (connectsInternal(nLoc)) {
+							container.updateWireLocation(nLoc);
+						} else if (nLoc != WireFace.CENTER) {
+							EnumFacing facing = nLoc.facing();
 
-						if (connectsExternal(facing)) {
-							if (neighborLevel[facing.ordinal()] < newSignal - 1) {
+							if (connectsExternal(facing)) {
 								propagateNotify(facing);
-							}
-						} else if (connectsCorner(facing)) {
-							if (neighborLevel[facing.ordinal()] < newSignal - 1) {
+							} else if (connectsCorner(facing)) {
 								propagateNotifyCorner(location.facing(), facing);
 							}
 						}
