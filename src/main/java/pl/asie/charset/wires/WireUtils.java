@@ -24,6 +24,14 @@ public final class WireUtils {
 	private WireUtils() {
 
 	}
+	
+	public static int getRedstoneLevel(World world, BlockPos pos, IBlockState state, EnumFacing facing) {
+		Block block = state.getBlock();
+
+		return block.shouldCheckWeakPower(world, pos, facing)
+				? block.getStrongPower(world, pos, state, facing)
+				: block.getWeakPower(world, pos, state, facing);
+	}
 
 	public static float getWireHitboxHeight(TileWireContainer tile, WireFace loc) {
 		switch (tile.getWireKind(loc).type()) {

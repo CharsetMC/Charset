@@ -21,10 +21,10 @@ import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.BlockWire;
 import pl.asie.charset.wires.TileWireContainer;
 import pl.asie.charset.wires.WireKind;
+import pl.asie.charset.wires.WireUtils;
 
 public class WireNormal extends Wire {
 	private int signalLevel;
-	private byte signalValue;
 
 	public WireNormal(WireKind type, WireFace location, TileWireContainer container) {
 		super(type, location, container);
@@ -36,6 +36,7 @@ public class WireNormal extends Wire {
 		if (type.type() == WireType.INSULATED) {
 			return EnumDyeColor.byMetadata(type.color()).getMapColor().colorValue;
 		} else {
+			int signalValue = signalLevel >> 8;
 			int v = (signalValue > 0 ? 0x96 : 0x78) + (signalValue * 7);
 			return (v << 16) | (v << 8) | v;
 		}
@@ -45,17 +46,13 @@ public class WireNormal extends Wire {
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		signalLevel = nbt.getShort("s");
-		signalValue = nbt.getByte("v");
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbt, boolean isPacket) {
 		super.writeToNBT(nbt, isPacket);
-		if (!isPacket) {
-			nbt.setShort("s", (short) signalLevel);
-		}
 		if (!isPacket || type == WireKind.NORMAL) {
-			nbt.setByte("v", signalValue);
+			nbt.setShort("s", (short) signalLevel);
 		}
 	}
 
@@ -74,11 +71,8 @@ public class WireNormal extends Wire {
 		}
 
 		int maxSignal = 0;
-		// [bundled] byte maxValue = 0;
 		int oldSignal = signalLevel;
-		byte oldValue = signalValue;
 		int[] neighborLevel = new int[7];
-		byte[] neighborValue = new byte[7];
 
 		if (type == WireKind.NORMAL) {
 			if (location != WireFace.CENTER) {
@@ -86,17 +80,11 @@ public class WireNormal extends Wire {
 
 				BlockPos pos = container.getPos().offset(facing);
 				IBlockState state = container.getWorld().getBlockState(pos);
-				Block block = state.getBlock();
 
-				int power = block.shouldCheckWeakPower(container.getWorld(), pos, facing)
-						? block.getStrongPower(container.getWorld(), pos, state, facing)
-						: block.getWeakPower(container.getWorld(), pos, state, facing);
+				int power = WireUtils.getRedstoneLevel(container.getWorld(), pos, state, facing);
 
 				if (power > 0) {
-					if (!(block instanceof BlockRedstoneWire && oldSignal > 0)) {
-						// [bundled] neighborValue[facing.ordinal()] = (byte) power;
-						neighborLevel[facing.ordinal()] = 255;
-					}
+					neighborLevel[facing.ordinal()] = Math.min(15, power) << 8 | 0xFF;
 				}
 			}
 		}
@@ -105,12 +93,13 @@ public class WireNormal extends Wire {
 			for (WireFace location : WireFace.VALUES) {
 				if (connectsInternal(location)) {
 					neighborLevel[location.ordinal()] = getSignalLevel(container, location);
-					// [bundled] neighborValue[location.ordinal()] = getRedstoneLevel(container, location);
 				}
 			}
 		}
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
+			int facidx = facing.ordinal();
+
 			if (facing == location.facing() && type == WireKind.NORMAL) {
 				BlockPos pos = container.getPos().offset(facing);
 				int i = 0;
@@ -119,10 +108,8 @@ public class WireNormal extends Wire {
 					IBlockState state = container.getWorld().getBlockState(pos.offset(enumfacing));
 					Block block = state.getBlock();
 
-					if (!(block instanceof BlockWire)) {
-						int power = block.shouldCheckWeakPower(container.getWorld(), pos, enumfacing)
-								? block.getStrongPower(container.getWorld(), pos, state, enumfacing)
-								: block.getWeakPower(container.getWorld(), pos, state, enumfacing);
+					if (!(block instanceof BlockWire) && !(block instanceof BlockRedstoneWire)) {
+						int power = WireUtils.getRedstoneLevel(container.getWorld(), pos, state, enumfacing);
 
 						if (power >= 15) {
 							i = 15;
@@ -136,36 +123,30 @@ public class WireNormal extends Wire {
 				}
 
 				if (i > 0) {
-					// [bundled] neighborValue[facing.ordinal()] = (byte) i;
-					neighborLevel[facing.ordinal()] = 255;
+					neighborLevel[facidx] = (i << 8) | 0xFF;
 				}
 			} else if (connectsExternal(facing)) {
 				TileEntity tile = container.getNeighbourTile(facing);
 
 				if (tile instanceof TileWireContainer) {
-					neighborLevel[facing.ordinal()] = getSignalLevel((TileWireContainer) tile, location);
-					// [bundled] neighborValue[facing.ordinal()] = getRedstoneLevel((TileWireContainer) tile, location);
+					neighborLevel[facidx] = getSignalLevel((TileWireContainer) tile, location);
 				} else if (tile instanceof IRedstoneEmitter) {
 					int value = ((IRedstoneEmitter) tile).getRedstoneSignal(location, facing.getOpposite());
 					if (value > 0) {
-						// [bundled] neighborValue[facing.ordinal()] = (byte) value;
-						neighborLevel[facing.ordinal()] = 255;
+						neighborLevel[facidx] = (Math.min(value, 15) << 8) | 0xFF;
 					}
 				} else {
 					BlockPos pos = container.getPos().offset(facing);
 					IBlockState state = container.getWorld().getBlockState(pos);
-					Block block = state.getBlock();
 
-					int power = block.shouldCheckWeakPower(container.getWorld(), pos, facing)
-							? block.getStrongPower(container.getWorld(), pos, state, facing)
-							: block.getWeakPower(container.getWorld(), pos, state, facing);
+					int power = WireUtils.getRedstoneLevel(container.getWorld(), pos, state, facing);
+
+					if (state.getBlock() instanceof BlockRedstoneWire) {
+						power--;
+					}
 
 					if (power > 0) {
-						if (block instanceof BlockRedstoneWire && oldSignal > 0) {
-							continue;
-						}
-						// [bundled] neighborValue[facing.ordinal()] = (byte) power;
-						neighborLevel[facing.ordinal()] = 255;
+						neighborLevel[facidx] = (Math.min(power, 15) << 8) | 0xFF;
 					}
 				}
 			} else if (connectsCorner(facing)) {
@@ -173,33 +154,33 @@ public class WireNormal extends Wire {
 				TileEntity tile = container.getWorld().getTileEntity(cornerPos);
 
 				if (tile instanceof TileWireContainer) {
-					// [bundled] neighborValue[facing.ordinal()] = getRedstoneLevel((TileWireContainer) tile, WireFace.get(facing.getOpposite()));
-					neighborLevel[facing.ordinal()] = getSignalLevel((TileWireContainer) tile, WireFace.get(facing.getOpposite()));
+					neighborLevel[facidx] = getSignalLevel((TileWireContainer) tile, WireFace.get(facing.getOpposite()));
 				}
+			}
+
+			if (neighborLevel[facidx] == 0xFFF) {
+				break;
 			}
 		}
 
 		for (int i = 0; i < 7; i++) {
-			if (neighborLevel[i] > 1) {
-				// [bundled] byte v = (byte) Math.min(neighborValue[i], 15);
-				if (neighborLevel[i] > maxSignal) {
-					maxSignal = neighborLevel[i];
-					// [bundled] maxValue = v;
-				}
+			if (neighborLevel[i] > maxSignal) {
+				maxSignal = neighborLevel[i];
 			}
 		}
 
-		if (maxSignal > signalLevel && maxSignal > 1) {
+		if (maxSignal > signalLevel) {
 			signalLevel = maxSignal - 1;
-			signalValue = 15;
+			if ((signalLevel & 0xFF) == 0 || (signalLevel & 0xFF) == 0xFF) {
+				signalLevel = 0;
+			}
 		} else {
 			signalLevel = 0;
-			signalValue = 0;
 		}
 
 		if (DEBUG) {
-			System.out.println("Levels: " + Arrays.toString(neighborLevel) + " " + Arrays.toString(neighborValue));
-			System.out.println("Switch: " + oldSignal + ", " + oldValue + " -> " + signalLevel + ", " + signalValue);
+			System.out.println("Levels: " + Arrays.toString(neighborLevel));
+			System.out.println("Switch: " + oldSignal + ", " + " -> " + signalLevel);
 		}
 
 		if (signalLevel == 0) {
@@ -252,7 +233,7 @@ public class WireNormal extends Wire {
 		}
 
 		if (type == WireKind.NORMAL) {
-			if (oldValue != signalValue) {
+			if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
 				container.scheduleRenderUpdate();
 
 				if (location != WireFace.CENTER) {
@@ -270,6 +251,6 @@ public class WireNormal extends Wire {
 
 	@Override
 	public int getRedstoneLevel() {
-		return signalValue;
+		return signalLevel >> 8;
 	}
 }

@@ -37,9 +37,8 @@ public class WireBundled extends Wire {
 		if (signalLevel == null || signalLevel.length != 16) {
 			signalLevel = new int[16];
 		}
-		signalValue = nbt.getByteArray("v");
-		if (signalValue == null || signalValue.length != 16) {
-			signalValue = new byte[16];
+		for (int i = 0; i < 16; i++) {
+			signalValue[i] = (byte) (signalLevel[i] >> 8);
 		}
 	}
 
@@ -48,36 +47,30 @@ public class WireBundled extends Wire {
 		super.writeToNBT(nbt, isPacket);
 		if (!isPacket) {
 			nbt.setIntArray("s", signalLevel);
-			nbt.setByteArray("v", signalValue);
 		}
 	}
 
 	private void propagate(int i, byte[][] nValues) {
 		int maxSignal = 0;
 		int[] neighborLevel = new int[7];
-		// [bundled] byte[] neighborValue = new byte[7];
-		// [bundled] byte maxValue = 0;
 
 		if (internalConnections > 0) {
 			for (WireFace location : WireFace.VALUES) {
 				if (connectsInternal(location)) {
 					neighborLevel[location.ordinal()] = container.getBundledSignalLevel(location, i);
-					// [bundled] neighborValue[location.ordinal()] = container.getBundledRedstoneLevel(location, i);
 				}
 			}
 		}
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
-				if (nValues[facing.ordinal()] != null && nValues[facing.ordinal()][i] > 0) {
-					neighborLevel[facing.ordinal()] = 255;
-					// [bundled] neighborValue[facing.ordinal()] = nValues[facing.ordinal()][i];
+				if (nValues[facing.ordinal()] != null) {
+					neighborLevel[facing.ordinal()] = nValues[facing.ordinal()][i];
 				} else {
 					TileEntity tile = container.getNeighbourTile(facing);
 
 					if (tile instanceof TileWireContainer) {
 						neighborLevel[facing.ordinal()] = ((TileWireContainer) tile).getBundledSignalLevel(location, i);
-						// [bundled] neighborValue[facing.ordinal()] = ((TileWireContainer) tile).getBundledRedstoneLevel(location, i);
 					}
 				}
 			} else if (connectsCorner(facing)) {
@@ -86,16 +79,13 @@ public class WireBundled extends Wire {
 
 				if (tile instanceof TileWireContainer) {
 					neighborLevel[facing.ordinal()] = ((TileWireContainer) tile).getBundledSignalLevel(WireFace.get(facing.getOpposite()), i);
-					// [bundled] neighborValue[facing.ordinal()] = ((TileWireContainer) tile).getBundledRedstoneLevel(WireFace.get(facing.getOpposite()), i);
 				}
 			}
 		}
 
 		for (int j = 0; j < 7; j++) {
-			// [bundled] byte v = (byte) Math.min(neighborValue[j], 15);
 			if (neighborLevel[j] > maxSignal) {
 				maxSignal = neighborLevel[j];
-				// [bundled] maxValue = v;
 			}
 		}
 
@@ -104,14 +94,16 @@ public class WireBundled extends Wire {
 		}
 
 		int newSignal = 0;
-		signalValue[i] = 0;
 
 		if (maxSignal > signalLevel[i] && maxSignal > 1) {
 			newSignal = maxSignal - 1;
-			signalValue[i] = 15;
+			if ((newSignal & 0xFF) == 0 || (newSignal & 0xFF) == 0xFF) {
+				newSignal = 0;
+			}
 		}
 
 		signalLevel[i] = newSignal;
+		signalValue[i] = (byte) (newSignal >> 8);
 
 		if (newSignal == 0) {
 			for (WireFace nLoc : WireFace.VALUES) {

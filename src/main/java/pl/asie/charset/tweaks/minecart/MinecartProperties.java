@@ -34,7 +34,11 @@ public class MinecartProperties implements IExtendedEntityProperties {
 
 	@Override
 	public void loadNBTData(NBTTagCompound compound) {
-		color = compound.getInteger("color");
+		if (compound.hasKey("color")) {
+			color = compound.getInteger("color");
+		} else {
+			color = -1;
+		}
 	}
 
 	@Override
