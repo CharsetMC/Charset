@@ -39,6 +39,7 @@ public class BlockWire extends BlockContainer {
 		this.setBlockBounds(0, 0, 0, 1.0f, 0.125f, 1.0f);
 		this.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 		this.setUnlocalizedName("charset.wire");
+		this.setHardness(0.2F);
 	}
 
 	@Override
