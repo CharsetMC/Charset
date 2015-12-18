@@ -9,7 +9,7 @@
     "south": "#arrow",
     "west": "#arrow"
   },
-	"display": {
+  "display": {
     "thirdperson": {
         "rotation": [ 10, -45, 170 ],
         "translation": [ 0, 1.5, -2.75 ],
