@@ -154,6 +154,7 @@ public class WireBundled extends Wire {
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
 				TileEntity tile = container.getNeighbourTile(facing);
+
 				if (tile instanceof IBundledEmitter && !(tile instanceof IWire)) {
 					nValues[facing.ordinal()] = ((IBundledEmitter) tile).getBundledSignal(location, facing.getOpposite());
 				}

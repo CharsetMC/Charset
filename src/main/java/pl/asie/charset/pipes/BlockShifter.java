@@ -33,6 +33,10 @@ public class BlockShifter extends BlockContainer {
 		setHardness(0.5F);
 	}
 
+	public boolean isValidFacing(IBlockAccess access, BlockPos pos, EnumFacing facing) {
+		return access.getBlockState(pos.offset(facing)).getBlock() instanceof BlockPipe;
+	}
+
 	@Override
 	public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
 		return side != world.getBlockState(pos).getValue(Properties.FACING);
@@ -129,9 +133,7 @@ public class BlockShifter extends BlockContainer {
 			return this.getStateFromMeta(facing.ordinal());
 		} else {
 			for (EnumFacing direction : EnumFacing.VALUES) {
-				TileEntity entity = world.getTileEntity(pos.offset(direction));
-
-				if (entity instanceof TilePipe) {
+				if (isValidFacing(world, pos, direction)) {
 					return this.getStateFromMeta(direction.ordinal());
 				}
 			}
@@ -181,6 +183,23 @@ public class BlockShifter extends BlockContainer {
 		if (tile instanceof TileShifter) {
 			((TileShifter) tile).updateRedstoneLevel();
 		}
+	}
+
+	@Override
+	public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+		IBlockState state = world.getBlockState(pos);
+
+		int m = state.getValue(Properties.FACING).ordinal();
+		for (int i = 1; i < 6; i++) {
+			EnumFacing f = EnumFacing.getFront((m + i) % 6);
+
+			if (isValidFacing(world, pos, f)) {
+				world.setBlockState(pos, state.withProperty(Properties.FACING, f), 3);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override

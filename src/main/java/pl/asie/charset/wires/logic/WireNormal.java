@@ -239,7 +239,6 @@ public class WireNormal extends Wire {
 
 	@Override
 	public int getSignalLevel() {
-        System.out.println("LEVEL @ " + container.getPos() + " = " + signalLevel);
 		return signalLevel;
 	}
 
