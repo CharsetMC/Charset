@@ -13,9 +13,4 @@ public class WireInsulated extends WireNormal {
 	protected int getSignalLevel(TileWireContainer container, WireFace location) {
 		return container.getInsulatedSignalLevel(location, type.color());
 	}
-
-	@Override
-	protected byte getRedstoneLevel(TileWireContainer container, WireFace location) {
-		return container.getInsulatedRedstoneLevel(location, type.color());
-	}
 }

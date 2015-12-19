@@ -24,7 +24,13 @@ public final class WireUtils {
 	private WireUtils() {
 
 	}
-	
+
+	public static int getStrongLevel(World world, BlockPos pos, IBlockState state, EnumFacing facing) {
+		Block block = state.getBlock();
+
+		return block.getStrongPower(world, pos, state, facing);
+	}
+
 	public static int getRedstoneLevel(World world, BlockPos pos, IBlockState state, EnumFacing facing) {
 		Block block = state.getBlock();
 

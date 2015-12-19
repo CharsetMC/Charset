@@ -11,9 +11,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.item.ItemStack;
 
+import net.minecraftforge.client.model.IFlexibleBakedModel;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.client.model.ISmartBlockModel;
 import net.minecraftforge.client.model.ISmartItemModel;
@@ -85,10 +88,15 @@ public abstract class RendererWireBase implements ISmartBlockModel, ISmartItemMo
 
 	public abstract void loadTextures(TextureMap map);
 
+    @Override
+    public VertexFormat getFormat() {
+        return DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL;
+    }
+
 	@Override
- 	public Pair<IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
+ 	public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
 		this.transform = cameraTransformType;
-		return new ImmutablePair<IBakedModel, Matrix4f>(this,
+		return new ImmutablePair<RendererWireBase, Matrix4f>(this,
 				transformMap.containsKey(cameraTransformType) ? transformMap.get(cameraTransformType).getMatrix() : TRSRTransformation.identity().getMatrix());
 	}
 }

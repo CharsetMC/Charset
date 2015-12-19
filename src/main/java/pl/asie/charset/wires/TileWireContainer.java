@@ -82,7 +82,6 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	public void validate() {
 		super.validate();
 		scheduleConnectionUpdate();
-		schedulePropagationUpdate();
 	}
 
 	@Override
@@ -200,19 +199,6 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 		return 0;
 	}
 
-	public byte getInsulatedRedstoneLevel(WireFace side, int i) {
-		if (wires[side.ordinal()] != null) {
-			switch (wires[side.ordinal()].type.type()) {
-				case BUNDLED:
-					return wires[side.ordinal()].getBundledRedstoneLevel(i);
-				default:
-					return (byte) wires[side.ordinal()].getRedstoneLevel();
-			}
-		}
-
-		return 0;
-	}
-
 	public int getBundledSignalLevel(WireFace side, int i) {
 		if (wires[side.ordinal()] != null) {
 			if (wires[side.ordinal()].type.type() == WireType.INSULATED) {
@@ -224,19 +210,6 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 
 		return 0;
 	}
-
-	public byte getBundledRedstoneLevel(WireFace side, int i) {
-		if (wires[side.ordinal()] != null) {
-			if (wires[side.ordinal()].type.type() == WireType.INSULATED) {
-				return wires[side.ordinal()].type.color() == i ? (byte) wires[side.ordinal()].getRedstoneLevel() : 0;
-			} else {
-				return wires[side.ordinal()].getBundledRedstoneLevel(i);
-			}
-		}
-
-		return 0;
-	}
-
 
 	public int getSignalLevel(WireFace side) {
 		return wires[side.ordinal()] != null ? wires[side.ordinal()].getSignalLevel() : 0;
@@ -435,6 +408,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 		this.wires[side.ordinal()] = createWire(side, meta >> 1);
 
 		scheduleConnectionUpdate();
+		schedulePropagationUpdate();
 		scheduleRenderUpdate();
 
 		return true;

@@ -60,10 +60,6 @@ public class WireNormal extends Wire {
 		return container.getSignalLevel(location);
 	}
 
-	protected byte getRedstoneLevel(TileWireContainer container, WireFace location) {
-		return (byte) container.getRedstoneLevel(location);
-	}
-
 	@Override
 	public void propagate(int color) {
 		if (DEBUG) {
@@ -109,7 +105,7 @@ public class WireNormal extends Wire {
 					Block block = state.getBlock();
 
 					if (!(block instanceof BlockWire) && !(block instanceof BlockRedstoneWire)) {
-						int power = WireUtils.getRedstoneLevel(container.getWorld(), pos, state, enumfacing);
+						int power = WireUtils.getStrongLevel(container.getWorld(), pos, state, enumfacing);
 
 						if (power >= 15) {
 							i = 15;
@@ -157,10 +153,6 @@ public class WireNormal extends Wire {
 					neighborLevel[facidx] = getSignalLevel((TileWireContainer) tile, WireFace.get(facing.getOpposite()));
 				}
 			}
-
-			if (neighborLevel[facidx] == 0xFFF) {
-				break;
-			}
 		}
 
 		for (int i = 0; i < 7; i++) {
@@ -179,8 +171,9 @@ public class WireNormal extends Wire {
 		}
 
 		if (DEBUG) {
+            System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
 			System.out.println("Levels: " + Arrays.toString(neighborLevel));
-			System.out.println("Switch: " + oldSignal + ", " + " -> " + signalLevel);
+			System.out.println("Switch: " + oldSignal + " -> " + signalLevel);
 		}
 
 		if (signalLevel == 0) {
@@ -246,6 +239,7 @@ public class WireNormal extends Wire {
 
 	@Override
 	public int getSignalLevel() {
+        System.out.println("LEVEL @ " + container.getPos() + " = " + signalLevel);
 		return signalLevel;
 	}
 

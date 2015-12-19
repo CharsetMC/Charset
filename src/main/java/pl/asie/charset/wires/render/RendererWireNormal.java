@@ -14,10 +14,10 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
+import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.TileWireContainer;
 import pl.asie.charset.wires.WireKind;
-import pl.asie.charset.api.wires.WireFace;
 
 /**
  * Created by asie on 12/5/15.

@@ -14,7 +14,8 @@
     ],
     "inventory": [
       {
-        "model": "charsetpipes:pipe_item"
+        "model": "charsetpipes:pipe_item",
+		"transform": "forge:default-block"
       }
     ],
     "down": {

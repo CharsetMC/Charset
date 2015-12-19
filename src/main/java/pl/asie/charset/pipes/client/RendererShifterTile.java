@@ -89,7 +89,7 @@ public class RendererShifterTile extends TileEntitySpecialRenderer {
 
 			GlStateManager.pushAttrib();
 			RenderHelper.enableStandardItemLighting();
-			this.itemRenderer.func_181564_a(entityitem.getEntityItem(), ItemCameraTransforms.TransformType.FIXED);
+			this.itemRenderer.renderItem(entityitem.getEntityItem(), ItemCameraTransforms.TransformType.FIXED);
 			RenderHelper.disableStandardItemLighting();
 			GlStateManager.popAttrib();
 
