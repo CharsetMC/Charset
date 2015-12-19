@@ -65,7 +65,7 @@ public class WireBundled extends Wire {
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
 				if (nValues[facing.ordinal()] != null) {
-					neighborLevel[facing.ordinal()] = nValues[facing.ordinal()][i];
+					neighborLevel[facing.ordinal()] = (nValues[facing.ordinal()][i] << 8) | 0xFF;
 				} else {
 					TileEntity tile = container.getNeighbourTile(facing);
 
