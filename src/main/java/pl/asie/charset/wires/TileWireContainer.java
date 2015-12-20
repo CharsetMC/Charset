@@ -450,15 +450,15 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 	}
 
 	public boolean connects(WireFace side, EnumFacing direction) {
-		return wires[side.ordinal()] != null ? wires[side.ordinal()].connects(direction) : null;
+		return wires[side.ordinal()] != null ? wires[side.ordinal()].connects(direction) : false;
 	}
 
 	public boolean connectsAny(WireFace side, EnumFacing direction) {
-		return wires[side.ordinal()] != null ? wires[side.ordinal()].connectsAny(direction) : null;
+		return wires[side.ordinal()] != null ? wires[side.ordinal()].connectsAny(direction) : false;
 	}
 
 	public boolean connectsCorner(WireFace side, EnumFacing direction) {
-		return wires[side.ordinal()] != null ? wires[side.ordinal()].connectsCorner(direction) : null;
+		return wires[side.ordinal()] != null ? wires[side.ordinal()].connectsCorner(direction) : false;
 	}
 
 	// API
