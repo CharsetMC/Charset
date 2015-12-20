@@ -104,13 +104,25 @@ public class ItemWire extends ItemBlock {
 			pos = pos.offset(side);
 		}
 
+		if (!player.canPlayerEdit(pos, side, stack)) {
+			return false;
+		}
+
 		if (!isFreestanding(stack) && !WireUtils.canPlaceWire(world, pos.offset(pSide), pSide.getOpposite())) {
 			return false;
 		}
 
-		if (super.onItemUse(stack, player, world, pos, side, hitX, hitY, hitZ)) {
+		if (world.canBlockBePlaced(this.block, pos, false, side, null, stack)) {
+			int i = this.getMetadata(stack.getMetadata());
+			IBlockState iblockstate1 = this.block.onBlockPlaced(world, pos, side, hitX, hitY, hitZ, i, player);
+
+			if (placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, iblockstate1)) {
+				world.playSoundEffect((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), this.block.stepSound.getPlaceSound(), (this.block.stepSound.getVolume() + 1.0F) / 2.0F, this.block.stepSound.getFrequency() * 0.8F);
+				stack.stackSize--;
+			}
+
 			TileEntity tileEntity = world.getTileEntity(pos);
-			if (world.getTileEntity(pos) == null) {
+			if (tileEntity == null) {
 				tileEntity = block.createTileEntity(world, world.getBlockState(pos));
 				world.setTileEntity(pos, tileEntity);
 			}

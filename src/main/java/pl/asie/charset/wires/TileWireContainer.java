@@ -267,6 +267,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 			}
 
 			scheduleConnectionUpdate();
+			scheduleNeighborUpdate();
 			scheduleRenderUpdate();
 
 			return true;
@@ -408,6 +409,7 @@ public class TileWireContainer extends TileEntity implements ITickable, IWire, I
 		this.wires[side.ordinal()] = createWire(side, meta >> 1);
 
 		scheduleConnectionUpdate();
+		scheduleNeighborUpdate();
 		schedulePropagationUpdate();
 		scheduleRenderUpdate();
 

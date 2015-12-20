@@ -42,6 +42,21 @@ public class BlockWire extends BlockContainer {
 		this.setHardness(0.2F);
 	}
 
+	/* @Override
+	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+		return true;
+	}
+
+	@Override
+	public boolean func_181623_g() {
+		return true;
+	}
+
+	@Override
+	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+		return false;
+	} */
+
 	@Override
 	public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
 		TileWireContainer wire = getWire(world, pos);
@@ -68,6 +83,16 @@ public class BlockWire extends BlockContainer {
 	@Override
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
 		List<ItemStack> drops = new ArrayList<ItemStack>();
+		TileWireContainer wire = getWire(world, pos);
+
+		if (wire != null) {
+			for (WireFace face : WireFace.VALUES) {
+				if (wire.hasWire(face)) {
+					drops.add(new ItemStack(this, 1, wire.getItemMetadata(face)));
+				}
+			}
+		}
+
 		return drops;
 	}
 
