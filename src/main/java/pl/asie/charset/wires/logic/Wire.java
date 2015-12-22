@@ -18,7 +18,7 @@ import pl.asie.charset.wires.TileWireContainer;
 import pl.asie.charset.wires.WireKind;
 
 public abstract class Wire {
-	protected static final boolean DEBUG = false;
+	protected static final boolean DEBUG = true;
 
 	public final WireKind type;
 	public final WireFace location;

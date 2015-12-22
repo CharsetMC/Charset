@@ -108,7 +108,7 @@ public class WireBundled extends Wire {
 		if (newSignal == 0) {
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] > 0) {
-					container.updateWireLocation(nLoc, type.color());
+					container.updateWireLocation(nLoc, i);
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing();
 
@@ -128,7 +128,7 @@ public class WireBundled extends Wire {
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (neighborLevel[nLoc.ordinal()] < newSignal - 1) {
 					if (connectsInternal(nLoc)) {
-						container.updateWireLocation(nLoc, type.color());
+						container.updateWireLocation(nLoc, i);
 					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing();
 
