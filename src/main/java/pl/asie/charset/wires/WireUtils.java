@@ -200,7 +200,7 @@ public final class WireUtils {
 
 	public static int getRedstoneLevel(World world, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face, boolean weak) {
         IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
-        if (getWire(container, face) != null) {
+        if (getWire(container, face) != null || getWire(container, WireFace.get(facing.getOpposite())) != null) {
             return 0;
         }
 

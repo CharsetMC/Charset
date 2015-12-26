@@ -117,6 +117,10 @@ public class PartWireNormal extends PartWireBase {
 				int i = 0;
 
 				for (EnumFacing enumfacing : EnumFacing.values()) {
+                    if (enumfacing == facing.getOpposite()) {
+                        continue;
+                    }
+
 					IBlockState state = getWorld().getBlockState(pos.offset(enumfacing));
 					Block block = state.getBlock();
 

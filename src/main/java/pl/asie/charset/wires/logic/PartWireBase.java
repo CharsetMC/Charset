@@ -1,5 +1,6 @@
 package pl.asie.charset.wires.logic;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -8,6 +9,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -25,20 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.client.multipart.IHitEffectsPart;
+import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.MultipartRegistry;
 import mcmultipart.multipart.PartSlot;
+import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IBundledUpdatable;
 import pl.asie.charset.api.wires.IRedstoneUpdatable;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.wires.ModCharsetWires;
+import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements ISlottedPart, IRedstonePart, ITickable {
-    protected static final boolean DEBUG = false;
+public abstract class PartWireBase extends Multipart implements ISlottedPart, IHitEffectsPart, IRedstonePart, ITickable {
+    protected static final boolean DEBUG = true;
 
     public static final Property PROPERTY = new Property();
 
@@ -92,6 +101,25 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IR
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addDestroyEffects(IHitEffectsPart.AdvancedEffectRenderer advancedEffectRenderer) {
+        advancedEffectRenderer.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.handlePartState(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())).getParticleTexture());
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addHitEffects(PartMOP partMOP, IHitEffectsPart.AdvancedEffectRenderer advancedEffectRenderer) {
+        return true;
+    }
+
+    @Override
+    public void onPartChanged(IMultipart part) {
+        scheduleConnectionUpdate();
+        schedulePropagationUpdate();
+    }
+
+    @Override
     public void onNeighborBlockChange(Block block) {
         scheduleConnectionUpdate();
         schedulePropagationUpdate();
@@ -110,6 +138,20 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IR
     @Override
     public EnumSet<PartSlot> getSlotMask() {
         return EnumSet.of(location.slot);
+    }
+
+    private ItemStack getItemStack() {
+        return new ItemStack(ModCharsetWires.wire, 1, type.ordinal() << 1 | (location == WireFace.CENTER ? 1 : 0));
+    }
+
+    @Override
+    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+        return getItemStack();
+    }
+
+    @Override
+    public List<ItemStack> getDrops() {
+        return Arrays.asList(getItemStack());
     }
 
     @Override
@@ -152,6 +194,11 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IR
         if (location != WireFace.CENTER) {
             nbt.setByte("cC", cornerConnections);
         }
+    }
+
+    @Override
+    public void onRemoved() {
+        pokeExtendedNeighbors();
     }
 
     @Override
@@ -223,6 +270,25 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IR
         return layer == EnumWorldBlockLayer.CUTOUT;
     }
 
+    private void pokeExtendedNeighbors() {
+        if (getContainer() != null) {
+            for (IMultipart multipart : getContainer().getParts()) {
+                if (multipart instanceof PartWireBase) {
+                    multipart.onNeighborBlockChange(MCMultiPartMod.multipart);
+                }
+            }
+        }
+
+        World world = this.getWorld();
+        BlockPos pos = this.getPos();
+        if (world != null) {
+            world.notifyNeighborsRespectDebug(pos, MCMultiPartMod.multipart);
+            for (EnumFacing facing : EnumFacing.VALUES) {
+                world.notifyNeighborsOfStateExcept(pos.offset(facing), MCMultiPartMod.multipart, facing.getOpposite());
+            }
+        }
+    }
+
     @Override
     public void update() {
         if (suConnection) {
@@ -232,14 +298,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IR
 
         if (suNeighbor) {
             suNeighbor = false;
-            World world = this.getWorld();
-            BlockPos pos = this.getPos();
-            if (world != null) {
-                world.notifyNeighborsRespectDebug(pos, MCMultiPartMod.multipart);
-                for (EnumFacing facing : EnumFacing.VALUES) {
-                    world.notifyNeighborsOfStateExcept(pos.offset(facing), MCMultiPartMod.multipart, facing.getOpposite());
-                }
-            }
+            pokeExtendedNeighbors();
         }
 
         if (suPropagation) {

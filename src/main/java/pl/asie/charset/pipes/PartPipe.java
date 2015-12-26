@@ -1,5 +1,6 @@
 package pl.asie.charset.pipes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -11,7 +12,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -26,10 +29,14 @@ import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ITickable;
 
 import net.minecraftforge.fluids.IFluidHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
+import mcmultipart.multipart.MultipartRegistry;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.pipes.IPipe;
@@ -37,7 +44,7 @@ import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.refs.Properties;
 
-public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IPipe, ITickable {
+public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IPipe, ITickable {
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
@@ -53,6 +60,23 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
     }
 
     // Block logic
+
+    @Override
+    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+        return new ItemStack(ModCharsetPipes.itemPipe);
+    }
+
+    @Override
+    public List<ItemStack> getDrops() {
+        List<ItemStack> drops = new ArrayList<ItemStack>();
+        for (PipeItem i : itemSet) {
+            if (i.isValid()) {
+                drops.add(i.getStack());
+            }
+        }
+
+        return drops;
+    }
 
     @Override
     public float getHardness(PartMOP hit) {
@@ -84,6 +108,20 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
                 Properties.SOUTH,
                 Properties.WEST,
                 Properties.EAST);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addDestroyEffects(AdvancedEffectRenderer advancedEffectRenderer) {
+        advancedEffectRenderer.addBlockDestroyEffects(getPos(),
+                Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())));
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
+        return true;
     }
 
     private static class BoundingBox {
