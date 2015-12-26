@@ -1,5 +1,6 @@
 package pl.asie.charset.wires.logic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -91,6 +92,11 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
 	public abstract int getRedstoneLevel();
 
     @Override
+    public float getHardness(PartMOP hit) {
+        return 0.2F;
+    }
+
+    @Override
     public String getModelPath() {
         return getType();
     }
@@ -105,6 +111,13 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
     public boolean addDestroyEffects(IHitEffectsPart.AdvancedEffectRenderer advancedEffectRenderer) {
         advancedEffectRenderer.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.handlePartState(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())).getParticleTexture());
         return true;
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
+        addSelectionBoxes(list);
+        return list.get(0);
     }
 
     @Override

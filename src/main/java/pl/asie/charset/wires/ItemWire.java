@@ -29,6 +29,15 @@ public class ItemWire extends ItemMultiPart {
 	}
 
     @Override
+    public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack) {
+        if (!isFreestanding(stack) && !world.getBlockState(pos.offset(side)).getBlock().isSideSolid(world, pos.offset(side), side.getOpposite())) {
+            return false;
+        }
+
+        return super.place(world, pos, side, hit, stack);
+    }
+
+    @Override
     public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack) {
         PartWireBase part = PartWireProvider.createPart(stack.getItemDamage() >> 1);
         part.location = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(facing);

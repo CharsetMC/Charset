@@ -69,6 +69,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
     @Override
     public List<ItemStack> getDrops() {
         List<ItemStack> drops = new ArrayList<ItemStack>();
+        drops.add(new ItemStack(ModCharsetPipes.itemPipe));
+
         for (PipeItem i : itemSet) {
             if (i.isValid()) {
                 drops.add(i.getStack());
@@ -108,6 +110,13 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
                 Properties.SOUTH,
                 Properties.WEST,
                 Properties.EAST);
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
+        addSelectionBoxes(list);
+        return list.get(0);
     }
 
     @Override
