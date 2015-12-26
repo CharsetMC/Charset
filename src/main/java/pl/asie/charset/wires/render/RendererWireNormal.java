@@ -16,12 +16,9 @@ import net.minecraft.util.ResourceLocation;
 
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
-import pl.asie.charset.wires.TileWireContainer;
 import pl.asie.charset.wires.WireKind;
+import pl.asie.charset.wires.logic.PartWireBase;
 
-/**
- * Created by asie on 12/5/15.
- */
 public class RendererWireNormal extends RendererWireBase {
 	private final EnumFacing[][] CONNECTION_DIRS = new EnumFacing[][] {
 			{EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST},
@@ -44,7 +41,7 @@ public class RendererWireNormal extends RendererWireBase {
 	protected final FaceBakeryWire faceBakery = new FaceBakeryWire();
 	protected final TextureAtlasSprite[] icons = new TextureAtlasSprite[getIconArraySize()];
 	protected final String type;
-	protected final int width, height;
+	protected final float width, height;
 
 	public RendererWireNormal(String type, int width, int height) {
 		this.type = type;
@@ -57,9 +54,9 @@ public class RendererWireNormal extends RendererWireBase {
 		return Collections.emptyList();
 	}
 
-	private int getRenderColor(TileWireContainer wire, WireFace loc) {
+	private int getRenderColor(PartWireBase wire, WireFace face) {
 		if (wire != null) {
-			return wire.getRenderColor(loc);
+			return wire.getRenderColor();
 		} else if (stack != null) {
 			WireKind t = WireKind.VALUES[stack.getItemDamage() >> 1];
 			if (t.type() == WireType.INSULATED) {
@@ -74,8 +71,8 @@ public class RendererWireNormal extends RendererWireBase {
 		}
 	}
 
-	private boolean wc(TileWireContainer wire, EnumFacing dir) {
-		return wire == null ? (transform == ItemCameraTransforms.TransformType.THIRD_PERSON ? dir.getAxis() == EnumFacing.Axis.Y : true) : wire.connects(WireFace.CENTER, dir);
+	private boolean wc(PartWireBase wire, EnumFacing dir) {
+		return wire == null ? (transform == ItemCameraTransforms.TransformType.THIRD_PERSON ? dir.getAxis() == EnumFacing.Axis.Y : true) : wire.connects(dir);
 	}
 
 	protected int getIconArraySize() {
@@ -94,25 +91,29 @@ public class RendererWireNormal extends RendererWireBase {
 
 	}
 
-	private boolean isCenterEdge(TileWireContainer wire, WireFace side) {
-		return wire.getWireType(side) != wire.getWireType(WireFace.CENTER);
+	private boolean isCenterEdge(PartWireBase wire, WireFace side) {
+        // TODO
+		//return wire.getWireType(side) != wire.getWireType(WireFace.CENTER);
+        return false;
 	}
 
-	private float getCL(TileWireContainer wire, WireFace side) {
-		float h = wire != null && wire.hasWire(side) ? wire.getWireKind(side).height() : 0;
+	private float getCL(PartWireBase wire, WireFace side) {
+        // TODO
+		//float h = wire != null && wire.hasWire(side) ? wire.getWireKind(side).height() : 0;
+        float h = 0;
 
 		if (wire != null && isCenterEdge(wire, side)) {
 			h = 0;
 		}
 
-		if (!wc(wire, side.facing())) {
+		if (!wc(wire, side.facing)) {
 			h = 8.0f - (width / 2);
 		}
 
-		return side.facing().getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;
+		return side.facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;
 	}
 
-	public void addWireFreestanding(TileWireContainer wire, boolean lit, List<BakedQuad> quads) {
+	public void addWireFreestanding(PartWireBase wire, boolean lit, List<BakedQuad> quads) {
 		float min = 8.0f - (width / 2);
 		float max = 8.0f + (width / 2);
 		Vector3f minX = new Vector3f(min, getCL(wire, WireFace.DOWN), getCL(wire, WireFace.NORTH));
@@ -189,7 +190,7 @@ public class RendererWireNormal extends RendererWireBase {
 		}
 	}
 
-	public void addCorner(TileWireContainer wire, WireFace side, EnumFacing dir, boolean lit, List<BakedQuad> quads) {
+	public void addCorner(PartWireBase wire, WireFace side, EnumFacing dir, boolean lit, List<BakedQuad> quads) {
 		ModelRotation rot = ROTATIONS[side.ordinal()];
 		float min = 8.0f - (width / 2);
 		float max = 8.0f + (width / 2);
@@ -354,7 +355,7 @@ public class RendererWireNormal extends RendererWireBase {
 		}
 	}
 
-	public void addWire(TileWireContainer wire, WireFace side, boolean lit, List<BakedQuad> quads) {
+	public void addWire(PartWireBase wire, WireFace side, boolean lit, List<BakedQuad> quads) {
 		if (side == WireFace.CENTER) {
 			addWireFreestanding(wire, lit, quads);
 			return;
@@ -366,18 +367,18 @@ public class RendererWireNormal extends RendererWireBase {
 		float maxH = height;
 		
 		boolean[] connectionMatrix = new boolean[] {
-				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][0]),
-				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][1]),
-				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][2]),
-				wire == null ? true : wire.connectsAny(side, CONNECTION_DIRS[side.ordinal()][3])
+				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][0]),
+				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][1]),
+				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][2]),
+				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][3])
 		};
 		int cmc = (connectionMatrix[0] ? 8 : 0) | (connectionMatrix[1] ? 4 : 0) | (connectionMatrix[2] ? 2 : 0) | (connectionMatrix[3] ? 1 : 0);
 
  		boolean[] cornerConnectionMatrix = new boolean[] {
-				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][0]),
-				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][1]),
-				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][2]),
-				wire == null ? true : wire.connectsCorner(side, CONNECTION_DIRS[side.ordinal()][3])
+				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][0]),
+				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][1]),
+				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][2]),
+				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][3])
 		};
 
 		ModelRotation rot = ROTATIONS[side.ordinal()];

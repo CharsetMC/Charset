@@ -2,7 +2,6 @@ package pl.asie.charset.wires;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -16,8 +15,10 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.wires.logic.PartWireProvider;
 
 @Mod(modid = ModCharsetWires.MODID, name = ModCharsetWires.NAME, version = ModCharsetWires.VERSION,
 	dependencies = "required-after:CharsetLib@" + ModCharsetWires.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -31,17 +32,19 @@ public class ModCharsetWires {
 	@SidedProxy(clientSide = "pl.asie.charset.wires.ProxyClient", serverSide = "pl.asie.charset.wires.ProxyCommon")
 	public static ProxyCommon proxy;
 
-	public static BlockWire wire;
+	public static ItemWire wire;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-		wire = new BlockWire();
-		GameRegistry.registerBlock(wire, ItemWire.class, "wire");
+        MultipartRegistry.registerProvider(new PartWireProvider(), "charsetwires:wire");
+
+        wire = new ItemWire();
+        GameRegistry.registerItem(wire, "charsetwires:wire");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		for (int i = 0; i < 2 * 18; i++) {
-			ModCharsetLib.proxy.registerItemModel(Item.getItemFromBlock(wire), i, "charsetwires:wire");
+			ModCharsetLib.proxy.registerItemModel(wire, i, "charsetwires:wire");
 		}
     }
 

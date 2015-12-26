@@ -1,7 +1,7 @@
 {
   "elements": [
-    { "from": [ 4, 12, 4 ],
-      "to": [ 12, 16, 12 ],
+    { "from": [ 4.003, 11.997, 4.003 ],
+      "to": [ 11.997, 16, 11.997 ],
       "faces": {
         "north": { "texture": "#pipe" },
         "south": { "texture": "#pipe" },
@@ -9,8 +9,8 @@
         "east":  { "texture": "#pipe" }
       }
     },
-    { "from": [ 12, 16, 12 ],
-      "to": [ 4, 12, 4 ],
+    { "from": [ 11.997, 16, 11.997 ],
+      "to": [ 4.003, 11.997, 4.003 ],
       "faces": {
         "north": { "texture": "#pipe" },
         "south": { "texture": "#pipe" },

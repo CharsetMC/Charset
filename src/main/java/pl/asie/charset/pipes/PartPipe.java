@@ -17,6 +17,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
@@ -41,9 +42,15 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
 	private boolean neighborBlockChanged;
+    private boolean requestUpdate;
 
 	public PartPipe() {
 	}
+
+    @Override
+    public void readUpdatePacket(PacketBuffer buf) {
+        requestUpdate = true;
+    }
 
     // Block logic
 
@@ -248,16 +255,15 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public void onLoaded() {
-		if (getWorld().isRemote) {
-			ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
-		}
-
-		updateShifters();
-		scheduleRenderUpdate();
+        neighborBlockChanged = true;
 	}
 
 	@Override
 	public void update() {
+        if (requestUpdate && getWorld() != null) {
+            ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
+        }
+
 		if (neighborBlockChanged) {
 			updateShifters();
 			scheduleRenderUpdate();
@@ -448,7 +454,6 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
     @Override
 	public void onNeighborBlockChange(Block block) {
-        System.out.println("!!");
 		neighborBlockChanged = true;
 	}
 

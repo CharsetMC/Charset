@@ -173,9 +173,13 @@ public class PipeItem {
 		}
 	}
 
+    PacketItemUpdate getSyncPacket(boolean syncStack) {
+        return new PacketItemUpdate(owner, this, syncStack);
+    }
+
 	protected void sendPacket(boolean syncStack) {
 		if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-			ModCharsetPipes.packet.sendToAllAround(new PacketItemUpdate(owner, this, syncStack), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+			ModCharsetPipes.packet.sendToAllAround(getSyncPacket(syncStack), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
 		}
 	}
 
@@ -223,7 +227,7 @@ public class PipeItem {
 	}
 
 	private void onItemEnd() {
-        PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite());
+        PartPipe pipe = output != null ? PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite()) : null;
 
 		if (owner.getWorld().isRemote) {
 			// Last resort security mechanism for stray packets.

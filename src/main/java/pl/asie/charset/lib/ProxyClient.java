@@ -22,15 +22,24 @@ public class ProxyClient extends ProxyCommon {
 
 	@Override
 	public World getLocalWorld(int dim) {
-	if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-		World w = Minecraft.getMinecraft().theWorld;
-		if (w != null && w.provider.getDimensionId() == dim) {
-			return w;
-		} else {
-			return null;
-		}
-	} else {
-		return DimensionManager.getWorld(dim);
-	}
-}
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            World w = Minecraft.getMinecraft().theWorld;
+            if (w != null && w.provider.getDimensionId() == dim) {
+                return w;
+            } else {
+                return null;
+            }
+        } else {
+            return DimensionManager.getWorld(dim);
+        }
+    }
+
+    @Override
+    public boolean isClientThread() {
+        return Minecraft.getMinecraft().isCallingFromMinecraftThread();
+    }
+
+    public void addScheduledClientTask(Runnable runnable) {
+        Minecraft.getMinecraft().addScheduledTask(runnable);
+    }
 }

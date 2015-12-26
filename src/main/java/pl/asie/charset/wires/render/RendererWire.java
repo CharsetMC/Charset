@@ -14,10 +14,10 @@ import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.property.IExtendedBlockState;
 
-import pl.asie.charset.wires.ItemWire;
-import pl.asie.charset.wires.TileWireContainer;
-import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.wires.ItemWire;
+import pl.asie.charset.wires.WireKind;
+import pl.asie.charset.wires.logic.PartWireBase;
 
 public class RendererWire extends RendererWireBase {
 	private final List<RendererWireBase> renderers = new ArrayList<RendererWireBase>();
@@ -29,8 +29,8 @@ public class RendererWire extends RendererWireBase {
 	}
 
 	@Override
-	public IBakedModel handleBlockState(IBlockState state) {
-		super.handleBlockState(state);
+	public IBakedModel handlePartState(IBlockState state) {
+		super.handlePartState(state);
 		return this;
 	}
 
@@ -40,15 +40,15 @@ public class RendererWire extends RendererWireBase {
 		return this;
 	}
 
-	private int getRendererId(WireFace side) {
+	private int getRendererId() {
 		if (state != null) {
-			TileWireContainer wire = null;
+			PartWireBase wire = null;
 			if (state instanceof IExtendedBlockState) {
-				wire = ((IExtendedBlockState) state).getValue(TileWireContainer.PROPERTY);
+				wire = ((IExtendedBlockState) state).getValue(PartWireBase.PROPERTY);
 			}
 
 			if (wire != null) {
-				return wire.getWireKind(side).type().ordinal();
+				return wire.type.type().ordinal();
 			}
 		} else if (stack != null) {
 			return WireKind.VALUES[stack.getItemDamage() >> 1].type().ordinal();
@@ -60,25 +60,21 @@ public class RendererWire extends RendererWireBase {
 	@Override
 	public List<BakedQuad> getGeneralQuads() {
 		List<BakedQuad> quads = new ArrayList<BakedQuad>();
-		TileWireContainer wire = null;
+		PartWireBase wire = null;
 		if (state instanceof IExtendedBlockState) {
-			wire = ((IExtendedBlockState) state).getValue(TileWireContainer.PROPERTY);
+			wire = ((IExtendedBlockState) state).getValue(PartWireBase.PROPERTY);
 		}
 
 		if (wire != null) {
-			for (WireFace side : WireFace.VALUES) {
-				if (wire.hasWire(side)) {
-					renderers.get(getRendererId(side)).handleBlockState(state);
-					renderers.get(getRendererId(side)).addWire(wire, side, wire.getRedstoneLevel(side) > 0, quads);
-				}
-			}
+            renderers.get(getRendererId()).handlePartState(state);
+            renderers.get(getRendererId()).addWire(wire, wire.location, wire.getRedstoneLevel() > 0, quads);
 		} else if (stack != null) {
 			if (ItemWire.isFreestanding(stack)) {
-				renderers.get(getRendererId(WireFace.CENTER)).handleItemState(stack);
-				renderers.get(getRendererId(WireFace.CENTER)).addWireFreestanding(null, false, quads);
+				renderers.get(getRendererId()).handleItemState(stack);
+				renderers.get(getRendererId()).addWireFreestanding(null, false, quads);
 			} else {
-				renderers.get(getRendererId(WireFace.DOWN)).handleItemState(stack);
-				renderers.get(getRendererId(WireFace.DOWN)).addWire(null, WireFace.DOWN, false, quads);
+				renderers.get(getRendererId()).handleItemState(stack);
+				renderers.get(getRendererId()).addWire(null, WireFace.DOWN, false, quads);
 			}
 		}
 
@@ -92,7 +88,7 @@ public class RendererWire extends RendererWireBase {
 
 	@Override
 	public TextureAtlasSprite getParticleTexture() {
-		return renderers.get(getRendererId(WireFace.CENTER)).getParticleTexture();
+		return renderers.get(getRendererId()).getParticleTexture();
 	}
 
 	@Override

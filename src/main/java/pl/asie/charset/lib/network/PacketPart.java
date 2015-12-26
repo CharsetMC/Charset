@@ -1,5 +1,7 @@
 package pl.asie.charset.lib.network;
 
+import java.util.UUID;
+
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.util.BlockPos;
@@ -9,7 +11,6 @@ import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartHelper;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.UUIDUtils;
 
 public abstract class PacketPart extends Packet {
 	protected IMultipart part;
@@ -28,15 +29,16 @@ public abstract class PacketPart extends Packet {
 		int x = buf.readInt();
 		int y = buf.readUnsignedShort();
 		int z = buf.readInt();
-        byte[] id = new byte[16];
-        buf.readBytes(id);
+        long l1 = buf.readLong();
+        long l2 = buf.readLong();
+        UUID id = new UUID(l1, l2);
 
 		World w = ModCharsetLib.proxy.getLocalWorld(dim);
 
 		if (w != null) {
             IMultipartContainer container = MultipartHelper.getPartContainer(w, new BlockPos(x, y, z));
             if (container != null) {
-                part = container.getPartFromID(UUIDUtils.toID(id));
+                part = container.getPartFromID(id);
             }
 		}
 	}
@@ -47,6 +49,8 @@ public abstract class PacketPart extends Packet {
 		buf.writeInt(part.getPos().getX());
 		buf.writeShort(part.getPos().getY());
 		buf.writeInt(part.getPos().getZ());
-        buf.writeBytes(UUIDUtils.toBytes(part.getContainer().getPartID(part)));
+        UUID id = part.getContainer().getPartID(part);
+        buf.writeLong(id.getMostSignificantBits());
+        buf.writeLong(id.getLeastSignificantBits());
 	}
 }

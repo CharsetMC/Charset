@@ -3,7 +3,7 @@ package pl.asie.charset.wires;
 import pl.asie.charset.api.wires.WireType;
 
 public enum WireKind {
-	NORMAL(0, 0),
+	NORMAL(0, -1),
 	INSULATED_0(1, 0),
 	INSULATED_1(1, 1),
 	INSULATED_2(1, 2),
@@ -20,7 +20,7 @@ public enum WireKind {
 	INSULATED_13(1, 13),
 	INSULATED_14(1, 14),
 	INSULATED_15(1, 15),
-	BUNDLED(2, 0);
+	BUNDLED(2, -1);
 
 	public static final WireKind[] VALUES = values();
 	private static final WireKind[] insulatedTypes = new WireKind[16];

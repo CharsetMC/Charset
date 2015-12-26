@@ -35,4 +35,12 @@ public class ProxyCommon {
 	public World getLocalWorld(int dim) {
 		return DimensionManager.getWorld(dim);
 	}
+
+    public boolean isClientThread() {
+        return false;
+    }
+
+    public void addScheduledClientTask(Runnable runnable) {
+
+    }
 }

@@ -8,16 +8,14 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
+import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.ItemUtils;
 import pl.asie.charset.lib.TileBase;
-import pl.asie.charset.lib.inventory.InventorySlotIterator;
 import pl.asie.charset.lib.inventory.InventorySlot;
-import pl.asie.charset.api.pipes.IShifter;
-import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.inventory.InventorySlotIterator;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
 	private ItemStack[] filters = new ItemStack[6];
@@ -177,11 +175,8 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		int oldRedstoneLevel = redstoneLevel;
 
 		redstoneLevel = 0;
-		EnumFacing facingDir = worldObj.getBlockState(pos).getValue(Properties.FACING);
 		for (EnumFacing d : EnumFacing.VALUES) {
-			if (d != facingDir) {
-				redstoneLevel = Math.max(redstoneLevel, worldObj.getRedstonePower(pos.offset(d), d));
-			}
+			redstoneLevel = Math.max(redstoneLevel, worldObj.getRedstonePower(pos.offset(d), d));
 		}
 
 		if (oldRedstoneLevel != redstoneLevel) {

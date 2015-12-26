@@ -2,32 +2,40 @@ package pl.asie.charset.wires;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import mcmultipart.item.ItemMultiPart;
+import mcmultipart.multipart.IMultipart;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.wires.logic.PartWireBase;
+import pl.asie.charset.wires.logic.PartWireProvider;
 
-public class ItemWire extends ItemBlock {
-	public ItemWire(Block block) {
-		super(block);
+public class ItemWire extends ItemMultiPart {
+	public ItemWire() {
 		setHasSubtypes(true);
+        setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 	}
 
-	@Override
+    @Override
+    public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack) {
+        PartWireBase part = PartWireProvider.createPart(stack.getItemDamage() >> 1);
+        part.location = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(facing);
+        return part;
+    }
+
+    @Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		for (int i = 0; i < 18 * 2; i++) {
@@ -59,79 +67,7 @@ public class ItemWire extends ItemBlock {
 		return name;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-		if (worldIn.getBlockState(pos).getBlock() instanceof BlockWire || worldIn.getBlockState(pos.offset(side)).getBlock() instanceof BlockWire) {
-			return true;
-		}
-
-		return super.canPlaceBlockOnSide(worldIn, pos, side, player, stack);
-	}
-
 	public static boolean isFreestanding(ItemStack stack) {
 		return (stack.getItemDamage() & 1) == 1;
-	}
-
-	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (stack.stackSize == 0) {
-			return false;
-		}
-
-		IBlockState state = world.getBlockState(pos);
-		Block blockN = state.getBlock();
-
-		if (!(blockN instanceof BlockWire) && !blockN.isReplaceable(world, pos)) {
-			pos = pos.offset(side);
-		}
-
-		EnumFacing pSide = side.getOpposite();
-		WireFace wpSide = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(pSide);
-
-		state = world.getBlockState(pos);
-		blockN = state.getBlock();
-
-		if (blockN instanceof BlockWire) {
-			TileEntity tileEntity = world.getTileEntity(pos);
-			if (tileEntity instanceof TileWireContainer) {
-				if (((TileWireContainer) tileEntity).addWire(wpSide, stack.getItemDamage())) {
-					stack.stackSize--;
-					return true;
-				}
-			}
-
-			pos = pos.offset(side);
-		}
-
-		if (!player.canPlayerEdit(pos, side, stack)) {
-			return false;
-		}
-
-		if (!isFreestanding(stack) && !WireUtils.canPlaceWire(world, pos.offset(pSide), pSide.getOpposite())) {
-			return false;
-		}
-
-		if (world.canBlockBePlaced(this.block, pos, false, side, null, stack)) {
-			int i = this.getMetadata(stack.getMetadata());
-			IBlockState iblockstate1 = this.block.onBlockPlaced(world, pos, side, hitX, hitY, hitZ, i, player);
-
-			if (placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, iblockstate1)) {
-				world.playSoundEffect((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), this.block.stepSound.getPlaceSound(), (this.block.stepSound.getVolume() + 1.0F) / 2.0F, this.block.stepSound.getFrequency() * 0.8F);
-				stack.stackSize--;
-			}
-
-			TileEntity tileEntity = world.getTileEntity(pos);
-			if (tileEntity == null) {
-				tileEntity = block.createTileEntity(world, world.getBlockState(pos));
-				world.setTileEntity(pos, tileEntity);
-			}
-
-			((TileWireContainer) tileEntity).addWire(wpSide, stack.getItemDamage());
-
-			return true;
-		} else {
-			return false;
-		}
 	}
 }

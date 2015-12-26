@@ -39,7 +39,7 @@ public class BlockShifter extends BlockContainer {
 
 	@Override
 	public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
-		return side != world.getBlockState(pos).getValue(Properties.FACING);
+        return true;
 	}
 
 	@Override
