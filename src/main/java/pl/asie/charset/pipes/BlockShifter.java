@@ -33,8 +33,8 @@ public class BlockShifter extends BlockContainer {
 		setHardness(0.5F);
 	}
 
-	public boolean isValidFacing(IBlockAccess access, BlockPos pos, EnumFacing facing) {
-		return access.getBlockState(pos.offset(facing)).getBlock() instanceof BlockPipe;
+	public boolean isValidFacing(World world, BlockPos pos, EnumFacing facing) {
+		return PipeUtils.getPipe(world, pos.offset(facing), facing.getOpposite()) != null;
 	}
 
 	@Override
@@ -124,12 +124,12 @@ public class BlockShifter extends BlockContainer {
 
 	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		TileEntity entityForward = world.getTileEntity(pos.offset(facing));
-		TileEntity entityBackward = world.getTileEntity(pos.offset(facing.getOpposite()));
+        PartPipe partForward = PipeUtils.getPipe(world, pos.offset(facing), facing.getOpposite());
+        PartPipe partBackward = PipeUtils.getPipe(world, pos.offset(facing.getOpposite()), facing);
 
-		if (entityBackward instanceof TilePipe) {
+		if (partBackward instanceof PartPipe) {
 			return this.getStateFromMeta(facing.getOpposite().ordinal());
-		} else if (entityForward instanceof TilePipe) {
+		} else if (partForward instanceof PartPipe) {
 			return this.getStateFromMeta(facing.ordinal());
 		} else {
 			for (EnumFacing direction : EnumFacing.VALUES) {

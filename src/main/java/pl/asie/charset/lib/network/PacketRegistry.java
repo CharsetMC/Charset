@@ -19,6 +19,8 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 
+import mcmultipart.multipart.IMultipart;
+
 public class PacketRegistry {
     private EnumMap<Side, FMLEmbeddedChannel> channels;
 	private TIntObjectMap<Class<? extends Packet>> idPacketMap = new TIntObjectHashMap<Class<? extends Packet>>();
@@ -82,7 +84,13 @@ public class PacketRegistry {
         channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.TOSERVER);
         channels.get(Side.CLIENT).writeOutbound(message);
     }
-    
+
+    public void sendToAllAround(Packet packet, IMultipart entity,
+                                double d) {
+        this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),
+                entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
+    }
+
 	public void sendToAllAround(Packet packet, TileEntity entity,
 			double d) {
 		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),

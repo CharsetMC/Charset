@@ -107,8 +107,8 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			EnumFacing direction = getDirection();
 
 			TileEntity input = getNeighbourTile(direction.getOpposite());
-			TileEntity output = getNeighbourTile(direction);
-			if (input instanceof IInventory && output instanceof TilePipe) {
+			PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
+			if (input instanceof IInventory && output instanceof PartPipe) {
 				InventorySlotIterator iterator = new InventorySlotIterator((IInventory) input, direction);
 				while (iterator.hasNext()) {
 					InventorySlot slot = iterator.next();
@@ -117,10 +117,10 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 						if (source != null && matches(source)) {
 							ItemStack stack = slot.remove(getRedstoneLevel() >= 8 ? source.stackSize : 1, true);
 							if (stack != null) {
-								if (((TilePipe) output).injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
+								if (output.injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
 									stack = slot.remove(getRedstoneLevel() >= 8 ? source.stackSize : 1, false);
 									if (stack != null) {
-										((TilePipe) output).injectItem(stack, direction.getOpposite(), false);
+										output.injectItem(stack, direction.getOpposite(), false);
 									}
 
 									return;

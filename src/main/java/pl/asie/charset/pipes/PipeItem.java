@@ -11,6 +11,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
+import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.DirectionUtils;
@@ -25,7 +28,7 @@ public class PipeItem {
 
 	public final short id;
 	private int activeShifterDistance;
-	private TilePipe owner;
+	private PartPipe owner;
 	private boolean stuck;
 
 	protected EnumFacing input, output;
@@ -34,20 +37,20 @@ public class PipeItem {
 	protected int progress;
 	protected int blocksSinceSync;
 
-	public PipeItem(TilePipe owner, ItemStack stack, EnumFacing side) {
+	public PipeItem(PartPipe owner, ItemStack stack, EnumFacing side) {
 		this.id = nextId++;
 		this.owner = owner;
 		this.stack = stack;
 		initializeFromEntrySide(side);
 	}
 
-	public PipeItem(TilePipe owner, NBTTagCompound nbt) {
+	public PipeItem(PartPipe owner, NBTTagCompound nbt) {
 		this.id = nextId++;
 		this.owner = owner;
 		readFromNBT(nbt);
 	}
 
-	protected PipeItem(TilePipe tile, short id) {
+	protected PipeItem(PartPipe tile, short id) {
 		this.owner = tile;
 		this.id = id;
 	}
@@ -220,25 +223,27 @@ public class PipeItem {
 	}
 
 	private void onItemEnd() {
-		TileEntity tile = owner.getNeighbourTile(output);
+        PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite());
 
 		if (owner.getWorld().isRemote) {
 			// Last resort security mechanism for stray packets.
 			blocksSinceSync++;
 
 			if (blocksSinceSync < 2) {
-				passToPipe(tile, output, false);
+				passToPipe(pipe, output, false);
 			}
 			return;
 		}
 
 		if (output != null) {
-			if (passToPipe(tile, output, false)) {
+			if (passToPipe(pipe, output, false)) {
 				// Pipe passing does not take into account stack size
 				// subtraction, as it re-uses the same object instance.
 				// Therefore, we need to quit here.
 				return;
 			} else {
+                TileEntity tile = owner.getNeighbourTile(output);
+
 				if (!passToInjectable(tile, output, false)) {
 					addToInventory(tile, output, false);
 				}
@@ -254,6 +259,12 @@ public class PipeItem {
 		if (dir == null || !owner.connects(dir)) {
 			return false;
 		}
+
+        PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
+
+        if (pipe != null) {
+            return pipe.canInjectItems(dir.getOpposite());
+        }
 
 		TileEntity tile = owner.getNeighbourTile(dir);
 
@@ -271,7 +282,7 @@ public class PipeItem {
 			return activeShifterDistance == 0;
 		}
 
-		TileEntity tile = owner.getNeighbourTile(dir);
+        PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
 
 		/* if (isPickingDirection) {
 			// If we're picking the direction, only check for pipe *connection*,
@@ -283,10 +294,12 @@ public class PipeItem {
 				}
 			}
 		} else { */
-		if (passToPipe(tile, dir, true)) {
+		if (passToPipe(pipe, dir, true)) {
 			return true;
 		}
 		// }
+
+        TileEntity tile = owner.getNeighbourTile(dir);
 
 		if (passToInjectable(tile, dir, true)) {
 			return true;
@@ -414,7 +427,7 @@ public class PipeItem {
 		sendPacket(false);
 	}
 
-	protected void reset(TilePipe owner, EnumFacing input) {
+	protected void reset(PartPipe owner, EnumFacing input) {
 		this.owner = owner;
 		initializeFromEntrySide(input);
 
@@ -424,7 +437,14 @@ public class PipeItem {
 	}
 
 	private boolean passToInjectable(TileEntity tile, EnumFacing dir, boolean simulate) {
-		if (tile instanceof IItemInjectable && !(tile instanceof TilePipe)) {
+        if (tile instanceof IMultipartContainer) {
+            IMultipart part = ((IMultipartContainer) tile).getPartInSlot(PartSlot.CENTER);
+            if (part instanceof PartPipe) {
+                return false;
+            }
+        }
+
+		if (tile instanceof IItemInjectable) {
 			int added = ((IItemInjectable) tile).injectItem(stack, dir.getOpposite(), simulate);
 			if (added > 0) {
 				if (!simulate) {
@@ -437,12 +457,12 @@ public class PipeItem {
 		return false;
 	}
 
-	private boolean passToPipe(TileEntity tile, EnumFacing dir, boolean simulate) {
-		if (tile instanceof TilePipe) {
-			if (((TilePipe) tile).injectItemInternal(this, dir.getOpposite(), simulate)) {
-				return true;
-			}
-		}
+	private boolean passToPipe(PartPipe pipe, EnumFacing dir, boolean simulate) {
+        if (pipe != null) {
+            if (pipe.injectItemInternal(this, dir.getOpposite(), simulate)) {
+                return true;
+            }
+        }
 
 		return false;
 	}
@@ -537,7 +557,7 @@ public class PipeItem {
 		}
 	}
 
-	public TilePipe getOwner() {
+	public PartPipe getOwner() {
 		return owner;
 	}
 

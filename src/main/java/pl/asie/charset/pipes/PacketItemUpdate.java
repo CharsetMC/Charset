@@ -6,14 +6,13 @@ import io.netty.buffer.ByteBuf;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-import net.minecraft.tileentity.TileEntity;
-
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
+import mcmultipart.multipart.IMultipart;
 import pl.asie.charset.lib.DirectionUtils;
-import pl.asie.charset.lib.network.PacketTile;
+import pl.asie.charset.lib.network.PacketPart;
 
-public class PacketItemUpdate extends PacketTile {
+public class PacketItemUpdate extends PacketPart {
 	protected PipeItem item;
 	private static final TIntObjectMap<WeakReference<PipeItem>> itemIdCache = new TIntObjectHashMap<WeakReference<PipeItem>>();
 	private boolean syncStack;
@@ -22,8 +21,8 @@ public class PacketItemUpdate extends PacketTile {
 		super();
 	}
 
-	public PacketItemUpdate(TileEntity tile, PipeItem item, boolean syncStack) {
-		super(tile);
+	public PacketItemUpdate(IMultipart part, PipeItem item, boolean syncStack) {
+		super(part);
 		this.item = item;
 		this.syncStack = syncStack;
 	}
@@ -32,7 +31,7 @@ public class PacketItemUpdate extends PacketTile {
 	public void readData(ByteBuf buf) {
 		super.readData(buf);
 
-		if (tile == null || !(tile instanceof TilePipe)) {
+		if (part == null || !(part instanceof PartPipe)) {
 			return;
 		}
 
@@ -46,14 +45,14 @@ public class PacketItemUpdate extends PacketTile {
 		item = ref != null ? ref.get() : null;
 		syncStack = (flags & 0x04) != 0;
 
-		if (item != null && (item.getOwner() != tile || !item.getOwner().getPipeItems().contains(item))) {
+		if (item != null && (item.getOwner() != part || !item.getOwner().getPipeItems().contains(item))) {
 			item.getOwner().removeItemClientSide(item);
 			itemIdCache.remove(id);
 			item = null;
 		}
 
 		if (item == null) {
-			TilePipe pipe = (TilePipe) tile;
+			PartPipe pipe = (PartPipe) part;
 			for (PipeItem p : pipe.getPipeItems()) {
 				if (p.id == id) {
 					item = p;
@@ -64,7 +63,7 @@ public class PacketItemUpdate extends PacketTile {
 
 		if (item == null) {
 			if (syncStack) {
-				item = new PipeItem((TilePipe) tile, id);
+				item = new PipeItem((PartPipe) part, id);
 				addWhenDone = true;
 			} else {
 				return;
@@ -88,7 +87,7 @@ public class PacketItemUpdate extends PacketTile {
 		itemIdCache.put(id, new WeakReference<PipeItem>(item));
 
 		if (addWhenDone) {
-			((TilePipe) tile).addItemClientSide(item);
+			((PartPipe) part).addItemClientSide(item);
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.fml.common.Mod;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
@@ -33,19 +35,20 @@ public class ModCharsetPipes {
     @SidedProxy(clientSide = "pl.asie.charset.pipes.ProxyClient", serverSide = "pl.asie.charset.pipes.ProxyCommon")
     public static ProxyCommon proxy;
 
-	public static Block pipeBlock, shifterBlock;
+	public static Block shifterBlock;
+    public static Item itemPipe;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-		pipeBlock = new BlockPipe();
-		ModCharsetLib.proxy.registerBlock(pipeBlock, "pipe");
-		GameRegistry.registerTileEntity(TilePipe.class, "CharsetPipes:pipe");
+        itemPipe = new ItemPipe();
+        GameRegistry.registerItem(itemPipe, "pipe");
+        MultipartRegistry.registerPart(PartPipe.class, "CharsetPipes:pipe");
 
 		shifterBlock = new BlockShifter();
 		ModCharsetLib.proxy.registerBlock(shifterBlock, "shifter");
 		GameRegistry.registerTileEntity(TileShifter.class, "CharsetPipes:shifter");
 
-		ModCharsetLib.proxy.registerItemModel(pipeBlock, 0, "charsetpipes:pipe");
+        ModCharsetLib.proxy.registerItemModel(itemPipe, 0, "charsetpipes:pipe");
 		ModCharsetLib.proxy.registerItemModel(shifterBlock, 0, "charsetpipes:shifter");
     }
 
@@ -63,7 +66,7 @@ public class ModCharsetPipes {
 				"crc",
 				'c', Blocks.cobblestone, 'P', Blocks.piston, 'r', Items.comparator, '^', Items.arrow);
 
-		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(pipeBlock, 8),
+		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
 				"mgm",
 				'g', Blocks.glass, 'm', Blocks.obsidian);
 	}

@@ -2,30 +2,29 @@ package pl.asie.charset.pipes;
 
 import io.netty.buffer.ByteBuf;
 
-import net.minecraft.tileentity.TileEntity;
-
-import pl.asie.charset.lib.network.PacketTile;
+import mcmultipart.multipart.IMultipart;
+import pl.asie.charset.lib.network.PacketPart;
 
 /**
  * Created by asie on 12/2/15.
  */
-public class PacketPipeSyncRequest extends PacketTile {
+public class PacketPipeSyncRequest extends PacketPart {
 	public PacketPipeSyncRequest() {
 		super();
 	}
 
-	public PacketPipeSyncRequest(TileEntity tile) {
-		super(tile);
+	public PacketPipeSyncRequest(IMultipart part) {
+		super(part);
 	}
 
 	@Override
 	public void readData(ByteBuf buf) {
 		super.readData(buf);
 
-		if (tile == null || !(tile instanceof TilePipe)) {
+		if (part == null || !(part instanceof PartPipe)) {
 			return;
 		}
 
-		((TilePipe) tile).onSyncRequest();
+		((PartPipe) part).onSyncRequest();
 	}
 }

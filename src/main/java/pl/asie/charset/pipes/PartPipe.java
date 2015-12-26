@@ -1,37 +1,149 @@
 package pl.asie.charset.pipes;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ITickable;
 
 import net.minecraftforge.fluids.IFluidHandler;
 
+import mcmultipart.MCMultiPartMod;
+import mcmultipart.multipart.ISlottedPart;
+import mcmultipart.multipart.Multipart;
+import mcmultipart.multipart.PartSlot;
+import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.pipes.IPipe;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
-import pl.asie.charset.lib.TileBase;
+import pl.asie.charset.lib.refs.Properties;
 
-public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable {
+public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IPipe, ITickable {
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
 	private boolean neighborBlockChanged;
 
-	public TilePipe() {
+	public PartPipe() {
 	}
 
+    // Block logic
+
+    @Override
+    public float getHardness(PartMOP hit) {
+        return 0.3F;
+    }
+
+    @Override
+    public Material getMaterial() {
+        return Material.glass;
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state) {
+        return state
+                .withProperty(Properties.DOWN, connects(EnumFacing.DOWN))
+                .withProperty(Properties.UP, connects(EnumFacing.UP))
+                .withProperty(Properties.NORTH, connects(EnumFacing.NORTH))
+                .withProperty(Properties.SOUTH, connects(EnumFacing.SOUTH))
+                .withProperty(Properties.WEST, connects(EnumFacing.WEST))
+                .withProperty(Properties.EAST, connects(EnumFacing.EAST));
+    }
+
+    @Override
+    public BlockState createBlockState() {
+        return new BlockState(MCMultiPartMod.multipart,
+                Properties.DOWN,
+                Properties.UP,
+                Properties.NORTH,
+                Properties.SOUTH,
+                Properties.WEST,
+                Properties.EAST);
+    }
+
+    private static class BoundingBox {
+        private static final AxisAlignedBB[] bounds = new AxisAlignedBB[0x40];
+
+        static {
+            for (int mask = 0; mask < 0x40; ++mask) {
+                bounds[mask] = AxisAlignedBB.fromBounds(
+                        ((mask & (1 << 4)) != 0 ? 0 : 0.25),
+                        ((mask & (1 << 0)) != 0 ? 0 : 0.25),
+                        ((mask & (1 << 2)) != 0 ? 0 : 0.25),
+                        ((mask & (1 << 5)) != 0 ? 1 : 0.75),
+                        ((mask & (1 << 1)) != 0 ? 1 : 0.75),
+                        ((mask & (1 << 3)) != 0 ? 1 : 0.75)
+                );
+            }
+        }
+
+        private static AxisAlignedBB getBox(int msk) {
+            return bounds[msk];
+        }
+    }
+
+    @Override
+    public void addSelectionBoxes(List<AxisAlignedBB> list) {
+        list.add(BoundingBox.getBox(neighbors()));
+    }
+
+    @Override
+    public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+        AxisAlignedBB box = BoundingBox.getBox(neighbors());
+        if (box.intersectsWith(mask)) {
+            list.add(box);
+        }
+    }
+
+    @Override
+    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+        return layer == EnumWorldBlockLayer.CUTOUT;
+    }
+
+    private int neighbors() {
+        int result = 0;
+            for (EnumFacing side : EnumFacing.VALUES) {
+            if (connects(side)) {
+                result |= 1 << side.ordinal();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public String getModelPath() {
+        return "charsetpipes:pipe";
+    }
+
+    // Tile logic
+
+    public TileEntity getNeighbourTile(EnumFacing side) {
+        return side != null ? getWorld().getTileEntity(getPos().offset(side)) : null;
+    }
+
 	private boolean internalConnects(EnumFacing side) {
+        if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
+            return true;
+        }
+
 		TileEntity tile = getNeighbourTile(side);
 
 		if (tile instanceof IInventory) {
@@ -45,7 +157,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 			return true;
 		}
 
-		if (tile instanceof IFluidHandler || tile instanceof TilePipe) {
+		if (tile instanceof IFluidHandler) {
 			return true;
 		}
 
@@ -59,8 +171,8 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 	@Override
 	public boolean connects(EnumFacing side) {
 		if (internalConnects(side)) {
-			TileEntity tile = getNeighbourTile(side);
-			if (tile instanceof TilePipe && !((TilePipe) tile).internalConnects(side.getOpposite())) {
+			PartPipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite());
+			if (pipe != null && !pipe.internalConnects(side.getOpposite())) {
 				return false;
 			}
 
@@ -119,18 +231,24 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 	}
 
 	@Override
-	public void onChunkUnload() {
-		super.onChunkUnload();
-		if (worldObj.isRemote) {
+	public void onUnloaded() {
+		super.onUnloaded();
+		if (getWorld().isRemote) {
 			synchronized (itemSet) {
 				itemSet.clear();
 			}
 		}
 	}
 
+    @Override
+    public void onAdded() {
+        updateShifters();
+        scheduleRenderUpdate();
+    }
+
 	@Override
-	public void initialize() {
-		if (worldObj.isRemote) {
+	public void onLoaded() {
+		if (getWorld().isRemote) {
 			ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
 		}
 
@@ -140,8 +258,6 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 
 	@Override
 	public void update() {
-		super.update();
-
 		if (neighborBlockChanged) {
 			updateShifters();
 			scheduleRenderUpdate();
@@ -171,19 +287,21 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 			return;
 		}
 
-		BlockPos p = pos;
+		BlockPos p = getPos();
 		int dist = 0;
-		TileEntity tile;
+        PartPipe pipe;
+        TileEntity tile;
 
-		while ((tile = worldObj.getTileEntity(p)) instanceof TilePipe) {
+		while ((pipe = PipeUtils.getPipe(getWorld(), p, dir.getOpposite())) instanceof PartPipe) {
 			p = p.offset(dir.getOpposite());
 			dist++;
 
-			if (!((TilePipe) tile).connects(dir.getOpposite())) {
-				tile = worldObj.getTileEntity(p);
+			if (!pipe.connects(dir.getOpposite())) {
 				break;
 			}
 		}
+
+        tile = getWorld().getTileEntity(p);
 
 		if (tile instanceof IShifter && isMatchingShifter((IShifter) tile, dir, dist)) {
 			shifterDistance[i] = dist;
@@ -192,15 +310,15 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 		}
 
 		if (oldDistance != shifterDistance[i]) {
-			TileEntity notifyTile = getNeighbourTile(dir);
-			if (notifyTile instanceof TilePipe) {
-				((TilePipe) notifyTile).updateShifterSide(dir);
+			pipe = PipeUtils.getPipe(getWorld(), getPos().offset(dir), null);
+			if (pipe != null) {
+				pipe.updateShifterSide(dir);
 			}
 		}
 	}
 
 	private void updateShifters() {
-		if (!worldObj.isRemote) {
+		if (!getWorld().isRemote) {
 			for (EnumFacing dir : EnumFacing.VALUES) {
 				updateShifterSide(dir);
 			}
@@ -221,7 +339,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 				tile = getNeighbourTile(dir.getOpposite());
 				break;
 			default:
-				tile = worldObj.getTileEntity(pos.offset(dir.getOpposite(), shifterDistance[dir.ordinal()]));
+				tile = getWorld().getTileEntity(getPos().offset(dir.getOpposite(), shifterDistance[dir.ordinal()]));
 		}
 
 		if (tile instanceof IShifter && isMatchingShifter((IShifter) tile, dir, Integer.MAX_VALUE)) {
@@ -248,7 +366,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 	}
 
 	protected void addItemClientSide(PipeItem item) {
-		if (!worldObj.isRemote) {
+		if (!getWorld().isRemote) {
 			return;
 		}
 
@@ -267,7 +385,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 	}
 
 	protected void removeItemClientSide(PipeItem item) {
-		if (worldObj.isRemote) {
+		if (getWorld().isRemote) {
 			synchronized (itemSet) {
 				itemSet.remove(item);
 			}
@@ -311,7 +429,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 
 	@Override
 	public int injectItem(ItemStack stack, EnumFacing direction, boolean simulate) {
-		if (worldObj.isRemote || !connects(direction)) {
+		if (getWorld().isRemote || !connects(direction)) {
 			return 0;
 		}
 
@@ -325,10 +443,12 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 	}
 
 	protected void scheduleRenderUpdate() {
-		worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
+		getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
 	}
 
-	public void onNeighborBlockChange() {
+    @Override
+	public void onNeighborBlockChange(Block block) {
+        System.out.println("!!");
 		neighborBlockChanged = true;
 	}
 
@@ -383,4 +503,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 
 		return targetItem != null ? targetItem.getStack() : null;
 	}
+
+    @Override
+    public EnumSet<PartSlot> getSlotMask() {
+        return EnumSet.of(PartSlot.CENTER);
+    }
 }
