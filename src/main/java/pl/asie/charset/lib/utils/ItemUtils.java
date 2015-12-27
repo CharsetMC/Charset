@@ -1,4 +1,4 @@
-package pl.asie.charset.lib;
+package pl.asie.charset.lib.utils;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;

@@ -3,6 +3,7 @@ package pl.asie.charset.wires;
 import java.util.List;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,16 +30,16 @@ public class ItemWire extends ItemMultiPart {
 	}
 
     @Override
-    public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack) {
+    public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
         if (!isFreestanding(stack) && !world.getBlockState(pos.offset(side)).getBlock().isSideSolid(world, pos.offset(side), side.getOpposite())) {
             return false;
         }
 
-        return super.place(world, pos, side, hit, stack);
+        return super.place(world, pos, side, hit, stack, player);
     }
 
     @Override
-    public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack) {
+    public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
         PartWireBase part = PartWireProvider.createPart(stack.getItemDamage() >> 1);
         part.location = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(facing);
         return part;

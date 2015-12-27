@@ -1,0 +1,31 @@
+{
+    "layers": [
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_xor_top"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_xor_left"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_xor_right"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_xor_middle"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [4, 9]
+        },
+        {
+            "pos": [11, 9]
+        },
+        {
+            "pos": [8, 13]
+        }
+    ]
+}

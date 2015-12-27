@@ -12,7 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
 import pl.asie.charset.api.pipes.IShifter;
-import pl.asie.charset.lib.ItemUtils;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.lib.inventory.InventorySlot;
 import pl.asie.charset.lib.inventory.InventorySlotIterator;

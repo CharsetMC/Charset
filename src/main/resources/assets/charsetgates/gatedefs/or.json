@@ -1,0 +1,32 @@
+{
+    "layers": [
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_or_top"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_or_left"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_or_right"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_or_bottom"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_or_middle"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [7, 9]
+        },
+        {
+            "pos": [7, 5]
+        }
+    ]
+}

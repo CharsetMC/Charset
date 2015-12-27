@@ -6,7 +6,7 @@ import java.util.Random;
 import net.minecraftforge.common.DimensionManager;
 
 import pl.asie.charset.audio.ModCharsetAudio;
-import pl.asie.charset.lib.MiscUtils;
+import pl.asie.charset.lib.utils.MiscUtils;
 
 public class StorageManager {
 	private static Random rand = new Random();

@@ -1,5 +1,6 @@
 package pl.asie.charset.pipes;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -17,7 +18,7 @@ public class ItemPipe extends ItemMultiPart {
     }
 
     @Override
-    public IMultipart createPart(World world, BlockPos blockPos, EnumFacing enumFacing, Vec3 vec3, ItemStack itemStack) {
+    public IMultipart createPart(World world, BlockPos blockPos, EnumFacing enumFacing, Vec3 vec3, ItemStack itemStack, EntityPlayer player) {
         return new PartPipe();
     }
 }

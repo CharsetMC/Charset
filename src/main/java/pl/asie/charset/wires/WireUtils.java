@@ -25,6 +25,7 @@ import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 public final class WireUtils {
+    public static boolean WIRES_CONNECT = true;
 	private static final Set<Block> WIRE_PLACEABLE = new HashSet<Block>();
 
 	static {
@@ -110,38 +111,45 @@ public final class WireUtils {
         IMultipartContainer container2 = MultipartHelper.getPartContainer(wire.getWorld(), pos2);
 
         if (container2 != null) {
-            if (isBlockingPart(container2, PartSlot.getFaceSlot(facing.getOpposite()))) {
-                return false;
-            }
-
-            if (wire.location != WireFace.CENTER && isBlockingPart(container2, PartSlot.getEdgeSlot(facing.getOpposite(), wire.location.facing))) {
-                return false;
-            }
-
             PartWireBase wire2 = getWire(container2, wire.location);
-            return wire2 != null && wire2.type.connects(wire.type);
-        } else {
-            Block connectingBlock = wire.getWorld().getBlockState(pos2).getBlock();
-            TileEntity connectingTile = wire.getWorld().getTileEntity(pos2);
-
-            if (connectingTile instanceof IConnectable) {
-                IConnectable tc = (IConnectable) connectingTile;
-                if (tc.canConnect(wire.type.type(), wire.location, facing.getOpposite())) {
-                    return true;
-                }
-            } else if (wire.type.type() != WireType.BUNDLED) {
-                if ((connectingBlock instanceof BlockRedstoneDiode || connectingBlock instanceof BlockRedstoneWire) && wire.location != WireFace.DOWN) {
+            if (wire2 != null) {
+                if (isBlockingPart(container2, PartSlot.getFaceSlot(facing.getOpposite()))) {
                     return false;
                 }
 
-                if (wire.location == WireFace.CENTER && !connectingBlock.isSideSolid(wire.getWorld(), pos2, facing.getOpposite())) {
+                if (wire.location != WireFace.CENTER && isBlockingPart(container2, PartSlot.getEdgeSlot(facing.getOpposite(), wire.location.facing))) {
                     return false;
                 }
 
-                if (connectingBlock.canConnectRedstone(wire.getWorld(), pos2, facing.getOpposite())) {
-                    return true;
-                }
+                return wire2.type.connects(wire.type);
             }
+        }
+
+        Block connectingBlock = wire.getWorld().getBlockState(pos2).getBlock();
+        TileEntity connectingTile = wire.getWorld().getTileEntity(pos2);
+
+        if (connectingTile instanceof IConnectable) {
+            IConnectable tc = (IConnectable) connectingTile;
+            if (tc.canConnect(wire.type.type(), wire.location, facing.getOpposite())) {
+                return true;
+            }
+        } else if (wire.type.type() != WireType.BUNDLED) {
+            if ((connectingBlock instanceof BlockRedstoneDiode || connectingBlock instanceof BlockRedstoneWire) && wire.location != WireFace.DOWN) {
+                return false;
+            }
+
+            if (wire.location == WireFace.CENTER && !connectingBlock.isSideSolid(wire.getWorld(), pos2, facing.getOpposite())) {
+                return false;
+            }
+
+            WIRES_CONNECT = false;
+
+            if (connectingBlock.canConnectRedstone(wire.getWorld(), pos2, facing)) {
+                WIRES_CONNECT = true;
+                return true;
+            }
+
+            WIRES_CONNECT = true;
         }
 
         return false;

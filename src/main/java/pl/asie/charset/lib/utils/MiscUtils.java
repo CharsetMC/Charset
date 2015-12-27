@@ -1,4 +1,4 @@
-package pl.asie.charset.lib;
+package pl.asie.charset.lib.utils;
 
 public final class MiscUtils {
 	private static final char[] hexArray = "0123456789abcdef".toCharArray();

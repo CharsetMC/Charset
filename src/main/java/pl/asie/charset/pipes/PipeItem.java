@@ -16,8 +16,8 @@ import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.api.pipes.IShifter;
-import pl.asie.charset.lib.DirectionUtils;
-import pl.asie.charset.lib.ItemUtils;
+import pl.asie.charset.lib.utils.DirectionUtils;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.inventory.InventoryUtils;
 
 public class PipeItem {

@@ -1,0 +1,6 @@
+{
+    "parent": "charsetgates:block/gate_torch",
+    "textures": {
+        "torch": "blocks/redstone_torch_off"
+    }
+}

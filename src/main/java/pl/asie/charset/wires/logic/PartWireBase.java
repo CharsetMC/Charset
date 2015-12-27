@@ -436,7 +436,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
 
     @Override
     public boolean canConnectRedstone(EnumFacing facing) {
-        return type.type() != WireType.BUNDLED && connectsExternal(facing);
+        return WireUtils.WIRES_CONNECT && type.type() != WireType.BUNDLED && connectsExternal(facing);
     }
 
     @Override
