@@ -43,7 +43,11 @@ public class PartWireNormal extends PartWireBase {
     public void readUpdatePacket(PacketBuffer data) {
         super.readUpdatePacket(data);
         if (type == WireKind.NORMAL) {
+            int oSL = signalLevel;
             signalLevel = data.readByte() << 8;
+            if (oSL != signalLevel) {
+                scheduleRenderUpdate();
+            }
         }
     }
 
@@ -247,7 +251,13 @@ public class PartWireNormal extends PartWireBase {
 					getWorld().notifyNeighborsOfStateExcept(uPos, MCMultiPartMod.multipart, location.facing.getOpposite());
 				}
 			}
-		}
+		} else {
+            if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
+                if (location != WireFace.CENTER) {
+                    getWorld().notifyBlockOfStateChange(getPos().offset(location.facing), MCMultiPartMod.multipart);
+                }
+            }
+        }
 	}
 
 	@Override

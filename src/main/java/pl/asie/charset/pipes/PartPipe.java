@@ -34,6 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.IHitEffectsPart;
+import mcmultipart.microblock.IMicroblock;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.MultipartRegistry;
@@ -194,6 +195,11 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
     }
 
 	private boolean internalConnects(EnumFacing side) {
+        ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(side));
+        if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isHollow()) {
+            return false;
+        }
+
         if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
             return true;
         }

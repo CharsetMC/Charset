@@ -1,14 +1,13 @@
 package pl.asie.charset.wires.logic;
 
-import io.netty.buffer.ByteBuf;
-
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IPartFactory;
 import pl.asie.charset.wires.WireKind;
 
-public class PartWireProvider implements IPartFactory {
+public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
     public static PartWireBase createPart(int type) {
         PartWireBase part = null;
         WireKind kind = WireKind.VALUES[type];
@@ -33,14 +32,18 @@ public class PartWireProvider implements IPartFactory {
     }
 
     @Override
-    public IMultipart createPart(String id, ByteBuf buf) {
+    public IMultipart createPart(String id, PacketBuffer buf) {
         int type = buf.readByte();
         buf.readerIndex(buf.readerIndex() - 1);
-        return createPart(type);
+        PartWireBase part = createPart(type);
+        part.readUpdatePacket(buf);
+        return part;
     }
 
     @Override
     public IMultipart createPart(String id, NBTTagCompound nbt) {
-        return createPart(nbt.getByte("t"));
+        PartWireBase part = createPart(nbt.getByte("t"));
+        part.readFromNBT(nbt);
+        return part;
     }
 }

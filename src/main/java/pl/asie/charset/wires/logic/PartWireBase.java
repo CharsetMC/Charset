@@ -180,13 +180,19 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
 
     @Override
     public void readUpdatePacket(PacketBuffer buf) {
+        int oldIC = internalConnections;
+        int oldEC = externalConnections;
+        int oldCC = cornerConnections;
+
         type = WireKind.VALUES[buf.readByte()];
         location = WireFace.VALUES[buf.readByte()];
         internalConnections = buf.readByte();
         externalConnections = buf.readByte();
         cornerConnections = location == WireFace.CENTER ? 0 : buf.readByte();
 
-        scheduleRenderUpdate();
+        if (oldIC != internalConnections || oldEC != externalConnections || oldCC != cornerConnections) {
+            scheduleRenderUpdate();
+        }
     }
 
     @Override
@@ -267,15 +273,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
     }
 
     public void scheduleRenderUpdate() {
-        if (getWorld() == null) {
-            return;
-        }
-
-        if (getWorld().isRemote) {
-            markRenderUpdate();
-        } else {
-            suRender = true;
-        }
+        suRender = true;
     }
 
     @Override
@@ -321,10 +319,10 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
             }
         }
 
-        if (suRender) {
+        if (suRender && getWorld() != null) {
             suRender = false;
             if (getWorld().isRemote) {
-                getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+                markRenderUpdate();
             } else {
                 sendUpdatePacket();
             }
@@ -443,23 +441,28 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
 
     @Override
     public int getWeakSignal(EnumFacing facing) {
-        if (connects(facing) || location.facing == facing) {
+        if (type.type() == WireType.BUNDLED) {
+            return 0;
+        }
+
+        // Block any signals if there's a wire on the target face
+        if (location.facing == facing) {
             return getRedstoneLevel();
         } else {
-            return 0;
+            if (connects(facing) || type.type() == WireType.NORMAL) {
+                return getRedstoneLevel();
+            } else {
+                return 0;
+            }
         }
     }
 
     @Override
     public int getStrongSignal(EnumFacing facing) {
-        if (type.type() != WireType.NORMAL) {
-            return 0;
-        } else if (location.facing == facing.getOpposite()) {
-            return 0;
-        } else if (location.facing != facing && !connectsExternal(facing)) {
-            return 0;
-        } else {
+        if (type.type() == WireType.NORMAL && location.facing == facing) {
             return getRedstoneLevel();
+        } else {
+            return 0;
         }
     }
 }

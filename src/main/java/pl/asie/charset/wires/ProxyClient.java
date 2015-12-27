@@ -19,7 +19,7 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
-		event.modelRegistry.putObject(new ModelResourceLocation("charsetwires:wire", "normal"), rendererWire);
+		event.modelRegistry.putObject(new ModelResourceLocation("charsetwires:wire", "multipart"), rendererWire);
 		event.modelRegistry.putObject(new ModelResourceLocation("charsetwires:wire", "inventory"), rendererWire);
 	}
 
