@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,6 +25,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
@@ -33,7 +35,7 @@ import pl.asie.charset.api.wires.IConnectable;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 
-public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable {
+public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable, IOccludingPart {
     public enum Connection {
         NONE,
         INPUT,
@@ -426,27 +428,46 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     // Utility functions
 
-    @Override
-    public void addSelectionBoxes(List<AxisAlignedBB> list) {
+    private AxisAlignedBB getBox() {
         switch (side) {
             case DOWN:
-                list.add(new AxisAlignedBB(0, 0, 0, 1, 0.125, 1));
-                break;
+                return new AxisAlignedBB(0, 0, 0, 1, 0.125, 1);
             case UP:
-                list.add(new AxisAlignedBB(0, 1 - 0.125, 0, 1, 1, 1));
-                break;
+                return new AxisAlignedBB(0, 1 - 0.125, 0, 1, 1, 1);
             case NORTH:
-                list.add(new AxisAlignedBB(0, 0, 0, 1, 1, 0.125));
-                break;
+                return new AxisAlignedBB(0, 0, 0, 1, 1, 0.125);
             case SOUTH:
-                list.add(new AxisAlignedBB(0, 0, 1 - 0.125, 1, 1, 1));
-                break;
+                return new AxisAlignedBB(0, 0, 1 - 0.125, 1, 1, 1);
             case WEST:
-                list.add(new AxisAlignedBB(0, 0, 0, 0.125, 1, 1));
-                break;
+                return new AxisAlignedBB(0, 0, 0, 0.125, 1, 1);
             case EAST:
-                list.add(new AxisAlignedBB(1 - 0.125, 0, 0, 1, 1, 1));
-                break;
+                return new AxisAlignedBB(1 - 0.125, 0, 0, 1, 1, 1);
+        }
+
+        return null;
+    }
+
+    @Override
+    public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+        AxisAlignedBB box = getBox();
+        if (box != null && box.intersectsWith(mask)) {
+            list.add(box);
+        }
+    }
+
+    @Override
+    public void addOcclusionBoxes(List<AxisAlignedBB> list) {
+        AxisAlignedBB box = getBox();
+        if (box != null) {
+            list.add(box);
+        }
+    }
+
+    @Override
+    public void addSelectionBoxes(List<AxisAlignedBB> list) {
+        AxisAlignedBB box = getBox();
+        if (box != null) {
+            list.add(box);
         }
     }
     

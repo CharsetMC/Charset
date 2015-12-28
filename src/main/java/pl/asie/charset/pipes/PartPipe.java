@@ -35,6 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.microblock.IMicroblock;
+import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.MultipartRegistry;
@@ -45,7 +46,7 @@ import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.refs.Properties;
 
-public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IPipe, ITickable {
+public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IPipe, ITickable, IOccludingPart {
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
@@ -132,6 +133,11 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
     @SideOnly(Side.CLIENT)
     public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
         return true;
+    }
+
+    @Override
+    public void addOcclusionBoxes(List<AxisAlignedBB> list) {
+        list.add(AxisAlignedBB.fromBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
     }
 
     private static class BoundingBox {

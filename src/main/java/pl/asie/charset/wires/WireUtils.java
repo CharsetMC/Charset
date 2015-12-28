@@ -73,7 +73,7 @@ public final class WireUtils {
     private static boolean isBlockingPart(IMultipartContainer container, PartSlot slot) {
         ISlottedPart part = container.getPartInSlot(slot);
         if (part instanceof IMicroblock.IFaceMicroblock) {
-            return ((IMicroblock.IFaceMicroblock) part).isEdgeHollow();
+            return !((IMicroblock.IFaceMicroblock) part).isEdgeHollow();
         } else {
             return part != null;
         }
