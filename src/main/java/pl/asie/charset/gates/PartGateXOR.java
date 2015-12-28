@@ -4,16 +4,25 @@ import net.minecraft.util.EnumFacing;
 
 public class PartGateXOR extends PartGate {
     @Override
+    public Connection getType(EnumFacing dir) {
+        if (dir == EnumFacing.SOUTH) {
+            return Connection.NONE;
+        } else {
+            return dir == EnumFacing.NORTH ? Connection.OUTPUT : Connection.INPUT;
+        }
+    }
+
+    @Override
     public State getLayerState(int id) {
         switch (id) {
             case 0:
-                return State.input(getOutputClient());
+                return State.input(getOutputInsideClient(EnumFacing.NORTH));
             case 1:
-                return State.input(getInputInside(0));
+                return State.input(getInputInside(EnumFacing.WEST));
             case 2:
-                return State.input(getInputInside(2));
+                return State.input(getInputInside(EnumFacing.EAST));
             case 3:
-                return State.bool(getInputInside(0) == 0 && getInputInside(2) == 0);
+                return State.bool(getInputInside(EnumFacing.WEST) == 0 && getInputInside(EnumFacing.EAST) == 0);
         }
         return State.OFF;
     }
@@ -22,27 +31,21 @@ public class PartGateXOR extends PartGate {
     public State getTorchState(int id) {
         switch (id) {
             case 0:
-                return State.input(getInputInside(0)).invert();
+                return State.input(getInputInside(EnumFacing.WEST)).invert();
             case 1:
-                return State.input(getInputInside(2)).invert();
+                return State.input(getInputInside(EnumFacing.EAST)).invert();
             case 2:
-                return State.bool(getInputInside(0) == 0 && getInputInside(2) == 0).invert();
+                return State.bool(getInputInside(EnumFacing.WEST) == 0 && getInputInside(EnumFacing.EAST) == 0).invert();
         }
         return State.ON;
     }
 
     @Override
-    public boolean canBlockSide(EnumFacing side) {
-        return false;
-    }
-
-    @Override
-    protected byte getSideMask() {
-        return 0b1101;
-    }
-
-    @Override
-    public int getOutputLevel() {
-        return digiToRs(rsToDigi(getInputInside(0)) ^ rsToDigi(getInputInside(2)));
+    public byte getOutputInside(EnumFacing facing) {
+        if (facing == EnumFacing.NORTH) {
+            return digiToRs(rsToDigi(getInputInside(EnumFacing.WEST)) ^ rsToDigi(getInputInside(EnumFacing.EAST)));
+        } else {
+            return 0;
+        }
     }
 }

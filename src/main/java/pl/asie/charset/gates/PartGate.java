@@ -34,6 +34,40 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 
 public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable {
+    public enum Connection {
+        NONE,
+        INPUT,
+        OUTPUT,
+        INPUT_ANALOG,
+        OUTPUT_ANALOG,
+        INPUT_BUNDLED,
+        OUTPUT_BUNDLED;
+
+        public boolean isInput() {
+            return this == INPUT || this == INPUT_ANALOG || this == INPUT_BUNDLED;
+        }
+
+        public boolean isOutput() {
+            return this == OUTPUT || this == OUTPUT_ANALOG || this == OUTPUT_BUNDLED;
+        }
+
+        public boolean isRedstone() {
+            return this == INPUT || this == OUTPUT || this == INPUT_ANALOG || this == OUTPUT_ANALOG;
+        }
+
+        public boolean isDigital() {
+            return this == INPUT || this == OUTPUT;
+        }
+
+        public boolean isAnalog() {
+            return this == INPUT_ANALOG || this == OUTPUT_ANALOG;
+        }
+
+        public boolean isBundled() {
+            return this == INPUT_BUNDLED || this == OUTPUT_BUNDLED;
+        }
+    }
+
     public enum State {
         NO_RENDER,
         OFF,
@@ -60,15 +94,13 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         }
     }
 
-    protected static final EnumFacing[] INPUT_SIDES = {
-            EnumFacing.WEST, EnumFacing.SOUTH, EnumFacing.EAST
-    };
+    protected byte enabledSides, invertedSides;
 
-    private byte[] inputs = new byte[3];
+    private byte[] inputs = new byte[4];
+    private byte[] outputClient = new byte[4];
 
     private EnumFacing side = EnumFacing.DOWN;
     private EnumFacing top = EnumFacing.NORTH;
-    private byte enabledSides, invertedSides, outputClient;
 
     public PartGate() {
         enabledSides = getSideMask();
@@ -84,16 +116,32 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         return this;
     }
 
+    public Connection getType(EnumFacing dir) {
+        return dir == EnumFacing.NORTH ? Connection.OUTPUT : Connection.INPUT;
+    }
     public abstract State getLayerState(int id);
     public abstract State getTorchState(int id);
     public boolean canBlockSide(EnumFacing side) {
-        return side != EnumFacing.NORTH;
+        return getType(side).isInput();
+    }
+    public boolean canInvertSide(EnumFacing side) {
+        return getType(side).isInput() && getType(side).isDigital();
     }
 
     @Override
     public boolean canConnect(WireType type, WireFace face, EnumFacing direction) {
-        System.out.println("!? " + type.toString() + " " + face.toString() + " " + direction.toString());
-        return type != WireType.BUNDLED && face.facing == side && direction.getAxis() != side.getAxis();
+        if (face.facing == side && direction.getAxis() != side.getAxis()) {
+            EnumFacing dir = realToGate(direction);
+            if (isSideOpen(dir)) {
+                Connection conn = getType(dir);
+                if (conn.isRedstone()) {
+                    return type != WireType.BUNDLED;
+                } else if (conn.isBundled()) {
+                    return type == WireType.BUNDLED;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -106,81 +154,99 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         return Arrays.asList(new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(getType())));
     }
 
-    private void getInputs() {
-        int oldOutput = getOutputLevel();
+    private void updateInputs() {
+        byte[] oldOutput = new byte[4];
         boolean changed = false;
 
-        for (int i = 0; i <= 2; i++) {
-            byte oi = inputs[i];
-            World w = getWorld();
-            BlockPos p = getPos().offset(gateToReal(INPUT_SIDES[i]));
-            IBlockState s = w.getBlockState(p);
-            inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, gateToReal(INPUT_SIDES[i]));
-            if (inputs[i] != oi) {
-                changed = true;
+        for (int i = 0; i <= 3; i++) {
+            Connection conn = getType(side);
+            if (conn.isOutput() && conn.isRedstone()) {
+                oldOutput[i] = getOutputOutside(side);
+            }
+        }
+        for (int i = 0; i <= 3; i++) {
+            EnumFacing side = EnumFacing.getFront(i + 2);
+            Connection conn = getType(side);
+            if (conn.isInput() && conn.isRedstone()) {
+                EnumFacing real = gateToReal(side);
+                byte oi = inputs[i];
+                World w = getWorld();
+                BlockPos p = getPos().offset(real);
+                IBlockState s = w.getBlockState(p);
+                inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+                if (conn.isDigital()) {
+                    inputs[i] = inputs[i] != 0 ? (byte) 15 : 0;
+                }
+                if (inputs[i] != oi) {
+                    changed = true;
+                }
             }
         }
 
-        if (changed || getOutputLevel() != oldOutput) {
+        if (!changed) {
+            for (int i = 0; i <= 3; i++) {
+                Connection conn = getType(side);
+                if (conn.isOutput() && conn.isRedstone()) {
+                    if (getOutputOutside(side) != oldOutput[i]) {
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (changed) {
             notifyBlockUpdate();
             sendUpdatePacket();
         }
     }
 
-    public byte getInputOutside(int i) {
-        return inputs[i];
+    public byte getInputOutside(EnumFacing side) {
+        return inputs[side.ordinal() - 2];
     }
 
-    protected byte getInputInside(int i) {
-        if (isSideInverted(INPUT_SIDES[i])) {
-            return inputs[i] != 0 ? 0 : (byte) 15;
+    protected byte getInputInside(EnumFacing side) {
+        if (isSideInverted(side)) {
+            return inputs[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
         } else {
-            return inputs[i];
+            return inputs[side.ordinal() - 2];
         }
     }
 
     public boolean getInverterState(EnumFacing facing) {
-        switch (facing) {
-            case NORTH:
-                return getOutputLevel() == 0;
-            case SOUTH:
-                return inputs[1] == 0;
-            case WEST:
-                return inputs[0] == 0;
-            case EAST:
-                return inputs[2] == 0;
-        }
-        return false;
+        byte value = getType(facing).isInput() ? getInputOutside(facing) : getOutputInsideClient(facing);
+        return value == 0;
     }
 
-    protected byte getOutputOutside() {
-        if (isSideInverted(EnumFacing.NORTH)) {
-            return getOutputLevel() != 0 ? 0 : (byte) 15;
+    protected byte getOutputOutside(EnumFacing side) {
+        if (isSideInverted(side)) {
+            return getOutputInside(side) != 0 ? 0 : (byte) 15;
         } else {
-            return (byte) getOutputLevel();
+            return (byte) getOutputInside(side);
         }
     }
 
-    public byte getOutputOutsideClient() {
-        if (isSideInverted(EnumFacing.NORTH)) {
-            return getOutputClient() != 0 ? 0 : (byte) 15;
+    public byte getOutputInsideClient(EnumFacing side) {
+        return outputClient[side.ordinal() - 2];
+    }
+
+
+    public byte getOutputOutsideClient(EnumFacing side) {
+        if (isSideInverted(side)) {
+            return outputClient[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
         } else {
-            return (byte) getOutputClient();
+            return outputClient[side.ordinal() - 2];
         }
-    }
-
-    public byte getOutputClient() {
-        return outputClient;
     }
 
     @Override
     public void onPartChanged(IMultipart part) {
-        getInputs();
+        updateInputs();
     }
 
     @Override
     public void onNeighborBlockChange(Block block) {
-        getInputs();
+        updateInputs();
     }
 
     public EnumFacing getSide() {
@@ -192,10 +258,16 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     }
 
     protected byte getSideMask() {
-        return 0b1111;
+        byte j = 0;
+        for (int i = 0; i <= 3; i++) {
+            if (getType(EnumFacing.getFront(i + 2)) != Connection.NONE) {
+                j |= (1 << i);
+            }
+        }
+        return j;
     }
 
-    public abstract int getOutputLevel();
+    protected abstract byte getOutputInside(EnumFacing side);
 
     public boolean isSideOpen(EnumFacing side) {
         return (enabledSides & (1 << (side.ordinal() - 2))) != 0;
@@ -261,19 +333,21 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     }
 
     @Override
-    public boolean canConnectRedstone(EnumFacing dir) {
-        if (side.getAxis() != dir.getAxis()) {
-            return isSideOpen(realToGate(dir));
-        } else {
-            return false;
+    public boolean canConnectRedstone(EnumFacing direction) {
+        if (side.getAxis() != direction.getAxis()) {
+            EnumFacing dir = realToGate(direction);
+            if (isSideOpen(dir)) {
+                return getType(dir).isRedstone();
+            }
         }
+        return false;
     }
 
     @Override
     public int getWeakSignal(EnumFacing facing) {
         EnumFacing dir = realToGate(facing);
-        if (dir == EnumFacing.NORTH && isSideOpen(EnumFacing.NORTH)) {
-            return getOutputOutside();
+        if (getType(dir).isOutput() && getType(dir).isRedstone() && isSideOpen(dir)) {
+            return getOutputOutside(dir);
         } else {
             return 0;
         }
@@ -303,8 +377,12 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     public void writeUpdatePacket(PacketBuffer buf) {
         buf.writeByte((side.ordinal() << 4) | top.ordinal());
         buf.writeByte(enabledSides | (invertedSides << 4));
-        buf.writeBytes(inputs);
-        buf.writeByte(getOutputLevel());
+        for (int i = 0; i <= 3; i++) {
+            EnumFacing dir = EnumFacing.getFront(i + 2);
+            if (getType(dir) != Connection.NONE) {
+                buf.writeByte(getType(dir).isInput() ? inputs[i] : getOutputInside(dir));
+            }
+        }
     }
 
     @Override
@@ -315,8 +393,17 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         sides = buf.readUnsignedByte();
         enabledSides = (byte) (sides & 15);
         invertedSides = (byte) (sides >> 4);
-        buf.readBytes(inputs);
-        outputClient = buf.readByte();
+        for (int i = 0; i <= 3; i++) {
+            inputs[i] = outputClient[i] = 0;
+            EnumFacing dir = EnumFacing.getFront(i + 2);
+            if (getType(dir) != Connection.NONE) {
+                if (getType(dir).isInput()) {
+                    inputs[i] = buf.readByte();
+                } else {
+                    outputClient[i] = buf.readByte();
+                }
+            }
+        }
 
         markRenderUpdate();
     }

@@ -1,13 +1,14 @@
 package pl.asie.charset.gates.render;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -105,11 +106,22 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             }
         }
 
+        Set<EnumFacing> invertedSides = EnumSet.noneOf(EnumFacing.class);
+
         i = 0;
         for (GateRenderDefinitions.Torch torch : definition.torches) {
             PartGate.State state = gate.getTorchState(i++);
             if (state == PartGate.State.NO_RENDER) {
                 continue;
+            }
+
+            if (torch.inverter != null) {
+                EnumFacing inverter = EnumFacing.byName(torch.inverter);
+                if (gate.isSideInverted(inverter)) {
+                    invertedSides.add(inverter);
+                } else {
+                    continue;
+                }
             }
 
             this.bakedModels.add(
@@ -120,7 +132,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
         }
 
         for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-            if (gate.isSideInverted(facing)) {
+            if (gate.isSideInverted(facing) && !invertedSides.contains(facing)) {
                 this.bakedModels.add(
                         ProxyClient.gateTorchModel[gate.getInverterState(facing) ? 1 : 0]
                                 .bake(new ModelStateComposition(

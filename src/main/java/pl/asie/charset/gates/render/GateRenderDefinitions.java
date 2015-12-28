@@ -43,7 +43,8 @@ public class GateRenderDefinitions {
     }
 
     public class Torch {
-        public final int[] pos = new int[2];
+        public final float[] pos = new float[2];
+        public String inverter;
     }
 
     public BaseDefinition base;

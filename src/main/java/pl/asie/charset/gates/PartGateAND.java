@@ -2,30 +2,38 @@ package pl.asie.charset.gates;
 
 import net.minecraft.util.EnumFacing;
 
-import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.api.wires.WireType;
-
+/**
+ * This is actually a NAND gate, but by default it sets up an inverter
+ * on its northern face, causing it to be an AND gate.
+ */
 public class PartGateAND extends PartGate {
+    public PartGateAND() {
+        super();
+        invertedSides = 0b0001;
+    }
+
     @Override
     public State getLayerState(int id) {
         switch (id) {
             case 0:
-                return State.input(getOutputClient());
+                return State.input(getOutputInsideClient(EnumFacing.NORTH));
             case 1:
                 if (!isSideOpen(EnumFacing.WEST)) {
                     return State.DISABLED;
                 }
-                return State.input(getInputInside(0));
+                return State.input(getInputInside(EnumFacing.WEST));
             case 2:
                 if (!isSideOpen(EnumFacing.EAST)) {
                     return State.DISABLED;
                 }
-                return State.input(getInputInside(2));
+                return State.input(getInputInside(EnumFacing.EAST));
             case 3:
                 if (!isSideOpen(EnumFacing.SOUTH)) {
                     return State.DISABLED;
                 }
-                return State.input(getInputInside(1));
+                return State.input(getInputInside(EnumFacing.SOUTH));
+            case 4:
+                return State.input(getOutputOutsideClient(EnumFacing.NORTH));
         }
         return State.OFF;
     }
@@ -34,22 +42,28 @@ public class PartGateAND extends PartGate {
     public State getTorchState(int id) {
         switch (id) {
             case 0:
+                return State.input(getInputInside(EnumFacing.WEST)).invert();
             case 1:
+                return State.input(getInputInside(EnumFacing.EAST)).invert();
             case 2:
-                return State.input(getInputInside(id)).invert();
+                return State.input(getInputInside(EnumFacing.SOUTH)).invert();
             case 3:
-                return State.input(getOutputClient()).invert();
+                return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
         }
         return State.ON;
     }
 
     @Override
-    public int getOutputLevel() {
-        for (int i = 0; i <= 2; i++) {
-            if (isSideOpen(INPUT_SIDES[i]) && getInputInside(i) == 0) {
-                return 0;
+    protected byte getOutputInside(EnumFacing side) {
+        if (side == EnumFacing.NORTH) {
+            for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+                if (isSideOpen(facing) && facing != EnumFacing.NORTH) {
+                    if (getInputInside(facing) == 0) {
+                        return 15;
+                    }
+                }
             }
         }
-        return 15;
+        return 0;
     }
 }

@@ -15,6 +15,10 @@
         {
             "type": "color",
             "texture": "charsetgates:blocks/gate_and_bottom"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/gate_and_out"
         }
     ],
     "torches": [
@@ -28,7 +32,8 @@
             "pos": [12, 6]
         },
         {
-            "pos": [8, 2]
+            "pos": [8, 2],
+            "inverter": "north"
         }
     ]
 }

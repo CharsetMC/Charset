@@ -7,24 +7,24 @@ public class PartGateOR extends PartGate {
     public State getLayerState(int id) {
         switch (id) {
             case 0:
-                return State.input(getOutputClient());
+                return State.input(getOutputInsideClient(EnumFacing.NORTH));
             case 1:
                 if (!isSideOpen(EnumFacing.WEST)) {
                     return State.DISABLED;
                 }
-                return State.input(getInputInside(0));
+                return State.input(getInputInside(EnumFacing.WEST));
             case 2:
                 if (!isSideOpen(EnumFacing.EAST)) {
                     return State.DISABLED;
                 }
-                return State.input(getInputInside(2));
+                return State.input(getInputInside(EnumFacing.EAST));
             case 3:
                 if (!isSideOpen(EnumFacing.SOUTH)) {
                     return State.DISABLED;
                 }
-                return State.input(getInputInside(1));
+                return State.input(getInputInside(EnumFacing.SOUTH));
             case 4:
-                return State.input(getOutputClient()).invert();
+                return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
         }
         return State.OFF;
     }
@@ -33,18 +33,22 @@ public class PartGateOR extends PartGate {
     public State getTorchState(int id) {
         switch (id) {
             case 0:
-                return State.input(getOutputClient()).invert();
+                return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
             case 1:
-                return State.input(getOutputClient());
+                return State.input(getOutputInsideClient(EnumFacing.NORTH));
         }
         return State.ON;
     }
 
     @Override
-    public int getOutputLevel() {
-        for (int i = 0; i <= 2; i++) {
-            if (isSideOpen(INPUT_SIDES[i]) && getInputInside(i) != 0) {
-                return 15;
+    public byte getOutputInside(EnumFacing side) {
+        if (side == EnumFacing.NORTH) {
+            for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+                if (isSideOpen(facing) && facing != EnumFacing.NORTH) {
+                    if (getInputInside(facing) != 0) {
+                        return 15;
+                    }
+                }
             }
         }
         return 0;
