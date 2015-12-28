@@ -32,6 +32,7 @@ import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
@@ -49,7 +50,7 @@ import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements ISlottedPart, IHitEffectsPart, IRedstonePart, ITickable, IWire {
+public abstract class PartWireBase extends Multipart implements ISlottedPart, IOccludingPart, IHitEffectsPart, IRedstonePart, ITickable, IWire {
     protected static final boolean DEBUG = true;
 
     public static final Property PROPERTY = new Property();
@@ -220,6 +221,37 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
     @Override
     public void onRemoved() {
         pokeExtendedNeighbors();
+    }
+
+    @Override
+    public void addOcclusionBoxes(List<AxisAlignedBB> list) {
+        float xMin = 0.5f - WireUtils.getWireHitboxWidth(this) / 2;
+        float xMax = 0.5f + WireUtils.getWireHitboxWidth(this) / 2;
+        float y = WireUtils.getWireHitboxHeight(this);
+        
+        switch (location) {
+            case DOWN:
+                list.add(new AxisAlignedBB(xMin, 0, xMin, xMax, y, xMax));
+                break;
+            case UP:
+                list.add(new AxisAlignedBB(xMin, 1 - y, xMin, xMax, 1, xMax));
+                break;
+            case NORTH:
+                list.add(new AxisAlignedBB(xMin, xMin, 0, xMax, xMax, y));
+                break;
+            case SOUTH:
+                list.add(new AxisAlignedBB(xMin, xMin, 1 - y, xMax, xMax, 1));
+                break;
+            case WEST:
+                list.add(new AxisAlignedBB(0, xMin, xMin, y, xMax, xMax));
+                break;
+            case EAST:
+                list.add(new AxisAlignedBB(1 - y, xMin, xMin, 1, xMax, xMax));
+                break;
+            case CENTER:
+                list.add(new AxisAlignedBB(xMin, xMin, xMin, xMax, xMax, xMax));
+                break;
+        }
     }
 
     @Override

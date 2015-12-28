@@ -231,17 +231,12 @@ public final class WireUtils {
         }
 	}
 
-	public static float getWireHitboxHeight(PartWireBase wire) {
-		switch (wire.type.type()) {
-			case NORMAL:
-				return 0.125f;
-			case INSULATED:
-				return 0.1875f;
-			case BUNDLED:
-				return 0.25f;
-		}
+    public static float getWireHitboxWidth(PartWireBase wire) {
+        return wire.type.width() / 16.0f;
+    }
 
-		return 0.125f;
+	public static float getWireHitboxHeight(PartWireBase wire) {
+        return wire.type.height() / 16.0f;
 	}
 
 	public static boolean canPlaceWire(World world, BlockPos pos, EnumFacing side) {
