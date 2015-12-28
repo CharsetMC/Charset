@@ -192,4 +192,16 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 	public byte[] getBundledSignal() {
 		return signalValue;
 	}
+
+    @Override
+    public byte[] getBundledSignal(WireFace face, EnumFacing toDirection) {
+        return face == location && connects(toDirection) ? signalValue : null;
+    }
+
+    @Override
+    public void onBundledInputChanged(EnumFacing face) {
+        if (connects(face)) {
+            schedulePropagationUpdate();
+        }
+    }
 }

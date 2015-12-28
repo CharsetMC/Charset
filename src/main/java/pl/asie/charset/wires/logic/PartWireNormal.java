@@ -19,12 +19,13 @@ import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartHelper;
 import pl.asie.charset.api.wires.IRedstoneUpdatable;
+import pl.asie.charset.api.wires.IRedstoneWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public class PartWireNormal extends PartWireBase {
+public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 	private int signalLevel;
 
 	@Override
@@ -269,4 +270,16 @@ public class PartWireNormal extends PartWireBase {
 	public int getRedstoneLevel() {
 		return signalLevel >> 8;
 	}
+
+    @Override
+    public int getRedstoneSignal(WireFace face, EnumFacing toDirection) {
+        return face == location && connects(toDirection) ? getRedstoneLevel() : 0;
+    }
+
+    @Override
+    public void onRedstoneInputChanged(EnumFacing face) {
+        if (connects(face)) {
+            schedulePropagationUpdate();
+        }
+    }
 }
