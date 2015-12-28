@@ -23,7 +23,7 @@ public final class PipeUtils {
 
         if (side != null) {
             ISlottedPart part = container.getPartInSlot(PartSlot.getFaceSlot(side));
-            if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isHollow()) {
+            if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
                 return null;
             }
         }

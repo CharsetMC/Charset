@@ -198,7 +198,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	private boolean internalConnects(EnumFacing side) {
         ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(side));
-        if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isHollow()) {
+        if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
             return false;
         }
 

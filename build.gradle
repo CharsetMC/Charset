@@ -28,8 +28,8 @@ minecraft {
     mappings = "snapshot_20151226"
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     // you may put jars on which you depend on in ./libs
