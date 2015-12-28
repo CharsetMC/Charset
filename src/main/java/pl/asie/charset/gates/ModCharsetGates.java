@@ -32,6 +32,7 @@ public class ModCharsetGates {
     public static ItemGate itemGate;
 
     static final String[] gateMeta = new String[64]; // TODO: why 64 lol
+    static final Map<String, Integer> metaGate = new HashMap<String, Integer>();
 
     static final Map<String, Class<? extends PartGate>> gateParts = new HashMap<String, Class<? extends PartGate>>();
     static final Map<String, ResourceLocation> gateDefintions = new HashMap<String, ResourceLocation>();
@@ -61,6 +62,7 @@ public class ModCharsetGates {
         gateDefintions.put(name, new ResourceLocation(gdLoc + ".json"));
         gateTextures.put(name, new ResourceLocation(topLoc));
         gateMeta[meta] = name;
+        metaGate.put(name, meta);
         MultipartRegistry.registerPart(clazz, name);
         ModCharsetLib.proxy.registerItemModel(itemGate, meta, name);
     }

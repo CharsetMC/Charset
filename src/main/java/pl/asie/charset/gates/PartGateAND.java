@@ -2,6 +2,9 @@ package pl.asie.charset.gates;
 
 import net.minecraft.util.EnumFacing;
 
+import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.api.wires.WireType;
+
 public class PartGateAND extends PartGate {
     @Override
     public State getLayerState(int id) {

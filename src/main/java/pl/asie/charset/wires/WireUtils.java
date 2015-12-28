@@ -22,6 +22,7 @@ import pl.asie.charset.api.wires.IConnectable;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 public final class WireUtils {
@@ -126,11 +127,13 @@ public final class WireUtils {
         }
 
         Block connectingBlock = wire.getWorld().getBlockState(pos2).getBlock();
-        TileEntity connectingTile = wire.getWorld().getTileEntity(pos2);
+        IConnectable connectable = MultipartUtils.getInterface(IConnectable.class, wire.getWorld(), pos2, wire.location.facing, facing.getOpposite());
+        if (connectable == null) {
+            connectable = MultipartUtils.getInterface(IConnectable.class, wire.getWorld(), pos2, wire.location.facing);
+        }
 
-        if (connectingTile instanceof IConnectable) {
-            IConnectable tc = (IConnectable) connectingTile;
-            if (tc.canConnect(wire.type.type(), wire.location, facing.getOpposite())) {
+        if (connectable != null) {
+            if (connectable.canConnect(wire.type.type(), wire.location, facing.getOpposite())) {
                 return true;
             }
         } else if (wire.type.type() != WireType.BUNDLED) {

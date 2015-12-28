@@ -73,8 +73,8 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
     private RendererGate(PartGate gate) {
         this.gate = gate;
         this.transform = new ModelStateComposition(
-                new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()]),
-                new TRSRTransformation(ROTATIONS_SIDE[gate.getSide().ordinal()])
+                new TRSRTransformation(ROTATIONS_SIDE[gate.getSide().ordinal()]),
+                new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()])
         );
 
         this.bakedModels.add(

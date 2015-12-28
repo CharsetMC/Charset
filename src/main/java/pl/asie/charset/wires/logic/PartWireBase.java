@@ -31,6 +31,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
@@ -40,6 +41,7 @@ import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IBundledUpdatable;
 import pl.asie.charset.api.wires.IRedstoneUpdatable;
+import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.ModCharsetWires;
@@ -47,7 +49,7 @@ import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements ISlottedPart, IHitEffectsPart, IRedstonePart, ITickable {
+public abstract class PartWireBase extends Multipart implements ISlottedPart, IHitEffectsPart, IRedstonePart, ITickable, IWire {
     protected static final boolean DEBUG = true;
 
     public static final Property PROPERTY = new Property();
@@ -401,7 +403,22 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
 		} else if (nt instanceof IRedstoneUpdatable) {
 			((IRedstoneUpdatable) nt).onRedstoneInputChanged(facing.getOpposite());
 		} else {
-			getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
+            IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
+            if (container != null) {
+                for (IMultipart m : container.getParts()) {
+                    if (m != null) {
+                        if (m instanceof IBundledUpdatable) {
+                            ((IBundledUpdatable) m).onBundledInputChanged(facing.getOpposite());
+                        } else if (m instanceof IRedstoneUpdatable) {
+                            ((IRedstoneUpdatable) m).onRedstoneInputChanged(facing.getOpposite());
+                        } else {
+                            m.onPartChanged(this);
+                        }
+                    }
+                }
+            } else {
+                getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
+            }
 		}
 	}
 
@@ -455,6 +472,11 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
                 return 0;
             }
         }
+    }
+
+    @Override
+    public WireType getWireType() {
+        return type.type();
     }
 
     @Override

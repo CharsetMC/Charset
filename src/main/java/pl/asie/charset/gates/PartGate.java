@@ -1,5 +1,6 @@
 package pl.asie.charset.gates;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -28,8 +29,11 @@ import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
+import pl.asie.charset.api.wires.IConnectable;
+import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.api.wires.WireType;
 
-public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart {
+public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable {
     public enum State {
         NO_RENDER,
         OFF,
@@ -84,6 +88,22 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     public abstract State getTorchState(int id);
     public boolean canBlockSide(EnumFacing side) {
         return side != EnumFacing.NORTH;
+    }
+
+    @Override
+    public boolean canConnect(WireType type, WireFace face, EnumFacing direction) {
+        System.out.println("!? " + type.toString() + " " + face.toString() + " " + direction.toString());
+        return type != WireType.BUNDLED && face.facing == side && direction.getAxis() != side.getAxis();
+    }
+
+    @Override
+    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+        return new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(getType()));
+    }
+
+    @Override
+    public List<ItemStack> getDrops() {
+        return Arrays.asList(new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(getType())));
     }
 
     private void getInputs() {

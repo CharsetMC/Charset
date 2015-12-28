@@ -3,7 +3,6 @@ package pl.asie.charset.wires.logic;
 import java.util.Arrays;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -13,11 +12,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartHelper;
 import pl.asie.charset.api.wires.IBundledEmitter;
+import pl.asie.charset.api.wires.IBundledWire;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.wires.WireUtils;
 
-public class PartWireBundled extends PartWireBase {
+public class PartWireBundled extends PartWireBase implements IBundledWire {
 	private int[] signalLevel = new int[16];
 	private byte[] signalValue = new byte[16];
 
@@ -147,10 +148,10 @@ public class PartWireBundled extends PartWireBase {
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
-				TileEntity tile = getWorld().getTileEntity(getPos().offset(facing));
+                IBundledEmitter emitter = MultipartUtils.getInterface(IBundledEmitter.class, getWorld(), getPos().offset(facing), location.facing, facing.getOpposite());
 
-				if (tile instanceof IBundledEmitter && !(tile instanceof IWire)) {
-					nValues[facing.ordinal()] = ((IBundledEmitter) tile).getBundledSignal(location, facing.getOpposite());
+				if (emitter != null && !(emitter instanceof IWire)) {
+					nValues[facing.ordinal()] = emitter.getBundledSignal(location, facing.getOpposite());
 				}
 			}
 		}
