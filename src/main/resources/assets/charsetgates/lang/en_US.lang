@@ -1,0 +1,6 @@
+part.charset.gate.nand=NAND Gate
+part.charset.gate.nand.i=AND Gate
+part.charset.gate.nor=NOR Gate
+part.charset.gate.nor.i=OR Gate
+part.charset.gate.xor=XOR Gate
+part.charset.gate.xor.i=XNOR Gate

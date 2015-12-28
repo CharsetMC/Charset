@@ -6,8 +6,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
@@ -24,13 +26,36 @@ public class ItemGate extends ItemMultiPart {
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 	}
 
+    public static ItemStack getStack(PartGate gate) {
+        ItemStack stack = new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(gate.getType()));
+        stack.setTagCompound(new NBTTagCompound());
+        gate.writeItemNBT(stack.getTagCompound());
+        return stack;
+    }
+
+    public static PartGate getPartGate(ItemStack stack) {
+        PartGate gate = getPartGate(stack.getItemDamage());
+        if (gate != null && stack.hasTagCompound()) {
+            gate.readItemNBT(stack.getTagCompound());
+        }
+        return gate;
+    }
+
+    @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        PartGate gate = getPartGate(stack);
+        String name = ModCharsetGates.gateUN[stack.getItemDamage() % ModCharsetGates.gateUN.length];
+        if (gate.isSideInverted(EnumFacing.NORTH) && StatCollector.canTranslate(name + ".i")) {
+            name += ".i";
+        }
+        return StatCollector.translateToLocal(name);
+    }
+
     @Override
     @SideOnly(Side.CLIENT)
     public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-        for (int i = 0; i < ModCharsetGates.gateMeta.length; i++) {
-            if (ModCharsetGates.gateMeta[i] != null) {
-                subItems.add(new ItemStack(itemIn, 1, i));
-            }
+        for (ItemStack stack : ModCharsetGates.gateStacks) {
+            subItems.add(stack);
         }
     }
 
@@ -44,7 +69,7 @@ public class ItemGate extends ItemMultiPart {
 
     public static PartGate getPartGate(int meta) {
         try {
-            return ModCharsetGates.gateParts.get(ModCharsetGates.gateMeta[meta]).newInstance();
+            return ModCharsetGates.gateParts.get(ModCharsetGates.gateMeta[meta % ModCharsetGates.gateMeta.length]).newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,7 +78,7 @@ public class ItemGate extends ItemMultiPart {
 
     @Override
     public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
-        PartGate part = getPartGate(stack.getItemDamage());
+        PartGate part = getPartGate(stack);
         return part != null ? part.setSide(facing).setTop(player.getHorizontalFacing()) : null;
     }
 }

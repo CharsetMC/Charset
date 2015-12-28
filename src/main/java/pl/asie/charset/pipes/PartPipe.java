@@ -175,9 +175,11 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
     private int neighbors() {
         int result = 0;
+        if (getContainer() != null) {
             for (EnumFacing side : EnumFacing.VALUES) {
-            if (connects(side)) {
-                result |= 1 << side.ordinal();
+                if (connects(side)) {
+                    result |= 1 << side.ordinal();
+                }
             }
         }
         return result;

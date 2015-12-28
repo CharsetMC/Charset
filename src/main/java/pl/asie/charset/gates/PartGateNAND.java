@@ -2,7 +2,11 @@ package pl.asie.charset.gates;
 
 import net.minecraft.util.EnumFacing;
 
-public class PartGateOR extends PartGate {
+public class PartGateNAND extends PartGate {
+    public PartGateNAND() {
+        super();
+    }
+
     @Override
     public State getLayerState(int id) {
         switch (id) {
@@ -24,7 +28,7 @@ public class PartGateOR extends PartGate {
                 }
                 return State.input(getInputInside(EnumFacing.SOUTH));
             case 4:
-                return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
+                return State.input(getOutputOutsideClient(EnumFacing.NORTH));
         }
         return State.OFF;
     }
@@ -33,19 +37,23 @@ public class PartGateOR extends PartGate {
     public State getTorchState(int id) {
         switch (id) {
             case 0:
-                return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
+                return State.input(getInputInside(EnumFacing.WEST)).invert();
             case 1:
-                return State.input(getOutputInsideClient(EnumFacing.NORTH));
+                return State.input(getInputInside(EnumFacing.SOUTH)).invert();
+            case 2:
+                return State.input(getInputInside(EnumFacing.EAST)).invert();
+            case 3:
+                return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
         }
         return State.ON;
     }
 
     @Override
-    public byte getOutputInside(EnumFacing side) {
+    protected byte getOutputInside(EnumFacing side) {
         if (side == EnumFacing.NORTH) {
             for (EnumFacing facing : EnumFacing.HORIZONTALS) {
                 if (isSideOpen(facing) && facing != EnumFacing.NORTH) {
-                    if (getInputInside(facing) != 0) {
+                    if (getInputInside(facing) == 0) {
                         return 15;
                     }
                 }

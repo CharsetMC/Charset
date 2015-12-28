@@ -1,8 +1,11 @@
 package pl.asie.charset.gates;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -32,7 +35,9 @@ public class ModCharsetGates {
     public static ItemGate itemGate;
 
     static final String[] gateMeta = new String[64]; // TODO: why 64 lol
+    static final String[] gateUN = new String[64];
     static final Map<String, Integer> metaGate = new HashMap<String, Integer>();
+    static final Set<ItemStack> gateStacks = new HashSet<ItemStack>();
 
     static final Map<String, Class<? extends PartGate>> gateParts = new HashMap<String, Class<? extends PartGate>>();
     static final Map<String, ResourceLocation> gateDefintions = new HashMap<String, ResourceLocation>();
@@ -43,34 +48,43 @@ public class ModCharsetGates {
         itemGate = new ItemGate();
         GameRegistry.registerItem(itemGate, "gate");
 
-        registerGate("xor", PartGateXOR.class, 0);
-        registerGate("and", PartGateAND.class, 1);
-        registerGate("or", PartGateOR.class, 2);
+        registerGate("nand", PartGateNAND.class, 0);
+        registerGate("nor", PartGateNOR.class, 1);
+        registerGate("xor", PartGateXOR.class, 2);
 
         MinecraftForge.EVENT_BUS.register(proxy);
-        for (int i = 0; i < gateMeta.length; i++) {
+    }
 
-        }
+    @EventHandler
+    public void init(FMLInitializationEvent event) {
+        packet = new PacketRegistry(ModCharsetGates.MODID);
+        registerGateStack(ItemGate.getStack(new PartGateNOR().setInvertedSides(0b0001)));
+        registerGateStack(ItemGate.getStack(new PartGateNAND().setInvertedSides(0b0001)));
+        registerGateStack(ItemGate.getStack(new PartGateXOR()));
+        registerGateStack(ItemGate.getStack(new PartGateNOR()));
+        registerGateStack(ItemGate.getStack(new PartGateNAND()));
+        registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)));
+    }
+
+    private void registerGateStack(ItemStack stack) {
+        gateStacks.add(stack);
     }
 
     private void registerGate(String name, Class<? extends PartGate> clazz, int meta) {
-        registerGate("charsetgates:gate_" + name, clazz, meta, "charsetgates:gatedefs/" + name, "charsetgates:blocks/gate_" + name);
+        registerGate("charsetgates:gate_" + name, clazz, meta, "charsetgates:gatedefs/" + name, "charsetgates:blocks/gate_" + name,
+                "part.charset.gate." + name);
     }
 
-    public void registerGate(String name, Class<? extends PartGate> clazz, int meta, String gdLoc, String topLoc) {
+    public void registerGate(String name, Class<? extends PartGate> clazz, int meta, String gdLoc, String topLoc, String unl) {
         gateParts.put(name, clazz);
         gateDefintions.put(name, new ResourceLocation(gdLoc + ".json"));
         gateTextures.put(name, new ResourceLocation(topLoc));
         gateMeta[meta] = name;
+        gateUN[meta] = unl;
         metaGate.put(name, meta);
         MultipartRegistry.registerPart(clazz, name);
         ModCharsetLib.proxy.registerItemModel(itemGate, meta, name);
     }
-
-	@EventHandler
-	public void init(FMLInitializationEvent event) {
-		packet = new PacketRegistry(ModCharsetGates.MODID);
-	}
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {

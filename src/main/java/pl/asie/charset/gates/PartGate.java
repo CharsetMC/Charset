@@ -116,6 +116,11 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         return this;
     }
 
+    PartGate setInvertedSides(int sides) {
+        this.invertedSides = (byte) sides;
+        return this;
+    }
+
     public Connection getType(EnumFacing dir) {
         return dir == EnumFacing.NORTH ? Connection.OUTPUT : Connection.INPUT;
     }
@@ -146,12 +151,12 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
-        return new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(getType()));
+        return ItemGate.getStack(this);
     }
 
     @Override
     public List<ItemStack> getDrops() {
-        return Arrays.asList(new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(getType())));
+        return Arrays.asList(ItemGate.getStack(this));
     }
 
     private void updateInputs() {
@@ -366,9 +371,20 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         tag.setByte("i", invertedSides);
     }
 
+    public void readItemNBT(NBTTagCompound tag) {
+        enabledSides = tag.getByte("e");
+        invertedSides = tag.getByte("i");
+    }
+
+    public void writeItemNBT(NBTTagCompound tag) {
+        tag.setByte("e", enabledSides);
+        tag.setByte("i", invertedSides);
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         enabledSides = tag.getByte("e");
+        invertedSides = tag.getByte("i");
         side = EnumFacing.getFront(tag.getByte("f"));
         top = EnumFacing.getFront(tag.getByte("t"));
     }

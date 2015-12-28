@@ -160,7 +160,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 
     @Override
     public IBakedModel handleItemState(ItemStack stack) {
-        PartGate partGate = ItemGate.getPartGate(stack.getItemDamage());
+        PartGate partGate = ItemGate.getPartGate(stack);
         if (partGate != null) {
             return new RendererGate(partGate);
         }
