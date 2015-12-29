@@ -29,6 +29,7 @@ import net.minecraftforge.client.model.IFlexibleBakedModel;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
+import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.client.model.ISmartItemModel;
 import net.minecraftforge.client.model.ModelStateComposition;
 import net.minecraftforge.client.model.TRSRTransformation;
@@ -38,9 +39,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import mcmultipart.client.multipart.ISmartMultipartModel;
 import pl.asie.charset.gates.ItemGate;
-import pl.asie.charset.gates.ModCharsetGates;
 import pl.asie.charset.gates.PartGate;
-import pl.asie.charset.gates.ProxyClient;
 import pl.asie.charset.lib.utils.ClientUtils;
 
 public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPerspectiveAwareModel {
@@ -60,7 +59,6 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             ModelRotation.X0_Y270, ModelRotation.X0_Y90
     };
 
-    private static final Map<String, IModel> gateModels = new HashMap<String, IModel>();
     private static final Map<String, IModel> layerModels = new HashMap<String, IModel>();
 
     public final PartGate gate;
@@ -83,17 +81,15 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
                 new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()])
         );
 
-        String texture = ModCharsetGates.gateTextures.get(gate.getType()).toString();
-        IModel model = gateModels.get(texture);
-        if (model == null) {
-            model = ProxyClient.gateModel.retexture(ImmutableMap.of("gate_top", texture));
-            gateModels.put(texture, model);
-        }
-
-        this.bakedModels.add(model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
-
         GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(gate.getType());
         GateRenderDefinitions.BaseDefinition base = GateRenderDefinitions.INSTANCE.base;
+
+        IModel model = definition.getModel("base");
+        if (model != null) {
+            this.bakedModels.add(model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
+        }
+        IRetexturableModel layerModel = (IRetexturableModel) definition.getModel("layer");
+
         int i = 0;
 
         for (GateRenderDefinitions.Layer layer : definition.layers) {
@@ -105,7 +101,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             if ("color".equals(layer.type) && layer.texture != null) {
                 model = layerModels.get(layer.texture);
                 if (model == null) {
-                    model = ProxyClient.gateLayerModel.retexture(ImmutableMap.of("layer", layer.texture));
+                    model = layerModel.retexture(ImmutableMap.of("layer", layer.texture));
                     layerModels.put(layer.texture, model);
                 }
 
@@ -137,7 +133,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             }
 
             this.bakedModels.add(
-                    ProxyClient.gateTorchModel[state == PartGate.State.ON ? 1 : 0]
+                    definition.getModel(state == PartGate.State.ON ? "torch_on" : "torch_off")
                             .bake(new ModelStateComposition(
                                     transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f , 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ClientUtils.textureGetter)
             );
@@ -146,7 +142,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
         for (EnumFacing facing : EnumFacing.HORIZONTALS) {
             if (gate.isSideInverted(facing) && !invertedSides.contains(facing)) {
                 this.bakedModels.add(
-                        ProxyClient.gateTorchModel[gate.getInverterState(facing) ? 1 : 0]
+                        definition.getModel(gate.getInverterState(facing) ? "torch_on" : "torch_off")
                                 .bake(new ModelStateComposition(
                                         transform, new TRSRTransformation(new Vector3f(((facing.getFrontOffsetX() * 7)) / 16.0f , 0f, ((facing.getFrontOffsetZ() * 7)) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ClientUtils.textureGetter)
                 );

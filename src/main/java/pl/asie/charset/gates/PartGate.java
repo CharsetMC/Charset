@@ -10,8 +10,6 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -145,7 +143,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         return getType(side).isInput();
     }
     public boolean canInvertSide(EnumFacing side) {
-        return getType(side).isInput() && getType(side).isDigital();
+        return getType(side).isDigital();
     }
 
     @Override
@@ -179,12 +177,19 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         if (getWorld() != null && !getWorld().isRemote && pendingTick > 0) {
             pendingTick--;
             if (pendingTick == 0) {
-                updateInputs();
+                if (tick()) {
+                    notifyBlockUpdate();
+                    sendUpdatePacket();
+                }
             }
         }
     }
 
-    private void updateInputs() {
+    protected boolean tick() {
+        return updateInputs();
+    }
+
+    private boolean updateInputs() {
         byte[] oldOutput = new byte[4];
         boolean changed = false;
 
@@ -225,10 +230,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
             }
         }
 
-        if (changed) {
-            notifyBlockUpdate();
-            sendUpdatePacket();
-        }
+        return changed;
     }
 
     public byte getInputOutside(EnumFacing side) {
@@ -269,6 +271,16 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         }
     }
 
+    protected void onChanged() {
+        scheduleTick();
+    }
+
+    protected void scheduleTick() {
+        if (pendingTick == 0) {
+            pendingTick = 2;
+        }
+    }
+
     @Override
     public void onAdded() {
         pendingTick = 1;
@@ -281,9 +293,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public void onPartChanged(IMultipart part) {
-        if (pendingTick == 0) {
-            pendingTick = 2;
-        }
+        onChanged();
     }
 
     @Override
@@ -293,9 +303,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
             return;
         }
 
-        if (pendingTick == 0) {
-            pendingTick = 2;
-        }
+        onChanged();
     }
 
     @Override
@@ -344,19 +352,45 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         return (invertedSides & (1 << (side.ordinal() - 2))) != 0;
     }
 
-    private boolean isInvalidEnabled() {
+    private boolean isInvalidInverted() {
         for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-            if (!isSideOpen(facing) && !canBlockSide(facing)) {
-                return false;
+            if (isSideInverted(facing) && !canInvertSide(facing)) {
+                return true;
             }
         }
 
-        return true;
+        return false;
+    }
+
+    private boolean isInvalidEnabled() {
+        for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+            if (!isSideOpen(facing) && !canBlockSide(facing)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public boolean onActivated(EntityPlayer playerIn, ItemStack stack, PartMOP hit) {
         if (!playerIn.worldObj.isRemote) {
+            if (playerIn.isSneaking()) {
+                int z = 32;
+                invertedSides = (byte) ((invertedSides + 1) & 15);
+                while (z > 0 && ((~getSideMask() & invertedSides) != 0
+                        || isInvalidInverted() || invertedSides == 0)) {
+                    invertedSides = (byte) ((invertedSides + 1) & 15);
+                    z--;
+                }
+                if (z == 0) {
+                    invertedSides = getSideMask();
+                }
+
+                notifyBlockUpdate();
+                sendUpdatePacket();
+                return true;
+            }
             if (stack != null) {
                 if (stack.getItem() instanceof ItemScrewdriver) {
                     int z = 32;
@@ -366,18 +400,8 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
                         enabledSides = (byte) ((enabledSides + 1) & 15);
                         z--;
                     }
-                    enabledSides |= 1;
                     if (z == 0) {
                         enabledSides = getSideMask();
-                    }
-
-                    notifyBlockUpdate();
-                    sendUpdatePacket();
-                    return true;
-                } else if (stack.getItem() == Item.getItemFromBlock(Blocks.redstone_torch)) {
-                    invertedSides = (byte) ((invertedSides + 1) & 15);
-                    while ((~getSideMask() & invertedSides) != 0) {
-                        invertedSides = (byte) ((invertedSides + 1) & 15);
                     }
 
                     notifyBlockUpdate();
@@ -437,6 +461,9 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         tag.setByte("t", (byte) top.ordinal());
         tag.setByte("e", enabledSides);
         tag.setByte("i", invertedSides);
+        if (pendingTick != 0) {
+            tag.setByte("p", (byte) pendingTick);
+        }
     }
 
     public void readItemNBT(NBTTagCompound tag) {
@@ -465,6 +492,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         invertedSides = tag.getByte("i");
         side = EnumFacing.getFront(tag.getByte("f"));
         top = EnumFacing.getFront(tag.getByte("t"));
+        pendingTick = tag.getByte("p");
     }
 
     @Override

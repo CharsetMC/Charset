@@ -4,7 +4,7 @@
             "to": [ 16, 1.995, 16 ],
             "faces": {
                 "down": { "texture": "#gate_bottom" },
-                "up": { "texture": "#gate_top" },
+                "up": { "texture": "#top" },
                 "north": { "texture": "#gate_side" },
                 "south": { "texture": "#gate_side" },
                 "west": { "texture": "#gate_side" },

@@ -42,7 +42,6 @@ public class ModCharsetGates {
 
     static final Map<String, Class<? extends PartGate>> gateParts = new HashMap<String, Class<? extends PartGate>>();
     static final Map<String, ResourceLocation> gateDefintions = new HashMap<String, ResourceLocation>();
-    public static final Map<String, ResourceLocation> gateTextures = new HashMap<String, ResourceLocation>();
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -55,6 +54,7 @@ public class ModCharsetGates {
         registerGate("nand", PartGateNAND.class, 0);
         registerGate("nor", PartGateNOR.class, 1);
         registerGate("xor", PartGateXOR.class, 2);
+        registerGate("pulse_former", PartGatePulseFormer.class, 3);
 
         ModCharsetLib.proxy.registerItemModel(itemScrewdriver, 0, "charsetgates:screwdriver");
 
@@ -70,6 +70,7 @@ public class ModCharsetGates {
         registerGateStack(ItemGate.getStack(new PartGateNOR()));
         registerGateStack(ItemGate.getStack(new PartGateNAND()));
         registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)));
+        registerGateStack(ItemGate.getStack(new PartGatePulseFormer()));
     }
 
     private void registerGateStack(ItemStack stack) {
@@ -77,14 +78,13 @@ public class ModCharsetGates {
     }
 
     private void registerGate(String name, Class<? extends PartGate> clazz, int meta) {
-        registerGate("charsetgates:gate_" + name, clazz, meta, "charsetgates:gatedefs/" + name, "charsetgates:blocks/gate_" + name,
+        registerGate("charsetgates:gate_" + name, clazz, meta, "charsetgates:gatedefs/" + name,
                 "part.charset.gate." + name);
     }
 
-    public void registerGate(String name, Class<? extends PartGate> clazz, int meta, String gdLoc, String topLoc, String unl) {
+    public void registerGate(String name, Class<? extends PartGate> clazz, int meta, String gdLoc, String unl) {
         gateParts.put(name, clazz);
         gateDefintions.put(name, new ResourceLocation(gdLoc + ".json"));
-        gateTextures.put(name, new ResourceLocation(topLoc));
         gateMeta[meta] = name;
         gateUN[meta] = unl;
         metaGate.put(name, meta);

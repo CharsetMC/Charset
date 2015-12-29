@@ -1,24 +1,27 @@
 {
+    "textures": {
+        "top": "charsetgates:blocks/nor/top"
+    },
     "layers": [
         {
             "type": "color",
-            "texture": "charsetgates:blocks/gate_or_top"
+            "texture": "charsetgates:blocks/nor/layer_top"
         },
         {
             "type": "color",
-            "texture": "charsetgates:blocks/gate_or_left"
+            "texture": "charsetgates:blocks/nor/layer_left"
         },
         {
             "type": "color",
-            "texture": "charsetgates:blocks/gate_or_right"
+            "texture": "charsetgates:blocks/nor/layer_right"
         },
         {
             "type": "color",
-            "texture": "charsetgates:blocks/gate_or_bottom"
+            "texture": "charsetgates:blocks/nor/layer_bottom"
         },
         {
             "type": "color",
-            "texture": "charsetgates:blocks/gate_or_middle"
+            "texture": "charsetgates:blocks/nor/layer_middle"
         }
     ],
     "torches": [

@@ -143,6 +143,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
                 return;
             }
         }
+
         scheduleConnectionUpdate();
         schedulePropagationUpdate();
     }
@@ -367,6 +368,11 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
             if (!getWorld().isRemote) {
                 onSignalChanged(-1);
             }
+        }
+
+        if (suNeighbor) {
+            suNeighbor = false;
+            pokeExtendedNeighbors();
         }
 
         if (suRender) {
