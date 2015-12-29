@@ -35,6 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.microblock.IMicroblock;
+import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
@@ -45,6 +46,7 @@ import pl.asie.charset.api.pipes.IPipe;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IPipe, ITickable, IOccludingPart {
 	protected int[] shifterDistance = new int[6];
@@ -149,55 +151,35 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
         list.add(AxisAlignedBB.fromBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
     }
 
-    private static class BoundingBox {
-        private static final AxisAlignedBB[] bounds = new AxisAlignedBB[0x40];
-
-        static {
-            for (int mask = 0; mask < 0x40; ++mask) {
-                bounds[mask] = AxisAlignedBB.fromBounds(
-                        ((mask & (1 << 4)) != 0 ? 0 : 0.25),
-                        ((mask & (1 << 0)) != 0 ? 0 : 0.25),
-                        ((mask & (1 << 2)) != 0 ? 0 : 0.25),
-                        ((mask & (1 << 5)) != 0 ? 1 : 0.75),
-                        ((mask & (1 << 1)) != 0 ? 1 : 0.75),
-                        ((mask & (1 << 3)) != 0 ? 1 : 0.75)
-                );
-            }
-        }
-
-        private static AxisAlignedBB getBox(int msk) {
-            return bounds[msk];
-        }
-    }
-
     @Override
     public void addSelectionBoxes(List<AxisAlignedBB> list) {
-        list.add(BoundingBox.getBox(neighbors()));
+        list.add(new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
+        for (EnumFacing f : EnumFacing.VALUES) {
+            if (connects(f)) {
+                list.add(RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), f));
+            }
+        }
     }
 
     @Override
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-        AxisAlignedBB box = BoundingBox.getBox(neighbors());
+        AxisAlignedBB box = new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
         if (box.intersectsWith(mask)) {
             list.add(box);
+        }
+        for (EnumFacing f : EnumFacing.VALUES) {
+            if (connects(f)) {
+                box = RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), f);
+                if (box.intersectsWith(mask)) {
+                    list.add(box);
+                }
+            }
         }
     }
 
     @Override
     public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
         return layer == EnumWorldBlockLayer.CUTOUT;
-    }
-
-    private int neighbors() {
-        int result = 0;
-        if (getContainer() != null) {
-            for (EnumFacing side : EnumFacing.VALUES) {
-                if (connects(side)) {
-                    result |= 1 << side.ordinal();
-                }
-            }
-        }
-        return result;
     }
 
     @Override
@@ -216,6 +198,19 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
         if (part instanceof IMicroblock.IFaceMicroblock) {
             if (!((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
                 return false;
+            }
+        }
+
+        for (IMultipart p : getContainer().getParts()) {
+            if (p != this && p instanceof IOccludingPart) {
+                AxisAlignedBB mask = RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), side);
+                List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
+                ((IOccludingPart) p).addOcclusionBoxes(boxes);
+                for (AxisAlignedBB box : boxes) {
+                    if (mask.intersectsWith(box)) {
+                        return false;
+                    }
+                }
             }
         }
 

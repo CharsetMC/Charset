@@ -33,6 +33,7 @@ public class ModCharsetGates {
 
 	public static PacketRegistry packet;
     public static ItemGate itemGate;
+    public static ItemScrewdriver itemScrewdriver;
 
     static final String[] gateMeta = new String[64]; // TODO: why 64 lol
     static final String[] gateUN = new String[64];
@@ -48,9 +49,14 @@ public class ModCharsetGates {
         itemGate = new ItemGate();
         GameRegistry.registerItem(itemGate, "gate");
 
+        itemScrewdriver = new ItemScrewdriver();
+        GameRegistry.registerItem(itemScrewdriver, "screwdriver");
+
         registerGate("nand", PartGateNAND.class, 0);
         registerGate("nor", PartGateNOR.class, 1);
         registerGate("xor", PartGateXOR.class, 2);
+
+        ModCharsetLib.proxy.registerItemModel(itemScrewdriver, 0, "charsetgates:screwdriver");
 
         MinecraftForge.EVENT_BUS.register(proxy);
     }

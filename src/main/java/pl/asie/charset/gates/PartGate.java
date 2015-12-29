@@ -10,6 +10,8 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -341,29 +343,34 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     @Override
     public boolean onActivated(EntityPlayer playerIn, ItemStack stack, PartMOP hit) {
         if (!playerIn.worldObj.isRemote) {
-            //this.top.rotateY();
-            if (playerIn.isSneaking()) {
-                invertedSides = (byte) ((invertedSides + 1) & 15);
-                while ((~getSideMask() & invertedSides) != 0) {
-                    invertedSides = (byte) ((invertedSides + 1) & 15);
-                }
-            } else {
-                int z = 32;
-                enabledSides = (byte) ((enabledSides + 1) & 15);
-                while (z > 0 && ((~getSideMask() & enabledSides) != 0
-                        || isInvalidEnabled() || enabledSides == 0)) {
+            if (stack != null) {
+                if (stack.getItem() instanceof ItemScrewdriver) {
+                    int z = 32;
                     enabledSides = (byte) ((enabledSides + 1) & 15);
-                    z--;
+                    while (z > 0 && ((~getSideMask() & enabledSides) != 0
+                            || isInvalidEnabled() || enabledSides == 0)) {
+                        enabledSides = (byte) ((enabledSides + 1) & 15);
+                        z--;
+                    }
+                    enabledSides |= 1;
+                    if (z == 0) {
+                        enabledSides = getSideMask();
+                    }
+
+                    notifyBlockUpdate();
+                    sendUpdatePacket();
+                    return true;
+                } else if (stack.getItem() == Item.getItemFromBlock(Blocks.redstone_torch)) {
+                    invertedSides = (byte) ((invertedSides + 1) & 15);
+                    while ((~getSideMask() & invertedSides) != 0) {
+                        invertedSides = (byte) ((invertedSides + 1) & 15);
+                    }
+
+                    notifyBlockUpdate();
+                    sendUpdatePacket();
+                    return true;
                 }
-                enabledSides |= 1;
-                if (z == 0) {
-                    enabledSides = getSideMask();
-                }
-                System.out.println("E = " + Integer.toString(enabledSides, 2));
             }
-            notifyBlockUpdate();
-            sendUpdatePacket();
-            return true;
         }
         return false;
     }
