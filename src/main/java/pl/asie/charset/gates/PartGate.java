@@ -288,7 +288,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public void onNeighborBlockChange(Block block) {
-        if (!getWorld().getBlockState(getPos()).getBlock().isSideSolid(getWorld(), getPos().offset(side), side.getOpposite())) {
+        if (!getWorld().getBlockState(getPos().offset(side)).getBlock().isSideSolid(getWorld(), getPos().offset(side), side.getOpposite())) {
             harvest(null, null);
             return;
         }
