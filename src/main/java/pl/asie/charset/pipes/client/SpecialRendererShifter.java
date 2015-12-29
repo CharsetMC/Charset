@@ -18,7 +18,7 @@ import net.minecraftforge.client.model.IPerspectiveAwareModel;
 
 import pl.asie.charset.pipes.TileShifter;
 
-public class RendererShifterTile extends TileEntitySpecialRenderer {
+public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 	private final Minecraft mc = Minecraft.getMinecraft();
 	private final RenderItem itemRenderer = mc.getRenderItem();
 

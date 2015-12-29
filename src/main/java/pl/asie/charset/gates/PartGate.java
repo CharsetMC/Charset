@@ -37,8 +37,17 @@ import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IConnectable;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.utils.RotationUtils;
 
 public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable, IOccludingPart, ITickable {
+    private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
+
+    static {
+        for (int i = 0; i < 6; i++) {
+            BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, 0, 1, 0.125, 1), EnumFacing.getFront(i));
+        }
+    }
+
     public enum Connection {
         NONE,
         INPUT,
@@ -279,6 +288,11 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public void onNeighborBlockChange(Block block) {
+        if (!getWorld().getBlockState(getPos()).getBlock().isSideSolid(getWorld(), getPos().offset(side), side.getOpposite())) {
+            harvest(null, null);
+            return;
+        }
+
         if (pendingTick == 0) {
             pendingTick = 2;
         }
@@ -426,12 +440,18 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     }
 
     public void readItemNBT(NBTTagCompound tag) {
-        enabledSides = tag.getByte("e");
-        invertedSides = tag.getByte("i");
+        if (tag.hasKey("e")) {
+            enabledSides = tag.getByte("e");
+        }
+        if (tag.hasKey("i")) {
+            invertedSides = tag.getByte("i");
+        }
     }
 
-    public void writeItemNBT(NBTTagCompound tag) {
-        tag.setByte("e", enabledSides);
+    public void writeItemNBT(NBTTagCompound tag, boolean silky) {
+        if (silky) {
+            tag.setByte("e", enabledSides);
+        }
         tag.setByte("i", invertedSides);
     }
 
@@ -484,28 +504,9 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     // Utility functions
 
-    private AxisAlignedBB getBox() {
-        switch (side) {
-            case DOWN:
-                return new AxisAlignedBB(0, 0, 0, 1, 0.125, 1);
-            case UP:
-                return new AxisAlignedBB(0, 1 - 0.125, 0, 1, 1, 1);
-            case NORTH:
-                return new AxisAlignedBB(0, 0, 0, 1, 1, 0.125);
-            case SOUTH:
-                return new AxisAlignedBB(0, 0, 1 - 0.125, 1, 1, 1);
-            case WEST:
-                return new AxisAlignedBB(0, 0, 0, 0.125, 1, 1);
-            case EAST:
-                return new AxisAlignedBB(1 - 0.125, 0, 0, 1, 1, 1);
-        }
-
-        return null;
-    }
-
     @Override
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-        AxisAlignedBB box = getBox();
+        AxisAlignedBB box = BOXES[side.ordinal()];
         if (box != null && box.intersectsWith(mask)) {
             list.add(box);
         }
@@ -513,7 +514,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public void addOcclusionBoxes(List<AxisAlignedBB> list) {
-        AxisAlignedBB box = getBox();
+        AxisAlignedBB box = BOXES[side.ordinal()];
         if (box != null) {
             list.add(box);
         }
@@ -521,7 +522,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public void addSelectionBoxes(List<AxisAlignedBB> list) {
-        AxisAlignedBB box = getBox();
+        AxisAlignedBB box = BOXES[side.ordinal()];
         if (box != null) {
             list.add(box);
         }

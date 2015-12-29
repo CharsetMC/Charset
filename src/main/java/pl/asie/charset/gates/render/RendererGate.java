@@ -22,9 +22,11 @@ import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelRotation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.client.model.IColoredBakedQuad;
 import net.minecraftforge.client.model.IFlexibleBakedModel;
+import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.client.model.ISmartItemModel;
@@ -58,6 +60,9 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             ModelRotation.X0_Y270, ModelRotation.X0_Y90
     };
 
+    private static final Map<String, IModel> gateModels = new HashMap<String, IModel>();
+    private static final Map<String, IModel> layerModels = new HashMap<String, IModel>();
+
     public final PartGate gate;
     private final IModelState transform;
     private final List<IBakedModel> bakedModels = new ArrayList<IBakedModel>();
@@ -78,11 +83,14 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
                 new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()])
         );
 
-        this.bakedModels.add(
-                ProxyClient.gateModel
-                        .retexture(ImmutableMap.of("gate_top", ModCharsetGates.gateTextures.get(gate.getType()).toString()))
-                        .bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter)
-        );
+        String texture = ModCharsetGates.gateTextures.get(gate.getType()).toString();
+        IModel model = gateModels.get(texture);
+        if (model == null) {
+            model = ProxyClient.gateModel.retexture(ImmutableMap.of("gate_top", texture));
+            gateModels.put(texture, model);
+        }
+
+        this.bakedModels.add(model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
 
         GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(gate.getType());
         GateRenderDefinitions.BaseDefinition base = GateRenderDefinitions.INSTANCE.base;
@@ -95,14 +103,18 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             }
 
             if ("color".equals(layer.type) && layer.texture != null) {
-                IBakedModel model = ProxyClient.gateLayerModel
-                                .retexture(ImmutableMap.of("layer", layer.texture))
-                                .bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter);
+                model = layerModels.get(layer.texture);
+                if (model == null) {
+                    model = ProxyClient.gateLayerModel.retexture(ImmutableMap.of("layer", layer.texture));
+                    layerModels.put(layer.texture, model);
+                }
+
+                IBakedModel bakedModel = model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter);
 
                 int color = state == PartGate.State.ON ? base.colorMul.get("on") :
                         (state == PartGate.State.OFF ? base.colorMul.get("off") : base.colorMul.get("disabled"));
 
-                bakedModelsRecolor.put(model, color);
+                bakedModelsRecolor.put(bakedModel, color);
             }
         }
 
@@ -248,7 +260,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return bakedModels.size() > 0 ? bakedModels.get(0).getParticleTexture() : null;
+        return ClientUtils.textureGetter.apply(new ResourceLocation("charsetgates:blocks/gate_bottom"));
     }
 
     @Override

@@ -49,12 +49,21 @@ import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IPipe, ITickable, IOccludingPart {
+    private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
+
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
     private byte connectionCache = 0;
 	private boolean neighborBlockChanged;
     private boolean requestUpdate;
+
+    static {
+        BOXES[6] = new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
+        for (int i = 0; i < 6; i++) {
+            BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), EnumFacing.getFront(i));
+        }
+    }
 
 	public PartPipe() {
 	}
@@ -153,25 +162,23 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
     @Override
     public void addSelectionBoxes(List<AxisAlignedBB> list) {
-        list.add(new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
+        list.add(BOXES[6]);
         for (EnumFacing f : EnumFacing.VALUES) {
             if (connects(f)) {
-                list.add(RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), f));
+                list.add(BOXES[f.ordinal()]);
             }
         }
     }
 
     @Override
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-        AxisAlignedBB box = new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-        if (box.intersectsWith(mask)) {
-            list.add(box);
+        if (BOXES[6].intersectsWith(mask)) {
+            list.add(BOXES[6]);
         }
         for (EnumFacing f : EnumFacing.VALUES) {
             if (connects(f)) {
-                box = RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), f);
-                if (box.intersectsWith(mask)) {
-                    list.add(box);
+                if (BOXES[f.ordinal()].intersectsWith(mask)) {
+                    list.add(BOXES[f.ordinal()]);
                 }
             }
         }
@@ -203,7 +210,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
         for (IMultipart p : getContainer().getParts()) {
             if (p != this && p instanceof IOccludingPart) {
-                AxisAlignedBB mask = RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), side);
+                AxisAlignedBB mask = BOXES[side.ordinal()];
                 List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
                 ((IOccludingPart) p).addOcclusionBoxes(boxes);
                 for (AxisAlignedBB box : boxes) {

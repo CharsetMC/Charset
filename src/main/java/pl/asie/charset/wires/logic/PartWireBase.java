@@ -137,6 +137,12 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
 
     @Override
     public void onNeighborBlockChange(Block block) {
+        if (location != WireFace.CENTER) {
+            if (!WireUtils.canPlaceWire(getWorld(), getPos().offset(location.facing), location.facing.getOpposite())) {
+                harvest(null, null);
+                return;
+            }
+        }
         scheduleConnectionUpdate();
         schedulePropagationUpdate();
     }

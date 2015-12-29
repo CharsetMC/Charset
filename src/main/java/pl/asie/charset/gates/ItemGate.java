@@ -29,7 +29,7 @@ public class ItemGate extends ItemMultiPart {
     public static ItemStack getStack(PartGate gate) {
         ItemStack stack = new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(gate.getType()));
         stack.setTagCompound(new NBTTagCompound());
-        gate.writeItemNBT(stack.getTagCompound());
+        gate.writeItemNBT(stack.getTagCompound(), false);
         return stack;
     }
 

@@ -31,7 +31,7 @@ public class ItemWire extends ItemMultiPart {
 
     @Override
     public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
-        if (!isFreestanding(stack) && !world.getBlockState(pos.offset(side)).getBlock().isSideSolid(world, pos.offset(side), side.getOpposite())) {
+        if (!isFreestanding(stack) && !WireUtils.canPlaceWire(world, pos.offset(side), side.getOpposite())) {
             return false;
         }
 

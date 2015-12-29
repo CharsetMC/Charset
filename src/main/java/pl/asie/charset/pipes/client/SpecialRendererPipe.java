@@ -12,7 +12,7 @@ import mcmultipart.client.multipart.MultipartSpecialRenderer;
 import pl.asie.charset.pipes.PartPipe;
 import pl.asie.charset.pipes.PipeItem;
 
-public class RendererPipePart extends MultipartSpecialRenderer<PartPipe> {
+public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
 	private static final float ITEM_RANDOM_OFFSET = 0.01F;
 
