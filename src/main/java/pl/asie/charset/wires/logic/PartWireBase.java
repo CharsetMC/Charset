@@ -194,7 +194,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
         cornerConnections = location == WireFace.CENTER ? 0 : buf.readByte();
 
         if (oldIC != internalConnections || oldEC != externalConnections || oldCC != cornerConnections) {
-            scheduleRenderUpdate();
+            markRenderUpdate();
         }
     }
 
@@ -216,6 +216,12 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
         if (location != WireFace.CENTER) {
             nbt.setByte("cC", cornerConnections);
         }
+    }
+
+    @Override
+    public void onAdded() {
+        scheduleConnectionUpdate();
+        schedulePropagationUpdate();
     }
 
     @Override
@@ -336,6 +342,10 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
 
     @Override
     public void update() {
+        if (getWorld() == null) {
+            return;
+        }
+
         if (suConnection) {
             suConnection = false;
             updateConnections();
@@ -353,7 +363,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
             }
         }
 
-        if (suRender && getWorld() != null) {
+        if (suRender) {
             suRender = false;
             if (getWorld().isRemote) {
                 markRenderUpdate();

@@ -15,8 +15,10 @@ public class PartWireInsulated extends PartWireNormal implements IInsulatedWire 
 
     @Override
     protected void onSignalChanged(int color) {
-        if (color == type.color() || color == -1) {
-            propagate(color);
+        if (getWorld() != null && !getWorld().isRemote) {
+            if (color == type.color() || color == -1) {
+                propagate(color);
+            }
         }
     }
 

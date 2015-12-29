@@ -1,7 +1,6 @@
 package pl.asie.charset.wires.logic;
 
 import java.util.Arrays;
-import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
@@ -10,7 +9,6 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -49,7 +47,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
             int oSL = signalLevel;
             signalLevel = data.readByte() << 8;
             if (oSL != signalLevel) {
-                scheduleRenderUpdate();
+                markRenderUpdate();
             }
         }
     }
@@ -76,7 +74,9 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 
     @Override
     protected void onSignalChanged(int color) {
-        propagate(color);
+        if (getWorld() != null && !getWorld().isRemote) {
+            propagate(color);
+        }
     }
 
     protected int getRedstoneLevel(IMultipartContainer container, WireFace location) {
@@ -86,7 +86,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 	@Override
 	public void propagate(int color) {
 		if (DEBUG) {
-			System.out.println("--- PROPAGATE " + getPos().toString() + " " + location.name() + " ---");
+			System.out.println("--- PROPAGATE " + getPos().toString() + " " + location.name() + " (" + getWorld().getTotalWorldTime() + ") ---");
 		}
 
 		int maxSignal = 0;
@@ -190,6 +190,10 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 			signalLevel = 0;
 		}
 
+        if (oldSignal == signalLevel) {
+            return;
+        }
+
 		if (DEBUG) {
             System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
 			System.out.println("Levels: " + Arrays.toString(neighborLevel));
@@ -247,7 +251,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 
 		if (type == WireKind.NORMAL) {
 			if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
-				scheduleRenderUpdate();
+                scheduleRenderUpdate();
 
 				if (location != WireFace.CENTER) {
 					BlockPos uPos = getPos().offset(location.facing);

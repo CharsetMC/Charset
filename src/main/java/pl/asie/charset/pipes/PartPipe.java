@@ -50,6 +50,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
+    private byte connectionCache = 0;
 	private boolean neighborBlockChanged;
     private boolean requestUpdate;
 
@@ -58,7 +59,15 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
     @Override
     public void readUpdatePacket(PacketBuffer buf) {
+        super.readUpdatePacket(buf);
+        connectionCache = buf.readByte();
         requestUpdate = true;
+    }
+
+    @Override
+    public void writeUpdatePacket(PacketBuffer buf) {
+        super.writeUpdatePacket(buf);
+        buf.writeByte(connectionCache);
     }
 
     // Block logic
@@ -204,8 +213,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	private boolean internalConnects(EnumFacing side) {
         ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(side));
-        if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
-            return false;
+        if (part instanceof IMicroblock.IFaceMicroblock) {
+            if (!((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
+                return false;
+            }
         }
 
         if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
@@ -236,18 +247,28 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		return false;
 	}
 
+    private void updateConnections(EnumFacing side) {
+        if (side != null) {
+            connectionCache &= ~(1 << side.ordinal());
+
+            if (internalConnects(side)) {
+                PartPipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite());
+                if (pipe != null && !pipe.internalConnects(side.getOpposite())) {
+                    return;
+                }
+
+                connectionCache |= 1 << side.ordinal();
+            }
+        } else {
+            for (EnumFacing facing : EnumFacing.VALUES) {
+                updateConnections(facing);
+            }
+        }
+    }
+
 	@Override
 	public boolean connects(EnumFacing side) {
-		if (internalConnects(side)) {
-			PartPipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite());
-			if (pipe != null && !pipe.internalConnects(side.getOpposite())) {
-				return false;
-			}
-
-			return true;
-		}
-
-		return false;
+		return (connectionCache & (1 << side.ordinal())) != 0;
 	}
 
 	@Override
@@ -255,6 +276,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		super.readFromNBT(nbt);
 		readItems(nbt);
 
+        connectionCache = nbt.getByte("cc");
 		shifterDistance = nbt.getIntArray("shifterDist");
 		if (shifterDistance == null || shifterDistance.length != 6) {
 			shifterDistance = new int[6];
@@ -295,6 +317,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		super.writeToNBT(nbt);
 		writeItems(nbt);
 
+        nbt.setByte("cc", connectionCache);
 		nbt.setIntArray("shifterDist", shifterDistance);
 	}
 
@@ -310,7 +333,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
     @Override
     public void onAdded() {
-        updateShifters();
+        updateNeighborInfo(false);
         scheduleRenderUpdate();
     }
 
@@ -326,8 +349,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
         }
 
 		if (neighborBlockChanged) {
-			updateShifters();
-			scheduleRenderUpdate();
+			updateNeighborInfo(true);
 			neighborBlockChanged = false;
 		}
 
@@ -384,11 +406,18 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		}
 	}
 
-	private void updateShifters() {
+	private void updateNeighborInfo(boolean sendPacket) {
 		if (!getWorld().isRemote) {
+            byte oc = connectionCache;
+
 			for (EnumFacing dir : EnumFacing.VALUES) {
+                updateConnections(dir);
 				updateShifterSide(dir);
 			}
+
+            if (sendPacket && connectionCache != oc) {
+                sendUpdatePacket();
+            }
 		}
 	}
 

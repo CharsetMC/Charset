@@ -17,6 +17,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -35,7 +36,7 @@ import pl.asie.charset.api.wires.IConnectable;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 
-public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable, IOccludingPart {
+public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable, IOccludingPart, ITickable {
     public enum Connection {
         NONE,
         INPUT,
@@ -98,6 +99,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     protected byte enabledSides, invertedSides;
 
+    private int pendingTick;
     private byte[] inputs = new byte[4];
     private byte[] outputClient = new byte[4];
 
@@ -159,6 +161,16 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     @Override
     public List<ItemStack> getDrops() {
         return Arrays.asList(ItemGate.getStack(this));
+    }
+
+    @Override
+    public void update() {
+        if (getWorld() != null && !getWorld().isRemote && pendingTick > 0) {
+            pendingTick--;
+            if (pendingTick == 0) {
+                updateInputs();
+            }
+        }
     }
 
     private void updateInputs() {
@@ -247,13 +259,45 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     }
 
     @Override
+    public void onAdded() {
+        pendingTick = 1;
+    }
+
+    @Override
+    public void onLoaded() {
+        pendingTick = 1;
+    }
+
+    @Override
     public void onPartChanged(IMultipart part) {
-        updateInputs();
+        if (pendingTick == 0) {
+            pendingTick = 2;
+        }
     }
 
     @Override
     public void onNeighborBlockChange(Block block) {
-        updateInputs();
+        if (pendingTick == 0) {
+            pendingTick = 2;
+        }
+    }
+
+    @Override
+    public EnumFacing[] getValidRotations() {
+        return new EnumFacing[]{side, side.getOpposite()};
+    }
+
+    @Override
+    public boolean rotatePart(EnumFacing axis) {
+        if (axis.getAxis() == side.getAxis()) {
+            if (axis.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE) {
+                top = top.rotateY();
+            } else {
+                top = top.rotateYCCW();
+            }
+            return true;
+        }
+        return false;
     }
 
     public EnumFacing getSide() {
@@ -367,6 +411,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
+        tag.setByteArray("in", inputs);
         tag.setByte("f", (byte) side.ordinal());
         tag.setByte("t", (byte) top.ordinal());
         tag.setByte("e", enabledSides);
@@ -385,6 +430,10 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
+        inputs = tag.getByteArray("in");
+        if (inputs == null || inputs.length != 4) {
+            inputs = new byte[4];
+        }
         enabledSides = tag.getByte("e");
         invertedSides = tag.getByte("i");
         side = EnumFacing.getFront(tag.getByte("f"));

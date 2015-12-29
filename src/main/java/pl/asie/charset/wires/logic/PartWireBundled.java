@@ -96,6 +96,10 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 			}
 		}
 
+        if (newSignal == signalLevel[color]) {
+            return;
+        }
+
 		signalLevel[color] = newSignal;
 		signalValue[color] = (byte) (newSignal >> 8);
 
@@ -167,7 +171,9 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 
     @Override
     protected void onSignalChanged(int color) {
-        propagate(color);
+        if (getWorld() != null && !getWorld().isRemote) {
+            propagate(color);
+        }
     }
 
 	@Override
