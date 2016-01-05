@@ -1,6 +1,8 @@
 package pl.asie.charset.wires;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.block.Block;
@@ -9,12 +11,15 @@ import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import mcmultipart.microblock.IMicroblock;
+import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.PartSlot;
@@ -28,6 +33,15 @@ import pl.asie.charset.wires.logic.PartWireBase;
 public final class WireUtils {
     public static boolean WIRES_CONNECT = true;
 	private static final Set<Block> WIRE_PLACEABLE = new HashSet<Block>();
+    private static final EnumFacing[][] CONNECTION_DIRS = new EnumFacing[][] {
+            {EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST},
+            {EnumFacing.SOUTH, EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.EAST},
+            {EnumFacing.UP, EnumFacing.DOWN, EnumFacing.WEST, EnumFacing.EAST},
+            {EnumFacing.UP, EnumFacing.DOWN, EnumFacing.EAST, EnumFacing.WEST},
+            {EnumFacing.UP, EnumFacing.DOWN, EnumFacing.SOUTH, EnumFacing.NORTH},
+            {EnumFacing.UP, EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH},
+            {EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST},
+    };
 
 	static {
 		WIRE_PLACEABLE.add(Blocks.glowstone);
@@ -38,6 +52,10 @@ public final class WireUtils {
 	private WireUtils() {
 
 	}
+
+    public static EnumFacing[] getConnectionsForRender(WireFace face) {
+        return CONNECTION_DIRS[face.ordinal()];
+    }
 
     public static int getRedstoneWireLevel(IMultipartContainer container, WireFace face) {
         PartWireBase wire = getWire(container, face);
@@ -118,6 +136,10 @@ public final class WireUtils {
                     return false;
                 }
 
+                if (wire2.isOccluded(facing.getOpposite())) {
+                    return false;
+                }
+
                 if (wire.location != WireFace.CENTER && isBlockingPart(container2, PartSlot.getEdgeSlot(facing.getOpposite(), wire.location.facing))) {
                     return false;
                 }
@@ -176,15 +198,6 @@ public final class WireUtils {
             return false;
         }
 
-        container = MultipartHelper.getPartContainer(wire.getWorld(), middlePos);
-        if (container != null) {
-            if (isBlockingPart(container, PartSlot.getFaceSlot(direction.getOpposite()))
-                    || isBlockingPart(container, PartSlot.getFaceSlot(side))
-                    || isBlockingPart(container, PartSlot.getEdgeSlot(direction.getOpposite(), side))) {
-                return false;
-            }
-        }
-
         BlockPos cornerPos = middlePos.offset(side);
         container = MultipartHelper.getPartContainer(wire.getWorld(), cornerPos);
         if (container == null) {
@@ -192,12 +205,42 @@ public final class WireUtils {
         }
 
         if (isBlockingPart(container, PartSlot.getFaceSlot(side.getOpposite()))
-            || isBlockingPart(container, PartSlot.getEdgeSlot(side.getOpposite(), direction.getOpposite()))) {
+                || isBlockingPart(container, PartSlot.getEdgeSlot(side.getOpposite(), direction.getOpposite()))) {
             return false;
         }
 
         PartWireBase wire2 = getWire(container, WireFace.get(direction.getOpposite()));
-        return wire2 != null && wire2.type.connects(wire.type);
+
+        if (wire2 == null || wire2.isOccluded(side.getOpposite()) || !wire2.type.connects(wire.type)) {
+            return false;
+        }
+
+        container = MultipartHelper.getPartContainer(wire.getWorld(), middlePos);
+        if (container != null) {
+            if (isBlockingPart(container, PartSlot.getFaceSlot(direction.getOpposite()))
+                    || isBlockingPart(container, PartSlot.getFaceSlot(side))
+                    || isBlockingPart(container, PartSlot.getEdgeSlot(direction.getOpposite(), side))) {
+                return false;
+            }
+
+            // Corner occlusion test
+            List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
+            for (IMultipart p : container.getParts()) {
+                if (p instanceof IOccludingPart && !(p instanceof PartWireBase)) {
+                    ((IOccludingPart) p).addOcclusionBoxes(boxes);
+                }
+            }
+
+            AxisAlignedBB corner1 = wire.getCornerCollisionBox(direction);
+            AxisAlignedBB corner2 = wire2.getCornerCollisionBox(side.getOpposite());
+            for (AxisAlignedBB box : boxes) {
+                if (box.intersectsWith(corner1) || box.intersectsWith(corner2)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public static PartWireBase getWire(IMultipartContainer container, WireFace face) {

@@ -17,18 +17,10 @@ import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.wires.WireKind;
+import pl.asie.charset.wires.WireUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 public class RendererWireNormal extends RendererWireBase {
-	private final EnumFacing[][] CONNECTION_DIRS = new EnumFacing[][] {
-			{EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST},
-			{EnumFacing.SOUTH, EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.EAST},
-			{EnumFacing.UP, EnumFacing.DOWN, EnumFacing.WEST, EnumFacing.EAST},
-			{EnumFacing.UP, EnumFacing.DOWN, EnumFacing.EAST, EnumFacing.WEST},
-			{EnumFacing.UP, EnumFacing.DOWN, EnumFacing.SOUTH, EnumFacing.NORTH},
-			{EnumFacing.UP, EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH}
-	};
-
 	private final ModelRotation[] ROTATIONS = new ModelRotation[] {
 			ModelRotation.X0_Y0,
 			ModelRotation.X180_Y0,
@@ -365,20 +357,21 @@ public class RendererWireNormal extends RendererWireBase {
 		float max = 8.0f + (width / 2);
 		float minH = 0.0f;
 		float maxH = height;
+        EnumFacing[] dirs = WireUtils.getConnectionsForRender(side);
 		
 		boolean[] connectionMatrix = new boolean[] {
-				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][0]),
-				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][1]),
-				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][2]),
-				wire == null ? true : wire.connectsAny(CONNECTION_DIRS[side.ordinal()][3])
+				wire == null ? true : wire.connectsAny(dirs[0]),
+				wire == null ? true : wire.connectsAny(dirs[1]),
+				wire == null ? true : wire.connectsAny(dirs[2]),
+				wire == null ? true : wire.connectsAny(dirs[3])
 		};
 		int cmc = (connectionMatrix[0] ? 8 : 0) | (connectionMatrix[1] ? 4 : 0) | (connectionMatrix[2] ? 2 : 0) | (connectionMatrix[3] ? 1 : 0);
 
  		boolean[] cornerConnectionMatrix = new boolean[] {
-				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][0]),
-				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][1]),
-				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][2]),
-				wire == null ? true : wire.connectsCorner(CONNECTION_DIRS[side.ordinal()][3])
+				wire == null ? true : wire.connectsCorner(dirs[0]),
+				wire == null ? true : wire.connectsCorner(dirs[1]),
+				wire == null ? true : wire.connectsCorner(dirs[2]),
+				wire == null ? true : wire.connectsCorner(dirs[3])
 		};
 
 		ModelRotation rot = ROTATIONS[side.ordinal()];
@@ -516,9 +509,10 @@ public class RendererWireNormal extends RendererWireBase {
 			);
 		}
 
+        EnumFacing[] dirs0 = WireUtils.getConnectionsForRender(WireFace.DOWN);
 		for (int i = 0; i < 4; i++) {
 			if (cornerConnectionMatrix[i]) {
-				addCorner(wire, side, CONNECTION_DIRS[0][i], lit, quads);
+				addCorner(wire, side, dirs0[i], lit, quads);
 			}
 		}
 	}

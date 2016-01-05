@@ -55,6 +55,7 @@ public class ModCharsetGates {
         registerGate("nor", PartGateNOR.class, 1);
         registerGate("xor", PartGateXOR.class, 2);
         registerGate("pulse_former", PartGatePulseFormer.class, 3);
+        registerGate("multiplexer", PartGateMultiplexer.class, 4);
 
         ModCharsetLib.proxy.registerItemModel(itemScrewdriver, 0, "charsetgates:screwdriver");
 
@@ -71,6 +72,7 @@ public class ModCharsetGates {
         registerGateStack(ItemGate.getStack(new PartGateNAND()));
         registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)));
         registerGateStack(ItemGate.getStack(new PartGatePulseFormer()));
+        registerGateStack(ItemGate.getStack(new PartGateMultiplexer()));
     }
 
     private void registerGateStack(ItemStack stack) {

@@ -92,6 +92,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 		int maxSignal = 0;
 		int oldSignal = signalLevel;
 		int[] neighborLevel = new int[7];
+        boolean[] isWire = new boolean[7];
 
 		if (type == WireKind.NORMAL) {
 			if (location != WireFace.CENTER) {
@@ -111,6 +112,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 		if (internalConnections > 0) {
 			for (WireFace location : WireFace.VALUES) {
 				if (connectsInternal(location)) {
+                    isWire[location.ordinal()] = true;
 					neighborLevel[location.ordinal()] = getRedstoneLevel(getContainer(), location);
 				}
 			}
@@ -153,6 +155,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
                 IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), pos);
 
                 if (WireUtils.getWire(container, location) != null) {
+                    isWire[facidx] = true;
                     neighborLevel[facidx] = getRedstoneLevel(container, location);
                 } else {
                     IBlockState state = getWorld().getBlockState(pos);
@@ -160,6 +163,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
                     int power = WireUtils.getRedstoneLevel(getWorld(), pos, state, facing, location, true);
 
                     if (state.getBlock() instanceof BlockRedstoneWire) {
+                        isWire[facidx] = true;
                         power--;
                     }
 
@@ -170,15 +174,21 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 			} else if (connectsCorner(facing)) {
                 IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing).offset(location.facing));
                 if (container != null) {
+                    isWire[facidx] = true;
                     neighborLevel[facidx] = getRedstoneLevel(container, WireFace.get(facing.getOpposite()));
                 }
 			}
 		}
 
+        int maxSignalNonWire = 0;
+
 		for (int i = 0; i < 7; i++) {
 			if (neighborLevel[i] > maxSignal) {
 				maxSignal = neighborLevel[i];
 			}
+            if (!isWire[i] && neighborLevel[i] > maxSignalNonWire) {
+                maxSignalNonWire = neighborLevel[i];
+            }
 		}
 
 		if (maxSignal > signalLevel) {
@@ -187,7 +197,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 				signalLevel = 0;
 			}
 		} else {
-			signalLevel = 0;
+			signalLevel = maxSignalNonWire;
 		}
 
         if (oldSignal == signalLevel) {
@@ -228,7 +238,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 			}
 		} else {
 			for (WireFace nLoc : WireFace.VALUES) {
-				if (neighborLevel[nLoc.ordinal()] < signalLevel - 1) {
+				if (neighborLevel[nLoc.ordinal()] < signalLevel - 1 || neighborLevel[nLoc.ordinal()] > (signalLevel + 1)) {
 					if (connectsInternal(nLoc)) {
                         WireUtils.getWire(getContainer(), nLoc).onSignalChanged(type.color());
 					} else if (nLoc != WireFace.CENTER) {

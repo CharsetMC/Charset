@@ -48,7 +48,7 @@ import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IPipe, ITickable, IOccludingPart {
+public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IOccludingPart, IPipe, ITickable {
     private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
 	protected int[] shifterDistance = new int[6];

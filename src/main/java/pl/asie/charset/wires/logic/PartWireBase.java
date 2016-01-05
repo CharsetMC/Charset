@@ -3,13 +3,16 @@ package pl.asie.charset.wires.logic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -45,13 +48,15 @@ import pl.asie.charset.api.wires.IRedstoneUpdatable;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.wires.ModCharsetWires;
 import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements ISlottedPart, IOccludingPart, IHitEffectsPart, IRedstonePart, ITickable, IWire {
+public abstract class PartWireBase extends Multipart implements ISlottedPart, IHitEffectsPart, IOccludingPart, IRedstonePart, ITickable, IWire {
     protected static final boolean DEBUG = true;
+    private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
     public static final Property PROPERTY = new Property();
 
@@ -83,7 +88,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
 
 	public WireKind type;
 	public WireFace location;
-	protected byte internalConnections, externalConnections, cornerConnections;
+	protected byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
     private boolean suPropagation, suNeighbor, suRender, suConnection;
 
 	public PartWireBase() {
@@ -212,6 +217,8 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
         internalConnections = nbt.getByte("iC");
         externalConnections = nbt.getByte("eC");
         cornerConnections = nbt.getByte("cC");
+        occludedSides = nbt.getByte("oS");
+        cornerOccludedSides = nbt.getByte("coS");
     }
 
     @Override
@@ -223,6 +230,8 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
         if (location != WireFace.CENTER) {
             nbt.setByte("cC", cornerConnections);
         }
+        nbt.setByte("oS", occludedSides);
+        nbt.setByte("coS", cornerOccludedSides);
     }
 
     @Override
@@ -236,36 +245,87 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
         pokeExtendedNeighbors();
     }
 
+    private AxisAlignedBB[] getBoxes() {
+        AxisAlignedBB[] boxes = BOXES.get(this.type);
+
+        if (boxes == null) {
+            boxes = new AxisAlignedBB[43 + 24];
+            float xMin = 0.5f - WireUtils.getWireHitboxWidth(this) / 2;
+            float xMax = 0.5f + WireUtils.getWireHitboxWidth(this) / 2;
+            float y = WireUtils.getWireHitboxHeight(this);
+
+            for (int j = 0; j < 6; j++) {
+                EnumFacing f = EnumFacing.getFront(j);
+                EnumFacing[] faces = WireUtils.getConnectionsForRender(WireFace.get(f));
+                for (int i = 0; i < faces.length; i++) {
+                    if (i >= 2) {
+                        if (faces[i].getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
+                            boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, xMin, xMin, y, xMax), f);
+                        } else {
+                            boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMax, 0, xMin, 1, y, xMax), f);
+                        }
+                    } else {
+                        if (faces[i].getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
+                            boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 0, xMax, y, xMin), f);
+                        } else {
+                            boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMax, xMax, y, 1), f);
+                        }
+                    }
+                }
+                boxes[j * 5 + 0] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, y, xMax), f);
+                boxes[31 + j] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, y, xMin, xMax, xMin, xMax), f);
+                boxes[37 + j] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, xMin, xMax), f);
+                boxes[43 + j * 4 + 0] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 0, xMax, y, y), f);
+                boxes[43 + j * 4 + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 1 - y, xMax, y, 1), f);
+                boxes[43 + j * 4 + 2] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, xMin, y, y, xMax), f);
+                boxes[43 + j * 4 + 3] = RotationUtils.rotateFace(new AxisAlignedBB(1 - y, 0, xMin, 1, y, xMax), f);
+            }
+            boxes[30] = new AxisAlignedBB(xMin, xMin, xMin, xMax, xMax, xMax);
+            BOXES.put(this.type, boxes);
+        }
+
+        return boxes;
+    }
+
+    private AxisAlignedBB getBox(int i) {
+        AxisAlignedBB[] boxes = getBoxes();
+
+        return boxes[location.ordinal() * 5 + i];
+    }
+
+    public AxisAlignedBB getCornerCollisionBox(EnumFacing facing) {
+        EnumFacing[] facings = WireUtils.getConnectionsForRender(location);
+        for (int i = 0; i < facings.length; i++) {
+            if (facing == facings[i]) {
+                return getCornerBox(i);
+            }
+        }
+
+        return null; // !?
+    }
+
+    private AxisAlignedBB getCornerBox(int i) {
+        AxisAlignedBB[] boxes = getBoxes();
+
+        return boxes[43 + location.ordinal() * 4 + i];
+    }
+
     @Override
     public void addOcclusionBoxes(List<AxisAlignedBB> list) {
-        float xMin = 0.5f - WireUtils.getWireHitboxWidth(this) / 2;
-        float xMax = 0.5f + WireUtils.getWireHitboxWidth(this) / 2;
-        float y = WireUtils.getWireHitboxHeight(this);
-        
-        switch (location) {
-            case DOWN:
-                list.add(new AxisAlignedBB(xMin, 0, xMin, xMax, y, xMax));
-                break;
-            case UP:
-                list.add(new AxisAlignedBB(xMin, 1 - y, xMin, xMax, 1, xMax));
-                break;
-            case NORTH:
-                list.add(new AxisAlignedBB(xMin, xMin, 0, xMax, xMax, y));
-                break;
-            case SOUTH:
-                list.add(new AxisAlignedBB(xMin, xMin, 1 - y, xMax, xMax, 1));
-                break;
-            case WEST:
-                list.add(new AxisAlignedBB(0, xMin, xMin, y, xMax, xMax));
-                break;
-            case EAST:
-                list.add(new AxisAlignedBB(1 - y, xMin, xMin, 1, xMax, xMax));
-                break;
-            case CENTER:
-                list.add(new AxisAlignedBB(xMin, xMin, xMin, xMax, xMax, xMax));
-                break;
-        }
+        list.add(getBox(0));
     }
+
+    /* @Override
+    public void addSelectionBoxes(List<AxisAlignedBB> list) {
+        list.add(getBox(0));
+
+        EnumFacing[] faces = WireUtils.getConnectionsForRender(location);
+        for (int i = 0; i < faces.length; i++) {
+            if (connectsAny(faces[i])) {
+                list.add(getBox(i + 1));
+            }
+        }
+    } */
 
     @Override
     public void addSelectionBoxes(List<AxisAlignedBB> list) {
@@ -294,19 +354,6 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
         }
     }
 
-    private AxisAlignedBB getCenterCollisionBox(WireKind kind) {
-        switch (kind.type()) {
-            case NORMAL:
-                return new AxisAlignedBB(0.4375, 0.4375, 0.4375, 0.5625, 0.5625, 0.5625);
-            case INSULATED:
-                return new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625);
-            case BUNDLED:
-                return new AxisAlignedBB(0.3125, 0.3125, 0.3125, 0.6875, 0.6875, 0.6875);
-            default:
-                return null;
-        }
-    }
-
     private AxisAlignedBB getCenterBox(WireKind kind) {
         switch (kind.type()) {
             case NORMAL:
@@ -316,6 +363,26 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
                 return new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
             default:
                 return null;
+        }
+    }
+
+    @Override
+    public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+        if (location == location) {
+            AxisAlignedBB bb = getBox(0);
+            if (mask.intersectsWith(bb)) {
+                list.add(bb);
+            }
+
+            EnumFacing[] faces = WireUtils.getConnectionsForRender(location);
+            for (int i = 0; i < faces.length; i++) {
+                if (connectsAny(faces[i])) {
+                    bb = getBox(i + 1);
+                    if (mask.intersectsWith(bb)) {
+                        list.add(bb);
+                    }
+                }
+            }
         }
     }
 
@@ -385,6 +452,14 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
         }
     }
 
+    public boolean isOccluded(EnumFacing face) {
+        if (suConnection) {
+            suConnection = false;
+            updateConnections();
+        }
+        return (occludedSides & (1 << face.ordinal())) != 0;
+    }
+
 	public void updateConnections() {
 		Set<WireFace> validSides = EnumSet.noneOf(WireFace.class);
 
@@ -401,9 +476,35 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IO
 		}
 
 		int oldConnectionCache = internalConnections << 12 | externalConnections << 6 | cornerConnections;
-		internalConnections = externalConnections = cornerConnections = 0;
+		internalConnections = externalConnections = cornerConnections = occludedSides = 0;
 
-		for (WireFace facing : validSides) {
+        // Occlusion test
+
+        EnumFacing[] connFaces = WireUtils.getConnectionsForRender(location);
+        List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
+        for (IMultipart p : getContainer().getParts()) {
+            if (p != this && p instanceof IOccludingPart && !(p instanceof PartWireBase)) {
+                ((IOccludingPart) p).addOcclusionBoxes(boxes);
+            }
+        }
+
+        for (int i = 0; i < connFaces.length; i++) {
+            AxisAlignedBB mask = getBox(i + 1);
+            if (mask != null) {
+                for (AxisAlignedBB box : boxes) {
+                    if (mask.intersectsWith(box)) {
+                        WireFace face = WireFace.get(connFaces[i]);
+                        occludedSides |= 1 << connFaces[i].ordinal();
+                        validSides.remove(face);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Connection test
+
+        for (WireFace facing : validSides) {
 			if (WireUtils.canConnectInternal(this, facing)) {
 				internalConnections |= 1 << facing.ordinal();
 			} else if (facing != WireFace.CENTER) {

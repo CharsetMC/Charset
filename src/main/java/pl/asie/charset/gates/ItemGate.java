@@ -79,6 +79,6 @@ public class ItemGate extends ItemMultiPart {
     @Override
     public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
         PartGate part = getPartGate(stack);
-        return part != null ? part.setSide(facing).setTop(player.getHorizontalFacing()) : null;
+        return part != null ? part.setSide(facing).setTop(facing.getAxis() == EnumFacing.Axis.Y ? player.getHorizontalFacing() : EnumFacing.NORTH) : null;
     }
 }

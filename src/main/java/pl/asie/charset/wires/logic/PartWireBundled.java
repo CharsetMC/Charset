@@ -49,10 +49,12 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 	private void propagate(int color, byte[][] nValues) {
 		int maxSignal = 0;
 		int[] neighborLevel = new int[7];
+        boolean[] isWire = new boolean[7];
 
 		if (internalConnections > 0) {
 			for (WireFace location : WireFace.VALUES) {
 				if (connectsInternal(location)) {
+                    isWire[location.ordinal()] = true;
 					neighborLevel[location.ordinal()] = WireUtils.getBundledWireLevel(getContainer(), location, color);
 				}
 			}
@@ -65,6 +67,7 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 				} else {
                     IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
 					if (container != null) {
+                        isWire[facing.ordinal()] = true;
 						neighborLevel[facing.ordinal()] = WireUtils.getBundledWireLevel(container, location, color);
 					}
 				}
@@ -72,22 +75,26 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 				BlockPos cornerPos = getPos().offset(facing).offset(location.facing);
                 IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), cornerPos);
                 if (container != null) {
+                    isWire[facing.ordinal()] = true;
                     neighborLevel[facing.ordinal()] = WireUtils.getBundledWireLevel(container, WireFace.get(facing.getOpposite()), color);
                 }
 			}
 		}
 
+        int newSignal = 0;
+
 		for (int j = 0; j < 7; j++) {
 			if (neighborLevel[j] > maxSignal) {
 				maxSignal = neighborLevel[j];
 			}
+            if (!isWire[j] && neighborLevel[j] > newSignal) {
+                newSignal = neighborLevel[j];
+            }
 		}
 
 		if (DEBUG) {
 			System.out.println("[" + color + "] Levels: " + Arrays.toString(neighborLevel));
 		}
-
-		int newSignal = 0;
 
 		if (maxSignal > signalLevel[color] && maxSignal > 1) {
 			newSignal = maxSignal - 1;
@@ -124,7 +131,7 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 			}
 		} else {
 			for (WireFace nLoc : WireFace.VALUES) {
-				if (neighborLevel[nLoc.ordinal()] < newSignal - 1) {
+				if (neighborLevel[nLoc.ordinal()] < newSignal - 1 || neighborLevel[nLoc.ordinal()] > (newSignal + 1)) {
 					if (connectsInternal(nLoc)) {
                         WireUtils.getWire(getContainer(), nLoc).onSignalChanged(color);
 					} else if (nLoc != WireFace.CENTER) {

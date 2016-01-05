@@ -37,7 +37,7 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IConnectable, IOccludingPart, ITickable {
+public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IOccludingPart, IConnectable, ITickable {
     private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
 
     static {
@@ -375,39 +375,45 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
     @Override
     public boolean onActivated(EntityPlayer playerIn, ItemStack stack, PartMOP hit) {
         if (!playerIn.worldObj.isRemote) {
-            if (playerIn.isSneaking()) {
-                int z = 32;
-                invertedSides = (byte) ((invertedSides + 1) & 15);
-                while (z > 0 && ((~getSideMask() & invertedSides) != 0
-                        || isInvalidInverted() || invertedSides == 0)) {
-                    invertedSides = (byte) ((invertedSides + 1) & 15);
-                    z--;
-                }
-                if (z == 0) {
-                    invertedSides = getSideMask();
-                }
-
-                notifyBlockUpdate();
-                sendUpdatePacket();
-                return true;
-            }
             if (stack != null) {
                 if (stack.getItem() instanceof ItemScrewdriver) {
-                    int z = 32;
-                    enabledSides = (byte) ((enabledSides + 1) & 15);
-                    while (z > 0 && ((~getSideMask() & enabledSides) != 0
-                            || isInvalidEnabled() || enabledSides == 0)) {
+                    if (playerIn.isSneaking()) {
+                        top = top.rotateY();
+                    } else {
+                        int z = 32;
                         enabledSides = (byte) ((enabledSides + 1) & 15);
+                        while (z > 0 && ((~getSideMask() & enabledSides) != 0
+                                || isInvalidEnabled() || enabledSides == 0)) {
+                            enabledSides = (byte) ((enabledSides + 1) & 15);
+                            z--;
+                        }
+                        if (z == 0) {
+                            enabledSides = getSideMask();
+                        }
+                    }
+
+                    notifyBlockUpdate();
+                    onChanged();
+                    sendUpdatePacket();
+                    return true;
+                }
+            } else {
+                /* if (playerIn.isSneaking()) {
+                    int z = 32;
+                    invertedSides = (byte) ((invertedSides + 1) & 15);
+                    while (z > 0 && ((~getSideMask() & invertedSides) != 0
+                            || isInvalidInverted() || invertedSides == 0)) {
+                        invertedSides = (byte) ((invertedSides + 1) & 15);
                         z--;
                     }
                     if (z == 0) {
-                        enabledSides = getSideMask();
+                        invertedSides = getSideMask();
                     }
 
                     notifyBlockUpdate();
                     sendUpdatePacket();
                     return true;
-                }
+                } */
             }
         }
         return false;

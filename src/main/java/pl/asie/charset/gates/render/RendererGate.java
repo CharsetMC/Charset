@@ -48,7 +48,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
     private static final Map<ItemCameraTransforms.TransformType, TRSRTransformation> TRANSFORM_MAP = new HashMap<ItemCameraTransforms.TransformType, TRSRTransformation>();
 
     private static final ModelRotation[] ROTATIONS_SIDE = {
-            ModelRotation.X0_Y0, ModelRotation.X0_Y180,
+            ModelRotation.X0_Y0, ModelRotation.X180_Y0,
             ModelRotation.X270_Y0, ModelRotation.X270_Y180,
             ModelRotation.X270_Y270, ModelRotation.X270_Y90
     };
