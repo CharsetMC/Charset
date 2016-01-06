@@ -63,7 +63,10 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
 				if (nValues[facing.ordinal()] != null) {
-					neighborLevel[facing.ordinal()] = (nValues[facing.ordinal()][color] << 8) | 0xFF;
+                    int v = nValues[facing.ordinal()][color] << 8;
+                    if (v != 0) {
+                        neighborLevel[facing.ordinal()] = v | 0xFF;
+                    }
 				} else {
                     IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
 					if (container != null) {
@@ -112,8 +115,10 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 
 		if (newSignal == 0) {
 			for (WireFace nLoc : WireFace.VALUES) {
-				if (connectsInternal(nLoc) && neighborLevel[nLoc.ordinal()] > 0) {
-                    WireUtils.getWire(getContainer(), nLoc).onSignalChanged(color);
+				if (connectsInternal(nLoc)) {
+                    if (neighborLevel[nLoc.ordinal()] > 0) {
+                        WireUtils.getWire(getContainer(), nLoc).onSignalChanged(color);
+                    }
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
 
@@ -200,10 +205,6 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 	@Override
 	public int getRedstoneLevel() {
 		return 0;
-	}
-
-	public byte[] getBundledSignal() {
-		return signalValue;
 	}
 
     @Override
