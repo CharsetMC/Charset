@@ -38,7 +38,11 @@ public final class RedstoneUtils {
             return false;
         }
 
-        if ((block instanceof BlockLever || block instanceof BlockButton) && face != state.getValue(BlockLever.FACING).getFacing()) {
+        if (block instanceof BlockLever && face != state.getValue(BlockLever.FACING).getFacing().getOpposite()) {
+            return false;
+        }
+
+        if (block instanceof BlockButton && face != state.getValue(BlockButton.FACING).getOpposite()) {
             return false;
         }
 
