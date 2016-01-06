@@ -15,6 +15,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import pl.asie.charset.api.lib.CharsetHelper;
+
 /**
  * Created by asie on 11/12/15.
  */
@@ -50,6 +52,8 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+        CharsetHelper.instance = new CharsetHelperImpl();
+
 		logger = LogManager.getLogger(MODID);
 
 		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");

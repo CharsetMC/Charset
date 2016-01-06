@@ -36,6 +36,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.client.multipart.ICustomHighlightPart;
 import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
@@ -59,7 +60,7 @@ import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements ISlottedPart, IHitEffectsPart, IOccludingPart, IRedstonePart, ITickable, IWire {
+public abstract class PartWireBase extends Multipart implements ICustomHighlightPart, ISlottedPart, IHitEffectsPart, IOccludingPart, IRedstonePart, ITickable, IWire {
     protected static final boolean DEBUG = false;
     private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
@@ -170,7 +171,7 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
 
     @Override
     public EnumSet<PartSlot> getSlotMask() {
-        return EnumSet.of(location.slot);
+        return EnumSet.of(WireUtils.getSlotForFace(location));
     }
 
     private ItemStack getItemStack() {
@@ -308,13 +309,17 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
         return boxes;
     }
 
-    private AxisAlignedBB getCenterBox(int i) {
+    public AxisAlignedBB getCenterBox(int i) {
         AxisAlignedBB[] boxes = getBoxes();
 
         return boxes[6 * 5 + i];
     }
 
-    private AxisAlignedBB getBox(int i) {
+    public AxisAlignedBB getSelectionBox(int i) {
+        return getBox((i > 0 && location == WireFace.CENTER) ? (i + 6) : i);
+    }
+
+    public AxisAlignedBB getBox(int i) {
         AxisAlignedBB[] boxes = getBoxes();
 
         return boxes[location.ordinal() * 5 + i];
@@ -342,72 +347,31 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
         list.add(getBox(0));
     }
 
-    /* @Override
+    @Override
     public void addSelectionBoxes(List<AxisAlignedBB> list) {
-        list.add(getBox(0));
+        list.add(getSelectionBox(0));
 
         EnumFacing[] faces = WireUtils.getConnectionsForRender(location);
         for (int i = 0; i < faces.length; i++) {
             if (connectsAny(faces[i])) {
-                list.add(getBox(i + 1));
+                list.add(getSelectionBox(i + 1));
             }
-        }
-    } */
-
-    @Override
-    public void addSelectionBoxes(List<AxisAlignedBB> list) {
-        switch (location) {
-            case DOWN:
-                list.add(new AxisAlignedBB(0, 0, 0, 1, WireUtils.getWireHitboxHeight(this), 1));
-                break;
-            case UP:
-                list.add(new AxisAlignedBB(0, 1 - WireUtils.getWireHitboxHeight(this), 0, 1, 1, 1));
-                break;
-            case NORTH:
-                list.add(new AxisAlignedBB(0, 0, 0, 1, 1, WireUtils.getWireHitboxHeight(this)));
-                break;
-            case SOUTH:
-                list.add(new AxisAlignedBB(0, 0, 1 - WireUtils.getWireHitboxHeight(this), 1, 1, 1));
-                break;
-            case WEST:
-                list.add(new AxisAlignedBB(0, 0, 0, WireUtils.getWireHitboxHeight(this), 1, 1));
-                break;
-            case EAST:
-                list.add(new AxisAlignedBB(1 - WireUtils.getWireHitboxHeight(this), 0, 0, 1, 1, 1));
-                break;
-            case CENTER:
-                list.add(getCenterBox(type));
-                break;
-        }
-    }
-
-    private AxisAlignedBB getCenterBox(WireKind kind) {
-        switch (kind.type()) {
-            case NORMAL:
-            case INSULATED:
-                return new AxisAlignedBB(0.375, 0.375, 0.375, 0.625, 0.625, 0.625);
-            case BUNDLED:
-                return new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-            default:
-                return null;
         }
     }
 
     @Override
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-        if (location == location) {
-            AxisAlignedBB bb = getBox(0);
-            if (mask.intersectsWith(bb)) {
-                list.add(bb);
-            }
+        AxisAlignedBB bb = getBox(0);
+        if (mask.intersectsWith(bb)) {
+            list.add(bb);
+        }
 
-            EnumFacing[] faces = WireUtils.getConnectionsForRender(location);
-            for (int i = 0; i < faces.length; i++) {
-                if (connectsAny(faces[i])) {
-                    bb = getBox(i + 1);
-                    if (mask.intersectsWith(bb)) {
-                        list.add(bb);
-                    }
+        EnumFacing[] faces = WireUtils.getConnectionsForRender(location);
+        for (int i = 0; i < faces.length; i++) {
+            if (connectsAny(faces[i])) {
+                bb = getBox(i + 1);
+                if (mask.intersectsWith(bb)) {
+                    list.add(bb);
                 }
             }
         }
@@ -664,6 +628,13 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
                 return 0;
             }
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean drawHighlight(PartMOP partMOP, EntityPlayer player, ItemStack stack, float v) {
+        ModCharsetWires.proxy.drawWireHighlight(this);
+        return true;
     }
 
     @Override

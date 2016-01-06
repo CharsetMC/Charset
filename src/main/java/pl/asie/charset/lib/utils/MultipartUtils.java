@@ -72,12 +72,14 @@ public final class MultipartUtils {
             return null;
         } else if (side == null) {
             return getInterfaceCenter(clazz, container);
+        } else if (face == side.getOpposite()) {
+            return null;
         }
 
         ISlottedPart part = container.getPartInSlot(PartSlot.getFaceSlot(side));
         if (part != null) {
             return clazz.isAssignableFrom(part.getClass()) ? (T) part : null;
-        } else {
+        } else if (side != face && face != null) {
             part = container.getPartInSlot(PartSlot.getEdgeSlot(side, face));
             if (part != null) {
                 return clazz.isAssignableFrom(part.getClass()) ? (T) part : null;
@@ -89,6 +91,8 @@ public final class MultipartUtils {
                     return getInterfaceCenter(clazz, container);
                 }
             }
+        } else {
+            return getInterfaceCenter(clazz, container);
         }
     }
 

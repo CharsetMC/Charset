@@ -1,7 +1,8 @@
 package pl.asie.charset.wires;
 
-/**
- * Created by asie on 12/5/15.
- */
+import pl.asie.charset.wires.logic.PartWireBase;
+
 public class ProxyCommon {
+    public void drawWireHighlight(PartWireBase wire) {
+    }
 }

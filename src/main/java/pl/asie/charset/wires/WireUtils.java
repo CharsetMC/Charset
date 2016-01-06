@@ -243,9 +243,13 @@ public final class WireUtils {
         return true;
     }
 
+    public static PartSlot getSlotForFace(WireFace face) {
+        return PartSlot.VALUES[face.ordinal()];
+    }
+
     public static PartWireBase getWire(IMultipartContainer container, WireFace face) {
         if (container != null) {
-            ISlottedPart part = container.getPartInSlot(face.slot);
+            ISlottedPart part = container.getPartInSlot(getSlotForFace(face));
             return part instanceof PartWireBase ? (PartWireBase) part : null;
         } else {
             return null;
