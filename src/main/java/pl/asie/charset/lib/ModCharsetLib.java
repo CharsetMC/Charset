@@ -20,13 +20,14 @@ import pl.asie.charset.api.lib.CharsetHelper;
 /**
  * Created by asie on 11/12/15.
  */
-@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
+@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart")
 public class ModCharsetLib {
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "CharsetLib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-    public static final String REQUIRES_MCMP = ";required-after:mcmultipart";
+    public static final String DEP_MCMP = "required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart";
+    public static final String DEP_NO_MCMP = "required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
 
     @Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;
