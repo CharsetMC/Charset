@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -28,6 +27,7 @@ import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.utils.MultipartUtils;
+import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 public final class WireUtils {
@@ -148,7 +148,6 @@ public final class WireUtils {
             }
         }
 
-        Block connectingBlock = wire.getWorld().getBlockState(pos2).getBlock();
         IConnectable connectable = MultipartUtils.getInterface(IConnectable.class, wire.getWorld(), pos2, wire.location.facing, facing.getOpposite());
         if (connectable == null) {
             connectable = MultipartUtils.getInterface(IConnectable.class, wire.getWorld(), pos2, wire.location.facing);
@@ -159,9 +158,8 @@ public final class WireUtils {
                 return true;
             }
         } else if (wire.type.type() != WireType.BUNDLED) {
-            if ((connectingBlock instanceof BlockRedstoneDiode || connectingBlock instanceof BlockRedstoneWire) && wire.location != WireFace.DOWN) {
-                return false;
-            }
+            IBlockState connectingState = wire.getWorld().getBlockState(pos2);
+            Block connectingBlock = connectingState.getBlock();
 
             if (wire.location == WireFace.CENTER && !connectingBlock.isSideSolid(wire.getWorld(), pos2, facing.getOpposite())) {
                 return false;
@@ -169,7 +167,7 @@ public final class WireUtils {
 
             WIRES_CONNECT = false;
 
-            if (connectingBlock.canConnectRedstone(wire.getWorld(), pos2, facing)) {
+            if (RedstoneUtils.canConnectFace(wire.getWorld(), pos2, connectingState, facing, wire.location.facing)) {
                 WIRES_CONNECT = true;
                 return true;
             }
@@ -270,6 +268,10 @@ public final class WireUtils {
         }
 
         if (weak) {
+            if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
+                return state.getValue(BlockRedstoneWire.POWER);
+            }
+
             return block.shouldCheckWeakPower(world, pos, facing)
                     ? block.getStrongPower(world, pos, state, facing)
                     : block.getWeakPower(world, pos, state, facing);

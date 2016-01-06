@@ -16,6 +16,7 @@ import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.lib.inventory.InventorySlot;
 import pl.asie.charset.lib.inventory.InventorySlotIterator;
+import pl.asie.charset.lib.utils.RedstoneUtils;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
 	private ItemStack[] filters = new ItemStack[6];
@@ -176,7 +177,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 		redstoneLevel = 0;
 		for (EnumFacing d : EnumFacing.VALUES) {
-			redstoneLevel = Math.max(redstoneLevel, worldObj.getRedstonePower(pos.offset(d), d));
+			redstoneLevel = Math.max(redstoneLevel, RedstoneUtils.getRedstonePowerWithWire(worldObj, pos.offset(d), d));
 		}
 
 		if (oldRedstoneLevel != redstoneLevel) {
