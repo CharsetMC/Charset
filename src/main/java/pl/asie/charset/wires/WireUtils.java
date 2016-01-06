@@ -11,7 +11,6 @@ import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -22,6 +21,7 @@ import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.OcclusionHelper;
 import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.wires.IConnectable;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -224,19 +224,19 @@ public final class WireUtils {
             }
 
             // Corner occlusion test
-            List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
+            List<IMultipart> parts = new ArrayList<IMultipart>();
             for (IMultipart p : container.getParts()) {
                 if (p instanceof IOccludingPart && !(p instanceof PartWireBase)) {
-                    ((IOccludingPart) p).addOcclusionBoxes(boxes);
+                    parts.add(p);
                 }
             }
 
-            AxisAlignedBB corner1 = wire.getCornerCollisionBox(direction);
-            AxisAlignedBB corner2 = wire2.getCornerCollisionBox(side.getOpposite());
-            for (AxisAlignedBB box : boxes) {
-                if (box.intersectsWith(corner1) || box.intersectsWith(corner2)) {
-                    return false;
-                }
+            if (!OcclusionHelper.occlusionTest(parts, wire.getCornerCollisionBox(direction))) {
+                return false;
+            }
+
+            if (!OcclusionHelper.occlusionTest(parts, wire2.getCornerCollisionBox(side.getOpposite()))) {
+                return false;
             }
         }
 

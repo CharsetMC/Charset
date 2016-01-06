@@ -24,8 +24,9 @@ public class ModCharsetLib {
 	public static final String MODID = "CharsetLib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
+    public static final String REQUIRES_MCMP = ";required-after:mcmultipart";
 
-	@Mod.Instance(value = ModCharsetLib.MODID)
+    @Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;
 
 	@SidedProxy(clientSide = "pl.asie.charset.lib.ProxyClient", serverSide = "pl.asie.charset.lib.ProxyCommon")

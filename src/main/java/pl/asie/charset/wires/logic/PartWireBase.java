@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -41,6 +45,7 @@ import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.MultipartRegistry;
+import mcmultipart.multipart.OcclusionHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IBundledUpdatable;
@@ -55,7 +60,7 @@ import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
 public abstract class PartWireBase extends Multipart implements ISlottedPart, IHitEffectsPart, IOccludingPart, IRedstonePart, ITickable, IWire {
-    protected static final boolean DEBUG = true;
+    protected static final boolean DEBUG = false;
     private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
     public static final Property PROPERTY = new Property();
@@ -193,20 +198,36 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
         }
     }
 
-    @Override
-    public void readUpdatePacket(PacketBuffer buf) {
+    public void handlePacket(ByteBuf buf) {
         int oldIC = internalConnections;
         int oldEC = externalConnections;
         int oldCC = cornerConnections;
 
-        type = WireKind.VALUES[buf.readByte()];
-        location = WireFace.VALUES[buf.readByte()];
         internalConnections = buf.readByte();
         externalConnections = buf.readByte();
         cornerConnections = location == WireFace.CENTER ? 0 : buf.readByte();
 
         if (oldIC != internalConnections || oldEC != externalConnections || oldCC != cornerConnections) {
             markRenderUpdate();
+        }
+    }
+
+    @Override
+    public final void readUpdatePacket(PacketBuffer buf) {
+        type = WireKind.VALUES[buf.readByte()];
+        location = WireFace.VALUES[buf.readByte()];
+
+        if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
+            final ByteBuf buf2 = Unpooled.copiedBuffer(buf);
+
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    handlePacket(buf2);
+                }
+            });
+        } else {
+            handlePacket(buf);
         }
     }
 
@@ -285,6 +306,12 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
         }
 
         return boxes;
+    }
+
+    private AxisAlignedBB getCenterBox(int i) {
+        AxisAlignedBB[] boxes = getBoxes();
+
+        return boxes[6 * 5 + i];
     }
 
     private AxisAlignedBB getBox(int i) {
@@ -481,23 +508,33 @@ public abstract class PartWireBase extends Multipart implements ISlottedPart, IH
         // Occlusion test
 
         EnumFacing[] connFaces = WireUtils.getConnectionsForRender(location);
-        List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
+        List<IMultipart> parts = new ArrayList<IMultipart>();
         for (IMultipart p : getContainer().getParts()) {
             if (p != this && p instanceof IOccludingPart && !(p instanceof PartWireBase)) {
-                ((IOccludingPart) p).addOcclusionBoxes(boxes);
+                parts.add(p);
             }
         }
 
         for (int i = 0; i < connFaces.length; i++) {
-            AxisAlignedBB mask = getBox(i + 1);
-            if (mask != null) {
-                for (AxisAlignedBB box : boxes) {
-                    if (mask.intersectsWith(box)) {
-                        WireFace face = WireFace.get(connFaces[i]);
+            WireFace face = WireFace.get(connFaces[i]);
+            if (validSides.contains(face)) {
+                AxisAlignedBB mask = getBox(i + 1);
+                if (mask != null) {
+                    if (!OcclusionHelper.occlusionTest(parts, this, mask)) {
                         occludedSides |= 1 << connFaces[i].ordinal();
                         validSides.remove(face);
                         break;
                     }
+                }
+            }
+        }
+
+        if (validSides.contains(WireFace.CENTER)) {
+            AxisAlignedBB mask = getCenterBox(1 + location.ordinal());
+            if (mask != null) {
+                if (!OcclusionHelper.occlusionTest(parts, this, mask)) {
+                    occludedSides |= 1 << 6;
+                    validSides.remove(WireFace.CENTER);
                 }
             }
         }

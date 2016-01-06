@@ -4,10 +4,14 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -513,14 +517,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
         }
     }
 
-    @Override
-    public void readUpdatePacket(PacketBuffer buf) {
-        int sides = buf.readUnsignedByte();
-        side = EnumFacing.getFront(sides >> 4);
-        top = EnumFacing.getFront(sides & 15);
-        sides = buf.readUnsignedByte();
-        enabledSides = (byte) (sides & 15);
-        invertedSides = (byte) (sides >> 4);
+    public void handlePacket(ByteBuf buf) {
         for (int i = 0; i <= 3; i++) {
             inputs[i] = outputClient[i] = 0;
             EnumFacing dir = EnumFacing.getFront(i + 2);
@@ -532,8 +529,30 @@ public abstract class PartGate extends Multipart implements IRedstonePart, ISlot
                 }
             }
         }
-
         markRenderUpdate();
+    }
+
+    @Override
+    public void readUpdatePacket(PacketBuffer buf) {
+        int sides = buf.readUnsignedByte();
+        side = EnumFacing.getFront(sides >> 4);
+        top = EnumFacing.getFront(sides & 15);
+        sides = buf.readUnsignedByte();
+        enabledSides = (byte) (sides & 15);
+        invertedSides = (byte) (sides >> 4);
+
+        if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
+            final ByteBuf buf2 = Unpooled.copiedBuffer(buf);
+
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    handlePacket(buf2);
+                }
+            });
+        } else {
+            handlePacket(buf);
+        }
     }
 
     // Utility functions

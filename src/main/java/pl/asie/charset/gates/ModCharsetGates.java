@@ -1,14 +1,21 @@
 package pl.asie.charset.gates;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -16,13 +23,14 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 @Mod(modid = ModCharsetGates.MODID, name = ModCharsetGates.NAME, version = ModCharsetGates.VERSION,
-	dependencies = "required-after:CharsetLib@" + ModCharsetGates.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
+	dependencies = "required-after:CharsetLib@" + ModCharsetGates.VERSION + ModCharsetLib.REQUIRES_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetGates {
 	public static final String MODID = "CharsetGates";
 	public static final String NAME = "&";
@@ -65,14 +73,34 @@ public class ModCharsetGates {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         packet = new PacketRegistry(ModCharsetGates.MODID);
-        registerGateStack(ItemGate.getStack(new PartGateNOR().setInvertedSides(0b0001)));
-        registerGateStack(ItemGate.getStack(new PartGateNAND().setInvertedSides(0b0001)));
-        registerGateStack(ItemGate.getStack(new PartGateXOR()));
-        registerGateStack(ItemGate.getStack(new PartGateNOR()));
-        registerGateStack(ItemGate.getStack(new PartGateNAND()));
-        registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)));
-        registerGateStack(ItemGate.getStack(new PartGatePulseFormer()));
-        registerGateStack(ItemGate.getStack(new PartGateMultiplexer()));
+        registerGateStack(ItemGate.getStack(new PartGateNOR().setInvertedSides(0b0001)), "scs", "scs", "sss");
+        registerGateStack(ItemGate.getStack(new PartGateNAND().setInvertedSides(0b0001)), "wcw", "ccc", "sws");
+        registerGateStack(ItemGate.getStack(new PartGateXOR()), "wsw", "cwc", "scs");
+        registerGateStack(ItemGate.getStack(new PartGateNOR()), "sws", "scs", "sss");
+        registerGateStack(ItemGate.getStack(new PartGateNAND()), "www", "ccc", "sws");
+        registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)), "wcw", "cwc", "scs");
+        registerGateStack(ItemGate.getStack(new PartGatePulseFormer()), "wcw", "cwc", "wws");
+        registerGateStack(ItemGate.getStack(new PartGateMultiplexer()), "wcw", "csc", "wcw");
+
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemScrewdriver), "  i", "si ", "ws ", 'i', "ingotIron", 's', "stickWood",
+                'w', new ItemStack(Blocks.wool, 1, EnumDyeColor.PINK.getMetadata())));
+    }
+
+    private void registerGateStack(ItemStack stack, Object... recipe) {
+        List<Object> data = new ArrayList<Object>();
+        for (Object o : recipe) {
+            data.add(o);
+        }
+
+        data.add('c');
+        data.add(new ItemStack(Blocks.redstone_torch));
+        data.add('w');
+        data.add(Loader.isModLoaded("CharsetWires") ? Item.getByNameOrId("CharsetWires:wire") : Items.redstone);
+        data.add('s');
+        data.add(new ItemStack(Blocks.stone_slab));
+        GameRegistry.addRecipe(new ShapedOreRecipe(stack, data.toArray(new Object[data.size()])));
+
+        registerGateStack(stack);
     }
 
     private void registerGateStack(ItemStack stack) {

@@ -2,6 +2,8 @@ package pl.asie.charset.wires.logic;
 
 import java.util.Arrays;
 
+import io.netty.buffer.ByteBuf;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
@@ -41,14 +43,12 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 	}
 
     @Override
-    public void readUpdatePacket(PacketBuffer data) {
-        super.readUpdatePacket(data);
+    public void handlePacket(ByteBuf data) {
+        super.handlePacket(data);
         if (type == WireKind.NORMAL) {
-            int oSL = signalLevel;
-            signalLevel = data.readByte() << 8;
-            if (oSL != signalLevel) {
-                markRenderUpdate();
-            }
+            byte d = data.readByte();
+            signalLevel = d << 8;
+            markRenderUpdate();
         }
     }
 
@@ -63,7 +63,9 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		signalLevel = nbt.getShort("s");
+        if (nbt.hasKey("s")) {
+            signalLevel = nbt.getShort("s");
+        }
 	}
 
 	@Override

@@ -21,7 +21,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.wires.logic.PartWireProvider;
 
 @Mod(modid = ModCharsetWires.MODID, name = ModCharsetWires.NAME, version = ModCharsetWires.VERSION,
-	dependencies = "required-after:CharsetLib@" + ModCharsetWires.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
+	dependencies = "required-after:CharsetLib@" + ModCharsetWires.VERSION + ModCharsetLib.REQUIRES_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetWires {
 	public static final String MODID = "CharsetWires";
 	public static final String NAME = "+";

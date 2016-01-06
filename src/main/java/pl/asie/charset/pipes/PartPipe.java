@@ -35,11 +35,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.microblock.IMicroblock;
-import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.MultipartRegistry;
+import mcmultipart.multipart.OcclusionHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.pipes.IPipe;
@@ -208,17 +208,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
             }
         }
 
-        for (IMultipart p : getContainer().getParts()) {
-            if (p != this && p instanceof IOccludingPart) {
-                AxisAlignedBB mask = BOXES[side.ordinal()];
-                List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
-                ((IOccludingPart) p).addOcclusionBoxes(boxes);
-                for (AxisAlignedBB box : boxes) {
-                    if (mask.intersectsWith(box)) {
-                        return false;
-                    }
-                }
-            }
+        if (!OcclusionHelper.occlusionTest(getContainer().getParts(), this, BOXES[side.ordinal()])) {
+            return false;
         }
 
         if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
