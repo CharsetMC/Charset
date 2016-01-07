@@ -46,6 +46,7 @@ public final class WireUtils {
 	static {
 		WIRE_PLACEABLE.add(Blocks.glowstone);
 		WIRE_PLACEABLE.add(Blocks.piston);
+        WIRE_PLACEABLE.add(Blocks.piston_extension);
 		WIRE_PLACEABLE.add(Blocks.sticky_piston);
 	}
 

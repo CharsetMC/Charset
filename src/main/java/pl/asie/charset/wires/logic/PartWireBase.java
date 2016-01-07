@@ -467,7 +467,7 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
 		}
 
 		int oldConnectionCache = internalConnections << 12 | externalConnections << 6 | cornerConnections;
-		internalConnections = externalConnections = cornerConnections = occludedSides = 0;
+		internalConnections = externalConnections = cornerConnections = occludedSides = cornerOccludedSides = 0;
 
         // Occlusion test
 
@@ -479,15 +479,17 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
             }
         }
 
-        for (int i = 0; i < connFaces.length; i++) {
-            WireFace face = WireFace.get(connFaces[i]);
-            if (validSides.contains(face)) {
-                AxisAlignedBB mask = getBox(i + 1);
-                if (mask != null) {
-                    if (!OcclusionHelper.occlusionTest(parts, this, mask)) {
-                        occludedSides |= 1 << connFaces[i].ordinal();
-                        validSides.remove(face);
-                        break;
+        if (parts.size() > 0) {
+            for (int i = 0; i < connFaces.length; i++) {
+                WireFace face = WireFace.get(connFaces[i]);
+                if (validSides.contains(face)) {
+                    AxisAlignedBB mask = getBox(i + 1);
+                    if (mask != null) {
+                        if (!OcclusionHelper.occlusionTest(parts, this, mask)) {
+                            occludedSides |= 1 << connFaces[i].ordinal();
+                            validSides.remove(face);
+                            break;
+                        }
                     }
                 }
             }
