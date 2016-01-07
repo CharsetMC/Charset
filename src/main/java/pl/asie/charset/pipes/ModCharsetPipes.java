@@ -66,9 +66,15 @@ public class ModCharsetPipes {
 				"crc",
 				'c', Blocks.cobblestone, 'P', Blocks.piston, 'r', Items.comparator, '^', Items.arrow);
 
-		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
-				"mgm",
-				'g', Blocks.glass, 'm', Blocks.obsidian);
+        ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
+                "mgm",
+                'g', Blocks.glass, 'm', Blocks.obsidian);
+
+        ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
+                "m",
+                "g",
+                "m",
+                'g', Blocks.glass, 'm', Blocks.obsidian);
 	}
 
     @EventHandler
