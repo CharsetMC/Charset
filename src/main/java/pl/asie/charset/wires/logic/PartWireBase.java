@@ -283,24 +283,24 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
                     if (i >= 2) {
                         if (faces[i].getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
                             boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, xMin, xMin, y, xMax), f);
+                            boxes[43 + j * 4 + i] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, xMin, y, y, xMax), f);
                         } else {
                             boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMax, 0, xMin, 1, y, xMax), f);
+                            boxes[43 + j * 4 + i] = RotationUtils.rotateFace(new AxisAlignedBB(1 - y, 0, xMin, 1, y, xMax), f);
                         }
                     } else {
                         if (faces[i].getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
                             boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 0, xMax, y, xMin), f);
+                            boxes[43 + j * 4 + i] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 0, xMax, y, y), f);
                         } else {
                             boxes[j * 5 + i + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMax, xMax, y, 1), f);
+                            boxes[43 + j * 4 + i] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 1 - y, xMax, y, 1), f);
                         }
                     }
                 }
                 boxes[j * 5 + 0] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, y, xMax), f);
                 boxes[31 + j] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, y, xMin, xMax, xMin, xMax), f);
                 boxes[37 + j] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, xMin, xMax), f);
-                boxes[43 + j * 4 + 0] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 0, xMax, y, y), f);
-                boxes[43 + j * 4 + 1] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, 1 - y, xMax, y, 1), f);
-                boxes[43 + j * 4 + 2] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, xMin, y, y, xMax), f);
-                boxes[43 + j * 4 + 3] = RotationUtils.rotateFace(new AxisAlignedBB(1 - y, 0, xMin, 1, y, xMax), f);
             }
             boxes[30] = new AxisAlignedBB(xMin, xMin, xMin, xMax, xMax, xMax);
             BOXES.put(this.type, boxes);
@@ -451,8 +451,17 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
         return (occludedSides & (1 << face.ordinal())) != 0;
     }
 
+    public boolean isCornerOccluded(EnumFacing face) {
+        if (suConnection) {
+            suConnection = false;
+            updateConnections();
+        }
+        return isOccluded(face) || (cornerOccludedSides & (1 << face.ordinal())) != 0;
+    }
+
 	public void updateConnections() {
 		Set<WireFace> validSides = EnumSet.noneOf(WireFace.class);
+        Set<WireFace> invalidCornerSides = EnumSet.noneOf(WireFace.class);
 
 		for (WireFace facing : WireFace.VALUES) {
 			if (facing == location) {
@@ -491,6 +500,31 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
                             break;
                         }
                     }
+
+                    if (location != WireFace.CENTER) {
+                        BlockPos cPos = getPos().offset(connFaces[i]);
+                        AxisAlignedBB cornerMask = getCornerBox(i ^ 1);
+                        if (cornerMask != null) {
+                            IMultipartContainer cornerContainer = MultipartHelper.getPartContainer(getWorld(), cPos);
+                            if (cornerContainer != null) {
+                                if (!OcclusionHelper.occlusionTest(cornerContainer.getParts(), cornerMask)) {
+                                    cornerOccludedSides |= 1 << connFaces[i].ordinal();
+                                    invalidCornerSides.add(face);
+                                    break;
+                                }
+                            } else {
+                                List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
+                                IBlockState cState = getWorld().getBlockState(cPos);
+                                cState.getBlock().addCollisionBoxesToList(getWorld(), cPos, cState,
+                                        cornerMask.offset(cPos.getX(), cPos.getY(), cPos.getZ()), boxes, null);
+                                if (boxes.size() > 0) {
+                                    cornerOccludedSides |= 1 << connFaces[i].ordinal();
+                                    invalidCornerSides.add(face);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -513,7 +547,7 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
 			} else if (facing != WireFace.CENTER) {
 				if (WireUtils.canConnectExternal(this, facing.facing)) {
 					externalConnections |= 1 << facing.ordinal();
-				} else if (location != WireFace.CENTER && WireUtils.canConnectCorner(this, facing.facing)) {
+				} else if (location != WireFace.CENTER && !invalidCornerSides.contains(facing) && WireUtils.canConnectCorner(this, facing.facing)) {
 					cornerConnections |= 1 << facing.ordinal();
 				}
 			}

@@ -180,7 +180,7 @@ public final class WireUtils {
     }
 
     public static boolean canConnectCorner(PartWireBase wire, EnumFacing direction) {
-        if (wire.location == WireFace.CENTER) {
+        if (wire.location == WireFace.CENTER || wire.isCornerOccluded(direction)) {
             return false;
         }
 
@@ -210,7 +210,7 @@ public final class WireUtils {
 
         PartWireBase wire2 = getWire(container, WireFace.get(direction.getOpposite()));
 
-        if (wire2 == null || wire2.isOccluded(side.getOpposite()) || !wire2.type.connects(wire.type)) {
+        if (wire2 == null || wire2.isCornerOccluded(side.getOpposite()) || !wire2.type.connects(wire.type)) {
             return false;
         }
 
@@ -219,22 +219,6 @@ public final class WireUtils {
             if (isBlockingPart(container, PartSlot.getFaceSlot(direction.getOpposite()))
                     || isBlockingPart(container, PartSlot.getFaceSlot(side))
                     || isBlockingPart(container, PartSlot.getEdgeSlot(direction.getOpposite(), side))) {
-                return false;
-            }
-
-            // Corner occlusion test
-            List<IMultipart> parts = new ArrayList<IMultipart>();
-            for (IMultipart p : container.getParts()) {
-                if (p instanceof IOccludingPart && !(p instanceof PartWireBase)) {
-                    parts.add(p);
-                }
-            }
-
-            if (!OcclusionHelper.occlusionTest(parts, wire.getCornerCollisionBox(direction))) {
-                return false;
-            }
-
-            if (!OcclusionHelper.occlusionTest(parts, wire2.getCornerCollisionBox(side.getOpposite()))) {
                 return false;
             }
         }
