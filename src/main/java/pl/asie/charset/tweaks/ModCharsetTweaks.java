@@ -41,6 +41,7 @@ public class ModCharsetTweaks {
 		tweakSet.add(new TweakDoubleDoors());
 		tweakSet.add(new TweakDyeableMinecarts());
 		tweakSet.add(new TweakGraphite());
+        tweakSet.add(new TweakMobControl());
         tweakSet.add(new TweakNoSprinting());
 
 		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
