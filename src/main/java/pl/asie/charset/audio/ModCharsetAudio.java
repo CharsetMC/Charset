@@ -22,6 +22,8 @@ import pl.asie.charset.audio.tape.ItemTape;
 import pl.asie.charset.audio.tape.StorageManager;
 import pl.asie.charset.audio.util.AudioStreamManager;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.audio.note.PacketNoteParticle;
 
 @Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION,
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -34,6 +36,8 @@ public class ModCharsetAudio {
 
 	@SidedProxy(clientSide = "pl.asie.charset.audio.client.AudioStreamManagerClient", serverSide = "pl.asie.charset.audio.util.AudioStreamManager")
 	public static AudioStreamManager audio;
+
+    public static PacketRegistry packet;
 	public static StorageManager storage;
 
 	public static BlockTapeDrive tapeDriveBlock;
@@ -59,6 +63,9 @@ public class ModCharsetAudio {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        packet = new PacketRegistry(ModCharsetAudio.MODID);
+        packet.registerPacket(0x01, PacketNoteParticle.class);
+
         GameRegistry.registerTileEntity(TileIronNote.class, "charset:ironnoteblock");
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ironNoteBlock), "iii", "iNi", "iii", 'i', "ingotIron", 'N', Blocks.noteblock));
     }

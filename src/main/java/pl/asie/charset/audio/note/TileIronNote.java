@@ -5,7 +5,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
 
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
@@ -15,8 +14,12 @@ import pl.asie.charset.api.wires.IBundledUpdatable;
 import pl.asie.charset.api.wires.IConnectable;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.audio.ModCharsetAudio;
 
 public class TileIronNote extends TileEntity implements IBundledUpdatable, IConnectable {
+    public static final int MIN_NOTE = 0;
+    public static final int MAX_NOTE = 24;
+
     private static final String[] INSTRUMENTS = {"harp", "bd", "snare", "hat", "bassattack"};
     private byte[] lastInput = new byte[16];
 
@@ -52,9 +55,15 @@ public class TileIronNote extends TileEntity implements IBundledUpdatable, IConn
             instrument = e.instrument.ordinal();
             note = e.getVanillaNoteId();
         }
+        if (note < 0) {
+            note = 0;
+        }
+        if (note > 24) {
+            note = 24;
+        }
         float f = (float)Math.pow(2.0D, (double)(note - 12) / 12.0D);
         worldObj.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, "note." + this.getInstrument(instrument), 3.0F, f);
-        worldObj.spawnParticle(EnumParticleTypes.NOTE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.2D, (double)pos.getZ() + 0.5D, (double)note / 24.0D, 0.0D, 0.0D, new int[0]);
+        ModCharsetAudio.packet.sendToAllAround(new PacketNoteParticle(this, note), this, 32);
     }
 
     @Override
@@ -100,8 +109,8 @@ public class TileIronNote extends TileEntity implements IBundledUpdatable, IConn
         if (canPlayNote()) {
             if (input != null) {
                 for (int i = 0; i < 16; i++) {
-                    if (lastInput[i] < input[i]) {
-                        playNote(getInstrumentID(), i + 4);
+                    if (lastInput[i] != input[i] && input[i] > 0) {
+                        playNote(i, getInstrumentID());
                     }
                 }
             }

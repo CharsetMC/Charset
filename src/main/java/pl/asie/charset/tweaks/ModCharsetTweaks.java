@@ -18,7 +18,6 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
 import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
-import pl.asie.charset.tweaks.noteblock.TweakImprovedNoteblock;
 
 @Mod(modid = ModCharsetTweaks.MODID, name = ModCharsetTweaks.NAME, version = ModCharsetTweaks.VERSION,
 	dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -42,7 +41,7 @@ public class ModCharsetTweaks {
 		tweakSet.add(new TweakDoubleDoors());
 		tweakSet.add(new TweakDyeableMinecarts());
 		tweakSet.add(new TweakGraphite());
-        tweakSet.add(new TweakImprovedNoteblock());
+        //tweakSet.add(new TweakImprovedNoteblock());
         tweakSet.add(new TweakMobControl());
         tweakSet.add(new TweakNoSprinting());
 

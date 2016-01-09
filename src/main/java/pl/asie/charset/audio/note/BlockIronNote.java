@@ -15,6 +15,17 @@ public class BlockIronNote extends BlockContainer {
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
     }
 
+    /* @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!worldIn.isRemote) {
+            TileEntity tile = worldIn.getTileEntity(pos);
+            if (tile instanceof TileIronNote) {
+                ((TileIronNote) tile).onRightClick();
+            }
+        }
+        return true;
+    } */
+
     @Override
     public int getRenderType() {
         return 3;
