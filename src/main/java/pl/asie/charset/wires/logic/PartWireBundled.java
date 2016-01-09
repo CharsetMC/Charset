@@ -151,6 +151,8 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 				}
 			}
 		}
+
+        finishPropagation();
 	}
 
 	@Override

@@ -30,9 +30,12 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.multipart.Multipart;
+import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.MultipartRedstoneHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IConnectable;
@@ -242,8 +245,14 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
                 byte oi = inputs[i];
                 World w = getWorld();
                 BlockPos p = getPos().offset(real);
-                IBlockState s = w.getBlockState(p);
-                inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+                IMultipartContainer container = MultipartHelper.getPartContainer(w, p);
+                if (container != null) {
+                    inputs[i] = (byte) MultipartRedstoneHelper.getWeakSignal(container, real.getOpposite(), this.side);
+                } else {
+                    IBlockState s = w.getBlockState(p);
+                    inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+                }
+
                 if (conn.isDigital()) {
                     inputs[i] = inputs[i] != 0 ? (byte) 15 : 0;
                 }

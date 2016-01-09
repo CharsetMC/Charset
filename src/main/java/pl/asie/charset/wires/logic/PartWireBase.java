@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -47,6 +48,8 @@ import mcmultipart.multipart.MultipartRegistry;
 import mcmultipart.multipart.OcclusionHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
+import pl.asie.charset.api.wires.IBundledUpdatable;
+import pl.asie.charset.api.wires.IRedstoneUpdatable;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
@@ -92,6 +95,8 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
 	public WireFace location;
 	protected byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
     private boolean suPropagation, suNeighbor, suRender, suConnection;
+
+    private final EnumSet<EnumFacing> propagationDirs = EnumSet.noneOf(EnumFacing.class);
 
 	public PartWireBase() {
         scheduleConnectionUpdate();
@@ -583,33 +588,39 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
         if (wire != null) {
             wire.onSignalChanged(color);
         } else {
-            PostWorldTickWireUpdater.instance.register(getWorld(), new PostWorldTickWireUpdater.Packet(this, getPos().offset(facing), facing.getOpposite()));
+            propagationDirs.add(facing);
         }
+	}
 
-		/* TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
-		if (nt instanceof IBundledUpdatable) {
-			((IBundledUpdatable) nt).onBundledInputChanged(facing.getOpposite());
-		} else if (nt instanceof IRedstoneUpdatable) {
-			((IRedstoneUpdatable) nt).onRedstoneInputChanged(facing.getOpposite());
-		} else {
-            IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
-            if (container != null) {
-                for (IMultipart m : container.getParts()) {
-                    if (m != null) {
-                        if (m instanceof IBundledUpdatable) {
-                            ((IBundledUpdatable) m).onBundledInputChanged(facing.getOpposite());
-                        } else if (m instanceof IRedstoneUpdatable) {
-                            ((IRedstoneUpdatable) m).onRedstoneInputChanged(facing.getOpposite());
-                        } else {
-                            m.onPartChanged(this);
+    protected void finishPropagation() {
+        for (EnumFacing facing : propagationDirs) {
+            TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
+            if (nt instanceof IBundledUpdatable) {
+                ((IBundledUpdatable) nt).onBundledInputChanged(facing.getOpposite());
+            } else if (nt instanceof IRedstoneUpdatable) {
+                ((IRedstoneUpdatable) nt).onRedstoneInputChanged(facing.getOpposite());
+            } else {
+                IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
+                if (container != null) {
+                    for (IMultipart m : container.getParts()) {
+                        if (m != null) {
+                            if (m instanceof IBundledUpdatable) {
+                                ((IBundledUpdatable) m).onBundledInputChanged(facing.getOpposite());
+                            } else if (m instanceof IRedstoneUpdatable) {
+                                ((IRedstoneUpdatable) m).onRedstoneInputChanged(facing.getOpposite());
+                            } else {
+                                m.onPartChanged(this);
+                            }
                         }
                     }
+                } else {
+                    getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
                 }
-            } else {
-                getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
             }
-		} */
-	}
+        }
+
+        propagationDirs.clear();
+    }
 
 	public boolean connectsInternal(WireFace side) {
 		return (internalConnections & (1 << side.ordinal())) != 0;

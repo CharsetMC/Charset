@@ -29,6 +29,7 @@ import pl.asie.charset.wires.WireUtils;
 
 public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 	private int signalLevel;
+    private int signalLevelPublic;
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -65,6 +66,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 		super.readFromNBT(nbt);
         if (nbt.hasKey("s")) {
             signalLevel = nbt.getShort("s");
+            signalLevelPublic = signalLevel;
         }
 	}
 
@@ -282,6 +284,8 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
                 }
             }
         }
+
+        finishPropagation();
 	}
 
 	@Override
