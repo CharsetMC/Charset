@@ -32,7 +32,6 @@ import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.IRedstonePart;
-import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
@@ -41,7 +40,7 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public abstract class PartGate extends Multipart implements IRedstonePart, ISlottedPart, IOccludingPart, IConnectable, ITickable {
+public abstract class PartGate extends Multipart implements IRedstonePart.ISlottedRedstonePart, IOccludingPart, IConnectable, ITickable {
     private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
 
     static {

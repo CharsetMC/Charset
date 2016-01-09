@@ -42,7 +42,6 @@ import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.IOccludingPart;
 import mcmultipart.multipart.IRedstonePart;
-import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.Multipart;
 import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.MultipartRegistry;
@@ -60,7 +59,7 @@ import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements ICustomHighlightPart, ISlottedPart, IHitEffectsPart, IOccludingPart, IRedstonePart, ITickable, IWire {
+public abstract class PartWireBase extends Multipart implements ICustomHighlightPart, IRedstonePart.ISlottedRedstonePart, IHitEffectsPart, IOccludingPart, ITickable, IWire {
     protected static final boolean DEBUG = false;
     private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
@@ -492,16 +491,17 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
             for (int i = 0; i < connFaces.length; i++) {
                 WireFace face = WireFace.get(connFaces[i]);
                 if (validSides.contains(face)) {
+                    boolean found = false;
                     AxisAlignedBB mask = getBox(i + 1);
                     if (mask != null) {
                         if (!OcclusionHelper.occlusionTest(parts, this, mask)) {
                             occludedSides |= 1 << connFaces[i].ordinal();
                             validSides.remove(face);
-                            break;
+                            found = true;
                         }
                     }
 
-                    if (location != WireFace.CENTER) {
+                    if (!found && location != WireFace.CENTER) {
                         BlockPos cPos = getPos().offset(connFaces[i]);
                         AxisAlignedBB cornerMask = getCornerBox(i ^ 1);
                         if (cornerMask != null) {
@@ -510,7 +510,6 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
                                 if (!OcclusionHelper.occlusionTest(cornerContainer.getParts(), cornerMask)) {
                                     cornerOccludedSides |= 1 << connFaces[i].ordinal();
                                     invalidCornerSides.add(face);
-                                    break;
                                 }
                             } else {
                                 List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
@@ -520,7 +519,6 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
                                 if (boxes.size() > 0) {
                                     cornerOccludedSides |= 1 << connFaces[i].ordinal();
                                     invalidCornerSides.add(face);
-                                    break;
                                 }
                             }
                         }
