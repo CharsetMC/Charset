@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -76,15 +77,26 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 
     private RendererGate(PartGate gate) {
         this.gate = gate;
-        this.transform = new ModelStateComposition(
+        ModelStateComposition transformPre = new ModelStateComposition(
                 new TRSRTransformation(ROTATIONS_SIDE[gate.getSide().ordinal()]),
                 new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()])
         );
 
+        if (gate.isMirrored()) {
+            this.transform = new ModelStateComposition(
+                    transformPre,
+                    new TRSRTransformation(
+                            null, null, new Vector3f(-1.0f, 1.0f, 1.0f), null
+                    )
+            );
+        } else {
+            this.transform = transformPre;
+        }
+
         GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(gate.getType());
         GateRenderDefinitions.BaseDefinition base = GateRenderDefinitions.INSTANCE.base;
 
-        IModel model = definition.getModel("base");
+        IModel model = definition.getModel(gate.getModelName());
         if (model != null) {
             this.bakedModels.add(model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
         }
@@ -98,6 +110,15 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
                 continue;
             }
 
+            IModelState layerTransform = transform;
+
+            if (layer.height != 0) {
+                layerTransform = new ModelStateComposition(
+                        new TRSRTransformation(new Vector3f(0, (float) layer.height / 16f, 0), null, null, null),
+                        transform
+                );
+            }
+
             if ("color".equals(layer.type) && layer.texture != null) {
                 model = layerModels.get(layer.texture);
                 if (model == null) {
@@ -105,12 +126,30 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
                     layerModels.put(layer.texture, model);
                 }
 
-                IBakedModel bakedModel = model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter);
+                IBakedModel bakedModel = model.bake(layerTransform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter);
 
                 int color = state == PartGate.State.ON ? base.colorMul.get("on") :
                         (state == PartGate.State.OFF ? base.colorMul.get("off") : base.colorMul.get("disabled"));
 
                 bakedModelsRecolor.put(bakedModel, color);
+            } else if ("map".equals(layer.type) && layer.textures != null) {
+                String texture = layer.textures.get(state.name().toLowerCase(Locale.ENGLISH));
+                if (texture == null) {
+                    texture = layer.textures.get("off");
+                    if (texture == null) {
+                        texture = layer.textures.get("disabled");
+                    }
+                }
+
+                if (texture != null) {
+                    model = layerModels.get(texture);
+                    if (model == null) {
+                        model = layerModel.retexture(ImmutableMap.of("layer", texture));
+                        layerModels.put(texture, model);
+                    }
+
+                    bakedModels.add(model.bake(layerTransform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
+                }
             }
         }
 

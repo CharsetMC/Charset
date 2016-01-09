@@ -110,6 +110,8 @@ public class GateRenderDefinitions {
 
     public class Layer {
         public String type, texture;
+        public Map<String, String> textures;
+        public int height = 0;
     }
 
     public class Torch {

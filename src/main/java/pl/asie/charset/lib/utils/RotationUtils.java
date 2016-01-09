@@ -2,6 +2,7 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 
 public final class RotationUtils {
     private RotationUtils() {

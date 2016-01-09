@@ -3,17 +3,20 @@
         { "from": [ 0, 0, 0 ],
             "to": [ 16, 1.995, 16 ],
             "faces": {
-                "down": { "texture": "#gate_bottom" },
+                "down": { "texture": "#bottom" },
                 "up": { "texture": "#top" },
-                "north": { "texture": "#gate_side" },
-                "south": { "texture": "#gate_side" },
-                "west": { "texture": "#gate_side" },
-                "east": { "texture": "#gate_side" }
+                "north": { "texture": "#north" },
+                "south": { "texture": "#south" },
+                "west": { "texture": "#west" },
+                "east": { "texture": "#east" }
             }
         }
     ],
     "textures": {
-        "gate_bottom": "charsetgates:blocks/gate_bottom",
-        "gate_side": "charsetgates:blocks/gate_side"
+        "bottom": "charsetgates:blocks/gate_bottom",
+        "north": "charsetgates:blocks/gate_side",
+        "south": "charsetgates:blocks/gate_side",
+        "west": "charsetgates:blocks/gate_side",
+        "east": "charsetgates:blocks/gate_side"
     }
 }

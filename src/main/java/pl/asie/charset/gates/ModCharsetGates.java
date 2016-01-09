@@ -64,6 +64,7 @@ public class ModCharsetGates {
         registerGate("xor", PartGateXOR.class, 2);
         registerGate("pulse_former", PartGatePulseFormer.class, 3);
         registerGate("multiplexer", PartGateMultiplexer.class, 4);
+        registerGate("rs_latch", PartGateRSLatch.class, 5);
 
         ModCharsetLib.proxy.registerItemModel(itemScrewdriver, 0, "charsetgates:screwdriver");
 
@@ -81,6 +82,7 @@ public class ModCharsetGates {
         registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)), "wcw", "cwc", "scs");
         registerGateStack(ItemGate.getStack(new PartGatePulseFormer()), "wcw", "cwc", "wws");
         registerGateStack(ItemGate.getStack(new PartGateMultiplexer()), "wcw", "csc", "wcw");
+        registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs");
 
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemScrewdriver), "  i", "si ", "ws ", 'i', "ingotIron", 's', "stickWood",
                 'w', new ItemStack(Blocks.wool, 1, EnumDyeColor.PINK.getMetadata())));

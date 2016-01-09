@@ -1,8 +1,6 @@
 package pl.asie.charset.wires;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.minecraft.block.Block;
@@ -17,10 +15,9 @@ import net.minecraft.world.World;
 import mcmultipart.microblock.IMicroblock;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.IOccludingPart;
+import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.OcclusionHelper;
 import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.wires.IConnectable;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -241,27 +238,43 @@ public final class WireUtils {
 
 	public static int getRedstoneLevel(World world, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face, boolean weak) {
         IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
-        if (getWire(container, face) != null || getWire(container, WireFace.get(facing.getOpposite())) != null) {
-            return 0;
-        }
-
-		Block block = state.getBlock();
-        TileEntity tile = world.getTileEntity(pos);
-
-        if (tile instanceof IRedstoneEmitter) {
-            return ((IRedstoneEmitter) tile).getRedstoneSignal(face, facing);
-        }
-
-        if (weak) {
-            if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
-                return state.getValue(BlockRedstoneWire.POWER);
+        if (container != null) {
+            if (getWire(container, face) != null || getWire(container, WireFace.get(facing.getOpposite())) != null) {
+                return 0;
             }
 
-            return block.shouldCheckWeakPower(world, pos, facing)
-                    ? block.getStrongPower(world, pos, state, facing)
-                    : block.getWeakPower(world, pos, state, facing);
+            int power = 0;
+
+            for (IMultipart part : container.getParts()) {
+                if (!(part instanceof PartWireBase)) {
+                    if (part instanceof IRedstoneEmitter) {
+                        power = Math.max(power, ((IRedstoneEmitter) part).getRedstoneSignal(face, facing.getOpposite()));
+                    } else if (part instanceof IRedstonePart) {
+                        power = Math.max(power, ((IRedstonePart) part).getWeakSignal(facing.getOpposite()));
+                    }
+                }
+            }
+
+            return power;
         } else {
-            return block.getStrongPower(world, pos, state, facing);
+            Block block = state.getBlock();
+            TileEntity tile = world.getTileEntity(pos);
+
+            if (tile instanceof IRedstoneEmitter) {
+                return ((IRedstoneEmitter) tile).getRedstoneSignal(face, facing);
+            }
+
+            if (weak) {
+                if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
+                    return state.getValue(BlockRedstoneWire.POWER);
+                }
+
+                return block.shouldCheckWeakPower(world, pos, facing)
+                        ? block.getStrongPower(world, pos, state, facing)
+                        : block.getWeakPower(world, pos, state, facing);
+            } else {
+                return block.getStrongPower(world, pos, state, facing);
+            }
         }
 	}
 

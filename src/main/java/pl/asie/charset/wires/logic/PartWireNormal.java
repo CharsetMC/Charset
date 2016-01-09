@@ -195,7 +195,12 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
             }
 		}
 
-		if (maxSignal > signalLevel) {
+        if (DEBUG) {
+            System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
+            System.out.println("Levels: " + Arrays.toString(neighborLevel));
+        }
+
+        if (maxSignal > signalLevel) {
 			signalLevel = maxSignal - 1;
 			if ((signalLevel & 0xFF) == 0 || (signalLevel & 0xFF) == 0xFF) {
 				signalLevel = 0;
@@ -209,9 +214,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
         }
 
 		if (DEBUG) {
-            System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
-			System.out.println("Levels: " + Arrays.toString(neighborLevel));
-			System.out.println("Switch: " + oldSignal + " -> " + signalLevel);
+            System.out.println("Switch: " + oldSignal + " -> " + signalLevel);
 		}
 
 		if (signalLevel == 0) {

@@ -72,11 +72,11 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void serverStart(FMLServerStartingEvent event) {
-		storage = new StorageManager();
+		//storage = new StorageManager();
 	}
 
 	@Mod.EventHandler
 	public void serverStop(FMLServerStoppedEvent event) {
-		storage = null;
+		//storage = null;
 	}
 }

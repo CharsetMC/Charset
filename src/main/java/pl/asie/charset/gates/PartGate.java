@@ -49,29 +49,56 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
         }
     }
 
+    private static class Property implements IUnlistedProperty<PartGate> {
+        private Property() {
+
+        }
+
+        @Override
+        public String getName() {
+            return "gate";
+        }
+
+        @Override
+        public boolean isValid(PartGate value) {
+            return true;
+        }
+
+        @Override
+        public Class<PartGate> getType() {
+            return PartGate.class;
+        }
+
+        @Override
+        public String valueToString(PartGate value) {
+            return "!?";
+        }
+    }
+
     public enum Connection {
         NONE,
         INPUT,
         OUTPUT,
+        INPUT_OUTPUT,
         INPUT_ANALOG,
         OUTPUT_ANALOG,
         INPUT_BUNDLED,
         OUTPUT_BUNDLED;
 
         public boolean isInput() {
-            return this == INPUT || this == INPUT_ANALOG || this == INPUT_BUNDLED;
+            return this == INPUT || this == INPUT_ANALOG || this == INPUT_OUTPUT || this == INPUT_BUNDLED;
         }
 
         public boolean isOutput() {
-            return this == OUTPUT || this == OUTPUT_ANALOG || this == OUTPUT_BUNDLED;
+            return this == OUTPUT || this == OUTPUT_ANALOG || this == INPUT_OUTPUT || this == OUTPUT_BUNDLED;
         }
 
         public boolean isRedstone() {
-            return this == INPUT || this == OUTPUT || this == INPUT_ANALOG || this == OUTPUT_ANALOG;
+            return this == INPUT || this == OUTPUT || this == INPUT_ANALOG || this == OUTPUT_ANALOG || this == INPUT_OUTPUT;
         }
 
         public boolean isDigital() {
-            return this == INPUT || this == OUTPUT;
+            return this == INPUT || this == OUTPUT || this == INPUT_OUTPUT;
         }
 
         public boolean isAnalog() {
@@ -110,6 +137,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
     }
 
     protected byte enabledSides, invertedSides;
+    protected boolean mirrored;
 
     private int pendingTick;
     private byte[] inputs = new byte[4];
@@ -135,6 +163,10 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
     PartGate setInvertedSides(int sides) {
         this.invertedSides = (byte) sides;
         return this;
+    }
+
+    public boolean isMirrored() {
+        return mirrored;
     }
 
     public Connection getType(EnumFacing dir) {
@@ -167,12 +199,12 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 
     @Override
     public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
-        return ItemGate.getStack(this);
+        return ItemGate.getStack(this, true);
     }
 
     @Override
     public List<ItemStack> getDrops() {
-        return Arrays.asList(ItemGate.getStack(this));
+        return Arrays.asList(ItemGate.getStack(this, false));
     }
 
     @Override
@@ -432,6 +464,10 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
         return getType();
     }
 
+    public String getModelName() {
+        return "base";
+    }
+
     @Override
     public EnumSet<PartSlot> getSlotMask() {
         return EnumSet.of(PartSlot.getFaceSlot(side));
@@ -470,6 +506,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
         tag.setByte("t", (byte) top.ordinal());
         tag.setByte("e", enabledSides);
         tag.setByte("i", invertedSides);
+        tag.setBoolean("m", mirrored);
         if (pendingTick != 0) {
             tag.setByte("p", (byte) pendingTick);
         }
@@ -501,12 +538,13 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
         invertedSides = tag.getByte("i");
         side = EnumFacing.getFront(tag.getByte("f"));
         top = EnumFacing.getFront(tag.getByte("t"));
+        mirrored = tag.getBoolean("m");
         pendingTick = tag.getByte("p");
     }
 
     @Override
     public void writeUpdatePacket(PacketBuffer buf) {
-        buf.writeByte((side.ordinal() << 4) | top.ordinal());
+        buf.writeByte((mirrored ? 0x40 : 0) | (side.ordinal() << 3) | top.ordinal());
         buf.writeByte(enabledSides | (invertedSides << 4));
         for (int i = 0; i <= 3; i++) {
             EnumFacing dir = EnumFacing.getFront(i + 2);
@@ -517,6 +555,10 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
     }
 
     public void handlePacket(ByteBuf buf) {
+        int sides = buf.readUnsignedByte();
+        enabledSides = (byte) (sides & 15);
+        invertedSides = (byte) (sides >> 4);
+
         for (int i = 0; i <= 3; i++) {
             inputs[i] = outputClient[i] = 0;
             EnumFacing dir = EnumFacing.getFront(i + 2);
@@ -534,11 +576,9 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
     @Override
     public void readUpdatePacket(PacketBuffer buf) {
         int sides = buf.readUnsignedByte();
-        side = EnumFacing.getFront(sides >> 4);
-        top = EnumFacing.getFront(sides & 15);
-        sides = buf.readUnsignedByte();
-        enabledSides = (byte) (sides & 15);
-        invertedSides = (byte) (sides >> 4);
+        side = EnumFacing.getFront((sides >> 3) & 7);
+        top = EnumFacing.getFront((sides & 7));
+        mirrored = (sides & 0x40) != 0;
 
         if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
             final ByteBuf buf2 = Unpooled.copiedBuffer(buf);
@@ -553,8 +593,6 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
             handlePacket(buf);
         }
     }
-
-    // Utility functions
 
     @Override
     public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
@@ -581,32 +619,6 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
     }
     
     public static final Property PROPERTY = new Property();
-
-    private static class Property implements IUnlistedProperty<PartGate> {
-        private Property() {
-
-        }
-
-        @Override
-        public String getName() {
-            return "gate";
-        }
-
-        @Override
-        public boolean isValid(PartGate value) {
-            return true;
-        }
-
-        @Override
-        public Class<PartGate> getType() {
-            return PartGate.class;
-        }
-
-        @Override
-        public String valueToString(PartGate value) {
-            return "!?";
-        }
-    }
 
     @Override
     public IBlockState getExtendedState(IBlockState state) {
@@ -645,6 +657,10 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
             return null;
         }
 
+        if (dir.getAxis() == EnumFacing.Axis.X && mirrored) {
+            dir = dir.getOpposite();
+        }
+
         EnumFacing itop = top;
         while (itop != EnumFacing.NORTH) {
             dir = dir.rotateY();
@@ -667,7 +683,11 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
                     dir = dir.rotateYCCW();
                     itop = itop.rotateYCCW();
                 }
-                return dir;
+                if (dir.getAxis() == EnumFacing.Axis.X && mirrored) {
+                    return dir.getOpposite();
+                } else {
+                    return dir;
+                }
             }
         }
 
