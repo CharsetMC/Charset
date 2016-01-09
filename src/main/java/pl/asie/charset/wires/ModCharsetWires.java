@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -19,6 +20,7 @@ import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.wires.logic.PartWireProvider;
+import pl.asie.charset.wires.logic.PostWorldTickWireUpdater;
 
 @Mod(modid = ModCharsetWires.MODID, name = ModCharsetWires.NAME, version = ModCharsetWires.VERSION,
 	dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -77,9 +79,16 @@ public class ModCharsetWires {
 			GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 0 + (i << 1)), new ItemStack(wire, 1, 1 + (i << 1)));
 			GameRegistry.addShapelessRecipe(new ItemStack(wire, 1, 1 + (i << 1)), new ItemStack(wire, 1, 0 + (i << 1)));
 		}
+
+        MinecraftForge.EVENT_BUS.register(PostWorldTickWireUpdater.instance);
 	}
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+    }
+
+    @Mod.EventHandler
+    public void serverStart(FMLServerStartingEvent event) {
+        PostWorldTickWireUpdater.instance.clear();
     }
 }

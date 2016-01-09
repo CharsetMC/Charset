@@ -21,7 +21,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -48,8 +47,6 @@ import mcmultipart.multipart.MultipartRegistry;
 import mcmultipart.multipart.OcclusionHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
-import pl.asie.charset.api.wires.IBundledUpdatable;
-import pl.asie.charset.api.wires.IRedstoneUpdatable;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
@@ -585,9 +582,11 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
         PartWireBase wire = WireUtils.getWire(MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing)), location);
         if (wire != null) {
             wire.onSignalChanged(color);
+        } else {
+            PostWorldTickWireUpdater.instance.register(getWorld(), new PostWorldTickWireUpdater.Packet(this, getPos().offset(facing), facing.getOpposite()));
         }
 
-		TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
+		/* TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
 		if (nt instanceof IBundledUpdatable) {
 			((IBundledUpdatable) nt).onBundledInputChanged(facing.getOpposite());
 		} else if (nt instanceof IRedstoneUpdatable) {
@@ -609,7 +608,7 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
             } else {
                 getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
             }
-		}
+		} */
 	}
 
 	public boolean connectsInternal(WireFace side) {
