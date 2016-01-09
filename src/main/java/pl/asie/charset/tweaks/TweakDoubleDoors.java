@@ -47,13 +47,14 @@ public class TweakDoubleDoors extends Tweak {
 	}
 
 	@Override
-	public void init() {
+	public boolean init() {
 		allowedDoors.add((BlockDoor) Blocks.acacia_door);
 		allowedDoors.add((BlockDoor) Blocks.birch_door);
 		allowedDoors.add((BlockDoor) Blocks.jungle_door);
 		allowedDoors.add((BlockDoor) Blocks.oak_door);
 		allowedDoors.add((BlockDoor) Blocks.spruce_door);
 		allowedDoors.add((BlockDoor) Blocks.dark_oak_door);
+        return true;
 	}
 
 	@Override

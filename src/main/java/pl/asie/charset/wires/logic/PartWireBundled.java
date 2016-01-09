@@ -209,7 +209,7 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 
     @Override
     public byte[] getBundledSignal(WireFace face, EnumFacing toDirection) {
-        return face == location && connects(toDirection) ? signalValue : null;
+        return (face == null || face == location) && connects(toDirection) ? signalValue : null;
     }
 
     @Override

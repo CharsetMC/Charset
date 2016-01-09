@@ -55,7 +55,6 @@ public class PartGateMultiplexer extends PartGate {
     @Override
     protected byte getOutputInside(EnumFacing side) {
         boolean isWest = getInputInside(EnumFacing.SOUTH) != 0;
-        System.out.println(isWest ? getInputInside(EnumFacing.WEST) : getInputInside(EnumFacing.EAST));
         return isWest ? getInputInside(EnumFacing.WEST) : getInputInside(EnumFacing.EAST);
     }
 

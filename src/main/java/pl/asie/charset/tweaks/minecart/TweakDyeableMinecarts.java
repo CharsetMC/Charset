@@ -23,10 +23,6 @@ public class TweakDyeableMinecarts extends Tweak {
 	}
 
 	@Override
-	public void init() {
-	}
-
-	@Override
 	public void enable() {
 		ModCharsetTweaks.proxy.initMinecraftTweakClient();
 		MinecraftForge.EVENT_BUS.register(this);

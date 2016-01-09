@@ -95,6 +95,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 		int oldSignal = signalLevel;
 		int[] neighborLevel = new int[7];
         boolean[] isWire = new boolean[7];
+        boolean hasRedstoneWire = false;
 
 		if (type == WireKind.NORMAL) {
 			if (location != WireFace.CENTER) {
@@ -166,6 +167,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 
                     if (state.getBlock() instanceof BlockRedstoneWire) {
                         isWire[facidx] = true;
+                        hasRedstoneWire = true;
                         power--;
                     }
 
@@ -291,7 +293,11 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 
     @Override
     public int getRedstoneSignal(WireFace face, EnumFacing toDirection) {
-        return face == location && connects(toDirection) ? getRedstoneLevel() : 0;
+        if (face == null) {
+            return getWeakSignal(toDirection);
+        } else {
+            return face == location && connects(toDirection) ? getRedstoneLevel() : 0;
+        }
     }
 
     @Override

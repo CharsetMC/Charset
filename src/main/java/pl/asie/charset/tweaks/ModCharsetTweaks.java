@@ -18,6 +18,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
 import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
+import pl.asie.charset.tweaks.noteblock.TweakImprovedNoteblock;
 
 @Mod(modid = ModCharsetTweaks.MODID, name = ModCharsetTweaks.NAME, version = ModCharsetTweaks.VERSION,
 	dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -41,6 +42,7 @@ public class ModCharsetTweaks {
 		tweakSet.add(new TweakDoubleDoors());
 		tweakSet.add(new TweakDyeableMinecarts());
 		tweakSet.add(new TweakGraphite());
+        tweakSet.add(new TweakImprovedNoteblock());
         tweakSet.add(new TweakMobControl());
         tweakSet.add(new TweakNoSprinting());
 
@@ -49,7 +51,10 @@ public class ModCharsetTweaks {
 		for (Tweak t : tweakSet) {
 			t.onConfigChanged(configuration, true);
 			if (t.isEnabled()) {
-				t.preInit();
+				if (!t.preInit()) {
+                    ModCharsetLib.logger.error("Tweak " + t.getClass().getSimpleName() + " failed to load! Please disable it in the config.");
+                    tweakSet.remove(t);
+                }
 			}
 		}
 
@@ -64,7 +69,10 @@ public class ModCharsetTweaks {
 
 		for (Tweak t : tweakSet) {
 			if (t.isEnabled()) {
-				t.init();
+                if (!t.init()) {
+                    ModCharsetLib.logger.error("Tweak " + t.getClass().getSimpleName() + " failed to load! Please disable it in the config.");
+                    tweakSet.remove(t);
+                }
 			}
 		}
 	}

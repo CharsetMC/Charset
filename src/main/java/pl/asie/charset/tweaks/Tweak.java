@@ -50,12 +50,12 @@ public abstract class Tweak {
 		return true;
 	}
 
-	public void preInit() {
-
+	public boolean preInit() {
+        return true;
 	}
 
-	public void init() {
-
+	public boolean init() {
+        return true;
 	}
 
 	public void enable() {

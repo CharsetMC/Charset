@@ -25,16 +25,18 @@ public class TweakGraphite extends Tweak {
 	}
 
 	@Override
-	public void preInit() {
+	public boolean preInit() {
 		graphite = new Item().setCreativeTab(ModCharsetLib.CREATIVE_TAB).setUnlocalizedName("charset.graphite");
 		GameRegistry.registerItem(graphite, "graphite");
 
 		ModCharsetLib.proxy.registerItemModel(graphite, 0, "charsettweaks:graphite");
+        return true;
 	}
 
 	@Override
-	public void init() {
+	public boolean init() {
 		OreDictionary.registerOre("dyeBlack", graphite);
 		GameRegistry.addShapelessRecipe(new ItemStack(graphite, 2, 0), new ItemStack(Items.coal, 1, 1));
+        return true;
 	}
 }
