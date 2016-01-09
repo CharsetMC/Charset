@@ -364,7 +364,9 @@ public class PipeItem {
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
 				return;
-			} else if (owner.getShifterStrength(dir) == owner.getShifterStrength(dir.getOpposite())) {
+			} else if (owner.getShifterStrength(dir) == owner.getShifterStrength(dir.getOpposite())
+                    && isShifterPushing(owner.getNearestShifter(dir), dir)
+                    && isShifterPushing(owner.getNearestShifter(dir.getOpposite()), dir.getOpposite())) {
 				// Pressurizers freezing an item in place.
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);

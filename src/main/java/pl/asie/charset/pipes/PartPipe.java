@@ -8,6 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockState;
@@ -51,11 +54,11 @@ import pl.asie.charset.lib.utils.RotationUtils;
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IOccludingPart, IPipe, ITickable {
     private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
-	protected int[] shifterDistance = new int[6];
-	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
+    protected int[] shifterDistance = new int[6];
+    private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
     private byte connectionCache = 0;
-	private boolean neighborBlockChanged;
+    private boolean neighborBlockChanged;
     private boolean requestUpdate;
 
     static {
@@ -65,14 +68,30 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
         }
     }
 
-	public PartPipe() {
-	}
+    public PartPipe() {
+    }
+
+    public void handlePacket(ByteBuf buf) {
+        connectionCache = buf.readByte();
+        requestUpdate = true;
+    }
 
     @Override
     public void readUpdatePacket(PacketBuffer buf) {
         super.readUpdatePacket(buf);
-        connectionCache = buf.readByte();
-        requestUpdate = true;
+
+        if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
+            final ByteBuf buf2 = Unpooled.copiedBuffer(buf);
+
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    handlePacket(buf2);
+                }
+            });
+        } else {
+            handlePacket(buf);
+        }
     }
 
     @Override

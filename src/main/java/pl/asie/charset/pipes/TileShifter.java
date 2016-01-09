@@ -184,5 +184,12 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			worldObj.markBlockForUpdate(pos);
 			worldObj.notifyBlockOfStateChange(pos, getBlockType());
 		}
+
+        EnumFacing direction = getDirection();
+        PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
+        if ((getMode() == Mode.Extract && !output.connects(direction.getOpposite()))
+                || (getMode() == Mode.Shift && output.connects(direction.getOpposite()))) {
+            worldObj.notifyBlockOfStateChange(pos.offset(getDirection()), getBlockType());
+        }
 	}
 }
