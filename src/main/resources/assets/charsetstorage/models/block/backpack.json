@@ -1,0 +1,87 @@
+{
+    "elements": [
+        {
+            "__comment": "left",
+            "from": [11, 2, 4],
+            "to": [12, 10, 5],
+            "faces": {
+                "down":  {"uv": [11, 11, 11.5, 11.5], "texture": "#all", "tintindex": 0},
+                "up":    {"uv": [10.5, 11, 11, 11.5], "texture": "#all", "tintindex": 0},
+                "north": {"uv": [10.5, 11.5, 11, 15.5], "texture": "#all", "tintindex": 0},
+                "south": {"uv": [11.5, 11.5, 12, 15.5], "texture": "#all", "tintindex": 0},
+                "west":  {"uv": [11, 11.5, 11.5, 15.5], "texture": "#all", "tintindex": 0},
+                "east":  {"uv": [10, 11.5, 10.5, 15.5], "texture": "#all", "tintindex": 0}
+            }
+        },
+        {
+            "__comment": "right",
+            "from": [4, 2, 4],
+            "to": [5, 10, 5],
+            "faces": {
+                "down":  {"uv": [11, 11, 11.5, 11.5], "texture": "#all", "tintindex": 0},
+                "up":    {"uv": [10.5, 11, 11, 11.5], "texture": "#all", "tintindex": 0},
+                "north": {"uv": [10.5, 11.5, 11, 15.5], "texture": "#all", "tintindex": 0},
+                "south": {"uv": [11.5, 11.5, 12, 15.5], "texture": "#all", "tintindex": 0},
+                "west":  {"uv": [11, 11.5, 11.5, 15.5], "texture": "#all", "tintindex": 0},
+                "east":  {"uv": [10, 11.5, 10.5, 15.5], "texture": "#all", "tintindex": 0}
+            }
+        },
+        {
+            "__comment": "main",
+            "from": [3, -1, 5],
+            "to": [13, 8, 10],
+            "faces": {
+                "down":  {"uv": [7.5, 4, 12.5, 6.5], "texture": "#all", "tintindex": 0},
+                "up":    {"uv": [2.5, 4, 7.5, 6.5], "texture": "#all", "tintindex": 0},
+                "north": {"uv": [2.5, 6.5, 7.5, 11], "texture": "#all", "tintindex": 0},
+                "south": {"uv": [10, 6.5, 15, 11], "texture": "#all", "tintindex": 0},
+                "west":  {"uv": [7.5, 6.5, 10, 11], "texture": "#all", "tintindex": 0},
+                "east":  {"uv": [0, 6.5, 2.5, 11], "texture": "#all", "tintindex": 0}
+            }
+        },
+        {
+            "__comment": "front",
+            "from": [4, 0, 10],
+            "to": [12, 6, 12],
+            "faces": {
+                "down":  {"uv": [5, 11, 9, 12], "texture": "#all", "tintindex": 0},
+                "up":    {"uv": [1, 11, 5, 12], "texture": "#all", "tintindex": 0},
+                "north": {"uv": [1, 12, 5, 15], "texture": "#all", "tintindex": 0},
+                "south": {"uv": [6, 12, 10, 15], "texture": "#all", "tintindex": 0},
+                "west":  {"uv": [5, 12, 6, 15], "texture": "#all", "tintindex": 0},
+                "east":  {"uv": [0, 12, 1, 15], "texture": "#all", "tintindex": 0}
+            }
+        },
+        {
+            "__comment": "maino",
+            "from": [3, -1, 5],
+            "to": [13, 8, 10],
+            "faces": {
+                "down":  {"uv": [7.5, 4, 12.5, 6.5], "texture": "#overlay"},
+                "up":    {"uv": [2.5, 4, 7.5, 6.5], "texture": "#overlay"},
+                "north": {"uv": [2.5, 6.5, 7.5, 11], "texture": "#overlay"},
+                "south": {"uv": [10, 6.5, 15, 11], "texture": "#overlay"},
+                "west":  {"uv": [7.5, 6.5, 10, 11], "texture": "#overlay"},
+                "east":  {"uv": [0, 6.5, 2.5, 11], "texture": "#overlay"}
+            }
+        },
+        {
+            "__comment": "fronto",
+            "from": [4, 0, 10],
+            "to": [12, 6, 12],
+            "faces": {
+                "down":  {"uv": [5, 11, 9, 12], "texture": "#overlay"},
+                "up":    {"uv": [1, 11, 5, 12], "texture": "#overlay"},
+                "north": {"uv": [1, 12, 5, 15], "texture": "#overlay"},
+                "south": {"uv": [6, 12, 10, 15], "texture": "#overlay"},
+                "west":  {"uv": [5, 12, 6, 15], "texture": "#overlay"},
+                "east":  {"uv": [0, 12, 1, 15], "texture": "#overlay"}
+            }
+        }
+    ],
+    "textures": {
+        "all": "charsetstorage:blocks/backpack",
+        "overlay": "charsetstorage:blocks/backpack_overlay",
+        "particle": "charsetstorage:blocks/backpack"
+    }
+}

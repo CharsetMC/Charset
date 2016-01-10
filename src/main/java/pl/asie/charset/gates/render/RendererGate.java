@@ -25,7 +25,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
-import net.minecraftforge.client.model.IColoredBakedQuad;
 import net.minecraftforge.client.model.IFlexibleBakedModel;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IModelState;
@@ -214,46 +213,6 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
         return null;
     }
 
-    private float getFaceBrightness(EnumFacing facing)
-    {
-        switch (facing)
-        {
-            case DOWN:
-                return 0.5F;
-            case UP:
-                return 1.0F;
-            case NORTH:
-            case SOUTH:
-                return 0.8F;
-            case WEST:
-            case EAST:
-                return 0.6F;
-            default:
-                return 1.0F;
-        }
-    }
-
-    private int getTransformedColor(int color, EnumFacing facing) {
-        int c = color & 0xFF000000;
-        c |= (int) (((color & 0xFF0000) >> 16) * getFaceBrightness(facing)) << 16;
-        c |= (int) (((color & 0x00FF00) >> 8) * getFaceBrightness(facing)) << 8;
-        c |= (int) (((color & 0x0000FF) >> 0) * getFaceBrightness(facing)) << 0;
-        return c;
-    }
-
-    private void addAllRecolored(List<BakedQuad> target, List<BakedQuad> src, int color) {
-        int cc = getTransformedColor(color, gate.getSide().getOpposite());
-        for (BakedQuad quad : src) {
-            IColoredBakedQuad.ColoredBakedQuad quad1 = new IColoredBakedQuad.ColoredBakedQuad(quad.getVertexData().clone(), color, quad.getFace());
-            int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
-            int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-            for (int i = 0; i < 4; i++) {
-                quad1.getVertexData()[v * i + c] = cc;
-            }
-            target.add(quad1);
-        }
-    }
-
     @Override
     public List<BakedQuad> getFaceQuads(EnumFacing facing) {
         List<BakedQuad> list = Lists.newArrayList();
@@ -261,7 +220,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             list.addAll(model.getFaceQuads(facing));
         }
         for (IBakedModel model : bakedModelsRecolor.keySet()) {
-            addAllRecolored(list, model.getFaceQuads(facing), bakedModelsRecolor.get(model));
+            ClientUtils.addRecoloredQuads(model.getFaceQuads(facing), bakedModelsRecolor.get(model), list, gate.getSide().getOpposite());
         }
         return list;
     }
@@ -273,7 +232,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
             list.addAll(model.getGeneralQuads());
         }
         for (IBakedModel model : bakedModelsRecolor.keySet()) {
-            addAllRecolored(list, model.getGeneralQuads(), bakedModelsRecolor.get(model));
+            ClientUtils.addRecoloredQuads(model.getGeneralQuads(), bakedModelsRecolor.get(model), list, gate.getSide().getOpposite());
         }
         return list;
     }

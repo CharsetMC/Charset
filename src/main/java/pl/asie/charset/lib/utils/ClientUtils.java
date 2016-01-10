@@ -1,6 +1,7 @@
 package pl.asie.charset.lib.utils;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.google.common.base.Function;
 import org.lwjgl.opengl.GL11;
@@ -9,12 +10,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraftforge.client.model.IColoredBakedQuad;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 
@@ -31,6 +34,65 @@ public final class ClientUtils {
 
     private ClientUtils() {
 
+    }
+
+    private static float getFaceBrightness(EnumFacing facing)
+    {
+        switch (facing)
+        {
+            case DOWN:
+                return 0.5F;
+            case UP:
+                return 1.0F;
+            case NORTH:
+            case SOUTH:
+                return 0.8F;
+            case WEST:
+            case EAST:
+                return 0.6F;
+            default:
+                return 1.0F;
+        }
+    }
+
+    public static int getFaceColor(int color, EnumFacing facing) {
+        int c = color & 0xFF000000;
+        c |= (int) (((color & 0xFF0000) >> 16) * getFaceBrightness(facing)) << 16;
+        c |= (int) (((color & 0x00FF00) >> 8) * getFaceBrightness(facing)) << 8;
+        c |= (int) (((color & 0x0000FF) >> 0) * getFaceBrightness(facing)) << 0;
+        return c;
+    }
+
+    public static BakedQuad recolorQuad(BakedQuad quad, int color) {
+        IColoredBakedQuad.ColoredBakedQuad quad1 = new IColoredBakedQuad.ColoredBakedQuad(quad.getVertexData().clone(), color, quad.getFace());
+        int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
+        int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
+        int cc = getFaceColor(color, quad.getFace());
+        int[] vertexData = quad1.getVertexData();
+        for (int i = 0; i < 4; i++) {
+            vertexData[v * i + c] = cc;
+        }
+        return quad;
+    }
+
+    public static void addRecoloredQuads(List<BakedQuad> src, int color, List<BakedQuad> target, EnumFacing facing) {
+        boolean hasColor = false;
+        int col = 0;
+        if (facing != null) {
+            hasColor = true;
+            col = getFaceColor(color, facing);
+        }
+        for (BakedQuad quad : src) {
+            IColoredBakedQuad.ColoredBakedQuad quad1 = new IColoredBakedQuad.ColoredBakedQuad(quad.getVertexData().clone(), color, quad.getFace());
+            int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
+            int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
+            int cc = hasColor ? col : getFaceColor(color, quad.getFace());
+            int[] vertexData = quad1.getVertexData();
+            for (int i = 0; i < 4; i++) {
+                vertexData[v * i + c] = cc;
+            }
+            target.add(quad1);
+        }
     }
 
     public static IModel getModel(ResourceLocation location) {

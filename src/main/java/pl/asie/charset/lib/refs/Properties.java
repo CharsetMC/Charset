@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing;
 
 public final class Properties {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
+    public static final PropertyDirection FACING4 = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
 	public static final PropertyBool UP = PropertyBool.create("up");
 	public static final PropertyBool DOWN = PropertyBool.create("down");
