@@ -1,4 +1,4 @@
-package pl.asie.charset.storage;
+package pl.asie.charset.storage.gui;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;

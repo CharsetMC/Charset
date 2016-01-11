@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.storage.gui.StorageGuiHandler;
 
 @Mod(modid = ModCharsetStorage.MODID, name = ModCharsetStorage.NAME, version = ModCharsetStorage.VERSION,
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -40,6 +41,7 @@ public class ModCharsetStorage {
         ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
 
         MinecraftForge.EVENT_BUS.register(proxy);
+        MinecraftForge.EVENT_BUS.register(new BackpackUnequipHandler());
 	}
 
     @Mod.EventHandler

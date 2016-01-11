@@ -1,32 +1,6 @@
 {
     "elements": [
         {
-            "__comment": "left",
-            "from": [11, 2, 4],
-            "to": [12, 10, 5],
-            "faces": {
-                "down":  {"uv": [11, 11, 11.5, 11.5], "texture": "#all", "tintindex": 0},
-                "up":    {"uv": [10.5, 11, 11, 11.5], "texture": "#all", "tintindex": 0},
-                "north": {"uv": [10.5, 11.5, 11, 15.5], "texture": "#all", "tintindex": 0},
-                "south": {"uv": [11.5, 11.5, 12, 15.5], "texture": "#all", "tintindex": 0},
-                "west":  {"uv": [11, 11.5, 11.5, 15.5], "texture": "#all", "tintindex": 0},
-                "east":  {"uv": [10, 11.5, 10.5, 15.5], "texture": "#all", "tintindex": 0}
-            }
-        },
-        {
-            "__comment": "right",
-            "from": [4, 2, 4],
-            "to": [5, 10, 5],
-            "faces": {
-                "down":  {"uv": [11, 11, 11.5, 11.5], "texture": "#all", "tintindex": 0},
-                "up":    {"uv": [10.5, 11, 11, 11.5], "texture": "#all", "tintindex": 0},
-                "north": {"uv": [10.5, 11.5, 11, 15.5], "texture": "#all", "tintindex": 0},
-                "south": {"uv": [11.5, 11.5, 12, 15.5], "texture": "#all", "tintindex": 0},
-                "west":  {"uv": [11, 11.5, 11.5, 15.5], "texture": "#all", "tintindex": 0},
-                "east":  {"uv": [10, 11.5, 10.5, 15.5], "texture": "#all", "tintindex": 0}
-            }
-        },
-        {
             "__comment": "main",
             "from": [3, -1, 5],
             "to": [13, 8, 10],

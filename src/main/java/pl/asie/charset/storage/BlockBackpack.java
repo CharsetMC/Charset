@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -32,6 +33,30 @@ public class BlockBackpack extends BlockContainer {
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
         setUnlocalizedName("charset.backpack");
         setBlockBounds(0.1875f, 0.0f, 0.1875f, 0.8125f, 0.75f, 0.8125f);
+    }
+
+    @Override
+    public float getPlayerRelativeBlockHardness(EntityPlayer player, World world, BlockPos pos) {
+        if (player.isSneaking()) {
+            return -1.0f;
+        } else {
+            return super.getPlayerRelativeBlockHardness(player, world, pos);
+        }
+    }
+
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        if (player.isSneaking() && player.getCurrentArmor(2) == null) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof TileBackpack) {
+                ItemStack stack = ((TileBackpack) tile).writeToItemStack();
+
+                world.removeTileEntity(pos);
+                world.setBlockToAir(pos);
+
+                player.setCurrentItemOrArmor(3, stack);
+            }
+        }
     }
 
     @Override

@@ -13,6 +13,7 @@ import net.minecraft.world.IInteractionObject;
 
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
+import pl.asie.charset.storage.gui.ContainerBackpack;
 
 /**
  * Created by asie on 1/10/16.
@@ -36,28 +37,36 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
     }
 
     public void readFromItemStack(ItemStack stack) {
-        readFromNBT(stack.getTagCompound());
+        readCustomData(stack.getTagCompound());
     }
 
     public ItemStack writeToItemStack() {
-        ItemStack stack = new ItemStack(getBlockType());
+        ItemStack stack = new ItemStack(ModCharsetStorage.backpackBlock);
         stack.setTagCompound(new NBTTagCompound());
-        writeToNBT(stack.getTagCompound());
+        writeCustomData(stack.getTagCompound());
         return stack;
+    }
+
+    public void readCustomData(NBTTagCompound nbt) {
+        color = nbt.hasKey("color") ? nbt.getInteger("color") : BlockBackpack.DEFAULT_COLOR;
+        inventory.readFromNBT(nbt, "items");
+    }
+
+    public void writeCustomData(NBTTagCompound nbt) {
+        nbt.setInteger("color", color);
+        inventory.writeToNBT(nbt, "items");
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        color = nbt.hasKey("color") ? nbt.getInteger("color") : BlockBackpack.DEFAULT_COLOR;
-        inventory.readFromNBT(nbt, "items");
+        readCustomData(nbt);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        nbt.setInteger("color", color);
-        inventory.writeToNBT(nbt, "items");
+        writeCustomData(nbt);
     }
 
     @Override

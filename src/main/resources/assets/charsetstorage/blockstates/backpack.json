@@ -6,6 +6,9 @@
     "variants": {
         "normal": [{
             "submodel": {
+                "lr": {
+                    "model": "charsetstorage:backpack_lr"
+                },
                 "top": {
                     "model": "charsetstorage:backpack_top"
                 }
@@ -39,6 +42,9 @@
                 }
             },
             "submodel": {
+                "lr": {
+                    "model": "charsetstorage:backpack_lr"
+                },
                 "top": {
                     "model": "charsetstorage:backpack_top"
                 }
