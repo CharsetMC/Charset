@@ -43,4 +43,8 @@ public class ProxyCommon {
     public void addScheduledClientTask(Runnable runnable) {
 
     }
+
+    public boolean isClient() {
+        return false;
+    }
 }

@@ -6,5 +6,6 @@ part.charset.gate.xor=XOR Gate
 part.charset.gate.xor.i=XNOR Gate
 part.charset.gate.pulse_former=Pulse Former
 part.charset.gate.multiplexer=Multiplexer
+part.charset.gate.rs_latch=RS Latch
 
 item.charset.screwdriver.name=Screwdriver

@@ -10,13 +10,9 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.util.BlockPos;
 
-import net.minecraftforge.client.model.TRSRTransformation;
-
 import pl.asie.charset.lib.refs.Properties;
-import pl.asie.charset.lib.utils.ClientUtils;
 
 /**
  * Created by asie on 1/10/16.
@@ -33,14 +29,10 @@ public class TileBackpackRenderer extends TileEntitySpecialRenderer<TileBackpack
         BlockPos pos = te.getPos();
         IBlockState state = getWorld().getBlockState(pos);
 
-        IBakedModel model = ProxyClient.backpackTopModel.bake(
-                new TRSRTransformation(state.getValue(Properties.FACING4)),
-                DefaultVertexFormats.BLOCK, ClientUtils.textureGetter);
-
         GlStateManager.translate(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
         Tessellator.getInstance().getWorldRenderer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        renderer.renderModel(getWorld(), model, state, pos, Tessellator.getInstance().getWorldRenderer(), false);
+        renderer.renderModel(getWorld(), ProxyClient.backpackTopModel[state.getValue(Properties.FACING4).ordinal() - 2], state, pos, Tessellator.getInstance().getWorldRenderer(), false);
         Tessellator.getInstance().draw();
 
         GlStateManager.enableLighting();

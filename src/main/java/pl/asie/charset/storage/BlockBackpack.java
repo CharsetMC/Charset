@@ -5,6 +5,9 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -29,6 +32,32 @@ public class BlockBackpack extends BlockContainer {
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
         setUnlocalizedName("charset.backpack");
         setBlockBounds(0.1875f, 0.0f, 0.1875f, 0.8125f, 0.75f, 0.8125f);
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (world.isRemote) {
+            return true;
+        }
+
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileBackpack) {
+            player.openGui(ModCharsetStorage.instance, 1, world, pos.getX(), pos.getY(), pos.getZ());
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity tile = worldIn.getTileEntity(pos);
+
+        if (tile instanceof IInventory) {
+            InventoryHelper.dropInventoryItems(worldIn, pos, (IInventory) tile);
+        }
+
+        super.breakBlock(worldIn, pos, state);
     }
 
     @Override

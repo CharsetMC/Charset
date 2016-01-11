@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import pl.asie.charset.lib.ModCharsetLib;
@@ -18,6 +19,9 @@ public class ModCharsetStorage {
 	public static final String MODID = "CharsetStorage";
 	public static final String NAME = "S";
 	public static final String VERSION = "@VERSION@";
+
+    @Mod.Instance(MODID)
+    public static ModCharsetStorage instance;
 
     @SidedProxy(clientSide = "pl.asie.charset.storage.ProxyClient", serverSide = "pl.asie.charset.storage.ProxyCommon")
     public static ProxyCommon proxy;
@@ -43,5 +47,7 @@ public class ModCharsetStorage {
         GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
 
         proxy.init();
+
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new StorageGuiHandler());
     }
 }
