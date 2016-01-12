@@ -36,7 +36,7 @@ public class ModCharsetWires {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        MultipartRegistry.registerProvider(new PartWireProvider(), "charsetwires:wire");
+        MultipartRegistry.registerPartFactory(new PartWireProvider(), "charsetwires:wire");
 
         wire = new ItemWire();
         GameRegistry.registerItem(wire, "wire");

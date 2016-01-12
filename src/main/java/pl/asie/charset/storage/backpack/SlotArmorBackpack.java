@@ -1,4 +1,4 @@
-package pl.asie.charset.storage.gui;
+package pl.asie.charset.storage.backpack;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -8,8 +8,6 @@ import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import pl.asie.charset.storage.ItemBackpack;
 
 /**
  * Created by asie on 1/11/16.

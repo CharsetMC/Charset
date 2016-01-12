@@ -1,4 +1,4 @@
-package pl.asie.charset.storage;
+package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -21,6 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.storage.ModCharsetStorage;
 
 /**
  * Created by asie on 1/10/16.
@@ -55,6 +56,18 @@ public class BlockBackpack extends BlockContainer {
                 world.setBlockToAir(pos);
 
                 player.setCurrentItemOrArmor(3, stack);
+            }
+        }
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
+
+        if (stack.hasTagCompound()) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof TileBackpack) {
+                ((TileBackpack) tile).readCustomData(stack.getTagCompound());
             }
         }
     }

@@ -1,4 +1,4 @@
-package pl.asie.charset.storage.gui;
+package pl.asie.charset.storage.backpack;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;

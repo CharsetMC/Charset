@@ -1,4 +1,4 @@
-package pl.asie.charset.storage;
+package pl.asie.charset.storage.backpack;
 
 import org.lwjgl.opengl.GL11;
 
@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.BlockPos;
 
 import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.storage.ProxyClient;
 
 /**
  * Created by asie on 1/10/16.

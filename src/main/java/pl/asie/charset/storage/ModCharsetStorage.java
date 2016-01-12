@@ -12,7 +12,10 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.storage.gui.StorageGuiHandler;
+import pl.asie.charset.storage.backpack.HandlerBackpackUnequip;
+import pl.asie.charset.storage.backpack.BlockBackpack;
+import pl.asie.charset.storage.backpack.ItemBackpack;
+import pl.asie.charset.storage.backpack.TileBackpack;
 
 @Mod(modid = ModCharsetStorage.MODID, name = ModCharsetStorage.NAME, version = ModCharsetStorage.VERSION,
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -41,7 +44,7 @@ public class ModCharsetStorage {
         ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
 
         MinecraftForge.EVENT_BUS.register(proxy);
-        MinecraftForge.EVENT_BUS.register(new BackpackUnequipHandler());
+        MinecraftForge.EVENT_BUS.register(new HandlerBackpackUnequip());
 	}
 
     @Mod.EventHandler
@@ -50,6 +53,6 @@ public class ModCharsetStorage {
 
         proxy.init();
 
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, new StorageGuiHandler());
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
     }
 }

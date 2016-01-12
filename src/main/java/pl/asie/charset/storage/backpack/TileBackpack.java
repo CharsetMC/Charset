@@ -1,4 +1,4 @@
-package pl.asie.charset.storage;
+package pl.asie.charset.storage.backpack;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -6,6 +6,9 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
@@ -13,17 +16,17 @@ import net.minecraft.world.IInteractionObject;
 
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
-import pl.asie.charset.storage.gui.ContainerBackpack;
+import pl.asie.charset.storage.ModCharsetStorage;
 
 /**
  * Created by asie on 1/10/16.
  */
 public class TileBackpack extends TileEntity implements IInteractionObject, IInventory, IInventoryOwner {
     private InventorySimple inventory = new InventorySimple(27, this);
-    private int color = BlockBackpack.DEFAULT_COLOR;
+    private int color = -1;
 
     public int getColor() {
-        return color;
+        return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
     }
 
     @Override
@@ -34,6 +37,28 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
     @Override
     public String getGuiID() {
         return null;
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+        if (color >= 0) {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setInteger("color", color);
+            return new S35PacketUpdateTileEntity(getPos(), getBlockMetadata(), tag);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+        if (pkt != null && pkt.getNbtCompound() != null && pkt.getNbtCompound().hasKey("color")) {
+            int oldColor = color;
+            color = pkt.getNbtCompound().getInteger("color");
+            if (oldColor != color) {
+                worldObj.markBlockRangeForRenderUpdate(pos, pos);
+            }
+        }
     }
 
     public void readFromItemStack(ItemStack stack) {
@@ -48,12 +73,14 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
     }
 
     public void readCustomData(NBTTagCompound nbt) {
-        color = nbt.hasKey("color") ? nbt.getInteger("color") : BlockBackpack.DEFAULT_COLOR;
+        color = nbt.hasKey("color") ? nbt.getInteger("color") : -1;
         inventory.readFromNBT(nbt, "items");
     }
 
     public void writeCustomData(NBTTagCompound nbt) {
-        nbt.setInteger("color", color);
+        if (color >= 0) {
+            nbt.setInteger("color", color);
+        }
         inventory.writeToNBT(nbt, "items");
     }
 

@@ -1,4 +1,4 @@
-package pl.asie.charset.storage;
+package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -8,13 +8,16 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import pl.asie.charset.storage.ModCharsetStorage;
+
 /**
  * Created by asie on 1/11/16.
  */
-public class BackpackUnequipHandler {
+public class HandlerBackpackUnequip {
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK
+            && event.entityPlayer.getCurrentEquippedItem() == null
             && event.face == EnumFacing.UP && !event.world.isRemote) {
             ItemStack backpack = event.entityPlayer.getCurrentArmor(2);
             if (backpack != null && backpack.getItem() instanceof ItemBackpack) {

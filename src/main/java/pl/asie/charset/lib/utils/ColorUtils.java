@@ -56,7 +56,7 @@ public final class ColorUtils {
 		int[] itemOreIDs = OreDictionary.getOreIDs(stack);
 		for (int i = 0; i < 16; i++) {
 			for (int id : itemOreIDs) {
-				if (i == id) {
+				if (OREDICT_DYE_IDS[i] == id) {
 					return i;
 				}
 			}

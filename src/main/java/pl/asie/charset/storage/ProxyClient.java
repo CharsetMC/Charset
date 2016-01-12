@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -21,6 +22,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.utils.ClientUtils;
+import pl.asie.charset.storage.backpack.ItemBackpack;
+import pl.asie.charset.storage.backpack.TileBackpack;
+import pl.asie.charset.storage.backpack.TileBackpackRenderer;
 
 /**
  * Created by asie on 1/10/16.
@@ -52,6 +56,8 @@ public class ProxyClient extends ProxyCommon {
         ItemStack backpack = event.entityPlayer.getCurrentArmor(2);
         if (backpack != null && backpack.getItem() instanceof ItemBackpack) {
             BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
+
+            Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.75, 0.75, 0.75);

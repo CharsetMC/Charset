@@ -14,8 +14,11 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.RecipeSorter;
 
 import pl.asie.charset.api.lib.CharsetHelper;
+import pl.asie.charset.lib.recipe.RecipeDyeableItem;
+import pl.asie.charset.lib.utils.ColorUtils;
 
 /**
  * Created by asie on 11/12/15.
@@ -71,5 +74,9 @@ public class ModCharsetLib {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
+        ColorUtils.initialize();
+
+        GameRegistry.addRecipe(new RecipeDyeableItem());
+        RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 	}
 }

@@ -1,4 +1,4 @@
-package pl.asie.charset.storage;
+package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -16,9 +16,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
-import pl.asie.charset.storage.gui.SlotArmorBackpack;
+import pl.asie.charset.lib.recipe.IDyeableItem;
 
-public class ItemBackpack extends ItemBlock {
+public class ItemBackpack extends ItemBlock implements IDyeableItem {
     public class InventoryOwnerBackpack implements IInventoryOwner {
         public final ItemStack stack;
 
@@ -54,9 +54,29 @@ public class ItemBackpack extends ItemBlock {
     }
 
     @Override
+    public int getColor(ItemStack stack) {
+        return stack.hasTagCompound() && stack.getTagCompound().hasKey("color") ? stack.getTagCompound().getInteger("color") : -1;
+    }
+
+    @Override
+    public boolean hasColor(ItemStack stack) {
+        return getColor(stack) >= 0;
+    }
+
+    @Override
+    public void setColor(ItemStack stack, int color) {
+        if (!stack.hasTagCompound()) {
+            stack.setTagCompound(new NBTTagCompound());
+        }
+
+        stack.getTagCompound().setInteger("color", color);
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
     public int getColorFromItemStack(ItemStack stack, int renderPass) {
-        return BlockBackpack.DEFAULT_COLOR;
+        int color = getColor(stack);
+        return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
     }
 
     public IInventory getInventory(ItemStack stack) {
