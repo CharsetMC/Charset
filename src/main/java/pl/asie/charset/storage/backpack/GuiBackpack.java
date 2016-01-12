@@ -3,6 +3,8 @@ package pl.asie.charset.storage.backpack;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiBackpack extends GuiContainer {
@@ -16,16 +18,14 @@ public class GuiBackpack extends GuiContainer {
         this.ySize = 168;
     }
 
-    /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the items). Args : mouseX, mouseY
-     */
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        this.fontRendererObj.drawString(this.container.getInventoryObject().getDisplayName().getUnformattedText(), 8, 6, 4210752);
+    public IChatComponent getDisplayName() {
+        return new ChatComponentTranslation("tile.charset.backpack.name");
     }
 
-    /**
-     * Args : renderPartialTicks, mouseX, mouseY
-     */
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        this.fontRendererObj.drawString(getDisplayName().getUnformattedText(), 8, 6, 4210752);
+    }
+
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(CHEST_GUI_TEXTURE);

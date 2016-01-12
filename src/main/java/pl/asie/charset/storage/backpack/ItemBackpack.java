@@ -36,6 +36,15 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
         super(block);
     }
 
+    public static ItemStack getBackpack(EntityPlayer player) {
+        ItemStack stack = player.getCurrentArmor(2);
+        if (stack != null && stack.getItem() instanceof ItemBackpack) {
+            return stack;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
         return armorType == 1;

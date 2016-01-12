@@ -1,5 +1,7 @@
 package pl.asie.charset.storage;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -8,6 +10,8 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.model.IBakedModel;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -18,11 +22,13 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.utils.ClientUtils;
 import pl.asie.charset.storage.backpack.ItemBackpack;
+import pl.asie.charset.storage.backpack.PacketBackpackOpen;
 import pl.asie.charset.storage.backpack.TileBackpack;
 import pl.asie.charset.storage.backpack.TileBackpackRenderer;
 
@@ -30,12 +36,14 @@ import pl.asie.charset.storage.backpack.TileBackpackRenderer;
  * Created by asie on 1/10/16.
  */
 public class ProxyClient extends ProxyCommon {
-    public static IBakedModel[] backpackTopModel = new IBakedModel[4];
-    public static IBakedModel[] backpackModel = new IBakedModel[4];
+    public static final KeyBinding backpackOpen = new KeyBinding("key.charset.backpackOpen", Keyboard.KEY_C, "key.categories.gameplay");
+    public static final IBakedModel[] backpackTopModel = new IBakedModel[4];
+    public static final IBakedModel[] backpackModel = new IBakedModel[4];
 
     @Override
     public void init() {
         ClientRegistry.bindTileEntitySpecialRenderer(TileBackpack.class, new TileBackpackRenderer());
+        ClientRegistry.registerKeyBinding(backpackOpen);
     }
 
     protected float interpolateRotation(float par1, float par2, float par3) {
@@ -48,6 +56,23 @@ public class ProxyClient extends ProxyCommon {
         }
 
         return par1 + par3 * f;
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onKey(InputEvent.KeyInputEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.thePlayer;
+        if (!mc.inGameHasFocus || player == null) {
+            return;
+        }
+
+        if (ModCharsetStorage.enableBackpackOpenKey && backpackOpen.isPressed()) {
+            ItemStack backpack = ItemBackpack.getBackpack(player);
+            if (backpack != null) {
+                ModCharsetStorage.packet.sendToServer(new PacketBackpackOpen(player));
+            }
+        }
     }
 
     @SubscribeEvent
