@@ -577,7 +577,7 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
     protected abstract void onSignalChanged(int color);
 
 	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction, int color) {
-        PartWireBase wire = WireUtils.getWire(MultipartHelper.getPartContainer(getWorld(), getPos().offset(side).offset(direction)), location);
+        PartWireBase wire = WireUtils.getWire(MultipartHelper.getPartContainer(getWorld(), getPos().offset(side).offset(direction)), WireFace.get(direction.getOpposite()));
         if (wire != null) {
             wire.onSignalChanged(color);
         }

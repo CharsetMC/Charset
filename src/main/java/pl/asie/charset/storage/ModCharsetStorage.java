@@ -3,6 +3,9 @@ package pl.asie.charset.storage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
@@ -11,6 +14,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -24,7 +28,7 @@ import pl.asie.charset.storage.backpack.TileBackpack;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetStorage {
 	public static final String MODID = "CharsetStorage";
-	public static final String NAME = "S";
+	public static final String NAME = "☒";
 	public static final String VERSION = "@VERSION@";
 
     @Mod.Instance(MODID)
@@ -70,5 +74,8 @@ public class ModCharsetStorage {
         packet.registerPacket(0x01, PacketBackpackOpen.class);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
+
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lll",
+                'l', Items.leather, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold"));
     }
 }
