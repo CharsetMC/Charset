@@ -34,6 +34,8 @@ public class BlockBackpack extends BlockContainer {
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
         setUnlocalizedName("charset.backpack");
         setBlockBounds(0.1875f, 0.0f, 0.1875f, 0.8125f, 0.75f, 0.8125f);
+        setHardness(0.8f);
+        setStepSound(soundTypeCloth);
     }
 
     @Override
