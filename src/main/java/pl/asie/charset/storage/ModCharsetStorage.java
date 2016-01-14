@@ -28,7 +28,7 @@ import pl.asie.charset.storage.backpack.TileBackpack;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetStorage {
 	public static final String MODID = "CharsetStorage";
-	public static final String NAME = "☒";
+	public static final String NAME = "#";
 	public static final String VERSION = "@VERSION@";
 
     @Mod.Instance(MODID)

@@ -38,6 +38,7 @@ public class ModCharsetTweaks {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 		tweakSet.add(new TweakAutoReplace());
+        tweakSet.add(new TweakDisableVanillaTools());
 		tweakSet.add(new TweakDoubleDoors());
 		tweakSet.add(new TweakDyeableMinecarts());
 		tweakSet.add(new TweakGraphite());
