@@ -1,1 +1,19 @@
 item.charset.graphite.name=Graphite
+
+item.charset.shard.16.name=Black Glass Shard
+item.charset.shard.15.name=Red Glass Shard
+item.charset.shard.14.name=Green Glass Shard
+item.charset.shard.13.name=Brown Glass Shard
+item.charset.shard.12.name=Blue Glass Shard
+item.charset.shard.11.name=Purple Glass Shard
+item.charset.shard.10.name=Cyan Glass Shard
+item.charset.shard.9.name=Light Gray Glass Shard
+item.charset.shard.8.name=Gray Glass Shard
+item.charset.shard.7.name=Pink Glass Shard
+item.charset.shard.6.name=Lime Glass Shard
+item.charset.shard.5.name=Yellow Glass Shard
+item.charset.shard.4.name=Light Blue Glass Shard
+item.charset.shard.3.name=Magenta Glass Shard
+item.charset.shard.2.name=Orange Glass Shard
+item.charset.shard.1.name=White Glass Shard
+item.charset.shard.0.name=Glass Shard
