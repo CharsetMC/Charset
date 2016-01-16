@@ -341,7 +341,7 @@ public class PipeItem {
 
 			IShifter p = owner.getNearestShifter(direction);
 
-			if (isShifterPushing(p, direction)) {
+			if (p != null && isShifterPushing(p, direction)) {
 				pressureList.add(direction);
 			}
 		}
@@ -370,8 +370,6 @@ public class PipeItem {
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
 				return;
-			} else if (firstOutput == null && isValidDirection(dir)) {
-				firstOutput = dir;
 			}
 		}
 

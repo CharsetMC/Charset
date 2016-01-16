@@ -114,10 +114,11 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 					if (slot != null) {
 						ItemStack source = slot.get();
 						if (source != null && matches(source)) {
-							ItemStack stack = slot.remove(getRedstoneLevel() >= 8 ? source.stackSize : 1, true);
+                            int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
+							ItemStack stack = slot.remove(maxSize, true);
 							if (stack != null) {
 								if (output.injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
-									stack = slot.remove(getRedstoneLevel() >= 8 ? source.stackSize : 1, false);
+									stack = slot.remove(maxSize, false);
 									if (stack != null) {
 										output.injectItem(stack, direction.getOpposite(), false);
 									}

@@ -77,7 +77,7 @@ public class ProxyClient extends ProxyCommon {
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    public void onRenderArmor(RenderPlayerEvent.Post event) {
+    public void onRenderArmor(RenderPlayerEvent.Pre event) {
         ItemStack backpack = event.entityPlayer.getCurrentArmor(2);
         if (backpack != null && backpack.getItem() instanceof ItemBackpack) {
             BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
@@ -86,6 +86,11 @@ public class ProxyClient extends ProxyCommon {
 
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.75, 0.75, 0.75);
+            GlStateManager.translate(
+                    event.entityPlayer.posX - Minecraft.getMinecraft().thePlayer.posX,
+                    event.entityPlayer.posY - Minecraft.getMinecraft().thePlayer.posY,
+                    event.entityPlayer.posZ - Minecraft.getMinecraft().thePlayer.posZ
+            );
             GlStateManager.rotate(-interpolateRotation(event.entityPlayer.prevRenderYawOffset, event.entityPlayer.renderYawOffset, event.partialRenderTick), 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(-0.5, 1.125, -0.845);
             if (event.entityPlayer.isSneaking()) {

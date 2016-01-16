@@ -76,7 +76,7 @@ public class BlockShifter extends BlockContainer {
 
 			return state
 					.withProperty(EXTRACT, shifter.getMode() == IShifter.Mode.Extract)
-					.withProperty(STRENGTH, shifter.getRedstoneLevel() >= 8 ? 2 : (shifter.getRedstoneLevel() > 0 ? 1 : 0))
+					.withProperty(STRENGTH, /* shifter.getRedstoneLevel() >= 8 ? 2 : */ (shifter.getRedstoneLevel() > 0 ? 2 : 0))
 					.withProperty(Properties.DOWN, shifter.getFilters()[shiftedCoordinates[0]] != null)
 					.withProperty(Properties.UP, shifter.getFilters()[shiftedCoordinates[1]] != null)
 					.withProperty(Properties.NORTH, shifter.getFilters()[shiftedCoordinates[2]] != null)
