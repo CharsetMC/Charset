@@ -16,9 +16,9 @@ public abstract class ContainerBase extends Container {
 	public ContainerBase(IInventory inventory, InventoryPlayer inventoryPlayer) {
 		this.inventory = inventory;
 
-		if(inventory != null) {
+		if (inventory != null) {
 			this.containerSize = inventory.getSizeInventory();
-            this.inventory.openInventory(inventoryPlayer.player);
+			this.inventory.openInventory(inventoryPlayer.player);
 		} else {
 			this.containerSize = 0;
 		}
@@ -39,14 +39,14 @@ public abstract class ContainerBase extends Container {
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
-		if(inventory == null) {
+		if (inventory == null) {
 			return null;
 		}
 
 		Slot slotObject = inventorySlots.get(slot);
-		if(slotObject != null && slotObject.getHasStack()) {
+		if (slotObject != null && slotObject.getHasStack()) {
 			tryTransferStackInSlot(slotObject, slotObject.inventory == this.inventory);
-			if(!ModCharsetLib.proxy.isClient()) {
+			if (!ModCharsetLib.proxy.isClient()) {
 				detectAndSendChanges();
 			}
 		}
@@ -60,7 +60,7 @@ public abstract class ContainerBase extends Container {
 
 		int step = intoPlayerInventory ? -1 : 1;
 		int begin = intoPlayerInventory ? (inventorySlots.size() - 1) : 0;
-        int end = intoPlayerInventory ? 0 : inventorySlots.size() - 1;
+		int end = intoPlayerInventory ? 0 : inventorySlots.size() - 1;
 
 		if (fromStack.getMaxStackSize() > 1) {
 			for (int i = begin; i * step <= end; i += step) {
@@ -102,13 +102,13 @@ public abstract class ContainerBase extends Container {
 	}
 
 	public void bindPlayerInventory(InventoryPlayer inventoryPlayer, int startX, int startY) {
-		for(int i = 0; i < 3; i++) {
-			for(int j = 0; j < 9; j++) {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
 				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
-					startX + j * 18, startY + i * 18));
+						startX + j * 18, startY + i * 18));
 			}
 		}
-		for(int i = 0; i < 9; i++) {
+		for (int i = 0; i < 9; i++) {
 			addSlotToContainer(new Slot(inventoryPlayer, i, startX + i * 18, startY + 58));
 		}
 	}

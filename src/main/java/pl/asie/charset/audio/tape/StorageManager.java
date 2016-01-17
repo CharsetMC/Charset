@@ -11,7 +11,7 @@ import pl.asie.charset.lib.utils.MiscUtils;
 public class StorageManager {
 	private static Random rand = new Random();
 	private File saveDir;
-	
+
 	public StorageManager() {
 		File saveDirParent = new File(DimensionManager.getCurrentSaveRootDirectory(), "charset");
 		if (saveDirParent.exists() || saveDirParent.mkdir()) {
@@ -23,7 +23,7 @@ public class StorageManager {
 			ModCharsetAudio.logger.error("Could not create save directory! " + saveDirParent.getAbsolutePath());
 		}
 	}
-	
+
 	private String filename(String storageName) {
 		return storageName + ".dsk";
 	}
@@ -32,7 +32,7 @@ public class StorageManager {
 		int i;
 		int j = 16;
 
-		while ( j < 32) {
+		while (j < 32) {
 			i = 1000;
 			while (i > 0) {
 				byte[] nameHex = new byte[16];
@@ -48,7 +48,7 @@ public class StorageManager {
 
 		return null;
 	}
-	
+
 	public TapeStorage create(int size) {
 		String storageName = generateRandomName();
 		if (storageName != null) {
@@ -57,11 +57,11 @@ public class StorageManager {
 			return null;
 		}
 	}
-	
+
 	public boolean exists(String name) {
 		return new File(saveDir, filename(name)).exists();
 	}
-	
+
 	public TapeStorage get(String name, int size, int position) {
 		return new TapeStorage(name, new File(saveDir, filename(name)), size, position);
 	}

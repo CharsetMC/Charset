@@ -66,8 +66,8 @@ public class RendererWire extends RendererWireBase {
 		}
 
 		if (wire != null) {
-            renderers.get(getRendererId()).handlePartState(state);
-            renderers.get(getRendererId()).addWire(wire, wire.location, wire.getRedstoneLevel() > 0, quads);
+			renderers.get(getRendererId()).handlePartState(state);
+			renderers.get(getRendererId()).addWire(wire, wire.location, wire.getRedstoneLevel() > 0, quads);
 		} else if (stack != null) {
 			if (ItemWire.isFreestanding(stack)) {
 				renderers.get(getRendererId()).handleItemState(stack);

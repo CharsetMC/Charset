@@ -43,18 +43,18 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
-        nbt.setIntArray("s", signalLevel);
+		nbt.setIntArray("s", signalLevel);
 	}
 
 	private void propagate(int color, byte[][] nValues) {
 		int maxSignal = 0;
 		int[] neighborLevel = new int[7];
-        boolean[] isWire = new boolean[7];
+		boolean[] isWire = new boolean[7];
 
 		if (internalConnections > 0) {
 			for (WireFace location : WireFace.VALUES) {
 				if (connectsInternal(location)) {
-                    isWire[location.ordinal()] = true;
+					isWire[location.ordinal()] = true;
 					neighborLevel[location.ordinal()] = WireUtils.getBundledWireLevel(getContainer(), location, color);
 				}
 			}
@@ -63,36 +63,36 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
 				if (nValues[facing.ordinal()] != null) {
-                    int v = nValues[facing.ordinal()][color] << 8;
-                    if (v != 0) {
-                        neighborLevel[facing.ordinal()] = v | 0xFF;
-                    }
+					int v = nValues[facing.ordinal()][color] << 8;
+					if (v != 0) {
+						neighborLevel[facing.ordinal()] = v | 0xFF;
+					}
 				} else {
-                    IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
+					IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
 					if (container != null) {
-                        isWire[facing.ordinal()] = true;
+						isWire[facing.ordinal()] = true;
 						neighborLevel[facing.ordinal()] = WireUtils.getBundledWireLevel(container, location, color);
 					}
 				}
 			} else if (connectsCorner(facing)) {
 				BlockPos cornerPos = getPos().offset(facing).offset(location.facing);
-                IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), cornerPos);
-                if (container != null) {
-                    isWire[facing.ordinal()] = true;
-                    neighborLevel[facing.ordinal()] = WireUtils.getBundledWireLevel(container, WireFace.get(facing.getOpposite()), color);
-                }
+				IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), cornerPos);
+				if (container != null) {
+					isWire[facing.ordinal()] = true;
+					neighborLevel[facing.ordinal()] = WireUtils.getBundledWireLevel(container, WireFace.get(facing.getOpposite()), color);
+				}
 			}
 		}
 
-        int newSignal = 0;
+		int newSignal = 0;
 
 		for (int j = 0; j < 7; j++) {
 			if (neighborLevel[j] > maxSignal) {
 				maxSignal = neighborLevel[j];
 			}
-            if (!isWire[j] && neighborLevel[j] > newSignal) {
-                newSignal = neighborLevel[j];
-            }
+			if (!isWire[j] && neighborLevel[j] > newSignal) {
+				newSignal = neighborLevel[j];
+			}
 		}
 
 		if (DEBUG) {
@@ -106,9 +106,9 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 			}
 		}
 
-        if (newSignal == signalLevel[color]) {
-            return;
-        }
+		if (newSignal == signalLevel[color]) {
+			return;
+		}
 
 		signalLevel[color] = newSignal;
 		signalValue[color] = (byte) (newSignal >> 8);
@@ -116,15 +116,15 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 		if (newSignal == 0) {
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (connectsInternal(nLoc)) {
-                    if (neighborLevel[nLoc.ordinal()] > 0) {
-                        WireUtils.getWire(getContainer(), nLoc).onSignalChanged(color);
-                    }
+					if (neighborLevel[nLoc.ordinal()] > 0) {
+						WireUtils.getWire(getContainer(), nLoc).onSignalChanged(color);
+					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
 
 					if (connectsExternal(facing)) {
-                        IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
-                        if (container == null || WireUtils.getWire(container, location) == null || neighborLevel[facing.ordinal()] > 0) {
+						IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
+						if (container == null || WireUtils.getWire(container, location) == null || neighborLevel[facing.ordinal()] > 0) {
 							propagateNotify(facing, color);
 						}
 					} else if (connectsCorner(facing)) {
@@ -138,7 +138,7 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (neighborLevel[nLoc.ordinal()] < newSignal - 1 || neighborLevel[nLoc.ordinal()] > (newSignal + 1)) {
 					if (connectsInternal(nLoc)) {
-                        WireUtils.getWire(getContainer(), nLoc).onSignalChanged(color);
+						WireUtils.getWire(getContainer(), nLoc).onSignalChanged(color);
 					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing;
 
@@ -152,21 +152,21 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 			}
 		}
 
-        finishPropagation();
+		finishPropagation();
 	}
 
 	@Override
 	public void propagate(int color) {
 		if (DEBUG) {
 			System.out.println("--- B! PROPAGATE " + getPos().toString() + " " + location.name() + " --- " + color);
-            System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
-        }
+			System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
+		}
 
 		byte[][] nValues = new byte[6][];
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
-                IBundledEmitter emitter = MultipartUtils.getInterface(IBundledEmitter.class, getWorld(), getPos().offset(facing), location.facing, facing.getOpposite());
+				IBundledEmitter emitter = MultipartUtils.getInterface(IBundledEmitter.class, getWorld(), getPos().offset(facing), location.facing, facing.getOpposite());
 
 				if (emitter != null && !(emitter instanceof IWire)) {
 					nValues[facing.ordinal()] = emitter.getBundledSignal(location, facing.getOpposite());
@@ -183,12 +183,12 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 		}
 	}
 
-    @Override
-    protected void onSignalChanged(int color) {
-        if (getWorld() != null && !getWorld().isRemote) {
-            propagate(color);
-        }
-    }
+	@Override
+	protected void onSignalChanged(int color) {
+		if (getWorld() != null && !getWorld().isRemote) {
+			propagate(color);
+		}
+	}
 
 	@Override
 	public int getBundledSignalLevel(int i) {
@@ -209,15 +209,15 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 		return 0;
 	}
 
-    @Override
-    public byte[] getBundledSignal(WireFace face, EnumFacing toDirection) {
-        return (face == null || face == location) && connects(toDirection) ? signalValue : null;
-    }
+	@Override
+	public byte[] getBundledSignal(WireFace face, EnumFacing toDirection) {
+		return (face == null || face == location) && connects(toDirection) ? signalValue : null;
+	}
 
-    @Override
-    public void onBundledInputChanged(EnumFacing face) {
-        if (connects(face)) {
-            schedulePropagationUpdate();
-        }
-    }
+	@Override
+	public void onBundledInputChanged(EnumFacing face) {
+		if (connects(face)) {
+			schedulePropagationUpdate();
+		}
+	}
 }

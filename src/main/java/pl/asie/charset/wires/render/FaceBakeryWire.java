@@ -23,9 +23,9 @@ public class FaceBakeryWire extends FaceBakery {
 		int b = tintIndex & 255;
 		float f = this.getFaceBrightness(facing);
 
-		r = MathHelper.clamp_int((int)((float) r * f), 0, 255);
-		g = MathHelper.clamp_int((int)((float) g * f), 0, 255);
-		b = MathHelper.clamp_int((int)((float) b * f), 0, 255);
+		r = MathHelper.clamp_int((int) ((float) r * f), 0, 255);
+		g = MathHelper.clamp_int((int) ((float) g * f), 0, 255);
+		b = MathHelper.clamp_int((int) ((float) b * f), 0, 255);
 		return -16777216 | b << 16 | g << 8 | r;
 	}
 
@@ -47,20 +47,20 @@ public class FaceBakeryWire extends FaceBakery {
 	}
 
 	public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex, float[] uvOrig,
-									TextureAtlasSprite icon, EnumFacing facing, ModelRotation rot, boolean uvLocked) {
+								   TextureAtlasSprite icon, EnumFacing facing, ModelRotation rot, boolean uvLocked) {
 		float[] uv = uvOrig;
 		if (!uvLocked && uvScale > 1) {
 			float ox = (uvOffset % uvScale) * (16.0f / uvScale);
 			float oy = (uvOffset / uvScale) * (16.0f / uvScale);
-			uv = new float[] {
-				uv[0] / (float) uvScale + ox,
-				uv[1] / (float) uvScale + oy,
-				uv[2] / (float) uvScale + ox,
-				uv[3] / (float) uvScale + oy
+			uv = new float[]{
+					uv[0] / (float) uvScale + ox,
+					uv[1] / (float) uvScale + oy,
+					uv[2] / (float) uvScale + ox,
+					uv[3] / (float) uvScale + oy
 			};
 		}
 
-		 BakedQuad quad = makeBakedQuad(
+		BakedQuad quad = makeBakedQuad(
 				min, max,
 				new BlockPartFace(null, tintIndex, "", new BlockFaceUV(uv, 0)),
 				icon, facing, rot, null, uvLocked, true
@@ -75,33 +75,28 @@ public class FaceBakeryWire extends FaceBakery {
 		}
 	}
 
-	private void func_178401_a(int p_178401_1_, int[] p_178401_2_, EnumFacing facing, BlockFaceUV p_178401_4_, TextureAtlasSprite p_178401_5_)
-	{
+	private void func_178401_a(int p_178401_1_, int[] p_178401_2_, EnumFacing facing, BlockFaceUV p_178401_4_, TextureAtlasSprite p_178401_5_) {
 		int i = 7 * p_178401_1_;
 		float f = Float.intBitsToFloat(p_178401_2_[i]);
 		float f1 = Float.intBitsToFloat(p_178401_2_[i + 1]);
 		float f2 = Float.intBitsToFloat(p_178401_2_[i + 2]);
 
-		if (f < -0.1F || f >= 1.1F)
-		{
+		if (f < -0.1F || f >= 1.1F) {
 			f -= (float) MathHelper.floor_float(f);
 		}
 
-		if (f1 < -0.1F || f1 >= 1.1F)
-		{
-			f1 -= (float)MathHelper.floor_float(f1);
+		if (f1 < -0.1F || f1 >= 1.1F) {
+			f1 -= (float) MathHelper.floor_float(f1);
 		}
 
-		if (f2 < -0.1F || f2 >= 1.1F)
-		{
-			f2 -= (float)MathHelper.floor_float(f2);
+		if (f2 < -0.1F || f2 >= 1.1F) {
+			f2 -= (float) MathHelper.floor_float(f2);
 		}
 
 		float f3 = 0.0F;
 		float f4 = 0.0F;
 
-		switch (facing)
-		{
+		switch (facing) {
 			case DOWN:
 				f3 = f * 16.0F;
 				f4 = (1.0F - f2) * 16.0F;
@@ -141,8 +136,7 @@ public class FaceBakeryWire extends FaceBakery {
 
 	@Override
 	public void func_178409_a(int[] faceData, EnumFacing facing, BlockFaceUV faceUV, TextureAtlasSprite p_178409_4_) {
-		for (int i = 0; i < 4; ++i)
-		{
+		for (int i = 0; i < 4; ++i) {
 			this.func_178401_a(i, faceData, facing, faceUV, p_178409_4_);
 		}
 	}

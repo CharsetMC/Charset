@@ -137,9 +137,9 @@ public class PipeItem {
 
 				if (
 						(!foundShifter && activeShifterDistance > 0)
-						||	(foundShifter && activeShifterDistance != minimumShifterDistance)
-						||	(foundShifter && activeShifterDistance != getInternalShifterStrength(owner.getNearestShifter(output), output))
-				) {
+								|| (foundShifter && activeShifterDistance != minimumShifterDistance)
+								|| (foundShifter && activeShifterDistance != getInternalShifterStrength(owner.getNearestShifter(output), output))
+						) {
 					TileEntity shifterTile = owner.getWorld().getTileEntity(owner.getPos().offset(output.getOpposite(), activeShifterDistance));
 
 					if (!(shifterTile instanceof IShifter) || !isShifterPushing((IShifter) shifterTile, output)) {
@@ -173,9 +173,9 @@ public class PipeItem {
 		}
 	}
 
-    PacketItemUpdate getSyncPacket(boolean syncStack) {
-        return new PacketItemUpdate(owner, this, syncStack);
-    }
+	PacketItemUpdate getSyncPacket(boolean syncStack) {
+		return new PacketItemUpdate(owner, this, syncStack);
+	}
 
 	protected void sendPacket(boolean syncStack) {
 		if (owner.getWorld() != null && !owner.getWorld().isRemote) {
@@ -227,7 +227,7 @@ public class PipeItem {
 	}
 
 	private void onItemEnd() {
-        PartPipe pipe = output != null ? PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite()) : null;
+		PartPipe pipe = output != null ? PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite()) : null;
 
 		if (owner.getWorld().isRemote) {
 			// Last resort security mechanism for stray packets.
@@ -246,7 +246,7 @@ public class PipeItem {
 				// Therefore, we need to quit here.
 				return;
 			} else {
-                TileEntity tile = owner.getNeighbourTile(output);
+				TileEntity tile = owner.getNeighbourTile(output);
 
 				if (!passToInjectable(tile, output, false)) {
 					addToInventory(tile, output, false);
@@ -264,11 +264,11 @@ public class PipeItem {
 			return false;
 		}
 
-        PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
+		PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
 
-        if (pipe != null) {
-            return pipe.canInjectItems(dir.getOpposite());
-        }
+		if (pipe != null) {
+			return pipe.canInjectItems(dir.getOpposite());
+		}
 
 		TileEntity tile = owner.getNeighbourTile(dir);
 
@@ -286,7 +286,7 @@ public class PipeItem {
 			return activeShifterDistance == 0;
 		}
 
-        PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
+		PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
 
 		/* if (isPickingDirection) {
 			// If we're picking the direction, only check for pipe *connection*,
@@ -303,7 +303,7 @@ public class PipeItem {
 		}
 		// }
 
-        TileEntity tile = owner.getNeighbourTile(dir);
+		TileEntity tile = owner.getNeighbourTile(dir);
 
 		if (passToInjectable(tile, dir, true)) {
 			return true;
@@ -365,7 +365,7 @@ public class PipeItem {
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
 				return;
 			} else if (owner.getShifterStrength(dir) == owner.getShifterStrength(dir.getOpposite())
-                    && pressureList.contains(dir) && pressureList.contains(dir.getOpposite())) {
+					&& pressureList.contains(dir) && pressureList.contains(dir.getOpposite())) {
 				// Pressurizers freezing an item in place.
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
@@ -440,12 +440,12 @@ public class PipeItem {
 	}
 
 	private boolean passToInjectable(TileEntity tile, EnumFacing dir, boolean simulate) {
-        if (tile instanceof IMultipartContainer) {
-            IMultipart part = ((IMultipartContainer) tile).getPartInSlot(PartSlot.CENTER);
-            if (part instanceof PartPipe) {
-                return false;
-            }
-        }
+		if (tile instanceof IMultipartContainer) {
+			IMultipart part = ((IMultipartContainer) tile).getPartInSlot(PartSlot.CENTER);
+			if (part instanceof PartPipe) {
+				return false;
+			}
+		}
 
 		if (tile instanceof IItemInjectable) {
 			int added = ((IItemInjectable) tile).injectItem(stack, dir.getOpposite(), simulate);
@@ -461,11 +461,11 @@ public class PipeItem {
 	}
 
 	private boolean passToPipe(PartPipe pipe, EnumFacing dir, boolean simulate) {
-        if (pipe != null) {
-            if (pipe.injectItemInternal(this, dir.getOpposite(), simulate)) {
-                return true;
-            }
-        }
+		if (pipe != null) {
+			if (pipe.injectItemInternal(this, dir.getOpposite(), simulate)) {
+				return true;
+			}
+		}
 
 		return false;
 	}

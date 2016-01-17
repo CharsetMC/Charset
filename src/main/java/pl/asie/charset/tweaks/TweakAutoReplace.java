@@ -13,19 +13,19 @@ import pl.asie.charset.lib.utils.ItemUtils;
 
 /**
  * Ported from the Minecraft mod "copycore" by copygirl.
- *
+ * <p/>
  * Copyright (c) 2014 copygirl
- *
+ * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p/>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p/>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -55,7 +55,7 @@ public class TweakAutoReplace extends Tweak {
 			return;
 		}
 
-		EntityPlayerMP player = (EntityPlayerMP)event.entityPlayer;
+		EntityPlayerMP player = (EntityPlayerMP) event.entityPlayer;
 		InventoryPlayer inv = player.inventory;
 
 		ItemStack currentItem = inv.getCurrentItem();
@@ -82,7 +82,9 @@ public class TweakAutoReplace extends Tweak {
 		}
 	}
 
-	/** Returns if the destroyed item can be replaced with this item. */
+	/**
+	 * Returns if the destroyed item can be replaced with this item.
+	 */
 	private static boolean canReplace(ItemStack replacement, ItemStack destroyed) {
 		// TODO: Allow tools of the same type to act as replacement?
 		// Also, maybe allow the same item with different NBT data (enchantments)?

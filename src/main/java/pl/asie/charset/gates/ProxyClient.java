@@ -20,38 +20,38 @@ import pl.asie.charset.gates.render.RendererGate;
  * Created by asie on 12/27/15.
  */
 public class ProxyClient extends ProxyCommon {
-    private final Set<ResourceLocation> textures = new HashSet<ResourceLocation>();
+	private final Set<ResourceLocation> textures = new HashSet<ResourceLocation>();
 
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onPostBake(ModelBakeEvent event) {
-        for (String s : ModCharsetGates.gateParts.keySet()) {
-            event.modelRegistry.putObject(new ModelResourceLocation(s, "multipart"), RendererGate.INSTANCE);
-            event.modelRegistry.putObject(new ModelResourceLocation(s, "inventory"), RendererGate.INSTANCE);
-        }
-    }
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onPostBake(ModelBakeEvent event) {
+		for (String s : ModCharsetGates.gateParts.keySet()) {
+			event.modelRegistry.putObject(new ModelResourceLocation(s, "multipart"), RendererGate.INSTANCE);
+			event.modelRegistry.putObject(new ModelResourceLocation(s, "inventory"), RendererGate.INSTANCE);
+		}
+	}
 
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onTextureStitch(TextureStitchEvent.Pre event) {
-        textures.clear();
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		textures.clear();
 
-        GateRenderDefinitions.INSTANCE.load("charsetgates:gatedefs/base.json", ModCharsetGates.gateDefintions);
+		GateRenderDefinitions.INSTANCE.load("charsetgates:gatedefs/base.json", ModCharsetGates.gateDefintions);
 
-        for (String s : ModCharsetGates.gateDefintions.keySet()) {
-            GateRenderDefinitions.Definition def = GateRenderDefinitions.INSTANCE.getGateDefinition(s);
-            for (IModel model : def.getAllModels()) {
-                textures.addAll(model.getTextures());
-            }
-            for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(s).layers) {
-                if (layer.texture != null) {
-                    event.map.registerSprite(new ResourceLocation(layer.texture));
-                }
-            }
-        }
+		for (String s : ModCharsetGates.gateDefintions.keySet()) {
+			GateRenderDefinitions.Definition def = GateRenderDefinitions.INSTANCE.getGateDefinition(s);
+			for (IModel model : def.getAllModels()) {
+				textures.addAll(model.getTextures());
+			}
+			for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(s).layers) {
+				if (layer.texture != null) {
+					event.map.registerSprite(new ResourceLocation(layer.texture));
+				}
+			}
+		}
 
-        for (ResourceLocation r : textures) {
-            event.map.registerSprite(r);
-        }
-    }
+		for (ResourceLocation r : textures) {
+			event.map.registerSprite(r);
+		}
+	}
 }

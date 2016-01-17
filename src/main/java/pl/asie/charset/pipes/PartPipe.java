@@ -52,188 +52,193 @@ import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IOccludingPart, IPipe, ITickable {
-    private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
+	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
-    protected int[] shifterDistance = new int[6];
-    private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
+	protected int[] shifterDistance = new int[6];
+	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
-    private byte connectionCache = 0;
-    private boolean neighborBlockChanged;
-    private boolean requestUpdate;
+	private byte connectionCache = 0;
+	private boolean neighborBlockChanged;
+	private boolean requestUpdate;
 
-    static {
-        BOXES[6] = new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
-        for (int i = 0; i < 6; i++) {
-            BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), EnumFacing.getFront(i));
-        }
-    }
+	static {
+		BOXES[6] = new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75);
+		for (int i = 0; i < 6; i++) {
+			BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.25, 0.75), EnumFacing.getFront(i));
+		}
+	}
 
-    public PartPipe() {
-    }
+	public PartPipe() {
+	}
 
-    public void handlePacket(ByteBuf buf) {
-        connectionCache = buf.readByte();
-        requestUpdate = true;
-    }
+	public void handlePacket(ByteBuf buf) {
+		byte oldCC = connectionCache;
+		connectionCache = buf.readByte();
+		requestUpdate = true;
 
-    @Override
-    public void readUpdatePacket(PacketBuffer buf) {
-        super.readUpdatePacket(buf);
+		if (oldCC != connectionCache) {
+			markRenderUpdate();
+		}
+	}
 
-        if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
-            final ByteBuf buf2 = Unpooled.copiedBuffer(buf);
+	@Override
+	public void readUpdatePacket(PacketBuffer buf) {
+		super.readUpdatePacket(buf);
 
-            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-                @Override
-                public void run() {
-                    handlePacket(buf2);
-                }
-            });
-        } else {
-            handlePacket(buf);
-        }
-    }
+		if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
+			final ByteBuf buf2 = Unpooled.copiedBuffer(buf);
 
-    @Override
-    public void writeUpdatePacket(PacketBuffer buf) {
-        super.writeUpdatePacket(buf);
-        buf.writeByte(connectionCache);
-    }
+			Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+				@Override
+				public void run() {
+					handlePacket(buf2);
+				}
+			});
+		} else {
+			handlePacket(buf);
+		}
+	}
 
-    // Block logic
+	@Override
+	public void writeUpdatePacket(PacketBuffer buf) {
+		super.writeUpdatePacket(buf);
+		buf.writeByte(connectionCache);
+	}
 
-    @Override
-    public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
-        return new ItemStack(ModCharsetPipes.itemPipe);
-    }
+	// Block logic
 
-    @Override
-    public List<ItemStack> getDrops() {
-        List<ItemStack> drops = new ArrayList<ItemStack>();
-        drops.add(new ItemStack(ModCharsetPipes.itemPipe));
+	@Override
+	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+		return new ItemStack(ModCharsetPipes.itemPipe);
+	}
 
-        for (PipeItem i : itemSet) {
-            if (i.isValid()) {
-                drops.add(i.getStack());
-            }
-        }
+	@Override
+	public List<ItemStack> getDrops() {
+		List<ItemStack> drops = new ArrayList<ItemStack>();
+		drops.add(new ItemStack(ModCharsetPipes.itemPipe));
 
-        return drops;
-    }
+		for (PipeItem i : itemSet) {
+			if (i.isValid()) {
+				drops.add(i.getStack());
+			}
+		}
 
-    @Override
-    public float getHardness(PartMOP hit) {
-        return 0.3F;
-    }
+		return drops;
+	}
 
-    @Override
-    public Material getMaterial() {
-        return Material.glass;
-    }
+	@Override
+	public float getHardness(PartMOP hit) {
+		return 0.3F;
+	}
 
-    @Override
-    public IBlockState getExtendedState(IBlockState state) {
-        return state
-                .withProperty(Properties.DOWN, connects(EnumFacing.DOWN))
-                .withProperty(Properties.UP, connects(EnumFacing.UP))
-                .withProperty(Properties.NORTH, connects(EnumFacing.NORTH))
-                .withProperty(Properties.SOUTH, connects(EnumFacing.SOUTH))
-                .withProperty(Properties.WEST, connects(EnumFacing.WEST))
-                .withProperty(Properties.EAST, connects(EnumFacing.EAST));
-    }
+	@Override
+	public Material getMaterial() {
+		return Material.glass;
+	}
 
-    @Override
-    public BlockState createBlockState() {
-        return new BlockState(MCMultiPartMod.multipart,
-                Properties.DOWN,
-                Properties.UP,
-                Properties.NORTH,
-                Properties.SOUTH,
-                Properties.WEST,
-                Properties.EAST);
-    }
+	@Override
+	public IBlockState getExtendedState(IBlockState state) {
+		return state
+				.withProperty(Properties.DOWN, connects(EnumFacing.DOWN))
+				.withProperty(Properties.UP, connects(EnumFacing.UP))
+				.withProperty(Properties.NORTH, connects(EnumFacing.NORTH))
+				.withProperty(Properties.SOUTH, connects(EnumFacing.SOUTH))
+				.withProperty(Properties.WEST, connects(EnumFacing.WEST))
+				.withProperty(Properties.EAST, connects(EnumFacing.EAST));
+	}
 
-    @Override
-    public AxisAlignedBB getRenderBoundingBox() {
-        List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
-        addSelectionBoxes(list);
-        return list.get(0);
-    }
+	@Override
+	public BlockState createBlockState() {
+		return new BlockState(MCMultiPartMod.multipart,
+				Properties.DOWN,
+				Properties.UP,
+				Properties.NORTH,
+				Properties.SOUTH,
+				Properties.WEST,
+				Properties.EAST);
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean addDestroyEffects(AdvancedEffectRenderer advancedEffectRenderer) {
-        advancedEffectRenderer.addBlockDestroyEffects(getPos(),
-                Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())));
-        return true;
-    }
+	@Override
+	public AxisAlignedBB getRenderBoundingBox() {
+		List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
+		addSelectionBoxes(list);
+		return list.get(0);
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
-        return true;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean addDestroyEffects(AdvancedEffectRenderer advancedEffectRenderer) {
+		advancedEffectRenderer.addBlockDestroyEffects(getPos(),
+				Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())));
+		return true;
+	}
 
-    @Override
-    public void addOcclusionBoxes(List<AxisAlignedBB> list) {
-        list.add(AxisAlignedBB.fromBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
+		return true;
+	}
 
-    @Override
-    public void addSelectionBoxes(List<AxisAlignedBB> list) {
-        list.add(BOXES[6]);
-        for (EnumFacing f : EnumFacing.VALUES) {
-            if (connects(f)) {
-                list.add(BOXES[f.ordinal()]);
-            }
-        }
-    }
+	@Override
+	public void addOcclusionBoxes(List<AxisAlignedBB> list) {
+		list.add(AxisAlignedBB.fromBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
+	}
 
-    @Override
-    public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-        if (BOXES[6].intersectsWith(mask)) {
-            list.add(BOXES[6]);
-        }
-        for (EnumFacing f : EnumFacing.VALUES) {
-            if (connects(f)) {
-                if (BOXES[f.ordinal()].intersectsWith(mask)) {
-                    list.add(BOXES[f.ordinal()]);
-                }
-            }
-        }
-    }
+	@Override
+	public void addSelectionBoxes(List<AxisAlignedBB> list) {
+		list.add(BOXES[6]);
+		for (EnumFacing f : EnumFacing.VALUES) {
+			if (connects(f)) {
+				list.add(BOXES[f.ordinal()]);
+			}
+		}
+	}
 
-    @Override
-    public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-        return layer == EnumWorldBlockLayer.CUTOUT;
-    }
+	@Override
+	public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
+		if (BOXES[6].intersectsWith(mask)) {
+			list.add(BOXES[6]);
+		}
+		for (EnumFacing f : EnumFacing.VALUES) {
+			if (connects(f)) {
+				if (BOXES[f.ordinal()].intersectsWith(mask)) {
+					list.add(BOXES[f.ordinal()]);
+				}
+			}
+		}
+	}
 
-    @Override
-    public String getModelPath() {
-        return "charsetpipes:pipe";
-    }
+	@Override
+	public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
+		return layer == EnumWorldBlockLayer.CUTOUT;
+	}
 
-    // Tile logic
+	@Override
+	public String getModelPath() {
+		return "charsetpipes:pipe";
+	}
 
-    public TileEntity getNeighbourTile(EnumFacing side) {
-        return side != null ? getWorld().getTileEntity(getPos().offset(side)) : null;
-    }
+	// Tile logic
+
+	public TileEntity getNeighbourTile(EnumFacing side) {
+		return side != null ? getWorld().getTileEntity(getPos().offset(side)) : null;
+	}
 
 	private boolean internalConnects(EnumFacing side) {
-        ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(side));
-        if (part instanceof IMicroblock.IFaceMicroblock) {
-            if (!((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
-                return false;
-            }
-        }
+		ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(side));
+		if (part instanceof IMicroblock.IFaceMicroblock) {
+			if (!((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
+				return false;
+			}
+		}
 
-        if (!OcclusionHelper.occlusionTest(getContainer().getParts(), this, BOXES[side.ordinal()])) {
-            return false;
-        }
+		if (!OcclusionHelper.occlusionTest(getContainer().getParts(), this, BOXES[side.ordinal()])) {
+			return false;
+		}
 
-        if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
-            return true;
-        }
+		if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
+			return true;
+		}
 
 		TileEntity tile = getNeighbourTile(side);
 
@@ -259,24 +264,24 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		return false;
 	}
 
-    private void updateConnections(EnumFacing side) {
-        if (side != null) {
-            connectionCache &= ~(1 << side.ordinal());
+	private void updateConnections(EnumFacing side) {
+		if (side != null) {
+			connectionCache &= ~(1 << side.ordinal());
 
-            if (internalConnects(side)) {
-                PartPipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite());
-                if (pipe != null && !pipe.internalConnects(side.getOpposite())) {
-                    return;
-                }
+			if (internalConnects(side)) {
+				PartPipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite());
+				if (pipe != null && !pipe.internalConnects(side.getOpposite())) {
+					return;
+				}
 
-                connectionCache |= 1 << side.ordinal();
-            }
-        } else {
-            for (EnumFacing facing : EnumFacing.VALUES) {
-                updateConnections(facing);
-            }
-        }
-    }
+				connectionCache |= 1 << side.ordinal();
+			}
+		} else {
+			for (EnumFacing facing : EnumFacing.VALUES) {
+				updateConnections(facing);
+			}
+		}
+	}
 
 	@Override
 	public boolean connects(EnumFacing side) {
@@ -288,7 +293,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		super.readFromNBT(nbt);
 		readItems(nbt);
 
-        connectionCache = nbt.getByte("cc");
+		connectionCache = nbt.getByte("cc");
 		shifterDistance = nbt.getIntArray("shifterDist");
 		if (shifterDistance == null || shifterDistance.length != 6) {
 			shifterDistance = new int[6];
@@ -329,7 +334,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		super.writeToNBT(nbt);
 		writeItems(nbt);
 
-        nbt.setByte("cc", connectionCache);
+		nbt.setByte("cc", connectionCache);
 		nbt.setIntArray("shifterDist", shifterDistance);
 	}
 
@@ -343,22 +348,22 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		}
 	}
 
-    @Override
-    public void onAdded() {
-        updateNeighborInfo(false);
-        scheduleRenderUpdate();
-    }
+	@Override
+	public void onAdded() {
+		updateNeighborInfo(false);
+		scheduleRenderUpdate();
+	}
 
 	@Override
 	public void onLoaded() {
-        neighborBlockChanged = true;
+		neighborBlockChanged = true;
 	}
 
 	@Override
 	public void update() {
-        if (requestUpdate && getWorld() != null) {
-            ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
-        }
+		if (requestUpdate && getWorld() != null) {
+			ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
+		}
 
 		if (neighborBlockChanged) {
 			updateNeighborInfo(true);
@@ -390,8 +395,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 		BlockPos p = getPos();
 		int dist = 0;
-        PartPipe pipe;
-        TileEntity tile;
+		PartPipe pipe;
+		TileEntity tile;
 
 		while ((pipe = PipeUtils.getPipe(getWorld(), p, dir.getOpposite())) instanceof PartPipe) {
 			p = p.offset(dir.getOpposite());
@@ -402,7 +407,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			}
 		}
 
-        tile = getWorld().getTileEntity(p);
+		tile = getWorld().getTileEntity(p);
 
 		if (tile instanceof IShifter && isMatchingShifter((IShifter) tile, dir, dist)) {
 			shifterDistance[i] = dist;
@@ -420,16 +425,16 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	private void updateNeighborInfo(boolean sendPacket) {
 		if (!getWorld().isRemote) {
-            byte oc = connectionCache;
+			byte oc = connectionCache;
 
 			for (EnumFacing dir : EnumFacing.VALUES) {
-                updateConnections(dir);
+				updateConnections(dir);
 				updateShifterSide(dir);
 			}
 
-            if (sendPacket && connectionCache != oc) {
-                sendUpdatePacket();
-            }
+			if (sendPacket && connectionCache != oc) {
+				sendUpdatePacket();
+			}
 		}
 	}
 
@@ -554,7 +559,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
 	}
 
-    @Override
+	@Override
 	public void onNeighborBlockChange(Block block) {
 		neighborBlockChanged = true;
 	}
@@ -611,8 +616,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		return targetItem != null ? targetItem.getStack() : null;
 	}
 
-    @Override
-    public EnumSet<PartSlot> getSlotMask() {
-        return EnumSet.of(PartSlot.CENTER);
-    }
+	@Override
+	public EnumSet<PartSlot> getSlotMask() {
+		return EnumSet.of(PartSlot.CENTER);
+	}
 }

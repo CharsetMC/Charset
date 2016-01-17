@@ -7,21 +7,21 @@ import pl.asie.charset.wires.WireUtils;
 
 public class PartWireInsulated extends PartWireNormal implements IInsulatedWire {
 	@Override
-    protected int getRedstoneLevel(IMultipartContainer container, WireFace location) {
-        return WireUtils.getInsulatedWireLevel(container, location, type.color());
-    }
+	protected int getRedstoneLevel(IMultipartContainer container, WireFace location) {
+		return WireUtils.getInsulatedWireLevel(container, location, type.color());
+	}
 
-    @Override
-    protected void onSignalChanged(int color) {
-        if (getWorld() != null && !getWorld().isRemote) {
-            if (color == type.color() || color == -1) {
-                propagate(color);
-            }
-        }
-    }
+	@Override
+	protected void onSignalChanged(int color) {
+		if (getWorld() != null && !getWorld().isRemote) {
+			if (color == type.color() || color == -1) {
+				propagate(color);
+			}
+		}
+	}
 
-    @Override
-    public int getWireColor() {
-        return type.color();
-    }
+	@Override
+	public int getWireColor() {
+		return type.color();
+	}
 }

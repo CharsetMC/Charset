@@ -11,9 +11,14 @@ public interface IShifter {
 	}
 
 	Mode getMode();
+
 	EnumFacing getDirection();
+
 	int getShiftDistance();
+
 	boolean isShifting();
+
 	boolean hasFilter();
+
 	boolean matches(ItemStack source);
 }

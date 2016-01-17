@@ -31,51 +31,51 @@ public class ModCharsetStorage {
 	public static final String NAME = "#";
 	public static final String VERSION = "@VERSION@";
 
-    @Mod.Instance(MODID)
-    public static ModCharsetStorage instance;
+	@Mod.Instance(MODID)
+	public static ModCharsetStorage instance;
 
-    @SidedProxy(clientSide = "pl.asie.charset.storage.ProxyClient", serverSide = "pl.asie.charset.storage.ProxyCommon")
-    public static ProxyCommon proxy;
+	@SidedProxy(clientSide = "pl.asie.charset.storage.ProxyClient", serverSide = "pl.asie.charset.storage.ProxyCommon")
+	public static ProxyCommon proxy;
 
-    public static PacketRegistry packet;
+	public static PacketRegistry packet;
 	public static Logger logger;
 
-    public static BlockBackpack backpackBlock;
+	public static BlockBackpack backpackBlock;
 
-    public static boolean enableBackpackOpenKey;
+	public static boolean enableBackpackOpenKey;
 
-    private Configuration config;
+	private Configuration config;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(ModCharsetStorage.MODID);
-        config = new Configuration(ModCharsetLib.instance.getConfigFile("storage.cfg"));
+		config = new Configuration(ModCharsetLib.instance.getConfigFile("storage.cfg"));
 
-        backpackBlock = new BlockBackpack();
-        GameRegistry.registerBlock(backpackBlock, ItemBackpack.class, "backpack");
+		backpackBlock = new BlockBackpack();
+		GameRegistry.registerBlock(backpackBlock, ItemBackpack.class, "backpack");
 
-        ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
+		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
 
-        MinecraftForge.EVENT_BUS.register(proxy);
-        MinecraftForge.EVENT_BUS.register(new HandlerBackpackUnequip());
+		MinecraftForge.EVENT_BUS.register(proxy);
+		MinecraftForge.EVENT_BUS.register(new HandlerBackpackUnequip());
 
-        enableBackpackOpenKey = config.getBoolean("enableOpenKeyBinding", "backpack", true, "Should backpacks be openable with a key binding?");
+		enableBackpackOpenKey = config.getBoolean("enableOpenKeyBinding", "backpack", true, "Should backpacks be openable with a key binding?");
 
-        config.save();
+		config.save();
 	}
 
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event) {
+		GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
 
-        proxy.init();
+		proxy.init();
 
-        packet = new PacketRegistry(ModCharsetStorage.MODID);
-        packet.registerPacket(0x01, PacketBackpackOpen.class);
+		packet = new PacketRegistry(ModCharsetStorage.MODID);
+		packet.registerPacket(0x01, PacketBackpackOpen.class);
 
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
+		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
 
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lll",
-                'l', Items.leather, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold"));
-    }
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lll",
+				'l', Items.leather, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold"));
+	}
 }

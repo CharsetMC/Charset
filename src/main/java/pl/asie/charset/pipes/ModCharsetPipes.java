@@ -21,7 +21,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
-	dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetPipes {
 	public static final String MODID = "CharsetPipes";
 	public static final String NAME = "|";
@@ -32,25 +32,25 @@ public class ModCharsetPipes {
 
 	public static PacketRegistry packet;
 
-    @SidedProxy(clientSide = "pl.asie.charset.pipes.ProxyClient", serverSide = "pl.asie.charset.pipes.ProxyCommon")
-    public static ProxyCommon proxy;
+	@SidedProxy(clientSide = "pl.asie.charset.pipes.ProxyClient", serverSide = "pl.asie.charset.pipes.ProxyCommon")
+	public static ProxyCommon proxy;
 
 	public static Block shifterBlock;
-    public static Item itemPipe;
+	public static Item itemPipe;
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        itemPipe = new ItemPipe();
-        GameRegistry.registerItem(itemPipe, "pipe");
-        MultipartRegistry.registerPart(PartPipe.class, "CharsetPipes:pipe");
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		itemPipe = new ItemPipe();
+		GameRegistry.registerItem(itemPipe, "pipe");
+		MultipartRegistry.registerPart(PartPipe.class, "CharsetPipes:pipe");
 
 		shifterBlock = new BlockShifter();
 		ModCharsetLib.proxy.registerBlock(shifterBlock, "shifter");
 		GameRegistry.registerTileEntity(TileShifter.class, "CharsetPipes:shifter");
 
-        ModCharsetLib.proxy.registerItemModel(itemPipe, 0, "charsetpipes:pipe");
+		ModCharsetLib.proxy.registerItemModel(itemPipe, 0, "charsetpipes:pipe");
 		ModCharsetLib.proxy.registerItemModel(shifterBlock, 0, "charsetpipes:shifter");
-    }
+	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
@@ -66,18 +66,18 @@ public class ModCharsetPipes {
 				"crc",
 				'c', Blocks.cobblestone, 'P', Blocks.piston, 'r', Items.comparator, '^', Items.arrow);
 
-        ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
-                "mgm",
-                'g', Blocks.glass, 'm', Blocks.obsidian);
+		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
+				"mgm",
+				'g', Blocks.glass, 'm', Blocks.obsidian);
 
-        ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
-                "m",
-                "g",
-                "m",
-                'g', Blocks.glass, 'm', Blocks.obsidian);
+		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
+				"m",
+				"g",
+				"m",
+				'g', Blocks.glass, 'm', Blocks.obsidian);
 	}
 
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-    }
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+	}
 }

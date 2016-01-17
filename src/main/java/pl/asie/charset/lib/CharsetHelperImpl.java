@@ -18,34 +18,34 @@ import pl.asie.charset.lib.utils.MultipartUtils;
  * Created by asie on 1/6/16.
  */
 public class CharsetHelperImpl extends CharsetHelper {
-    @Override
-    public <T> T getInterface(Class<T> clazz, World world, BlockPos pos, EnumFacing side) {
-        return MultipartUtils.getInterface(clazz, world, pos, side);
-    }
+	@Override
+	public <T> T getInterface(Class<T> clazz, World world, BlockPos pos, EnumFacing side) {
+		return MultipartUtils.getInterface(clazz, world, pos, side);
+	}
 
-    @Override
-    public <T> T getInterface(Class<T> clazz, World world, BlockPos pos, EnumFacing side, EnumFacing face) {
-        return MultipartUtils.getInterface(clazz, world, pos, side, face);
-    }
+	@Override
+	public <T> T getInterface(Class<T> clazz, World world, BlockPos pos, EnumFacing side, EnumFacing face) {
+		return MultipartUtils.getInterface(clazz, world, pos, side, face);
+	}
 
-    @Override
-    public <T> List<T> getInterfaceList(Class<T> clazz, World world, BlockPos pos) {
-        IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
-        List<T> list = new ArrayList<T>();
+	@Override
+	public <T> List<T> getInterfaceList(Class<T> clazz, World world, BlockPos pos) {
+		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
+		List<T> list = new ArrayList<T>();
 
-        if (container == null) {
-            TileEntity tile = world.getTileEntity(pos);
-            if (tile != null && clazz.isAssignableFrom(tile.getClass())) {
-                list.add((T) tile);
-            }
-        } else {
-            for (IMultipart part : container.getParts()) {
-                if (clazz.isAssignableFrom(part.getClass())) {
-                    list.add((T) part);
-                }
-            }
-        }
+		if (container == null) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile != null && clazz.isAssignableFrom(tile.getClass())) {
+				list.add((T) tile);
+			}
+		} else {
+			for (IMultipart part : container.getParts()) {
+				if (clazz.isAssignableFrom(part.getClass())) {
+					list.add((T) part);
+				}
+			}
+		}
 
-        return list;
-    }
+		return list;
+	}
 }

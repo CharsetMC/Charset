@@ -19,23 +19,23 @@ import pl.asie.charset.wires.render.RendererWire;
 public class ProxyClient extends ProxyCommon {
 	public static RendererWire rendererWire = new RendererWire();
 
-    @Override
-    public void drawWireHighlight(PartWireBase wire) {
-        int lineMaskCenter = 0xFFF;
-        EnumFacing[] faces = WireUtils.getConnectionsForRender(wire.location);
-        for (int i = 0; i < faces.length; i++) {
-            EnumFacing face = faces[i];
-            if (wire.connectsAny(face)) {
-                int lineMask = 0xfff;
-                lineMask &= ~ClientUtils.getLineMask(face.getOpposite());
-                ClientUtils.drawSelectionBoundingBox(wire.getSelectionBox(i + 1), lineMask);
-                lineMaskCenter &= ~ClientUtils.getLineMask(face);
-            }
-        }
-        if (lineMaskCenter != 0) {
-            ClientUtils.drawSelectionBoundingBox(wire.getSelectionBox(0), lineMaskCenter);
-        }
-    }
+	@Override
+	public void drawWireHighlight(PartWireBase wire) {
+		int lineMaskCenter = 0xFFF;
+		EnumFacing[] faces = WireUtils.getConnectionsForRender(wire.location);
+		for (int i = 0; i < faces.length; i++) {
+			EnumFacing face = faces[i];
+			if (wire.connectsAny(face)) {
+				int lineMask = 0xfff;
+				lineMask &= ~ClientUtils.getLineMask(face.getOpposite());
+				ClientUtils.drawSelectionBoundingBox(wire.getSelectionBox(i + 1), lineMask);
+				lineMaskCenter &= ~ClientUtils.getLineMask(face);
+			}
+		}
+		if (lineMaskCenter != 0) {
+			ClientUtils.drawSelectionBoundingBox(wire.getSelectionBox(0), lineMaskCenter);
+		}
+	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)

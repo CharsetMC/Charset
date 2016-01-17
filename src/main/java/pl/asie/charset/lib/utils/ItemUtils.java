@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 
 public final class ItemUtils {
 	private ItemUtils() {
-		
+
 	}
 
 	public static boolean equals(ItemStack source, ItemStack target, boolean matchStackSize, boolean matchDamage, boolean matchNBT) {
@@ -40,7 +40,7 @@ public final class ItemUtils {
 			return true;
 		}
 	}
-	
+
 	public static void spawnItemEntity(World world, double x, double y, double z, ItemStack stack, float mXm, float mYm, float mZm) {
 		EntityItem entityItem = new EntityItem(world, x, y, z, stack);
 		entityItem.setDefaultPickupDelay();

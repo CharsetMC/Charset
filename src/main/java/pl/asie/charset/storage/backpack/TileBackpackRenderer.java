@@ -19,27 +19,27 @@ import pl.asie.charset.storage.ProxyClient;
  * Created by asie on 1/10/16.
  */
 public class TileBackpackRenderer extends TileEntitySpecialRenderer<TileBackpack> {
-    @Override
-    public void renderTileEntityAt(TileBackpack te, double x, double y, double z, float partialTicks, int destroyStage) {
-        BlockPos pos = te.getPos();
-        IBlockState state = getWorld().getBlockState(pos);
+	@Override
+	public void renderTileEntityAt(TileBackpack te, double x, double y, double z, float partialTicks, int destroyStage) {
+		BlockPos pos = te.getPos();
+		IBlockState state = getWorld().getBlockState(pos);
 
-        if (state.getBlock() instanceof BlockBackpack) {
-            Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+		if (state.getBlock() instanceof BlockBackpack) {
+			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
 
-            GlStateManager.pushMatrix();
-            GlStateManager.disableLighting();
+			GlStateManager.pushMatrix();
+			GlStateManager.disableLighting();
 
-            BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
+			BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 
-            GlStateManager.translate(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+			GlStateManager.translate(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
-            Tessellator.getInstance().getWorldRenderer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-            renderer.renderModel(getWorld(), ProxyClient.backpackTopModel[state.getValue(Properties.FACING4).ordinal() - 2], state, pos, Tessellator.getInstance().getWorldRenderer(), false);
-            Tessellator.getInstance().draw();
+			Tessellator.getInstance().getWorldRenderer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+			renderer.renderModel(getWorld(), ProxyClient.backpackTopModel[state.getValue(Properties.FACING4).ordinal() - 2], state, pos, Tessellator.getInstance().getWorldRenderer(), false);
+			Tessellator.getInstance().draw();
 
-            GlStateManager.enableLighting();
-            GlStateManager.popMatrix();
-        }
-    }
+			GlStateManager.enableLighting();
+			GlStateManager.popMatrix();
+		}
+	}
 }

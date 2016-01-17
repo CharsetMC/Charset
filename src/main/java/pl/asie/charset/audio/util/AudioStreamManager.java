@@ -14,7 +14,7 @@ public class AudioStreamManager {
 	public void set(int id, IAudioStream stream) {
 
 	}
-	
+
 	public IAudioStream get(int id) {
 		return null;
 	}

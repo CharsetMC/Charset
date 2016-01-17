@@ -22,12 +22,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import mcmultipart.multipart.IMultipart;
 
 public class PacketRegistry {
-    private EnumMap<Side, FMLEmbeddedChannel> channels;
+	private EnumMap<Side, FMLEmbeddedChannel> channels;
 	private TIntObjectMap<Class<? extends Packet>> idPacketMap = new TIntObjectHashMap<Class<? extends Packet>>();
 	private TObjectIntMap<Class<? extends Packet>> packetIdMap = new TObjectIntHashMap<Class<? extends Packet>>();
-    
+
 	public PacketRegistry(String channelName) {
-        channels = NetworkRegistry.INSTANCE.newChannel(channelName, new PacketChannelHandler(this));
+		channels = NetworkRegistry.INSTANCE.newChannel(channelName, new PacketChannelHandler(this));
 	}
 
 	public void registerPacket(int id, Class<? extends Packet> packet) {
@@ -35,16 +35,14 @@ public class PacketRegistry {
 		packetIdMap.put(packet, id);
 	}
 
-    public net.minecraft.network.Packet getPacketFrom(Packet message)
-    {
-        return channels.get(Side.SERVER).generatePacketFrom(message);
-    }
+	public net.minecraft.network.Packet getPacketFrom(Packet message) {
+		return channels.get(Side.SERVER).generatePacketFrom(message);
+	}
 
-    public void sendToAll(Packet message)
-    {
-        channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALL);
-        channels.get(Side.SERVER).writeOutbound(message);
-    }
+	public void sendToAll(Packet message) {
+		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALL);
+		channels.get(Side.SERVER).writeOutbound(message);
+	}
 
 	public void sendToWatching(Packet message, TileEntity tile) {
 		for (EntityPlayerMP player : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
@@ -58,47 +56,43 @@ public class PacketRegistry {
 		}
 	}
 
-    public void sendTo(Packet message, EntityPlayerMP player)
-    {
-        channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
-        channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-        channels.get(Side.SERVER).writeOutbound(message);
-    }
+	public void sendTo(Packet message, EntityPlayerMP player) {
+		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
+		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
+		channels.get(Side.SERVER).writeOutbound(message);
+	}
 
-    public void sendToAllAround(Packet message, NetworkRegistry.TargetPoint point)
-    {
-        channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
-        channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point);
-        channels.get(Side.SERVER).writeOutbound(message);
-    }
+	public void sendToAllAround(Packet message, NetworkRegistry.TargetPoint point) {
+		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
+		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point);
+		channels.get(Side.SERVER).writeOutbound(message);
+	}
 
-    public void sendToDimension(Packet message, int dimensionId)
-    {
-        channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.DIMENSION);
-        channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(dimensionId);
-        channels.get(Side.SERVER).writeOutbound(message);
-    }
+	public void sendToDimension(Packet message, int dimensionId) {
+		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.DIMENSION);
+		channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(dimensionId);
+		channels.get(Side.SERVER).writeOutbound(message);
+	}
 
-    public void sendToServer(Packet message)
-    {
-        channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.TOSERVER);
-        channels.get(Side.CLIENT).writeOutbound(message);
-    }
+	public void sendToServer(Packet message) {
+		channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.TOSERVER);
+		channels.get(Side.CLIENT).writeOutbound(message);
+	}
 
-    public void sendToAllAround(Packet packet, IMultipart entity,
-                                double d) {
-        this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),
-                entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
-    }
-
-	public void sendToAllAround(Packet packet, TileEntity entity,
-			double d) {
+	public void sendToAllAround(Packet packet, IMultipart entity,
+								double d) {
 		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),
 				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
 	}
-	
+
+	public void sendToAllAround(Packet packet, TileEntity entity,
+								double d) {
+		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),
+				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
+	}
+
 	public void sendToAllAround(Packet packet, Entity entity,
-			double d) {
+								double d) {
 		this.sendToAllAround(packet, new TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, d));
 	}
 

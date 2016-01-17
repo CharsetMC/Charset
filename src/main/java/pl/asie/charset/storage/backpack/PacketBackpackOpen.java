@@ -11,19 +11,19 @@ import pl.asie.charset.storage.ModCharsetStorage;
  * Created by asie on 1/12/16.
  */
 public class PacketBackpackOpen extends PacketEntity {
-    public PacketBackpackOpen() {
+	public PacketBackpackOpen() {
 
-    }
+	}
 
-    public PacketBackpackOpen(EntityPlayer player) {
-        super(player);
-    }
+	public PacketBackpackOpen(EntityPlayer player) {
+		super(player);
+	}
 
-    @Override
-    public void readData(ByteBuf buf) {
-        super.readData(buf);
-        if (entity instanceof EntityPlayer) {
-            ((EntityPlayer) entity).openGui(ModCharsetStorage.instance, 2, entity.worldObj, (int) entity.posX, (int) entity.posY, (int) entity.posZ);
-        }
-    }
+	@Override
+	public void readData(ByteBuf buf) {
+		super.readData(buf);
+		if (entity instanceof EntityPlayer) {
+			((EntityPlayer) entity).openGui(ModCharsetStorage.instance, 2, entity.worldObj, (int) entity.posX, (int) entity.posY, (int) entity.posZ);
+		}
+	}
 }

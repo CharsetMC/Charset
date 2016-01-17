@@ -37,11 +37,11 @@ public class ModCharsetAudio {
 	@SidedProxy(clientSide = "pl.asie.charset.audio.client.AudioStreamManagerClient", serverSide = "pl.asie.charset.audio.util.AudioStreamManager")
 	public static AudioStreamManager audio;
 
-    public static PacketRegistry packet;
+	public static PacketRegistry packet;
 	public static StorageManager storage;
 
 	public static BlockTapeDrive tapeDriveBlock;
-    public static BlockIronNote ironNoteBlock;
+	public static BlockIronNote ironNoteBlock;
 	public static ItemTape tapeItem;
 
 	@Mod.EventHandler
@@ -56,19 +56,19 @@ public class ModCharsetAudio {
 
 		ModCharsetLib.proxy.registerItemModel(tapeItem, 0, "charsetaudio:tape"); */
 
-        ironNoteBlock = new BlockIronNote();
-        GameRegistry.registerBlock(ironNoteBlock, "ironnoteblock");
-        ModCharsetLib.proxy.registerItemModel(ironNoteBlock, 0, "charsetaudio:ironnoteblock");
+		ironNoteBlock = new BlockIronNote();
+		GameRegistry.registerBlock(ironNoteBlock, "ironnoteblock");
+		ModCharsetLib.proxy.registerItemModel(ironNoteBlock, 0, "charsetaudio:ironnoteblock");
 	}
 
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        packet = new PacketRegistry(ModCharsetAudio.MODID);
-        packet.registerPacket(0x01, PacketNoteParticle.class);
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event) {
+		packet = new PacketRegistry(ModCharsetAudio.MODID);
+		packet.registerPacket(0x01, PacketNoteParticle.class);
 
-        GameRegistry.registerTileEntity(TileIronNote.class, "charset:ironnoteblock");
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ironNoteBlock), "iii", "iNi", "iii", 'i', "ingotIron", 'N', Blocks.noteblock));
-    }
+		GameRegistry.registerTileEntity(TileIronNote.class, "charset:ironnoteblock");
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ironNoteBlock), "iii", "iNi", "iii", 'i', "ingotIron", 'N', Blocks.noteblock));
+	}
 
 	@Mod.EventHandler
 	public void serverStart(FMLServerStartingEvent event) {

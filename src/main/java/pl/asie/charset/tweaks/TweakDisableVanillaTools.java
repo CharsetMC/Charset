@@ -21,34 +21,34 @@ public class TweakDisableVanillaTools extends Tweak {
 		super("tweaks", "disableVanillaTools", "Setting to 1 makes vanilla-type tools ineffective. Setting to 2 also tries to remove their recipes.", false, 2);
 	}
 
-    @Override
-    public boolean canTogglePostLoad() {
-        return false;
-    }
+	@Override
+	public boolean canTogglePostLoad() {
+		return false;
+	}
 
 	@Override
 	public void enable() {
-        Set<Item> itemSet = new HashSet<Item>();
-        for (ResourceLocation l : Item.itemRegistry.getKeys()) {
-            Item i = Item.itemRegistry.getObject(l);
-            if (i instanceof ItemPickaxe || i instanceof ItemAxe || i instanceof ItemSpade || i instanceof ItemSword) {
-                i.setMaxDamage(1);
-                itemSet.add(i);
-            }
-        }
-        if (getMode() >= 2) {
-            Iterator<IRecipe> iterator = CraftingManager.getInstance().getRecipeList().iterator();
-            while (iterator.hasNext()) {
-                ItemStack output = iterator.next().getRecipeOutput();
-                if (output != null && itemSet.contains(output.getItem())) {
-                    iterator.remove();
-                    itemSet.remove(output.getItem());
-                    ModCharsetLib.logger.info("Disabled " + Item.itemRegistry.getNameForObject(output.getItem()).toString() + " (removed recipe)");
-                }
-            }
-        }
-        for (Item i : itemSet) {
-            ModCharsetLib.logger.info("Disabled " + Item.itemRegistry.getNameForObject(i).toString());
-        }
+		Set<Item> itemSet = new HashSet<Item>();
+		for (ResourceLocation l : Item.itemRegistry.getKeys()) {
+			Item i = Item.itemRegistry.getObject(l);
+			if (i instanceof ItemPickaxe || i instanceof ItemAxe || i instanceof ItemSpade || i instanceof ItemSword) {
+				i.setMaxDamage(1);
+				itemSet.add(i);
+			}
+		}
+		if (getMode() >= 2) {
+			Iterator<IRecipe> iterator = CraftingManager.getInstance().getRecipeList().iterator();
+			while (iterator.hasNext()) {
+				ItemStack output = iterator.next().getRecipeOutput();
+				if (output != null && itemSet.contains(output.getItem())) {
+					iterator.remove();
+					itemSet.remove(output.getItem());
+					ModCharsetLib.logger.info("Disabled " + Item.itemRegistry.getNameForObject(output.getItem()).toString() + " (removed recipe)");
+				}
+			}
+		}
+		for (Item i : itemSet) {
+			ModCharsetLib.logger.info("Disabled " + Item.itemRegistry.getNameForObject(i).toString());
+		}
 	}
 }

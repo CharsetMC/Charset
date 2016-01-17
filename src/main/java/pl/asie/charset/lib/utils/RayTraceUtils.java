@@ -73,8 +73,8 @@ public final class RayTraceUtils {
 	}
 
 	public static MovingObjectPosition getCollision(BlockPos pos, Vec3 start, Vec3 end, AxisAlignedBB aabb, int subHit) {
-		start = start.addVector((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
-		end = end.addVector((double)(-pos.getX()), (double)(-pos.getY()), (double)(-pos.getZ()));
+		start = start.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+		end = end.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
 
 		Vec3 vec3 = start.getIntermediateWithXValue(end, aabb.minX);
 		Vec3 vec31 = start.getIntermediateWithXValue(end, aabb.maxX);
@@ -83,107 +83,86 @@ public final class RayTraceUtils {
 		Vec3 vec34 = start.getIntermediateWithZValue(end, aabb.minZ);
 		Vec3 vec35 = start.getIntermediateWithZValue(end, aabb.maxZ);
 
-		if (!isVecInsideYZBounds(aabb, vec3))
-		{
+		if (!isVecInsideYZBounds(aabb, vec3)) {
 			vec3 = null;
 		}
 
-		if (!isVecInsideYZBounds(aabb, vec31))
-		{
+		if (!isVecInsideYZBounds(aabb, vec31)) {
 			vec31 = null;
 		}
 
-		if (!isVecInsideXZBounds(aabb, vec32))
-		{
+		if (!isVecInsideXZBounds(aabb, vec32)) {
 			vec32 = null;
 		}
 
-		if (!isVecInsideXZBounds(aabb, vec33))
-		{
+		if (!isVecInsideXZBounds(aabb, vec33)) {
 			vec33 = null;
 		}
 
-		if (!isVecInsideXYBounds(aabb, vec34))
-		{
+		if (!isVecInsideXYBounds(aabb, vec34)) {
 			vec34 = null;
 		}
 
-		if (!isVecInsideXYBounds(aabb, vec35))
-		{
+		if (!isVecInsideXYBounds(aabb, vec35)) {
 			vec35 = null;
 		}
 
 		Vec3 vec36 = null;
 
-		if (vec3 != null && (vec36 == null || start.squareDistanceTo(vec3) < start.squareDistanceTo(vec36)))
-		{
+		if (vec3 != null && (vec36 == null || start.squareDistanceTo(vec3) < start.squareDistanceTo(vec36))) {
 			vec36 = vec3;
 		}
 
-		if (vec31 != null && (vec36 == null || start.squareDistanceTo(vec31) < start.squareDistanceTo(vec36)))
-		{
+		if (vec31 != null && (vec36 == null || start.squareDistanceTo(vec31) < start.squareDistanceTo(vec36))) {
 			vec36 = vec31;
 		}
 
-		if (vec32 != null && (vec36 == null || start.squareDistanceTo(vec32) < start.squareDistanceTo(vec36)))
-		{
+		if (vec32 != null && (vec36 == null || start.squareDistanceTo(vec32) < start.squareDistanceTo(vec36))) {
 			vec36 = vec32;
 		}
 
-		if (vec33 != null && (vec36 == null || start.squareDistanceTo(vec33) < start.squareDistanceTo(vec36)))
-		{
+		if (vec33 != null && (vec36 == null || start.squareDistanceTo(vec33) < start.squareDistanceTo(vec36))) {
 			vec36 = vec33;
 		}
 
-		if (vec34 != null && (vec36 == null || start.squareDistanceTo(vec34) < start.squareDistanceTo(vec36)))
-		{
+		if (vec34 != null && (vec36 == null || start.squareDistanceTo(vec34) < start.squareDistanceTo(vec36))) {
 			vec36 = vec34;
 		}
 
-		if (vec35 != null && (vec36 == null || start.squareDistanceTo(vec35) < start.squareDistanceTo(vec36)))
-		{
+		if (vec35 != null && (vec36 == null || start.squareDistanceTo(vec35) < start.squareDistanceTo(vec36))) {
 			vec36 = vec35;
 		}
 
-		if (vec36 == null)
-		{
+		if (vec36 == null) {
 			return null;
-		}
-		else
-		{
+		} else {
 			EnumFacing enumfacing = null;
 
-			if (vec36 == vec3)
-			{
+			if (vec36 == vec3) {
 				enumfacing = EnumFacing.WEST;
 			}
 
-			if (vec36 == vec31)
-			{
+			if (vec36 == vec31) {
 				enumfacing = EnumFacing.EAST;
 			}
 
-			if (vec36 == vec32)
-			{
+			if (vec36 == vec32) {
 				enumfacing = EnumFacing.DOWN;
 			}
 
-			if (vec36 == vec33)
-			{
+			if (vec36 == vec33) {
 				enumfacing = EnumFacing.UP;
 			}
 
-			if (vec36 == vec34)
-			{
+			if (vec36 == vec34) {
 				enumfacing = EnumFacing.NORTH;
 			}
 
-			if (vec36 == vec35)
-			{
+			if (vec36 == vec35) {
 				enumfacing = EnumFacing.SOUTH;
 			}
 
-			MovingObjectPosition mop = new MovingObjectPosition(vec36.addVector((double)pos.getX(), (double)pos.getY(), (double)pos.getZ()), enumfacing, pos);
+			MovingObjectPosition mop = new MovingObjectPosition(vec36.addVector((double) pos.getX(), (double) pos.getY(), (double) pos.getZ()), enumfacing, pos);
 			mop.subHit = subHit;
 			return mop;
 		}

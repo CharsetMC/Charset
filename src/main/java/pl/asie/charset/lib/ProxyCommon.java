@@ -36,15 +36,15 @@ public class ProxyCommon {
 		return DimensionManager.getWorld(dim);
 	}
 
-    public boolean isClientThread() {
-        return false;
-    }
+	public boolean isClientThread() {
+		return false;
+	}
 
-    public void addScheduledClientTask(Runnable runnable) {
+	public void addScheduledClientTask(Runnable runnable) {
 
-    }
+	}
 
-    public boolean isClient() {
-        return false;
-    }
+	public boolean isClient() {
+		return false;
+	}
 }

@@ -21,7 +21,7 @@ import pl.asie.charset.wires.WireUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 public class RendererWireNormal extends RendererWireBase {
-	private final ModelRotation[] ROTATIONS = new ModelRotation[] {
+	private final ModelRotation[] ROTATIONS = new ModelRotation[]{
 			ModelRotation.X0_Y0,
 			ModelRotation.X180_Y0,
 			ModelRotation.X270_Y0,
@@ -84,15 +84,15 @@ public class RendererWireNormal extends RendererWireBase {
 	}
 
 	private boolean isCenterEdge(PartWireBase wire, WireFace side) {
-        // TODO
+		// TODO
 		//return wire.getWireType(side) != wire.getWireType(WireFace.CENTER);
-        return false;
+		return false;
 	}
 
 	private float getCL(PartWireBase wire, WireFace side) {
-        // TODO
+		// TODO
 		//float h = wire != null && wire.hasWire(side) ? wire.getWireKind(side).height() : 0;
-        float h = 0;
+		float h = 0;
 
 		if (wire != null && isCenterEdge(wire, side)) {
 			h = 0;
@@ -123,31 +123,31 @@ public class RendererWireNormal extends RendererWireBase {
 			configureRenderer(true, cmcX);
 
 			quads.add(
-				faceBakery.makeBakedQuad(
-					minX, maxX, getRenderColor(wire, WireFace.CENTER), new float[] {minX.getZ(), minX.getY(), maxX.getZ(), maxX.getY()},
-					getIcon(true, lit, false, i == 0 ? EnumFacing.WEST : EnumFacing.EAST), i == 0 ? EnumFacing.WEST : EnumFacing.EAST,
-					ModelRotation.X0_Y0, true
-				)
+					faceBakery.makeBakedQuad(
+							minX, maxX, getRenderColor(wire, WireFace.CENTER), new float[]{minX.getZ(), minX.getY(), maxX.getZ(), maxX.getY()},
+							getIcon(true, lit, false, i == 0 ? EnumFacing.WEST : EnumFacing.EAST), i == 0 ? EnumFacing.WEST : EnumFacing.EAST,
+							ModelRotation.X0_Y0, true
+					)
 			);
 
 			configureRenderer(true, cmcY);
 
 			quads.add(
-				faceBakery.makeBakedQuad(
-					minY, maxY, getRenderColor(wire, WireFace.CENTER), new float[]{minY.getX(), minY.getZ(), maxY.getX(), maxY.getZ()},
-					getIcon(true, lit, false, i == 0 ? EnumFacing.DOWN : EnumFacing.UP), i == 0 ? EnumFacing.DOWN : EnumFacing.UP,
-					ModelRotation.X0_Y0, true
-				)
+					faceBakery.makeBakedQuad(
+							minY, maxY, getRenderColor(wire, WireFace.CENTER), new float[]{minY.getX(), minY.getZ(), maxY.getX(), maxY.getZ()},
+							getIcon(true, lit, false, i == 0 ? EnumFacing.DOWN : EnumFacing.UP), i == 0 ? EnumFacing.DOWN : EnumFacing.UP,
+							ModelRotation.X0_Y0, true
+					)
 			);
 
 			configureRenderer(true, cmcZ);
 
 			quads.add(
-				faceBakery.makeBakedQuad(
-					minZ, maxZ, getRenderColor(wire, WireFace.CENTER), new float[]{minZ.getX(), minZ.getY(), maxZ.getX(), maxZ.getY()},
-					getIcon(true, lit, false, i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH), i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH,
-					ModelRotation.X0_Y0, true
-				)
+					faceBakery.makeBakedQuad(
+							minZ, maxZ, getRenderColor(wire, WireFace.CENTER), new float[]{minZ.getX(), minZ.getY(), maxZ.getX(), maxZ.getY()},
+							getIcon(true, lit, false, i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH), i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH,
+							ModelRotation.X0_Y0, true
+					)
 			);
 
 			if (i == 0) {
@@ -174,7 +174,7 @@ public class RendererWireNormal extends RendererWireBase {
 						faceBakery.makeBakedQuad(
 								new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
 								getRenderColor(wire, WireFace.CENTER),
-								f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[] {max, min, min, max} : new float[] {min, min, max, max},
+								f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[]{max, min, min, max} : new float[]{min, min, max, max},
 								getIcon(false, lit, true, f), EnumFacing.DOWN, ROTATIONS[f.ordinal()], true
 						)
 				);
@@ -189,11 +189,11 @@ public class RendererWireNormal extends RendererWireBase {
 
 		// Edge faces
 
-		float[] edgeUV = new float[] {min, 0, max, height};
-		float[] edgeUVFlipped = new float[] {max, 0, min, height};
+		float[] edgeUV = new float[]{min, 0, max, height};
+		float[] edgeUVFlipped = new float[]{max, 0, min, height};
 
 		if (dir == EnumFacing.NORTH) {
-			float[] topUV = new float[] {min, 16 - height, max, 16};
+			float[] topUV = new float[]{min, 16 - height, max, 16};
 
 			configureRenderer(true, 15);
 
@@ -231,7 +231,7 @@ public class RendererWireNormal extends RendererWireBase {
 					)
 			);
 		} else if (dir == EnumFacing.SOUTH) {
-			float[] topUV = new float[] {min, 0, max, height};
+			float[] topUV = new float[]{min, 0, max, height};
 
 			configureRenderer(true, 15);
 
@@ -269,7 +269,7 @@ public class RendererWireNormal extends RendererWireBase {
 					)
 			);
 		} else if (dir == EnumFacing.WEST) {
-			float[] topUV = new float[] {16 - height, min, 16, max};
+			float[] topUV = new float[]{16 - height, min, 16, max};
 
 			configureRenderer(true, 15);
 
@@ -307,7 +307,7 @@ public class RendererWireNormal extends RendererWireBase {
 					)
 			);
 		} else if (dir == EnumFacing.EAST) {
-			float[] topUV = new float[] {0, min, height, max};
+			float[] topUV = new float[]{0, min, height, max};
 
 			configureRenderer(true, 15);
 
@@ -357,9 +357,9 @@ public class RendererWireNormal extends RendererWireBase {
 		float max = 8.0f + (width / 2);
 		float minH = 0.0f;
 		float maxH = height;
-        EnumFacing[] dirs = WireUtils.getConnectionsForRender(side);
-		
-		boolean[] connectionMatrix = new boolean[] {
+		EnumFacing[] dirs = WireUtils.getConnectionsForRender(side);
+
+		boolean[] connectionMatrix = new boolean[]{
 				wire == null ? true : wire.connectsAny(dirs[0]),
 				wire == null ? true : wire.connectsAny(dirs[1]),
 				wire == null ? true : wire.connectsAny(dirs[2]),
@@ -367,7 +367,7 @@ public class RendererWireNormal extends RendererWireBase {
 		};
 		int cmc = (connectionMatrix[0] ? 8 : 0) | (connectionMatrix[1] ? 4 : 0) | (connectionMatrix[2] ? 2 : 0) | (connectionMatrix[3] ? 1 : 0);
 
- 		boolean[] cornerConnectionMatrix = new boolean[] {
+		boolean[] cornerConnectionMatrix = new boolean[]{
 				wire == null ? true : wire.connectsCorner(dirs[0]),
 				wire == null ? true : wire.connectsCorner(dirs[1]),
 				wire == null ? true : wire.connectsCorner(dirs[2]),
@@ -399,7 +399,7 @@ public class RendererWireNormal extends RendererWireBase {
 		quads.add(
 				faceBakery.makeBakedQuad(
 						from, to,
-						getRenderColor(wire, side), new float[] {from.getX(), from.getZ(), to.getX(), to.getZ()},
+						getRenderColor(wire, side), new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
 						getIcon(true, lit, false, EnumFacing.UP), EnumFacing.UP,
 						rot, true
 				)
@@ -410,7 +410,7 @@ public class RendererWireNormal extends RendererWireBase {
 		quads.add(
 				faceBakery.makeBakedQuad(
 						from, to,
-						getRenderColor(wire, side), new float[] {from.getX(), from.getZ(), to.getX(), to.getZ()},
+						getRenderColor(wire, side), new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
 						getIcon(true, lit, false, EnumFacing.DOWN), EnumFacing.DOWN, rot, true
 				)
 		);
@@ -428,19 +428,19 @@ public class RendererWireNormal extends RendererWireBase {
 		boolean crossroadsZ = connectionMatrix[0] && !connectionMatrix[1];
 
 		quads.add(
-			faceBakery.makeBakedQuad(
-				fromX, toX,
-				getRenderColor(wire, side), new float[] {fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-				getIcon(false, lit, cmc == 1, crossroadsX, EnumFacing.WEST), EnumFacing.WEST, rot, false
-			)
+				faceBakery.makeBakedQuad(
+						fromX, toX,
+						getRenderColor(wire, side), new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
+						getIcon(false, lit, cmc == 1, crossroadsX, EnumFacing.WEST), EnumFacing.WEST, rot, false
+				)
 		);
 
 		quads.add(
-			faceBakery.makeBakedQuad(
-				fromZ, toZ,
-				getRenderColor(wire, side), new float[] {toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
-				getIcon(false, lit, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
-			)
+				faceBakery.makeBakedQuad(
+						fromZ, toZ,
+						getRenderColor(wire, side), new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
+						getIcon(false, lit, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
+				)
 		);
 
 		fromX.setX(max);
@@ -450,66 +450,66 @@ public class RendererWireNormal extends RendererWireBase {
 		toZ.setZ(max);
 
 		quads.add(
-			faceBakery.makeBakedQuad(
-				fromX, toX,
-				getRenderColor(wire, side), new float[] {toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
-				getIcon(false, lit, cmc == 2, crossroadsX, EnumFacing.EAST), EnumFacing.EAST, rot, false
-			)
+				faceBakery.makeBakedQuad(
+						fromX, toX,
+						getRenderColor(wire, side), new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
+						getIcon(false, lit, cmc == 2, crossroadsX, EnumFacing.EAST), EnumFacing.EAST, rot, false
+				)
 		);
 
 		quads.add(
-			faceBakery.makeBakedQuad(
-				fromZ, toZ,
-				getRenderColor(wire, side), new float[] {fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-				getIcon(false, lit, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
-			)
+				faceBakery.makeBakedQuad(
+						fromZ, toZ,
+						getRenderColor(wire, side), new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
+						getIcon(false, lit, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
+				)
 		);
 
 		// Edge faces
-		float[] edgeUV = new float[] {min, minH, max, maxH};
-		float[] edgeUVFlipped = new float[] {max, minH, min, maxH};
+		float[] edgeUV = new float[]{min, minH, max, maxH};
+		float[] edgeUVFlipped = new float[]{max, minH, min, maxH};
 
 		if (connectionMatrix[0]) {
 			quads.add(
-				faceBakery.makeBakedQuad(
-					new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
-					getRenderColor(wire, side), edgeUVFlipped,
-					getIcon(false, lit, true, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
-				)
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(false, lit, true, EnumFacing.NORTH), EnumFacing.NORTH, rot, false
+					)
 			);
 		}
 
 		if (connectionMatrix[1]) {
 			quads.add(
-				faceBakery.makeBakedQuad(
-					new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
-					getRenderColor(wire, side), edgeUV,
-						getIcon(false, lit, true, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
-				)
+					faceBakery.makeBakedQuad(
+							new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(false, lit, true, EnumFacing.SOUTH), EnumFacing.SOUTH, rot, false
+					)
 			);
 		}
 
 		if (connectionMatrix[2]) {
 			quads.add(
-				faceBakery.makeBakedQuad(
-					new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
-					getRenderColor(wire, side), edgeUV,
-						getIcon(false, lit, true, EnumFacing.WEST), EnumFacing.WEST, rot, false
-				)
+					faceBakery.makeBakedQuad(
+							new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
+							getRenderColor(wire, side), edgeUV,
+							getIcon(false, lit, true, EnumFacing.WEST), EnumFacing.WEST, rot, false
+					)
 			);
 		}
 
 		if (connectionMatrix[3]) {
 			quads.add(
-				faceBakery.makeBakedQuad(
-					new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
-					getRenderColor(wire, side), edgeUVFlipped,
-						getIcon(false, lit, true, EnumFacing.EAST), EnumFacing.EAST, rot, false
-				)
+					faceBakery.makeBakedQuad(
+							new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
+							getRenderColor(wire, side), edgeUVFlipped,
+							getIcon(false, lit, true, EnumFacing.EAST), EnumFacing.EAST, rot, false
+					)
 			);
 		}
 
-        EnumFacing[] dirs0 = WireUtils.getConnectionsForRender(WireFace.DOWN);
+		EnumFacing[] dirs0 = WireUtils.getConnectionsForRender(WireFace.DOWN);
 		for (int i = 0; i < 4; i++) {
 			if (cornerConnectionMatrix[i]) {
 				addCorner(wire, side, dirs0[i], lit, quads);

@@ -26,26 +26,26 @@ import pl.asie.charset.wires.logic.PartWireProvider;
 public class ItemWire extends ItemMultiPart {
 	public ItemWire() {
 		setHasSubtypes(true);
-        setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+		setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 	}
 
-    @Override
-    public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
-        if (!isFreestanding(stack) && !WireUtils.canPlaceWire(world, pos.offset(side), side.getOpposite())) {
-            return false;
-        }
+	@Override
+	public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
+		if (!isFreestanding(stack) && !WireUtils.canPlaceWire(world, pos.offset(side), side.getOpposite())) {
+			return false;
+		}
 
-        return super.place(world, pos, side, hit, stack, player);
-    }
+		return super.place(world, pos, side, hit, stack, player);
+	}
 
-    @Override
-    public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
-        PartWireBase part = PartWireProvider.createPart(stack.getItemDamage() >> 1);
-        part.location = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(facing);
-        return part;
-    }
+	@Override
+	public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
+		PartWireBase part = PartWireProvider.createPart(stack.getItemDamage() >> 1);
+		part.location = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(facing);
+		return part;
+	}
 
-    @Override
+	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		for (int i = 0; i < 18 * 2; i++) {

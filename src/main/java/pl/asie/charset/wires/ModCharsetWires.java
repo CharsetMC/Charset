@@ -21,7 +21,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.wires.logic.PartWireProvider;
 
 @Mod(modid = ModCharsetWires.MODID, name = ModCharsetWires.NAME, version = ModCharsetWires.VERSION,
-	dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetWires {
 	public static final String MODID = "CharsetWires";
 	public static final String NAME = "+";
@@ -34,19 +34,19 @@ public class ModCharsetWires {
 
 	public static ItemWire wire;
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        MultipartRegistry.registerPartFactory(new PartWireProvider(), "charsetwires:wire");
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		MultipartRegistry.registerPartFactory(new PartWireProvider(), "charsetwires:wire");
 
-        wire = new ItemWire();
-        GameRegistry.registerItem(wire, "wire");
+		wire = new ItemWire();
+		GameRegistry.registerItem(wire, "wire");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		for (int i = 0; i < 2 * 18; i++) {
 			ModCharsetLib.proxy.registerItemModel(wire, i, "charsetwires:wire");
 		}
-    }
+	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
@@ -68,7 +68,7 @@ public class ModCharsetWires {
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 1, 34),
 				"sws", "www", "sws", 'w', "charsetWireInsulated", 's', Items.string
-				));
+		));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 1, 35),
 				"sws", "www", "sws", 'w', "charsetWireInsulatedFreestanding", 's', Items.string
 		));
@@ -79,7 +79,7 @@ public class ModCharsetWires {
 		}
 	}
 
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-    }
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+	}
 }

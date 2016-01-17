@@ -17,51 +17,51 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public class TweakMobControl extends Tweak {
-    private Set<Class<? extends Entity>> disabledClasses = new HashSet<Class<? extends Entity>>();
-    private Configuration config;
+	private Set<Class<? extends Entity>> disabledClasses = new HashSet<Class<? extends Entity>>();
+	private Configuration config;
 
-    public TweakMobControl() {
-        super("tweaks", "mobControl", "Control mob spawning. Upon enabling, refer to 'tweaks-mobcontrol.cfg'.", false);
-    }
+	public TweakMobControl() {
+		super("tweaks", "mobControl", "Control mob spawning. Upon enabling, refer to 'tweaks-mobcontrol.cfg'.", false);
+	}
 
-    private void reloadConfig() {
-        config = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks-mobcontrol.cfg"));
+	private void reloadConfig() {
+		config = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks-mobcontrol.cfg"));
 
-        for (String s : EntityList.getEntityNameList()) {
-            Class<? extends Entity> entity = EntityList.stringToClassMapping.get(s);
-            if (entity != null && EntityLiving.class.isAssignableFrom(entity)) {
-                boolean enabled = config.get("allow", s, true, null).getBoolean();
-                if (!enabled) {
-                    disabledClasses.add(entity);
-                }
-            }
-        }
+		for (String s : EntityList.getEntityNameList()) {
+			Class<? extends Entity> entity = EntityList.stringToClassMapping.get(s);
+			if (entity != null && EntityLiving.class.isAssignableFrom(entity)) {
+				boolean enabled = config.get("allow", s, true, null).getBoolean();
+				if (!enabled) {
+					disabledClasses.add(entity);
+				}
+			}
+		}
 
-        config.save();
-    }
+		config.save();
+	}
 
-    @Override
-    public void enable() {
-        reloadConfig();
-        MinecraftForge.EVENT_BUS.register(this);
-    }
+	@Override
+	public void enable() {
+		reloadConfig();
+		MinecraftForge.EVENT_BUS.register(this);
+	}
 
-    @Override
-    public void disable() {
-        MinecraftForge.EVENT_BUS.unregister(this);
-    }
+	@Override
+	public void disable() {
+		MinecraftForge.EVENT_BUS.unregister(this);
+	}
 
-    @SubscribeEvent
-    public void checkSpawn(LivingSpawnEvent.CheckSpawn event) {
-        if (disabledClasses.contains(event.entity.getClass())) {
-            event.setResult(Event.Result.DENY);
-        }
-    }
+	@SubscribeEvent
+	public void checkSpawn(LivingSpawnEvent.CheckSpawn event) {
+		if (disabledClasses.contains(event.entity.getClass())) {
+			event.setResult(Event.Result.DENY);
+		}
+	}
 
-    @SubscribeEvent
-    public void checkJoinWorld(EntityJoinWorldEvent event) {
-        if (disabledClasses.contains(event.entity.getClass())) {
-            event.setCanceled(true);
-        }
-    }
+	@SubscribeEvent
+	public void checkJoinWorld(EntityJoinWorldEvent event) {
+		if (disabledClasses.contains(event.entity.getClass())) {
+			event.setCanceled(true);
+		}
+	}
 }

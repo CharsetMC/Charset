@@ -28,55 +28,55 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		}
 	};
 
-    @Override
-    public void renderMultipartAt(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage) {
-        if (part == null) {
-            return;
-        }
+	@Override
+	public void renderMultipartAt(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage) {
+		if (part == null) {
+			return;
+		}
 
-        synchronized (part.getPipeItems()) {
-            for (PipeItem item : part.getPipeItems()) {
-                EntityItem itemEntity = new EntityItem(part.getWorld(), part.getPos().getX(), part.getPos().getY(), part.getPos().getZ(), item.getStack());
-                itemEntity.hoverStart = 0;
+		synchronized (part.getPipeItems()) {
+			for (PipeItem item : part.getPipeItems()) {
+				EntityItem itemEntity = new EntityItem(part.getWorld(), part.getPos().getX(), part.getPos().getY(), part.getPos().getZ(), item.getStack());
+				itemEntity.hoverStart = 0;
 
-                EnumFacing id = item.getDirection();
-                double ix, iy, iz;
+				EnumFacing id = item.getDirection();
+				double ix, iy, iz;
 
-                if (id == null) {
-                    ix = 0.5;
-                    iy = 0.5;
-                    iz = 0.5;
-                } else if (item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
-                    ix = item.getX();
-                    iy = item.getY();
-                    iz = item.getZ();
-                } else {
-                    ix = item.getX() + ((float) id.getFrontOffsetX() * PipeItem.SPEED / PipeItem.MAX_PROGRESS * partialTicks);
-                    iy = item.getY() + ((float) id.getFrontOffsetY() * PipeItem.SPEED / PipeItem.MAX_PROGRESS * partialTicks);
-                    iz = item.getZ() + ((float) id.getFrontOffsetZ() * PipeItem.SPEED / PipeItem.MAX_PROGRESS * partialTicks);
-                }
+				if (id == null) {
+					ix = 0.5;
+					iy = 0.5;
+					iz = 0.5;
+				} else if (item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
+					ix = item.getX();
+					iy = item.getY();
+					iz = item.getZ();
+				} else {
+					ix = item.getX() + ((float) id.getFrontOffsetX() * PipeItem.SPEED / PipeItem.MAX_PROGRESS * partialTicks);
+					iy = item.getY() + ((float) id.getFrontOffsetY() * PipeItem.SPEED / PipeItem.MAX_PROGRESS * partialTicks);
+					iz = item.getZ() + ((float) id.getFrontOffsetZ() * PipeItem.SPEED / PipeItem.MAX_PROGRESS * partialTicks);
+				}
 
-                if (id != null) {
-                    PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
+				if (id != null) {
+					PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
 
-                    switch (id.ordinal() >> 1) {
-                        case 0:
-                        case 1:
-                            ix += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-                            break;
-                        case 2:
-                            iz += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-                            break;
-                    }
-                }
+					switch (id.ordinal() >> 1) {
+						case 0:
+						case 1:
+							ix += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+							break;
+						case 2:
+							iz += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+							break;
+					}
+				}
 
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(x + ix, y + iy - 0.25, z + iz);
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(x + ix, y + iy - 0.25, z + iz);
 
-                RENDER_ITEM.doRender(itemEntity, 0, 0, 0, 0.0f, 0.0f);
+				RENDER_ITEM.doRender(itemEntity, 0, 0, 0, 0.0f, 0.0f);
 
-                GlStateManager.popMatrix();
-            }
-        }
-    }
+				GlStateManager.popMatrix();
+			}
+		}
+	}
 }

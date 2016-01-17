@@ -39,7 +39,7 @@ public class BlockShifter extends BlockContainer {
 
 	@Override
 	public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
-        return true;
+		return true;
 	}
 
 	@Override
@@ -124,8 +124,8 @@ public class BlockShifter extends BlockContainer {
 
 	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        PartPipe partForward = PipeUtils.getPipe(world, pos.offset(facing), facing.getOpposite());
-        PartPipe partBackward = PipeUtils.getPipe(world, pos.offset(facing.getOpposite()), facing);
+		PartPipe partForward = PipeUtils.getPipe(world, pos.offset(facing), facing.getOpposite());
+		PartPipe partBackward = PipeUtils.getPipe(world, pos.offset(facing.getOpposite()), facing);
 
 		if (partBackward instanceof PartPipe) {
 			return this.getStateFromMeta(facing.getOpposite().ordinal());

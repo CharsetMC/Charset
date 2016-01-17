@@ -30,13 +30,13 @@ public class TweakGraphite extends Tweak {
 		GameRegistry.registerItem(graphite, "graphite");
 
 		ModCharsetLib.proxy.registerItemModel(graphite, 0, "charsettweaks:graphite");
-        return true;
+		return true;
 	}
 
 	@Override
 	public boolean init() {
 		OreDictionary.registerOre("dyeBlack", graphite);
 		GameRegistry.addShapelessRecipe(new ItemStack(graphite, 2, 0), new ItemStack(Items.coal, 1, 1));
-        return true;
+		return true;
 	}
 }

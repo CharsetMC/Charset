@@ -114,7 +114,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 					if (slot != null) {
 						ItemStack source = slot.get();
 						if (source != null && matches(source)) {
-                            int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
+							int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
 							ItemStack stack = slot.remove(maxSize, true);
 							if (stack != null) {
 								if (output.injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
@@ -186,13 +186,13 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			worldObj.notifyBlockOfStateChange(pos, getBlockType());
 		}
 
-        EnumFacing direction = getDirection();
-        PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
-        if (output != null) {
-            if ((getMode() == Mode.Extract && !output.connects(direction.getOpposite()))
-                    || (getMode() == Mode.Shift && output.connects(direction.getOpposite()))) {
-                worldObj.notifyBlockOfStateChange(pos.offset(getDirection()), getBlockType());
-            }
-        }
+		EnumFacing direction = getDirection();
+		PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
+		if (output != null) {
+			if ((getMode() == Mode.Extract && !output.connects(direction.getOpposite()))
+					|| (getMode() == Mode.Shift && output.connects(direction.getOpposite()))) {
+				worldObj.notifyBlockOfStateChange(pos.offset(getDirection()), getBlockType());
+			}
+		}
 	}
 }

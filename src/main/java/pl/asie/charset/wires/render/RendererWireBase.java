@@ -88,13 +88,13 @@ public abstract class RendererWireBase implements ISmartMultipartModel, ISmartIt
 
 	public abstract void loadTextures(TextureMap map);
 
-    @Override
-    public VertexFormat getFormat() {
-        return DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL;
-    }
+	@Override
+	public VertexFormat getFormat() {
+		return DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL;
+	}
 
 	@Override
- 	public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
+	public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
 		this.transform = cameraTransformType;
 		return new ImmutablePair<RendererWireBase, Matrix4f>(this,
 				transformMap.containsKey(cameraTransformType) ? transformMap.get(cameraTransformType).getMatrix() : TRSRTransformation.identity().getMatrix());

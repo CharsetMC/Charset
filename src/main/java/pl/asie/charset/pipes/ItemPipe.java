@@ -12,13 +12,13 @@ import mcmultipart.multipart.IMultipart;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public class ItemPipe extends ItemMultiPart {
-    public ItemPipe() {
-        setUnlocalizedName("charset.pipe");
-        setCreativeTab(ModCharsetLib.CREATIVE_TAB);
-    }
+	public ItemPipe() {
+		setUnlocalizedName("charset.pipe");
+		setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+	}
 
-    @Override
-    public IMultipart createPart(World world, BlockPos blockPos, EnumFacing enumFacing, Vec3 vec3, ItemStack itemStack, EntityPlayer player) {
-        return new PartPipe();
-    }
+	@Override
+	public IMultipart createPart(World world, BlockPos blockPos, EnumFacing enumFacing, Vec3 vec3, ItemStack itemStack, EntityPlayer player) {
+		return new PartPipe();
+	}
 }

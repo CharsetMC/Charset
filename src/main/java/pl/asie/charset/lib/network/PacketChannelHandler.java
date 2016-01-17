@@ -16,24 +16,24 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, Packet> {
 	private final PacketRegistry registry;
 
-    public PacketChannelHandler(PacketRegistry registry) {
+	public PacketChannelHandler(PacketRegistry registry) {
 		this.registry = registry;
-    }
+	}
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Packet msg,
-			List<Object> out) throws Exception {
+						  List<Object> out) throws Exception {
 		PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
 		buffer.writeByte(registry.getPacketId(msg.getClass()));
-        msg.toBytes(buffer);
-        FMLProxyPacket proxy = new FMLProxyPacket(buffer, ctx.channel().attr(NetworkRegistry.FML_CHANNEL).get());
-        out.add(proxy);
+		msg.toBytes(buffer);
+		FMLProxyPacket proxy = new FMLProxyPacket(buffer, ctx.channel().attr(NetworkRegistry.FML_CHANNEL).get());
+		out.add(proxy);
 	}
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, FMLProxyPacket msg,
-			List<Object> out) throws Exception {
-        Packet newMsg = registry.instantiatePacket(msg.payload().readUnsignedByte());
+						  List<Object> out) throws Exception {
+		Packet newMsg = registry.instantiatePacket(msg.payload().readUnsignedByte());
 		if (newMsg != null) {
 			newMsg.fromBytes(msg.payload());
 		}

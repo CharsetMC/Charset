@@ -29,10 +29,10 @@ public class ModCharsetLib {
 	public static final String MODID = "CharsetLib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-    public static final String DEP_MCMP = "required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart";
-    public static final String DEP_NO_MCMP = "required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
+	public static final String DEP_MCMP = "required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart";
+	public static final String DEP_NO_MCMP = "required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
 
-    @Mod.Instance(value = ModCharsetLib.MODID)
+	@Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;
 
 	@SidedProxy(clientSide = "pl.asie.charset.lib.ProxyClient", serverSide = "pl.asie.charset.lib.ProxyCommon")
@@ -56,7 +56,7 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-        CharsetHelper.instance = new CharsetHelperImpl();
+		CharsetHelper.instance = new CharsetHelperImpl();
 
 		logger = LogManager.getLogger(MODID);
 
@@ -74,9 +74,9 @@ public class ModCharsetLib {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
-        ColorUtils.initialize();
+		ColorUtils.initialize();
 
-        GameRegistry.addRecipe(new RecipeDyeableItem());
-        RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+		GameRegistry.addRecipe(new RecipeDyeableItem());
+		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 	}
 }

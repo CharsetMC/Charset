@@ -29,17 +29,17 @@ public abstract class PacketPart extends Packet {
 		int x = buf.readInt();
 		int y = buf.readUnsignedShort();
 		int z = buf.readInt();
-        long l1 = buf.readLong();
-        long l2 = buf.readLong();
-        UUID id = new UUID(l1, l2);
+		long l1 = buf.readLong();
+		long l2 = buf.readLong();
+		UUID id = new UUID(l1, l2);
 
 		World w = ModCharsetLib.proxy.getLocalWorld(dim);
 
 		if (w != null) {
-            IMultipartContainer container = MultipartHelper.getPartContainer(w, new BlockPos(x, y, z));
-            if (container != null) {
-                part = container.getPartFromID(id);
-            }
+			IMultipartContainer container = MultipartHelper.getPartContainer(w, new BlockPos(x, y, z));
+			if (container != null) {
+				part = container.getPartFromID(id);
+			}
 		}
 	}
 
@@ -49,8 +49,8 @@ public abstract class PacketPart extends Packet {
 		buf.writeInt(part.getPos().getX());
 		buf.writeShort(part.getPos().getY());
 		buf.writeInt(part.getPos().getZ());
-        UUID id = part.getContainer().getPartID(part);
-        buf.writeLong(id.getMostSignificantBits());
-        buf.writeLong(id.getLeastSignificantBits());
+		UUID id = part.getContainer().getPartID(part);
+		buf.writeLong(id.getMostSignificantBits());
+		buf.writeLong(id.getLeastSignificantBits());
 	}
 }

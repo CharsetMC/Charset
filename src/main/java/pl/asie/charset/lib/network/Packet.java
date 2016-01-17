@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public abstract class Packet implements IMessage {
 	public abstract void readData(ByteBuf buf);
+
 	public abstract void writeData(ByteBuf buf);
 
 	@Override

@@ -19,86 +19,86 @@ import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.lib.recipe.IDyeableItem;
 
 public class ItemBackpack extends ItemBlock implements IDyeableItem {
-    public class InventoryOwnerBackpack implements IInventoryOwner {
-        public final ItemStack stack;
+	public class InventoryOwnerBackpack implements IInventoryOwner {
+		public final ItemStack stack;
 
-        protected InventoryOwnerBackpack(ItemStack stack) {
-            this.stack = stack;
-        }
+		protected InventoryOwnerBackpack(ItemStack stack) {
+			this.stack = stack;
+		}
 
-        @Override
-        public void onInventoryChanged(IInventory inventory) {
-            ((InventorySimple) inventory).writeToNBT(stack.getTagCompound(), "items");
-        }
-    }
+		@Override
+		public void onInventoryChanged(IInventory inventory) {
+			((InventorySimple) inventory).writeToNBT(stack.getTagCompound(), "items");
+		}
+	}
 
-    public ItemBackpack(Block block) {
-        super(block);
-    }
+	public ItemBackpack(Block block) {
+		super(block);
+	}
 
-    public static ItemStack getBackpack(EntityPlayer player) {
-        ItemStack stack = player.getCurrentArmor(2);
-        if (stack != null && stack.getItem() instanceof ItemBackpack) {
-            return stack;
-        } else {
-            return null;
-        }
-    }
+	public static ItemStack getBackpack(EntityPlayer player) {
+		ItemStack stack = player.getCurrentArmor(2);
+		if (stack != null && stack.getItem() instanceof ItemBackpack) {
+			return stack;
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
-        return armorType == 1;
-    }
+	@Override
+	public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
+		return armorType == 1;
+	}
 
-    @Override
-    public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-        if (entity instanceof EntityPlayer) {
-            Container container = ((EntityPlayer) entity).inventoryContainer;
-            Slot slot = container.getSlot(6);
-            if (!(slot instanceof SlotArmorBackpack)) {
-                container.inventorySlots.set(6, new SlotArmorBackpack((EntityPlayer) entity, ((EntityPlayer) entity).inventory,
-                        slot.getSlotIndex(), slot.xDisplayPosition, slot.yDisplayPosition));
-            }
-        }
-    }
+	@Override
+	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
+		if (entity instanceof EntityPlayer) {
+			Container container = ((EntityPlayer) entity).inventoryContainer;
+			Slot slot = container.getSlot(6);
+			if (!(slot instanceof SlotArmorBackpack)) {
+				container.inventorySlots.set(6, new SlotArmorBackpack((EntityPlayer) entity, ((EntityPlayer) entity).inventory,
+						slot.getSlotIndex(), slot.xDisplayPosition, slot.yDisplayPosition));
+			}
+		}
+	}
 
-    @Override
-    public int getColor(ItemStack stack) {
-        return stack.hasTagCompound() && stack.getTagCompound().hasKey("color") ? stack.getTagCompound().getInteger("color") : -1;
-    }
+	@Override
+	public int getColor(ItemStack stack) {
+		return stack.hasTagCompound() && stack.getTagCompound().hasKey("color") ? stack.getTagCompound().getInteger("color") : -1;
+	}
 
-    @Override
-    public boolean hasColor(ItemStack stack) {
-        return getColor(stack) >= 0;
-    }
+	@Override
+	public boolean hasColor(ItemStack stack) {
+		return getColor(stack) >= 0;
+	}
 
-    @Override
-    public void setColor(ItemStack stack, int color) {
-        if (!stack.hasTagCompound()) {
-            stack.setTagCompound(new NBTTagCompound());
-        }
+	@Override
+	public void setColor(ItemStack stack, int color) {
+		if (!stack.hasTagCompound()) {
+			stack.setTagCompound(new NBTTagCompound());
+		}
 
-        stack.getTagCompound().setInteger("color", color);
-    }
+		stack.getTagCompound().setInteger("color", color);
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getColorFromItemStack(ItemStack stack, int renderPass) {
-        int color = getColor(stack);
-        return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getColorFromItemStack(ItemStack stack, int renderPass) {
+		int color = getColor(stack);
+		return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
+	}
 
-    public IInventory getInventory(ItemStack stack) {
-        if (stack.getItem() == this) {
-            if (!stack.hasTagCompound()) {
-                stack.setTagCompound(new NBTTagCompound());
-            }
+	public IInventory getInventory(ItemStack stack) {
+		if (stack.getItem() == this) {
+			if (!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
+			}
 
-            InventorySimple inventory = new InventorySimple(27, new InventoryOwnerBackpack(stack));
-            inventory.readFromNBT(stack.getTagCompound(), "items");
-            return inventory;
-        } else {
-            return null;
-        }
-    }
+			InventorySimple inventory = new InventorySimple(27, new InventoryOwnerBackpack(stack));
+			inventory.readFromNBT(stack.getTagCompound(), "items");
+			return inventory;
+		} else {
+			return null;
+		}
+	}
 }
