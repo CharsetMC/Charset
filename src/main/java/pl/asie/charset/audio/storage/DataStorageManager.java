@@ -1,4 +1,4 @@
-package pl.asie.charset.audio.tape;
+package pl.asie.charset.audio.storage;
 
 import java.io.File;
 import java.util.Random;
@@ -8,11 +8,11 @@ import net.minecraftforge.common.DimensionManager;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.utils.MiscUtils;
 
-public class StorageManager {
+public class DataStorageManager {
 	private static Random rand = new Random();
 	private File saveDir;
 
-	public StorageManager() {
+	public DataStorageManager() {
 		File saveDirParent = new File(DimensionManager.getCurrentSaveRootDirectory(), "charset");
 		if (saveDirParent.exists() || saveDirParent.mkdir()) {
 			saveDir = new File(saveDirParent, "tape");
@@ -28,7 +28,7 @@ public class StorageManager {
 		return storageName + ".dsk";
 	}
 
-	private String generateRandomName() {
+	public String generateUID() {
 		int i;
 		int j = 16;
 
@@ -49,20 +49,11 @@ public class StorageManager {
 		return null;
 	}
 
-	public TapeStorage create(int size) {
-		String storageName = generateRandomName();
-		if (storageName != null) {
-			return get(storageName, size, 0);
-		} else {
-			return null;
-		}
-	}
-
 	public boolean exists(String name) {
 		return new File(saveDir, filename(name)).exists();
 	}
 
-	public TapeStorage get(String name, int size, int position) {
-		return new TapeStorage(name, new File(saveDir, filename(name)), size, position);
+	public File get(String name) {
+		return new File(saveDir, filename(name));
 	}
 }

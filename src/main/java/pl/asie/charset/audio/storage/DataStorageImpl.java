@@ -1,4 +1,4 @@
-package pl.asie.charset.audio.tape;
+package pl.asie.charset.audio.storage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,25 +7,38 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 
-public class TapeStorage {
+public class DataStorageImpl implements IDataStorage {
 	private String uniqueId;
 	private File file;
 	private int size;
 	private byte[] data;
 	private int position;
-	private boolean modified = false;
+	private boolean dirty = false;
 
-	protected TapeStorage(String uniqueId, File file, int size, int position) {
-		this.uniqueId = uniqueId;
-		this.file = file;
+	public DataStorageImpl() {
+
+	}
+
+	public boolean isInitialized() {
+		return data != null;
+	}
+
+	public void initialize(String id, int position, int size) {
+		if (id == null || id.length() == 0) {
+			this.uniqueId = ModCharsetAudio.storage.generateUID();
+		} else {
+			this.uniqueId = id;
+		}
+
+		this.file = ModCharsetAudio.storage.get(this.uniqueId);
+		this.position = position;
 		this.size = size;
 		this.data = new byte[size];
-		this.position = position;
 
 		if (!file.exists()) {
-			// Create new file
 			try {
 				file.createNewFile();
 				writeFile();
@@ -43,10 +56,6 @@ public class TapeStorage {
 
 	public String getUniqueId() {
 		return uniqueId;
-	}
-
-	public String getName() {
-		return "Tape";
 	}
 
 	public int getPosition() {
@@ -75,7 +84,7 @@ public class TapeStorage {
 	public int seek(int dir) {
 		int seek = trySeek(dir);
 		position += seek;
-		modified = true;
+		dirty = true;
 		return seek;
 	}
 
@@ -85,7 +94,7 @@ public class TapeStorage {
 		if (simulate) {
 			return (int) data[position] & 0xFF;
 		} else {
-			modified = true;
+			dirty = true;
 			return (int) data[position++] & 0xFF;
 		}
 	}
@@ -96,7 +105,7 @@ public class TapeStorage {
 		System.arraycopy(data, position + offset, v, 0, len);
 		if (!simulate) {
 			position += len;
-			modified = true;
+			dirty = true;
 		}
 
 		return len;
@@ -109,7 +118,7 @@ public class TapeStorage {
 	public void write(byte v) {
 		if (position >= size) return;
 
-		modified = true;
+		dirty = true;
 		data[position++] = v;
 	}
 
@@ -120,7 +129,7 @@ public class TapeStorage {
 		System.arraycopy(v, 0, data, position, len);
 		position += len;
 
-		modified = true;
+		dirty = true;
 		return len;
 	}
 
@@ -164,19 +173,12 @@ public class TapeStorage {
 		stream.close();
 		fileStream.close();
 
-		modified = false;
+		dirty = false;
 	}
 
-	public void writeFileIfModified() throws IOException {
-		if (modified) writeFile();
-	}
-
-	public void onStorageUnload() {
-		try {
-			writeFileIfModified();
-		} catch (Exception e) {
-			ModCharsetAudio.logger.error("Could not save tape! (id: " + this.getUniqueId() + ")");
-			e.printStackTrace();
+	public void onUnload() throws IOException {
+		if (dirty) {
+			writeFile();
 		}
 	}
 }

@@ -8,7 +8,7 @@ NOTE, len is in bytes relative to DFPWM (len*8 PCM bytes)
 also the main() function takes unsigned 8-bit data and converts it to suit
 */
 
-package pl.asie.charset.audio.util;
+package pl.asie.charset.lib.utils;
 
 public class DFPWM {
 	private final int RESP_INC = 7;

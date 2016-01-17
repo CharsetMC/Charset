@@ -1,4 +1,4 @@
-package pl.asie.charset.audio.client;
+package pl.asie.charset.audio.manager;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -17,7 +17,6 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.audio.util.IAudioStream;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public class AudioStreamOpenAL implements IAudioStream {

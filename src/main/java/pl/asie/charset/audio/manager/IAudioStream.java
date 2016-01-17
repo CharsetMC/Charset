@@ -1,4 +1,4 @@
-package pl.asie.charset.audio.util;
+package pl.asie.charset.audio.manager;
 
 public interface IAudioStream {
 	void setHearing(float distance, float volume);

@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -15,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.refs.Properties;
 
@@ -28,6 +30,21 @@ public class BlockTapeDrive extends BlockContainer {
 		super(Material.iron);
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 		setUnlocalizedName("charset.tapedrive");
+	}
+
+	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (world.isRemote) {
+			return true;
+		}
+
+		TileEntity tile = world.getTileEntity(pos);
+		if (tile instanceof TileTapeDrive) {
+			player.openGui(ModCharsetAudio.instance, 1, world, pos.getX(), pos.getY(), pos.getZ());
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -64,7 +81,7 @@ public class BlockTapeDrive extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
-		return null;
+		return new TileTapeDrive();
 	}
 
 	@Override

@@ -5,7 +5,9 @@
       "model": "forge:item-layer",
       "transform": "forge:default-item",
       "textures": {
-        "layer0": "charsetaudio:items/tape"
+        "layer0": "charsetaudio:items/tape_layer0",
+        "layer1": "charsetaudio:items/tape_layer1",
+        "layer2": "charsetaudio:items/tape_layer2"
       }
     }
   }

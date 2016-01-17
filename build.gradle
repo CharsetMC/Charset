@@ -17,7 +17,7 @@ group= "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-    version = "1.8.9-11.15.0.1695"
+    version = "1.8.9-11.15.0.1699"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -25,7 +25,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20160112"
+    mappings = "snapshot_20160116"
 
     replace '@VERSION@', project.version
     replace '@MC_VERSION@', version
@@ -44,6 +44,10 @@ sourceSets {
 
 repositories {
     maven { url "http://maven.amadornes.com/" }
+    maven {
+        name 'DVS1 Maven FS'
+        url 'http://dvs1.progwml6.com/files/maven'
+    }
 }
 dependencies {
     deobfCompile "MCMultiPart:MCMultiPart:1.0.4:universal"
