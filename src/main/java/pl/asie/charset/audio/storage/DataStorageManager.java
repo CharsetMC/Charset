@@ -9,7 +9,7 @@ import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.utils.MiscUtils;
 
 public class DataStorageManager {
-	private static Random rand = new Random();
+	private static final Random rand = new Random();
 	private File saveDir;
 
 	public DataStorageManager() {
@@ -50,7 +50,7 @@ public class DataStorageManager {
 	}
 
 	public boolean exists(String name) {
-		return new File(saveDir, filename(name)).exists();
+		return get(name).exists();
 	}
 
 	public File get(String name) {

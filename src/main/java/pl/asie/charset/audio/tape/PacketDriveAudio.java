@@ -26,6 +26,8 @@ public class PacketDriveAudio extends PacketTile {
 
 	@Override
 	public void writeData(ByteBuf buf) {
+		super.writeData(buf);
+
 		buf.writeMedium(packet.length);
 		buf.writeBytes(packet);
 	}
@@ -43,13 +45,16 @@ public class PacketDriveAudio extends PacketTile {
 			IAudioStream stream = ProxyClient.stream.get(source);
 			if (stream == null) {
 				stream = new AudioStreamOpenAL(false, false, 8);
-				stream.setSampleRate(32800);
+				stream.setSampleRate(48000);
 				stream.setHearing(32.0F, 1.0F);
 				ProxyClient.stream.put(source, stream);
 			}
 
 			byte[] out = new byte[packet.length * 8];
 			dfpwm.decompress(out, packet, 0, 0, packet.length);
+			for (int i = 0; i < out.length; i++) {
+				out[i] = (byte) (out[i] ^ 0x80);
+			}
 
 			stream.push(out);
 			stream.play(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ());

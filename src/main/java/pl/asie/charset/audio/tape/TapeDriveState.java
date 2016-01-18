@@ -32,16 +32,15 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 		} else {
 			boolean found = false;
 			ItemStack stack = inventory.getStackInSlot(0);
-			System.out.println("0");
 			if (stack != null && stack.hasCapability(ModCharsetAudio.CAP_STORAGE, null)) {
-				System.out.println("1");
 				IDataStorage storage = stack.getCapability(ModCharsetAudio.CAP_STORAGE, null);
 				if (storage != null) {
 					found = true;
 
 					if (state == State.PLAYING) {
-						byte[] data = new byte[205];
+						byte[] data = new byte[300];
 						int len = storage.read(data, false);
+						System.out.println(storage.getPosition() + " " + data[0] + " " + len);
 
 						ModCharsetAudio.packet.sendToWatching(new PacketDriveAudio((TileEntity) inventory, data), (TileEntity) inventory);
 

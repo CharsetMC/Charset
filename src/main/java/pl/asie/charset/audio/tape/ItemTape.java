@@ -9,7 +9,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -27,15 +26,11 @@ public class ItemTape extends Item {
 
 		@Override
 		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-			return FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT && capability == ModCharsetAudio.CAP_STORAGE;
+			return capability == ModCharsetAudio.CAP_STORAGE;
 		}
 
 		@Override
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-				return null;
-			}
-
 			if (dataStorage != null && !dataStorage.isInitialized()) {
 				dataStorage.initialize(null, 0, 2097152);
 			}
@@ -45,6 +40,7 @@ public class ItemTape extends Item {
 		@Override
 		public NBTTagCompound serializeNBT() {
 			if (dataStorage != null) {
+				System.out.println(this.toString());
 				NBTTagCompound compound = new NBTTagCompound();
 				NBTBase data = ModCharsetAudio.CAP_STORAGE.getStorage().writeNBT(
 						ModCharsetAudio.CAP_STORAGE, dataStorage, null

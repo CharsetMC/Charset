@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 
@@ -19,7 +22,7 @@ public class DataStorageImpl implements IDataStorage {
 	private boolean dirty = false;
 
 	public DataStorageImpl() {
-
+		System.out.println("new");
 	}
 
 	public boolean isInitialized() {
@@ -27,6 +30,7 @@ public class DataStorageImpl implements IDataStorage {
 	}
 
 	public void initialize(String id, int position, int size) {
+		System.out.println("init");
 		if (id == null || id.length() == 0) {
 			this.uniqueId = ModCharsetAudio.storage.generateUID();
 		} else {
@@ -135,6 +139,7 @@ public class DataStorageImpl implements IDataStorage {
 
 
 	public void readFile() throws IOException {
+		System.out.println("reading");
 		FileInputStream fileStream = new FileInputStream(file);
 		GZIPInputStream stream = new GZIPInputStream(fileStream);
 
@@ -146,34 +151,48 @@ public class DataStorageImpl implements IDataStorage {
 			int b3 = stream.read() & 0xFF;
 			int b4 = stream.read() & 0xFF;
 			this.position = b1 | (b2 << 8) | (b3 << 16) | (b4 << 24);
+			if (position < 0 || position >= size) {
+				position = 0;
+			}
+		} else {
+			this.position = 0;
 		}
-		this.data = new byte[size];
 
 		int position = 0;
 		while (position < this.data.length) {
-			position += stream.read(this.data, position, this.data.length - position);
+			int s = stream.read(this.data, position, this.data.length - position);
+			if (s >= 0) {
+				position += s;
+			} else {
+				break;
+			}
 		}
+
+		System.out.println("read " + position);
 
 		stream.close();
 		fileStream.close();
 	}
 
 	public void writeFile() throws IOException {
-		FileOutputStream fileStream = new FileOutputStream(file);
-		GZIPOutputStream stream = new GZIPOutputStream(fileStream);
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			System.out.println("write");
+			FileOutputStream fileStream = new FileOutputStream(file);
+			GZIPOutputStream stream = new GZIPOutputStream(fileStream);
 
-		stream.write(1);
-		stream.write(this.position & 0xFF);
-		stream.write((this.position >>> 8) & 0xFF);
-		stream.write((this.position >>> 16) & 0xFF);
-		stream.write((this.position >>> 24) & 0xFF);
-		stream.write(data);
-		stream.finish();
-		stream.flush();
-		stream.close();
-		fileStream.close();
+			stream.write(1);
+			stream.write(this.position & 0xFF);
+			stream.write((this.position >>> 8) & 0xFF);
+			stream.write((this.position >>> 16) & 0xFF);
+			stream.write((this.position >>> 24) & 0xFF);
+			stream.write(data);
+			stream.finish();
+			stream.flush();
+			stream.close();
+			fileStream.close();
 
-		dirty = false;
+			dirty = false;
+		}
 	}
 
 	public void onUnload() throws IOException {
