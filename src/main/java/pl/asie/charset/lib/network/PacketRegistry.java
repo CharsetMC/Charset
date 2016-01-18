@@ -11,6 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
@@ -44,16 +46,20 @@ public class PacketRegistry {
 		channels.get(Side.SERVER).writeOutbound(message);
 	}
 
-	public void sendToWatching(Packet message, TileEntity tile) {
+	public void sendToWatching(Packet message, World world, BlockPos pos) {
 		for (EntityPlayerMP player : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
-			if (player.worldObj.provider.getDimensionId() == tile.getWorld().provider.getDimensionId()) {
-				if (((WorldServer) player.worldObj).getPlayerManager().isPlayerWatchingChunk(player, tile.getPos().getX() >> 4, tile.getPos().getZ() >> 4)) {
+			if (player.worldObj.provider.getDimensionId() == world.provider.getDimensionId()) {
+				if (((WorldServer) player.worldObj).getPlayerManager().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
 					channels.get(Side.SERVER).writeOutbound(message);
 				}
 			}
 		}
+	}
+
+	public void sendToWatching(Packet message, TileEntity tile) {
+		sendToWatching(message, tile.getWorld(), tile.getPos());
 	}
 
 	public void sendTo(Packet message, EntityPlayerMP player) {

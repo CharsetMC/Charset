@@ -189,7 +189,7 @@ public class PipeItem {
 
 			if (atCenter) {
 				onReachedCenter();
-			} else {
+			} else if (!stuck) {
 				progress += SPEED;
 			}
 		} else {
@@ -370,6 +370,8 @@ public class PipeItem {
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
 				return;
+			} else if (directionList.contains(dir) && firstOutput == null) {
+				firstOutput = dir;
 			}
 		}
 

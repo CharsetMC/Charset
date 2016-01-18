@@ -24,7 +24,7 @@ public class PacketDriveState extends PacketTile {
 		state = State.values()[buf.readUnsignedByte()];
 
 		if (tile instanceof TileTapeDrive) {
-			((TileTapeDrive) tile).state = state;
+			((TileTapeDrive) tile).setState(state);
 		}
 	}
 

@@ -5,20 +5,16 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -87,8 +83,6 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-
 		packet = new PacketRegistry(ModCharsetAudio.MODID);
 		packet.registerPacket(0x01, PacketNoteParticle.class);
 
@@ -120,15 +114,6 @@ public class ModCharsetAudio {
 		if (ModCharsetLib.INDEV) {
 			storage = null;
 			proxy.onServerStop();
-		}
-	}
-
-	@SubscribeEvent
-	public void onAC(AttachCapabilitiesEvent.Item event) {
-		if (ModCharsetLib.INDEV) {
-			if (event.getItem() instanceof ItemTape) {
-				event.addCapability(new ResourceLocation("charsetaudio", "tape"), new ItemTape.CapabilityProvider());
-			}
 		}
 	}
 }

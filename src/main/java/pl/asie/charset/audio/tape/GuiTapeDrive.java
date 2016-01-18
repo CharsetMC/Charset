@@ -37,7 +37,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	public boolean isButtonPressed(Button button) {
 		if(button == buttonMouse) return true;
 
-		switch(state) {
+		switch (state) {
 			case FORWARDING:
 				return button == Button.FAST_FORWARD;
 			case PLAYING:
@@ -55,7 +55,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			try {
 				PacketDriveState packet = new PacketDriveState(getTapeDrive(), state);
 				ModCharsetAudio.packet.sendToServer(packet);
-				getTapeDrive().state = state;
+				getTapeDrive().setState(state);
 			} catch (Exception e) {
 				//NO-OP
 			}
@@ -84,7 +84,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	@Override
 	public void updateScreen() {
 		super.updateScreen();
-		this.state = getTapeDrive().state;
+		this.state = getTapeDrive().getState();
 	}
 
 	@Override

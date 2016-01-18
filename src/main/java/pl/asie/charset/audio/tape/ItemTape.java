@@ -2,6 +2,7 @@ package pl.asie.charset.audio.tape;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
@@ -21,9 +22,7 @@ public class ItemTape extends Item {
 		private IDataStorage dataStorage;
 
 		public CapabilityProvider() {
-			if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) {
-				dataStorage = ModCharsetAudio.CAP_STORAGE.getDefaultInstance();
-			}
+			dataStorage = ModCharsetAudio.CAP_STORAGE.getDefaultInstance();
 		}
 
 		@Override
@@ -47,9 +46,12 @@ public class ItemTape extends Item {
 		public NBTTagCompound serializeNBT() {
 			if (dataStorage != null) {
 				NBTTagCompound compound = new NBTTagCompound();
-				ModCharsetAudio.CAP_STORAGE.getStorage().writeNBT(
+				NBTBase data = ModCharsetAudio.CAP_STORAGE.getStorage().writeNBT(
 						ModCharsetAudio.CAP_STORAGE, dataStorage, null
 				);
+				if (data != null) {
+					compound.setTag("data", data);
+				}
 				return compound;
 			} else {
 				return new NBTTagCompound();
@@ -58,9 +60,9 @@ public class ItemTape extends Item {
 
 		@Override
 		public void deserializeNBT(NBTTagCompound nbt) {
-			if (dataStorage != null) {
+			if (dataStorage != null && nbt.hasKey("data")) {
 				ModCharsetAudio.CAP_STORAGE.getStorage().readNBT(
-						ModCharsetAudio.CAP_STORAGE, dataStorage, null, nbt
+						ModCharsetAudio.CAP_STORAGE, dataStorage, null, nbt.getCompoundTag("data")
 				);
 			}
 		}
@@ -88,7 +90,6 @@ public class ItemTape extends Item {
 
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
-		return null;
-		//return new CapabilityProvider();
+		return new CapabilityProvider();
 	}
 }

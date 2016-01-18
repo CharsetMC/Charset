@@ -13,14 +13,11 @@ import net.minecraft.util.ITickable;
 import net.minecraft.world.IInteractionObject;
 
 import pl.asie.charset.api.audio.IAudioSource;
-import pl.asie.charset.api.audio.IDataStorage;
-import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 
 public class TileTapeDrive extends TileEntity implements IInteractionObject, ITickable, IInventory, IInventoryOwner, IAudioSource {
-	public State state = State.STOPPED;
-	public State lastState = State.STOPPED;
+	private final TapeDriveState state = new TapeDriveState(this);
 
 	private InventorySimple inventory = new InventorySimple(1, this) {
 		@Override
@@ -29,51 +26,19 @@ public class TileTapeDrive extends TileEntity implements IInteractionObject, ITi
 		}
 	};
 
+	public State getState() {
+		return this.state.getState();
+	}
+
+	public void setState(State state) {
+		this.state.setState(state);
+	}
+
 	@Override
 	public void update() {
-		if (state == State.STOPPED) {
-			if (lastState == State.PLAYING) {
-				ModCharsetAudio.packet.sendToWatching(new PacketDriveStop(this), this);
-			}
-		} else {
-			boolean found = false;
-			ItemStack stack = inventory.getStackInSlot(0);
-			System.out.println("0");
-			if (stack != null && stack.hasCapability(ModCharsetAudio.CAP_STORAGE, null)) {
-				System.out.println("1");
-				IDataStorage storage = stack.getCapability(ModCharsetAudio.CAP_STORAGE, null);
-				if (storage != null) {
-					found = true;
-
-					if (state == State.PLAYING) {
-						byte[] data = new byte[205];
-						int len = storage.read(data, false);
-
-						ModCharsetAudio.packet.sendToWatching(new PacketDriveAudio(this, data), this);
-
-						if (len < data.length) {
-							state = State.STOPPED;
-						}
-					} else {
-						int offset = state == State.FORWARDING ? 2048 : -2048;
-						int len = storage.seek(offset);
-						if (len != offset) {
-							state = State.STOPPED;
-						}
-					}
-				}
-			}
-
-			if (!found) {
-				state = State.STOPPED;
-			}
+		if (worldObj != null && !worldObj.isRemote) {
+			state.update();
 		}
-
-		if (lastState != state) {
-			ModCharsetAudio.packet.sendToWatching(new PacketDriveState(this, state), this);
-		}
-
-		lastState = state;
 	}
 
 	@Override
@@ -88,16 +53,13 @@ public class TileTapeDrive extends TileEntity implements IInteractionObject, ITi
 
 	public void readCustomData(NBTTagCompound nbt) {
 		inventory.readFromNBT(nbt, "items");
-		if (nbt.hasKey("state")) {
-			state = State.values()[nbt.getByte("state")];
-		} else {
-			state = State.STOPPED;
-		}
+		state.deserializeNBT(nbt.getCompoundTag("state"));
 	}
 
 	public void writeCustomData(NBTTagCompound nbt) {
 		inventory.writeToNBT(nbt, "items");
-		nbt.setByte("state", (byte) state.ordinal());
+		NBTTagCompound stateNbt = state.serializeNBT();
+		nbt.setTag("state", stateNbt);
 	}
 
 	@Override
