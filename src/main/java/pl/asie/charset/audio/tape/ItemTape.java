@@ -18,10 +18,12 @@ import pl.asie.charset.lib.ModCharsetLib;
 
 public class ItemTape extends Item {
 	public static class CapabilityProvider implements INBTSerializable<NBTTagCompound>, ICapabilityProvider {
-		private IDataStorage dataStorage;
+		private final ItemStack stack;
+		private final IDataStorage dataStorage;
 
-		public CapabilityProvider() {
-			dataStorage = ModCharsetAudio.CAP_STORAGE.getDefaultInstance();
+		public CapabilityProvider(ItemStack stack) {
+			this.stack = stack;
+			this.dataStorage = ModCharsetAudio.CAP_STORAGE.getDefaultInstance();
 		}
 
 		@Override
@@ -86,6 +88,6 @@ public class ItemTape extends Item {
 
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt) {
-		return new CapabilityProvider();
+		return new CapabilityProvider(stack);
 	}
 }

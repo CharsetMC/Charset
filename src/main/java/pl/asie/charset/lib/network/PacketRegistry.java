@@ -58,6 +58,10 @@ public class PacketRegistry {
 		}
 	}
 
+	public void sendToWatching(Packet message, IMultipart tile) {
+		sendToWatching(message, tile.getWorld(), tile.getPos());
+	}
+
 	public void sendToWatching(Packet message, TileEntity tile) {
 		sendToWatching(message, tile.getWorld(), tile.getPos());
 	}

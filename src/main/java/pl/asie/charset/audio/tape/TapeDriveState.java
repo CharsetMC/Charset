@@ -3,7 +3,6 @@ package pl.asie.charset.audio.tape;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 
 import net.minecraftforge.common.util.INBTSerializable;
@@ -12,14 +11,17 @@ import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 
 public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompound> {
+	private final PartTapeDrive owner;
 	private final IInventory inventory;
 	private State state = State.STOPPED, lastState;
 
-	public TapeDriveState(IInventory inventory) {
+	public TapeDriveState(PartTapeDrive owner, IInventory inventory) {
+		this.owner = owner;
 		this.inventory = inventory;
 	}
 
 	public void setState(State state) {
+		this.lastState = this.state;
 		this.state = state;
 	}
 
@@ -27,7 +29,7 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 	public void update() {
 		if (state == State.STOPPED) {
 			if (lastState == State.PLAYING) {
-				ModCharsetAudio.packet.sendToWatching(new PacketDriveStop((TileEntity) inventory), (TileEntity) inventory);
+				ModCharsetAudio.packet.sendToWatching(new PacketDriveStop(owner), owner);
 			}
 		} else {
 			boolean found = false;
@@ -42,7 +44,7 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 						int len = storage.read(data, false);
 						System.out.println(storage.getPosition() + " " + data[0] + " " + len);
 
-						ModCharsetAudio.packet.sendToWatching(new PacketDriveAudio((TileEntity) inventory, data), (TileEntity) inventory);
+						ModCharsetAudio.packet.sendToWatching(new PacketDriveAudio(owner, data), owner);
 
 						if (len < data.length) {
 							state = State.STOPPED;
@@ -63,7 +65,7 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 		}
 
 		if (lastState != state) {
-			ModCharsetAudio.packet.sendToWatching(new PacketDriveState((TileEntity) inventory, state), (TileEntity) inventory);
+			ModCharsetAudio.packet.sendToWatching(new PacketDriveState(owner, state), owner);
 		}
 
 		lastState = state;
@@ -92,5 +94,17 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 
 	public State getState() {
 		return state;
+	}
+
+	public IDataStorage getStorage() {
+		ItemStack stack = inventory.getStackInSlot(0);
+		if (stack != null && stack.hasCapability(ModCharsetAudio.CAP_STORAGE, null)) {
+			IDataStorage storage = stack.getCapability(ModCharsetAudio.CAP_STORAGE, null);
+			if (storage != null) {
+				return storage;
+			}
+		}
+
+		return null;
 	}
 }

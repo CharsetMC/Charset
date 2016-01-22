@@ -11,7 +11,7 @@ public enum WireFace {
 	SOUTH,
 	WEST,
 	EAST,
-	CENTER;
+	CENTER, PartSlot;
 
 	WireFace() {
 		facing = ordinal() >= 6 ? null : EnumFacing.getFront(ordinal());

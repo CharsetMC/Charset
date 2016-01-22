@@ -2,18 +2,20 @@ package pl.asie.charset.audio.tape;
 
 import io.netty.buffer.ByteBuf;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.server.MinecraftServer;
 
-import pl.asie.charset.lib.network.PacketTile;
+import mcmultipart.multipart.IMultipart;
+import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.network.PacketPart;
 
-public class PacketDriveState extends PacketTile {
+public class PacketDriveState extends PacketPart {
 	private State state;
 
 	public PacketDriveState() {
 		super();
 	}
 
-	public PacketDriveState(TileEntity tile, State state) {
+	public PacketDriveState(IMultipart tile, State state) {
 		super(tile);
 		this.state = state;
 	}
@@ -21,10 +23,29 @@ public class PacketDriveState extends PacketTile {
 	@Override
 	public void readData(ByteBuf buf) {
 		super.readData(buf);
-		state = State.values()[buf.readUnsignedByte()];
+		final State newState = State.values()[buf.readUnsignedByte()];
 
-		if (tile instanceof TileTapeDrive) {
-			((TileTapeDrive) tile).setState(state);
+		if (part instanceof PartTapeDrive) {
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					((PartTapeDrive) part).setState(newState);
+				}
+			};
+
+			if (part.getWorld().isRemote) {
+				if (ModCharsetLib.proxy.isClientThread()) {
+					runnable.run();
+				} else {
+					ModCharsetLib.proxy.addScheduledClientTask(runnable);
+				}
+			} else {
+				if (!MinecraftServer.getServer().isCallingFromMinecraftThread()) {
+					MinecraftServer.getServer().addScheduledTask(runnable);
+				} else {
+					runnable.run();
+				}
+			}
 		}
 	}
 

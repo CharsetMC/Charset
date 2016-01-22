@@ -8,13 +8,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import pl.asie.charset.audio.ModCharsetAudio;
-import pl.asie.charset.lib.container.ContainerBase;
 import pl.asie.charset.lib.container.GuiContainerCharset;
 
 public class GuiTapeDrive extends GuiContainerCharset {
 	private static final ResourceLocation TEXTURE = new ResourceLocation("charsetaudio:textures/gui/tape_drive.png");
-	private static final int BUTTON_START_X = 48;
+	private static final int BUTTON_START_X = 88 - (Button.values().length * 10);
 	private static final int BUTTON_START_Y = 58;
 
 	private State state = State.STOPPED;
@@ -22,20 +23,31 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		REWIND,
 		PLAY,
 		STOP,
-		FAST_FORWARD
+		FAST_FORWARD,
+		RECORD
 	}
-	private Button buttonMouse = null;
-	
-	public GuiTapeDrive(Container container) {
-		super(container, 176, 166);
-	}
+	private PartTapeDrive tapeDrive;
+	private Button buttonHovering = null;
+	private TapeRecordThread tapeRecord;
+	private Thread tapeRecordThread;
 
-	private TileTapeDrive getTapeDrive() {
-		return ((TileTapeDrive) ((ContainerBase) inventorySlots).getInventoryObject());
+	public boolean isRecording() {
+		return tapeRecordThread != null && tapeRecordThread.isAlive();
+	}
+	
+	public GuiTapeDrive(Container container, PartTapeDrive tapeDrive) {
+		super(container, 176, 166);
+		this.tapeDrive = tapeDrive;
 	}
 	
 	public boolean isButtonPressed(Button button) {
-		if(button == buttonMouse) return true;
+		if (button == buttonHovering) {
+			return true;
+		}
+
+		if (isRecording() && button == Button.RECORD) {
+			return true;
+		}
 
 		switch (state) {
 			case FORWARDING:
@@ -51,11 +63,11 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	}
 	
 	public void setState(State state) {
-		if (getTapeDrive() != null && !getTapeDrive().isInvalid()) {
+		if (tapeDrive != null) {
 			try {
-				PacketDriveState packet = new PacketDriveState(getTapeDrive(), state);
+				PacketDriveState packet = new PacketDriveState(tapeDrive, state);
 				ModCharsetAudio.packet.sendToServer(packet);
-				getTapeDrive().setState(state);
+				tapeDrive.setState(state);
 			} catch (Exception e) {
 				//NO-OP
 			}
@@ -63,6 +75,10 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	}
 	
 	public void handleButtonPress(Button button) {
+		if (isRecording()) {
+			return;
+		}
+
 		switch(button) {
 			case REWIND:
 				if(state == State.REWINDING) setState(State.STOPPED);
@@ -78,17 +94,43 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			case STOP:
 				setState(State.STOPPED);
 				break;
+			case RECORD:
+				setState(State.STOPPED);
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+				chooser.setFileFilter(new FileNameExtensionFilter("Audio file", "ogg", "wav"));
+				chooser.showOpenDialog(null);
+				tapeRecord = new TapeRecordThread(chooser.getSelectedFile(), tapeDrive);
+				tapeRecordThread = new Thread(tapeRecord);
+				tapeRecordThread.start();
+				break;
 		}
 	}
 
 	@Override
 	public void updateScreen() {
 		super.updateScreen();
-		this.state = getTapeDrive().getState();
+		this.state = tapeDrive.getState();
+	}
+
+	@Override
+	protected void keyTyped(char typedChar, int keyCode) throws IOException {
+		if (isRecording()) {
+			if (keyCode == 1 || keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
+				return;
+			}
+		}
+
+		super.keyTyped(typedChar, keyCode);
 	}
 
 	@Override
 	public void mouseClicked(int x, int y, int mb) throws IOException {
+		if (isRecording()) {
+			return;
+		}
+
 		super.mouseClicked(x, y, mb);
 		if(mb == 0) {
 			for(Button button: Button.values()) {
@@ -96,7 +138,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 				int button_y = this.yCenter + BUTTON_START_Y;
 				if(x >= button_x && x < (button_x + 20) && y >= button_y && y < (button_y + 15)) {
 					if(!isButtonPressed(button))
-						buttonMouse = button;
+						buttonHovering = button;
 				}
 			}
 		}
@@ -104,11 +146,15 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	
 	@Override
 	public void mouseReleased(int x, int y, int which) {
+		if (isRecording()) {
+			return;
+		}
+
 		super.mouseReleased(x, y, which);
-		if(which >= 0 && buttonMouse != null) {
+		if(which >= 0 && buttonHovering != null) {
 			this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
-			handleButtonPress(buttonMouse);
-			buttonMouse = null;
+			handleButtonPress(buttonHovering);
+			buttonHovering = null;
 		}
 	}
 	
@@ -141,13 +187,18 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		
 		// Draw label
 		String label = getLabel();
-		
 		int labelColor = 0xFFFFFF;
-		if(label == null) {
-			label = StatCollector.translateToLocal("tooltip.charset.tape.none");
-			labelColor = 0xFF3333;
+
+		if (isRecording()) {
+			label = tapeRecord.getStatusBar();
+			labelColor = 0x90E0B0;
+		} else {
+			if (label == null) {
+				label = StatCollector.translateToLocal("tooltip.charset.tape.none");
+				labelColor = 0xFF3333;
+			}
+			if (label.length() > 24) label = label.substring(0, 22) + "...";
 		}
-		if(label.length() > 24) label = label.substring(0, 22) + "...";
 		this.drawCenteredString(this.fontRendererObj, label, this.xCenter + 88, this.yCenter + 15, labelColor);
 	}
 }

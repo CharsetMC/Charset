@@ -25,7 +25,7 @@ import pl.asie.charset.lib.utils.ColorUtils;
  */
 @Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart")
 public class ModCharsetLib {
-	public static final boolean INDEV = false;
+	public static final boolean INDEV = true;
 
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "CharsetLib";

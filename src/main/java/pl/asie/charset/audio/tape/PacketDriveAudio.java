@@ -2,16 +2,15 @@ package pl.asie.charset.audio.tape;
 
 import io.netty.buffer.ByteBuf;
 
-import net.minecraft.tileentity.TileEntity;
-
+import mcmultipart.multipart.IMultipart;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.audio.ProxyClient;
 import pl.asie.charset.audio.manager.AudioStreamOpenAL;
 import pl.asie.charset.audio.manager.IAudioStream;
-import pl.asie.charset.lib.network.PacketTile;
+import pl.asie.charset.lib.network.PacketPart;
 import pl.asie.charset.lib.utils.DFPWM;
 
-public class PacketDriveAudio extends PacketTile {
+public class PacketDriveAudio extends PacketPart {
 	private static final DFPWM dfpwm = new DFPWM();
 	private byte[] packet;
 
@@ -19,8 +18,8 @@ public class PacketDriveAudio extends PacketTile {
 		super();
 	}
 
-	public PacketDriveAudio(TileEntity tile, byte[] packet) {
-		super(tile);
+	public PacketDriveAudio(IMultipart part, byte[] packet) {
+		super(part);
 		this.packet = packet;
 	}
 
@@ -40,8 +39,8 @@ public class PacketDriveAudio extends PacketTile {
 		packet = new byte[len];
 		buf.readBytes(packet);
 
-		if (tile instanceof IAudioSource) {
-			IAudioSource source = (IAudioSource) tile;
+		if (part instanceof IAudioSource) {
+			IAudioSource source = (IAudioSource) part;
 			IAudioStream stream = ProxyClient.stream.get(source);
 			if (stream == null) {
 				stream = new AudioStreamOpenAL(false, false, 8);
@@ -57,7 +56,7 @@ public class PacketDriveAudio extends PacketTile {
 			}
 
 			stream.push(out);
-			stream.play(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ());
+			stream.play(part.getPos().getX(), part.getPos().getY(), part.getPos().getZ());
 		}
 	}
 }

@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.note.BlockIronNote;
 import pl.asie.charset.audio.note.PacketNoteParticle;
@@ -26,12 +27,13 @@ import pl.asie.charset.audio.note.TileIronNote;
 import pl.asie.charset.audio.storage.DataStorageImpl;
 import pl.asie.charset.audio.storage.DataStorageManager;
 import pl.asie.charset.audio.storage.DataStorageStorage;
-import pl.asie.charset.audio.tape.BlockTapeDrive;
+import pl.asie.charset.audio.tape.ItemPartTapeDrive;
 import pl.asie.charset.audio.tape.ItemTape;
 import pl.asie.charset.audio.tape.PacketDriveAudio;
+import pl.asie.charset.audio.tape.PacketDriveRecord;
 import pl.asie.charset.audio.tape.PacketDriveState;
 import pl.asie.charset.audio.tape.PacketDriveStop;
-import pl.asie.charset.audio.tape.TileTapeDrive;
+import pl.asie.charset.audio.tape.PartTapeDrive;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
@@ -56,8 +58,8 @@ public class ModCharsetAudio {
 	public static PacketRegistry packet;
 	public static DataStorageManager storage;
 
-	public static BlockTapeDrive tapeDriveBlock;
 	public static BlockIronNote ironNoteBlock;
+	public static ItemPartTapeDrive partTapeDriveItem;
 	public static ItemTape tapeItem;
 
 	@Mod.EventHandler
@@ -65,12 +67,15 @@ public class ModCharsetAudio {
 		logger = LogManager.getLogger(ModCharsetAudio.MODID);
 
 		if (ModCharsetLib.INDEV) {
-			tapeDriveBlock = new BlockTapeDrive();
-			GameRegistry.registerBlock(tapeDriveBlock, "tapedrive");
+			partTapeDriveItem = new ItemPartTapeDrive();
+			GameRegistry.registerItem(partTapeDriveItem, "tapeDrive");
 
 			tapeItem = new ItemTape();
 			GameRegistry.registerItem(tapeItem, "tape");
 
+			MultipartRegistry.registerPart(PartTapeDrive.class, "charsetaudio:tapedrive");
+
+			ModCharsetLib.proxy.registerItemModel(partTapeDriveItem, 0, "charsetaudio:tapedrive");
 			ModCharsetLib.proxy.registerItemModel(tapeItem, 0, "charsetaudio:tape");
 
 			CapabilityManager.INSTANCE.register(IDataStorage.class, new DataStorageStorage(), DataStorageImpl.class);
@@ -89,11 +94,9 @@ public class ModCharsetAudio {
 		packet.registerPacket(0x10, PacketDriveState.class);
 		packet.registerPacket(0x11, PacketDriveAudio.class);
 		packet.registerPacket(0x12, PacketDriveStop.class);
+		packet.registerPacket(0x13, PacketDriveRecord.class);
 
 		GameRegistry.registerTileEntity(TileIronNote.class, "charset:ironnoteblock");
-		if (ModCharsetLib.INDEV) {
-			GameRegistry.registerTileEntity(TileTapeDrive.class, "charset:tapedrive");
-		}
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ironNoteBlock), "iii", "iNi", "iii", 'i', "ingotIron", 'N', Blocks.noteblock));
 

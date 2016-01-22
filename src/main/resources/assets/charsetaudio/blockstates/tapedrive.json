@@ -2,39 +2,23 @@
   "forge_marker": 1,
   "defaults": {
     "textures": {
-      "particle": "charsetaudio:blocks/tapedrive/front",
-      "front": "charsetaudio:blocks/tapedrive/front",
-      "back": "charsetaudio:blocks/tapedrive/side",
-      "top": "charsetaudio:blocks/tapedrive/side",
-      "bottom": "charsetaudio:blocks/tapedrive/side",
-      "left": "charsetaudio:blocks/tapedrive/side",
-      "right": "charsetaudio:blocks/tapedrive/side",
-      "inside": "charsetaudio:blocks/tapedrive/inside",
-      "tape": "charsetaudio:items/tape"
+      "particle": "charsetaudio:blocks/tape_drive_Front"
     },
-    "model": "charsetaudio:tapedrive",
-    "uvlock": false
+    "model": "charsetaudio:tapedrive"
   },
   "variants": {
     "normal": [{}],
     "inventory": [{}],
     "facing": {
-      "down": {"x": 90},
-      "up": {"x": 270},
       "north": {},
       "east": {"y": 90},
       "south": {"y": 180},
       "west": {"y": 270}
     },
-    "tapeinserted": {
+    "top": {
       "true": {
-        "submodel": {
-          "tape": {
-            "model": "charsetaudio:tapedrive_tape",
-            "transform": {
-              "translation": [0, -0.125, 0]
-            }
-          }
+        "transform": {
+          "translation": [0, 0.5, 0]
         }
       },
       "false": {}

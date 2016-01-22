@@ -25,6 +25,7 @@ import pl.asie.charset.wires.logic.PartWireProvider;
 
 public class ItemWire extends ItemMultiPart {
 	public ItemWire() {
+		super();
 		setHasSubtypes(true);
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 	}
