@@ -115,9 +115,11 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	// Uses NBT data.
 	private String getLabel() {
 		ItemStack stack = this.inventorySlots.getInventory().get(0);
-		if(stack != null && stack.getItem() instanceof ItemTape) {
-			String label = StatCollector.translateToLocal("tooltip.computronics.tape.unnamed");
-			if(stack.getTagCompound() != null && stack.getTagCompound().hasKey("label")) label = stack.getTagCompound().getString("label");
+		if (stack != null && stack.getItem() instanceof ItemTape) {
+			String label = StatCollector.translateToLocal("tooltip.charset.tape.unnamed");
+			if (stack.hasDisplayName()) {
+				label = stack.getDisplayName();
+			}
 			return label;
 		} else return null;
 	}
@@ -142,7 +144,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		
 		int labelColor = 0xFFFFFF;
 		if(label == null) {
-			label = StatCollector.translateToLocal("tooltip.computronics.tape.none");
+			label = StatCollector.translateToLocal("tooltip.charset.tape.none");
 			labelColor = 0xFF3333;
 		}
 		if(label.length() > 24) label = label.substring(0, 22) + "...";

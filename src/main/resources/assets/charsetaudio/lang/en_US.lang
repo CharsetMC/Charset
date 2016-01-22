@@ -1,2 +1,5 @@
 item.charset.tape.name=Tape
 tile.charset.ironNoteBlock.name=Iron Note Block
+
+tooltip.charset.tape.none=No Tape
+tooltip.charset.tape.unnamed=Unnamed Tape

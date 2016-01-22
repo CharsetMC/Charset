@@ -18,6 +18,7 @@ public class HandlerBackpackUnequip {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK
 				&& event.entityPlayer.getCurrentEquippedItem() == null
+				&& event.entityPlayer.isSneaking()
 				&& event.face == EnumFacing.UP && !event.world.isRemote) {
 			ItemStack backpack = ItemBackpack.getBackpack(event.entityPlayer);
 			if (backpack != null) {
