@@ -18,7 +18,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 
 public class TweakDisableVanillaTools extends Tweak {
 	public TweakDisableVanillaTools() {
-		super("tweaks", "disableVanillaTools", "Setting to 1 makes vanilla-type tools ineffective. Setting to 2 also tries to remove their recipes.", false, 2);
+		super("tweaks", "disableVanillaStyleTools", "Setting to 1 makes vanilla-type tools ineffective. Setting to 2 also tries to remove their recipes.", false, 0);
 	}
 
 	@Override

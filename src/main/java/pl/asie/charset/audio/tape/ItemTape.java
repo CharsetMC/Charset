@@ -18,6 +18,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
@@ -30,18 +31,25 @@ public class ItemTape extends Item implements IDyeableItem {
 	private static final int DEFAULT_SAMPLE_RATE = 48000;
 
 	public enum Material {
-		IRON("ingotIron", 0xA0A0A0),
-		GOLD("ingotGold", 0xF0E060),
-		DIAMOND("gemDiamond", 0x60E0F0),
+		IRON("ingotIron", 0x8C8C8C),
+		GOLD("ingotGold", 0xF0E060, EnumChatFormatting.YELLOW + "Shiny"),
+		DIAMOND("gemDiamond", 0x60E0F0, EnumChatFormatting.AQUA + "Audiophile"),
 		EMERALD("gemEmerald", 0x50E080),
-		QUARTZ("gemQuartz", 0xE0E0E0);
+		QUARTZ("gemQuartz", 0xE0E0E0),
+		DARK_IRON("ingotDarkIron", 0x503080, EnumChatFormatting.DARK_PURPLE + "Dank");
 
 		public final String oreDict;
+		public final String subtitle;
 		public final int color;
 
 		Material(String oreDict, int color) {
+			this(oreDict, color, null);
+		}
+
+		Material(String oreDict, int color, String subtitle) {
 			this.oreDict = oreDict;
 			this.color = color;
+			this.subtitle = subtitle;
 
 			materialByName.put(name(), this);
 		}
@@ -102,6 +110,12 @@ public class ItemTape extends Item implements IDyeableItem {
 		this.setMaxStackSize(1);
 	}
 
+	@Override
+	public String getUnlocalizedName(ItemStack stack) {
+		Material mat = getMaterial(stack);
+		return "item.charset.tape" + (mat != null ? "." + mat.name().toLowerCase() : "");
+	}
+
 	public static ItemStack asItemStack(int size, Material material) {
 		ItemStack stack = new ItemStack(ModCharsetAudio.tapeItem);
 		stack.setTagCompound(new NBTTagCompound());
@@ -110,19 +124,30 @@ public class ItemTape extends Item implements IDyeableItem {
 		return stack;
 	}
 
+	public Material getMaterial(ItemStack stack) {
+		return stack.hasTagCompound() && stack.getTagCompound().hasKey("material") ? materialByName.get(stack.getTagCompound().getString("material")) : null;
+	}
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		for (Material mat : Material.values()) {
-			subItems.add(asItemStack(480 * DEFAULT_SAMPLE_RATE, mat));
+			if (OreDictionary.doesOreNameExist(mat.oreDict)) {
+				subItems.add(asItemStack(480 / 8 * DEFAULT_SAMPLE_RATE, mat));
+			}
 		}
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		Material mat = getMaterial(stack);
+		if (mat != null && mat.subtitle != null) {
+			tooltip.add(mat.subtitle);
+		}
+
 		int size = stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE;
-		int sizeSec = size / DEFAULT_SAMPLE_RATE;
+		int sizeSec = size / (DEFAULT_SAMPLE_RATE / 8);
 		int sizeMin = sizeSec / 60;
 		sizeSec %= 60;
 		tooltip.add(EnumChatFormatting.GRAY + "" + sizeMin + " minutes " + (sizeSec != 0 ? sizeSec + "seconds" : ""));
@@ -136,7 +161,7 @@ public class ItemTape extends Item implements IDyeableItem {
 			default:
 				return 0xFFFFFF;
 			case 1:
-				Material mat = stack.hasTagCompound() && stack.getTagCompound().hasKey("material") ? materialByName.get(stack.getTagCompound().getString("material")) : null;
+				Material mat = getMaterial(stack);
 				return mat != null ? mat.color : Material.IRON.color;
 			case 2:
 				return getColor(stack);

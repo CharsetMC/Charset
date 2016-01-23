@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -28,7 +29,9 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		RECORD
 	}
 	private PartTapeDrive tapeDrive;
+	private int counter;
 	private Button buttonHovering = null;
+	private boolean ctrResetHover = false;
 	private TapeRecordThread tapeRecord;
 	private Thread tapeRecordThread;
 
@@ -118,6 +121,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	public void updateScreen() {
 		super.updateScreen();
 		this.state = tapeDrive.getState();
+		this.counter = tapeDrive.state.counter;
 	}
 
 	@Override
@@ -143,9 +147,18 @@ public class GuiTapeDrive extends GuiContainerCharset {
 				int button_x = this.xCenter + BUTTON_START_X + (button.ordinal() * 20);
 				int button_y = this.yCenter + BUTTON_START_Y;
 				if(x >= button_x && x < (button_x + 20) && y >= button_y && y < (button_y + 15)) {
-					if(!isButtonPressed(button))
+					if(!isButtonPressed(button)) {
 						buttonHovering = button;
+						return;
+					}
 				}
+			}
+
+			int reset_x = this.xCenter + 121;
+			int reset_y = this.yCenter + 39;
+			if (x >= reset_x && x <= (reset_x + 5) && y >= reset_y && y <= (reset_y + 6)) {
+				ctrResetHover = true;
+				return;
 			}
 		}
 	}
@@ -161,6 +174,11 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
 			handleButtonPress(buttonHovering);
 			buttonHovering = null;
+		}
+
+		if (which >= 0 && ctrResetHover) {
+			this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+			ModCharsetAudio.packet.sendToServer(new PacketDriveCounter(tapeDrive, 0));
 		}
 	}
 	
@@ -190,7 +208,28 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			int button_x = BUTTON_START_X + (button.ordinal() * 20);
 			this.drawTexturedModalRect(this.xCenter + button_x, this.yCenter + BUTTON_START_Y, button_tx, button_ty, 20, 15);
 		}
-		
+
+		if (ctrResetHover) {
+			this.drawTexturedModalRect(this.xCenter + 121, this.yCenter + 39, 121, 38, 5, 6);
+		}
+
+		// Draw counter
+		float counterReal = (float) counter / 48000.0f;
+		float[] counterPos = new float[3];
+		counterPos[0] = (counterReal / 100.0f) % 10;
+		counterPos[1] = (counterReal / 10.0f) % 10;
+		counterPos[2] = (counterReal) % 10;
+
+		for (int c = 0; c < 3; c++) {
+			int cpy = Math.round(counterPos[c] * 10) - 5;
+			if (cpy < 0) cpy += 100;
+			this.drawTexturedModalRect(this.xCenter + 97 + (c * 7), this.yCenter + 34, 248, cpy, 7, 16);
+		}
+
+		GlStateManager.enableBlend();
+		this.drawTexturedModalRect(this.xCenter + 98, this.yCenter + 34, 176, 1, 21, 16);
+		GlStateManager.disableBlend();
+
 		// Draw label
 		String label = getLabel();
 		int labelColor = 0xFFFFFF;

@@ -1,5 +1,8 @@
 package pl.asie.charset.lib.inventory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -11,6 +14,7 @@ import net.minecraft.util.IChatComponent;
  * Created by asie on 1/10/16.
  */
 public class InventorySimple implements IInventory {
+	public final Set<EntityPlayer> watchers;
 	private final IInventoryOwner owner;
 	private final int size;
 	private final ItemStack[] items;
@@ -19,6 +23,7 @@ public class InventorySimple implements IInventory {
 		this.owner = owner;
 		this.size = size;
 		this.items = new ItemStack[size];
+		this.watchers = new HashSet<EntityPlayer>();
 	}
 
 	public void readFromNBT(NBTTagCompound nbt, String key) {
@@ -109,12 +114,12 @@ public class InventorySimple implements IInventory {
 
 	@Override
 	public void openInventory(EntityPlayer player) {
-
+		watchers.add(player);
 	}
 
 	@Override
 	public void closeInventory(EntityPlayer player) {
-
+		watchers.remove(player);
 	}
 
 	@Override

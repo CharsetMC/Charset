@@ -7,6 +7,7 @@ import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -53,8 +54,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	protected EnumFacing facing = EnumFacing.NORTH;
-
-	private final TapeDriveState state = new TapeDriveState(this, inventory);
+	protected final TapeDriveState state = new TapeDriveState(this, inventory);
 
 	public State getState() {
 		return this.state.getState();
@@ -72,7 +72,12 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	@Override
 	public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
 		player.openGui(ModCharsetAudio.instance, isTop ? PartSlot.UP.ordinal() : PartSlot.DOWN.ordinal(), getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
-		ModCharsetAudio.packet.sendToWatching(new PacketDriveState(this, getState()), this);
+		if (!player.worldObj.isRemote) {
+			ModCharsetAudio.packet.sendToWatching(new PacketDriveState(this, getState()), this);
+		}
+		if (player instanceof EntityPlayerMP) {
+			ModCharsetAudio.packet.sendTo(new PacketDriveCounter(this, state.counter), (EntityPlayerMP) player);
+		}
 		return true;
 	}
 
