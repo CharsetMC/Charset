@@ -20,10 +20,12 @@ public class SlotArmorBackpack extends Slot {
 		this.player = player;
 	}
 
+	@Override
 	public int getSlotStackLimit() {
 		return 1;
 	}
 
+	@Override
 	public boolean isItemValid(ItemStack stack) {
 		if (stack == null || stack.getItem() instanceof ItemBackpack) return false;
 		return stack.getItem().isValidArmor(stack, 1, player);
@@ -32,9 +34,14 @@ public class SlotArmorBackpack extends Slot {
 	@Override
 	public boolean canTakeStack(EntityPlayer player) {
 		ItemStack stack = getStack();
-		return stack == null || !(stack.getItem() instanceof ItemBackpack);
+		if (stack != null && stack.getItem() instanceof ItemBackpack) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
 	public String getSlotTexture() {
 		return ItemArmor.EMPTY_SLOT_NAMES[1];

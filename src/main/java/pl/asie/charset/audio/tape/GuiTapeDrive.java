@@ -154,7 +154,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 				}
 			}
 
-			int reset_x = this.xCenter + 121;
+			int reset_x = this.xCenter + 122;
 			int reset_y = this.yCenter + 39;
 			if (x >= reset_x && x <= (reset_x + 5) && y >= reset_y && y <= (reset_y + 6)) {
 				ctrResetHover = true;
@@ -179,6 +179,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		if (which >= 0 && ctrResetHover) {
 			this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
 			ModCharsetAudio.packet.sendToServer(new PacketDriveCounter(tapeDrive, 0));
+			ctrResetHover = false;
 		}
 	}
 	
@@ -210,24 +211,37 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		}
 
 		if (ctrResetHover) {
-			this.drawTexturedModalRect(this.xCenter + 121, this.yCenter + 39, 121, 38, 5, 6);
+			this.drawTexturedModalRect(this.xCenter + 122, this.yCenter + 39, 121, 38, 5, 6);
 		}
 
 		// Draw counter
 		float counterReal = (float) counter / 48000.0f;
+		if (counterReal < 0) {
+			counterReal = (counterReal % 1000f) + 1000.0f;
+		}
 		float[] counterPos = new float[3];
 		counterPos[0] = (counterReal / 100.0f) % 10;
 		counterPos[1] = (counterReal / 10.0f) % 10;
 		counterPos[2] = (counterReal) % 10;
+		if (counterPos[2] < 9f) {
+			counterPos[1] = (float) Math.floor(counterPos[1]);
+		} else {
+			counterPos[1] = (float) Math.floor(counterPos[1]) + counterReal % 1;
+		}
+		if ((counterReal % 100) < 99f) {
+			counterPos[0] = (float) Math.floor(counterPos[0]);
+		} else {
+			counterPos[0] = (float) Math.floor(counterPos[0]) + counterReal % 1;
+		}
 
 		for (int c = 0; c < 3; c++) {
-			int cpy = Math.round(counterPos[c] * 10) - 5;
+			int cpy = Math.round(counterPos[c] * 10);
 			if (cpy < 0) cpy += 100;
-			this.drawTexturedModalRect(this.xCenter + 97 + (c * 7), this.yCenter + 34, 248, cpy, 7, 16);
+			this.drawTexturedModalRect(this.xCenter + 98 + (c * 7), this.yCenter + 38, 248, cpy, 8, 9);
 		}
 
 		GlStateManager.enableBlend();
-		this.drawTexturedModalRect(this.xCenter + 98, this.yCenter + 34, 176, 1, 21, 16);
+		this.drawTexturedModalRect(this.xCenter + 99, this.yCenter + 34, 98, 34, 21, 16);
 		GlStateManager.disableBlend();
 
 		// Draw label

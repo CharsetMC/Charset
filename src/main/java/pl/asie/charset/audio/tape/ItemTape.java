@@ -27,14 +27,14 @@ import pl.asie.charset.lib.recipe.IDyeableItem;
 
 public class ItemTape extends Item implements IDyeableItem {
 	public static final Map<String, Material> materialByName = new HashMap<String, Material>();
+	public static final int DEFAULT_SAMPLE_RATE = 48000;
 	private static final int DEFAULT_SIZE = 2880000;
-	private static final int DEFAULT_SAMPLE_RATE = 48000;
 
 	public enum Material {
 		IRON("ingotIron", 0x8C8C8C),
 		GOLD("ingotGold", 0xF0E060, EnumChatFormatting.YELLOW + "Shiny"),
 		DIAMOND("gemDiamond", 0x60E0F0, EnumChatFormatting.AQUA + "Audiophile"),
-		EMERALD("gemEmerald", 0x50E080),
+		EMERALD("gemEmerald", 0x50E080, EnumChatFormatting.GREEN + "Best of Trade"),
 		QUARTZ("gemQuartz", 0xE0E0E0),
 		DARK_IRON("ingotDarkIron", 0x503080, EnumChatFormatting.DARK_PURPLE + "Dank");
 
@@ -150,7 +150,7 @@ public class ItemTape extends Item implements IDyeableItem {
 		int sizeSec = size / (DEFAULT_SAMPLE_RATE / 8);
 		int sizeMin = sizeSec / 60;
 		sizeSec %= 60;
-		tooltip.add(EnumChatFormatting.GRAY + "" + sizeMin + " minutes " + (sizeSec != 0 ? sizeSec + "seconds" : ""));
+		TapeUtils.addTooltip(tooltip, sizeMin, sizeSec);
 	}
 
 	@Override

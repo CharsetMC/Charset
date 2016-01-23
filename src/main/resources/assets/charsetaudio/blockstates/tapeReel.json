@@ -1,0 +1,40 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "inventory": {
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charsetaudio:items/tape_reel_0"
+      }
+    },
+    "inventory_1": {
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charsetaudio:items/tape_reel_1"
+      }
+    },
+    "inventory_2": {
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charsetaudio:items/tape_reel_2"
+      }
+    },
+    "inventory_3": {
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charsetaudio:items/tape_reel_3"
+      }
+    },
+    "inventory_4": {
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charsetaudio:items/tape_reel_4"
+      }
+    }
+  }
+}

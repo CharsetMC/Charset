@@ -1,4 +1,7 @@
 item.charset.tape.name=Tape
+item.charset.tapedrive.name=Tape Drive
+item.charset.tapereel.name=Tape Reel
+item.charset.tapeitem.name=Magnetic Tape
 item.charset.tape.iron.name=Iron Tape
 item.charset.tape.gold.name=Gold Tape
 item.charset.tape.diamond.name=Diamond Tape

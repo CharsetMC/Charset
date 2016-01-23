@@ -10,6 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 import net.minecraftforge.fml.common.Loader;
 
 import javax.sound.sampled.AudioFormat;
+import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
@@ -24,8 +25,6 @@ public class TapeRecordThread implements Runnable {
 		exts.add("wav");
 		if (Loader.isModLoaded("NotEnoughCodecs")) {
 			exts.add("mp3");
-			exts.add("aac");
-			exts.add("flac");
 			exts.add("mp4");
 		}
 		return exts.toArray(new String[exts.size()]);
@@ -55,19 +54,29 @@ public class TapeRecordThread implements Runnable {
 	public void run() {
 		try {
 			String ext = FilenameUtils.getExtension(file.getName());
-			SoundBuffer buffer = null;
+			SoundBuffer buffer;
+			ICodec codec = null;
 
 			statusBar = "Loading...";
 
 			if ("ogg".equals(ext)) {
-				CodecJOrbis orbis = new CodecJOrbis();
-				orbis.initialize(file.toURI().toURL());
-				buffer = orbis.readAll();
+				codec = new CodecJOrbis();
 			} else if ("wav".equals(ext)) {
-				CodecWav wav = new CodecWav();
-				wav.initialize(file.toURI().toURL());
-				buffer = wav.readAll();
+				codec = new CodecWav();
+			} else if ("mp3".equals(ext)) {
+				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
+			} else if ("mp4".equals(ext)) {
+				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
 			}
+
+			if (codec == null) {
+				statusBar = "Unsupported format!";
+				Thread.sleep(1250);
+				return;
+			}
+
+			codec.initialize(file.toURI().toURL());
+			buffer = codec.readAll();
 
 			if (buffer == null) {
 				statusBar = "Failed to load!";
@@ -152,6 +161,12 @@ public class TapeRecordThread implements Runnable {
 			Thread.sleep(1250);
 		} catch (Exception e) {
 			e.printStackTrace();
+			statusBar = "Strange error!";
+			try {
+				Thread.sleep(1250);
+			} catch (InterruptedException ee) {
+
+			}
 		}
 	}
 }

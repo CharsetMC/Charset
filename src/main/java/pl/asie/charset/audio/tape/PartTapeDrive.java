@@ -1,8 +1,9 @@
 package pl.asie.charset.audio.tape;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -44,13 +45,28 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
+	public float getHardness(PartMOP hit) {
+		return 3.0F;
+	}
+
+	@Override
+	public Material getMaterial() {
+		return Material.iron;
+	}
+
+	@Override
 	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
 		return asItemStack();
 	}
 
 	@Override
 	public List<ItemStack> getDrops() {
-		return Arrays.asList(asItemStack());
+		List<ItemStack> list = new ArrayList<ItemStack>();
+		list.add(asItemStack());
+		if (inventory.getStackInSlot(0) != null) {
+			list.add(inventory.getStackInSlot(0));
+		}
+		return list;
 	}
 
 	protected EnumFacing facing = EnumFacing.NORTH;
