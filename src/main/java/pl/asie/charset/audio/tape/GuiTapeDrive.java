@@ -1,6 +1,7 @@
 package pl.asie.charset.audio.tape;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.inventory.Container;
@@ -95,15 +96,20 @@ public class GuiTapeDrive extends GuiContainerCharset {
 				setState(State.STOPPED);
 				break;
 			case RECORD:
-				setState(State.STOPPED);
-				JFileChooser chooser = new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-				chooser.setFileFilter(new FileNameExtensionFilter("Audio file", "ogg", "wav"));
-				chooser.showOpenDialog(null);
-				tapeRecord = new TapeRecordThread(chooser.getSelectedFile(), tapeDrive);
-				tapeRecordThread = new Thread(tapeRecord);
-				tapeRecordThread.start();
+				if (tapeDrive.inventory.getStackInSlot(0) != null) {
+					setState(State.STOPPED);
+					JFileChooser chooser = new JFileChooser();
+					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+					chooser.setFileFilter(new FileNameExtensionFilter("Audio file " + Arrays.toString(TapeRecordThread.getSupportedExtensions()), TapeRecordThread.getSupportedExtensions()));
+					if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+						if (chooser.getSelectedFile() != null) {
+							tapeRecord = new TapeRecordThread(chooser.getSelectedFile(), tapeDrive);
+							tapeRecordThread = new Thread(tapeRecord);
+							tapeRecordThread.start();
+						}
+					}
+				}
 				break;
 		}
 	}
@@ -197,7 +203,14 @@ public class GuiTapeDrive extends GuiContainerCharset {
 				label = StatCollector.translateToLocal("tooltip.charset.tape.none");
 				labelColor = 0xFF3333;
 			}
-			if (label.length() > 24) label = label.substring(0, 22) + "...";
+			int width = fontRendererObj.getStringWidth(label);
+			if (width > 142) {
+				while (width > (144 - 8) && label.length() > 4) {
+					label = label.substring(0, label.length() - 1);
+					width = fontRendererObj.getStringWidth(label);
+				}
+				label += "...";
+			}
 		}
 		this.drawCenteredString(this.fontRendererObj, label, this.xCenter + 88, this.yCenter + 15, labelColor);
 	}

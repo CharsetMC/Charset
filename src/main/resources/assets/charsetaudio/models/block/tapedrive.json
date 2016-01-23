@@ -3,18 +3,18 @@
     { "from": [ 0, 0, 0 ],
       "to": [ 16, 8, 16 ],
       "faces": {
-        "down": { "texture": "#bottom", "cullface": "down" },
-        "up": { "texture": "#top", "cullface": "up" },
-        "north": { "texture": "#front", "cullface": "north" },
-        "south": { "texture": "#back", "cullface": "south" },
-        "west":  { "texture": "#left", "cullface": "west" },
-        "east":  { "texture": "#right", "cullface": "east" }
+        "down": { "texture": "#bottom", "cullface": "down", "tintIndex": 0 },
+        "up": { "texture": "#top", "cullface": "up", "tintIndex": 0 },
+        "north": { "texture": "#front", "cullface": "north", "tintIndex": 0 },
+        "south": { "texture": "#back", "cullface": "south", "tintIndex": 0 },
+        "west":  { "texture": "#left", "cullface": "west", "tintIndex": 0 },
+        "east":  { "texture": "#right", "cullface": "east", "tintIndex": 0 }
       }
     }
   ],
   "textures": {
     "front": "charsetaudio:blocks/tape_drive_front",
-    "back": "charsetaudio:blocks/tape_drive_back",
+    "back": "charsetaudio:blocks/eq_back",
     "bottom": "charsetaudio:blocks/eq_bottom",
     "top": "charsetaudio:blocks/eq_top",
     "left": "charsetaudio:blocks/eq_left",

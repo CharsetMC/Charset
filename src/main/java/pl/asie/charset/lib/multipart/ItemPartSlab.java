@@ -27,19 +27,16 @@ public abstract class ItemPartSlab extends ItemMultiPart {
 	@Override
 	public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
 		PartSlab slab = createPartSlab(world, blockPos, facing, vec3, stack, player);
-		System.out.println(vec3.toString());
 		slab.isTop = facing == EnumFacing.UP || (vec3.yCoord >= 0.5 && facing != EnumFacing.DOWN);
 
 		IMultipartContainer container = MultipartHelper.getPartContainer(world, blockPos);
 		if (container != null) {
 			boolean occupiedDown = false;
 			if (container.getPartInSlot(PartSlot.DOWN) != null || !OcclusionHelper.occlusionTest(container.getParts(), PartSlab.BOXES[0])) {
-				System.out.println("a");
 				slab.isTop = true;
 				occupiedDown = true;
 			}
 			if (slab.isTop && (container.getPartInSlot(PartSlot.UP) != null || !OcclusionHelper.occlusionTest(container.getParts(), PartSlab.BOXES[1]))) {
-				System.out.println("b");
 				if (occupiedDown) {
 					return null;
 				} else {

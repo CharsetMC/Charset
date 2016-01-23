@@ -22,7 +22,6 @@ public class DataStorageImpl implements IDataStorage {
 	private boolean dirty = false;
 
 	public DataStorageImpl() {
-		System.out.println("new");
 	}
 
 	public boolean isInitialized() {
@@ -30,7 +29,6 @@ public class DataStorageImpl implements IDataStorage {
 	}
 
 	public void initialize(String id, int position, int size) {
-		System.out.println("init");
 		if (id == null || id.length() == 0) {
 			this.uniqueId = ModCharsetAudio.storage.generateUID();
 		} else {
@@ -139,7 +137,6 @@ public class DataStorageImpl implements IDataStorage {
 
 
 	public void readFile() throws IOException {
-		System.out.println("reading");
 		FileInputStream fileStream = new FileInputStream(file);
 		GZIPInputStream stream = new GZIPInputStream(fileStream);
 
@@ -168,15 +165,12 @@ public class DataStorageImpl implements IDataStorage {
 			}
 		}
 
-		System.out.println("read " + position);
-
 		stream.close();
 		fileStream.close();
 	}
 
 	public void writeFile() throws IOException {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			System.out.println("write");
 			FileOutputStream fileStream = new FileOutputStream(file);
 			GZIPOutputStream stream = new GZIPOutputStream(fileStream);
 

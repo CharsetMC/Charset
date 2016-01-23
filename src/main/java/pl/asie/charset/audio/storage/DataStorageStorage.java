@@ -14,10 +14,7 @@ import pl.asie.charset.audio.ModCharsetAudio;
 public class DataStorageStorage implements Capability.IStorage<IDataStorage> {
 	@Override
 	public NBTBase writeNBT(Capability<IDataStorage> capability, IDataStorage instance, EnumFacing side) {
-		System.out.println("write");
-		//new Throwable().printStackTrace();
 		if (instance.getUniqueId() != null) {
-			System.out.println("write2");
 			NBTTagCompound compound = new NBTTagCompound();
 
 			compound.setInteger("size", instance.getSize());
@@ -38,10 +35,7 @@ public class DataStorageStorage implements Capability.IStorage<IDataStorage> {
 
 	@Override
 	public void readNBT(Capability<IDataStorage> capability, IDataStorage instance, EnumFacing side, NBTBase nbt) {
-		System.out.println("read");
-		//new Throwable().printStackTrace();
 		if (nbt instanceof NBTTagCompound) {
-			System.out.println("read2");
 			NBTTagCompound compound = (NBTTagCompound) nbt;
 			if (compound.hasKey("uid")) {
 				instance.initialize(compound.getString("uid"), 0, compound.getInteger("size"));

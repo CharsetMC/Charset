@@ -1,9 +1,16 @@
 package pl.asie.charset.audio.tape;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.capabilities.Capability;
@@ -15,8 +22,31 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.recipe.IDyeableItem;
 
-public class ItemTape extends Item {
+public class ItemTape extends Item implements IDyeableItem {
+	public static final Map<String, Material> materialByName = new HashMap<String, Material>();
+	private static final int DEFAULT_SIZE = 2880000;
+	private static final int DEFAULT_SAMPLE_RATE = 48000;
+
+	public enum Material {
+		IRON("ingotIron", 0xA0A0A0),
+		GOLD("ingotGold", 0xF0E060),
+		DIAMOND("gemDiamond", 0x60E0F0),
+		EMERALD("gemEmerald", 0x50E080),
+		QUARTZ("gemQuartz", 0xE0E0E0);
+
+		public final String oreDict;
+		public final int color;
+
+		Material(String oreDict, int color) {
+			this.oreDict = oreDict;
+			this.color = color;
+
+			materialByName.put(name(), this);
+		}
+	}
+
 	public static class CapabilityProvider implements INBTSerializable<NBTTagCompound>, ICapabilityProvider {
 		private final ItemStack stack;
 		private final IDataStorage dataStorage;
@@ -34,7 +64,7 @@ public class ItemTape extends Item {
 		@Override
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 			if (dataStorage != null && !dataStorage.isInitialized()) {
-				dataStorage.initialize(null, 0, 2097152);
+				dataStorage.initialize(null, 0, stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE);
 			}
 			return capability == ModCharsetAudio.CAP_STORAGE ? (T) dataStorage : null;
 		}
@@ -42,7 +72,6 @@ public class ItemTape extends Item {
 		@Override
 		public NBTTagCompound serializeNBT() {
 			if (dataStorage != null) {
-				System.out.println(this.toString());
 				NBTTagCompound compound = new NBTTagCompound();
 				NBTBase data = ModCharsetAudio.CAP_STORAGE.getStorage().writeNBT(
 						ModCharsetAudio.CAP_STORAGE, dataStorage, null
@@ -70,6 +99,33 @@ public class ItemTape extends Item {
 		super();
 		this.setUnlocalizedName("charset.tape");
 		this.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+		this.setMaxStackSize(1);
+	}
+
+	public static ItemStack asItemStack(int size, Material material) {
+		ItemStack stack = new ItemStack(ModCharsetAudio.tapeItem);
+		stack.setTagCompound(new NBTTagCompound());
+		stack.getTagCompound().setInteger("size", size);
+		stack.getTagCompound().setString("material", material.name());
+		return stack;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+		for (Material mat : Material.values()) {
+			subItems.add(asItemStack(480 * DEFAULT_SAMPLE_RATE, mat));
+		}
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		int size = stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE;
+		int sizeSec = size / DEFAULT_SAMPLE_RATE;
+		int sizeMin = sizeSec / 60;
+		sizeSec %= 60;
+		tooltip.add(EnumChatFormatting.GRAY + "" + sizeMin + " minutes " + (sizeSec != 0 ? sizeSec + "seconds" : ""));
 	}
 
 	@Override
@@ -78,12 +134,35 @@ public class ItemTape extends Item {
 		switch (renderPass) {
 			case 0:
 			default:
-				return 16777215;
+				return 0xFFFFFF;
 			case 1:
-				return 0x848484;
+				Material mat = stack.hasTagCompound() && stack.getTagCompound().hasKey("material") ? materialByName.get(stack.getTagCompound().getString("material")) : null;
+				return mat != null ? mat.color : Material.IRON.color;
 			case 2:
-				return 0xC4C4BC;
+				return getColor(stack);
 		}
+	}
+
+	@Override
+	public int getColor(ItemStack stack) {
+		if (hasColor(stack)) {
+			return stack.getTagCompound().getInteger("labelColor");
+		} else {
+			return 0xF0F0E8;
+		}
+	}
+
+	@Override
+	public boolean hasColor(ItemStack stack) {
+		return stack.hasTagCompound() && stack.getTagCompound().hasKey("labelColor");
+	}
+
+	@Override
+	public void setColor(ItemStack stack, int color) {
+		if (!stack.hasTagCompound()) {
+			stack.setTagCompound(new NBTTagCompound());
+		}
+		stack.getTagCompound().setInteger("labelColor", color);
 	}
 
 	@Override

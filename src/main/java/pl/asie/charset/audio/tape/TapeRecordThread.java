@@ -2,8 +2,12 @@ package pl.asie.charset.audio.tape;
 
 import java.io.File;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
+
+import net.minecraftforge.fml.common.Loader;
 
 import javax.sound.sampled.AudioFormat;
 import paulscode.sound.SoundBuffer;
@@ -13,10 +17,20 @@ import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.audio.repack.com.laszlosystems.libresample4j.Resampler;
 import pl.asie.charset.lib.utils.DFPWM;
 
-/**
- * Created by asie on 1/22/16.
- */
 public class TapeRecordThread implements Runnable {
+	public static String[] getSupportedExtensions() {
+		List<String> exts = new ArrayList<String>();
+		exts.add("ogg");
+		exts.add("wav");
+		if (Loader.isModLoaded("NotEnoughCodecs")) {
+			exts.add("mp3");
+			exts.add("aac");
+			exts.add("flac");
+			exts.add("mp4");
+		}
+		return exts.toArray(new String[exts.size()]);
+	}
+
 	private static final Resampler RESAMPLER = new Resampler(true, 0.01, 100);
 	private static final DFPWM CODEC = new DFPWM();
 	private final File file;
@@ -57,6 +71,7 @@ public class TapeRecordThread implements Runnable {
 
 			if (buffer == null) {
 				statusBar = "Failed to load!";
+				Thread.sleep(1250);
 				return;
 			}
 
@@ -64,6 +79,9 @@ public class TapeRecordThread implements Runnable {
 
 			float[] output = new float[buffer.audioData.length / buffer.audioFormat.getChannels() / (buffer.audioFormat.getSampleSizeInBits() / 8)];
 			int si = 0;
+
+			float min = 0.0f;
+			float max = 0.0f;
 
 			for(int i = 0; i < output.length; i++) {
 				int v = 0;
@@ -92,7 +110,15 @@ public class TapeRecordThread implements Runnable {
 
 				v = (v*2+buffer.audioFormat.getChannels())/(buffer.audioFormat.getChannels()*2);
 				output[i] = clamp((float) v / 0x8000, -1.0f, 1.0f);
+				if (output[i] < min) {
+					min = output[i];
+				}
+				if (output[i] > max) {
+					max = output[i];
+				}
 			}
+
+			float multiplier = min != 0.0f || max != 0.0f ? 1.0f / Math.max(0 - min, max) : 1.0f;
 
 			double factor = sampleRate / buffer.audioFormat.getSampleRate();
 			FloatBuffer resampledBuffer = FloatBuffer.allocate((int) Math.ceil(output.length * factor) + 1024);
@@ -101,8 +127,8 @@ public class TapeRecordThread implements Runnable {
 			byte[] preEncodeOutput = new byte[resampledBuffer.position()];
 
 			for (int i = 0; i < preEncodeOutput.length; i++) {
-				preEncodeOutput[i] = (byte) (clamp(resampledOutput[i], -1.0f, 1.0f) * 127);
-			}
+				preEncodeOutput[i] = (byte) (clamp(resampledOutput[i] * multiplier, -1.0f, 1.0f) * 127);
+			} 
 
 			statusBar = "Encoding...";
 

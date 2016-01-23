@@ -27,11 +27,7 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 
 	@Override
 	public void update() {
-		if (state == State.STOPPED) {
-			if (lastState == State.PLAYING) {
-				ModCharsetAudio.packet.sendToWatching(new PacketDriveStop(owner), owner);
-			}
-		} else {
+		if (state != State.STOPPED) {
 			boolean found = false;
 			ItemStack stack = inventory.getStackInSlot(0);
 			if (stack != null && stack.hasCapability(ModCharsetAudio.CAP_STORAGE, null)) {
@@ -42,30 +38,33 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 					if (state == State.PLAYING) {
 						byte[] data = new byte[300];
 						int len = storage.read(data, false);
-						System.out.println(storage.getPosition() + " " + data[0] + " " + len);
 
 						ModCharsetAudio.packet.sendToWatching(new PacketDriveAudio(owner, data), owner);
 
 						if (len < data.length) {
-							state = State.STOPPED;
+							setState(State.STOPPED);
 						}
 					} else {
 						int offset = state == State.FORWARDING ? 2048 : -2048;
 						int len = storage.seek(offset);
 						if (len != offset) {
-							state = State.STOPPED;
+							setState(State.STOPPED);
 						}
 					}
 				}
 			}
 
 			if (!found) {
-				state = State.STOPPED;
+				setState(State.STOPPED);
 			}
 		}
 
+
 		if (lastState != state) {
 			ModCharsetAudio.packet.sendToWatching(new PacketDriveState(owner, state), owner);
+			if (state == State.STOPPED && lastState == State.PLAYING) {
+				ModCharsetAudio.packet.sendToWatching(new PacketDriveStop(owner), owner);
+			}
 		}
 
 		lastState = state;

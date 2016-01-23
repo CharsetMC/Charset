@@ -21,6 +21,8 @@ public class ItemPartTapeDrive extends ItemPartSlab {
 
 	@Override
 	public PartSlab createPartSlab(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
-		return new PartTapeDrive();
+		PartTapeDrive tapeDrive = new PartTapeDrive();
+		tapeDrive.facing = player.getHorizontalFacing().getOpposite();
+		return tapeDrive;
 	}
 }

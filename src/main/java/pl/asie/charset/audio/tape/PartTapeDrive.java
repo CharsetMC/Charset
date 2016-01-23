@@ -1,13 +1,22 @@
 package pl.asie.charset.audio.tape;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
+
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.PartSlot;
@@ -19,6 +28,7 @@ import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.lib.multipart.PartSlab;
 import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.utils.MachineSound;
 
 public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, IInventoryOwner {
 	public final InventorySimple inventory = new InventorySimple(1, this) {
@@ -27,6 +37,20 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 			return stack == null || stack.getItem() instanceof ItemTape;
 		}
 	};
+
+	public ItemStack asItemStack() {
+		return new ItemStack(ModCharsetAudio.partTapeDriveItem);
+	}
+
+	@Override
+	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+		return asItemStack();
+	}
+
+	@Override
+	public List<ItemStack> getDrops() {
+		return Arrays.asList(asItemStack());
+	}
 
 	protected EnumFacing facing = EnumFacing.NORTH;
 
@@ -56,6 +80,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		inventory.writeToNBT(nbt, "items");
+		nbt.setByte("facing", (byte) facing.ordinal());
 		NBTTagCompound stateNbt = state.serializeNBT();
 		nbt.setTag("state", stateNbt);
 	}
@@ -65,6 +90,26 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 		super.readFromNBT(nbt);
 		inventory.readFromNBT(nbt, "items");
 		state.deserializeNBT(nbt.getCompoundTag("state"));
+		if (nbt.hasKey("facing")) {
+			facing = EnumFacing.getFront(nbt.getByte("facing"));
+			if (facing == null || facing.getAxis() == EnumFacing.Axis.Y) {
+				facing = EnumFacing.NORTH;
+			}
+		} else {
+			facing = EnumFacing.NORTH;
+		}
+	}
+
+	@Override
+	public void writeUpdatePacket(PacketBuffer buf) {
+		super.writeUpdatePacket(buf);
+		buf.writeByte(facing.ordinal());
+	}
+
+	@Override
+	public void readUpdatePacket(PacketBuffer buf) {
+		super.readUpdatePacket(buf);
+		facing = EnumFacing.getFront(buf.readByte());
 	}
 
 	@Override
@@ -79,8 +124,12 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 
 	@Override
 	public void update() {
-		if (getWorld() != null && !getWorld().isRemote) {
-			state.update();
+		if (getWorld() != null) {
+			if (!getWorld().isRemote) {
+				state.update();
+			} else {
+				updateSound();
+			}
 		}
 	}
 
@@ -97,6 +146,26 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 			if (isLast) {
 				storage.seek(-totalLength);
 			}
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	private MachineSound sound;
+
+	@SideOnly(Side.CLIENT)
+	public void updateSound() {
+		boolean isLooping = getState() == State.REWINDING || getState() == State.FORWARDING;
+		if (isLooping && sound == null) {
+			sound = new MachineSound(new ResourceLocation("charsetaudio", "tape_rewind"),
+					getPos().getX() + 0.5F,
+					getPos().getY() + (isTop() ? 0.75F : 0.25F),
+					getPos().getZ() + 0.5F,
+					1.0f, 1.0f);
+			Minecraft.getMinecraft().getSoundHandler().playSound(sound);
+		} else if (!isLooping && sound != null) {
+			sound.endPlaying();
+			Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
+			sound = null;
 		}
 	}
 }
