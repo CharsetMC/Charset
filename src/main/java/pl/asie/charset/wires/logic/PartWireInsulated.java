@@ -1,11 +1,11 @@
 package pl.asie.charset.wires.logic;
 
 import mcmultipart.multipart.IMultipartContainer;
-import pl.asie.charset.api.wires.IInsulatedWire;
+import pl.asie.charset.api.wires.IWireInsulated;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.wires.WireUtils;
 
-public class PartWireInsulated extends PartWireNormal implements IInsulatedWire {
+public class PartWireInsulated extends PartWireNormal implements IWireInsulated {
 	@Override
 	protected int getRedstoneLevel(IMultipartContainer container, WireFace location) {
 		return WireUtils.getInsulatedWireLevel(container, location, type.color());

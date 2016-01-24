@@ -7,6 +7,8 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+import net.minecraftforge.common.capabilities.Capability;
+
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.ISlottedPart;
@@ -16,6 +18,26 @@ import mcmultipart.multipart.PartSlot;
 public final class MultipartUtils {
 	private MultipartUtils() {
 
+	}
+
+	public static boolean hasCapability(Capability cap, World world, BlockPos pos, PartSlot slot, EnumFacing side) {
+		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
+		if (container == null) {
+			TileEntity tile = world.getTileEntity(pos);
+			return tile != null ? tile.hasCapability(cap, side) : false;
+		} else {
+			return container.hasCapability(cap, slot, side);
+		}
+	}
+
+	public static <T> T getCapability(Capability<T> cap, World world, BlockPos pos, PartSlot slot, EnumFacing side) {
+		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
+		if (container == null) {
+			TileEntity tile = world.getTileEntity(pos);
+			return tile != null ? tile.getCapability(cap, side) : null;
+		} else {
+			return container.getCapability(cap, slot, side);
+		}
 	}
 
 	public static <T> T getInterface(Class<T> clazz, World world, BlockPos pos, EnumFacing side) {

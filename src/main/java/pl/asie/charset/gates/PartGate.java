@@ -24,11 +24,13 @@ import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.capabilities.ISlottedCapabilityProvider;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.IOccludingPart;
@@ -38,13 +40,44 @@ import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.MultipartRedstoneHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
-import pl.asie.charset.api.wires.IConnectable;
-import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.api.wires.IBundledEmitter;
+import pl.asie.charset.api.wires.IBundledReceiver;
+import pl.asie.charset.api.wires.IRedstoneEmitter;
+import pl.asie.charset.api.wires.IRedstoneReceiver;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public abstract class PartGate extends Multipart implements IRedstonePart.ISlottedRedstonePart, IOccludingPart, IConnectable, ITickable {
+public abstract class PartGate extends Multipart implements IRedstonePart.ISlottedRedstonePart, IOccludingPart,ISlottedCapabilityProvider, ITickable {
+	private class RedstoneCommunications implements IBundledEmitter, IBundledReceiver, IRedstoneEmitter, IRedstoneReceiver {
+		private final EnumFacing side;
+
+		RedstoneCommunications(EnumFacing side) {
+			this.side = side;
+		}
+
+		@Override
+		public byte[] getBundledSignal() {
+			return new byte[0];
+		}
+
+		@Override
+		public void onBundledInputChange() {
+			onChanged();
+		}
+
+		@Override
+		public int getRedstoneSignal() {
+			return getOutputOutside(side);
+		}
+
+		@Override
+		public void onRedstoneInputChange() {
+			onChanged();
+		}
+	}
+
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
+	private final RedstoneCommunications[] COMMS = new RedstoneCommunications[4];
 
 	static {
 		for (int i = 0; i < 6; i++) {
@@ -151,6 +184,11 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 
 	public PartGate() {
 		enabledSides = getSideMask();
+
+		COMMS[0] = new RedstoneCommunications(EnumFacing.NORTH);
+		COMMS[1] = new RedstoneCommunications(EnumFacing.SOUTH);
+		COMMS[2] = new RedstoneCommunications(EnumFacing.WEST);
+		COMMS[3] = new RedstoneCommunications(EnumFacing.EAST);
 	}
 
 	PartGate setSide(EnumFacing facing) {
@@ -189,19 +227,32 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 	}
 
 	@Override
-	public boolean canConnect(WireType type, WireFace face, EnumFacing direction) {
-		if (face.facing == side && direction.getAxis() != side.getAxis()) {
+	public boolean hasCapability(Capability<?> capability, PartSlot partSlot, EnumFacing direction) {
+		if (partSlot.f1 == side && direction.getAxis() != side.getAxis()) {
 			EnumFacing dir = realToGate(direction);
 			if (isSideOpen(dir)) {
 				Connection conn = getType(dir);
-				if (conn.isRedstone()) {
-					return type != WireType.BUNDLED;
-				} else if (conn.isBundled()) {
-					return type == WireType.BUNDLED;
+				if (capability == Capabilities.BUNDLED_EMITTER && conn.isOutput() && conn.isBundled()) {
+					return true;
+				} else if (capability == Capabilities.BUNDLED_RECEIVER && conn.isInput() && conn.isBundled()) {
+					return true;
+				} else if (capability == Capabilities.REDSTONE_EMITTER && conn.isOutput() && conn.isRedstone()) {
+					return true;
+				} else if (capability == Capabilities.REDSTONE_RECEIVER && conn.isInput() && conn.isRedstone()) {
+					return true;
 				}
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, PartSlot partSlot, EnumFacing enumFacing) {
+		if (enumFacing.ordinal() >= 2) {
+			return (T) COMMS[enumFacing.ordinal() - 2];
+		} else {
+			return null;
+		}
 	}
 
 	@Override

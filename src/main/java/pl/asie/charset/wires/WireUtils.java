@@ -7,7 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -19,10 +18,9 @@ import mcmultipart.multipart.IRedstonePart;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.PartSlot;
-import pl.asie.charset.api.wires.IConnectable;
-import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
@@ -146,16 +144,23 @@ public final class WireUtils {
 			}
 		}
 
-		IConnectable connectable = MultipartUtils.getInterface(IConnectable.class, wire.getWorld(), pos2, wire.location.facing, facing.getOpposite());
-		if (connectable == null) {
-			connectable = MultipartUtils.getInterface(IConnectable.class, wire.getWorld(), pos2, wire.location.facing);
-		}
-
-		if (connectable != null) {
-			if (connectable.canConnect(wire.type.type(), wire.location, facing.getOpposite())) {
+		if (wire.type.type() == WireType.BUNDLED) {
+			if (MultipartUtils.hasCapability(Capabilities.BUNDLED_EMITTER, wire.getWorld(), pos2, WireUtils.getSlotForFace(wire.location), facing.getOpposite())) {
 				return true;
 			}
-		} else if (wire.type.type() != WireType.BUNDLED) {
+
+			if (MultipartUtils.hasCapability(Capabilities.BUNDLED_RECEIVER, wire.getWorld(), pos2, WireUtils.getSlotForFace(wire.location), facing.getOpposite())) {
+				return true;
+			}
+		} else {
+			if (MultipartUtils.hasCapability(Capabilities.REDSTONE_EMITTER, wire.getWorld(), pos2, WireUtils.getSlotForFace(wire.location), facing.getOpposite())) {
+				return true;
+			}
+
+			if (MultipartUtils.hasCapability(Capabilities.REDSTONE_RECEIVER, wire.getWorld(), pos2, WireUtils.getSlotForFace(wire.location), facing.getOpposite())) {
+				return true;
+			}
+
 			IBlockState connectingState = wire.getWorld().getBlockState(pos2);
 			Block connectingBlock = connectingState.getBlock();
 
@@ -237,33 +242,30 @@ public final class WireUtils {
 	}
 
 	public static int getRedstoneLevel(World world, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face, boolean weak) {
+		int power = 0;
+
 		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
 		if (container != null) {
 			if (getWire(container, face) != null || getWire(container, WireFace.get(facing.getOpposite())) != null) {
 				return 0;
 			}
 
-			int power = 0;
-
 			for (IMultipart part : container.getParts()) {
 				if (!(part instanceof PartWireBase)) {
-					if (part instanceof IRedstoneEmitter) {
-						power = Math.max(power, ((IRedstoneEmitter) part).getRedstoneSignal(face, facing.getOpposite()));
-					} else if (part instanceof IRedstonePart) {
+					if (part instanceof IRedstonePart) {
 						power = Math.max(power, ((IRedstonePart) part).getWeakSignal(facing.getOpposite()));
 					}
 				}
 			}
+		}
 
-			return power;
-		} else {
-			Block block = state.getBlock();
-			TileEntity tile = world.getTileEntity(pos);
+		if (MultipartUtils.hasCapability(Capabilities.REDSTONE_EMITTER, world, pos, WireUtils.getSlotForFace(face), facing)) {
+			power = Math.max(power, MultipartUtils.getCapability(Capabilities.REDSTONE_EMITTER, world, pos, WireUtils.getSlotForFace(face), facing).getRedstoneSignal());
+		}
 
-			if (tile instanceof IRedstoneEmitter) {
-				return ((IRedstoneEmitter) tile).getRedstoneSignal(face, facing);
-			}
+		Block block = state.getBlock();
 
+		if (power == 0) {
 			if (weak) {
 				if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
 					return state.getValue(BlockRedstoneWire.POWER);
@@ -275,6 +277,8 @@ public final class WireUtils {
 			} else {
 				return block.getStrongPower(world, pos, state, facing);
 			}
+		} else {
+			return power;
 		}
 	}
 

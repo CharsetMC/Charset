@@ -14,22 +14,24 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartHelper;
-import pl.asie.charset.api.wires.IRedstoneUpdatable;
-import pl.asie.charset.api.wires.IRedstoneWire;
+import mcmultipart.multipart.PartSlot;
+import pl.asie.charset.api.wires.IRedstoneEmitter;
+import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public class PartWireNormal extends PartWireBase implements IRedstoneWire {
+public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IRedstoneReceiver {
 	private int signalLevel;
-	private int signalLevelPublic;
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -66,7 +68,6 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 		super.readFromNBT(nbt);
 		if (nbt.hasKey("s")) {
 			signalLevel = nbt.getShort("s");
-			signalLevelPublic = signalLevel;
 		}
 	}
 
@@ -239,7 +240,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 						}
 					} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing) {
 						TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
-						if (!(nt instanceof IRedstoneUpdatable)) {
+						if (!(nt instanceof IRedstoneReceiver)) {
 							getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
 						}
 					}
@@ -259,7 +260,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 							propagateNotifyCorner(location.facing, facing, type.color());
 						} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing) {
 							TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
-							if (!(nt instanceof IRedstoneUpdatable)) {
+							if (!(nt instanceof IRedstoneReceiver)) {
 								getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
 							}
 						}
@@ -298,19 +299,44 @@ public class PartWireNormal extends PartWireBase implements IRedstoneWire {
 		return signalLevel >> 8;
 	}
 
-	@Override
+	/* @Override
 	public int getRedstoneSignal(WireFace face, EnumFacing toDirection) {
 		if (face == null) {
 			return getWeakSignal(toDirection);
 		} else {
 			return face == location && connects(toDirection) ? getRedstoneLevel() : 0;
 		}
+	} */
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, PartSlot partSlot, EnumFacing face) {
+		if (capability == Capabilities.REDSTONE_RECEIVER) {
+			return connects(face);
+		}
+		if (capability == Capabilities.REDSTONE_EMITTER) {
+			return connects(face);
+		}
+		return false;
 	}
 
 	@Override
-	public void onRedstoneInputChanged(EnumFacing face) {
-		if (connects(face)) {
-			schedulePropagationUpdate();
+	public <T> T getCapability(Capability<T> capability, PartSlot partSlot, EnumFacing enumFacing) {
+		if (capability == Capabilities.REDSTONE_RECEIVER) {
+			return (T) this;
 		}
+		if (capability == Capabilities.REDSTONE_EMITTER) {
+			return (T) this;
+		}
+		return null;
+	}
+
+	@Override
+	public int getRedstoneSignal() {
+		return getRedstoneLevel();
+	}
+
+	@Override
+	public void onRedstoneInputChange() {
+		schedulePropagationUpdate();
 	}
 }

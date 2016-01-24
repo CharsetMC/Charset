@@ -36,6 +36,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.MCMultiPartMod;
+import mcmultipart.capabilities.ISlottedCapabilityProvider;
 import mcmultipart.client.multipart.ICustomHighlightPart;
 import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.multipart.IMultipart;
@@ -48,18 +49,19 @@ import mcmultipart.multipart.MultipartRegistry;
 import mcmultipart.multipart.OcclusionHelper;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
-import pl.asie.charset.api.wires.IBundledUpdatable;
-import pl.asie.charset.api.wires.IRedstoneUpdatable;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.wires.ModCharsetWires;
 import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements ICustomHighlightPart, IRedstonePart.ISlottedRedstonePart, IHitEffectsPart, IOccludingPart, ITickable, IWire {
+public abstract class PartWireBase extends Multipart implements
+		ICustomHighlightPart, IRedstonePart.ISlottedRedstonePart, IHitEffectsPart,
+		IOccludingPart, ITickable, ISlottedCapabilityProvider, IWire {
 	protected static final boolean DEBUG = false;
 	private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
@@ -602,27 +604,23 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
 	protected void finishPropagation() {
 		for (EnumFacing facing : propagationDirs) {
 			TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
-			if (nt instanceof IBundledUpdatable) {
-				((IBundledUpdatable) nt).onBundledInputChanged(facing.getOpposite());
-			} else if (nt instanceof IRedstoneUpdatable) {
-				((IRedstoneUpdatable) nt).onRedstoneInputChanged(facing.getOpposite());
-			} else {
-				IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
-				if (container != null) {
-					for (IMultipart m : container.getParts()) {
-						if (m != null) {
-							if (m instanceof IBundledUpdatable) {
-								((IBundledUpdatable) m).onBundledInputChanged(facing.getOpposite());
-							} else if (m instanceof IRedstoneUpdatable) {
-								((IRedstoneUpdatable) m).onRedstoneInputChanged(facing.getOpposite());
-							} else {
-								m.onPartChanged(this);
-							}
-						}
+			boolean found = false;
+			if (nt != null) {
+				if (type.type() == WireType.BUNDLED) {
+					if (nt.hasCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite())) {
+						nt.getCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite()).onBundledInputChange();
+						found = true;
 					}
 				} else {
-					getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
+					if (nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite())) {
+						nt.getCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()).onRedstoneInputChange();
+						found = true;
+					}
 				}
+			}
+
+			if (type.type() != WireType.BUNDLED && !found) {
+				getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
 			}
 		}
 
@@ -665,18 +663,26 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
 
 	@Override
 	public int getWeakSignal(EnumFacing facing) {
-		if (type.type() == WireType.BUNDLED) {
+		if (connectsWeak(facing)) {
+			return getRedstoneLevel();
+		} else {
 			return 0;
+		}
+	}
+
+	public boolean connectsWeak(EnumFacing facing) {
+		if (type.type() == WireType.BUNDLED) {
+			return false;
 		}
 
 		// Block any signals if there's a wire on the target face
 		if (location.facing == facing) {
-			return getRedstoneLevel();
+			return true;
 		} else {
 			if (connects(facing) || type.type() == WireType.NORMAL) {
-				return getRedstoneLevel();
+				return true;
 			} else {
-				return 0;
+				return false;
 			}
 		}
 	}

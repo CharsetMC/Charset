@@ -6,22 +6,38 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.MultipartHelper;
-import pl.asie.charset.api.wires.IBundledEmitter;
-import pl.asie.charset.api.wires.IBundledUpdatable;
-import pl.asie.charset.api.wires.IConnectable;
-import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.api.wires.WireType;
-import pl.asie.charset.audio.ModCharsetAudio;
+import net.minecraftforge.common.capabilities.Capability;
 
-public class TileIronNote extends TileEntity implements IBundledUpdatable, IConnectable {
+import pl.asie.charset.api.wires.IBundledReceiver;
+import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.Capabilities;
+
+public class TileIronNote extends TileEntity {
+	private class RedstoneCommunications implements IBundledReceiver {
+		private final EnumFacing side;
+
+		RedstoneCommunications(EnumFacing side) {
+			this.side = side;
+		}
+
+		@Override
+		public void onBundledInputChange() {
+			onBundledInputChanged(side);
+		}
+	}
+
 	public static final int MIN_NOTE = 0;
 	public static final int MAX_NOTE = 24;
 
 	private static final String[] INSTRUMENTS = {"harp", "bd", "snare", "hat", "bassattack"};
+	private final RedstoneCommunications[] COMMS = new RedstoneCommunications[6];
 	private byte[] lastInput = new byte[16];
+
+	public TileIronNote() {
+		for (int i = 0; i < 6; i++) {
+			COMMS[i] = new RedstoneCommunications(EnumFacing.getFront(i));
+		}
+	}
 
 	private String getInstrument(int id) {
 		if (id < 0 || id >= INSTRUMENTS.length) {
@@ -79,48 +95,48 @@ public class TileIronNote extends TileEntity implements IBundledUpdatable, IConn
 		compound.setByteArray("lastInput", lastInput);
 	}
 
-	@Override
-	public void onBundledInputChanged(EnumFacing face) {
-		byte[] input;
+	private void onBundledInputChanged(EnumFacing face) {
+		if (!canPlayNote()) {
+			return;
+		}
+
 		BlockPos pos = getPos().offset(face);
 		TileEntity tileEntity = worldObj.getTileEntity(pos);
 
-		if (tileEntity instanceof IBundledEmitter) {
-			input = ((IBundledEmitter) tileEntity).getBundledSignal(null, face.getOpposite());
+		if (tileEntity != null && tileEntity.hasCapability(Capabilities.BUNDLED_EMITTER, face.getOpposite())) {
+			byte[] input = tileEntity.getCapability(Capabilities.BUNDLED_EMITTER, face.getOpposite()).getBundledSignal();
+
+			if (input == null) {
+				input = new byte[16];
+			}
+
+			for (int i = 0; i < 16; i++) {
+				if (lastInput[i] != input[i] && input[i] > 0) {
+					playNote(i, getInstrumentID());
+				}
+			}
+
+			lastInput = input.clone();
 		} else {
-			input = new byte[16];
-			IMultipartContainer container = MultipartHelper.getPartContainer(worldObj, pos);
-
-			for (IMultipart part : container.getParts()) {
-				if (part instanceof IBundledEmitter) {
-					IBundledEmitter emitter = (IBundledEmitter) part;
-					byte[] data = emitter.getBundledSignal(null, face.getOpposite());
-					if (data != null) {
-						for (int i = 0; i < 16; i++) {
-							if (data[i] > input[i]) {
-								input[i] = data[i];
-							}
-						}
-					}
-				}
-			}
+			lastInput = new byte[16];
 		}
-
-		if (canPlayNote()) {
-			if (input != null) {
-				for (int i = 0; i < 16; i++) {
-					if (lastInput[i] != input[i] && input[i] > 0) {
-						playNote(i, getInstrumentID());
-					}
-				}
-			}
-		}
-
-		lastInput = input;
 	}
 
 	@Override
-	public boolean canConnect(WireType type, WireFace face, EnumFacing direction) {
-		return type == WireType.BUNDLED;
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		if (capability == Capabilities.BUNDLED_RECEIVER) {
+			return facing != null;
+		} else {
+			return super.hasCapability(capability, facing);
+		}
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if (capability == Capabilities.BUNDLED_RECEIVER && facing != null) {
+			return (T) COMMS[facing.ordinal()];
+		} else {
+			return super.getCapability(capability, facing);
+		}
 	}
 }

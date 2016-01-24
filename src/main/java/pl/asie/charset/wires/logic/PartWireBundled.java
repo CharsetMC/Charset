@@ -3,22 +3,26 @@ package pl.asie.charset.wires.logic;
 import java.util.Arrays;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import mcmultipart.block.TileMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.wires.IBundledEmitter;
-import pl.asie.charset.api.wires.IBundledWire;
+import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.lib.utils.MultipartUtils;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.wires.WireUtils;
 
-public class PartWireBundled extends PartWireBase implements IBundledWire {
+public class PartWireBundled extends PartWireBase implements IBundledReceiver, IBundledEmitter {
 	private int[] signalLevel = new int[16];
 	private byte[] signalValue = new byte[16];
 
@@ -166,10 +170,20 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
-				IBundledEmitter emitter = MultipartUtils.getInterface(IBundledEmitter.class, getWorld(), getPos().offset(facing), location.facing, facing.getOpposite());
+				TileEntity tile = getWorld().getTileEntity(getPos().offset(facing));
+
+				IBundledEmitter emitter = null;
+
+				if (tile instanceof TileMultipart) {
+					if (((TileMultipart) tile).hasCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite())) {
+						emitter = ((TileMultipart) tile).getCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite());
+					}
+				} else if (tile.hasCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite())) {
+					emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite());
+				}
 
 				if (emitter != null && !(emitter instanceof IWire)) {
-					nValues[facing.ordinal()] = emitter.getBundledSignal(location, facing.getOpposite());
+					nValues[facing.ordinal()] = emitter.getBundledSignal();
 				}
 			}
 		}
@@ -210,14 +224,34 @@ public class PartWireBundled extends PartWireBase implements IBundledWire {
 	}
 
 	@Override
-	public byte[] getBundledSignal(WireFace face, EnumFacing toDirection) {
-		return (face == null || face == location) && connects(toDirection) ? signalValue : null;
+	public byte[] getBundledSignal() {
+		return signalValue;
 	}
 
 	@Override
-	public void onBundledInputChanged(EnumFacing face) {
-		if (connects(face)) {
-			schedulePropagationUpdate();
+	public void onBundledInputChange() {
+		schedulePropagationUpdate();
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, PartSlot partSlot, EnumFacing face) {
+		if (capability == Capabilities.BUNDLED_RECEIVER) {
+			return partSlot == WireUtils.getSlotForFace(location) ? connects(face) : false;
 		}
+		if (capability == Capabilities.BUNDLED_EMITTER) {
+			return partSlot == WireUtils.getSlotForFace(location) ? connects(face) : false;
+		}
+		return false;
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, PartSlot partSlot, EnumFacing face) {
+		if (capability == Capabilities.BUNDLED_RECEIVER) {
+			return (T) this;
+		}
+		if (capability == Capabilities.BUNDLED_EMITTER) {
+			return (T) this;
+		}
+		return null;
 	}
 }

@@ -93,10 +93,12 @@ public class ProxyClient extends ProxyCommon {
 					event.entityPlayer.posZ - Minecraft.getMinecraft().thePlayer.posZ
 			);
 			GlStateManager.rotate(-interpolateRotation(event.entityPlayer.prevRenderYawOffset, event.entityPlayer.renderYawOffset, event.partialRenderTick), 0.0F, 1.0F, 0.0F);
-			GlStateManager.translate(-0.5, 1.125, -0.845);
 			if (event.entityPlayer.isSneaking()) {
+				GlStateManager.translate(-0.5, 1.125, -0.845);
 				GlStateManager.rotate(30.0f, 1.0f, 0.0f, 0.0f);
-				GlStateManager.translate(0, 0.1, -0.35);
+				GlStateManager.translate(0, 0.175, -0.35);
+			} else {
+				GlStateManager.translate(-0.5, 1.2, -0.845);
 			}
 
 			int i = backpack.getItem().getColorFromItemStack(backpack, 0);

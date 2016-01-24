@@ -50,7 +50,8 @@ repositories {
     }
 }
 dependencies {
-    deobfCompile "MCMultiPart:MCMultiPart:1.0.4:universal"
+    //deobfCompile "MCMultiPart:MCMultiPart:1.0.5:universal"
+    compile files("libs/MCMultiPart-1.0.5-universal.jar")
 }
 
 processResources
