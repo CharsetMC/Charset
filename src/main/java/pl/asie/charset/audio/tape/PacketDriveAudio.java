@@ -55,6 +55,31 @@ public class PacketDriveAudio extends PacketPart {
 				out[i] = (byte) (out[i] ^ 0x80);
 			}
 
+			/* if (part instanceof PartTapeDrive) {
+				ItemStack tape = ((PartTapeDrive) part).invWrapper.getStackInSlot(0);
+				if (tape != null && ModCharsetAudio.tapeItem.getMaterial(tape) == ItemTape.Material.SOUL_SAND) {
+					int j = 0;
+					byte[] rout = out;
+					out = new byte[rout.length];
+					int rspeed = part.getWorld().rand.nextInt(20) + 5;
+					int rand = 3;
+					for (int i = 0; i < out.length; i++) {
+						if ((i % 4) == 0) {
+							rand = part.getWorld().rand.nextInt(rspeed);
+						}
+						if (j >= out.length) {
+							j = out.length - 1;
+						}
+						out[i] = rout[j];
+						if (rand == 0) {
+							j += 2;
+						} if (rand != 1 && rand != 2) {
+							j++;
+						}
+					}
+				}
+			} */
+
 			stream.push(out);
 			stream.play(part.getPos().getX(), part.getPos().getY(), part.getPos().getZ());
 		}

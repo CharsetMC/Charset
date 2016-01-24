@@ -2,12 +2,22 @@ item.charset.tape.name=Tape
 item.charset.tapedrive.name=Tape Drive
 item.charset.tapereel.name=Tape Reel
 item.charset.tapeitem.name=Magnetic Tape
+
 item.charset.tape.iron.name=Iron Tape
 item.charset.tape.gold.name=Gold Tape
 item.charset.tape.diamond.name=Diamond Tape
 item.charset.tape.emerald.name=Emerald Tape
 item.charset.tape.quartz.name=Quartz Tape
 item.charset.tape.dark_iron.name=Dark Iron Tape
+item.charset.tape.ruby.name=Ruby Tape
+item.charset.tape.sapphire.name=Sapphire Tape
+
+item.charset.tape.gold.tip=Shiny
+item.charset.tape.diamond.tip=Audiophile
+item.charset.tape.dark_iron.tip=Dank
+item.charset.tape.quartz.tip=Precise
+item.charset.tape.emerald.tip=Best of Trade
+
 tile.charset.ironNoteBlock.name=Iron Note Block
 
 tooltip.charset.tape.none=No Tape

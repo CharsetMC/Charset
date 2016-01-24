@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.StatCollector;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -32,11 +33,13 @@ public class ItemTape extends Item implements IDyeableItem {
 
 	public enum Material {
 		IRON("ingotIron", 0x8C8C8C),
-		GOLD("ingotGold", 0xF0E060, EnumChatFormatting.YELLOW + "Shiny"),
-		DIAMOND("gemDiamond", 0x60E0F0, EnumChatFormatting.AQUA + "Audiophile"),
-		EMERALD("gemEmerald", 0x50E080, EnumChatFormatting.GREEN + "Best of Trade"),
-		QUARTZ("gemQuartz", 0xE0E0E0),
-		DARK_IRON("ingotDarkIron", 0x503080, EnumChatFormatting.DARK_PURPLE + "Dank");
+		GOLD("ingotGold", 0xF0E060, EnumChatFormatting.YELLOW + ""),
+		DIAMOND("gemDiamond", 0x60E0F0, EnumChatFormatting.AQUA + ""),
+		EMERALD("gemEmerald", 0x50E080, EnumChatFormatting.GREEN + ""),
+		QUARTZ("gemQuartz", 0xE0E0E0, EnumChatFormatting.WHITE + ""),
+		RUBY("gemRuby", 0xE05050),
+		SAPPHIRE("gemSapphire", 0x3040E0),
+		DARK_IRON("ingotDarkIron", 0x503080, EnumChatFormatting.DARK_PURPLE + "");
 
 		public final String oreDict;
 		public final String subtitle;
@@ -143,7 +146,7 @@ public class ItemTape extends Item implements IDyeableItem {
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		Material mat = getMaterial(stack);
 		if (mat != null && mat.subtitle != null) {
-			tooltip.add(mat.subtitle);
+			tooltip.add(mat.subtitle + StatCollector.translateToLocal(getUnlocalizedName(stack) + ".tip"));
 		}
 
 		int size = stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE;

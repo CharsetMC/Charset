@@ -33,11 +33,12 @@ public class TapeRecordThread implements Runnable {
 		return exts.toArray(new String[exts.size()]);
 	}
 
+	private static final int PACKET_SIZE = 8192;
 	private static final Resampler RESAMPLER = new Resampler(true, 0.01, 100);
 	private static final DFPWM CODEC = new DFPWM();
 	private final File file;
 	private final PartTapeDrive owner;
-	private int sampleRate = 48000;
+	private int sampleRate = ItemTape.DEFAULT_SAMPLE_RATE;
 	private String statusBar = "Encoding...";
 
 	private float clamp(float in, float min, float max) {
@@ -83,6 +84,11 @@ public class TapeRecordThread implements Runnable {
 			}
 
 			codec.initialize(file.toURI().toURL());
+			if (!codec.initialized()) {
+				statusBar = "Failed to load!";
+				Thread.sleep(1250);
+				return;
+			}
 			buffer = codec.readAll();
 
 			if (buffer == null) {
@@ -104,28 +110,39 @@ public class TapeRecordThread implements Runnable {
 
 				for(int j = 0; j < buffer.audioFormat.getChannels(); j++) {
 					int s = 0;
-					if (buffer.audioFormat.getSampleSizeInBits() == 16) {
+					if (buffer.audioFormat.getSampleSizeInBits() >= 32) {
+						si++;
+					}
+
+					if (buffer.audioFormat.getSampleSizeInBits() >= 24) {
+						int l = 0xFF&(int)buffer.audioData[si++];
+						int m = 0xFF&(int)buffer.audioData[si++];
+						int h = 0xFF&(int)buffer.audioData[si++];
+						s = buffer.audioFormat.isBigEndian() ? ((l << 16) | (m << 8) | h) : (l | (m << 8) | (h << 16));
+						s &= 0xFFFFFF;
+					} else if (buffer.audioFormat.getSampleSizeInBits() >= 16) {
 						int l = 0xFF&(int)buffer.audioData[si++];
 						int h = 0xFF&(int)buffer.audioData[si++];
 						s = buffer.audioFormat.isBigEndian() ? ((l << 8) | h) : (l | (h<<8));
 						s &= 0xFFFF;
+						s <<= 8;
 					} else {
 						s = buffer.audioData[si++];
 						s &= 0xFF;
-						s <<= 8;
+						s <<= 16;
 					}
 
 					if (buffer.audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED) {
-						s = (s >= 0x8000 ? s - 0x10000 : s);
+						s = (s >= 0x800000 ? s - 0x1000000 : s);
 					} else {
-						s -= 0x8000;
+						s -= 0x800000;
 					}
 
 					v += s;
 				}
 
 				v = (v*2+buffer.audioFormat.getChannels())/(buffer.audioFormat.getChannels()*2);
-				output[i] = clamp((float) v / 0x8000, -1.0f, 1.0f);
+				output[i] = clamp((float) v / 0x800000, -1.0f, 1.0f);
 				if (output[i] < min) {
 					min = output[i];
 				}
@@ -151,8 +168,8 @@ public class TapeRecordThread implements Runnable {
 			byte[] finalOutput = new byte[(preEncodeOutput.length + 7) >> 3];
 			CODEC.compress(finalOutput, preEncodeOutput, 0, 0, finalOutput.length);
 
-			for (int i = 0; i < finalOutput.length; i += 1024) {
-				int len = Math.min(finalOutput.length - i, 1024);
+			for (int i = 0; i < finalOutput.length; i += PACKET_SIZE) {
+				int len = Math.min(finalOutput.length - i, PACKET_SIZE);
 				byte[] data = new byte[len];
 				System.arraycopy(finalOutput, i, data, 0, len);
 
