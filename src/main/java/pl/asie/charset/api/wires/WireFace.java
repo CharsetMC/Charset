@@ -2,8 +2,6 @@ package pl.asie.charset.api.wires;
 
 import net.minecraft.util.EnumFacing;
 
-import mcmultipart.multipart.PartSlot;
-
 public enum WireFace {
 	DOWN,
 	UP,
@@ -11,7 +9,7 @@ public enum WireFace {
 	SOUTH,
 	WEST,
 	EAST,
-	CENTER, PartSlot;
+	CENTER;
 
 	WireFace() {
 		facing = ordinal() >= 6 ? null : EnumFacing.getFront(ordinal());

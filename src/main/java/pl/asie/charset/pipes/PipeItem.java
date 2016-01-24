@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IMultipartContainer;
@@ -18,7 +20,6 @@ import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.inventory.InventoryUtils;
 
 public class PipeItem {
 	public static final int MAX_PROGRESS = 128;
@@ -249,7 +250,7 @@ public class PipeItem {
 				TileEntity tile = owner.getNeighbourTile(output);
 
 				if (!passToInjectable(tile, output, false)) {
-					addToInventory(tile, output, false);
+					addToItemHandler(tile, output, false);
 				}
 			}
 		}
@@ -272,10 +273,12 @@ public class PipeItem {
 
 		TileEntity tile = owner.getNeighbourTile(dir);
 
-		if (tile instanceof IItemInjectable) {
-			return ((IItemInjectable) tile).canInjectItems(dir.getOpposite());
-		} else if (tile instanceof IInventory) {
-			return InventoryUtils.connects((IInventory) tile, dir.getOpposite());
+		if (tile != null) {
+			if (tile instanceof IItemInjectable) {
+				return ((IItemInjectable) tile).canInjectItems(dir.getOpposite());
+			} else if (tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
+				return true;
+			}
 		}
 
 		return false;
@@ -309,7 +312,7 @@ public class PipeItem {
 			return true;
 		}
 
-		if (addToInventory(tile, dir, true)) {
+		if (addToItemHandler(tile, dir, true)) {
 			return true;
 		}
 
@@ -472,13 +475,27 @@ public class PipeItem {
 		return false;
 	}
 
-	private boolean addToInventory(TileEntity tile, EnumFacing dir, boolean simulate) {
-		if (tile instanceof IInventory) {
-			int added = InventoryUtils.addStack((IInventory) tile, dir.getOpposite(), stack, simulate);
-			if (added > 0) {
-				if (!simulate) {
-					stack.stackSize -= added;
+	private boolean addToItemHandler(TileEntity tile, EnumFacing dir, boolean simulate) {
+		if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
+			int stackSize = stack.stackSize;
+			IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite());
+			for (int i = 0; i < handler.getSlots(); i++) {
+				ItemStack remain = handler.insertItem(i, stack, simulate);
+				int added = stack.stackSize;
+				if (remain != null) {
+					added -= remain.stackSize;
 				}
+				stackSize -= added;
+				if (stackSize == 0) {
+					if (!simulate) {
+						stack.stackSize = 0;
+					}
+					return true;
+				}
+			}
+
+			if (stackSize > 0 && !simulate) {
+				stack.stackSize = stackSize;
 				return true;
 			}
 		}

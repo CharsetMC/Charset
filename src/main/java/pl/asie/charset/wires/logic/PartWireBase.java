@@ -414,6 +414,11 @@ public abstract class PartWireBase extends Multipart implements ICustomHighlight
 			return;
 		}
 
+		if (location == null) {
+			getContainer().removePart(this);
+			return;
+		}
+
 		if (suConnection) {
 			suConnection = false;
 			updateConnections();

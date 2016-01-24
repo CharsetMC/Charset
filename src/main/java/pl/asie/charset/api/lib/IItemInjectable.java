@@ -3,6 +3,7 @@ package pl.asie.charset.api.lib;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
+@Deprecated
 public interface IItemInjectable {
 	/**
 	 * Checks if items can be injected from a given side.
