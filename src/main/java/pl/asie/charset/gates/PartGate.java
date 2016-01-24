@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
@@ -45,6 +46,7 @@ import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public abstract class PartGate extends Multipart implements IRedstonePart.ISlottedRedstonePart, IOccludingPart,ISlottedCapabilityProvider, ITickable {
@@ -305,7 +307,13 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 					inputs[i] = (byte) MultipartRedstoneHelper.getWeakSignal(container, real.getOpposite(), this.side);
 				} else {
 					IBlockState s = w.getBlockState(p);
-					inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+					if (RedstoneUtils.canConnectFace(w, p, s, real, this.side)) {
+						if (s.getBlock() instanceof BlockRedstoneWire) {
+							inputs[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
+						} else {
+							inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+						}
+					}
 				}
 
 				if (conn.isDigital()) {
@@ -401,6 +409,8 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 			harvest(null, null);
 			return;
 		}
+
+		System.out.println("!");
 
 		onChanged();
 	}

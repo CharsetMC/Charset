@@ -185,4 +185,9 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 	public void onInventoryChanged(IInventory inventory) {
 		markDirty();
 	}
+
+	@Override
+	public boolean hasFastRenderer() {
+		return true;
+	}
 }
