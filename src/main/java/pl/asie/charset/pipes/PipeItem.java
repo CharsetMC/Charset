@@ -477,26 +477,32 @@ public class PipeItem {
 
 	private boolean addToItemHandler(TileEntity tile, EnumFacing dir, boolean simulate) {
 		if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
-			int stackSize = stack.stackSize;
+		int stackSize = stack.stackSize;
 			IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite());
-			for (int i = 0; i < handler.getSlots(); i++) {
-				ItemStack remain = handler.insertItem(i, stack, simulate);
-				int added = stack.stackSize;
-				if (remain != null) {
-					added -= remain.stackSize;
-				}
-				stackSize -= added;
-				if (stackSize == 0) {
-					if (!simulate) {
-						stack.stackSize = 0;
+			if (handler != null) {
+				for (int i = 0; i < handler.getSlots(); i++) {
+					ItemStack remain = handler.insertItem(i, stack, simulate);
+					int added = stack.stackSize;
+					if (remain != null) {
+						added -= remain.stackSize;
 					}
+					stackSize -= added;
+					if (stackSize == 0) {
+						if (!simulate) {
+							stack = null;
+						}
+						return true;
+					} else if (!simulate) {
+						stack = stack.copy();
+						stack.stackSize = stackSize;
+					}
+				}
+
+				if (stackSize > 0 && !simulate) {
+					stack = stack.copy();
+					stack.stackSize = stackSize;
 					return true;
 				}
-			}
-
-			if (stackSize > 0 && !simulate) {
-				stack.stackSize = stackSize;
-				return true;
 			}
 		}
 

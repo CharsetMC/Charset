@@ -24,8 +24,11 @@ public class TapeRecordThread implements Runnable {
 		exts.add("ogg");
 		exts.add("wav");
 		if (Loader.isModLoaded("NotEnoughCodecs")) {
+			exts.add("aac");
 			exts.add("mp3");
+			exts.add("m4a");
 			exts.add("mp4");
+			exts.add("flac");
 		}
 		return exts.toArray(new String[exts.size()]);
 	}
@@ -65,8 +68,12 @@ public class TapeRecordThread implements Runnable {
 				codec = new CodecWav();
 			} else if ("mp3".equals(ext)) {
 				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
-			} else if ("mp4".equals(ext)) {
+			} else if ("mp4".equals(ext) || "m4a".equals(ext)) {
 				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
+			} else if ("aac".equals(ext)) {
+				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecADTS").newInstance();
+			} else if ("flac".equals(ext)) {
+				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecFLAC").newInstance();
 			}
 
 			if (codec == null) {

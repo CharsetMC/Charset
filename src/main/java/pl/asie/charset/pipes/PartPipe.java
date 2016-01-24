@@ -18,8 +18,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -31,9 +29,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ITickable;
 
-import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.client.multipart.IHitEffectsPart;
@@ -242,20 +240,13 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 		TileEntity tile = getNeighbourTile(side);
 
-		if (tile instanceof IInventory) {
-			if (tile instanceof ISidedInventory) {
-				int[] slots = ((ISidedInventory) tile).getSlotsForFace(side.getOpposite());
-				if (slots == null || slots.length == 0) {
-					return false;
-				}
-			}
-
+		if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.getOpposite())) {
 			return true;
 		}
 
-		if (tile instanceof IFluidHandler) {
+		/* if (tile instanceof IFluidHandler) {
 			return true;
-		}
+		} */
 
 		if (tile instanceof IShifter && ((IShifter) tile).getMode() == IShifter.Mode.Extract && ((IShifter) tile).getDirection() == side.getOpposite()) {
 			return true;

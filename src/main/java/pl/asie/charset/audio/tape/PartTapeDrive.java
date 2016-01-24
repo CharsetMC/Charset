@@ -17,8 +17,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.PartSlot;
@@ -32,13 +36,14 @@ import pl.asie.charset.lib.multipart.PartSlab;
 import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.MachineSound;
 
-public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, IInventoryOwner {
+public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, IInventoryOwner, ICapabilityProvider {
 	public final InventorySimple inventory = new InventorySimple(1, this) {
 		@Override
 		public boolean isItemValidForSlot(int index, ItemStack stack) {
 			return stack == null || stack.getItem() instanceof ItemTape;
 		}
 	};
+	public final InvWrapper invWrapper = new InvWrapper(inventory);
 
 	public ItemStack asItemStack() {
 		return new ItemStack(ModCharsetAudio.partTapeDriveItem);
@@ -188,5 +193,18 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 			Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
 			sound = null;
 		}
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			return (T) invWrapper;
+		}
+		return null;
 	}
 }
