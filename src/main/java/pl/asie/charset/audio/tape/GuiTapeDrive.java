@@ -241,7 +241,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		}
 
 		GlStateManager.enableBlend();
-		this.drawTexturedModalRect(this.xCenter + 99, this.yCenter + 34, 98, 34, 21, 16);
+		this.drawTexturedModalRect(this.xCenter + 98, this.yCenter + 34, 98, 34, 22, 16);
 		GlStateManager.disableBlend();
 
 		// Draw label
