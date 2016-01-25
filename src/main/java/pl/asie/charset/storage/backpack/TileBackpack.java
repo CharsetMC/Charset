@@ -1,5 +1,6 @@
 package pl.asie.charset.storage.backpack;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -134,11 +135,19 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 	@Override
 	public void openInventory(EntityPlayer player) {
 		inventory.openInventory(player);
+		if (inventory.watchers.size() == 1) {
+			worldObj.playSound(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
+					Block.soundTypeSnow.getStepSound(), 1.0f, 0.6f, false);
+		}
 	}
 
 	@Override
 	public void closeInventory(EntityPlayer player) {
 		inventory.closeInventory(player);
+		if (inventory.watchers.size() == 0) {
+			worldObj.playSound(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
+					Block.soundTypeSnow.getStepSound(), 0.8f, 0.4f, false);
+		}
 	}
 
 	@Override

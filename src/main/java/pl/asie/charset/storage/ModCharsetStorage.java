@@ -3,6 +3,7 @@ package pl.asie.charset.storage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
@@ -75,7 +76,7 @@ public class ModCharsetStorage {
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lll",
-				'l', Items.leather, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lwl",
+				'l', Items.leather, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold", 'w', Blocks.wool));
 	}
 }

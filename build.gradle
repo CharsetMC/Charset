@@ -12,13 +12,14 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.1.6"
+version = "0.2.0"
 group= "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
     version = "1.8.9-11.15.0.1718"
     runDir = "run"
+    useDepAts = true
     
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
@@ -51,6 +52,8 @@ repositories {
 }
 dependencies {
     //deobfCompile "MCMultiPart:MCMultiPart:1.0.5:universal"
+
+    deobfCompile "mezz.jei:jei_1.8.9:2.22.4.106"
     compile files("libs/MCMultiPart-1.0.5-universal.jar")
 }
 

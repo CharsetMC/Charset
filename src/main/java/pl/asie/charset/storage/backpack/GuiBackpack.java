@@ -22,10 +22,12 @@ public class GuiBackpack extends GuiContainer {
 		return new ChatComponentTranslation("tile.charset.backpack.name");
 	}
 
+	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		this.fontRendererObj.drawString(getDisplayName().getUnformattedText(), 8, 6, 4210752);
 	}
 
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(CHEST_GUI_TEXTURE);
