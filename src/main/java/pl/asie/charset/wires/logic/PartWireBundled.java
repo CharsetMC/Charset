@@ -209,10 +209,6 @@ public class PartWireBundled extends PartWireBase implements IBundledReceiver, I
 		return signalLevel[i & 15];
 	}
 
-	public byte getBundledRedstoneLevel(int i) {
-		return signalValue[i & 15];
-	}
-
 	@Override
 	public int getSignalLevel() {
 		return 0;
@@ -246,6 +242,9 @@ public class PartWireBundled extends PartWireBase implements IBundledReceiver, I
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, PartSlot partSlot, EnumFacing face) {
+		if (!hasCapability(capability, partSlot, face)) {
+			return null;
+		}
 		if (capability == Capabilities.BUNDLED_RECEIVER) {
 			return (T) this;
 		}

@@ -18,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -250,6 +251,9 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, PartSlot partSlot, EnumFacing enumFacing) {
+		if (!hasCapability(capability, partSlot, enumFacing)) {
+			return null;
+		}
 		if (enumFacing.ordinal() >= 2) {
 			return (T) COMMS[enumFacing.ordinal() - 2];
 		} else {
@@ -306,12 +310,17 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 				if (container != null) {
 					inputs[i] = (byte) MultipartRedstoneHelper.getWeakSignal(container, real.getOpposite(), this.side);
 				} else {
-					IBlockState s = w.getBlockState(p);
-					if (RedstoneUtils.canConnectFace(w, p, s, real, this.side)) {
-						if (s.getBlock() instanceof BlockRedstoneWire) {
-							inputs[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
-						} else {
-							inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+					TileEntity tile = w.getTileEntity(p);
+					if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
+						inputs[i] = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
+					} else {
+						IBlockState s = w.getBlockState(p);
+						if (RedstoneUtils.canConnectFace(w, p, s, real, this.side)) {
+							if (s.getBlock() instanceof BlockRedstoneWire) {
+								inputs[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
+							} else {
+								inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+							}
 						}
 					}
 				}
@@ -409,8 +418,6 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 			harvest(null, null);
 			return;
 		}
-
-		System.out.println("!");
 
 		onChanged();
 	}

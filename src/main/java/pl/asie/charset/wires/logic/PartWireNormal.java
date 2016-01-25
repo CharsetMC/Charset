@@ -321,6 +321,9 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, PartSlot partSlot, EnumFacing enumFacing) {
+		if (!hasCapability(capability, partSlot, enumFacing)) {
+			return null;
+		}
 		if (capability == Capabilities.REDSTONE_RECEIVER) {
 			return (T) this;
 		}

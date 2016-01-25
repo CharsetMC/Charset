@@ -1,5 +1,6 @@
 package pl.asie.charset.pipes;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -15,6 +16,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.TileBase;
+import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 
@@ -23,8 +25,16 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	private int redstoneLevel;
 	private int ticker = ModCharsetPipes.RANDOM.nextInt(256);
 
+	public EnumFacing getDirection(IBlockState state) {
+		return state.getValue(Properties.FACING);
+	}
+
 	public EnumFacing getDirection() {
-		return EnumFacing.getFront(getBlockMetadata());
+		if (worldObj != null) {
+			return getDirection(worldObj.getBlockState(pos));
+		} else {
+			return EnumFacing.UP;
+		}
 	}
 
 	@Override

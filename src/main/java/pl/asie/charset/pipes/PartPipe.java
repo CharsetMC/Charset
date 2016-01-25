@@ -50,6 +50,47 @@ import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IOccludingPart, IPipe, ITickable {
+	/* public class PipeItemHandler implements IItemHandler {
+		private final EnumFacing side;
+
+		public PipeItemHandler(EnumFacing side) {
+			this.side = side;
+		}
+
+		@Override
+		public int getSlots() {
+			return 1;
+		}
+
+		@Override
+		public ItemStack getStackInSlot(int slot) {
+			return null;
+		}
+
+		@Override
+		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+			if (slot != 0) return stack;
+			ItemStack insertedStack = stack.copy();
+			insertedStack.stackSize = 1;
+			if (injectItem(insertedStack, side, simulate) > 0) {
+				if (stack.stackSize > 1) {
+					ItemStack rejectedStack = stack.copy();
+					rejectedStack.stackSize--;
+					return rejectedStack;
+				} else {
+					return null;
+				}
+			} else {
+				return stack;
+			}
+		}
+
+		@Override
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			return null;
+		}
+	} */
+
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
 	protected int[] shifterDistance = new int[6];
@@ -611,4 +652,25 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	public EnumSet<PartSlot> getSlotMask() {
 		return EnumSet.of(PartSlot.CENTER);
 	}
+
+	/* @Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			return getNeighbourTile(facing) instanceof IHopper;
+		} else {
+			return super.hasCapability(capability, facing);
+		}
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if (!hasCapability(capability, facing)) {
+			return null;
+		}
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			return (T) new PipeItemHandler(facing);
+		} else {
+			return super.getCapability(capability, facing);
+		}
+	} */
 }

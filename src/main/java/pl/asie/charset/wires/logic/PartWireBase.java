@@ -96,7 +96,8 @@ public abstract class PartWireBase extends Multipart implements
 	public WireKind type;
 	public WireFace location;
 	protected byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
-	private boolean suPropagation, suNeighbor, suRender, suConnection;
+	private boolean suPropagation, suRender, suConnection;
+	private int suNeighbor;
 
 	private final EnumSet<EnumFacing> propagationDirs = EnumSet.noneOf(EnumFacing.class);
 
@@ -412,7 +413,8 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public void update() {
-		if (getWorld() == null) {
+		World world = getWorld();
+		if (world == null) {
 			return;
 		}
 
@@ -426,26 +428,30 @@ public abstract class PartWireBase extends Multipart implements
 			updateConnections();
 		}
 
-		if (suNeighbor) {
-			suNeighbor = false;
+		if (suNeighbor != 0) {
+			int it = suNeighbor;
+			suNeighbor = 0;
+			propagateExternalTiles(it);
 			pokeExtendedNeighbors();
 		}
 
 		if (suPropagation) {
 			suPropagation = false;
-			if (!getWorld().isRemote) {
+			if (!world.isRemote) {
 				onSignalChanged(-1);
 			}
 		}
 
-		if (suNeighbor) {
-			suNeighbor = false;
+		if (suNeighbor != 0) {
+			int it = suNeighbor;
+			suNeighbor = 0;
+			propagateExternalTiles(it);
 			pokeExtendedNeighbors();
 		}
 
 		if (suRender) {
 			suRender = false;
-			if (getWorld().isRemote) {
+			if (world.isRemote) {
 				markRenderUpdate();
 			} else {
 				sendUpdatePacket();
@@ -565,14 +571,38 @@ public abstract class PartWireBase extends Multipart implements
 		int newConnectionCache = internalConnections << 12 | externalConnections << 6 | cornerConnections;
 
 		if (oldConnectionCache != newConnectionCache) {
-			scheduleNeighborUpdate();
+			scheduleNeighborUpdate((oldConnectionCache ^ newConnectionCache) >> 6);
 			schedulePropagationUpdate();
 			scheduleRenderUpdate();
 		}
 	}
 
+	protected void propagateExternalTiles(int i) {
+		for (int j = 0; j < 6; j++) {
+			if ((i & (1 << j)) != 0) {
+				EnumFacing facing = EnumFacing.getFront(j);
+				TileEntity tile = getWorld().getTileEntity(getPos().offset(facing));
+				if (tile != null) {
+					if (type.type() == WireType.BUNDLED) {
+						if (tile.hasCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite())) {
+							tile.getCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite()).onBundledInputChange();
+						}
+					} else {
+						if (tile.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite())) {
+							tile.getCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()).onRedstoneInputChange();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	protected void scheduleNeighborUpdate(int et) {
+		suNeighbor = (et & 0x3f) | 0x10000;
+	}
+
 	protected void scheduleNeighborUpdate() {
-		suNeighbor = true;
+		scheduleNeighborUpdate(0);
 	}
 
 	protected void schedulePropagationUpdate() {

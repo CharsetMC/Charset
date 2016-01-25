@@ -53,7 +53,7 @@ public class BlockShifter extends BlockContainer {
 			for (EnumFacing side : EnumFacing.VALUES) {
 				EnumFacing newSide = side;
 
-				switch (shifter.getDirection()) {
+				switch (shifter.getDirection(state)) {
 					case DOWN:
 						newSide = side.rotateAround(EnumFacing.Axis.X).rotateAround(EnumFacing.Axis.X);
 						break;
