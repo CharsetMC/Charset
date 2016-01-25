@@ -10,7 +10,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import mcmultipart.multipart.IMultipart;
@@ -18,6 +17,7 @@ import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.inventory.InventoryUtils;
 import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 
@@ -276,8 +276,11 @@ public class PipeItem {
 		if (tile != null) {
 			if (tile instanceof IItemInjectable) {
 				return ((IItemInjectable) tile).canInjectItems(dir.getOpposite());
-			} else if (tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
-				return true;
+			} else {
+				IItemHandler handler = InventoryUtils.getItemHandler(tile, dir.getOpposite());
+				if (handler != null && handler.getSlots() > 0) {
+					return true;
+				}
 			}
 		}
 
@@ -476,9 +479,9 @@ public class PipeItem {
 	}
 
 	private boolean addToItemHandler(TileEntity tile, EnumFacing dir, boolean simulate) {
-		if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite())) {
-		int stackSize = stack.stackSize;
-			IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir.getOpposite());
+		if (tile != null) {
+			int stackSize = stack.stackSize;
+			IItemHandler handler = InventoryUtils.getItemHandler(tile, dir.getOpposite());
 			if (handler != null) {
 				for (int i = 0; i < handler.getSlots(); i++) {
 					ItemStack remain = handler.insertItem(i, stack, simulate);

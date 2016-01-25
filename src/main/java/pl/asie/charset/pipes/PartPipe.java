@@ -18,6 +18,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -282,6 +284,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		TileEntity tile = getNeighbourTile(side);
 
 		if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.getOpposite())) {
+			return true;
+		}
+
+		if (tile instanceof ISidedInventory || tile instanceof IInventory) {
 			return true;
 		}
 

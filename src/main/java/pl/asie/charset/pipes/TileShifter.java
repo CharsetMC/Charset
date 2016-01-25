@@ -11,11 +11,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.TileBase;
+import pl.asie.charset.lib.inventory.InventoryUtils;
 import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
@@ -42,7 +42,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		EnumFacing direction = getDirection();
 		TileEntity input = getNeighbourTile(direction.getOpposite());
 
-		return input != null && input.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction) ? Mode.Extract : Mode.Shift;
+		return input != null && InventoryUtils.getItemHandler(input, direction) != null ? Mode.Extract : Mode.Shift;
 	}
 
 	public ItemStack[] getFilters() {
@@ -117,21 +117,23 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
-			if (input != null && input.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction) && output != null) {
-				IItemHandler handler = input.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
-				for (int i = 0; i < handler.getSlots(); i++) {
-					ItemStack source = handler.getStackInSlot(i);
-					if (source != null && matches(source)) {
-						int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
-						ItemStack stack = handler.extractItem(i, maxSize, true);
-						if (stack != null) {
-							if (output.injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
-								stack = handler.extractItem(i, maxSize, false);
-								if (stack != null) {
-									output.injectItem(stack, direction.getOpposite(), false);
-								}
+			if (input != null && output != null) {
+				IItemHandler handler = InventoryUtils.getItemHandler(input, direction);
+				if (handler != null) {
+					for (int i = 0; i < handler.getSlots(); i++) {
+						ItemStack source = handler.getStackInSlot(i);
+						if (source != null && matches(source)) {
+							int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
+							ItemStack stack = handler.extractItem(i, maxSize, true);
+							if (stack != null) {
+								if (output.injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
+									stack = handler.extractItem(i, maxSize, false);
+									if (stack != null) {
+										output.injectItem(stack, direction.getOpposite(), false);
+									}
 
-								return;
+									return;
+								}
 							}
 						}
 					}
