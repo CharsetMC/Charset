@@ -74,7 +74,7 @@ public class TweakDoubleDoors extends Tweak {
 
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.entityPlayer.isSneaking()) {
+		if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.entityPlayer.isSneaking() || event.world.isRemote) {
 			return;
 		}
 
