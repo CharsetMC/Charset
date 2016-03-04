@@ -64,7 +64,7 @@ public class ModCharsetPipes {
 				"cPc",
 				"c^c",
 				"crc",
-				'c', Blocks.cobblestone, 'P', Blocks.piston, 'r', Items.comparator, '^', Items.arrow);
+				'c', Blocks.cobblestone, 'P', Blocks.piston, 'r', Items.redstone, '^', Items.arrow);
 
 		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
 				"mgm",

@@ -61,5 +61,14 @@
 		"description": "Objects which help store things",
 		"authorList": [ "asiekierka" ],
 		"url": "http://charset.asie.pl"
+	},
+	{
+		"modid": "CharsetDrama",
+		"name": "!",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"description": "Straight Outta Reddit",
+		"authorList": [ "asiekierka" ],
+		"url": "http://charset.asie.pl"
 	}
 ]
