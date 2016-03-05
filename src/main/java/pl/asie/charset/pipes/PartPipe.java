@@ -295,8 +295,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			return true;
 		} */
 
-		if (tile instanceof IShifter && ((IShifter) tile).getMode() == IShifter.Mode.Extract && ((IShifter) tile).getDirection() == side.getOpposite()) {
-			return true;
+		if (tile != null && tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, side.getOpposite())) {
+			return tile.getCapability(ModCharsetPipes.CAP_SHIFTER, side.getOpposite()).getMode() == IShifter.Mode.Extract;
 		}
 
 		return false;
@@ -447,7 +447,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 		tile = getWorld().getTileEntity(p);
 
-		if (tile instanceof IShifter && isMatchingShifter((IShifter) tile, dir, dist)) {
+		if (tile != null && tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, dir)
+				&& isMatchingShifter(tile.getCapability(ModCharsetPipes.CAP_SHIFTER, dir), dir, dist)) {
 			shifterDistance[i] = dist;
 		} else {
 			shifterDistance[i] = 0;
@@ -493,8 +494,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 				tile = getWorld().getTileEntity(getPos().offset(dir.getOpposite(), shifterDistance[dir.ordinal()]));
 		}
 
-		if (tile instanceof IShifter && isMatchingShifter((IShifter) tile, dir, Integer.MAX_VALUE)) {
-			return (IShifter) tile;
+		IShifter shifter;
+		if (tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, dir) && isMatchingShifter(
+				shifter = tile.getCapability(ModCharsetPipes.CAP_SHIFTER, dir), dir, Integer.MAX_VALUE)) {
+			return shifter;
 		} else {
 			return null;
 		}

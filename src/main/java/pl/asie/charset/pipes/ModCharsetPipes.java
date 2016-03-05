@@ -1,13 +1,14 @@
 package pl.asie.charset.pipes;
 
-import java.util.Random;
-
+import mcmultipart.multipart.MultipartRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -15,10 +16,13 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-
-import mcmultipart.multipart.MultipartRegistry;
+import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.pipes.capability.ShifterImpl;
+import pl.asie.charset.pipes.capability.ShifterStorage;
+
+import java.util.Random;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -35,11 +39,16 @@ public class ModCharsetPipes {
 	@SidedProxy(clientSide = "pl.asie.charset.pipes.ProxyClient", serverSide = "pl.asie.charset.pipes.ProxyCommon")
 	public static ProxyCommon proxy;
 
+	@CapabilityInject(IShifter.class)
+	public static Capability<IShifter> CAP_SHIFTER;
+
 	public static Block shifterBlock;
 	public static Item itemPipe;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
+
 		itemPipe = new ItemPipe();
 		GameRegistry.registerItem(itemPipe, "pipe");
 		MultipartRegistry.registerPart(PartPipe.class, "CharsetPipes:pipe");

@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.IItemHandler;
 
 import pl.asie.charset.api.pipes.IShifter;
@@ -203,5 +204,19 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 				worldObj.notifyBlockOfStateChange(pos.offset(getDirection()), getBlockType());
 			}
 		}
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		return ((facing == null || facing == getDirection()) && capability == ModCharsetPipes.CAP_SHIFTER)
+				|| super.hasCapability(capability, facing);
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if ((facing == null || facing == getDirection()) && capability == ModCharsetPipes.CAP_SHIFTER) {
+			return (T) this;
+		}
+		return super.getCapability(capability, facing);
 	}
 }
