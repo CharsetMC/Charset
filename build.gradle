@@ -12,7 +12,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.2.2"
+version = "0.2.3"
 group= "pl.asie.charset"
 archivesBaseName = "Charset"
 
