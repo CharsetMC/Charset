@@ -143,7 +143,9 @@ public class PipeItem {
 						) {
 					TileEntity shifterTile = owner.getWorld().getTileEntity(owner.getPos().offset(output.getOpposite(), activeShifterDistance));
 
-					if (!(shifterTile instanceof IShifter) || !isShifterPushing((IShifter) shifterTile, output)) {
+					if (shifterTile == null
+							|| !shifterTile.hasCapability(ModCharsetPipes.CAP_SHIFTER, output)
+							|| !isShifterPushing(shifterTile.getCapability(ModCharsetPipes.CAP_SHIFTER, output), output)) {
 						needsRecalculation = true;
 					}
 				}
