@@ -3,6 +3,7 @@ package pl.asie.charset.audio.tape;
 import java.io.IOException;
 import java.util.Arrays;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
@@ -101,6 +102,10 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			case RECORD:
 				if (tapeDrive.inventory.getStackInSlot(0) != null) {
 					setState(State.STOPPED);
+					if (Minecraft.getMinecraft().isFullScreen()) {
+						Minecraft.getMinecraft().toggleFullscreen();
+					}
+
 					JFileChooser chooser = new JFileChooser();
 					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					chooser.setDialogType(JFileChooser.OPEN_DIALOG);

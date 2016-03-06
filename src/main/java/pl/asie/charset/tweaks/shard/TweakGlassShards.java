@@ -55,6 +55,10 @@ public class TweakGlassShards extends Tweak {
 
 	@SubscribeEvent
 	public void onBlockHarvest(BlockEvent.HarvestDropsEvent event) {
+		if (event.drops.size() > 0) {
+			return;
+		}
+
 		Block block = event.state.getBlock();
 		boolean isPane = false;
 		int md = 0;

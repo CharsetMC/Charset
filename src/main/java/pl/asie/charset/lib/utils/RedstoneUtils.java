@@ -13,6 +13,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.MultipartRedstoneHelper;
+
 /**
  * Created by asie on 1/6/16.
  */
@@ -46,6 +50,11 @@ public final class RedstoneUtils {
 			return false;
 		}
 
-		return block.canConnectRedstone(world, pos, side);
+		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
+		if (container != null) {
+			return MultipartRedstoneHelper.canConnectRedstone(container, side, face);
+		} else {
+			return block.canConnectRedstone(world, pos, side);
+		}
 	}
 }

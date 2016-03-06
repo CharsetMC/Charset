@@ -254,8 +254,9 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 		if (!hasCapability(capability, partSlot, enumFacing)) {
 			return null;
 		}
-		if (enumFacing.ordinal() >= 2) {
-			return (T) COMMS[enumFacing.ordinal() - 2];
+		EnumFacing dir = realToGate(enumFacing);
+		if (dir.ordinal() >= 2) {
+			return (T) COMMS[dir.ordinal() - 2];
 		} else {
 			return null;
 		}
