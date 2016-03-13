@@ -495,7 +495,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		}
 
 		IShifter shifter;
-		if (tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, dir) && isMatchingShifter(
+		if (tile != null && tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, dir) && isMatchingShifter(
 				shifter = tile.getCapability(ModCharsetPipes.CAP_SHIFTER, dir), dir, Integer.MAX_VALUE)) {
 			return shifter;
 		} else {

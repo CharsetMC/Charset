@@ -1,14 +1,17 @@
 package pl.asie.charset.pipes;
 
-import mcmultipart.multipart.MultipartRegistry;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -16,13 +19,13 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.pipes.capability.ShifterImpl;
 import pl.asie.charset.pipes.capability.ShifterStorage;
-
-import java.util.Random;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -75,9 +78,11 @@ public class ModCharsetPipes {
 				"crc",
 				'c', Blocks.cobblestone, 'P', Blocks.piston, 'r', Items.redstone, '^', Items.arrow);
 
-		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
-				"mgm",
-				'g', Blocks.glass, 'm', Blocks.obsidian);
+		if (!Loader.isModLoaded("BuildCraft|Transport")) {
+			ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
+					"mgm",
+					'g', Blocks.glass, 'm', Blocks.obsidian);
+		}
 
 		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
 				"m",
