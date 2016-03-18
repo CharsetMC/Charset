@@ -64,7 +64,7 @@ public class ItemWire extends ItemMultiPart {
 				name = StatCollector.translateToLocal("tile.charset.wire.name");
 				break;
 			case INSULATED:
-				name = StatCollector.translateToLocal("charset.color." + EnumDyeColor.byMetadata(kind.color()).getUnlocalizedName()) + " " + StatCollector.translateToLocal("tile.charset.wire.insulated.name");
+				name = String.format(StatCollector.translateToLocal("tile.charset.wire.insulated.suffix"), StatCollector.translateToLocal("charset.color." + EnumDyeColor.byMetadata(kind.color()).getUnlocalizedName()));
 				break;
 			case BUNDLED:
 				name = StatCollector.translateToLocal("tile.charset.wire.bundled.name");
@@ -72,7 +72,7 @@ public class ItemWire extends ItemMultiPart {
 		}
 
 		if (isFreestanding(stack)) {
-			name = StatCollector.translateToLocal("tile.charset.wire.freestanding") + " " + name;
+			name = String.format(StatCollector.translateToLocal("tile.charset.wire.freestanding.prefix"), name);
 		}
 
 		return name;

@@ -1,7 +1,7 @@
 tile.charset.wire.name=Redstone Cable
-tile.charset.wire.insulated.name=Insulated Cable
+tile.charset.wire.insulated.suffix=%s Insulated Cable
 tile.charset.wire.bundled.name=Bundled Cable
-tile.charset.wire.freestanding=Freestanding
+tile.charset.wire.freestanding.prefix=Freestanding %s
 charset.color.black=Black
 charset.color.red=Red
 charset.color.green=Green
