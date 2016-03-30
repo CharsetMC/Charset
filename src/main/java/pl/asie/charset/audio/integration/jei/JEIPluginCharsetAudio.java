@@ -1,11 +1,8 @@
 package pl.asie.charset.audio.integration.jei;
 
-import mezz.jei.api.IItemRegistry;
-import mezz.jei.api.IJeiHelpers;
-import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.IRecipeRegistry;
-import mezz.jei.api.JEIPlugin;
+import mezz.jei.api.*;
+
+import javax.annotation.Nonnull;
 
 @JEIPlugin
 public class JEIPluginCharsetAudio implements IModPlugin {
@@ -25,5 +22,10 @@ public class JEIPluginCharsetAudio implements IModPlugin {
 
 	@Override
 	public void onRecipeRegistryAvailable(IRecipeRegistry recipeRegistry) {
+	}
+
+	@Override
+	public void onRuntimeAvailable(@Nonnull IJeiRuntime jeiRuntime) {
+
 	}
 }

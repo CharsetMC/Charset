@@ -135,7 +135,7 @@ public class FaceBakeryWire extends FaceBakery {
 	}
 
 	@Override
-	public void func_178409_a(int[] faceData, EnumFacing facing, BlockFaceUV faceUV, TextureAtlasSprite p_178409_4_) {
+	public void lockUv(int[] faceData, EnumFacing facing, BlockFaceUV faceUV, TextureAtlasSprite p_178409_4_) {
 		for (int i = 0; i < 4; ++i) {
 			this.func_178401_a(i, faceData, facing, faceUV, p_178409_4_);
 		}

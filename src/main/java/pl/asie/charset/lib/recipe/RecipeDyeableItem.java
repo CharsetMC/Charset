@@ -68,7 +68,7 @@ public class RecipeDyeableItem extends RecipeBase {
 				} else {
 					int dyeId = ColorUtils.getColorIDFromDye(source);
 					if (dyeId >= 0) {
-						col = EntitySheep.func_175513_a(EnumDyeColor.byMetadata(dyeId));
+						col = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(dyeId));
 					}
 				}
 
