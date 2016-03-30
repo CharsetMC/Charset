@@ -1,6 +1,7 @@
 package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -30,6 +31,15 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 		@Override
 		public void onInventoryChanged(IInventory inventory) {
 			((InventorySimple) inventory).writeToNBT(stack.getTagCompound(), "items");
+		}
+	}
+
+	public static class Color implements IItemColor {
+		@Override
+		@SideOnly(Side.CLIENT)
+		public int getColorFromItemstack(ItemStack stack, int renderPass) {
+			int color = ((IDyeableItem) stack.getItem()).getColor(stack);
+			return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
 		}
 	}
 
@@ -83,14 +93,6 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 
 		stack.getTagCompound().setInteger("color", color);
 	}
-
-	// TODO
-	/* @Override
-	@SideOnly(Side.CLIENT)
-	public int getColorFromItemStack(ItemStack stack, int renderPass) {
-		int color = getColor(stack);
-		return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
-	} */
 
 	public IInventory getInventory(ItemStack stack) {
 		if (stack.getItem() == this) {

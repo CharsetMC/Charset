@@ -28,10 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.utils.ClientUtils;
-import pl.asie.charset.storage.backpack.ItemBackpack;
-import pl.asie.charset.storage.backpack.PacketBackpackOpen;
-import pl.asie.charset.storage.backpack.TileBackpack;
-import pl.asie.charset.storage.backpack.TileBackpackRenderer;
+import pl.asie.charset.storage.backpack.*;
 
 /**
  * Created by asie on 1/10/16.
@@ -45,6 +42,8 @@ public class ProxyClient extends ProxyCommon {
 	public void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileBackpack.class, new TileBackpackRenderer());
 		ClientRegistry.registerKeyBinding(backpackOpen);
+		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new BlockBackpack.Color(), ModCharsetStorage.backpackBlock);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemBackpack.Color(), ModCharsetStorage.backpackBlock);
 	}
 
 	protected float interpolateRotation(float par1, float par2, float par3) {

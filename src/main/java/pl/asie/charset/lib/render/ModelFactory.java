@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ModelFactory<T extends IRenderComparable<T>> implements IPerspectiveAwareModel {
+public abstract class ModelFactory<T extends IRenderComparable<T>> extends CharsetBakedModel {
     private static class MFItemOverride extends ItemOverrideList {
         public static final MFItemOverride INSTANCE = new MFItemOverride();
 
@@ -46,26 +46,14 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> implements IP
     private final Map<ModelKey<T>, IBakedModel> cache = new HashMap<>();
 
     private final IUnlistedProperty<T> property;
-    private final ResourceLocation particle;
-    private final Map<ItemCameraTransforms.TransformType, TRSRTransformation> transformMap = new HashMap<ItemCameraTransforms.TransformType, TRSRTransformation>();
 
     public ModelFactory(IUnlistedProperty<T> property, ResourceLocation particle) {
+        super(particle);
         this.property = property;
-        this.particle = particle;
     }
 
     public abstract IBakedModel bake(T object);
     public abstract T fromItemStack(ItemStack stack);
-
-    public void addTransformation(ItemCameraTransforms.TransformType type, TRSRTransformation transformation) {
-        transformMap.put(type, transformation);
-    }
-
-    @Override
-    public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
-        return new ImmutablePair<>(this,
-                transformMap.containsKey(cameraTransformType) ? transformMap.get(cameraTransformType).getMatrix() : TRSRTransformation.identity().getMatrix());
-    }
 
     public IBakedModel getModel(T object) {
         if (object == null) {
@@ -92,31 +80,6 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> implements IP
         }
 
         return ImmutableList.of();
-    }
-
-    @Override
-    public boolean isAmbientOcclusion() {
-        return true;
-    }
-
-    @Override
-    public boolean isGui3d() {
-        return true;
-    }
-
-    @Override
-    public boolean isBuiltInRenderer() {
-        return false;
-    }
-
-    @Override
-    public TextureAtlasSprite getParticleTexture() {
-        return ClientUtils.textureGetter.apply(particle);
-    }
-
-    @Override
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return ItemCameraTransforms.DEFAULT;
     }
 
     @Override

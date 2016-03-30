@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.common.base.Function;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraftforge.client.model.pipeline.LightUtil;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -33,28 +34,12 @@ public final class ClientUtils {
 
 	}
 
-	private static float getFaceBrightness(EnumFacing facing) {
-		switch (facing) {
-			case DOWN:
-				return 0.5F;
-			case UP:
-				return 1.0F;
-			case NORTH:
-			case SOUTH:
-				return 0.8F;
-			case WEST:
-			case EAST:
-				return 0.6F;
-			default:
-				return 1.0F;
-		}
-	}
-
 	public static int getFaceColor(int color, EnumFacing facing) {
 		int c = color & 0xFF000000;
-		c |= (int) (((color & 0xFF0000) >> 16) * getFaceBrightness(facing)) << 16;
-		c |= (int) (((color & 0x00FF00) >> 8) * getFaceBrightness(facing)) << 8;
-		c |= (int) (((color & 0x0000FF) >> 0) * getFaceBrightness(facing)) << 0;
+		float b = LightUtil.diffuseLight(facing);
+		c |= (int) (((color & 0xFF0000) >> 16) * b) << 16;
+		c |= (int) (((color & 0x00FF00) >> 8) * b) << 8;
+		c |= (int) (((color & 0x0000FF) >> 0) * b) << 0;
 		return c;
 	}
 

@@ -5,6 +5,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -32,6 +33,19 @@ import pl.asie.charset.storage.ModCharsetStorage;
  * Created by asie on 1/10/16.
  */
 public class BlockBackpack extends BlockContainer {
+	public static class Color implements IBlockColor {
+		@Override
+		@SideOnly(Side.CLIENT)
+		public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
+			TileEntity tile = worldIn.getTileEntity(pos);
+			if (tile instanceof TileBackpack) {
+				return ((TileBackpack) tile).getColor();
+			} else {
+				return DEFAULT_COLOR;
+			}
+		}
+	}
+
 	public static final int DEFAULT_COLOR = 0x805038;
 	private static final AxisAlignedBB AABB = new AxisAlignedBB(0.1875f, 0.0f, 0.1875f, 0.8125f, 0.75f, 0.8125f);
 
@@ -155,26 +169,4 @@ public class BlockBackpack extends BlockContainer {
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.MODEL;
 	}
-
-	// TODO
-	/*
-	@SideOnly(Side.CLIENT)
-	public int getBlockColor() {
-		return DEFAULT_COLOR;
-	}
-
-	@SideOnly(Side.CLIENT)
-	public int getRenderColor(IBlockState state) {
-		return DEFAULT_COLOR;
-	}
-
-	@SideOnly(Side.CLIENT)
-	public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass) {
-		TileEntity tile = worldIn.getTileEntity(pos);
-		if (tile instanceof TileBackpack) {
-			return ((TileBackpack) tile).getColor();
-		} else {
-			return DEFAULT_COLOR;
-		}
-	} */
 }

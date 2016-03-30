@@ -1,48 +1,31 @@
 package pl.asie.charset.gates.render;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
-import net.minecraftforge.common.property.IUnlistedProperty;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.client.model.ModelStateComposition;
-import net.minecraftforge.common.property.IExtendedBlockState;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import pl.asie.charset.gates.ItemGate;
 import pl.asie.charset.gates.PartGate;
-import pl.asie.charset.lib.render.CharsetBakedModel;
+import pl.asie.charset.lib.render.SimpleBakedModel;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.utils.ClientUtils;
 
 public class RendererGate extends ModelFactory<PartGate> {
 	public static final RendererGate INSTANCE = new RendererGate();
-
-	private static final Map<ItemCameraTransforms.TransformType, TRSRTransformation> TRANSFORM_MAP = new HashMap<ItemCameraTransforms.TransformType, TRSRTransformation>();
 
 	private static final ModelRotation[] ROTATIONS_SIDE = {
 			ModelRotation.X0_Y0, ModelRotation.X180_Y0,
@@ -60,11 +43,12 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 	public RendererGate() {
 		super(PartGate.PROPERTY, new ResourceLocation("charsetgates:blocks/gate_bottom"));
+		addDefaultBlockTransforms();
 	}
 
 	@Override
 	public IBakedModel bake(PartGate gate) {
-		CharsetBakedModel result = new CharsetBakedModel();
+		SimpleBakedModel result = new SimpleBakedModel(this);
 		ModelStateComposition transform = new ModelStateComposition(
 				new TRSRTransformation(ROTATIONS_SIDE[gate.getSide().ordinal()]),
 				new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()])
@@ -180,5 +164,11 @@ public class RendererGate extends ModelFactory<PartGate> {
 	@Override
 	public PartGate fromItemStack(ItemStack stack) {
 		return ItemGate.getPartGate(stack);
+	}
+
+	@Override
+	public ItemOverrideList getOverrides() {
+		addThirdPersonTransformation(getTransformation(0, 2.5f, 2.75f, 75, 45, 0, 0.375f));
+		return super.getOverrides();
 	}
 }

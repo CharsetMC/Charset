@@ -133,7 +133,7 @@ public class DramaGenerator {
 				SENTENCES.add("[things] breaks [function]");
 				SENTENCES.add("[people] sues [things] developers");
 				SENTENCES.add("[people] reminds you that [things] is [adj]");
-				SENTENCES.add("[people] and [people] get into a drama fight on [sites]");
+				SENTENCES.add("[people] and [people] get into a dramatic fight on [sites]");
 						SENTENCES.add("Fans of [things] and [things] argue on [sites]");
 				SENTENCES.add("[people] and [people] argue about [things]");
 				SENTENCES.add("[people] puts [badsoft] in [things]");

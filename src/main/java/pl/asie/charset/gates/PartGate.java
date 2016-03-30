@@ -784,7 +784,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 			return false;
 		}
 
-		if (this.getSide() != other.getSide() || this.getTop() != this.getTop()) {
+		if (this.getSide() != other.getSide() || this.getTop() != this.getTop() || this.isMirrored() != other.isMirrored()) {
 			return false;
 		}
 
@@ -799,7 +799,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	@Override
 	public int renderHashCode() {
-		return Objects.hash(this.getClass(), this.getSide(), this.getTop(),
+		return Objects.hash(this.getClass(), this.getSide(), this.getTop(), this.isMirrored(),
 				getUniqueSideRenderID(EnumFacing.NORTH), getUniqueSideRenderID(EnumFacing.SOUTH), getUniqueSideRenderID(EnumFacing.WEST), getUniqueSideRenderID(EnumFacing.EAST));
 	}
 }
