@@ -100,7 +100,7 @@ public class ModCharsetTweaks {
 
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-		if (ModCharsetTweaks.MODID.equals(event.modID)) {
+		if (ModCharsetTweaks.MODID.equals(event.getModID())) {
 			for (Tweak t : tweakSet) {
 				t.onConfigChanged(configuration, false);
 			}

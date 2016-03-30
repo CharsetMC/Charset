@@ -2,8 +2,9 @@ package pl.asie.charset.audio.note;
 
 import io.netty.buffer.ByteBuf;
 
+import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 
 import pl.asie.charset.lib.network.PacketTile;
@@ -24,8 +25,8 @@ public class PacketNoteParticle extends PacketTile {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
-		super.readData(buf);
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
 		note = buf.readByte();
 		if (tile != null) {
 			BlockPos pos = tile.getPos();

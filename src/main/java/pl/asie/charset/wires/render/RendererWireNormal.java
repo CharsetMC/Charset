@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.resources.model.ModelRotation;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -21,7 +20,7 @@ import pl.asie.charset.wires.WireUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 public class RendererWireNormal extends RendererWireBase {
-	private final ModelRotation[] ROTATIONS = new ModelRotation[]{
+	/* private final ModelRotation[] ROTATIONS = new ModelRotation[]{
 			ModelRotation.X0_Y0,
 			ModelRotation.X180_Y0,
 			ModelRotation.X270_Y0,
@@ -530,5 +529,5 @@ public class RendererWireNormal extends RendererWireBase {
 	public void loadTextures(TextureMap map) {
 		icons[0] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_cross"));
 		icons[1] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_full"));
-	}
+	} */
 }

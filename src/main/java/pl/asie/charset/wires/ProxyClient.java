@@ -1,6 +1,6 @@
 package pl.asie.charset.wires;
 
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -40,13 +40,13 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
-		event.modelRegistry.putObject(new ModelResourceLocation("charsetwires:wire", "multipart"), rendererWire);
-		event.modelRegistry.putObject(new ModelResourceLocation("charsetwires:wire", "inventory"), rendererWire);
+		//event.getModelRegistry().putObject(new ModelResourceLocation("charsetwires:wire", "multipart"), rendererWire);
+		//event.getModelRegistry().putObject(new ModelResourceLocation("charsetwires:wire", "inventory"), rendererWire);
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		rendererWire.loadTextures(event.map);
+		//rendererWire.loadTextures(event.getMap());
 	}
 }

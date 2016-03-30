@@ -1,6 +1,7 @@
 package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -9,10 +10,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IInteractionObject;
 
 import pl.asie.charset.lib.inventory.IInventoryOwner;
@@ -45,14 +47,14 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 		if (color >= 0) {
 			NBTTagCompound tag = new NBTTagCompound();
 			tag.setInteger("color", color);
-			return new S35PacketUpdateTileEntity(getPos(), getBlockMetadata(), tag);
+			return new SPacketUpdateTileEntity(getPos(), getBlockMetadata(), tag);
 		} else {
 			return null;
 		}
 	}
 
 	@Override
-	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		if (pkt != null && pkt.getNbtCompound() != null && pkt.getNbtCompound().hasKey("color")) {
 			int oldColor = color;
 			color = pkt.getNbtCompound().getInteger("color");
@@ -136,8 +138,8 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 	public void openInventory(EntityPlayer player) {
 		inventory.openInventory(player);
 		if (inventory.watchers.size() == 1) {
-			worldObj.playSound(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
-					Block.soundTypeSnow.getStepSound(), 1.0f, 0.6f, false);
+			worldObj.playSound( getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
+					SoundType.SNOW.getStepSound(), SoundCategory.BLOCKS, 1.0f, 0.6f, false);
 		}
 	}
 
@@ -146,7 +148,7 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 		inventory.closeInventory(player);
 		if (inventory.watchers.size() == 0) {
 			worldObj.playSound(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
-					Block.soundTypeSnow.getStepSound(), 0.8f, 0.4f, false);
+					SoundType.SNOW.getStepSound(), SoundCategory.BLOCKS, 0.8f, 0.4f, false);
 		}
 	}
 
@@ -186,8 +188,8 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 	}
 
 	@Override
-	public IChatComponent getDisplayName() {
-		return new ChatComponentTranslation("tile.charset.backpack.name");
+	public ITextComponent getDisplayName() {
+		return new TextComponentTranslation("tile.charset.backpack.name");
 	}
 
 	@Override

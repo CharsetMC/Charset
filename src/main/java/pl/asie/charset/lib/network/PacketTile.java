@@ -2,8 +2,9 @@ package pl.asie.charset.lib.network;
 
 import io.netty.buffer.ByteBuf;
 
+import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import pl.asie.charset.lib.ModCharsetLib;
@@ -20,7 +21,7 @@ public abstract class PacketTile extends Packet {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
+	public void readData(INetHandler handler, ByteBuf buf) {
 		int dim = buf.readInt();
 		int x = buf.readInt();
 		int y = buf.readUnsignedShort();
@@ -35,7 +36,7 @@ public abstract class PacketTile extends Packet {
 
 	@Override
 	public void writeData(ByteBuf buf) {
-		buf.writeInt(tile.getWorld().provider.getDimensionId());
+		buf.writeInt(tile.getWorld().provider.getDimension());
 		buf.writeInt(tile.getPos().getX());
 		buf.writeShort(tile.getPos().getY());
 		buf.writeInt(tile.getPos().getZ());

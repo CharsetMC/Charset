@@ -3,7 +3,7 @@ package pl.asie.charset.gates;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -26,8 +26,8 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
 		for (String s : ModCharsetGates.gateParts.keySet()) {
-			event.modelRegistry.putObject(new ModelResourceLocation(s, "multipart"), RendererGate.INSTANCE);
-			event.modelRegistry.putObject(new ModelResourceLocation(s, "inventory"), RendererGate.INSTANCE);
+			event.getModelRegistry().putObject(new ModelResourceLocation(s, "multipart"), RendererGate.INSTANCE);
+			event.getModelRegistry().putObject(new ModelResourceLocation(s, "inventory"), RendererGate.INSTANCE);
 		}
 	}
 
@@ -39,19 +39,21 @@ public class ProxyClient extends ProxyCommon {
 		GateRenderDefinitions.INSTANCE.load("charsetgates:gatedefs/base.json", ModCharsetGates.gateDefintions);
 
 		for (String s : ModCharsetGates.gateDefintions.keySet()) {
-			GateRenderDefinitions.Definition def = GateRenderDefinitions.INSTANCE.getGateDefinition(s);
+			ResourceLocation rs = new ResourceLocation(s);
+
+			GateRenderDefinitions.Definition def = GateRenderDefinitions.INSTANCE.getGateDefinition(rs);
 			for (IModel model : def.getAllModels()) {
 				textures.addAll(model.getTextures());
 			}
-			for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(s).layers) {
+			for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(rs).layers) {
 				if (layer.texture != null) {
-					event.map.registerSprite(new ResourceLocation(layer.texture));
+					event.getMap().registerSprite(new ResourceLocation(layer.texture));
 				}
 			}
 		}
 
 		for (ResourceLocation r : textures) {
-			event.map.registerSprite(r);
+			event.getMap().registerSprite(r);
 		}
 	}
 }

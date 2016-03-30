@@ -13,25 +13,20 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.item.ItemStack;
 
-import net.minecraftforge.client.model.IFlexibleBakedModel;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
-import net.minecraftforge.client.model.ISmartItemModel;
-import net.minecraftforge.client.model.TRSRTransformation;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import mcmultipart.client.multipart.ISmartMultipartModel;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 /**
  * Created by asie on 12/5/15.
  */
-public abstract class RendererWireBase implements ISmartMultipartModel, ISmartItemModel, IPerspectiveAwareModel {
-	protected IBlockState state;
+public abstract class RendererWireBase /* implements ISmartMultipartModel, ISmartItemModel, IPerspectiveAwareModel */ {
+/*	protected IBlockState state;
 	protected ItemStack stack;
 	protected ItemCameraTransforms.TransformType transform;
 	private final Map<ItemCameraTransforms.TransformType, TRSRTransformation> transformMap = new HashMap<ItemCameraTransforms.TransformType, TRSRTransformation>();
@@ -98,5 +93,5 @@ public abstract class RendererWireBase implements ISmartMultipartModel, ISmartIt
 		this.transform = cameraTransformType;
 		return new ImmutablePair<RendererWireBase, Matrix4f>(this,
 				transformMap.containsKey(cameraTransformType) ? transformMap.get(cameraTransformType).getMatrix() : TRSRTransformation.identity().getMatrix());
-	}
+	} */
 }

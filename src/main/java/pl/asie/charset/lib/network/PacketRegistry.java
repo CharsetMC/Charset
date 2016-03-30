@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
@@ -47,9 +47,10 @@ public class PacketRegistry {
 	}
 
 	public void sendToWatching(Packet message, World world, BlockPos pos) {
-		for (EntityPlayerMP player : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
-			if (player.worldObj.provider.getDimensionId() == world.provider.getDimensionId()) {
-				if (((WorldServer) player.worldObj).getPlayerManager().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
+		WorldServer worldServer = (WorldServer) world;
+		for (EntityPlayerMP player : worldServer.getMinecraftServer().getPlayerList().getPlayerList()) {
+			if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
+				if (worldServer.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
 					channels.get(Side.SERVER).writeOutbound(message);
@@ -91,13 +92,13 @@ public class PacketRegistry {
 
 	public void sendToAllAround(Packet packet, IMultipart entity,
 								double d) {
-		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),
+		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimension(),
 				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
 	}
 
 	public void sendToAllAround(Packet packet, TileEntity entity,
 								double d) {
-		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimensionId(),
+		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimension(),
 				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
 	}
 

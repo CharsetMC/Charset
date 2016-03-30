@@ -8,7 +8,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
@@ -20,7 +19,7 @@ import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.logic.PartWireBase;
 
 public class RendererWire extends RendererWireBase {
-	private final List<RendererWireBase> renderers = new ArrayList<RendererWireBase>();
+	/* private final List<RendererWireBase> renderers = new ArrayList<RendererWireBase>();
 
 	public RendererWire() {
 		renderers.add(new RendererWireNormal("wire", 2, 2));
@@ -96,5 +95,5 @@ public class RendererWire extends RendererWireBase {
 		for (RendererWireBase renderer : renderers) {
 			renderer.loadTextures(map);
 		}
-	}
+	} */
 }

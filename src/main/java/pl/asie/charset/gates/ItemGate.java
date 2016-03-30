@@ -7,10 +7,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.StatCollector;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,7 +31,7 @@ public class ItemGate extends ItemMultiPart {
 	}
 
 	public static ItemStack getStack(PartGate gate, boolean silky) {
-		ItemStack stack = new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(gate.getType()));
+		ItemStack stack = new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(gate.getType().toString()));
 		stack.setTagCompound(new NBTTagCompound());
 		gate.writeItemNBT(stack.getTagCompound(), silky);
 		return stack;
@@ -49,10 +49,10 @@ public class ItemGate extends ItemMultiPart {
 	public String getItemStackDisplayName(ItemStack stack) {
 		PartGate gate = getPartGate(stack);
 		String name = ModCharsetGates.gateUN[stack.getItemDamage() % ModCharsetGates.gateUN.length];
-		if (gate.isSideInverted(EnumFacing.NORTH) && StatCollector.canTranslate(name + ".i")) {
+		if (gate.isSideInverted(EnumFacing.NORTH) && I18n.canTranslate(name + ".i")) {
 			name += ".i";
 		}
-		return StatCollector.translateToLocal(name);
+		return I18n.translateToLocal(name);
 	}
 
 	@Override
@@ -63,8 +63,9 @@ public class ItemGate extends ItemMultiPart {
 		}
 	}
 
-	public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
-		if (!world.getBlockState(pos.offset(side)).getBlock().isSideSolid(world, pos.offset(side), side.getOpposite())) {
+	@Override
+	public boolean place(World world, BlockPos pos, EnumFacing side, Vec3d hit, ItemStack stack, EntityPlayer player) {
+		if (!world.isSideSolid(pos.offset(side), side.getOpposite())) {
 			return false;
 		}
 
@@ -81,7 +82,7 @@ public class ItemGate extends ItemMultiPart {
 	}
 
 	@Override
-	public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
+	public IMultipart createPart(World world, BlockPos pos, EnumFacing facing, Vec3d hit, ItemStack stack, EntityPlayer player) {
 		PartGate part = getPartGate(stack);
 		return part != null ? part.setSide(facing).setTop(facing.getAxis() == EnumFacing.Axis.Y ? player.getHorizontalFacing() : EnumFacing.NORTH) : null;
 	}

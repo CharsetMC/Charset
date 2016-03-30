@@ -9,7 +9,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.text.translation.I18n;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -176,13 +177,13 @@ public class GuiTapeDrive extends GuiContainerCharset {
 
 		super.mouseReleased(x, y, which);
 		if(which >= 0 && buttonHovering != null) {
-			this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+			this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(new SoundEvent(new ResourceLocation("gui.button.press")), 1.0F));
 			handleButtonPress(buttonHovering);
 			buttonHovering = null;
 		}
 
 		if (which >= 0 && ctrResetHover) {
-			this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+			this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(new SoundEvent(new ResourceLocation("gui.button.press")), 1.0F));
 			ModCharsetAudio.packet.sendToServer(new PacketDriveCounter(tapeDrive, 0));
 			ctrResetHover = false;
 		}
@@ -192,7 +193,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	private String getLabel() {
 		ItemStack stack = this.inventorySlots.getInventory().get(0);
 		if (stack != null && stack.getItem() instanceof ItemTape) {
-			String label = StatCollector.translateToLocal("tooltip.charset.tape.unnamed");
+			String label = I18n.translateToLocal("tooltip.charset.tape.unnamed");
 			if (stack.hasDisplayName()) {
 				label = stack.getDisplayName();
 			}
@@ -258,7 +259,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			labelColor = 0x90E0B0;
 		} else {
 			if (label == null) {
-				label = StatCollector.translateToLocal("tooltip.charset.tape.none");
+				label = I18n.translateToLocal("tooltip.charset.tape.none");
 				labelColor = 0xFF3333;
 			}
 			int width = fontRendererObj.getStringWidth(label);

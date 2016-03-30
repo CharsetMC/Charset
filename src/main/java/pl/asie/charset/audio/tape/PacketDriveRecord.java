@@ -2,6 +2,7 @@ package pl.asie.charset.audio.tape;
 
 import io.netty.buffer.ByteBuf;
 
+import net.minecraft.network.INetHandler;
 import net.minecraft.server.MinecraftServer;
 
 import mcmultipart.multipart.IMultipart;
@@ -34,8 +35,8 @@ public class PacketDriveRecord extends PacketPart {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
-		super.readData(buf);
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
 
 		totalLength = buf.readInt();
 		isLast = buf.readBoolean();
@@ -45,8 +46,8 @@ public class PacketDriveRecord extends PacketPart {
 			buf.readBytes(in);
 
 			if (part instanceof PartTapeDrive) {
-				if (!MinecraftServer.getServer().isCallingFromMinecraftThread()) {
-					MinecraftServer.getServer().addScheduledTask(new Runnable() {
+				if (!getThreadListener(handler).isCallingFromMinecraftThread()) {
+					getThreadListener(handler).addScheduledTask(new Runnable() {
 						@Override
 						public void run() {
 							((PartTapeDrive) part).writeData(in, isLast, totalLength);

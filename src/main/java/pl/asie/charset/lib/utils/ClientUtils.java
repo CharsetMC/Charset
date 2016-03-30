@@ -4,20 +4,19 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Function;
+import net.minecraft.client.renderer.VertexBuffer;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
-import net.minecraftforge.client.model.IColoredBakedQuad;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 
@@ -59,12 +58,15 @@ public final class ClientUtils {
 		return c;
 	}
 
-	public static BakedQuad recolorQuad(BakedQuad quad, int color) {
-		IColoredBakedQuad.ColoredBakedQuad quad1 = new IColoredBakedQuad.ColoredBakedQuad(quad.getVertexData().clone(), color, quad.getFace());
+	public static BakedQuad clone(BakedQuad quad) {
+		return new BakedQuad(quad.getVertexData(), quad.getTintIndex(), quad.getFace(), quad.getSprite(), quad.shouldApplyDiffuseLighting(), quad.getFormat());
+	}
+
+	public static BakedQuad recolorQuad(BakedQuad quad, int color){
 		int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
 		int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
 		int cc = getFaceColor(color, quad.getFace());
-		int[] vertexData = quad1.getVertexData();
+		int[] vertexData = quad.getVertexData();
 		for (int i = 0; i < 4; i++) {
 			vertexData[v * i + c] = cc;
 		}
@@ -79,10 +81,10 @@ public final class ClientUtils {
 			col = getFaceColor(color, facing);
 		}
 		for (BakedQuad quad : src) {
-			IColoredBakedQuad.ColoredBakedQuad quad1 = new IColoredBakedQuad.ColoredBakedQuad(quad.getVertexData().clone(), color, quad.getFace());
+			BakedQuad quad1 = clone(quad);
 			int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
 			int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-			int cc = hasColor ? col : getFaceColor(color, quad.getFace());
+			int cc = hasColor ? col : getFaceColor(color, quad1.getFace());
 			int[] vertexData = quad1.getVertexData();
 			for (int i = 0; i < 4; i++) {
 				vertexData[v * i + c] = cc;
@@ -98,7 +100,7 @@ public final class ClientUtils {
 				ModCharsetLib.logger.error("Model " + location.toString() + " is missing! THIS WILL CAUSE A CRASH!");
 			}
 			return model;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -108,7 +110,7 @@ public final class ClientUtils {
 		return 1 << (y * 4 + x * 2 + z);
 	}
 
-	private static void drawLine(WorldRenderer worldrenderer, Tessellator tessellator, double x1, double y1, double z1, double x2, double y2, double z2) {
+	private static void drawLine(VertexBuffer worldrenderer, Tessellator tessellator, double x1, double y1, double z1, double x2, double y2, double z2) {
 		worldrenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
 		worldrenderer.pos(x1, y1, z1).endVertex();
 		worldrenderer.pos(x2, y2, z2).endVertex();
@@ -160,7 +162,7 @@ public final class ClientUtils {
 		GlStateManager.depthMask(false);
 
 		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+		VertexBuffer worldrenderer = tessellator.getBuffer();
 		if ((lineMask & getLineMask(0, 0, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.minZ,

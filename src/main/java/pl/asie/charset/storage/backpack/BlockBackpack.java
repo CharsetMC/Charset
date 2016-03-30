@@ -1,18 +1,23 @@
 package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -28,28 +33,33 @@ import pl.asie.charset.storage.ModCharsetStorage;
  */
 public class BlockBackpack extends BlockContainer {
 	public static final int DEFAULT_COLOR = 0x805038;
+	private static final AxisAlignedBB AABB = new AxisAlignedBB(0.1875f, 0.0f, 0.1875f, 0.8125f, 0.75f, 0.8125f);
 
 	public BlockBackpack() {
 		super(Material.cloth);
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 		setUnlocalizedName("charset.backpack");
-		setBlockBounds(0.1875f, 0.0f, 0.1875f, 0.8125f, 0.75f, 0.8125f);
 		setHardness(0.8f);
-		setStepSound(soundTypeCloth);
+		setSoundType(SoundType.CLOTH);
 	}
 
 	@Override
-	public float getPlayerRelativeBlockHardness(EntityPlayer player, World world, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return AABB;
+	}
+
+	@Override
+	public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
 		if (player.isSneaking()) {
 			return -1.0f;
 		} else {
-			return super.getPlayerRelativeBlockHardness(player, world, pos);
+			return super.getPlayerRelativeBlockHardness(state, player, world, pos);
 		}
 	}
 
 	@Override
 	public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-		if (player.isSneaking() && player.getCurrentArmor(2) == null) {
+		if (player.isSneaking() && player.getItemStackFromSlot(EntityEquipmentSlot.CHEST) == null) {
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile instanceof TileBackpack) {
 				ItemStack stack = ((TileBackpack) tile).writeToItemStack();
@@ -57,7 +67,7 @@ public class BlockBackpack extends BlockContainer {
 				world.removeTileEntity(pos);
 				world.setBlockToAir(pos);
 
-				player.setCurrentItemOrArmor(3, stack);
+				player.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack);
 			}
 		}
 	}
@@ -75,7 +85,7 @@ public class BlockBackpack extends BlockContainer {
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (world.isRemote) {
 			return true;
 		}
@@ -102,22 +112,17 @@ public class BlockBackpack extends BlockContainer {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public EnumWorldBlockLayer getBlockLayer() {
-		return EnumWorldBlockLayer.CUTOUT_MIPPED;
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 
 	@Override
-	public int getRenderType() {
-		return 3;
-	}
-
-	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 
@@ -127,8 +132,8 @@ public class BlockBackpack extends BlockContainer {
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, Properties.FACING4);
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, Properties.FACING4);
 	}
 
 	@Override
@@ -146,6 +151,13 @@ public class BlockBackpack extends BlockContainer {
 		return new TileBackpack();
 	}
 
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.MODEL;
+	}
+
+	// TODO
+	/*
 	@SideOnly(Side.CLIENT)
 	public int getBlockColor() {
 		return DEFAULT_COLOR;
@@ -164,5 +176,5 @@ public class BlockBackpack extends BlockContainer {
 		} else {
 			return DEFAULT_COLOR;
 		}
-	}
+	} */
 }

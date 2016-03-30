@@ -1,6 +1,7 @@
 package pl.asie.charset.storage.backpack;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
@@ -28,7 +29,7 @@ public class SlotArmorBackpack extends Slot {
 	@Override
 	public boolean isItemValid(ItemStack stack) {
 		if (stack == null || stack.getItem() instanceof ItemBackpack) return false;
-		return stack.getItem().isValidArmor(stack, 1, player);
+		return stack.getItem().isValidArmor(stack, EntityEquipmentSlot.CHEST, player);
 	}
 
 	@Override

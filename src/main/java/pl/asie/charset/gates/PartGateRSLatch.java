@@ -4,7 +4,10 @@ import io.netty.buffer.ByteBuf;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class PartGateRSLatch extends PartGate {
@@ -42,8 +45,8 @@ public class PartGateRSLatch extends PartGate {
 			case 3:
 				burnt = true;
 				BlockPos pos = getPos();
-				getWorld().playSoundEffect(pos.getX() + 0.5F, pos.getY() + 0.1F, pos.getZ() + 0.5F,
-						"random.fizz", 0.5F, 2.6F + (getWorld().rand.nextFloat() - getWorld().rand.nextFloat()) * 0.8F);
+				getWorld().playSound(pos.getX() + 0.5F, pos.getY() + 0.1F, pos.getZ() + 0.5F,
+						new SoundEvent(new ResourceLocation("random.fizz")), SoundCategory.BLOCKS, 0.5F, 2.6F + (getWorld().rand.nextFloat() - getWorld().rand.nextFloat()) * 0.8F, true);
 				return true;
 		}
 	}

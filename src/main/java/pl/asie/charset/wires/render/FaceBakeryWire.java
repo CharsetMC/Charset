@@ -1,23 +1,12 @@
 package pl.asie.charset.wires.render;
 
-import org.lwjgl.util.vector.Vector3f;
-
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockFaceUV;
-import net.minecraft.client.renderer.block.model.BlockPartFace;
 import net.minecraft.client.renderer.block.model.FaceBakery;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelRotation;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-
-import net.minecraftforge.client.model.IColoredBakedQuad;
 
 public class FaceBakeryWire extends FaceBakery {
 	public int uvScale = 1;
 	public int uvOffset = 0;
 
-	private int getFaceShadeColor(int tintIndex, EnumFacing facing) {
+	/* private int getFaceShadeColor(int tintIndex, EnumFacing facing) {
 		int r = tintIndex >> 16;
 		int g = (tintIndex >> 8) & 255;
 		int b = tintIndex & 255;
@@ -129,7 +118,7 @@ public class FaceBakeryWire extends FaceBakery {
 			f4 = f4 / (float) uvScale + oy;
 		}
 
-		int j = p_178401_4_.func_178345_c(p_178401_1_) * 7;
+		int j = p_178401_4_.getVertexRotatedRev(p_178401_1_) * 7;
 		p_178401_2_[j + 4] = Float.floatToRawIntBits(p_178401_5_.getInterpolatedU((double) f3));
 		p_178401_2_[j + 4 + 1] = Float.floatToRawIntBits(p_178401_5_.getInterpolatedV((double) f4));
 	}
@@ -139,5 +128,5 @@ public class FaceBakeryWire extends FaceBakery {
 		for (int i = 0; i < 4; ++i) {
 			this.func_178401_a(i, faceData, facing, faceUV, p_178409_4_);
 		}
-	}
+	} */
 }

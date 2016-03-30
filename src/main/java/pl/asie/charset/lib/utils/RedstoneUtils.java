@@ -8,7 +8,7 @@ import net.minecraft.block.BlockLever;
 import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -33,7 +33,7 @@ public final class RedstoneUtils {
 			return iblockstate.getValue(BlockRedstoneWire.POWER);
 		}
 
-		return block.shouldCheckWeakPower(world, pos, facing) ? world.getStrongPower(pos) : block.getWeakPower(world, pos, iblockstate, facing);
+		return block.shouldCheckWeakPower(iblockstate, world, pos, facing) ? world.getStrongPower(pos) : block.getWeakPower(iblockstate, world, pos, facing);
 	}
 
 	public static boolean canConnectFace(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side, EnumFacing face) {
@@ -54,7 +54,7 @@ public final class RedstoneUtils {
 		if (container != null) {
 			return MultipartRedstoneHelper.canConnectRedstone(container, side, face);
 		} else {
-			return block.canConnectRedstone(world, pos, side);
+			return block.canConnectRedstone(state, world, pos, side);
 		}
 	}
 }

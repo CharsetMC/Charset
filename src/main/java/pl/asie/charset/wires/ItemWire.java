@@ -7,10 +7,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.StatCollector;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,7 +31,7 @@ public class ItemWire extends ItemMultiPart {
 	}
 
 	@Override
-	public boolean place(World world, BlockPos pos, EnumFacing side, Vec3 hit, ItemStack stack, EntityPlayer player) {
+	public boolean place(World world, BlockPos pos, EnumFacing side, Vec3d hit, ItemStack stack, EntityPlayer player) {
 		if (!isFreestanding(stack) && !WireUtils.canPlaceWire(world, pos.offset(side), side.getOpposite())) {
 			return false;
 		}
@@ -40,7 +40,7 @@ public class ItemWire extends ItemMultiPart {
 	}
 
 	@Override
-	public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3 vec3, ItemStack stack, EntityPlayer player) {
+	public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3d vec3, ItemStack stack, EntityPlayer player) {
 		PartWireBase part = PartWireProvider.createPart(stack.getItemDamage() >> 1);
 		part.location = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(facing);
 		return part;
@@ -61,18 +61,18 @@ public class ItemWire extends ItemMultiPart {
 
 		switch (kind.type()) {
 			case NORMAL:
-				name = StatCollector.translateToLocal("tile.charset.wire.name");
+				name = I18n.translateToLocal("tile.charset.wire.name");
 				break;
 			case INSULATED:
-				name = String.format(StatCollector.translateToLocal("tile.charset.wire.insulated.suffix"), StatCollector.translateToLocal("charset.color." + EnumDyeColor.byMetadata(kind.color()).getUnlocalizedName()));
+				name = String.format(I18n.translateToLocal("tile.charset.wire.insulated.suffix"), I18n.translateToLocal("charset.color." + EnumDyeColor.byMetadata(kind.color()).getUnlocalizedName()));
 				break;
 			case BUNDLED:
-				name = StatCollector.translateToLocal("tile.charset.wire.bundled.name");
+				name = I18n.translateToLocal("tile.charset.wire.bundled.name");
 				break;
 		}
 
 		if (isFreestanding(stack)) {
-			name = String.format(StatCollector.translateToLocal("tile.charset.wire.freestanding.prefix"), name);
+			name = String.format(I18n.translateToLocal("tile.charset.wire.freestanding.prefix"), name);
 		}
 
 		return name;

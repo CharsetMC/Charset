@@ -1,5 +1,6 @@
 package pl.asie.charset.lib;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 
 import net.minecraft.util.EnumFacing;
@@ -23,5 +24,10 @@ public class TileBase extends TileEntity {
 
 	public TileEntity getNeighbourTile(EnumFacing side) {
 		return worldObj != null && side != null ? worldObj.getTileEntity(pos.offset(side)) : null;
+	}
+
+	public void markBlockForUpdate() {
+		IBlockState state = worldObj.getBlockState(pos);
+		worldObj.notifyBlockUpdate(pos, state, state, 3);
 	}
 }

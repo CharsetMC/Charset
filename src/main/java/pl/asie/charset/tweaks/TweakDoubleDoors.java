@@ -7,7 +7,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 
@@ -74,11 +75,11 @@ public class TweakDoubleDoors extends Tweak {
 
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.entityPlayer.isSneaking() || event.world.isRemote) {
+		if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.getEntityPlayer().isSneaking() || event.getWorld().isRemote) {
 			return;
 		}
 
-		IBlockState state = getActualState(event.world, event.pos);
+		IBlockState state = getActualState(event.getWorld(), event.getPos());
 		Block block = state.getBlock();
 
 		if (!(block instanceof BlockDoor) || !allowedDoors.contains(block)) {
@@ -91,14 +92,14 @@ public class TweakDoubleDoors extends Tweak {
 		boolean isOpen = state.getValue(BlockDoor.OPEN);
 		BlockDoor.EnumHingePosition isMirrored = state.getValue(BlockDoor.HINGE);
 
-		BlockPos pos = event.pos.offset(isMirrored == BlockDoor.EnumHingePosition.RIGHT ? direction.rotateYCCW() : direction.rotateY());
-		IBlockState other = getActualState(event.world, pos);
+		BlockPos pos = event.getPos().offset(isMirrored == BlockDoor.EnumHingePosition.RIGHT ? direction.rotateYCCW() : direction.rotateY());
+		IBlockState other = getActualState(event.getWorld(), pos);
 
 		if (other.getBlock() == door &&
 				other.getValue(BlockDoor.FACING) == direction &&
 				other.getValue(BlockDoor.OPEN) == isOpen &&
 				other.getValue(BlockDoor.HINGE) != isMirrored) {
-			door.onBlockActivated(event.world, pos, other, event.entityPlayer, event.face, 0, 0, 0);
+			door.onBlockActivated(event.getWorld(), pos, other, event.getEntityPlayer(), EnumHand.MAIN_HAND, null, event.getFace(), 0, 0, 0);
 		}
 	}
 }

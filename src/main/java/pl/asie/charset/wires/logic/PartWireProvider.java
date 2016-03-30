@@ -5,6 +5,7 @@ import net.minecraft.network.PacketBuffer;
 
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IPartFactory;
+import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.wires.WireKind;
 
 public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
@@ -32,7 +33,7 @@ public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
 	}
 
 	@Override
-	public IMultipart createPart(String id, PacketBuffer buf) {
+	public IMultipart createPart(ResourceLocation id, PacketBuffer buf) {
 		int type = buf.readByte();
 		buf.readerIndex(buf.readerIndex() - 1);
 		PartWireBase part = createPart(type);
@@ -41,7 +42,7 @@ public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
 	}
 
 	@Override
-	public IMultipart createPart(String id, NBTTagCompound nbt) {
+	public IMultipart createPart(ResourceLocation id, NBTTagCompound nbt) {
 		PartWireBase part = createPart(nbt.getByte("t"));
 		part.readFromNBT(nbt);
 		return part;

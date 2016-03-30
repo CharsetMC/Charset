@@ -2,7 +2,7 @@ package pl.asie.charset.audio.tape;
 
 import java.util.List;
 
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 public final class TapeUtils {
 	private TapeUtils() {
@@ -11,9 +11,9 @@ public final class TapeUtils {
 
 	public static void addTooltip(List<String> tooltip, int mins, int secs) {
 		if (mins != 0) {
-			tooltip.add(EnumChatFormatting.GRAY + "" + mins + " minutes " + (secs != 0 ? secs + " seconds" : ""));
+			tooltip.add(TextFormatting.GRAY + "" + mins + " minutes " + (secs != 0 ? secs + " seconds" : ""));
 		} else {
-			tooltip.add(EnumChatFormatting.GRAY + "" + secs + " seconds");
+			tooltip.add(TextFormatting.GRAY + "" + secs + " seconds");
 		}
 	}
 }

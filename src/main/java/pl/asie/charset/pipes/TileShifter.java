@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -52,7 +52,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	public void setFilter(int side, ItemStack stack) {
 		filters[side] = stack;
-		worldObj.markBlockForUpdate(pos);
+		markBlockForUpdate();
 	}
 
 	public int getRedstoneLevel() {
@@ -148,11 +148,11 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	public Packet getDescriptionPacket() {
 		NBTTagCompound tag = new NBTTagCompound();
 		writeToNBT(tag);
-		return new S35PacketUpdateTileEntity(pos, 2, tag);
+		return new SPacketUpdateTileEntity(pos, 2, tag);
 	}
 
 	@Override
-	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		readFromNBT(pkt.getNbtCompound());
 		worldObj.markBlockRangeForRenderUpdate(pos, pos);
 	}
@@ -192,7 +192,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		}
 
 		if (oldRedstoneLevel != redstoneLevel) {
-			worldObj.markBlockForUpdate(pos);
+			markBlockForUpdate();
 			worldObj.notifyBlockOfStateChange(pos, getBlockType());
 		}
 

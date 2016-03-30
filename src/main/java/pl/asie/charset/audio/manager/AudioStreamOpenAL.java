@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.Vec3d;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SoundCategory;
-import net.minecraft.util.Vec3;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -75,8 +75,8 @@ public class AudioStreamOpenAL implements IAudioStream {
 
 	@SideOnly(Side.CLIENT)
 	private double getDistance(int x, int y, int z) {
-		Vec3 pos = Minecraft.getMinecraft().thePlayer.getPositionVector();
-		return pos.distanceTo(new Vec3(x, y, z));
+		Vec3d pos = Minecraft.getMinecraft().thePlayer.getPositionVector();
+		return pos.distanceTo(new Vec3d(x, y, z));
 	}
 
 	@Override

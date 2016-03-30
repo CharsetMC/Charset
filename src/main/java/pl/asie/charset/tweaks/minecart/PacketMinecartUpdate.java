@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 
+import net.minecraft.network.INetHandler;
 import pl.asie.charset.lib.network.PacketEntity;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 
@@ -30,8 +31,8 @@ public class PacketMinecartUpdate extends PacketEntity {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
-		super.readData(buf);
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
 		final int color = buf.readInt();
 
 		if (entity instanceof EntityMinecart) {

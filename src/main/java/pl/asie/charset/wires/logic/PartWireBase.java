@@ -11,9 +11,11 @@ import java.util.Set;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import mcmultipart.client.multipart.AdvancedEffectRenderer;
+import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -22,10 +24,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
@@ -38,16 +41,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.capabilities.ISlottedCapabilityProvider;
 import mcmultipart.client.multipart.ICustomHighlightPart;
-import mcmultipart.client.multipart.IHitEffectsPart;
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.IOccludingPart;
-import mcmultipart.multipart.IRedstonePart;
-import mcmultipart.multipart.Multipart;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.MultipartRegistry;
-import mcmultipart.multipart.OcclusionHelper;
-import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
@@ -60,8 +53,8 @@ import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
 public abstract class PartWireBase extends Multipart implements
-		ICustomHighlightPart, IRedstonePart.ISlottedRedstonePart, IHitEffectsPart,
-		IOccludingPart, ITickable, ISlottedCapabilityProvider, IWire {
+		ICustomHighlightPart, IRedstonePart.ISlottedRedstonePart,
+		INormallyOccludingPart, ITickable, ISlottedCapabilityProvider, IWire {
 	protected static final boolean DEBUG = false;
 	private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
@@ -117,19 +110,20 @@ public abstract class PartWireBase extends Multipart implements
 	}
 
 	@Override
-	public String getModelPath() {
+	public ResourceLocation getModelPath() {
 		return getType();
 	}
 
 	@Override
-	public String getType() {
-		return "charsetwires:wire";
+	public ResourceLocation getType() {
+		return new ResourceLocation("charsetwires:wire");
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addDestroyEffects(IHitEffectsPart.AdvancedEffectRenderer advancedEffectRenderer) {
-		advancedEffectRenderer.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.handlePartState(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())).getParticleTexture());
+	public boolean addDestroyEffects(AdvancedEffectRenderer advancedEffectRenderer) {
+		// TODO
+		//advancedEffectRenderer.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.handlePartState(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())).getParticleTexture());
 		return true;
 	}
 
@@ -142,7 +136,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addHitEffects(PartMOP partMOP, IHitEffectsPart.AdvancedEffectRenderer advancedEffectRenderer) {
+	public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
 		return true;
 	}
 
@@ -171,7 +165,7 @@ public abstract class PartWireBase extends Multipart implements
 	}
 
 	@Override
-	public BlockState createBlockState() {
+	public BlockStateContainer createBlockState() {
 		return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
@@ -388,8 +382,8 @@ public abstract class PartWireBase extends Multipart implements
 	}
 
 	@Override
-	public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-		return layer == EnumWorldBlockLayer.CUTOUT;
+	public boolean canRenderInLayer(BlockRenderLayer layer) {
+		return layer == BlockRenderLayer.CUTOUT;
 	}
 
 	private void pokeExtendedNeighbors() {
@@ -499,7 +493,7 @@ public abstract class PartWireBase extends Multipart implements
 		EnumFacing[] connFaces = WireUtils.getConnectionsForRender(location);
 		List<IMultipart> parts = new ArrayList<IMultipart>();
 		for (IMultipart p : getContainer().getParts()) {
-			if (p != this && p instanceof IOccludingPart && !(p instanceof PartWireBase)) {
+			if (p != this && p instanceof INormallyOccludingPart && !(p instanceof PartWireBase)) {
 				parts.add(p);
 			}
 		}
@@ -511,7 +505,7 @@ public abstract class PartWireBase extends Multipart implements
 					boolean found = false;
 					AxisAlignedBB mask = getBox(i + 1);
 					if (mask != null) {
-						if (!OcclusionHelper.occlusionTest(parts, this, mask)) {
+						if (!OcclusionHelper.occlusionTest(parts, p -> p == this, mask)) {
 							occludedSides |= 1 << connFaces[i].ordinal();
 							validSides.remove(face);
 							found = true;
@@ -531,7 +525,7 @@ public abstract class PartWireBase extends Multipart implements
 							} else {
 								List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
 								IBlockState cState = getWorld().getBlockState(cPos);
-								cState.getBlock().addCollisionBoxesToList(getWorld(), cPos, cState,
+								cState.getBlock().addCollisionBoxToList(cState, getWorld(), cPos,
 										cornerMask.offset(cPos.getX(), cPos.getY(), cPos.getZ()), boxes, null);
 								if (boxes.size() > 0) {
 									cornerOccludedSides |= 1 << connFaces[i].ordinal();
@@ -547,7 +541,7 @@ public abstract class PartWireBase extends Multipart implements
 		if (validSides.contains(WireFace.CENTER)) {
 			AxisAlignedBB mask = getCenterBox(1 + location.ordinal());
 			if (mask != null) {
-				if (!OcclusionHelper.occlusionTest(parts, this, mask)) {
+				if (!OcclusionHelper.occlusionTest(parts, p -> p == this, mask)) {
 					occludedSides |= 1 << 6;
 					validSides.remove(WireFace.CENTER);
 				}
@@ -719,7 +713,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean drawHighlight(PartMOP partMOP, EntityPlayer player, ItemStack stack, float v) {
+	public boolean drawHighlight(PartMOP partMOP, EntityPlayer player, float v) {
 		ModCharsetWires.proxy.drawWireHighlight(this);
 		return true;
 	}

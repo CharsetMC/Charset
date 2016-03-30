@@ -3,8 +3,8 @@ package pl.asie.charset.tweaks;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.S2FPacketSetSlot;
 
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -51,15 +51,15 @@ public class TweakAutoReplace extends Tweak {
 
 	@SubscribeEvent
 	public void onPlayerDestroyItem(PlayerDestroyItemEvent event) {
-		if (!(event.entity instanceof EntityPlayerMP) || event.entity.worldObj.isRemote) {
+		if (!(event.getEntity() instanceof EntityPlayerMP) || event.getEntity().worldObj.isRemote) {
 			return;
 		}
 
-		EntityPlayerMP player = (EntityPlayerMP) event.entityPlayer;
+		EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
 		InventoryPlayer inv = player.inventory;
 
 		ItemStack currentItem = inv.getCurrentItem();
-		if (currentItem != null && currentItem != event.original) {
+		if (currentItem != null && currentItem != event.getOriginal()) {
 			return;
 		}
 
@@ -68,17 +68,17 @@ public class TweakAutoReplace extends Tweak {
 		for (row = 2; row >= 0; row--) {
 			int slot = inv.currentItem + row * 9 + 9;
 			ItemStack stackAbove = inv.getStackInSlot(slot);
-			if (!canReplace(stackAbove, event.original)) break;
+			if (!canReplace(stackAbove, event.getOriginal())) break;
 			int targetSlot = ((slot < 27) ? (slot + 9) : (slot - 27));
 			inv.setInventorySlotContents(targetSlot, stackAbove);
 			inv.setInventorySlotContents(slot, null);
 			player.playerNetServerHandler.sendPacket(
-					new S2FPacketSetSlot(0, slot + 9, stackAbove));
+					new SPacketSetSlot(0, slot + 9, stackAbove));
 		}
 
 		if (row < 2) {
 			player.playerNetServerHandler.sendPacket(
-					new S2FPacketSetSlot(0, inv.currentItem + row * 9 + 18, null));
+					new SPacketSetSlot(0, inv.currentItem + row * 9 + 18, null));
 		}
 	}
 

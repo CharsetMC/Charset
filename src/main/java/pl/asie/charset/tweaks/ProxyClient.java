@@ -11,10 +11,17 @@ import net.minecraft.entity.Entity;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.tweaks.minecart.ModelMinecartWrapped;
+import pl.asie.charset.tweaks.shard.ItemShard;
+import pl.asie.charset.tweaks.shard.TweakGlassShards;
 
 public class ProxyClient extends ProxyCommon {
 	@Override
-	public void initMinecraftTweakClient() {
+	public void initShardsTweakClient() {
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemShard.Color(), TweakGlassShards.shardItem);
+	}
+
+	@Override
+	public void initMinecartTweakClient() {
 		Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap = Minecraft.getMinecraft().getRenderManager().entityRenderMap;
 
 		for (Render<? extends Entity> e : entityRenderMap.values()) {

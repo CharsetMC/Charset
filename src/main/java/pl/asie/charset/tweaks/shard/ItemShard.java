@@ -2,6 +2,7 @@ package pl.asie.charset.tweaks.shard;
 
 import java.util.List;
 
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.EnumDyeColor;
@@ -17,6 +18,22 @@ import pl.asie.charset.lib.ModCharsetLib;
  * Created by asie on 1/15/16.
  */
 public class ItemShard extends Item {
+	public static class Color implements IItemColor {
+		@Override
+		public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+			int md = stack.getItemDamage();
+			if (md == 0 || md > MAX_SHARD) {
+				return 16777215;
+			} else {
+				float[] colors = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(md - 1));
+				int r = (int) (colors[0] * 255.0f);
+				int g = (int) (colors[1] * 255.0f);
+				int b = (int) (colors[2] * 255.0f);
+				return (r << 16) | (g << 8) | b;
+			}
+		}
+	}
+
 	public static final int MAX_SHARD = 16;
 
 	public ItemShard() {
@@ -28,21 +45,6 @@ public class ItemShard extends Item {
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 		return "item.charset.shard." + stack.getItemDamage();
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int getColorFromItemStack(ItemStack stack, int renderPass) {
-		int md = stack.getItemDamage();
-		if (md == 0 || md > MAX_SHARD) {
-			return 16777215;
-		} else {
-			float[] colors = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(md - 1));
-			int r = (int) (colors[0] * 255.0f);
-			int g = (int) (colors[1] * 255.0f);
-			int b = (int) (colors[2] * 255.0f);
-			return (r << 16) | (g << 8) | b;
-		}
 	}
 
 	@Override

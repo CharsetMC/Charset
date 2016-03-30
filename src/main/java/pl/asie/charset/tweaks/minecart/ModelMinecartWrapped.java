@@ -22,7 +22,7 @@ public class ModelMinecartWrapped extends ModelBase {
 
 		if (entityIn instanceof EntityMinecart) {
 			EntityMinecart minecart = (EntityMinecart) entityIn;
-			if (minecart.getExtendedProperties(MinecartProperties.NAME) instanceof MinecartProperties) {
+			/* if (minecart.getExtendedProperties(MinecartProperties.NAME) instanceof MinecartProperties) {
 				properties = (MinecartProperties) minecart.getExtendedProperties(MinecartProperties.NAME);
 				if (properties.getColor() >= 0) {
 					Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("charsettweaks:textures/entity/minecart.png"));
@@ -32,7 +32,7 @@ public class ModelMinecartWrapped extends ModelBase {
 					float b = (float) (properties.getColor() & 255) / 255.0f;
 					GlStateManager.color(r, g, b);
 				}
-			}
+			} */
 		}
 
 		parent.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);

@@ -7,7 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -164,7 +164,7 @@ public final class WireUtils {
 			IBlockState connectingState = wire.getWorld().getBlockState(pos2);
 			Block connectingBlock = connectingState.getBlock();
 
-			if (wire.location == WireFace.CENTER && !connectingBlock.isSideSolid(wire.getWorld(), pos2, facing.getOpposite())) {
+			if (wire.location == WireFace.CENTER && !connectingBlock.isSideSolid(connectingState, wire.getWorld(), pos2, facing.getOpposite())) {
 				return false;
 			}
 
@@ -271,11 +271,11 @@ public final class WireUtils {
 					return state.getValue(BlockRedstoneWire.POWER);
 				}
 
-				return block.shouldCheckWeakPower(world, pos, facing)
-						? block.getStrongPower(world, pos, state, facing)
-						: block.getWeakPower(world, pos, state, facing);
+				return block.shouldCheckWeakPower(state, world, pos, facing)
+						? block.getStrongPower(state, world, pos, facing)
+						: block.getWeakPower(state, world, pos, facing);
 			} else {
-				return block.getStrongPower(world, pos, state, facing);
+				return block.getStrongPower(state, world, pos, facing);
 			}
 		} else {
 			return power;
@@ -298,6 +298,6 @@ public final class WireUtils {
 			return true;
 		}
 
-		return block.isSideSolid(world, pos, side);
+		return block.isSideSolid(state, world, pos, side);
 	}
 }

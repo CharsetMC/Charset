@@ -53,14 +53,14 @@ public class TweakMobControl extends Tweak {
 
 	@SubscribeEvent
 	public void checkSpawn(LivingSpawnEvent.CheckSpawn event) {
-		if (disabledClasses.contains(event.entity.getClass())) {
+		if (disabledClasses.contains(event.getEntity().getClass())) {
 			event.setResult(Event.Result.DENY);
 		}
 	}
 
 	@SubscribeEvent
 	public void checkJoinWorld(EntityJoinWorldEvent event) {
-		if (disabledClasses.contains(event.entity.getClass())) {
+		if (disabledClasses.contains(event.getEntity().getClass())) {
 			event.setCanceled(true);
 		}
 	}

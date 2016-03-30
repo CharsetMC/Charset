@@ -122,8 +122,8 @@ public class GateRenderDefinitions {
 	public BaseDefinition base;
 	private final Map<String, Definition> definitionMap = new HashMap<String, Definition>();
 
-	public Definition getGateDefinition(String type) {
-		return definitionMap.get(type);
+	public Definition getGateDefinition(ResourceLocation type) {
+		return definitionMap.get(type.toString());
 	}
 
 	public void load(String baseLoc, Map<String, ResourceLocation> definitions) {

@@ -2,11 +2,11 @@ package pl.asie.charset.tweaks.noteblock;
 
 import net.minecraft.block.BlockNote;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityNote;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 public class BlockNoteCharset extends BlockNote {
@@ -30,8 +30,8 @@ public class BlockNoteCharset extends BlockNote {
 	}
 
 	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this, PITCH);
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, PITCH);
 	}
 
 	@Override

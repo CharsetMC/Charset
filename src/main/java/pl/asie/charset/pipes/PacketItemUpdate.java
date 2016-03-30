@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
+import net.minecraft.network.INetHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import mcmultipart.multipart.IMultipart;
@@ -100,8 +101,8 @@ public class PacketItemUpdate extends PacketPart {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
-		super.readData(buf);
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
 		readItemData(buf);
 	}
 

@@ -2,16 +2,16 @@ package pl.asie.charset.wires.logic;
 
 import java.util.Arrays;
 
+import mcmultipart.block.TileMultipartContainer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import mcmultipart.block.TileMultipart;
 import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.PartSlot;
@@ -174,9 +174,9 @@ public class PartWireBundled extends PartWireBase implements IBundledReceiver, I
 
 				IBundledEmitter emitter = null;
 
-				if (tile instanceof TileMultipart) {
-					if (((TileMultipart) tile).hasCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite())) {
-						emitter = ((TileMultipart) tile).getCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite());
+				if (tile instanceof TileMultipartContainer) {
+					if (((TileMultipartContainer) tile).hasCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite())) {
+						emitter = ((TileMultipartContainer) tile).getCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite());
 					}
 				} else if (tile.hasCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite())) {
 					emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite());

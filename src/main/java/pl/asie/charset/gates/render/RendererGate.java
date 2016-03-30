@@ -10,39 +10,36 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import net.minecraft.client.renderer.block.model.*;
+import net.minecraftforge.common.model.IModelState;
+import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.resources.model.IBakedModel;
-import net.minecraft.client.resources.model.ModelRotation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
-import net.minecraftforge.client.model.IFlexibleBakedModel;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.client.model.IRetexturableModel;
-import net.minecraftforge.client.model.ISmartItemModel;
 import net.minecraftforge.client.model.ModelStateComposition;
-import net.minecraftforge.client.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import mcmultipart.client.multipart.ISmartMultipartModel;
 import pl.asie.charset.gates.ItemGate;
 import pl.asie.charset.gates.PartGate;
+import pl.asie.charset.lib.render.CharsetBakedModel;
+import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.utils.ClientUtils;
 
-public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPerspectiveAwareModel {
+public class RendererGate extends ModelFactory<PartGate> {
 	public static final RendererGate INSTANCE = new RendererGate();
 
 	private static final Map<ItemCameraTransforms.TransformType, TRSRTransformation> TRANSFORM_MAP = new HashMap<ItemCameraTransforms.TransformType, TRSRTransformation>();
@@ -61,35 +58,25 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 
 	private static final Map<String, IModel> layerModels = new HashMap<String, IModel>();
 
-	public final PartGate gate;
-	private final IModelState transform;
-	private final List<IBakedModel> bakedModels = new ArrayList<IBakedModel>();
-	private final Map<IBakedModel, Integer> bakedModelsRecolor = new HashMap<IBakedModel, Integer>();
-
-	static {
-		TRANSFORM_MAP.put(ItemCameraTransforms.TransformType.THIRD_PERSON, new TRSRTransformation(
-				new Vector3f(0, 0, -2.75f / 16),
-				TRSRTransformation.quatFromYXZDegrees(new Vector3f(10, -45, 170)),
-				new Vector3f(0.375f, 0.375f, 0.375f),
-				null));
+	public RendererGate() {
+		super(PartGate.PROPERTY, new ResourceLocation("charsetgates:blocks/gate_bottom"));
 	}
 
-	private RendererGate(PartGate gate) {
-		this.gate = gate;
-		ModelStateComposition transformPre = new ModelStateComposition(
+	@Override
+	public IBakedModel bake(PartGate gate) {
+		CharsetBakedModel result = new CharsetBakedModel();
+		ModelStateComposition transform = new ModelStateComposition(
 				new TRSRTransformation(ROTATIONS_SIDE[gate.getSide().ordinal()]),
 				new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()])
 		);
 
 		if (gate.isMirrored()) {
-			this.transform = new ModelStateComposition(
-					transformPre,
+			transform = new ModelStateComposition(
+					transform,
 					new TRSRTransformation(
 							null, null, new Vector3f(-1.0f, 1.0f, 1.0f), null
 					)
 			);
-		} else {
-			this.transform = transformPre;
 		}
 
 		GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(gate.getType());
@@ -97,7 +84,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 
 		IModel model = definition.getModel(gate.getModelName());
 		if (model != null) {
-			this.bakedModels.add(model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
+			result.addModel(model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
 		}
 		IRetexturableModel layerModel = (IRetexturableModel) definition.getModel("layer");
 
@@ -130,7 +117,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 				int color = state == PartGate.State.ON ? base.colorMul.get("on") :
 						(state == PartGate.State.OFF ? base.colorMul.get("off") : base.colorMul.get("disabled"));
 
-				bakedModelsRecolor.put(bakedModel, color);
+				result.addModel(bakedModel, color);
 			} else if ("map".equals(layer.type) && layer.textures != null) {
 				String texture = layer.textures.get(state.name().toLowerCase(Locale.ENGLISH));
 				if (texture == null) {
@@ -147,7 +134,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 						layerModels.put(texture, model);
 					}
 
-					bakedModels.add(model.bake(layerTransform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
+					result.addModel(model.bake(layerTransform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
 				}
 			}
 		}
@@ -170,7 +157,7 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 				}
 			}
 
-			this.bakedModels.add(
+			result.addModel(
 					definition.getModel(state == PartGate.State.ON ? "torch_on" : "torch_off")
 							.bake(new ModelStateComposition(
 									transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f, 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ClientUtils.textureGetter)
@@ -179,97 +166,19 @@ public class RendererGate implements ISmartMultipartModel, ISmartItemModel, IPer
 
 		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
 			if (gate.isSideInverted(facing) && !invertedSides.contains(facing)) {
-				this.bakedModels.add(
+				result.addModel(
 						definition.getModel(gate.getInverterState(facing) ? "torch_on" : "torch_off")
 								.bake(new ModelStateComposition(
 										transform, new TRSRTransformation(new Vector3f(((facing.getFrontOffsetX() * 7)) / 16.0f, 0f, ((facing.getFrontOffsetZ() * 7)) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ClientUtils.textureGetter)
 				);
 			}
 		}
-	}
 
-	private RendererGate() {
-		this.gate = null;
-		this.transform = null;
+		return result;
 	}
 
 	@Override
-	public IBakedModel handlePartState(IBlockState state) {
-		if (state instanceof IExtendedBlockState) {
-			PartGate partGate = ((IExtendedBlockState) state).getValue(PartGate.PROPERTY);
-			if (partGate != null) {
-				return new RendererGate(partGate);
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public IBakedModel handleItemState(ItemStack stack) {
-		PartGate partGate = ItemGate.getPartGate(stack);
-		if (partGate != null) {
-			return new RendererGate(partGate);
-		}
-		return null;
-	}
-
-	@Override
-	public List<BakedQuad> getFaceQuads(EnumFacing facing) {
-		List<BakedQuad> list = Lists.newArrayList();
-		for (IBakedModel model : bakedModels) {
-			list.addAll(model.getFaceQuads(facing));
-		}
-		for (IBakedModel model : bakedModelsRecolor.keySet()) {
-			ClientUtils.addRecoloredQuads(model.getFaceQuads(facing), bakedModelsRecolor.get(model), list, gate.getSide().getOpposite());
-		}
-		return list;
-	}
-
-	@Override
-	public List<BakedQuad> getGeneralQuads() {
-		List<BakedQuad> list = Lists.newArrayList();
-		for (IBakedModel model : bakedModels) {
-			list.addAll(model.getGeneralQuads());
-		}
-		for (IBakedModel model : bakedModelsRecolor.keySet()) {
-			ClientUtils.addRecoloredQuads(model.getGeneralQuads(), bakedModelsRecolor.get(model), list, gate.getSide().getOpposite());
-		}
-		return list;
-	}
-
-	@Override
-	public boolean isAmbientOcclusion() {
-		return true;
-	}
-
-	@Override
-	public boolean isGui3d() {
-		return true;
-	}
-
-	@Override
-	public boolean isBuiltInRenderer() {
-		return false;
-	}
-
-	@Override
-	public TextureAtlasSprite getParticleTexture() {
-		return ClientUtils.textureGetter.apply(new ResourceLocation("charsetgates:blocks/gate_bottom"));
-	}
-
-	@Override
-	public ItemCameraTransforms getItemCameraTransforms() {
-		return ItemCameraTransforms.DEFAULT;
-	}
-
-	@Override
-	public Pair<? extends IFlexibleBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
-		return new ImmutablePair<RendererGate, Matrix4f>(this,
-				TRANSFORM_MAP.containsKey(cameraTransformType) ? TRANSFORM_MAP.get(cameraTransformType).getMatrix() : TRSRTransformation.identity().getMatrix());
-	}
-
-	@Override
-	public VertexFormat getFormat() {
-		return DefaultVertexFormats.BLOCK;
+	public PartGate fromItemStack(ItemStack stack) {
+		return ItemGate.getPartGate(stack);
 	}
 }

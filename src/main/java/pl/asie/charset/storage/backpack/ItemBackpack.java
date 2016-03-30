@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemBlock;
@@ -37,7 +38,7 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 	}
 
 	public static ItemStack getBackpack(EntityPlayer player) {
-		ItemStack stack = player.getCurrentArmor(2);
+		ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 		if (stack != null && stack.getItem() instanceof ItemBackpack) {
 			return stack;
 		} else {
@@ -46,8 +47,8 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 	}
 
 	@Override
-	public boolean isValidArmor(ItemStack stack, int armorType, Entity entity) {
-		return armorType == 1;
+	public boolean isValidArmor(ItemStack stack, EntityEquipmentSlot armorType, Entity entity) {
+		return armorType == EntityEquipmentSlot.CHEST;
 	}
 
 	@Override
@@ -83,12 +84,13 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 		stack.getTagCompound().setInteger("color", color);
 	}
 
-	@Override
+	// TODO
+	/* @Override
 	@SideOnly(Side.CLIENT)
 	public int getColorFromItemStack(ItemStack stack, int renderPass) {
 		int color = getColor(stack);
 		return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
-	}
+	} */
 
 	public IInventory getInventory(ItemStack stack) {
 		if (stack.getItem() == this) {

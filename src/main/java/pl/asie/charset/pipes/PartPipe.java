@@ -11,9 +11,11 @@ import java.util.Set;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import mcmultipart.client.multipart.AdvancedEffectRenderer;
+import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -25,10 +27,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ITickable;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -36,14 +39,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import mcmultipart.MCMultiPartMod;
-import mcmultipart.client.multipart.IHitEffectsPart;
 import mcmultipart.microblock.IMicroblock;
-import mcmultipart.multipart.IOccludingPart;
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.Multipart;
-import mcmultipart.multipart.MultipartRegistry;
-import mcmultipart.multipart.OcclusionHelper;
-import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.pipes.IPipe;
 import pl.asie.charset.api.pipes.IShifter;
@@ -51,7 +47,7 @@ import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public class PartPipe extends Multipart implements IConnectable, ISlottedPart, IHitEffectsPart, IOccludingPart, IPipe, ITickable {
+public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable {
 	/* public class PipeItemHandler implements IItemHandler {
 		private final EnumFacing side;
 
@@ -189,8 +185,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	}
 
 	@Override
-	public BlockState createBlockState() {
-		return new BlockState(MCMultiPartMod.multipart,
+	public BlockStateContainer createBlockState() {
+		return new BlockStateContainer(MCMultiPartMod.multipart,
 				Properties.DOWN,
 				Properties.UP,
 				Properties.NORTH,
@@ -222,7 +218,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public void addOcclusionBoxes(List<AxisAlignedBB> list) {
-		list.add(AxisAlignedBB.fromBounds(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
+		list.add(new AxisAlignedBB(0.25, 0.25, 0.25, 0.75, 0.75, 0.75));
 	}
 
 	@Override
@@ -250,13 +246,13 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	}
 
 	@Override
-	public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-		return layer == EnumWorldBlockLayer.CUTOUT;
+	public boolean canRenderInLayer(BlockRenderLayer layer) {
+		return layer == BlockRenderLayer.CUTOUT;
 	}
 
 	@Override
-	public String getModelPath() {
-		return "charsetpipes:pipe";
+	public ResourceLocation getModelPath() {
+		return new ResourceLocation("charsetpipes:pipe");
 	}
 
 	// Tile logic
@@ -273,7 +269,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			}
 		}
 
-		if (!OcclusionHelper.occlusionTest(getContainer().getParts(), this, BOXES[side.ordinal()])) {
+		if (!OcclusionHelper.occlusionTest(getContainer().getParts(), p -> p == this, BOXES[side.ordinal()])) {
 			return false;
 		}
 

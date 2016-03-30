@@ -1,7 +1,11 @@
 package pl.asie.charset.tweaks;
 
 public class ProxyCommon {
-	public void initMinecraftTweakClient() {
+	public void initMinecartTweakClient() {
+
+	}
+
+	public void initShardsTweakClient() {
 
 	}
 }

@@ -4,15 +4,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -31,15 +32,38 @@ public class ItemTape extends Item implements IDyeableItem {
 	public static final int DEFAULT_SAMPLE_RATE = 48000;
 	private static final int DEFAULT_SIZE = 2880000;
 
+	@SideOnly(Side.CLIENT)
+	public static class Color implements IItemColor {
+		private final ItemTape item;
+
+		public Color(ItemTape item) {
+			this.item = item;
+		}
+
+		@Override
+		public int getColorFromItemstack(ItemStack stack, int renderPass) {
+			switch (renderPass) {
+				case 0:
+				default:
+					return 0xFFFFFF;
+				case 1:
+					Material mat = item.getMaterial(stack);
+					return mat != null ? mat.color : Material.IRON.color;
+				case 2:
+					return item.getColor(stack);
+			}
+		}
+	}
+
 	public enum Material {
 		IRON("ingotIron", 0x8C8C8C),
-		GOLD("ingotGold", 0xF0E060, EnumChatFormatting.YELLOW + ""),
-		DIAMOND("gemDiamond", 0x60E0F0, EnumChatFormatting.AQUA + ""),
-		EMERALD("gemEmerald", 0x50E080, EnumChatFormatting.GREEN + ""),
-		QUARTZ("gemQuartz", 0xE0E0E0, EnumChatFormatting.WHITE + ""),
+		GOLD("ingotGold", 0xF0E060, TextFormatting.YELLOW + ""),
+		DIAMOND("gemDiamond", 0x60E0F0, TextFormatting.AQUA + ""),
+		EMERALD("gemEmerald", 0x50E080, TextFormatting.GREEN + ""),
+		QUARTZ("gemQuartz", 0xE0E0E0, TextFormatting.WHITE + ""),
 		RUBY("gemRuby", 0xE05050),
 		SAPPHIRE("gemSapphire", 0x3040E0),
-		DARK_IRON("ingotDarkIron", 0x503080, EnumChatFormatting.DARK_PURPLE + "");
+		DARK_IRON("ingotDarkIron", 0x503080, TextFormatting.DARK_PURPLE + "");
 
 		public final String oreDict;
 		public final String subtitle;
@@ -146,7 +170,7 @@ public class ItemTape extends Item implements IDyeableItem {
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		Material mat = getMaterial(stack);
 		if (mat != null && mat.subtitle != null) {
-			tooltip.add(mat.subtitle + StatCollector.translateToLocal(getUnlocalizedName(stack) + ".tip"));
+			tooltip.add(mat.subtitle + I18n.translateToLocal(getUnlocalizedName(stack) + ".tip"));
 		}
 
 		int size = stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE;
@@ -154,21 +178,6 @@ public class ItemTape extends Item implements IDyeableItem {
 		int sizeMin = sizeSec / 60;
 		sizeSec %= 60;
 		TapeUtils.addTooltip(tooltip, sizeMin, sizeSec);
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int getColorFromItemStack(ItemStack stack, int renderPass) {
-		switch (renderPass) {
-			case 0:
-			default:
-				return 0xFFFFFF;
-			case 1:
-				Material mat = getMaterial(stack);
-				return mat != null ? mat.color : Material.IRON.color;
-			case 2:
-				return getColor(stack);
-		}
 	}
 
 	@Override

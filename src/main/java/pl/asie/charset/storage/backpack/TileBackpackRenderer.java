@@ -3,8 +3,8 @@ package pl.asie.charset.storage.backpack;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.util.math.BlockPos;
 
 import net.minecraftforge.client.model.animation.FastTESR;
 
@@ -18,7 +18,7 @@ public class TileBackpackRenderer extends FastTESR<TileBackpack> {
 	protected static BlockModelRenderer renderer;
 
 	@Override
-	public void renderTileEntityFast(TileBackpack te, double x, double y, double z, float partialTicks, int destroyStage, WorldRenderer worldRenderer) {
+	public void renderTileEntityFast(TileBackpack te, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer worldRenderer) {
 		if(renderer == null) {
 			renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 		}

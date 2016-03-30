@@ -1,7 +1,7 @@
 package pl.asie.charset.lib;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
 
@@ -24,7 +24,7 @@ public class ProxyClient extends ProxyCommon {
 	public World getLocalWorld(int dim) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			World w = Minecraft.getMinecraft().theWorld;
-			if (w != null && w.provider.getDimensionId() == dim) {
+			if (w != null && w.provider.getDimension() == dim) {
 				return w;
 			} else {
 				return null;

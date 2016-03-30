@@ -3,9 +3,9 @@ package pl.asie.charset.storage.backpack;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.Container;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public class GuiBackpack extends GuiContainer {
 	private static final ResourceLocation CHEST_GUI_TEXTURE = new ResourceLocation("textures/gui/container/generic_54.png");
@@ -18,8 +18,8 @@ public class GuiBackpack extends GuiContainer {
 		this.ySize = 168;
 	}
 
-	public IChatComponent getDisplayName() {
-		return new ChatComponentTranslation("tile.charset.backpack.name");
+	public ITextComponent getDisplayName() {
+		return new TextComponentTranslation("tile.charset.backpack.name");
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package pl.asie.charset.audio.tape;
 import io.netty.buffer.ByteBuf;
 
 import mcmultipart.multipart.IMultipart;
+import net.minecraft.network.INetHandler;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.audio.ProxyClient;
 import pl.asie.charset.audio.manager.AudioStreamOpenAL;
@@ -32,8 +33,8 @@ public class PacketDriveAudio extends PacketPart {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
-		super.readData(buf);
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
 
 		int len = buf.readMedium();
 		packet = new byte[len];

@@ -4,7 +4,8 @@ import java.util.UUID;
 
 import io.netty.buffer.ByteBuf;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.network.INetHandler;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import mcmultipart.multipart.IMultipart;
@@ -24,7 +25,7 @@ public abstract class PacketPart extends Packet {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
+	public void readData(INetHandler handler, ByteBuf buf) {
 		int dim = buf.readInt();
 		int x = buf.readInt();
 		int y = buf.readUnsignedShort();
@@ -45,7 +46,7 @@ public abstract class PacketPart extends Packet {
 
 	@Override
 	public void writeData(ByteBuf buf) {
-		buf.writeInt(part.getWorld().provider.getDimensionId());
+		buf.writeInt(part.getWorld().provider.getDimension());
 		buf.writeInt(part.getPos().getX());
 		buf.writeShort(part.getPos().getY());
 		buf.writeInt(part.getPos().getZ());

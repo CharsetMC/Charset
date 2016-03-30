@@ -2,9 +2,11 @@ package pl.asie.charset.audio.tape;
 
 import io.netty.buffer.ByteBuf;
 
+import net.minecraft.network.INetHandler;
 import net.minecraft.server.MinecraftServer;
 
 import mcmultipart.multipart.IMultipart;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketPart;
 
@@ -21,8 +23,8 @@ public class PacketDriveState extends PacketPart {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
-		super.readData(buf);
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
 		final State newState = State.values()[buf.readUnsignedByte()];
 
 		if (part instanceof PartTapeDrive) {
@@ -40,8 +42,8 @@ public class PacketDriveState extends PacketPart {
 					ModCharsetLib.proxy.addScheduledClientTask(runnable);
 				}
 			} else {
-				if (!MinecraftServer.getServer().isCallingFromMinecraftThread()) {
-					MinecraftServer.getServer().addScheduledTask(runnable);
+				if (!getThreadListener(handler).isCallingFromMinecraftThread()) {
+					getThreadListener(handler).addScheduledTask(runnable);
 				} else {
 					runnable.run();
 				}

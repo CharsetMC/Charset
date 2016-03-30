@@ -3,14 +3,16 @@ package pl.asie.charset.gates;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -19,11 +21,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.capabilities.Capability;
@@ -33,24 +33,18 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.capabilities.ISlottedCapabilityProvider;
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.IOccludingPart;
-import mcmultipart.multipart.IRedstonePart;
-import mcmultipart.multipart.Multipart;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.MultipartRedstoneHelper;
-import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public abstract class PartGate extends Multipart implements IRedstonePart.ISlottedRedstonePart, IOccludingPart,ISlottedCapabilityProvider, ITickable {
+public abstract class PartGate extends Multipart implements IRenderComparable<PartGate>,
+		IRedstonePart.ISlottedRedstonePart, INormallyOccludingPart, ISlottedCapabilityProvider, ITickable {
 	private class RedstoneCommunications implements IBundledEmitter, IBundledReceiver, IRedstoneEmitter, IRedstoneReceiver {
 		private final EnumFacing side;
 
@@ -320,7 +314,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 							if (s.getBlock() instanceof BlockRedstoneWire) {
 								inputs[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
 							} else {
-								inputs[i] = (byte) s.getBlock().getWeakPower(w, p, s, real);
+								inputs[i] = (byte) s.getBlock().getWeakPower(s, w, p, real);
 							}
 						}
 					}
@@ -415,7 +409,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 
 	@Override
 	public void onNeighborBlockChange(Block block) {
-		if (!getWorld().getBlockState(getPos().offset(side)).getBlock().isSideSolid(getWorld(), getPos().offset(side), side.getOpposite())) {
+		if (!getWorld().isSideSolid(getPos().offset(side), side.getOpposite())) {
 			harvest(null, null);
 			return;
 		}
@@ -490,7 +484,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer playerIn, ItemStack stack, PartMOP hit) {
+	public boolean onActivated(EntityPlayer playerIn, EnumHand hand, ItemStack stack, PartMOP hit) {
 		if (!playerIn.worldObj.isRemote) {
 			if (stack != null) {
 				if (stack.getItem() instanceof ItemScrewdriver) {
@@ -542,7 +536,7 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 	}
 
 	@Override
-	public String getModelPath() {
+	public ResourceLocation getModelPath() {
 		return getType();
 	}
 
@@ -708,13 +702,13 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 	}
 
 	@Override
-	public BlockState createBlockState() {
+	public BlockStateContainer createBlockState() {
 		return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
 	@Override
-	public boolean canRenderInLayer(EnumWorldBlockLayer layer) {
-		return layer == EnumWorldBlockLayer.CUTOUT;
+	public boolean canRenderInLayer(BlockRenderLayer layer) {
+		return layer == BlockRenderLayer.CUTOUT;
 	}
 
 	private final EnumFacing[][] CONNECTION_DIRS = new EnumFacing[][]{
@@ -774,5 +768,38 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 		}
 
 		return null;
+	}
+
+	private int getUniqueSideRenderID(EnumFacing side) {
+		int rid = (isSideInverted(side) ? 16 : 0) | (isSideOpen(side) ? 32 : 0);
+		if (!getType(side).isBundled()) {
+			rid |= getType(side) == Connection.INPUT ? getInputInside(side) : getOutputInsideClient(side);
+		}
+		return rid;
+ 	}
+
+	@Override
+	public boolean renderEquals(PartGate other) {
+		if (other.getClass() != this.getClass()) {
+			return false;
+		}
+
+		if (this.getSide() != other.getSide() || this.getTop() != this.getTop()) {
+			return false;
+		}
+
+		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+			if (getUniqueSideRenderID(facing) != other.getUniqueSideRenderID(facing)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	@Override
+	public int renderHashCode() {
+		return Objects.hash(this.getClass(), this.getSide(), this.getTop(),
+				getUniqueSideRenderID(EnumFacing.NORTH), getUniqueSideRenderID(EnumFacing.SOUTH), getUniqueSideRenderID(EnumFacing.WEST), getUniqueSideRenderID(EnumFacing.EAST));
 	}
 }

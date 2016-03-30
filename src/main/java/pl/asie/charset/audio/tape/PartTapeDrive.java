@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,9 +13,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -86,12 +84,12 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
-	public String getModelPath() {
-		return "charsetaudio:tapedrive";
+	public ResourceLocation getModelPath() {
+		return new ResourceLocation("charsetaudio:tapedrive");
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, ItemStack stack, PartMOP hit) {
+	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
 		player.openGui(ModCharsetAudio.instance, isTop ? PartSlot.UP.ordinal() : PartSlot.DOWN.ordinal(), getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
 		if (!player.worldObj.isRemote) {
 			ModCharsetAudio.packet.sendToWatching(new PacketDriveState(this, getState()), this);
@@ -144,8 +142,8 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
-	public BlockState createBlockState() {
-		return new BlockState(MCMultiPartMod.multipart, PartSlab.IS_TOP, Properties.FACING4);
+	public BlockStateContainer createBlockState() {
+		return new BlockStateContainer(MCMultiPartMod.multipart, PartSlab.IS_TOP, Properties.FACING4);
 	}
 
 	@Override
@@ -183,6 +181,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 		boolean isLooping = getState() == State.REWINDING || getState() == State.FORWARDING;
 		if (isLooping && sound == null) {
 			sound = new MachineSound(new ResourceLocation("charsetaudio", "tape_rewind"),
+					SoundCategory.BLOCKS,
 					getPos().getX() + 0.5F,
 					getPos().getY() + (isTop() ? 0.75F : 0.25F),
 					getPos().getZ() + 0.5F,

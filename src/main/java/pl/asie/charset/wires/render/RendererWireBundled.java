@@ -6,7 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 public class RendererWireBundled extends RendererWireInsulated {
-	public RendererWireBundled(String type, int width, int height) {
+/*	public RendererWireBundled(String type, int width, int height) {
 		super(type, width, height);
 	}
 
@@ -34,5 +34,5 @@ public class RendererWireBundled extends RendererWireInsulated {
 		icons[2] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_side_nw"));
 		icons[3] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_side_se"));
 		icons[4] = map.registerSprite(new ResourceLocation("charsetwires:blocks/" + type + "_side_se_wire"));
-	}
+	} */
 }

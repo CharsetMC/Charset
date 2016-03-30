@@ -1,9 +1,13 @@
 package pl.asie.charset.audio.note;
 
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.capabilities.Capability;
@@ -52,7 +56,8 @@ public class TileIronNote extends TileEntity {
 	}
 
 	public int getInstrumentID() {
-		Material material = worldObj.getBlockState(pos.down()).getBlock().getMaterial();
+		IBlockState state = worldObj.getBlockState(pos.down());
+		Material material = state.getBlock().getMaterial(state);
 		if (material == Material.rock) return 1;
 		else if (material == Material.sand) return 2;
 		else if (material == Material.glass) return 3;
@@ -68,7 +73,7 @@ public class TileIronNote extends TileEntity {
 				return;
 			}
 
-			instrument = e.instrument.ordinal();
+			instrument = e.getInstrument().ordinal();
 			note = e.getVanillaNoteId();
 		}
 		if (note < 0) {
@@ -78,7 +83,7 @@ public class TileIronNote extends TileEntity {
 			note = 24;
 		}
 		float f = (float) Math.pow(2.0D, (double) (note - 12) / 12.0D);
-		worldObj.playSoundEffect((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, "note." + this.getInstrument(instrument), 3.0F, f);
+		worldObj.playSound((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, new SoundEvent(new ResourceLocation("note." + this.getInstrument(instrument))), SoundCategory.BLOCKS, 3.0F, f, true);
 		ModCharsetAudio.packet.sendToAllAround(new PacketNoteParticle(this, note), this, 32);
 	}
 

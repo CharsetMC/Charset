@@ -5,19 +5,18 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.refs.Properties;
@@ -38,7 +37,7 @@ public class BlockShifter extends BlockContainer {
 	}
 
 	@Override
-	public boolean canConnectRedstone(IBlockAccess world, BlockPos pos, EnumFacing side) {
+	public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
 		return true;
 	}
 
@@ -89,7 +88,7 @@ public class BlockShifter extends BlockContainer {
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (side == null) {
 			return false;
 		}
@@ -103,7 +102,6 @@ public class BlockShifter extends BlockContainer {
 				return false;
 			}
 
-			ItemStack heldItem = player.getHeldItem();
 			if (shifter.getFilters()[side.ordinal()] != null) {
 				if (!world.isRemote) {
 					shifter.setFilter(side.ordinal(), null);
@@ -143,14 +141,8 @@ public class BlockShifter extends BlockContainer {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public IBlockState getStateForEntityRender(IBlockState state) {
-		return this.getDefaultState().withProperty(Properties.FACING, EnumFacing.UP);
-	}
-
-	@Override
-	protected BlockState createBlockState() {
-		return new BlockState(this,
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this,
 				STRENGTH, EXTRACT,
 				Properties.FACING,
 				Properties.DOWN,
@@ -203,7 +195,7 @@ public class BlockShifter extends BlockContainer {
 	}
 
 	@Override
-	public int getRenderType() {
-		return 3;
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.MODEL;
 	}
 }

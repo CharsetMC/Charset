@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 
 import net.minecraft.entity.player.EntityPlayer;
 
+import net.minecraft.network.INetHandler;
 import pl.asie.charset.lib.network.PacketEntity;
 import pl.asie.charset.storage.ModCharsetStorage;
 
@@ -20,8 +21,8 @@ public class PacketBackpackOpen extends PacketEntity {
 	}
 
 	@Override
-	public void readData(ByteBuf buf) {
-		super.readData(buf);
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
 		if (entity instanceof EntityPlayer) {
 			((EntityPlayer) entity).openGui(ModCharsetStorage.instance, 2, entity.worldObj, (int) entity.posX, (int) entity.posY, (int) entity.posZ);
 		}

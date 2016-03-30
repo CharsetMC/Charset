@@ -3,18 +3,14 @@ package pl.asie.charset.lib.multipart;
 import java.util.EnumSet;
 import java.util.List;
 
+import mcmultipart.multipart.*;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.math.AxisAlignedBB;
 
-import mcmultipart.multipart.IOccludingPart;
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.Multipart;
-import mcmultipart.multipart.PartSlot;
-
-public class PartSlab extends Multipart implements ISlottedPart.ISlotOccludingPart, IOccludingPart {
+public class PartSlab extends Multipart implements ISlottedPart, INormallyOccludingPart, ISlotOccludingPart {
 	public static final PropertyBool IS_TOP = PropertyBool.create("top");
 	protected static final AxisAlignedBB[] BOXES = new AxisAlignedBB[] {
 			new AxisAlignedBB(0, 0, 0, 1, 0.5, 1),
