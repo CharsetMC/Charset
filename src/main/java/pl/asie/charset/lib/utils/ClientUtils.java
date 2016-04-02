@@ -21,6 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 
+import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public final class ClientUtils {
@@ -32,6 +33,38 @@ public final class ClientUtils {
 
 	private ClientUtils() {
 
+	}
+
+	public static float[] calculateUV(Vector3f from, Vector3f to, EnumFacing facing1) {
+		EnumFacing facing = facing1;
+		if (facing == null) {
+			if (from.y == to.y) {
+				facing = EnumFacing.UP;
+			} else if (from.x == to.x) {
+				facing = EnumFacing.EAST;
+			} else if (from.z == to.z) {
+				facing = EnumFacing.SOUTH;
+			} else {
+				return null; // !?
+			}
+		}
+
+		switch (facing) {
+			case DOWN:
+				return new float[] {from.x, 16.0F - to.z, to.x, 16.0F - from.z};
+			case UP:
+				return new float[] {from.x, from.z, to.x, to.z};
+			case NORTH:
+				return new float[] {16.0F - to.x, 16.0F - to.y, 16.0F - from.x, 16.0F - from.y};
+			case SOUTH:
+				return new float[] {from.x, 16.0F - to.y, to.x, 16.0F - from.y};
+			case WEST:
+				return new float[] {from.z, 16.0F - to.y, to.z, 16.0F - from.y};
+			case EAST:
+				return new float[] {16.0F - to.z, 16.0F - to.y, 16.0F - from.z, 16.0F - from.y};
+		}
+
+		return null;
 	}
 
 	public static int getFaceColor(int color, EnumFacing facing) {
@@ -47,10 +80,10 @@ public final class ClientUtils {
 		return new BakedQuad(quad.getVertexData(), quad.getTintIndex(), quad.getFace(), quad.getSprite(), quad.shouldApplyDiffuseLighting(), quad.getFormat());
 	}
 
-	public static BakedQuad recolorQuad(BakedQuad quad, int color){
+	public static BakedQuad recolorQuad(BakedQuad quad, int color) {
 		int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
 		int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-		int cc = getFaceColor(color, quad.getFace());
+		int cc = quad.getFace() != null ? getFaceColor(color, quad.getFace()) : color;
 		int[] vertexData = quad.getVertexData();
 		for (int i = 0; i < 4; i++) {
 			vertexData[v * i + c] = cc;

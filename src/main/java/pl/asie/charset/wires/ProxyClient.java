@@ -3,12 +3,14 @@ package pl.asie.charset.wires;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.utils.ClientUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 import pl.asie.charset.wires.render.RendererWire;
@@ -40,13 +42,15 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
-		//event.getModelRegistry().putObject(new ModelResourceLocation("charsetwires:wire", "multipart"), rendererWire);
-		//event.getModelRegistry().putObject(new ModelResourceLocation("charsetwires:wire", "inventory"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetwires:wire", "multipart"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetwires:wire", "inventory"), rendererWire);
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		//rendererWire.loadTextures(event.getMap());
+		for (WireType type : WireType.values()) {
+			rendererWire.registerSheet(event.getMap(), type, new ResourceLocation("charsetwires", "blocks/wire_" + type.name().toLowerCase()));
+		}
 	}
 }

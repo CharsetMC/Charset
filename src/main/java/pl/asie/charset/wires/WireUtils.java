@@ -282,6 +282,32 @@ public final class WireUtils {
 		}
 	}
 
+	public static int width(WireType type) {
+		switch (type) {
+			case NORMAL:
+				return 2;
+			case INSULATED:
+				return 4;
+			case BUNDLED:
+				return 6;
+		}
+
+		return 0;
+	}
+
+	public static int height(WireType type) {
+		switch (type) {
+			case NORMAL:
+				return 2;
+			case INSULATED:
+				return 3;
+			case BUNDLED:
+				return 4;
+		}
+
+		return 0;
+	}
+
 	public static float getWireHitboxWidth(PartWireBase wire) {
 		return wire.type.width() / 16.0f;
 	}

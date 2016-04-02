@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,6 +20,7 @@ import java.util.List;
 public class SimpleBakedModel implements IPerspectiveAwareModel {
     private final List<BakedQuad>[] quads = new List[7];
     private final IBakedModel parent;
+    private TextureAtlasSprite particle;
 
     public SimpleBakedModel() {
         this(null);
@@ -29,6 +31,10 @@ public class SimpleBakedModel implements IPerspectiveAwareModel {
         for (int i = 0; i < quads.length; i++) {
             quads[i] = new ArrayList<>();
         }
+    }
+
+    public void setParticle(TextureAtlasSprite particle) {
+        this.particle = particle;
     }
 
     public void addQuad(EnumFacing side, BakedQuad quad) {
@@ -70,7 +76,11 @@ public class SimpleBakedModel implements IPerspectiveAwareModel {
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return parent != null ? parent.getParticleTexture() : null;
+        if (particle != null) {
+            return particle;
+        } else {
+            return parent != null ? parent.getParticleTexture() : null;
+        }
     }
 
     @Override

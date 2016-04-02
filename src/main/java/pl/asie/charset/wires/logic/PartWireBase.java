@@ -1,12 +1,6 @@
 package pl.asie.charset.wires.logic;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -46,6 +40,7 @@ import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.wires.ModCharsetWires;
 import pl.asie.charset.wires.ProxyClient;
@@ -53,7 +48,7 @@ import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
 public abstract class PartWireBase extends Multipart implements
-		ICustomHighlightPart, IRedstonePart.ISlottedRedstonePart,
+		ICustomHighlightPart, IRedstonePart.ISlottedRedstonePart, IRenderComparable<PartWireBase>,
 		INormallyOccludingPart, ITickable, ISlottedCapabilityProvider, IWire {
 	protected static final boolean DEBUG = false;
 	private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
@@ -730,5 +725,26 @@ public abstract class PartWireBase extends Multipart implements
 		} else {
 			return 0;
 		}
+	}
+
+	public void setConnectionsForItemRender() {
+		internalConnections = 0x3F;
+		externalConnections = 0;
+		cornerConnections = 0;
+	}
+
+	@Override
+	public boolean renderEquals(PartWireBase other) {
+		return other.getWireType() == getWireType()
+				&& other.location == location
+				&& other.internalConnections == internalConnections
+				&& other.externalConnections == externalConnections
+				&& other.cornerConnections == cornerConnections
+				&& (getWireType() == WireType.INSULATED || other.getRedstoneLevel() == getRedstoneLevel());
+	}
+
+	@Override
+	public int renderHashCode() {
+		return Objects.hash(getWireType(), location, internalConnections, externalConnections, cornerConnections, getWireType() == WireType.INSULATED ? 0 : getRedstoneLevel());
 	}
 }

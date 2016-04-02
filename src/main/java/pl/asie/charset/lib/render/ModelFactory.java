@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ModelFactory<T extends IRenderComparable<T>> extends CharsetBakedModel {
+    private static final boolean DISABLE_CACHE = true;
+
     private static class MFItemOverride extends ItemOverrideList {
         public static final MFItemOverride INSTANCE = new MFItemOverride();
 
@@ -62,10 +64,13 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends Chars
 
         ModelKey<T> key = new ModelKey<>(object);
         if (cache.containsKey(key)) {
+            System.out.println("Cache hit! " + object.getClass());
             return cache.get(key);
         } else {
             IBakedModel model = bake(object);
-            cache.put(key, model);
+            if (!DISABLE_CACHE) {
+                cache.put(key, model);
+            }
             return model;
         }
     }
