@@ -1,21 +1,29 @@
 package pl.asie.charset.lib.render;
 
+import javax.annotation.Nonnull;
+
 public class ModelKey<T extends IRenderComparable<T>> {
     T object;
     Class objectClass;
 
-    public ModelKey(T object) {
+    public ModelKey(@Nonnull T object) {
         this.object = object;
         this.objectClass = object.getClass();
     }
 
     @Override
     public boolean equals(Object other) {
-        if (other == null || !objectClass.isAssignableFrom(other.getClass())) {
+        if (other == null || !(other instanceof ModelKey) ){
             return false;
         }
 
-        return object.renderEquals((T) other);
+        IRenderComparable o = ((ModelKey) other).object;
+
+        if (!objectClass.isInstance(o)) {
+            return false;
+        }
+
+        return object.renderEquals((T) o);
     }
 
     @Override

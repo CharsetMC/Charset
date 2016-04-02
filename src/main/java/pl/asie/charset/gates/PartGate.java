@@ -780,7 +780,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	@Override
 	public boolean renderEquals(PartGate other) {
-		if (other.getClass() != this.getClass()) {
+		if (!this.getClass().equals(other.getClass())) {
 			return false;
 		}
 

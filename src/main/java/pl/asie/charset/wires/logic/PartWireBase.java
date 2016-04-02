@@ -735,7 +735,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public boolean renderEquals(PartWireBase other) {
-		return other.getWireType() == getWireType()
+		return other.type == type
 				&& other.location == location
 				&& other.internalConnections == internalConnections
 				&& other.externalConnections == externalConnections
@@ -745,6 +745,6 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public int renderHashCode() {
-		return Objects.hash(getWireType(), location, internalConnections, externalConnections, cornerConnections, getWireType() == WireType.INSULATED ? 0 : getRedstoneLevel());
+		return Objects.hash(type, location, internalConnections, externalConnections, cornerConnections, getWireType() == WireType.INSULATED ? 0 : getRedstoneLevel());
 	}
 }
