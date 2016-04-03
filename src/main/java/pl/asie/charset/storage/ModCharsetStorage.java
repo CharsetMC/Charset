@@ -53,7 +53,8 @@ public class ModCharsetStorage {
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("storage.cfg"));
 
 		backpackBlock = new BlockBackpack();
-		GameRegistry.registerBlock(backpackBlock, ItemBackpack.class, "backpack");
+		GameRegistry.register(backpackBlock.setRegistryName("backpack"));
+		GameRegistry.register(new ItemBackpack(backpackBlock).setRegistryName("backpack"));
 
 		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
 

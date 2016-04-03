@@ -39,7 +39,7 @@ public class ModCharsetWires {
 		MultipartRegistry.registerPartFactory(new PartWireProvider(), "charsetwires:wire");
 
 		wire = new ItemWire();
-		GameRegistry.registerItem(wire, "wire");
+		GameRegistry.register(wire.setRegistryName("wire"));
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 

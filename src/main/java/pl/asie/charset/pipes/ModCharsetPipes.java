@@ -53,7 +53,7 @@ public class ModCharsetPipes {
 		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
 
 		itemPipe = new ItemPipe();
-		GameRegistry.registerItem(itemPipe, "pipe");
+		GameRegistry.register(itemPipe.setRegistryName("pipe"));
 		MultipartRegistry.registerPart(PartPipe.class, "CharsetPipes:pipe");
 
 		shifterBlock = new BlockShifter();

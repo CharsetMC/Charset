@@ -54,10 +54,10 @@ public class ModCharsetGates {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		itemGate = new ItemGate();
-		GameRegistry.registerItem(itemGate, "gate");
+		GameRegistry.register(itemGate.setRegistryName("gate"));
 
 		itemScrewdriver = new ItemScrewdriver();
-		GameRegistry.registerItem(itemScrewdriver, "screwdriver");
+		GameRegistry.register(itemScrewdriver.setRegistryName("screwdriver"));
 
 		registerGate("nand", PartGateNAND.class, 0);
 		registerGate("nor", PartGateNOR.class, 1);

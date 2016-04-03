@@ -38,7 +38,7 @@ public class ModCharsetDrama {
 		dramaInABottle.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 		dramaInABottle.setMaxStackSize(1);
 
-		GameRegistry.registerItem(dramaInABottle, "dramaInABottle");
+		GameRegistry.register(dramaInABottle.setRegistryName("dramaInABottle"));
 		ModCharsetLib.proxy.registerItemModel(dramaInABottle, 0, "charsetdrama:dramaInABottle");
 	}
 

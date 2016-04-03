@@ -2,6 +2,7 @@ package pl.asie.charset.lib;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
@@ -20,7 +21,8 @@ public class ProxyCommon {
 	}
 
 	public void registerBlock(Block block, String name) {
-		GameRegistry.registerBlock(block, name);
+		GameRegistry.register(block.setRegistryName(name));
+		GameRegistry.register(new ItemBlock(block).setRegistryName(name));
 		block.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 	}
 

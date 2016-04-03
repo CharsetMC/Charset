@@ -1,5 +1,6 @@
 package pl.asie.charset.audio;
 
+import net.minecraft.item.ItemBlock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -77,15 +78,15 @@ public class ModCharsetAudio {
 		logger = LogManager.getLogger(ModCharsetAudio.MODID);
 
 		partTapeDriveItem = new ItemPartTapeDrive();
-		GameRegistry.registerItem(partTapeDriveItem, "tapeDrive");
+		GameRegistry.register(partTapeDriveItem.setRegistryName("tapeDrive"));
 
 		tapeItem = new ItemTape();
-		GameRegistry.registerItem(tapeItem, "tape");
+		GameRegistry.register(tapeItem.setRegistryName("tape"));
 
 		magneticTapeItem = new Item().setCreativeTab(ModCharsetLib.CREATIVE_TAB).setUnlocalizedName("charset.tapeitem");
 		tapeReelItem = new ItemTapeReel().setHasSubtypes(true).setCreativeTab(ModCharsetLib.CREATIVE_TAB).setUnlocalizedName("charset.tapereel");
-		GameRegistry.registerItem(magneticTapeItem, "tapeMagnetic");
-		GameRegistry.registerItem(tapeReelItem, "tapeReel");
+		GameRegistry.register(magneticTapeItem.setRegistryName("tapeMagnetic"));
+		GameRegistry.register(tapeReelItem.setRegistryName("tapeReel"));
 
 		MultipartRegistry.registerPart(PartTapeDrive.class, "charsetaudio:tapedrive");
 
@@ -109,7 +110,8 @@ public class ModCharsetAudio {
 		CapabilityManager.INSTANCE.register(IDataStorage.class, new DataStorageStorage(), DataStorageImpl.class);
 
 		ironNoteBlock = new BlockIronNote();
-		GameRegistry.registerBlock(ironNoteBlock, "ironnoteblock");
+		GameRegistry.register(ironNoteBlock.setRegistryName("ironnoteblock"));
+		GameRegistry.register(new ItemBlock(ironNoteBlock).setRegistryName("ironnoteblock"));
 		ModCharsetLib.proxy.registerItemModel(ironNoteBlock, 0, "charsetaudio:ironnoteblock");
 	}
 
