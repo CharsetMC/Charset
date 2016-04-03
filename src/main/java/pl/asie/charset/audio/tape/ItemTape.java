@@ -108,9 +108,7 @@ public class ItemTape extends Item implements IDyeableItem {
 		public NBTTagCompound serializeNBT() {
 			if (dataStorage != null) {
 				NBTTagCompound compound = new NBTTagCompound();
-				NBTBase data = ModCharsetAudio.CAP_STORAGE.getStorage().writeNBT(
-						ModCharsetAudio.CAP_STORAGE, dataStorage, null
-				);
+				NBTBase data = ModCharsetAudio.CAP_STORAGE.writeNBT(dataStorage, null);
 				if (data != null) {
 					compound.setTag("data", data);
 				}
@@ -123,9 +121,7 @@ public class ItemTape extends Item implements IDyeableItem {
 		@Override
 		public void deserializeNBT(NBTTagCompound nbt) {
 			if (dataStorage != null && nbt.hasKey("data")) {
-				ModCharsetAudio.CAP_STORAGE.getStorage().readNBT(
-						ModCharsetAudio.CAP_STORAGE, dataStorage, null, nbt.getCompoundTag("data")
-				);
+				ModCharsetAudio.CAP_STORAGE.readNBT(dataStorage, null, nbt.getCompoundTag("data"));
 			}
 		}
 	}

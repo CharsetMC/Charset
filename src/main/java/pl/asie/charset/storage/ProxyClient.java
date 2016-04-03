@@ -2,6 +2,7 @@ package pl.asie.charset.storage;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
 import org.lwjgl.input.Keyboard;
 
@@ -34,29 +35,19 @@ import pl.asie.charset.storage.backpack.*;
  * Created by asie on 1/10/16.
  */
 public class ProxyClient extends ProxyCommon {
-	public static final KeyBinding backpackOpen = new KeyBinding("key.charset.backpackOpen", Keyboard.KEY_C, "key.categories.gameplay");
+	public static final KeyBinding backpackOpenKey = new KeyBinding("key.charset.backpackOpen", Keyboard.KEY_C, "key.categories.gameplay");
 	public static final IBakedModel[] backpackTopModel = new IBakedModel[4];
 	public static final IBakedModel[] backpackModel = new IBakedModel[4];
 
 	@Override
 	public void init() {
-		ClientRegistry.bindTileEntitySpecialRenderer(TileBackpack.class, new TileBackpackRenderer());
-		ClientRegistry.registerKeyBinding(backpackOpen);
+		ClientRegistry.bindTileEntitySpecialRenderer(TileBackpack.class, new RendererBackpack.Tile());
+		ClientRegistry.registerKeyBinding(backpackOpenKey);
+
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new BlockBackpack.Color(), ModCharsetStorage.backpackBlock);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemBackpack.Color(), ModCharsetStorage.backpackBlock);
-	}
 
-	protected float interpolateRotation(float par1, float par2, float par3) {
-		float f;
-
-		for (f = par2 - par1; f < -180.0F; f += 360.0F) {
-		}
-
-		while (f >= 180.0F) {
-			f -= 360.0F;
-		}
-
-		return par1 + par3 * f;
+		MinecraftForge.EVENT_BUS.register(new RendererBackpack.Armor());
 	}
 
 	@SubscribeEvent
@@ -68,53 +59,11 @@ public class ProxyClient extends ProxyCommon {
 			return;
 		}
 
-		if (ModCharsetStorage.enableBackpackOpenKey && backpackOpen.isPressed()) {
+		if (ModCharsetStorage.enableBackpackOpenKey && backpackOpenKey.isPressed()) {
 			ItemStack backpack = ItemBackpack.getBackpack(player);
 			if (backpack != null) {
 				ModCharsetStorage.packet.sendToServer(new PacketBackpackOpen(player));
 			}
-		}
-	}
-
-	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
-	public void onRenderArmor(RenderPlayerEvent.Pre event) {
-		ItemStack backpack = event.getEntityPlayer().getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (backpack != null && backpack.getItem() instanceof ItemBackpack) {
-			BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
-
-			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-
-			GlStateManager.pushMatrix();
-			GlStateManager.scale(0.75, 0.75, 0.75);
-			GlStateManager.translate(
-					event.getEntity().posX - Minecraft.getMinecraft().thePlayer.posX,
-					event.getEntity().posY - Minecraft.getMinecraft().thePlayer.posY,
-					event.getEntity().posZ - Minecraft.getMinecraft().thePlayer.posZ
-			);
-			GlStateManager.rotate(-interpolateRotation(event.getEntityPlayer().prevRenderYawOffset, event.getEntityPlayer().renderYawOffset, event.getPartialRenderTick()), 0.0F, 1.0F, 0.0F);
-			if (event.getEntityPlayer().isSneaking()) {
-				GlStateManager.translate(-0.5, 1.125, -0.845);
-				GlStateManager.rotate(30.0f, 1.0f, 0.0f, 0.0f);
-				GlStateManager.translate(0, 0.175, -0.35);
-			} else {
-				GlStateManager.translate(-0.5, 1.2, -0.845);
-			}
-
-			int i = ((ItemBackpack) backpack.getItem()).getColor(backpack);
-
-			if (EntityRenderer.anaglyphEnable) {
-				i = TextureUtil.anaglyphColor(i);
-			}
-
-			float f = (float) (i >> 16 & 255) / 255.0F;
-			float f1 = (float) (i >> 8 & 255) / 255.0F;
-			float f2 = (float) (i & 255) / 255.0F;
-
-			renderer.renderModelBrightnessColor(backpackModel[1], 1.0f, f, f1, f2);
-			renderer.renderModelBrightnessColor(backpackTopModel[1], 1.0f, f, f1, f2);
-
-			GlStateManager.popMatrix();
 		}
 	}
 

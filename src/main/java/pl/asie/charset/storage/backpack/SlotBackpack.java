@@ -13,10 +13,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Created by asie on 1/11/16.
  */
-public class SlotArmorBackpack extends Slot {
+public class SlotBackpack extends Slot {
 	private final EntityPlayer player;
 
-	public SlotArmorBackpack(EntityPlayer player, IInventory inventoryIn, int index, int xPosition, int yPosition) {
+	public SlotBackpack(EntityPlayer player, IInventory inventoryIn, int index, int xPosition, int yPosition) {
 		super(inventoryIn, index, xPosition, yPosition);
 		this.player = player;
 	}

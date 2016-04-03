@@ -2,16 +2,51 @@ package pl.asie.charset.tweaks.minecart;
 
 import net.minecraft.entity.item.EntityMinecart;
 
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.common.capabilities.*;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
 
 public class TweakDyeableMinecarts extends Tweak {
+	public static class CapabilityProvider implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
+		private final IMinecartDyeable dyeable = new IMinecartDyeable.Impl();
+
+		@Override
+		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+			return capability == MINECART_DYEABLE;
+		}
+
+		@Override
+		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+			return capability == MINECART_DYEABLE ? (T) dyeable : null;
+		}
+
+		@Override
+		public NBTTagCompound serializeNBT() {
+			return (NBTTagCompound) MINECART_DYEABLE.writeNBT(dyeable, null);
+		}
+
+		@Override
+		public void deserializeNBT(NBTTagCompound nbt) {
+			MINECART_DYEABLE.readNBT(dyeable, null, nbt);
+		}
+	}
+
+	@CapabilityInject(IMinecartDyeable.class)
+	public static Capability<IMinecartDyeable> MINECART_DYEABLE;
+	public static ResourceLocation MINECART_DYEABLE_KEY = new ResourceLocation("charsettweaks:minecart_dyeable");
+
 	public TweakDyeableMinecarts() {
 		super("additions", "dyeableMinecarts", "Dye minecarts by right-clicking them!", true);
 	}
@@ -23,6 +58,28 @@ public class TweakDyeableMinecarts extends Tweak {
 
 	@Override
 	public void enable() {
+		CapabilityManager.INSTANCE.register(IMinecartDyeable.class, new Capability.IStorage<IMinecartDyeable>() {
+			@Override
+			public NBTBase writeNBT(Capability<IMinecartDyeable> capability, IMinecartDyeable instance, EnumFacing side) {
+				if (instance != null) {
+					NBTTagCompound compound = new NBTTagCompound();
+					compound.setInteger("color", instance.getColor());
+					return compound;
+				} else {
+					return null;
+				}
+			}
+
+			@Override
+			public void readNBT(Capability<IMinecartDyeable> capability, IMinecartDyeable instance, EnumFacing side, NBTBase nbt) {
+				if (nbt instanceof NBTTagCompound && instance != null) {
+					NBTTagCompound compound = (NBTTagCompound) nbt;
+					if (compound.hasKey("color")) {
+						instance.setColor(compound.getInteger("color"));
+					}
+				}
+			}
+		}, IMinecartDyeable.Impl.class);
 		ModCharsetTweaks.proxy.initMinecartTweakClient();
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -33,9 +90,9 @@ public class TweakDyeableMinecarts extends Tweak {
 	}
 
 	@SubscribeEvent
-	public void onEntityConstructing(EntityEvent.EntityConstructing event) {
-		if (event.getEntity() instanceof EntityMinecart) {
-			//event.getEntity().registerExtendedProperties(MinecartProperties.NAME, new MinecartProperties());
+	public void onAttachCapabilities(AttachCapabilitiesEvent event) {
+		if (event.getObject() instanceof EntityMinecart) {
+			event.addCapability(MINECART_DYEABLE_KEY, new CapabilityProvider());
 		}
 	}
 
@@ -48,18 +105,18 @@ public class TweakDyeableMinecarts extends Tweak {
 
 	@SubscribeEvent
 	public void onEntityInteract(EntityInteractEvent event) {
-		/* if (!event.target.worldObj.isRemote
-				&& event.target instanceof EntityMinecart
-				&& ColorUtils.isDye(event.getEntityPlayer().getHeldItem())) {
-			MinecartProperties properties = MinecartProperties.get((EntityMinecart) event.target);
+		 if (!event.getTarget().worldObj.isRemote
+				&& event.getTarget() instanceof EntityMinecart
+				&& ColorUtils.isDye(event.getEntityPlayer().getHeldItem(event.getHand()))) {
+			IMinecartDyeable properties = IMinecartDyeable.get((EntityMinecart) event.getTarget());
 			if (properties != null) {
-				properties.setColor(ColorUtils.getRGBColor(ColorUtils.getColorIDFromDye(event.getEntityPlayer().getHeldItem())));
+				properties.setColor(ColorUtils.getRGBColor(ColorUtils.getColorIDFromDye(event.getEntityPlayer().getHeldItem(event.getHand()))));
 
 				event.setCanceled(true);
-				event.getEntityPlayer().swingItem();
+				event.getEntityPlayer().swingArm(event.getHand());
 
-				PacketMinecartUpdate.send((EntityMinecart) event.target);
+				PacketMinecartUpdate.send((EntityMinecart) event.getTarget());
 			}
-		} */
+		}
 	}
 }

@@ -19,7 +19,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
-import pl.asie.charset.storage.backpack.HandlerBackpackUnequip;
+import pl.asie.charset.storage.backpack.HandlerBackpack;
 import pl.asie.charset.storage.backpack.BlockBackpack;
 import pl.asie.charset.storage.backpack.ItemBackpack;
 import pl.asie.charset.storage.backpack.PacketBackpackOpen;
@@ -59,7 +59,6 @@ public class ModCharsetStorage {
 		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
-		MinecraftForge.EVENT_BUS.register(new HandlerBackpackUnequip());
 
 		enableBackpackOpenKey = config.getBoolean("enableOpenKeyBinding", "backpack", true, "Should backpacks be openable with a key binding?");
 
@@ -74,8 +73,9 @@ public class ModCharsetStorage {
 
 		packet = new PacketRegistry(ModCharsetStorage.MODID);
 		packet.registerPacket(0x01, PacketBackpackOpen.class);
-
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
+
+		MinecraftForge.EVENT_BUS.register(new HandlerBackpack());
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lwl",
 				'l', Items.leather, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold", 'w', Blocks.wool));

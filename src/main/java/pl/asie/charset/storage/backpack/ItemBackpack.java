@@ -66,8 +66,8 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 		if (entity instanceof EntityPlayer) {
 			Container container = ((EntityPlayer) entity).inventoryContainer;
 			Slot slot = container.getSlot(6);
-			if (!(slot instanceof SlotArmorBackpack)) {
-				SlotArmorBackpack newSlot = new SlotArmorBackpack((EntityPlayer) entity, slot.inventory,
+			if (!(slot instanceof SlotBackpack)) {
+				SlotBackpack newSlot = new SlotBackpack((EntityPlayer) entity, slot.inventory,
 						slot.getSlotIndex(), slot.xDisplayPosition, slot.yDisplayPosition);
 				newSlot.slotNumber = slot.slotNumber;
 				container.inventorySlots.set(6, newSlot);

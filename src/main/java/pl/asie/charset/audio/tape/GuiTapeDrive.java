@@ -14,6 +14,8 @@ import net.minecraft.util.text.translation.I18n;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.lwjgl.opengl.Display;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.container.GuiContainerCharset;
 
@@ -111,7 +113,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					chooser.setDialogType(JFileChooser.OPEN_DIALOG);
 					chooser.setFileFilter(new FileNameExtensionFilter("Audio file " + Arrays.toString(TapeRecordThread.getSupportedExtensions()), TapeRecordThread.getSupportedExtensions()));
-					if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+					if (chooser.showOpenDialog(Display.getParent()) == JFileChooser.APPROVE_OPTION) {
 						if (chooser.getSelectedFile() != null) {
 							tapeRecord = new TapeRecordThread(chooser.getSelectedFile(), tapeDrive);
 							tapeRecordThread = new Thread(tapeRecord);

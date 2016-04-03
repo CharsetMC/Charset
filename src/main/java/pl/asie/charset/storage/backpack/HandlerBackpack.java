@@ -16,7 +16,7 @@ import pl.asie.charset.storage.ModCharsetStorage;
 /**
  * Created by asie on 1/11/16.
  */
-public class HandlerBackpackUnequip {
+public class HandlerBackpack {
 	@SubscribeEvent
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK
