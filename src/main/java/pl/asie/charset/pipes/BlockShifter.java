@@ -26,7 +26,7 @@ public class BlockShifter extends BlockContainer {
 	public static final PropertyInteger STRENGTH = PropertyInteger.create("strength", 0, 2);
 
 	public BlockShifter() {
-		super(Material.iron);
+		super(Material.IRON);
 		setUnlocalizedName("charset.shifter");
 		setDefaultState(this.blockState.getBaseState().withProperty(Properties.FACING, EnumFacing.NORTH));
 		setHardness(0.5F);

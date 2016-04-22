@@ -39,10 +39,10 @@ public final class WireUtils {
 	};
 
 	static {
-		WIRE_PLACEABLE.add(Blocks.glowstone);
-		WIRE_PLACEABLE.add(Blocks.piston);
-		WIRE_PLACEABLE.add(Blocks.piston_extension);
-		WIRE_PLACEABLE.add(Blocks.sticky_piston);
+		WIRE_PLACEABLE.add(Blocks.GLOWSTONE);
+		WIRE_PLACEABLE.add(Blocks.PISTON);
+		WIRE_PLACEABLE.add(Blocks.PISTON_EXTENSION);
+		WIRE_PLACEABLE.add(Blocks.STICKY_PISTON);
 	}
 
 	private WireUtils() {

@@ -48,7 +48,7 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 	}
 
 	public static ItemStack getBackpack(EntityPlayer player) {
-		ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+		ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 		if (stack != null && stack.getItem() instanceof ItemBackpack) {
 			return stack;
 		} else {

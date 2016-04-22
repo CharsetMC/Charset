@@ -76,19 +76,19 @@ public class ModCharsetPipes {
 				"cPc",
 				"c^c",
 				"crc",
-				'c', Blocks.cobblestone, 'P', Blocks.piston, 'r', Items.redstone, '^', Items.arrow);
+				'c', Blocks.COBBLESTONE, 'P', Blocks.PISTON, 'r', Items.REDSTONE, '^', Items.ARROW);
 
 		if (!Loader.isModLoaded("BuildCraft|Transport")) {
 			ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
 					"mgm",
-					'g', Blocks.glass, 'm', Blocks.obsidian);
+					'g', Blocks.GLASS, 'm', Blocks.OBSIDIAN);
 		}
 
 		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
 				"m",
 				"g",
 				"m",
-				'g', Blocks.glass, 'm', Blocks.obsidian);
+				'g', Blocks.GLASS, 'm', Blocks.OBSIDIAN);
 	}
 
 	@EventHandler

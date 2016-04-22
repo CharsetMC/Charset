@@ -170,7 +170,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public Material getMaterial() {
-		return Material.glass;
+		return Material.GLASS;
 	}
 
 	@Override

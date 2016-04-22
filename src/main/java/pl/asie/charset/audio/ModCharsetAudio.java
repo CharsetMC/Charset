@@ -128,11 +128,11 @@ public class ModCharsetAudio {
 
 		GameRegistry.registerTileEntity(TileIronNote.class, "charset:ironnoteblock");
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ironNoteBlock), "iii", "iNi", "iii", 'i', "ingotIron", 'N', Blocks.noteblock));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ironNoteBlock), "iii", "iNi", "iii", 'i', "ingotIron", 'N', Blocks.NOTEBLOCK));
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(tapeReelItem), " i ", "ipi", " i ", 'i', "ingotIron", 'p', Items.paper));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(magneticTapeItem, 32), "ddd", "rir", "ddd", 'd', "dyeBlack", 'r', Items.redstone, 'i', "ingotIron"));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(partTapeDriveItem), "igi", "rRr", "ipi", 'g', "blockGlass", 'p', Blocks.piston, 'R', new ItemStack(tapeReelItem, 1, 0), 'r', Items.redstone, 'i', "ingotIron"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(tapeReelItem), " i ", "ipi", " i ", 'i', "ingotIron", 'p', Items.PAPER));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(magneticTapeItem, 32), "ddd", "rir", "ddd", 'd', "dyeBlack", 'r', Items.REDSTONE, 'i', "ingotIron"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(partTapeDriveItem), "igi", "rRr", "ipi", 'g', "blockGlass", 'p', Blocks.PISTON, 'R', new ItemStack(tapeReelItem, 1, 0), 'r', Items.REDSTONE, 'i', "ingotIron"));
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerAudio());
 

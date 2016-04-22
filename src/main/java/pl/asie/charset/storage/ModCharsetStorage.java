@@ -78,6 +78,6 @@ public class ModCharsetStorage {
 		MinecraftForge.EVENT_BUS.register(new HandlerBackpack());
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lwl",
-				'l', Items.leather, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold", 'w', Blocks.wool));
+				'l', Items.LEATHER, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold", 'w', Blocks.WOOL));
 	}
 }

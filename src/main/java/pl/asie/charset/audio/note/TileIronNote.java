@@ -58,10 +58,10 @@ public class TileIronNote extends TileEntity {
 	public int getInstrumentID() {
 		IBlockState state = worldObj.getBlockState(pos.down());
 		Material material = state.getBlock().getMaterial(state);
-		if (material == Material.rock) return 1;
-		else if (material == Material.sand) return 2;
-		else if (material == Material.glass) return 3;
-		else if (material == Material.wood) return 4;
+		if (material == Material.ROCK) return 1;
+		else if (material == Material.SAND) return 2;
+		else if (material == Material.GLASS) return 3;
+		else if (material == Material.WOOD) return 4;
 		else return 0;
 	}
 

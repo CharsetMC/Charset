@@ -11,7 +11,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 
 public class BlockIronNote extends BlockContainer {
 	public BlockIronNote() {
-		super(Material.iron);
+		super(Material.IRON);
 		setHardness(1.6F);
 		setUnlocalizedName("charset.ironNoteBlock");
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);

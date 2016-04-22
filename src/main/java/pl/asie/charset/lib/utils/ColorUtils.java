@@ -49,7 +49,7 @@ public final class ColorUtils {
 			return -1;
 		}
 
-		if (stack.getItem() == Items.dye) {
+		if (stack.getItem() == Items.DYE) {
 			return 15 - stack.getItemDamage();
 		}
 

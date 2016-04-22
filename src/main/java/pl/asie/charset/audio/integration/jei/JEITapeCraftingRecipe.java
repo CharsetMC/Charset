@@ -64,7 +64,7 @@ public class JEITapeCraftingRecipe extends BlankRecipeWrapper implements IShaped
 		inputs[2] = mats;
 		inputs[3] = new ItemStack(ModCharsetAudio.tapeReelItem, 1, OreDictionary.WILDCARD_VALUE);
 		inputs[5] = inputs[3];
-		inputs[6] = inputs[7] = inputs[8] = new ItemStack(Blocks.stone_slab);
+		inputs[6] = inputs[7] = inputs[8] = new ItemStack(Blocks.STONE_SLAB);
 
 		return Arrays.asList(inputs);
 	}

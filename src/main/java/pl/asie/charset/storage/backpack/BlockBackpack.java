@@ -50,7 +50,7 @@ public class BlockBackpack extends BlockContainer {
 	private static final AxisAlignedBB AABB = new AxisAlignedBB(0.1875f, 0.0f, 0.1875f, 0.8125f, 0.75f, 0.8125f);
 
 	public BlockBackpack() {
-		super(Material.cloth);
+		super(Material.CLOTH);
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 		setUnlocalizedName("charset.backpack");
 		setHardness(0.8f);

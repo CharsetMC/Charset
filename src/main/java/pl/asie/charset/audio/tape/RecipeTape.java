@@ -62,7 +62,7 @@ public class RecipeTape extends RecipeBase {
 					}
 					break;
 				case 's':
-					if (source == null || source.getItem() != Item.getItemFromBlock(Blocks.stone_slab)) {
+					if (source == null || source.getItem() != Item.getItemFromBlock(Blocks.STONE_SLAB)) {
 						return false;
 					}
 					break;
@@ -120,7 +120,7 @@ public class RecipeTape extends RecipeBase {
 					}
 					break;
 				case 's':
-					if (source == null || source.getItem() != Item.getItemFromBlock(Blocks.stone_slab)) {
+					if (source == null || source.getItem() != Item.getItemFromBlock(Blocks.STONE_SLAB)) {
 						return null;
 					}
 					break;

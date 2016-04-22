@@ -54,7 +54,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 
 	@Override
 	public Material getMaterial() {
-		return Material.iron;
+		return Material.IRON;
 	}
 
 	@Override

@@ -18,9 +18,8 @@ import pl.asie.charset.storage.ModCharsetStorage;
  */
 public class HandlerBackpack {
 	@SubscribeEvent
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (event.getAction() == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK
-				&& event.getEntityPlayer().getItemStackFromSlot(EntityEquipmentSlot.MAINHAND) == null
+	public void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {
+		if (event.getEntityPlayer().getItemStackFromSlot(EntityEquipmentSlot.MAINHAND) == null
 				&& event.getEntityPlayer().isSneaking()
 				&& event.getFace() == EnumFacing.UP && !event.getWorld().isRemote) {
 			ItemStack backpack = ItemBackpack.getBackpack(event.getEntityPlayer());

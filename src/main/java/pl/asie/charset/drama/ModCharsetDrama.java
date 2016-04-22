@@ -44,6 +44,6 @@ public class ModCharsetDrama {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		BrewingRecipeRegistry.addRecipe(new ItemStack(Items.potionitem, 1, 16), "dyePink", new ItemStack(dramaInABottle));
+		BrewingRecipeRegistry.addRecipe(new ItemStack(Items.POTIONITEM, 1, 16), "dyePink", new ItemStack(dramaInABottle));
 	}
 }

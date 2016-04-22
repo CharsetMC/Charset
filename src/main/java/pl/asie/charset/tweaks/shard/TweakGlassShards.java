@@ -45,9 +45,9 @@ public class TweakGlassShards extends Tweak {
 		ModCharsetTweaks.proxy.initShardsTweakClient();
 		MinecraftForge.EVENT_BUS.register(this);
 
-		GameRegistry.addShapedRecipe(new ItemStack(Blocks.glass), "gg", "gg", 'g', new ItemStack(shardItem, 1, 0));
+		GameRegistry.addShapedRecipe(new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(shardItem, 1, 0));
 		for (int i = 0; i < 16; i++) {
-			GameRegistry.addShapedRecipe(new ItemStack(Blocks.stained_glass, 1, i), "gg", "gg", 'g', new ItemStack(shardItem, 1, i + 1));
+			GameRegistry.addShapedRecipe(new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(shardItem, 1, i + 1));
 		}
 
 		OreDictionary.registerOre("shardGlassColorless", new ItemStack(shardItem, 1, 0));
@@ -65,12 +65,12 @@ public class TweakGlassShards extends Tweak {
 		boolean isPane = false;
 		int md = 0;
 
-		if (block == Blocks.glass) {
-		} else if (block == Blocks.stained_glass) {
+		if (block == Blocks.GLASS) {
+		} else if (block == Blocks.STAINED_GLASS) {
 			md = 1 + block.getMetaFromState(event.getState());
-		} else if (block == Blocks.glass_pane) {
+		} else if (block == Blocks.GLASS_PANE) {
 			isPane = true;
-		} else if (block == Blocks.stained_glass_pane) {
+		} else if (block == Blocks.STAINED_GLASS_PANE) {
 			isPane = true;
 			md = 1 + block.getMetaFromState(event.getState());
 		} else {

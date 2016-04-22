@@ -61,16 +61,16 @@ public class ModCharsetWires {
 			OreDictionary.registerOre("charsetWireInsulatedFreestanding", new ItemStack(wire, 1, (i + 1) << 1));
 
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 8, 2 + (i << 1)),
-					"ddd", "dwd", "ddd", 'd', new ItemStack(wire, 1, 0), 'w', new ItemStack(Blocks.wool, 1, i)));
+					"ddd", "dwd", "ddd", 'd', new ItemStack(wire, 1, 0), 'w', new ItemStack(Blocks.WOOL, 1, i)));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 8, 3 + (i << 1)),
-					"ddd", "dwd", "ddd", 'd', new ItemStack(wire, 1, 1), 'w', new ItemStack(Blocks.wool, 1, i)));
+					"ddd", "dwd", "ddd", 'd', new ItemStack(wire, 1, 1), 'w', new ItemStack(Blocks.WOOL, 1, i)));
 		}
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 1, 34),
-				"sws", "www", "sws", 'w', "charsetWireInsulated", 's', Items.string
+				"sws", "www", "sws", 'w', "charsetWireInsulated", 's', Items.STRING
 		));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wire, 1, 35),
-				"sws", "www", "sws", 'w', "charsetWireInsulatedFreestanding", 's', Items.string
+				"sws", "www", "sws", 'w', "charsetWireInsulatedFreestanding", 's', Items.STRING
 		));
 
 		for (int i = 0; i < 18; i++) {

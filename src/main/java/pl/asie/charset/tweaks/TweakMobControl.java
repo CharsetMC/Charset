@@ -28,7 +28,7 @@ public class TweakMobControl extends Tweak {
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks-mobcontrol.cfg"));
 
 		for (String s : EntityList.getEntityNameList()) {
-			Class<? extends Entity> entity = EntityList.stringToClassMapping.get(s);
+			Class<? extends Entity> entity = EntityList.NAME_TO_CLASS.get(s);
 			if (entity != null && EntityLiving.class.isAssignableFrom(entity)) {
 				boolean enabled = config.get("allow", s, true, null).getBoolean();
 				if (!enabled) {

@@ -85,7 +85,7 @@ public class ModCharsetGates {
 		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs");
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemScrewdriver), "  i", "si ", "ws ", 'i', "ingotIron", 's', "stickWood",
-				'w', new ItemStack(Blocks.wool, 1, EnumDyeColor.PINK.getMetadata())));
+				'w', new ItemStack(Blocks.WOOL, 1, EnumDyeColor.PINK.getMetadata())));
 	}
 
 	private void registerGateStack(ItemStack stack, Object... recipe) {
@@ -95,11 +95,11 @@ public class ModCharsetGates {
 		}
 
 		data.add('c');
-		data.add(new ItemStack(Blocks.redstone_torch));
+		data.add(new ItemStack(Blocks.REDSTONE_TORCH));
 		data.add('w');
-		data.add(Loader.isModLoaded("CharsetWires") ? Item.getByNameOrId("CharsetWires:wire") : Items.redstone);
+		data.add(Loader.isModLoaded("CharsetWires") ? Item.getByNameOrId("CharsetWires:wire") : Items.REDSTONE);
 		data.add('s');
-		data.add(new ItemStack(Blocks.stone_slab));
+		data.add(new ItemStack(Blocks.STONE_SLAB));
 		GameRegistry.addRecipe(new ShapedOreRecipe(stack, data.toArray(new Object[data.size()])));
 
 		registerGateStack(stack);

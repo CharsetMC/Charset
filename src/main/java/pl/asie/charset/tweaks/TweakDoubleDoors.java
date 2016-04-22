@@ -49,12 +49,12 @@ public class TweakDoubleDoors extends Tweak {
 
 	@Override
 	public boolean init() {
-		allowedDoors.add((BlockDoor) Blocks.acacia_door);
-		allowedDoors.add((BlockDoor) Blocks.birch_door);
-		allowedDoors.add((BlockDoor) Blocks.jungle_door);
-		allowedDoors.add((BlockDoor) Blocks.oak_door);
-		allowedDoors.add((BlockDoor) Blocks.spruce_door);
-		allowedDoors.add((BlockDoor) Blocks.dark_oak_door);
+		allowedDoors.add((BlockDoor) Blocks.ACACIA_DOOR);
+		allowedDoors.add((BlockDoor) Blocks.BIRCH_DOOR);
+		allowedDoors.add((BlockDoor) Blocks.JUNGLE_DOOR);
+		allowedDoors.add((BlockDoor) Blocks.OAK_DOOR);
+		allowedDoors.add((BlockDoor) Blocks.SPRUCE_DOOR);
+		allowedDoors.add((BlockDoor) Blocks.DARK_OAK_DOOR);
 		return true;
 	}
 
@@ -74,8 +74,8 @@ public class TweakDoubleDoors extends Tweak {
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOW)
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		if (event.getAction() != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK || event.getEntityPlayer().isSneaking() || event.getWorld().isRemote) {
+	public void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {
+		if (event.getEntityPlayer().isSneaking() || event.getWorld().isRemote) {
 			return;
 		}
 

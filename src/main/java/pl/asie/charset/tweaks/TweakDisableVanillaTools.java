@@ -29,8 +29,8 @@ public class TweakDisableVanillaTools extends Tweak {
 	@Override
 	public void enable() {
 		Set<Item> itemSet = new HashSet<Item>();
-		for (ResourceLocation l : Item.itemRegistry.getKeys()) {
-			Item i = Item.itemRegistry.getObject(l);
+		for (ResourceLocation l : Item.REGISTRY.getKeys()) {
+			Item i = Item.REGISTRY.getObject(l);
 			if (i instanceof ItemPickaxe || i instanceof ItemAxe || i instanceof ItemSpade || i instanceof ItemSword) {
 				i.setMaxDamage(1);
 				itemSet.add(i);
@@ -43,12 +43,12 @@ public class TweakDisableVanillaTools extends Tweak {
 				if (output != null && itemSet.contains(output.getItem())) {
 					iterator.remove();
 					itemSet.remove(output.getItem());
-					ModCharsetLib.logger.info("Disabled " + Item.itemRegistry.getNameForObject(output.getItem()).toString() + " (removed recipe)");
+					ModCharsetLib.logger.info("Disabled " + Item.REGISTRY.getNameForObject(output.getItem()).toString() + " (removed recipe)");
 				}
 			}
 		}
 		for (Item i : itemSet) {
-			ModCharsetLib.logger.info("Disabled " + Item.itemRegistry.getNameForObject(i).toString());
+			ModCharsetLib.logger.info("Disabled " + Item.REGISTRY.getNameForObject(i).toString());
 		}
 	}
 }

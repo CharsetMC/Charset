@@ -62,7 +62,7 @@ public final class RendererBackpack {
 			if (backpack != null && backpack.getItem() instanceof ItemBackpack) {
 				BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 
-				Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+				Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
 				GlStateManager.pushMatrix();
 				GlStateManager.scale(0.75, 0.75, 0.75);

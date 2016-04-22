@@ -36,7 +36,7 @@ public class TweakGraphite extends Tweak {
 	@Override
 	public boolean init() {
 		OreDictionary.registerOre("dyeBlack", graphite);
-		GameRegistry.addShapelessRecipe(new ItemStack(graphite, 2, 0), new ItemStack(Items.coal, 1, 1));
+		GameRegistry.addShapelessRecipe(new ItemStack(graphite, 2, 0), new ItemStack(Items.COAL, 1, 1));
 		return true;
 	}
 }

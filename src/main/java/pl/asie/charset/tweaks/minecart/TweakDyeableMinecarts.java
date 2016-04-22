@@ -11,7 +11,7 @@ import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import pl.asie.charset.lib.utils.ColorUtils;
@@ -104,7 +104,7 @@ public class TweakDyeableMinecarts extends Tweak {
 	}
 
 	@SubscribeEvent
-	public void onEntityInteract(EntityInteractEvent event) {
+	public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
 		 if (!event.getTarget().worldObj.isRemote
 				&& event.getTarget() instanceof EntityMinecart
 				&& ColorUtils.isDye(event.getEntityPlayer().getHeldItem(event.getHand()))) {
