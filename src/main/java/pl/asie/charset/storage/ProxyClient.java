@@ -1,9 +1,13 @@
 package pl.asie.charset.storage;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
@@ -30,6 +34,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.utils.ClientUtils;
 import pl.asie.charset.storage.backpack.*;
+import pl.asie.charset.storage.locking.EntityLock;
+import pl.asie.charset.storage.locking.ItemKey;
+import pl.asie.charset.storage.locking.ItemLock;
+import pl.asie.charset.storage.locking.RenderLock;
 
 /**
  * Created by asie on 1/10/16.
@@ -40,12 +48,24 @@ public class ProxyClient extends ProxyCommon {
 	public static final IBakedModel[] backpackModel = new IBakedModel[4];
 
 	@Override
+	public void preInit() {
+		RenderingRegistry.registerEntityRenderingHandler(EntityLock.class, new IRenderFactory<EntityLock>() {
+			@Override
+			public Render<? super EntityLock> createRenderFor(RenderManager manager) {
+				return new RenderLock(manager);
+			}
+		});
+	}
+
+	@Override
 	public void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileBackpack.class, new RendererBackpack.Tile());
 		ClientRegistry.registerKeyBinding(backpackOpenKey);
 
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new BlockBackpack.Color(), ModCharsetStorage.backpackBlock);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemBackpack.Color(), ModCharsetStorage.backpackBlock);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), ModCharsetStorage.keyItem);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), ModCharsetStorage.lockItem);
 
 		MinecraftForge.EVENT_BUS.register(new RendererBackpack.Armor());
 	}
