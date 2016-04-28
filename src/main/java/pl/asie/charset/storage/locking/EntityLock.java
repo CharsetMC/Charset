@@ -52,8 +52,13 @@ public class EntityLock extends EntityHanging {
     }
 
     private void setColors(NBTTagCompound compound) {
-        colors[0] = compound.hasKey("color0") ? compound.getInteger("color0") : -1;
-        colors[1] = compound.hasKey("color1") ? compound.getInteger("color1") : -1;
+        if (compound != null) {
+            colors[0] = compound.hasKey("color0") ? compound.getInteger("color0") : -1;
+            colors[1] = compound.hasKey("color1") ? compound.getInteger("color1") : -1;
+        } else {
+            colors[0] = -1;
+            colors[1] = -1;
+        }
         getDataManager().set(COLOR_0, colors[0]);
         getDataManager().set(COLOR_1, colors[1]);
         getDataManager().setDirty(COLOR_0);

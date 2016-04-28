@@ -11,6 +11,8 @@ import pl.asie.charset.lib.ModCharsetLib;
 import java.util.List;
 
 public class ItemKey extends Item implements IKeyItem {
+    static final boolean DEBUG_KEY_ID = false;
+
     public ItemKey() {
         super();
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
@@ -42,7 +44,9 @@ public class ItemKey extends Item implements IKeyItem {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        tooltip.add(getKey(stack));
+        if (ItemKey.DEBUG_KEY_ID) {
+            tooltip.add(getKey(stack));
+        }
     }
 
     @Override

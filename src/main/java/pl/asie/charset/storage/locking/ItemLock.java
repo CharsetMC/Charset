@@ -76,6 +76,8 @@ public class ItemLock extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        tooltip.add(getKey(stack));
+        if (ItemKey.DEBUG_KEY_ID) {
+            tooltip.add(getKey(stack));
+        }
     }
 }
