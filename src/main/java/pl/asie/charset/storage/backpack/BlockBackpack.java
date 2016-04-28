@@ -37,12 +37,14 @@ public class BlockBackpack extends BlockContainer {
 		@Override
 		@SideOnly(Side.CLIENT)
 		public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-			TileEntity tile = worldIn.getTileEntity(pos);
-			if (tile instanceof TileBackpack) {
-				return ((TileBackpack) tile).getColor();
-			} else {
-				return DEFAULT_COLOR;
+			if (worldIn != null && pos != null) {
+				TileEntity tile = worldIn.getTileEntity(pos);
+				if (tile instanceof TileBackpack) {
+					return ((TileBackpack) tile).getColor();
+				}
 			}
+
+			return DEFAULT_COLOR;
 		}
 	}
 

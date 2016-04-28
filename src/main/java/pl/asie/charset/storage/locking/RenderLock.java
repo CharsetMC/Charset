@@ -60,9 +60,11 @@ public class RenderLock extends Render<EntityLock> {
         stack.setTagCompound(new NBTTagCompound());
         int color0 = entity.getDataManager().get(EntityLock.COLOR_0);
         int color1 = entity.getDataManager().get(EntityLock.COLOR_1);
+
         if (color0 != -1) {
             stack.getTagCompound().setInteger("color0", color0);
         }
+
         if (color1 != -1) {
             stack.getTagCompound().setInteger("color1", color1);
         }

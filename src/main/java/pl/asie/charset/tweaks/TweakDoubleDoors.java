@@ -99,7 +99,7 @@ public class TweakDoubleDoors extends Tweak {
 				other.getValue(BlockDoor.FACING) == direction &&
 				other.getValue(BlockDoor.OPEN) == isOpen &&
 				other.getValue(BlockDoor.HINGE) != isMirrored) {
-			door.onBlockActivated(event.getWorld(), pos, other, event.getEntityPlayer(), EnumHand.MAIN_HAND, null, event.getFace(), 0, 0, 0);
+			door.onBlockActivated(event.getWorld(), pos, other, event.getEntityPlayer(), event.getHand(), event.getItemStack(), event.getFace(), 0, 0, 0);
 		}
 	}
 }

@@ -5,6 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
@@ -12,11 +13,11 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.LockCode;
@@ -167,11 +168,19 @@ public class EntityLock extends EntityHanging {
 
     @Override
     public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, ItemStack stack, EnumHand hand) {
-        if (lockKey != null) {
+        if (hand == EnumHand.MAIN_HAND && lockKey != null) {
             boolean canUnlock = false;
             if (stack != null && stack.getItem() instanceof IKeyItem) {
                 IKeyItem key = (IKeyItem) stack.getItem();
                 canUnlock = key.canUnlock(prefixedLockKey, stack);
+            }
+
+            if (!canUnlock) {
+                stack = player.getHeldItemOffhand();
+                if (stack != null && stack.getItem() instanceof IKeyItem) {
+                    IKeyItem key = (IKeyItem) stack.getItem();
+                    canUnlock = key.canUnlock(prefixedLockKey, stack);
+                }
             }
 
             if (getAttachedTile() instanceof ILockableContainer) {
@@ -182,20 +191,18 @@ public class EntityLock extends EntityHanging {
 
                 BlockPos pos = this.hangingPosition.offset(this.facingDirection.getOpposite());
                 IBlockState state = worldObj.getBlockState(pos);
-                if (state.getBlock().onBlockActivated(worldObj, pos, state, player, hand, stack, this.facingDirection,
+
+                state.getBlock().onBlockActivated(worldObj, pos, state, player, hand, stack, this.facingDirection,
                         0.5F + this.facingDirection.getFrontOffsetX() * 0.5F,
                         0.5F + this.facingDirection.getFrontOffsetY() * 0.5F,
                         0.5F + this.facingDirection.getFrontOffsetZ() * 0.5F
-                )) {
-                    if (canUnlock) {
-                        container.setLockCode(new LockCode(prefixedLockKey));
-                    }
+                );
+
+                if (canUnlock) {
+                    container.setLockCode(new LockCode(prefixedLockKey));
                     return EnumActionResult.SUCCESS;
                 } else {
-                    if (canUnlock) {
-                        container.setLockCode(new LockCode(prefixedLockKey));
-                    }
-                    return EnumActionResult.SUCCESS;
+                    return EnumActionResult.FAIL;
                 }
             }
         }
@@ -273,10 +280,8 @@ public class EntityLock extends EntityHanging {
         }
     }
 
-    @Override
-    public void onBroken(Entity brokenEntity) {
-        unlockContainer();
-        ItemStack lock = new ItemStack(ModCharsetStorage.lockItem);
+    private ItemStack createItemStack(Item item) {
+        ItemStack lock = new ItemStack(item);
         lock.setTagCompound(new NBTTagCompound());
         if (lockKey != null) {
             lock.getTagCompound().setString("key", lockKey);
@@ -287,7 +292,18 @@ public class EntityLock extends EntityHanging {
         if (colors[1] != -1) {
             lock.getTagCompound().setInteger("color1", colors[1]);
         }
-        this.entityDropItem(lock, 0.0F);
+        return lock;
+    }
+
+    @Override
+    public ItemStack getPickedResult(RayTraceResult target) {
+        return createItemStack(ModCharsetStorage.keyItem);
+    }
+
+    @Override
+    public void onBroken(Entity brokenEntity) {
+        unlockContainer();
+        this.entityDropItem(createItemStack(ModCharsetStorage.lockItem), 0.0F);
     }
 
     @Override

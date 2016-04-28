@@ -61,4 +61,13 @@ public class RecipeDyeLock extends RecipeDyeableItem {
 
         return null;
     }
+
+    @Override
+    public ItemStack[] getRemainingItems(InventoryCrafting inv) {
+        ItemStack[] stacks = new ItemStack[inv.getSizeInventory()];
+
+        // Nothing shall remain, for it is the key itself! We don't want to clone it.
+
+        return stacks;
+    }
 }
