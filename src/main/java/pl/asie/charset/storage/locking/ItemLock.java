@@ -21,11 +21,14 @@ public class ItemLock extends Item {
         @Override
         public int getColorFromItemstack(ItemStack stack, int tintIndex) {
             if (stack.hasTagCompound()) {
-                String key = "color" + tintIndex;
-                if (stack.getTagCompound().hasKey(key)) {
-                    return stack.getTagCompound().getInteger(key);
+                for (int i = tintIndex; i >= 0; i--) {
+                    String key = "color" + i;
+                    if (stack.getTagCompound().hasKey(key)) {
+                        return stack.getTagCompound().getInteger(key);
+                    }
                 }
             }
+
             return ModCharsetStorage.DEFAULT_LOCKING_COLOR;
         }
     }

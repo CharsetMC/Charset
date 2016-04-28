@@ -25,6 +25,9 @@ import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 public class EntityLock extends EntityHanging {
+    static final DataParameter<Integer> COLOR_0 = EntityDataManager.createKey(EntityLock.class, DataSerializers.VARINT);
+    static final DataParameter<Integer> COLOR_1 = EntityDataManager.createKey(EntityLock.class, DataSerializers.VARINT);
+
     private static final DataParameter<EnumFacing> HANGING_ROTATION = EntityDataManager.createKey(EntityLock.class, DataSerializers.FACING);
     private static final Predicate<Entity> IS_HANGING_ENTITY = new Predicate<Entity>() {
         public boolean apply(Entity entity) {
@@ -34,6 +37,7 @@ public class EntityLock extends EntityHanging {
 
     private String lockKey = null;
     private String prefixedLockKey = null;
+    private int[] colors = new int[] { -1, -1 };
     private TileEntity tileCached;
 
     public EntityLock(World worldIn) {
@@ -42,8 +46,18 @@ public class EntityLock extends EntityHanging {
 
     public EntityLock(World worldIn, ItemStack stack, BlockPos p_i45852_2_, EnumFacing p_i45852_3_) {
         super(worldIn, p_i45852_2_);
+        this.setColors(stack.getTagCompound());
         this.setLockKey(((ItemLock) stack.getItem()).getRawKey(stack));
         this.updateFacingWithBoundingBox(p_i45852_3_);
+    }
+
+    private void setColors(NBTTagCompound compound) {
+        colors[0] = compound.hasKey("color0") ? compound.getInteger("color0") : -1;
+        colors[1] = compound.hasKey("color1") ? compound.getInteger("color1") : -1;
+        getDataManager().set(COLOR_0, colors[0]);
+        getDataManager().set(COLOR_1, colors[1]);
+        getDataManager().setDirty(COLOR_0);
+        getDataManager().setDirty(COLOR_1);
     }
 
     private void setLockKey(String s) {
@@ -55,6 +69,7 @@ public class EntityLock extends EntityHanging {
     public void readEntityFromNBT(NBTTagCompound compound) {
         super.readEntityFromNBT(compound);
         setLockKey(compound.hasKey("key") ? compound.getString("key") : null);
+        setColors(compound);
     }
 
     @Override
@@ -62,6 +77,12 @@ public class EntityLock extends EntityHanging {
         super.writeEntityToNBT(compound);
         if (lockKey != null) {
             compound.setString("key", lockKey);
+        }
+        if (colors[0] != -1) {
+            compound.setInteger("color0", colors[0]);
+        }
+        if (colors[1] != -1) {
+            compound.setInteger("color1", colors[1]);
         }
     }
 
@@ -77,6 +98,8 @@ public class EntityLock extends EntityHanging {
     @Override
     protected void entityInit() {
         this.getDataManager().register(HANGING_ROTATION, null);
+        this.getDataManager().register(COLOR_0, null);
+        this.getDataManager().register(COLOR_1, null);
         this.setEntityInvulnerable(true);
     }
 
@@ -249,9 +272,15 @@ public class EntityLock extends EntityHanging {
     public void onBroken(Entity brokenEntity) {
         unlockContainer();
         ItemStack lock = new ItemStack(ModCharsetStorage.lockItem);
+        lock.setTagCompound(new NBTTagCompound());
         if (lockKey != null) {
-            lock.setTagCompound(new NBTTagCompound());
             lock.getTagCompound().setString("key", lockKey);
+        }
+        if (colors[0] != -1) {
+            lock.getTagCompound().setInteger("color0", colors[0]);
+        }
+        if (colors[1] != -1) {
+            lock.getTagCompound().setInteger("color1", colors[1]);
         }
         this.entityDropItem(lock, 0.0F);
     }

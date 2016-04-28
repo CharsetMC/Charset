@@ -3,6 +3,7 @@ package pl.asie.charset.storage;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,6 +21,8 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import pl.asie.charset.audio.tape.RecipeTape;
+import pl.asie.charset.audio.tape.RecipeTapeReel;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.storage.backpack.HandlerBackpack;
@@ -118,6 +121,24 @@ public class ModCharsetStorage {
 			}
 		});
 
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(keyItem), "ng", "ng", "kg", 'n', "nuggetGold", 'g', "ingotGold", 'k', keyItem) {
+			@Override
+			public ItemStack getCraftingResult(InventoryCrafting inv) {
+				ItemStack key = inv.getStackInRowAndColumn(0, 2);
+				if (key == null) {
+					key = inv.getStackInRowAndColumn(1, 2);
+				}
+
+				if (key != null && key.getItem() instanceof ItemKey) {
+					ItemStack result = output.copy();
+					result.setTagCompound(new NBTTagCompound());
+					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getRawKey(key));
+					return result;
+				}
+				return null;
+			}
+		});
+
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(lockItem), " g ", "gkg", "gig", 'i', "ingotIron", 'g', "ingotGold", 'k', keyItem) {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
@@ -131,5 +152,8 @@ public class ModCharsetStorage {
 				return null;
 			}
 		});
+
+		GameRegistry.addRecipe(new RecipeDyeLock());
+		RecipeSorter.register("charsetstorage:lockDye", RecipeDyeLock.class, RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
 	}
 }

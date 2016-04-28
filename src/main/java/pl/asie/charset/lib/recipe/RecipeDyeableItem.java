@@ -2,6 +2,8 @@ package pl.asie.charset.lib.recipe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.inventory.InventoryCrafting;
@@ -12,6 +14,10 @@ import net.minecraft.world.World;
 import pl.asie.charset.lib.utils.ColorUtils;
 
 public class RecipeDyeableItem extends RecipeBase {
+	protected boolean isTarget(ItemStack stack) {
+		return stack.getItem() instanceof IDyeableItem;
+	}
+
 	@Override
 	public boolean matches(InventoryCrafting inv, World worldIn) {
 		ItemStack target = null;
@@ -20,13 +26,13 @@ public class RecipeDyeableItem extends RecipeBase {
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			ItemStack source = inv.getStackInSlot(i);
 			if (source != null) {
-				if (source.getItem() instanceof IDyeableItem) {
+				if (isTarget(source)) {
 					if (target != null) {
 						return false;
 					} else {
 						target = source;
 					}
-				} else if (ColorUtils.getColorIDFromDye(source) >= 0) {
+				} else if (getColor(source) != null) {
 					dyes.add(source);
 				} else {
 					return false;
@@ -37,52 +43,64 @@ public class RecipeDyeableItem extends RecipeBase {
 		return target != null && !dyes.isEmpty();
 	}
 
-	/**
-	 * Returns an Item that is the result of this recipe
-	 */
-	public ItemStack getCraftingResult(InventoryCrafting inv) {
-		ItemStack target = null;
-		IDyeableItem targetItem = null;
-		int[] color = new int[3];
-		int scale = 0;
-		int count = 0;
+	protected int[] getColor(ItemStack stack) {
+		if (stack != null) {
+			if (stack.getItem() instanceof IDyeableItem) {
+				IDyeableItem targetItem = (IDyeableItem) stack.getItem();
 
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			ItemStack source = inv.getStackInSlot(i);
-			if (source != null) {
-				float[] col = null;
-				if (source.getItem() instanceof IDyeableItem) {
-					targetItem = (IDyeableItem) source.getItem();
-					target = source.copy();
-					target.stackSize = 1;
-
-					if (targetItem.hasColor(source)) {
-						int c = targetItem.getColor(source);
-
-						col = new float[]{
-								(c >> 16 & 255) / 255.0F,
-								(c >> 8 & 255) / 255.0F,
-								(c & 255) / 255.0F
-						};
-					}
-				} else {
-					int dyeId = ColorUtils.getColorIDFromDye(source);
-					if (dyeId >= 0) {
-						col = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(dyeId));
-					}
+				if (targetItem.hasColor(stack)) {
+					int c = targetItem.getColor(stack);
+					return new int[] {(c >> 16) & 255, (c >> 8) & 255, c & 255};
 				}
-
-				if (col != null) {
-					scale = (int) (scale + Math.max(col[0], Math.max(col[1], col[2])) * 255.0F);
-					color[0] += (int) (color[0] + col[0] * 255.0F);
-					color[1] += (int) (color[1] + col[1] * 255.0F);
-					color[2] += (int) (color[2] + col[2] * 255.0F);
-					count++;
+			} else {
+				int dyeId = ColorUtils.getColorIDFromDye(stack);
+				if (dyeId >= 0) {
+					float[] col = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(dyeId));
+					return new int[] {
+							(int) (col[0] * 255.0F),
+							(int) (col[1] * 255.0F),
+							(int) (col[2] * 255.0F)
+					};
 				}
 			}
 		}
 
-		if (targetItem != null) {
+		return null;
+	}
+
+	protected Optional<Integer> getMixedColor(InventoryCrafting inv, ItemStack base, Predicate<Integer> slotFilter) {
+		int[] color = new int[3];
+		int scale = 0;
+		int count = 0;
+
+		if (base != null) {
+			int[] col = getColor(base);
+			if (col != null) {
+				scale += Math.max(col[0], Math.max(col[1], col[2]));
+				color[0] += col[0];
+				color[1] += col[1];
+				color[2] += col[2];
+				count++;
+			}
+		}
+
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			if (slotFilter == null || slotFilter.test(i)) {
+				ItemStack source = inv.getStackInSlot(i);
+				if (source != null && source != base) {
+					int[] col = getColor(source);
+					if (col != null) {
+						scale += Math.max(col[0], Math.max(col[1], col[2]));
+						color[0] += col[0];
+						color[1] += col[1];
+						color[2] += col[2];
+						count++;
+					}
+				}
+			}
+		}
+
+		if (count > 0) {
 			int i1 = color[0] / count;
 			int j1 = color[1] / count;
 			int k1 = color[2] / count;
@@ -91,13 +109,40 @@ public class RecipeDyeableItem extends RecipeBase {
 			i1 = (int) (i1 * f3 / f4);
 			j1 = (int) (j1 * f3 / f4);
 			k1 = (int) (k1 * f3 / f4);
-			targetItem.setColor(target, (i1 << 16) + (j1 << 8) + k1);
-			return target;
+			return Optional.of((i1 << 16) + (j1 << 8) + k1);
+		}
+
+		return Optional.empty();
+	}
+
+	@Override
+	public ItemStack getCraftingResult(InventoryCrafting inv) {
+		ItemStack target = null;
+		IDyeableItem targetItem = null;
+
+		for (int i = 0; i < inv.getSizeInventory(); i++) {
+			ItemStack source = inv.getStackInSlot(i);
+			if (source != null) {
+				if (source.getItem() instanceof IDyeableItem) {
+					targetItem = (IDyeableItem) source.getItem();
+					target = source.copy();
+					target.stackSize = 1;
+				}
+			}
+		}
+
+		if (targetItem != null) {
+			Optional<Integer> result = getMixedColor(inv, target, null);
+			if (result.isPresent()) {
+				targetItem.setColor(target, result.get());
+				return target;
+			}
 		}
 
 		return null;
 	}
 
+	@Override
 	public ItemStack getRecipeOutput() {
 		return null;
 	}

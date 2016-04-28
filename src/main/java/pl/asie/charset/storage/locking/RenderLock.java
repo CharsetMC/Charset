@@ -18,6 +18,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -56,6 +57,15 @@ public class RenderLock extends Render<EntityLock> {
         }
 
         ItemStack stack = new ItemStack(ModCharsetStorage.lockItem);
+        stack.setTagCompound(new NBTTagCompound());
+        int color0 = entity.getDataManager().get(EntityLock.COLOR_0);
+        int color1 = entity.getDataManager().get(EntityLock.COLOR_1);
+        if (color0 != -1) {
+            stack.getTagCompound().setInteger("color0", color0);
+        }
+        if (color1 != -1) {
+            stack.getTagCompound().setInteger("color1", color1);
+        }
 
         mc.getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.FIXED);
 
