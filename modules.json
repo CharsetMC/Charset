@@ -1,0 +1,58 @@
+{
+	"lib": {
+		"char": "‽",
+		"default": true,
+		"description": "Base library mod",
+		"stability": "stable"
+	},
+	"pipes": {
+		"char": "|",
+		"default": true,
+		"description": "Item transport system",
+		"dependencies": ["lib", "mod:MCMultiPart"],
+		"stability": "stable"
+	},
+	"tweaks": {
+		"char": "*",
+		"default": true,
+		"description": "Gameplay/aesthetic tweaks to vanilla",
+		"dependencies": ["lib"],
+		"stability": "stable"
+	},
+	"wires": {
+		"char": "+",
+		"default": true,
+		"description": "Redstone cabling with analog support",
+		"dependencies": ["lib", "mod:MCMultiPart"],
+		"stability": "staging"
+	},
+	"gates": {
+		"char": "&",
+		"default": true,
+		"description": "Simple redstone gates",
+		"dependencies": ["lib", "mod:MCMultiPart"],
+		"stability": "staging"
+	},
+	"audio": {
+		"char": "♫",
+		"default": true,
+		"description": "Tape Drives, Iron Note Block, etc.",
+		"dependencies": ["lib", "mod:MCMultiPart"],
+		"stability": "staging"
+	},
+	"storage": {
+		"char": "#",
+		"default": true,
+		"description": "Things useful for storage (Backpacks, Locks)",
+		"dependencies": ["lib"],
+		"stability": "staging"
+	},
+	"drama": {
+		"char": "!",
+		"default": true,
+		"description": "Drama Generator in Minecraft. Joke module.",
+		"dependencies": ["lib"],
+		"stability": "stable"
+	}
+}
+
