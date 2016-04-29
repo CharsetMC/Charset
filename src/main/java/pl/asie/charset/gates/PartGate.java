@@ -299,12 +299,15 @@ public abstract class PartGate extends Multipart implements IRedstonePart.ISlott
 				oldOutput[i] = getOutputOutside(side);
 			}
 		}
+
 		for (int i = 0; i <= 3; i++) {
 			EnumFacing side = EnumFacing.getFront(i + 2);
 			Connection conn = getType(side);
 			if (conn.isInput() && conn.isRedstone()) {
-				EnumFacing real = gateToReal(side);
 				byte oi = inputs[i];
+				inputs[i] = 0;
+				
+				EnumFacing real = gateToReal(side);
 				World w = getWorld();
 				BlockPos p = getPos().offset(real);
 				IMultipartContainer container = MultipartHelper.getPartContainer(w, p);
