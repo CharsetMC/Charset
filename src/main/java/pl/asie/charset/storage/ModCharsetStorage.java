@@ -1,5 +1,6 @@
 package pl.asie.charset.storage;
 
+import com.google.common.base.Predicate;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -32,6 +33,7 @@ import pl.asie.charset.storage.backpack.PacketBackpackOpen;
 import pl.asie.charset.storage.backpack.TileBackpack;
 import pl.asie.charset.storage.locking.*;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.UUID;
 
@@ -59,6 +61,7 @@ public class ModCharsetStorage {
 	public static ItemLock lockItem;
 
 	public static boolean enableBackpackOpenKey;
+	public static boolean enableKeyKeepInventory;
 
 	private Configuration config;
 
@@ -88,6 +91,7 @@ public class ModCharsetStorage {
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		enableBackpackOpenKey = config.getBoolean("enableOpenKeyBinding", "backpack", true, "Should backpacks be openable with a key binding?");
+		enableKeyKeepInventory = config.getBoolean("keepKeysOnDeath", "locks", true, "Should keys be kept in inventory on death?");
 
 		config.save();
 
@@ -107,6 +111,15 @@ public class ModCharsetStorage {
 
 		MinecraftForge.EVENT_BUS.register(new HandlerBackpack());
 		MinecraftForge.EVENT_BUS.register(new LockEventHandler());
+
+		if (enableKeyKeepInventory) {
+			ModCharsetLib.deathHandler.addPredicate(new Predicate<ItemStack>() {
+				@Override
+				public boolean apply(@Nullable ItemStack input) {
+					return input != null && input.getItem() instanceof ItemKey;
+				}
+			});
+		}
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lwl",
 				'l', Items.LEATHER, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold", 'w', Blocks.WOOL));

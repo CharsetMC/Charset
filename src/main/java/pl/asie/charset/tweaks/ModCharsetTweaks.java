@@ -53,6 +53,7 @@ public class ModCharsetTweaks {
 		tweakSet.add(new TweakDyeableMinecarts());
 		tweakSet.add(new TweakGlassShards());
 		tweakSet.add(new TweakGraphite());
+		tweakSet.add(new TweakKeepInventory());
 		tweakSet.add(new TweakMobControl());
 		tweakSet.add(new TweakNoSprinting());
 

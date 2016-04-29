@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 
 import pl.asie.charset.api.lib.CharsetHelper;
+import pl.asie.charset.lib.handlers.PlayerDeathHandler;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 
@@ -39,6 +40,8 @@ public class ModCharsetLib {
 
 	@SidedProxy(clientSide = "pl.asie.charset.lib.ProxyClient", serverSide = "pl.asie.charset.lib.ProxyCommon")
 	public static ProxyCommon proxy;
+
+	public static PlayerDeathHandler deathHandler = new PlayerDeathHandler();
 
 	public static IconCharset charsetIconItem;
 
@@ -82,5 +85,12 @@ public class ModCharsetLib {
 
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+	}
+
+	@Mod.EventHandler
+	public void postInit(FMLInitializationEvent event) {
+		if (deathHandler.hasPredicate()) {
+			MinecraftForge.EVENT_BUS.register(deathHandler);
+		}
 	}
 }
