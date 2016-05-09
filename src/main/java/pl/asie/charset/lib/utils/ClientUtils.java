@@ -35,6 +35,10 @@ public final class ClientUtils {
 
 	}
 
+	public static void glColor(int color) {
+		GlStateManager.color((((color >> 16) & 0xFF) / 255.0f), (((color >> 8) & 0xFF) / 255.0f), ((color & 0xFF) / 255.0f));
+	}
+
 	public static float[] calculateUV(Vector3f from, Vector3f to, EnumFacing facing1) {
 		EnumFacing facing = facing1;
 		if (facing == null) {

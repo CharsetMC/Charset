@@ -1,4 +1,4 @@
-package pl.asie.charset.pipes.client;
+package pl.asie.charset.pipes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;

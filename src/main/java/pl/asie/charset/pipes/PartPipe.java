@@ -34,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
+import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -48,49 +49,9 @@ import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable {
-	/* public class PipeItemHandler implements IItemHandler {
-		private final EnumFacing side;
-
-		public PipeItemHandler(EnumFacing side) {
-			this.side = side;
-		}
-
-		@Override
-		public int getSlots() {
-			return 1;
-		}
-
-		@Override
-		public ItemStack getStackInSlot(int slot) {
-			return null;
-		}
-
-		@Override
-		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			if (slot != 0) return stack;
-			ItemStack insertedStack = stack.copy();
-			insertedStack.stackSize = 1;
-			if (injectItem(insertedStack, side, simulate) > 0) {
-				if (stack.stackSize > 1) {
-					ItemStack rejectedStack = stack.copy();
-					rejectedStack.stackSize--;
-					return rejectedStack;
-				} else {
-					return null;
-				}
-			} else {
-				return stack;
-			}
-		}
-
-		@Override
-		public ItemStack extractItem(int slot, int amount, boolean simulate) {
-			return null;
-		}
-	} */
-
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
+	final PipeFluidContainer fluid = new PipeFluidContainer(this);
 	protected int[] shifterDistance = new int[6];
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
@@ -287,9 +248,9 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			return true;
 		}
 
-		/* if (tile instanceof IFluidHandler) {
+		if (tile instanceof IFluidHandler) {
 			return true;
-		} */
+		}
 
 		if (tile != null && tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, side.getOpposite())) {
 			return tile.getCapability(ModCharsetPipes.CAP_SHIFTER, side.getOpposite()).getMode() == IShifter.Mode.Extract;
@@ -404,6 +365,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			neighborBlockChanged = false;
 		}
 
+		fluid.update();
+
 		synchronized (itemSet) {
 			Iterator<PipeItem> itemIterator = itemSet.iterator();
 			while (itemIterator.hasNext()) {
@@ -427,16 +390,17 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			return;
 		}
 
-		BlockPos p = getPos();
+		BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(getPos());
+		EnumFacing dirO = dir.getOpposite();
 		int dist = 0;
 		PartPipe pipe;
 		TileEntity tile;
 
-		while ((pipe = PipeUtils.getPipe(getWorld(), p, dir.getOpposite())) instanceof PartPipe) {
-			p = p.offset(dir.getOpposite());
+		while ((pipe = PipeUtils.getPipe(getWorld(), p, dirO)) instanceof PartPipe) {
+			p.offsetMutable(dirO);
 			dist++;
 
-			if (!pipe.connects(dir.getOpposite())) {
+			if (!pipe.connects(dirO)) {
 				break;
 			}
 		}
@@ -657,25 +621,4 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	public EnumSet<PartSlot> getSlotMask() {
 		return EnumSet.of(PartSlot.CENTER);
 	}
-
-	/* @Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return getNeighbourTile(facing) instanceof IHopper;
-		} else {
-			return super.hasCapability(capability, facing);
-		}
-	}
-
-	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-		if (!hasCapability(capability, facing)) {
-			return null;
-		}
-		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return (T) new PipeItemHandler(facing);
-		} else {
-			return super.getCapability(capability, facing);
-		}
-	} */
 }
