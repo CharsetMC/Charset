@@ -94,11 +94,14 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 			System.out.println("--- PROPAGATE " + getPos().toString() + " " + location.name() + " (" + getWorld().getTotalWorldTime() + ") ---");
 		}
 
+
 		int maxSignal = 0;
 		int oldSignal = signalLevel;
 		int[] neighborLevel = new int[7];
 		boolean[] isWire = new boolean[7];
 		boolean hasRedstoneWire = false;
+
+		PartWireBase.PROPAGATING = true;
 
 		if (type == WireKind.NORMAL) {
 			if (location != WireFace.CENTER) {
@@ -186,6 +189,8 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 				}
 			}
 		}
+
+		PartWireBase.PROPAGATING = false;
 
 		int maxSignalNonWire = 0;
 

@@ -55,6 +55,8 @@ public class PartWireBundled extends PartWireBase implements IBundledReceiver, I
 		int[] neighborLevel = new int[7];
 		boolean[] isWire = new boolean[7];
 
+		PartWireBase.PROPAGATING = true;
+
 		if (internalConnections > 0) {
 			for (WireFace location : WireFace.VALUES) {
 				if (connectsInternal(location)) {
@@ -87,6 +89,8 @@ public class PartWireBundled extends PartWireBase implements IBundledReceiver, I
 				}
 			}
 		}
+
+		PartWireBase.PROPAGATING = false;
 
 		int newSignal = 0;
 
