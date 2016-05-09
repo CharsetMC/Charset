@@ -53,6 +53,8 @@ public abstract class PartWireBase extends Multipart implements
 	protected static final boolean DEBUG = false;
 	private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
+	static boolean PROPAGATING = false;
+
 	public static final Property PROPERTY = new Property();
 
 	private static class Property implements IUnlistedProperty<PartWireBase> {
@@ -682,7 +684,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public int getWeakSignal(EnumFacing facing) {
-		if (connectsWeak(facing)) {
+		if (!PROPAGATING && connectsWeak(facing)) {
 			return getRedstoneLevel();
 		} else {
 			return 0;
