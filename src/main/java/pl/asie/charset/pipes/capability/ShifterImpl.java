@@ -2,6 +2,9 @@ package pl.asie.charset.pipes.capability;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import pl.asie.charset.api.pipes.IShifter;
 
 /**
@@ -9,7 +12,6 @@ import pl.asie.charset.api.pipes.IShifter;
  * @author rubensworks
  */
 public class ShifterImpl implements IShifter {
-
     private Mode mode;
     private EnumFacing direction;
     private int shiftDistance;
@@ -58,7 +60,13 @@ public class ShifterImpl implements IShifter {
 
     @Override
     public boolean matches(ItemStack source) {
-        return ItemStack.areItemStacksEqual(filter, source);
+        return filter == null || ItemStack.areItemStacksEqual(filter, source);
+    }
+
+    @Override
+    public boolean matches(FluidStack source) {
+        return source != null && (filter == null || FluidContainerRegistry.containsFluid(filter, source) ||
+                (filter.getItem() instanceof IFluidContainerItem && source.isFluidEqual(((IFluidContainerItem) filter.getItem()).getFluid(filter))));
     }
 
     public void setMode(Mode mode) {

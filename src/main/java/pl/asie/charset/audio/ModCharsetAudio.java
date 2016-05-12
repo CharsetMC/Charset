@@ -1,6 +1,7 @@
 package pl.asie.charset.audio;
 
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -117,6 +118,8 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		OreDictionary.registerOre("blockNoteIron", ironNoteBlock);
+
 		packet = new PacketRegistry(ModCharsetAudio.MODID);
 		packet.registerPacket(0x01, PacketNoteParticle.class);
 

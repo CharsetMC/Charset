@@ -81,6 +81,7 @@ public class ModCharsetLib {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.register(proxy);
 		ColorUtils.initialize();
 
 		GameRegistry.addRecipe(new RecipeDyeableItem());

@@ -148,6 +148,7 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
         }
 
         EnumFacing pushDir = null;
+        IShifter shifter = null;
         int shifterDist = Integer.MAX_VALUE;
 
         for (EnumFacing facing : EnumFacing.VALUES) {
@@ -155,8 +156,9 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
                 int sStr = owner.getShifterStrength(facing);
                 if (sStr > 0 && sStr < shifterDist) {
                     IShifter s = owner.getNearestShifter(facing);
-                    if (s.isShifting()) {
+                    if (s != null && s.isShifting()) {
                         pushDir = facing;
+                        shifter = s;
                         shifterDist = sStr;
                     }
                 }
@@ -164,9 +166,9 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
         }
 
         if (pushDir != null) {
-            pushAll(pushDir);
+            pushAll(pushDir, shifter);
         } else if (owner.connects(EnumFacing.DOWN)) {
-            pushAll(EnumFacing.DOWN);
+            pushAll(EnumFacing.DOWN, null);
         } else {
             /* FluidStack baseStack = tanks[6].get();
             if (baseStack == null) {
@@ -240,7 +242,7 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
         }
     }
 
-    private void pushAll(EnumFacing pushDir) {
+    private void pushAll(EnumFacing pushDir, IShifter shifter) {
         push(tanks[pushDir.ordinal()], getTankBlockNeighbor(owner.getPos(), pushDir), pushDir.getOpposite(), TANK_RATE);
         push(tanks[6], tanks[pushDir.ordinal()], TANK_RATE);
         for (EnumFacing facing : EnumFacing.VALUES) {

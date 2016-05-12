@@ -18,12 +18,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.lib.utils.ClientUtils;
 
 import javax.vecmath.Matrix4f;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class ModelFactory<T extends IRenderComparable<T>> extends CharsetBakedModel {
     private static final boolean DISABLE_CACHE = false;
+    private static final Set<ModelFactory> FACTORIES = new HashSet<>();
 
     private static class MFItemOverride extends ItemOverrideList {
         public static final MFItemOverride INSTANCE = new MFItemOverride();
@@ -49,9 +48,16 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends Chars
 
     private final IUnlistedProperty<T> property;
 
-    public ModelFactory(IUnlistedProperty<T> property, ResourceLocation particle) {
+    protected ModelFactory(IUnlistedProperty<T> property, ResourceLocation particle) {
         super(particle);
+        this.FACTORIES.add(this);
         this.property = property;
+    }
+
+    public static void clearCaches() {
+        for (ModelFactory factory : FACTORIES) {
+            factory.cache.clear();
+        }
     }
 
     public abstract IBakedModel bake(T object);

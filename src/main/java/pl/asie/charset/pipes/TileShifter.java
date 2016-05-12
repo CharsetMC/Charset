@@ -12,7 +12,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -110,6 +112,32 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	}
 
 	@Override
+	public boolean matches(FluidStack stack) {
+		if (stack == null) {
+			return false;
+		}
+
+		if (!hasFilter()) {
+			return true;
+		}
+
+		for (ItemStack s : filters) {
+			if (s != null) {
+				if (FluidContainerRegistry.containsFluid(s, stack)) {
+					return true;
+				} else if (s.getItem() instanceof IFluidContainerItem) {
+					FluidStack filter = ((IFluidContainerItem) s.getItem()).getFluid(s);
+					if (filter != null && filter.amount > 0 && filter.isFluidEqual(stack)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public void update() {
 		super.update();
 
@@ -128,11 +156,15 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 				if (input instanceof IFluidHandler) {
 					FluidStack stack = ((IFluidHandler) input).drain(direction, PipeFluidContainer.TANK_RATE, false);
 					if (stack != null) {
-						int filled = output.fluid.fill(direction.getOpposite(), stack, false);
-						if (filled > 0) {
-							stack.amount = filled;
-							stack = ((IFluidHandler) input).drain(direction, stack, true);
-							output.fluid.fill(direction.getOpposite(), stack, true);
+						boolean matches = matches(stack);
+
+						if (matches) {
+							int filled = output.fluid.fill(direction.getOpposite(), stack, false);
+							if (filled > 0) {
+								stack.amount = filled;
+								stack = ((IFluidHandler) input).drain(direction, stack, true);
+								output.fluid.fill(direction.getOpposite(), stack, true);
+							}
 						}
 					}
 				}
