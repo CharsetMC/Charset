@@ -1,8 +1,6 @@
-package pl.asie.charset.audio.manager;
+package pl.asie.charset.lib.audio.manager;
 
 public interface IAudioStream {
-	void setHearing(float distance, float volume);
-
 	void setSampleRate(int sampleRate);
 
 	void reset();
@@ -11,5 +9,5 @@ public interface IAudioStream {
 
 	void push(byte[] data);
 
-	void play(int x, int y, int z);
+	void play(float x, float y, float z, float distance, float volume);
 }

@@ -37,11 +37,9 @@ import pl.asie.charset.audio.storage.DataStorageStorage;
 import pl.asie.charset.audio.tape.ItemPartTapeDrive;
 import pl.asie.charset.audio.tape.ItemTape;
 import pl.asie.charset.audio.tape.ItemTapeReel;
-import pl.asie.charset.audio.tape.PacketDriveAudio;
 import pl.asie.charset.audio.tape.PacketDriveCounter;
 import pl.asie.charset.audio.tape.PacketDriveRecord;
 import pl.asie.charset.audio.tape.PacketDriveState;
-import pl.asie.charset.audio.tape.PacketDriveStop;
 import pl.asie.charset.audio.tape.PartTapeDrive;
 import pl.asie.charset.audio.tape.RecipeTape;
 import pl.asie.charset.audio.tape.RecipeTapeReel;
@@ -124,8 +122,6 @@ public class ModCharsetAudio {
 		packet.registerPacket(0x01, PacketNoteParticle.class);
 
 		packet.registerPacket(0x10, PacketDriveState.class);
-		packet.registerPacket(0x11, PacketDriveAudio.class);
-		packet.registerPacket(0x12, PacketDriveStop.class);
 		packet.registerPacket(0x13, PacketDriveRecord.class);
 		packet.registerPacket(0x14, PacketDriveCounter.class);
 
@@ -163,6 +159,5 @@ public class ModCharsetAudio {
 	@Mod.EventHandler
 	public void serverStop(FMLServerStoppedEvent event) {
 		storage = null;
-		proxy.onServerStop();
 	}
 }

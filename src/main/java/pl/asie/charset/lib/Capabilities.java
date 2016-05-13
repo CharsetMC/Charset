@@ -10,21 +10,20 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 
 import mcmultipart.capabilities.CapabilityWrapperRegistry;
+import pl.asie.charset.api.audio.IAudioSink;
+import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
-import pl.asie.charset.lib.capability.BundledEmitterWrapper;
-import pl.asie.charset.lib.capability.BundledReceiverWrapper;
-import pl.asie.charset.lib.capability.DefaultBundledEmitter;
-import pl.asie.charset.lib.capability.DefaultBundledEmitterStorage;
-import pl.asie.charset.lib.capability.DefaultRedstoneEmitter;
-import pl.asie.charset.lib.capability.DefaultRedstoneEmitterStorage;
-import pl.asie.charset.lib.capability.DummyRedstoneReceiver;
-import pl.asie.charset.lib.capability.RedstoneEmitterWrapper;
-import pl.asie.charset.lib.capability.RedstoneReceiverWrapper;
+import pl.asie.charset.lib.capability.*;
 
 public class Capabilities {
+	@CapabilityInject(IAudioSource.class)
+	public static Capability<IAudioSource> AUDIO_SOURCE;
+	@CapabilityInject(IAudioSink.class)
+	public static Capability<IAudioSink> AUDIO_SINK;
+
 	@CapabilityInject(IBundledEmitter.class)
 	public static Capability<IBundledEmitter> BUNDLED_EMITTER;
 	@CapabilityInject(IBundledReceiver.class)
@@ -35,32 +34,15 @@ public class Capabilities {
 	public static Capability<IRedstoneReceiver> REDSTONE_RECEIVER;
 
 	public static void init() {
+		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource.class);
+		CapabilityManager.INSTANCE.register(IAudioSink.class, new NullCapabilityStorage<IAudioSink>(), DefaultAudioSink.class);
+
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter.class);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter.class);
 
-		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new Capability.IStorage<IBundledReceiver>() {
-			@Override
-			public NBTBase writeNBT(Capability<IBundledReceiver> capability, IBundledReceiver instance, EnumFacing side) {
-				return null;
-			}
+		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver.class);
 
-			@Override
-			public void readNBT(Capability<IBundledReceiver> capability, IBundledReceiver instance, EnumFacing side, NBTBase nbt) {
-
-			}
-		}, DummyRedstoneReceiver.class);
-
-		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new Capability.IStorage<IRedstoneReceiver>() {
-			@Override
-			public NBTBase writeNBT(Capability<IRedstoneReceiver> capability, IRedstoneReceiver instance, EnumFacing side) {
-				return null;
-			}
-
-			@Override
-			public void readNBT(Capability<IRedstoneReceiver> capability, IRedstoneReceiver instance, EnumFacing side, NBTBase nbt) {
-
-			}
-		}, DummyRedstoneReceiver.class);
+		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver.class);
 
 		if (Loader.isModLoaded("mcmultipart")) {
 			initMultiplePants();

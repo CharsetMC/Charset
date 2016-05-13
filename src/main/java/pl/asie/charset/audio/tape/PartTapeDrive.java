@@ -28,6 +28,7 @@ import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.lib.multipart.PartSlab;
@@ -196,13 +197,17 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+				|| capability == Capabilities.AUDIO_SOURCE;
 	}
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return (T) invWrapper;
+			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(invWrapper);
+		}
+		if (capability == Capabilities.AUDIO_SOURCE) {
+			return Capabilities.AUDIO_SOURCE.cast(this);
 		}
 		return null;
 	}

@@ -12,6 +12,8 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.audio.manager.AudioStreamManager;
+import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.render.ModelFactory;
 
 public class ProxyClient extends ProxyCommon {
@@ -19,6 +21,11 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		ModelFactory.clearCaches();
+	}
+
+	@Override
+	public void init() {
+		AudioStreamManager.INSTANCE = new AudioStreamManagerClient();
 	}
 
 	@Override
@@ -42,6 +49,11 @@ public class ProxyClient extends ProxyCommon {
 		} else {
 			return DimensionManager.getWorld(dim);
 		}
+	}
+
+	@Override
+	public void onServerStop() {
+		AudioStreamManagerClient.INSTANCE.removeAll();
 	}
 
 	@Override

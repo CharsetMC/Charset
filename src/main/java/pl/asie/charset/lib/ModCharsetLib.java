@@ -2,6 +2,7 @@ package pl.asie.charset.lib;
 
 import java.io.File;
 
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +18,10 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 
 import pl.asie.charset.api.lib.CharsetHelper;
+import pl.asie.charset.lib.audio.PacketAudioData;
+import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.handlers.PlayerDeathHandler;
+import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 
@@ -37,6 +41,8 @@ public class ModCharsetLib {
 
 	@Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;
+
+	public static PacketRegistry packet;
 
 	@SidedProxy(clientSide = "pl.asie.charset.lib.ProxyClient", serverSide = "pl.asie.charset.lib.ProxyCommon")
 	public static ProxyCommon proxy;
@@ -80,6 +86,12 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		proxy.init();
+
+		packet = new PacketRegistry(ModCharsetLib.MODID);
+		packet.registerPacket(0x01, PacketAudioData.class);
+		packet.registerPacket(0x02, PacketAudioStop.class);
+
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(proxy);
 		ColorUtils.initialize();
@@ -93,5 +105,10 @@ public class ModCharsetLib {
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);
 		}
+	}
+
+	@Mod.EventHandler
+	public void serverStop(FMLServerStoppedEvent event) {
+		proxy.onServerStop();
 	}
 }

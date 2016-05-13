@@ -17,12 +17,35 @@ import pl.asie.charset.lib.recipe.RecipeBase;
 public class RecipeTape extends RecipeBase {
 	private static final String TAPE_PATTERN = "mmmr rsss";
 
+	private ItemTape.Material getMaterial(ItemStack source, ItemTape.Material previous) {
+		int[] oreIds = OreDictionary.getOreIDs(source);
+
+		if (previous != null) {
+			int oreId = OreDictionary.getOreID(previous.oreDict);
+			for (int j : oreIds) {
+				if (oreId == j) {
+					return previous;
+				}
+			}
+		} else {
+			for (ItemTape.Material m : ItemTape.Material.values()) {
+				int oreId = OreDictionary.getOreID(m.oreDict);
+				for (int j : oreIds) {
+					if (oreId == j) {
+						return m;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
 	@Override
 	public boolean matches(InventoryCrafting inv, World worldIn) {
 		ItemTape.Material material = null;
 
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			boolean found = false;
 			ItemStack source = inv.getStackInSlot(i);
 
 			switch (TAPE_PATTERN.charAt(i)) {
@@ -35,25 +58,11 @@ public class RecipeTape extends RecipeBase {
 					if (source == null) {
 						return false;
 					}
-					for (ItemTape.Material m : ItemTape.Material.values()) {
-						if (material != null & material != m) {
-							continue;
-						}
-						int oreId = OreDictionary.getOreID(m.oreDict);
-						int[] oreIds = OreDictionary.getOreIDs(source);
-						for (int j : oreIds) {
-							if (oreId == j) {
-								found = true;
-								break;
-							}
-						}
-						if (found) {
-							material = m;
-							break;
-						}
-					}
-					if (!found) {
+					ItemTape.Material newMaterial = getMaterial(source, material);
+					if (newMaterial == null) {
 						return false;
+					} else {
+						material = newMaterial;
 					}
 					break;
 				case 'r':
@@ -78,51 +87,19 @@ public class RecipeTape extends RecipeBase {
 		int totalTapeItems = 0;
 
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			boolean found = false;
 			ItemStack source = inv.getStackInSlot(i);
 
 			switch (TAPE_PATTERN.charAt(i)) {
-				case ' ':
-					if (source != null) {
-						return null;
-					}
-					break;
 				case 'm':
-					if (source == null) {
+					ItemTape.Material newMaterial = getMaterial(source, material);
+					if (newMaterial == null) {
 						return null;
-					}
-					for (ItemTape.Material m : ItemTape.Material.values()) {
-						if (material != null & material != m) {
-							continue;
-						}
-						int oreId = OreDictionary.getOreID(m.oreDict);
-						int[] oreIds = OreDictionary.getOreIDs(source);
-						for (int j : oreIds) {
-							if (oreId == j) {
-								found = true;
-								break;
-							}
-						}
-						if (found) {
-							material = m;
-							break;
-						}
-					}
-					if (!found) {
-						return null;
+					} else {
+						material = newMaterial;
 					}
 					break;
 				case 'r':
-					if (source == null || source.getItem() != ModCharsetAudio.tapeReelItem) {
-						return null;
-					} else {
-						totalTapeItems += source.getItemDamage();
-					}
-					break;
-				case 's':
-					if (source == null || source.getItem() != Item.getItemFromBlock(Blocks.STONE_SLAB)) {
-						return null;
-					}
+					totalTapeItems += source.getItemDamage();
 					break;
 			}
 		}

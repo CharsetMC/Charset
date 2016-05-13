@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.audio.*;
 import pl.asie.charset.lib.inventory.InventorySimple;
 
 public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompound> {
@@ -17,6 +18,7 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 	private final PartTapeDrive owner;
 	private final InventorySimple inventory;
 	private State state = State.STOPPED, lastState;
+	private Integer sourceId;
 
 	public TapeDriveState(PartTapeDrive owner, InventorySimple inventory) {
 		this.owner = owner;
@@ -41,6 +43,10 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 		int lastCounter = counter;
 
 		if (state != State.STOPPED) {
+			if (sourceId == null) {
+				sourceId = AudioUtils.start();
+			}
+
 			boolean found = false;
 			ItemStack stack = inventory.getStackInSlot(0);
 			if (stack != null && stack.hasCapability(ModCharsetAudio.CAP_STORAGE, null)) {
@@ -53,7 +59,10 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 						byte[] data = new byte[300];
 						int len = storage.read(data, false);
 
-						ModCharsetAudio.packet.sendToWatching(new PacketDriveAudio(owner, data), owner);
+						AudioPacketDFPWM packetDFPWM = new AudioPacketDFPWM(sourceId, data, 1);
+						packetDFPWM.beginPropagation();
+						packetDFPWM.add(new AudioSinkPart(this.owner));
+						packetDFPWM.endPropagation();
 
 						if (len < data.length) {
 							setState(State.STOPPED);
@@ -77,8 +86,9 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 
 		if (lastState != state) {
 			ModCharsetAudio.packet.sendToWatching(new PacketDriveState(owner, state), owner);
-			if (state == State.STOPPED && lastState == State.PLAYING) {
-				ModCharsetAudio.packet.sendToWatching(new PacketDriveStop(owner), owner);
+			if (state == State.STOPPED && lastState == State.PLAYING && sourceId != null) {
+				AudioUtils.stop(sourceId);
+				sourceId = null;
 			}
 		}
 

@@ -1,4 +1,4 @@
-package pl.asie.charset.audio.manager;
+package pl.asie.charset.lib.audio.manager;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -21,11 +21,11 @@ import pl.asie.charset.lib.ModCharsetLib;
 
 public class AudioStreamOpenAL implements IAudioStream {
 	public class SourceEntry {
-		public final int x, y, z;
+		public final float x, y, z;
 		public final IntBuffer src;
 		public int receivedPackets;
 
-		public SourceEntry(int x, int y, int z) {
+		public SourceEntry(float x, float y, float z) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -41,8 +41,6 @@ public class AudioStreamOpenAL implements IAudioStream {
 	private IntBuffer currentBuffer;
 
 	private int sampleRate = 32768;
-	private float volume = 1.0F;
-	private float distance = 24.0F;
 
 	public AudioStreamOpenAL(boolean sixteenBit, boolean stereo, int bufferPackets) {
 		super();
@@ -57,12 +55,6 @@ public class AudioStreamOpenAL implements IAudioStream {
 	}
 
 	@Override
-	public void setHearing(float dist, float vol) {
-		this.distance = dist;
-		this.volume = vol;
-	}
-
-	@Override
 	public void setSampleRate(int rate) {
 		sampleRate = rate;
 	}
@@ -74,7 +66,7 @@ public class AudioStreamOpenAL implements IAudioStream {
 	}
 
 	@SideOnly(Side.CLIENT)
-	private double getDistance(int x, int y, int z) {
+	private double getDistance(float x, float y, float z) {
 		Vec3d pos = Minecraft.getMinecraft().thePlayer.getPositionVector();
 		return pos.distanceTo(new Vec3d(x, y, z));
 	}
@@ -102,7 +94,7 @@ public class AudioStreamOpenAL implements IAudioStream {
 	}
 
 	@Override
-	public void play(int x, int y, int z) {
+	public void play(float x, float y, float z, float distance, float volume) {
 		FloatBuffer sourcePos = (FloatBuffer) (BufferUtils.createFloatBuffer(3).put(new float[]{x, y, z}).rewind());
 		FloatBuffer sourceVel = (FloatBuffer) (BufferUtils.createFloatBuffer(3).put(new float[]{0.0f, 0.0f, 0.0f}).rewind());
 
