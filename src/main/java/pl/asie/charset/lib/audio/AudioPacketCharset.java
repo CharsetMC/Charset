@@ -46,12 +46,13 @@ public abstract class AudioPacketCharset extends AudioPacket {
         }
 
         for (WorldServer world : worlds.keySet()) {
-            for (IAudioSink sink : worlds.get(world)) {
-                BlockPos pos = new BlockPos(sink.getPos());
-                for (EntityPlayerMP player : world.getMinecraftServer().getPlayerList().getPlayerList()) {
-                    if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
+            for (EntityPlayerMP player : world.getMinecraftServer().getPlayerList().getPlayerList()) {
+                if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
+                    for (IAudioSink sink : worlds.get(world)) {
+                       BlockPos pos = new BlockPos(sink.getPos());
                         if (world.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
                             ModCharsetLib.packet.sendTo(packet, player);
+                            break;
                         }
                     }
                 }
