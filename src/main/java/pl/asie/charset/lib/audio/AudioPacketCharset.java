@@ -3,6 +3,7 @@ package pl.asie.charset.lib.audio;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IAudioSink;
 import pl.asie.charset.lib.ModCharsetLib;

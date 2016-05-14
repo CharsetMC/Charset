@@ -1,5 +1,7 @@
 package pl.asie.charset.lib.render;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
@@ -19,6 +21,7 @@ import pl.asie.charset.lib.utils.ClientUtils;
 
 import javax.vecmath.Matrix4f;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public abstract class ModelFactory<T extends IRenderComparable<T>> extends CharsetBakedModel {
     private static final boolean DISABLE_CACHE = false;
@@ -43,20 +46,20 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends Chars
         }
     }
 
-    // TODO: Garbage collection?
-    private final Map<ModelKey<T>, IBakedModel> cache = new HashMap<>();
-
+    private final Cache<ModelKey<T>, IBakedModel> cache;
     private final IUnlistedProperty<T> property;
 
     protected ModelFactory(IUnlistedProperty<T> property, ResourceLocation particle) {
         super(particle);
         this.FACTORIES.add(this);
+
+        this.cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
         this.property = property;
     }
 
     public static void clearCaches() {
         for (ModelFactory factory : FACTORIES) {
-            factory.cache.clear();
+            factory.cache.invalidateAll();
         }
     }
 
@@ -69,14 +72,17 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends Chars
         }
 
         ModelKey<T> key = new ModelKey<>(object);
-        if (cache.containsKey(key)) {
-            return cache.get(key);
+        if (DISABLE_CACHE) {
+            return bake(object);
         } else {
-            IBakedModel model = bake(object);
-            if (!DISABLE_CACHE) {
+            IBakedModel model = cache.getIfPresent(key);
+            if (model != null) {
+                return model;
+            } else {
+                model = bake(object);
                 cache.put(key, model);
+                return model;
             }
-            return model;
         }
     }
 

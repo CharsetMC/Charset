@@ -1,14 +1,19 @@
 package pl.asie.charset.pipes;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -22,6 +27,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.render.CharsetBakedModel;
@@ -46,49 +52,81 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		}
 	};
 
-	private void renderFluidCube(IBlockAccess world, BlockPos pos, Vector3f from, Vector3f to, Fluid fluid, int color) {
-		TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
-		TextureAtlasSprite sprite = map.getTextureExtry(fluid.getStill().toString());
-		if (sprite == null) {
-			sprite = map.getTextureExtry(TextureMap.LOCATION_MISSING_TEXTURE.toString());
-			if (sprite == null) {
-				return;
-			}
+	private class FluidEntry {
+		public final FluidStack stack;
+		public final int side;
+		private final int hash;
+
+		public FluidEntry(FluidStack stack, EnumFacing side) {
+			this.stack = stack;
+			this.side = side != null ? side.ordinal() : 6;
+			this.hash = Objects.hash(stack, side);
 		}
 
-		SimpleBakedModel model = new SimpleBakedModel();
-		model.addQuad(null, faceBakery.makeBakedQuad(
-				new Vector3f(from.x, from.y, from.z),
-				new Vector3f(to.x, from.y, to.z),
-				-1, sprite, EnumFacing.DOWN, ModelRotation.X0_Y0, false
-		));
-		model.addQuad(null, faceBakery.makeBakedQuad(
-				new Vector3f(from.x, to.y, from.z),
-				new Vector3f(to.x, to.y, to.z),
-				-1, sprite, EnumFacing.UP, ModelRotation.X0_Y0, false
-		));
-		model.addQuad(null, faceBakery.makeBakedQuad(
-				new Vector3f(from.x, from.y, from.z),
-				new Vector3f(from.x, to.y, to.z),
-				-1, sprite, EnumFacing.WEST, ModelRotation.X0_Y0, false
-		));
-		model.addQuad(null, faceBakery.makeBakedQuad(
-				new Vector3f(to.x, from.y, from.z),
-				new Vector3f(to.x, to.y, to.z),
-				-1, sprite, EnumFacing.EAST, ModelRotation.X0_Y0, false
-		));
-		model.addQuad(null, faceBakery.makeBakedQuad(
-				new Vector3f(from.x, from.y, from.z),
-				new Vector3f(to.x, to.y, from.z),
-				-1, sprite, EnumFacing.NORTH, ModelRotation.X0_Y0, false
-		));
-		model.addQuad(null, faceBakery.makeBakedQuad(
-				new Vector3f(from.x, from.y, to.z),
-				new Vector3f(to.x, to.y, to.z),
-				-1, sprite, EnumFacing.SOUTH, ModelRotation.X0_Y0, false
-		));
+		@Override
+		public boolean equals(Object o) {
+			if (o == null || !(o instanceof FluidEntry)) {
+				return false;
+			}
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			FluidEntry f = (FluidEntry) o;
+			return f.stack.getFluid() == stack.getFluid() && f.stack.amount == stack.amount && f.side == side;
+		}
+
+		@Override
+		public int hashCode() {
+			return this.hash;
+		}
+	}
+
+	private final Cache<FluidEntry, SimpleBakedModel> fluidModelCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
+
+	private void renderFluidCube(IBlockAccess world, BlockPos pos, Vector3f from, Vector3f to, FluidEntry entry, int color) {
+		SimpleBakedModel model = fluidModelCache.getIfPresent(entry);
+		if (model == null) {
+			TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
+			TextureAtlasSprite sprite = map.getTextureExtry(entry.stack.getFluid().getStill().toString());
+			if (sprite == null) {
+				sprite = map.getTextureExtry(TextureMap.LOCATION_MISSING_TEXTURE.toString());
+				if (sprite == null) {
+					return;
+				}
+			}
+
+			model = new SimpleBakedModel();
+			model.addQuad(null, faceBakery.makeBakedQuad(
+					new Vector3f(from.x, from.y, from.z),
+					new Vector3f(to.x, from.y, to.z),
+					-1, sprite, EnumFacing.DOWN, ModelRotation.X0_Y0, false
+			));
+			model.addQuad(null, faceBakery.makeBakedQuad(
+					new Vector3f(from.x, to.y, from.z),
+					new Vector3f(to.x, to.y, to.z),
+					-1, sprite, EnumFacing.UP, ModelRotation.X0_Y0, false
+			));
+			model.addQuad(null, faceBakery.makeBakedQuad(
+					new Vector3f(from.x, from.y, from.z),
+					new Vector3f(from.x, to.y, to.z),
+					-1, sprite, EnumFacing.WEST, ModelRotation.X0_Y0, false
+			));
+			model.addQuad(null, faceBakery.makeBakedQuad(
+					new Vector3f(to.x, from.y, from.z),
+					new Vector3f(to.x, to.y, to.z),
+					-1, sprite, EnumFacing.EAST, ModelRotation.X0_Y0, false
+			));
+			model.addQuad(null, faceBakery.makeBakedQuad(
+					new Vector3f(from.x, from.y, from.z),
+					new Vector3f(to.x, to.y, from.z),
+					-1, sprite, EnumFacing.NORTH, ModelRotation.X0_Y0, false
+			));
+			model.addQuad(null, faceBakery.makeBakedQuad(
+					new Vector3f(from.x, from.y, to.z),
+					new Vector3f(to.x, to.y, to.z),
+					-1, sprite, EnumFacing.SOUTH, ModelRotation.X0_Y0, false
+			));
+
+			fluidModelCache.put(entry, model);
+		}
 
 		GlStateManager.pushMatrix();
 		GlStateManager.disableLighting();
@@ -98,7 +136,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 
 		Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-		renderer.renderModel(world, model, fluid.getBlock().getDefaultState(), pos, Tessellator.getInstance().getBuffer(), false);
+		renderer.renderModel(world, model, entry.stack.getFluid().getBlock().getDefaultState(), pos, Tessellator.getInstance().getBuffer(), false);
 		Tessellator.getInstance().draw();
 
 		GlStateManager.enableLighting();
@@ -113,11 +151,12 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x - part.getPos().getX(), y - part.getPos().getY(), z - part.getPos().getZ());
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
 		for (PipeFluidContainer.Tank tank : part.fluid.tanks) {
 			if (tank.stack != null) {
-				Vector3f from = new Vector3f(4.006f, 4.006f, 4.006f);
-				Vector3f to = new Vector3f(11.994f, 11.994f, 11.994f);
+				Vector3f from = new Vector3f(4.01f, 4.01f, 4.01f);
+				Vector3f to = new Vector3f(11.99f, 11.99f, 11.99f);
 
 				if (tank.location != null) {
 					if (tank.location.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
@@ -148,7 +187,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 				}
 
 				to.y = from.y + (to.y - from.y) * ((float) tank.stack.amount / tank.getCapacity());
-				renderFluidCube(part.getWorld(), part.getPos(), from, to, tank.stack.getFluid(), tank.color);
+				renderFluidCube(part.getWorld(), part.getPos(), from, to, new FluidEntry(tank.stack, tank.location), tank.color);
 			}
 		}
 
@@ -198,5 +237,9 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 				GlStateManager.popMatrix();
 			}
 		}
+	}
+
+	public void clearCache() {
+		fluidModelCache.invalidateAll();
 	}
 }
