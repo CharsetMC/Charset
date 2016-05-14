@@ -12,6 +12,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import mcmultipart.client.multipart.AdvancedEffectRenderer;
+import mcmultipart.client.multipart.IFastMSRPart;
 import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -48,7 +49,7 @@ import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable {
+public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable, IFastMSRPart {
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
 	final PipeFluidContainer fluid = new PipeFluidContainer(this);
@@ -569,6 +570,18 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		return itemSet;
 	}
 
+	PipeItem getItemByID(int id) {
+		synchronized (itemSet) {
+			for (PipeItem p : itemSet) {
+				if (p.id == id) {
+					return p;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	protected void onSyncRequest() {
 		// TODO: HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
 		synchronized (itemSet) {
@@ -620,5 +633,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	@Override
 	public EnumSet<PartSlot> getSlotMask() {
 		return EnumSet.of(PartSlot.CENTER);
+	}
+
+	@Override
+	public boolean hasFastRenderer() {
+		return false;
 	}
 }
