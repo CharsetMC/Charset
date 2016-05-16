@@ -637,6 +637,6 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public boolean hasFastRenderer() {
-		return false;
+		return true;
 	}
 }

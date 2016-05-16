@@ -1,6 +1,5 @@
 package pl.asie.charset.pipes;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -10,61 +9,82 @@ import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
-import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import mcmultipart.client.multipart.MultipartSpecialRenderer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.lib.render.CharsetBakedModel;
 import pl.asie.charset.lib.render.CharsetFaceBakery;
+import pl.asie.charset.lib.render.ModelTransformer;
 import pl.asie.charset.lib.render.SimpleBakedModel;
-import pl.asie.charset.lib.utils.ClientUtils;
 
 public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 	protected static BlockModelRenderer renderer;
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
 	private static final float ITEM_RANDOM_OFFSET = 0.01F;
+	private final ItemModelTransformer ITEM_MODEL_TRANSFORMER = new ItemModelTransformer();
 	private final CharsetFaceBakery faceBakery = new CharsetFaceBakery();
 
-	private static final RenderEntityItem RENDER_ITEM = new RenderEntityItem(Minecraft.getMinecraft().getRenderManager(), Minecraft.getMinecraft().getRenderItem()) {
-		@Override
-		public boolean shouldBob() {
-			return false;
+	private final class FluidModelTransformer implements ModelTransformer.IVertexTransformer {
+		private final int color;
+
+		public FluidModelTransformer(int color) {
+			this.color = color;
 		}
 
 		@Override
-		public boolean shouldSpreadItems() {
-			return false;
+		public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
+			if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
+				for (int i = 0; i < Math.min(data.length, 4); i++) {
+					data[i] = data[i] * ((color >> (i * 8)) & 0xFF) / 255.0f;
+				}
+			}
+			return data;
+		}
+	}
+
+	private final class ItemModelTransformer implements ModelTransformer.IVertexTransformer {
+		private final float[] offset = new float[3];
+		private boolean isBlock;
+
+		@Override
+		public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
+			if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {
+				for (int i = 0; i < 3; i++) {
+					if (isBlock) {
+						data[i] = (data[i] * 0.35f) + 0.075f + offset[i];
+					} else {
+						data[i] = (data[i] * 0.45f) + 0.025f + offset[i];
+					}
+				}
+			}
+			return data;
 		}
 	};
 
 	private class FluidEntry {
 		public final FluidStack stack;
 		public final int side;
+		public final int color;
 		private final int hash;
 
-		public FluidEntry(FluidStack stack, EnumFacing side) {
+		public FluidEntry(FluidStack stack, int color, EnumFacing side) {
 			this.stack = stack;
+			this.color = color;
 			this.side = side != null ? side.ordinal() : 6;
-			this.hash = Objects.hash(stack, side);
+			this.hash = Objects.hash(stack, color, side);
 		}
 
 		@Override
@@ -74,7 +94,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 			}
 
 			FluidEntry f = (FluidEntry) o;
-			return f.stack.getFluid() == stack.getFluid() && f.stack.amount == stack.amount && f.side == side;
+			return f.stack.getFluid() == stack.getFluid() && f.stack.amount == stack.amount && f.color == color && f.side == side;
 		}
 
 		@Override
@@ -83,10 +103,10 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		}
 	}
 
-	private final Cache<FluidEntry, SimpleBakedModel> fluidModelCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
+	private final Cache<FluidEntry, IBakedModel> fluidModelCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
 
-	private void renderFluidCube(IBlockAccess world, BlockPos pos, Vector3f from, Vector3f to, FluidEntry entry, int color, boolean isFast) {
-		SimpleBakedModel model = fluidModelCache.getIfPresent(entry);
+	private void renderFluidCube(IBlockAccess world, BlockPos pos, Vector3f from, Vector3f to, FluidEntry entry, VertexBuffer buffer) {
+		IBakedModel model = fluidModelCache.getIfPresent(entry);
 		if (model == null) {
 			TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
 			TextureAtlasSprite sprite = map.getTextureExtry(entry.stack.getFluid().getStill().toString());
@@ -97,63 +117,51 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 				}
 			}
 
-			model = new SimpleBakedModel();
-			model.addQuad(null, faceBakery.makeBakedQuad(
+			SimpleBakedModel smodel = new SimpleBakedModel();
+			smodel.addQuad(null, faceBakery.makeBakedQuad(
 					new Vector3f(from.x, from.y, from.z),
 					new Vector3f(to.x, from.y, to.z),
 					-1, sprite, EnumFacing.DOWN, ModelRotation.X0_Y0, false
 			));
-			model.addQuad(null, faceBakery.makeBakedQuad(
+			smodel.addQuad(null, faceBakery.makeBakedQuad(
 					new Vector3f(from.x, to.y, from.z),
 					new Vector3f(to.x, to.y, to.z),
 					-1, sprite, EnumFacing.UP, ModelRotation.X0_Y0, false
 			));
-			model.addQuad(null, faceBakery.makeBakedQuad(
+			smodel.addQuad(null, faceBakery.makeBakedQuad(
 					new Vector3f(from.x, from.y, from.z),
 					new Vector3f(from.x, to.y, to.z),
 					-1, sprite, EnumFacing.WEST, ModelRotation.X0_Y0, false
 			));
-			model.addQuad(null, faceBakery.makeBakedQuad(
+			smodel.addQuad(null, faceBakery.makeBakedQuad(
 					new Vector3f(to.x, from.y, from.z),
 					new Vector3f(to.x, to.y, to.z),
 					-1, sprite, EnumFacing.EAST, ModelRotation.X0_Y0, false
 			));
-			model.addQuad(null, faceBakery.makeBakedQuad(
+			smodel.addQuad(null, faceBakery.makeBakedQuad(
 					new Vector3f(from.x, from.y, from.z),
 					new Vector3f(to.x, to.y, from.z),
 					-1, sprite, EnumFacing.NORTH, ModelRotation.X0_Y0, false
 			));
-			model.addQuad(null, faceBakery.makeBakedQuad(
+			smodel.addQuad(null, faceBakery.makeBakedQuad(
 					new Vector3f(from.x, from.y, to.z),
 					new Vector3f(to.x, to.y, to.z),
 					-1, sprite, EnumFacing.SOUTH, ModelRotation.X0_Y0, false
 			));
+			model = smodel;
 
-			fluidModelCache.put(entry, model);
+			if (entry.color == -1) {
+				fluidModelCache.put(entry, model);
+			} else {
+				fluidModelCache.put(entry, ModelTransformer.transform(model, entry.stack.getFluid().getBlock().getDefaultState(), 0L, new FluidModelTransformer(entry.color)));
+			}
 		}
 
-		if (isFast) {
-			// TODO: count in color
-			renderer.renderModel(world, model, entry.stack.getFluid().getBlock().getDefaultState(), pos, Tessellator.getInstance().getBuffer(), false);
-		} else {
-			GlStateManager.pushMatrix();
-			GlStateManager.disableLighting();
-
-			ClientUtils.glColor(color);
-
-			BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
-
-			Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-			renderer.renderModel(world, model, entry.stack.getFluid().getBlock().getDefaultState(), pos, Tessellator.getInstance().getBuffer(), false);
-			Tessellator.getInstance().draw();
-
-			GlStateManager.enableLighting();
-			GlStateManager.popMatrix();
-		}
+		renderer.renderModelSmooth(world, model, entry.stack.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
 	}
 
-	private void renderMultipart(PartPipe part, double x, double y, double z, float partialTicks, VertexBuffer buffer) {
-		boolean isFast = buffer != null;
+	@Override
+	public void renderMultipartFast(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
 		if (part == null) {
 			return;
 		}
@@ -164,13 +172,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 
 		BlockPos pos = part.getPos();
 
-		if (isFast) {
-			buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
-		} else {
-			GlStateManager.pushMatrix();
-			GlStateManager.translate(x - part.getPos().getX(), y - part.getPos().getY(), z - part.getPos().getZ());
-			Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-		}
+		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
 		for (PipeFluidContainer.Tank tank : part.fluid.tanks) {
 			if (tank.stack != null) {
@@ -181,24 +183,30 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					if (tank.location.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
 						switch (tank.location.getAxis()) {
 							case X:
+								to.x = from.x;
 								from.x = 0;
 								break;
 							case Y:
+								to.y = from.y;
 								from.y = 0;
 								break;
 							case Z:
+								to.z = from.z;
 								from.z = 0;
 								break;
 						}
 					} else {
 						switch (tank.location.getAxis()) {
 							case X:
+								from.x = to.x;
 								to.x = 16;
 								break;
 							case Y:
+								from.y = to.y;
 								to.y = 16;
 								break;
 							case Z:
+								from.z = to.z;
 								to.z = 16;
 								break;
 						}
@@ -206,23 +214,24 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 				}
 
 				to.y = from.y + (to.y - from.y) * ((float) tank.stack.amount / tank.getCapacity());
-				renderFluidCube(part.getWorld(), pos, from, to, new FluidEntry(tank.stack, tank.location), tank.color, isFast);
+				renderFluidCube(part.getWorld(), pos, from, to, new FluidEntry(tank.stack, tank.color, tank.location), buffer);
 			}
-		}
-
-		if (!isFast) {
-			GlStateManager.popMatrix();
 		}
 
 		synchronized (part.getPipeItems()) {
 			for (PipeItem item : part.getPipeItems()) {
+				ItemStack stack = item.getStack();
+				if (stack == null || stack.getItem() == null) {
+					continue;
+				}
+
 				EnumFacing id = item.getDirection();
-				double ix, iy, iz;
+				float ix, iy, iz;
 
 				if (id == null) {
-					ix = 0.5;
-					iy = 0.5;
-					iz = 0.5;
+					ix = 0.5f;
+					iy = 0.5f;
+					iz = 0.5f;
 				} else if (item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
 					ix = item.getX();
 					iy = item.getY();
@@ -247,37 +256,23 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					}
 				}
 
-				if (isFast) {
-					IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(item.stack, part.getWorld(), null);
-					if (model.isBuiltInRenderer()) {
-						model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(new ItemStack(Blocks.BARRIER), part.getWorld(), null);
-					}
-
-					buffer.setTranslation(x - pos.getX() + ix, y - pos.getY() + iy - 0.25, z - pos.getZ() + iz);
-					renderer.renderModel(getWorld(), model, Blocks.AIR.getDefaultState(), pos, buffer, false);
-				} else {
-					EntityItem itemEntity = new EntityItem(part.getWorld(), part.getPos().getX(), part.getPos().getY(), part.getPos().getZ(), item.getStack());
-					itemEntity.hoverStart = 0;
-
-					GlStateManager.pushMatrix();
-					GlStateManager.translate(x + ix, y + iy - 0.25, z + iz);
-
-					RENDER_ITEM.doRender(itemEntity, 0, 0, 0, 0.0f, 0.0f);
-
-					GlStateManager.popMatrix();
+				IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, part.getWorld(), null);
+				IBlockState state = Blocks.AIR.getDefaultState();
+				if (model.isBuiltInRenderer()) {
+					model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(new ItemStack(Blocks.BARRIER), part.getWorld(), null);
 				}
+
+				ITEM_MODEL_TRANSFORMER.isBlock = stack.getItem() instanceof ItemBlock;
+				ITEM_MODEL_TRANSFORMER.offset[0] = ix;
+				ITEM_MODEL_TRANSFORMER.offset[1] = iy - 0.25f;
+				ITEM_MODEL_TRANSFORMER.offset[2] = iz - 0.25f;
+				renderer.renderModel(getWorld(), ModelTransformer.transform(model, state, 0L, ITEM_MODEL_TRANSFORMER), state, pos, buffer, false);
 			}
 		}
 	}
 
 	@Override
-	public void renderMultipartFast(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
-		renderMultipart(part, x, y, z, partialTicks, buffer);
-	}
-
-	@Override
 	public void renderMultipartAt(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage) {
-		renderMultipart(part, x, y, z, partialTicks, null);
 	}
 
 	public void clearCache() {

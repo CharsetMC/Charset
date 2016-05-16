@@ -37,6 +37,10 @@ public abstract class AudioPacketCharset extends AudioPacket {
 
         Map<WorldServer, Set<IAudioSink>> worlds = new HashMap<>();
         for (IAudioSink sink : sinks) {
+            if (sink.getVolume() <= 0.0f || sink.getHearingDistance() <= 0.0f) {
+                continue;
+            }
+
             if (worlds.containsKey(sink.getWorld())) {
                 worlds.get(sink.getWorld()).add(sink);
             } else {

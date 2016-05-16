@@ -4,24 +4,32 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import pl.asie.charset.api.audio.IAudioSink;
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.audio.*;
 import pl.asie.charset.lib.inventory.InventorySimple;
 
 public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompound> {
 	protected int counter;
 	private final PartTapeDrive owner;
+	private final AudioSinkPart internalSpeaker;
 	private final InventorySimple inventory;
 	private State state = State.STOPPED, lastState;
 	private Integer sourceId;
 
 	public TapeDriveState(PartTapeDrive owner, InventorySimple inventory) {
 		this.owner = owner;
+		this.internalSpeaker = new AudioSinkPart(this.owner);
 		this.inventory = inventory;
 	}
 
@@ -61,7 +69,20 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 
 						AudioPacketDFPWM packetDFPWM = new AudioPacketDFPWM(sourceId, data, 1);
 						packetDFPWM.beginPropagation();
-						packetDFPWM.add(new AudioSinkPart(this.owner));
+
+						World world = owner.getWorld();
+						BlockPos pos = owner.getPos();
+						for (EnumFacing facing : EnumFacing.VALUES) {
+							TileEntity tile = world.getTileEntity(pos.offset(facing));
+							if (tile != null && tile.hasCapability(Capabilities.AUDIO_SINK, facing.getOpposite())) {
+								tile.getCapability(Capabilities.AUDIO_SINK, facing.getOpposite()).receive(packetDFPWM);
+							}
+						}
+
+						if (packetDFPWM.sinkCount() == 0) {
+							internalSpeaker.receive(packetDFPWM);
+						}
+
 						packetDFPWM.endPropagation();
 
 						if (len < data.length) {

@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.network.INetHandler;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IAudioSink;
 import pl.asie.charset.api.audio.IAudioSinkEntity;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
@@ -49,6 +50,11 @@ public class PacketAudioData extends Packet {
 		@Override
 		public float getVolume() {
 			return v;
+		}
+
+		@Override
+		public boolean receive(AudioPacket packet) {
+			return false;
 		}
 	}
 

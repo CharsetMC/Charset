@@ -8,4 +8,5 @@ public interface IAudioSink {
     Vec3d getPos();
     float getHearingDistance();
     float getVolume();
+    boolean receive(AudioPacket packet);
 }
