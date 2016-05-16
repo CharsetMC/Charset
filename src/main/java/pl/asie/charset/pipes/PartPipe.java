@@ -57,6 +57,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
 	private byte connectionCache = 0;
+	private boolean initialize;
 	private boolean neighborBlockChanged;
 	private boolean requestUpdate;
 
@@ -331,7 +332,9 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		writeItems(nbt);
 
 		nbt.setByte("cc", connectionCache);
-		nbt.setIntArray("shifterDist", shifterDistance);
+		if (shifterDistance != null) {
+			nbt.setIntArray("shifterDist", shifterDistance);
+		}
 	}
 
 	@Override
@@ -347,6 +350,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	@Override
 	public void onAdded() {
 		updateNeighborInfo(false);
+		onLoaded();
 		scheduleRenderUpdate();
 	}
 

@@ -27,18 +27,21 @@ public class PacketFluidUpdate extends PacketPart {
 		container = ((PartPipe) part).fluid;
 		int sides = buf.readUnsignedByte();
 
+		if ((sides & 128) != 0) {
+			int fluidID = buf.readInt();
+			if (fluidID >= 0) {
+				container.fluidColor = buf.readInt();
+				container.fluidStack = new FluidStack(FluidRegistry.getFluid(fluidID), 1000);
+			} else {
+				container.fluidColor = 0;
+				container.fluidStack = null;
+			}
+		}
+
 		for (int i = 0; i <= 6; i++) {
 			if ((sides & (1 << i)) != 0) {
 				PipeFluidContainer.Tank tank = container.tanks[i];
-				int amount = buf.readUnsignedShort();
-				if (amount > 0) {
-					int fluidID = buf.readInt();
-					tank.color = buf.readInt();
-					tank.stack = new FluidStack(FluidRegistry.getFluid(fluidID), amount);
-				} else {
-					tank.stack = null;
-					tank.color = 0;
-				}
+				tank.amount = buf.readUnsignedShort();
 			}
 		}
 	}
@@ -52,18 +55,25 @@ public class PacketFluidUpdate extends PacketPart {
 			}
 		}
 
+		if (container.fluidDirty) {
+			sides |= 128;
+		}
+
 		buf.writeByte(sides);
+
+		if (container.fluidDirty) {
+			container.fluidDirty = false;
+			if (container.fluidStack == null) {
+				buf.writeInt(-1);
+			} else {
+				buf.writeInt(FluidRegistry.getFluidID(container.fluidStack.getFluid()));
+				buf.writeInt(container.fluidStack.getFluid().getColor(container.fluidStack));
+			}
+		}
 
 		for (int i = 0; i <= 6; i++) {
 			if ((sides & (1 << i)) != 0) {
-				PipeFluidContainer.Tank tank = container.tanks[i];
-				if (tank.stack == null) {
-					buf.writeShort(0);
-				} else {
-					buf.writeShort(tank.stack.amount);
-					buf.writeInt(FluidRegistry.getFluidID(tank.stack.getFluid()));
-					buf.writeInt(tank.stack.getFluid().getColor(tank.stack));
-				}
+				buf.writeShort(container.tanks[i].amount);
 			}
 		}
 	}

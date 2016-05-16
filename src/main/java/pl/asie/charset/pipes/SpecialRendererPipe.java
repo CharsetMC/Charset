@@ -174,47 +174,53 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
-		for (PipeFluidContainer.Tank tank : part.fluid.tanks) {
-			if (tank.stack != null) {
-				Vector3f from = new Vector3f(4.01f, 4.01f, 4.01f);
-				Vector3f to = new Vector3f(11.99f, 11.99f, 11.99f);
+		if (part.fluid.fluidStack != null) {
+			FluidStack base = part.fluid.fluidStack;
+			for (PipeFluidContainer.Tank tank : part.fluid.tanks) {
+				if (tank.amount > 0) {
+					Vector3f from = new Vector3f(4.01f, 4.01f, 4.01f);
+					Vector3f to = new Vector3f(11.99f, 11.99f, 11.99f);
 
-				if (tank.location != null) {
-					if (tank.location.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
-						switch (tank.location.getAxis()) {
-							case X:
-								to.x = from.x;
-								from.x = 0;
-								break;
-							case Y:
-								to.y = from.y;
-								from.y = 0;
-								break;
-							case Z:
-								to.z = from.z;
-								from.z = 0;
-								break;
-						}
-					} else {
-						switch (tank.location.getAxis()) {
-							case X:
-								from.x = to.x;
-								to.x = 16;
-								break;
-							case Y:
-								from.y = to.y;
-								to.y = 16;
-								break;
-							case Z:
-								from.z = to.z;
-								to.z = 16;
-								break;
+					if (tank.location != null) {
+						if (tank.location.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
+							switch (tank.location.getAxis()) {
+								case X:
+									to.x = from.x;
+									from.x = 0;
+									break;
+								case Y:
+									to.y = from.y;
+									from.y = 0;
+									break;
+								case Z:
+									to.z = from.z;
+									from.z = 0;
+									break;
+							}
+						} else {
+							switch (tank.location.getAxis()) {
+								case X:
+									from.x = to.x;
+									to.x = 16;
+									break;
+								case Y:
+									from.y = to.y;
+									to.y = 16;
+									break;
+								case Z:
+									from.z = to.z;
+									to.z = 16;
+									break;
+							}
 						}
 					}
-				}
 
-				to.y = from.y + (to.y - from.y) * ((float) tank.stack.amount / tank.getCapacity());
-				renderFluidCube(part.getWorld(), pos, from, to, new FluidEntry(tank.stack, tank.color, tank.location), buffer);
+					FluidStack stack = base.copy();
+					stack.amount = tank.amount;
+
+					to.y = from.y + (to.y - from.y) * ((float) tank.amount / tank.getCapacity());
+					renderFluidCube(part.getWorld(), pos, from, to, new FluidEntry(stack, part.fluid.fluidColor, tank.location), buffer);
+				}
 			}
 		}
 
