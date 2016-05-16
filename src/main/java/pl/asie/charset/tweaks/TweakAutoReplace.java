@@ -72,12 +72,12 @@ public class TweakAutoReplace extends Tweak {
 			int targetSlot = ((slot < 27) ? (slot + 9) : (slot - 27));
 			inv.setInventorySlotContents(targetSlot, stackAbove);
 			inv.setInventorySlotContents(slot, null);
-			player.playerNetServerHandler.sendPacket(
+			player.connection.sendPacket(
 					new SPacketSetSlot(0, slot + 9, stackAbove));
 		}
 
 		if (row < 2) {
-			player.playerNetServerHandler.sendPacket(
+			player.connection.sendPacket(
 					new SPacketSetSlot(0, inv.currentItem + row * 9 + 18, null));
 		}
 	}

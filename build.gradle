@@ -12,12 +12,12 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.3.0-pre1"
+version = "0.3.0-pre2"
 group= "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-    version = "1.9-12.16.1.1894"
+    version = "1.9-12.16.1.1906"
     runDir = "run"
     useDepAts = true
     
@@ -26,7 +26,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20160509"
+    mappings = "snapshot_20160516"
 
     replace '@VERSION@', project.version
     replace '@MC_VERSION@', version
