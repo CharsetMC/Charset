@@ -16,7 +16,6 @@ public class PlayerDeathHandler {
 	private Predicate<ItemStack> itemKeepPredicate;
 
 	public PlayerDeathHandler() {
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	public boolean hasPredicate() {
