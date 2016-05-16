@@ -3,20 +3,23 @@ package pl.asie.charset.pipes;
 import io.netty.buffer.ByteBuf;
 import mcmultipart.multipart.IMultipart;
 import net.minecraft.network.INetHandler;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import pl.asie.charset.lib.network.PacketPart;
 
 public class PacketFluidUpdate extends PacketPart {
 	protected PipeFluidContainer container;
+	private boolean ignoreDirty;
 
 	public PacketFluidUpdate() {
 		super();
 	}
 
-	public PacketFluidUpdate(IMultipart part, PipeFluidContainer container) {
+	public PacketFluidUpdate(IMultipart part, PipeFluidContainer container, boolean ignoreDirty) {
 		super(part);
 		this.container = container;
+		this.ignoreDirty = ignoreDirty;
 	}
 
 	public void readFluidData(ByteBuf buf) {
@@ -49,20 +52,24 @@ public class PacketFluidUpdate extends PacketPart {
 	public void writeFluidData(ByteBuf buf) {
 		int sides = 0;
 
-		for (int i = 0; i <= 6; i++) {
-			if (container.tanks[i].removeDirty()) {
-				sides |= (1 << i);
+		if (ignoreDirty) {
+			sides = 255;
+		} else {
+			for (int i = 0; i <= 6; i++) {
+				if (container.tanks[i].removeDirty()) {
+					sides |= (1 << i);
+				}
 			}
-		}
 
-		if (container.fluidDirty) {
-			sides |= 128;
+			if (container.fluidDirty) {
+				sides |= 128;
+				container.fluidDirty = false;
+			}
 		}
 
 		buf.writeByte(sides);
 
-		if (container.fluidDirty) {
-			container.fluidDirty = false;
+		if ((sides & 128) != 0) {
 			if (container.fluidStack == null) {
 				buf.writeInt(-1);
 			} else {

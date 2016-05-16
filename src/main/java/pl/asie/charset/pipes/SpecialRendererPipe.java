@@ -62,12 +62,9 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		@Override
 		public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
 			if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {
+				float sizeHalf = isBlock ? 0.35f : 0.45f;
 				for (int i = 0; i < 3; i++) {
-					if (isBlock) {
-						data[i] = (data[i] * 0.35f) + 0.075f + offset[i];
-					} else {
-						data[i] = (data[i] * 0.45f) + 0.025f + offset[i];
-					}
+					data[i] = (data[i] * sizeHalf / 2) + 0.075f + offset[i] - (sizeHalf / 2);
 				}
 			}
 			return data;
@@ -270,8 +267,8 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 
 				ITEM_MODEL_TRANSFORMER.isBlock = stack.getItem() instanceof ItemBlock;
 				ITEM_MODEL_TRANSFORMER.offset[0] = ix;
-				ITEM_MODEL_TRANSFORMER.offset[1] = iy - 0.25f;
-				ITEM_MODEL_TRANSFORMER.offset[2] = iz - 0.25f;
+				ITEM_MODEL_TRANSFORMER.offset[1] = iy;
+				ITEM_MODEL_TRANSFORMER.offset[2] = iz;
 				renderer.renderModel(getWorld(), ModelTransformer.transform(model, state, 0L, ITEM_MODEL_TRANSFORMER), state, pos, buffer, false);
 			}
 		}

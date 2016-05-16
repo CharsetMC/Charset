@@ -1,5 +1,6 @@
 package pl.asie.charset.pipes;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -92,6 +93,35 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
         if (total == 0) {
             fluidStack = null;
             fluidDirty = true;
+        }
+    }
+
+    public void writeToNBT(NBTTagCompound nbt) {
+        if (fluidStack != null) {
+            fluidStack.writeToNBT(nbt);
+            int[] amt = new int[7];
+            for (int i = 0; i <= 6; i++) {
+                amt[i] = tanks[i].amount;
+            }
+            nbt.setIntArray("TankAmts", amt);
+        }
+    }
+
+    public void readFromNBT(NBTTagCompound nbt) {
+        fluidStack = FluidStack.loadFluidStackFromNBT(nbt);
+        fluidDirty = true;
+        for (int i = 0; i <= 6; i++) {
+            tanks[i].amount = 0;
+            tanks[i].dirty = true;
+        }
+
+        if (fluidStack != null) {
+            int[] amt = nbt.getIntArray("TankAmts");
+            if (amt != null && amt.length == 7) {
+                for (int i = 0; i <= 6; i++) {
+                    tanks[i].amount = Math.min(TANK_SIZE, amt[i]);
+                }
+            }
         }
     }
 
@@ -193,10 +223,16 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
         checkPacketUpdate();
     }
 
+    void sendPacket(boolean ignoreDirty) {
+        if (owner.getWorld() != null && !owner.getWorld().isRemote) {
+            ModCharsetPipes.packet.sendToAllAround(new PacketFluidUpdate(owner, this, ignoreDirty), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+        }
+    }
+
     private void checkPacketUpdate() {
         if (fluidDirty) {
             if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-                ModCharsetPipes.packet.sendToAllAround(new PacketFluidUpdate(owner, this), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+                sendPacket(false);
             }
             return;
         }
@@ -204,7 +240,7 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
         for (int i = 0; i <= 6; i++) {
             if (tanks[i].isDirty()) {
                 if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-                    ModCharsetPipes.packet.sendToAllAround(new PacketFluidUpdate(owner, this), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+                    sendPacket(false);
                 }
                 return;
             }

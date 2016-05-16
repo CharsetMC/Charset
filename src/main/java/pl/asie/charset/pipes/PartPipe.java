@@ -290,6 +290,9 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		super.readFromNBT(nbt);
 		readItems(nbt);
 
+		NBTTagCompound tag = nbt.getCompoundTag("fluid");
+		fluid.readFromNBT(tag);
+
 		connectionCache = nbt.getByte("cc");
 		shifterDistance = nbt.getIntArray("shifterDist");
 		if (shifterDistance == null || shifterDistance.length != 6) {
@@ -330,6 +333,12 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		writeItems(nbt);
+
+		NBTTagCompound tag = new NBTTagCompound();
+		fluid.writeToNBT(tag);
+		if (tag.getSize() > 0) {
+			nbt.setTag("fluid", tag);
+		}
 
 		nbt.setByte("cc", connectionCache);
 		if (shifterDistance != null) {
@@ -593,6 +602,8 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 				p.sendPacket(true);
 			}
 		}
+
+		fluid.sendPacket(true);
 	}
 
 	@Override
