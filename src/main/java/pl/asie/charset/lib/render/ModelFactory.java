@@ -5,25 +5,18 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
-import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import pl.asie.charset.lib.utils.ClientUtils;
 
-import javax.vecmath.Matrix4f;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public abstract class ModelFactory<T extends IRenderComparable<T>> extends CharsetBakedModel {
+public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseBakedModel {
     private static final boolean DISABLE_CACHE = false;
     private static final Set<ModelFactory> FACTORIES = new HashSet<>();
 

@@ -62,9 +62,9 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		@Override
 		public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
 			if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {
-				float sizeHalf = isBlock ? 0.35f : 0.45f;
+				float size = isBlock ? 0.35f : 0.4f;
 				for (int i = 0; i < 3; i++) {
-					data[i] = (data[i] * sizeHalf / 2) + 0.075f + offset[i] - (sizeHalf / 2);
+					data[i] = ((data[i] - 0.5f) * size) + offset[i];
 				}
 			}
 			return data;

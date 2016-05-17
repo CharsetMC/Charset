@@ -1,14 +1,8 @@
 package pl.asie.charset.lib.render;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.block.model.ItemOverrideList;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.EnumFacing;
@@ -22,16 +16,16 @@ import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
      }
 
      public static IBakedModel transform(IBakedModel model, IBlockState state, long rand, IVertexTransformer transformer) {
-         List<BakedQuad>[] quads = new List[7];
+         SimpleBakedModel out = new SimpleBakedModel(model);
 
-         for (int i = 0; i < quads.length; i++) {
-             quads[i] = new ArrayList<BakedQuad>();
-             for (BakedQuad quad : model.getQuads(state, (i == 6 ? null : EnumFacing.getFront(i)), rand)) {
-                 quads[i].add(transform(quad, transformer));
+         for (int i = 0; i <= 6; i++) {
+             EnumFacing side = (i == 6 ? null : EnumFacing.getFront(i));
+             for (BakedQuad quad : model.getQuads(state, side, rand)) {
+                 out.addQuad(side, transform(quad, transformer));
              }
          }
 
-         return new TransformedModel(model, quads);
+         return out;
      }
 
      private static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) {
@@ -78,51 +72,6 @@ import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
          public void put(int elementId, float... data) {
              VertexFormatElement element = format.getElement(elementId);
              parent.put(elementId, transformer.transform(parentQuad, element, data));
-         }
-     }
-
-     private static final class TransformedModel implements IBakedModel {
-         private final IBakedModel parent;
-         private final List<BakedQuad>[] quads;
-
-         public TransformedModel(IBakedModel parent, List<BakedQuad>[] quads) {
-             this.parent = parent;
-             this.quads = quads;
-         }
-
-         @Override
-         public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-             return quads[side == null ? 6 : side.ordinal()];
-         }
-
-         @Override
-         public boolean isAmbientOcclusion() {
-             return parent.isAmbientOcclusion();
-         }
-
-         @Override
-         public boolean isGui3d() {
-             return parent.isGui3d();
-         }
-
-         @Override
-         public boolean isBuiltInRenderer() {
-             return parent.isBuiltInRenderer();
-         }
-
-         @Override
-         public TextureAtlasSprite getParticleTexture() {
-             return parent.getParticleTexture();
-         }
-
-         @Override
-         public ItemCameraTransforms getItemCameraTransforms() {
-             return parent.getItemCameraTransforms();
-         }
-
-         @Override
-         public ItemOverrideList getOverrides() {
-             return parent.getOverrides();
          }
      }
 

@@ -16,6 +16,7 @@ import mcmultipart.client.multipart.IFastMSRPart;
 import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -35,6 +36,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -50,6 +54,35 @@ import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable, IFastMSRPart {
+	public static final Property PROPERTY = new Property();
+
+	private static class Property implements IUnlistedProperty<PartPipe> {
+		private Property() {
+
+		}
+
+		@Override
+		public String getName() {
+			return "pipeTile";
+		}
+
+		@Override
+		public boolean isValid(PartPipe value) {
+			return true;
+		}
+
+		@Override
+		public Class<PartPipe> getType() {
+			return PartPipe.class;
+		}
+
+		@Override
+		public String valueToString(PartPipe value) {
+			return "!?";
+		}
+	}
+
+
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
 	final PipeFluidContainer fluid = new PipeFluidContainer(this);
@@ -57,7 +90,6 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 
 	private byte connectionCache = 0;
-	private boolean initialize;
 	private boolean neighborBlockChanged;
 	private boolean requestUpdate;
 
@@ -134,28 +166,6 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	@Override
 	public Material getMaterial() {
 		return Material.GLASS;
-	}
-
-	@Override
-	public IBlockState getExtendedState(IBlockState state) {
-		return state
-				.withProperty(Properties.DOWN, connects(EnumFacing.DOWN))
-				.withProperty(Properties.UP, connects(EnumFacing.UP))
-				.withProperty(Properties.NORTH, connects(EnumFacing.NORTH))
-				.withProperty(Properties.SOUTH, connects(EnumFacing.SOUTH))
-				.withProperty(Properties.WEST, connects(EnumFacing.WEST))
-				.withProperty(Properties.EAST, connects(EnumFacing.EAST));
-	}
-
-	@Override
-	public BlockStateContainer createBlockState() {
-		return new BlockStateContainer(MCMultiPartMod.multipart,
-				Properties.DOWN,
-				Properties.UP,
-				Properties.NORTH,
-				Properties.SOUTH,
-				Properties.WEST,
-				Properties.EAST);
 	}
 
 	@Override
@@ -643,6 +653,16 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		}
 
 		return targetItem != null ? targetItem.getStack() : null;
+	}
+
+	@Override
+	public IBlockState getExtendedState(IBlockState state) {
+		return ((IExtendedBlockState) state).withProperty(PROPERTY, this);
+	}
+
+	@Override
+	public BlockStateContainer createBlockState() {
+		return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
 	@Override

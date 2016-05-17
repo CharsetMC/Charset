@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -15,11 +16,15 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import java.util.EnumMap;
 
-public abstract class CharsetBakedModel implements IPerspectiveAwareModel {
+public abstract class BaseBakedModel implements IPerspectiveAwareModel {
     private final EnumMap<ItemCameraTransforms.TransformType, TRSRTransformation> transformMap = new EnumMap(ItemCameraTransforms.TransformType.class);
     private final ResourceLocation particle;
 
-    public CharsetBakedModel(ResourceLocation particle) {
+    public BaseBakedModel() {
+        this.particle = TextureMap.LOCATION_MISSING_TEXTURE;
+    }
+
+    public BaseBakedModel(ResourceLocation particle) {
         this.particle = particle;
     }
 
