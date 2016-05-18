@@ -1,11 +1,10 @@
 package pl.asie.charset.lib.utils;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Function;
 import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraftforge.client.model.pipeline.LightUtil;
+import net.minecraft.client.renderer.block.model.ModelRotation;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -23,15 +22,17 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.render.CharsetFaceBakery;
 
-public final class ClientUtils {
+public final class RenderUtils {
+	public static final CharsetFaceBakery BAKERY = new CharsetFaceBakery();
 	public static final Function<ResourceLocation, TextureAtlasSprite> textureGetter = new Function<ResourceLocation, TextureAtlasSprite>() {
 		public TextureAtlasSprite apply(ResourceLocation location) {
 			return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
 		}
 	};
 
-	private ClientUtils() {
+	private RenderUtils() {
 
 	}
 
@@ -71,15 +72,6 @@ public final class ClientUtils {
 		return null;
 	}
 
-	public static int getFaceColor(int color, EnumFacing facing) {
-		int c = color & 0xFF000000;
-		float b = LightUtil.diffuseLight(facing);
-		c |= (int) (((color & 0xFF0000) >> 16) * b) << 16;
-		c |= (int) (((color & 0x00FF00) >> 8) * b) << 8;
-		c |= (int) (((color & 0x0000FF) >> 0) * b) << 0;
-		return c;
-	}
-
 	public static BakedQuad clone(BakedQuad quad) {
 		return new BakedQuad(quad.getVertexData(), quad.getTintIndex(), quad.getFace(), quad.getSprite(), quad.shouldApplyDiffuseLighting(), quad.getFormat());
 	}
@@ -87,7 +79,6 @@ public final class ClientUtils {
 	public static BakedQuad recolorQuad(BakedQuad quad, int color) {
 		int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
 		int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-		//int cc = quad.getFace() != null ? getFaceColor(color, quad.getFace()) : color;
 		int[] vertexData = quad.getVertexData();
 		for (int i = 0; i < 4; i++) {
 			vertexData[v * i + c] = multiplyColor(vertexData[v * i + c], color);
@@ -104,17 +95,10 @@ public final class ClientUtils {
 	}
 
 	public static void addRecoloredQuads(List<BakedQuad> src, int color, List<BakedQuad> target, EnumFacing facing) {
-		boolean hasColor = false;
-		int col = 0;
-		/* if (facing != null) {
-			hasColor = true;
-			col = getFaceColor(color, facing);
-		} */
 		for (BakedQuad quad : src) {
 			BakedQuad quad1 = clone(quad);
 			int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
 			int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-			//int cc = hasColor ? col : getFaceColor(color, quad1.getFace());
 			int[] vertexData = quad1.getVertexData();
 			for (int i = 0; i < 4; i++) {
 				vertexData[v * i + c] = multiplyColor(vertexData[v * i + c], color);

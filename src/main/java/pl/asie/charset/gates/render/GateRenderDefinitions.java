@@ -17,7 +17,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IRetexturableModel;
 
-import pl.asie.charset.lib.utils.ClientUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 /**
  * Created by asie on 12/27/15.
@@ -73,7 +73,7 @@ public class GateRenderDefinitions {
 				return modelObjs.get(name);
 			}
 
-			IModel model = ClientUtils.getModel(new ResourceLocation(models.get(name)));
+			IModel model = RenderUtils.getModel(new ResourceLocation(models.get(name)));
 			if (model != null) {
 				if (model instanceof IRetexturableModel) {
 					model = ((IRetexturableModel) model).retexture(ImmutableMap.copyOf(textures));

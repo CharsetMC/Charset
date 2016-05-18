@@ -7,11 +7,10 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import pl.asie.charset.lib.utils.ClientUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.vecmath.Matrix4f;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class SimpleBakedModel implements IPerspectiveAwareModel {
     public void addModel(IBakedModel model, int tint) {
         for (int i = 0; i < 7; i++) {
             EnumFacing side = i == 6 ? null : EnumFacing.getFront(i);
-            ClientUtils.addRecoloredQuads(model.getQuads(null, side, 0), tint, quads[i], side);
+            RenderUtils.addRecoloredQuads(model.getQuads(null, side, 0), tint, quads[i], side);
         }
     }
 

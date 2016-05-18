@@ -3,7 +3,6 @@ package pl.asie.charset.gates.render;
 import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -22,7 +21,7 @@ import pl.asie.charset.gates.ItemGate;
 import pl.asie.charset.gates.PartGate;
 import pl.asie.charset.lib.render.SimpleBakedModel;
 import pl.asie.charset.lib.render.ModelFactory;
-import pl.asie.charset.lib.utils.ClientUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 public class RendererGate extends ModelFactory<PartGate> {
 	public static final RendererGate INSTANCE = new RendererGate();
@@ -68,7 +67,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 		IModel model = definition.getModel(gate.getModelName());
 		if (model != null) {
-			result.addModel(model.bake(transform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
+			result.addModel(model.bake(transform, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter));
 		}
 		IRetexturableModel layerModel = (IRetexturableModel) definition.getModel("layer");
 
@@ -96,7 +95,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 					layerModels.put(layer.texture, model);
 				}
 
-				IBakedModel bakedModel = model.bake(layerTransform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter);
+				IBakedModel bakedModel = model.bake(layerTransform, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter);
 
 				int color = state == PartGate.State.ON ? base.colorMul.get("on") :
 						(state == PartGate.State.OFF ? base.colorMul.get("off") : base.colorMul.get("disabled"));
@@ -118,7 +117,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 						layerModels.put(texture, model);
 					}
 
-					result.addModel(model.bake(layerTransform, DefaultVertexFormats.BLOCK, ClientUtils.textureGetter));
+					result.addModel(model.bake(layerTransform, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter));
 				}
 			}
 		}
@@ -144,7 +143,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 			result.addModel(
 					definition.getModel(state == PartGate.State.ON ? "torch_on" : "torch_off")
 							.bake(new ModelStateComposition(
-									transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f, 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ClientUtils.textureGetter)
+									transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f, 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, RenderUtils.textureGetter)
 			);
 		}
 
@@ -153,7 +152,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 				result.addModel(
 						definition.getModel(gate.getInverterState(facing) ? "torch_on" : "torch_off")
 								.bake(new ModelStateComposition(
-										transform, new TRSRTransformation(new Vector3f(((facing.getFrontOffsetX() * 7)) / 16.0f, 0f, ((facing.getFrontOffsetZ() * 7)) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ClientUtils.textureGetter)
+										transform, new TRSRTransformation(new Vector3f(((facing.getFrontOffsetX() * 7)) / 16.0f, 0f, ((facing.getFrontOffsetZ() * 7)) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, RenderUtils.textureGetter)
 				);
 			}
 		}

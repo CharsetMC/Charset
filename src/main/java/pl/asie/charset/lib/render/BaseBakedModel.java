@@ -10,7 +10,7 @@ import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.common.model.TRSRTransformation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import pl.asie.charset.lib.utils.ClientUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -51,7 +51,7 @@ public abstract class BaseBakedModel implements IPerspectiveAwareModel {
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return ClientUtils.textureGetter.apply(particle);
+        return RenderUtils.textureGetter.apply(particle);
     }
 
     @Override

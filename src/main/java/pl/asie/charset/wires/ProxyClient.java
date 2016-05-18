@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.api.wires.WireType;
-import pl.asie.charset.lib.utils.ClientUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 import pl.asie.charset.wires.render.RendererWire;
 
@@ -29,13 +29,13 @@ public class ProxyClient extends ProxyCommon {
 			EnumFacing face = faces[i];
 			if (wire.connectsAny(face)) {
 				int lineMask = 0xfff;
-				lineMask &= ~ClientUtils.getLineMask(face.getOpposite());
-				ClientUtils.drawSelectionBoundingBox(wire.getSelectionBox(i + 1), lineMask);
-				lineMaskCenter &= ~ClientUtils.getLineMask(face);
+				lineMask &= ~RenderUtils.getLineMask(face.getOpposite());
+				RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(i + 1), lineMask);
+				lineMaskCenter &= ~RenderUtils.getLineMask(face);
 			}
 		}
 		if (lineMaskCenter != 0) {
-			ClientUtils.drawSelectionBoundingBox(wire.getSelectionBox(0), lineMaskCenter);
+			RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(0), lineMaskCenter);
 		}
 	}
 

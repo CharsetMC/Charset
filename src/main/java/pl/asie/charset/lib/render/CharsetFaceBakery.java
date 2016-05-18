@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.lib.utils.ClientUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 /**
  * Created by asie on 3/31/16.
@@ -12,7 +12,7 @@ import pl.asie.charset.lib.utils.ClientUtils;
 public class CharsetFaceBakery extends FaceBakery {
     public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex,
                                    TextureAtlasSprite icon, EnumFacing facing, ModelRotation rot, boolean uvLocked) {
-        return makeBakedQuad(min, max, tintIndex, ClientUtils.calculateUV(min, max, facing), icon, facing, rot, uvLocked);
+        return makeBakedQuad(min, max, tintIndex, RenderUtils.calculateUV(min, max, facing), icon, facing, rot, uvLocked);
     }
 
     public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex, float[] uv,
@@ -24,7 +24,7 @@ public class CharsetFaceBakery extends FaceBakery {
         );
 
         if (tintIndex != -1) {
-            ClientUtils.recolorQuad(quad, tintIndex);
+            RenderUtils.recolorQuad(quad, tintIndex);
         }
 
         return quad;

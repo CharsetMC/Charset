@@ -13,10 +13,10 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
-import pl.asie.charset.lib.render.CharsetFaceBakery;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.render.SimpleBakedModel;
 import pl.asie.charset.lib.render.SpritesheetFactory;
+import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.wires.ItemWire;
 import pl.asie.charset.wires.WireUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
@@ -41,7 +41,6 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             ModelRotation.X270_Y90
     };
 
-    private final CharsetFaceBakery faceBakery = new CharsetFaceBakery();
     private final TIntObjectMap<PartWireBase> stackMap = new TIntObjectHashMap<>();
     private final EnumMap<WireType, WireSheet> sheetMap = new EnumMap<>(WireType.class);
 
@@ -108,7 +107,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         for (int i = 0; i < 2; i++) {
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             minX, maxX, renderColor,
                             sheet.top[cmcX], i == 0 ? EnumFacing.WEST : EnumFacing.EAST,
                             ModelRotation.X0_Y0, true
@@ -116,7 +115,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             minY, maxY, renderColor,
                             sheet.top[cmcY], i == 0 ? EnumFacing.DOWN : EnumFacing.UP,
                             ModelRotation.X0_Y0, true
@@ -124,7 +123,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             minZ, maxZ, renderColor,
                             sheet.top[cmcZ], i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH,
                             ModelRotation.X0_Y0, true
@@ -150,7 +149,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
         for (EnumFacing f : EnumFacing.VALUES) {
             if (wc(wire, f)) {
                 quads.add(
-                        faceBakery.makeBakedQuad(
+                        RenderUtils.BAKERY.makeBakedQuad(
                                 new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
                                 renderColor,
                                 f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[]{max, min, min, max} : new float[]{min, min, max, max},
@@ -178,7 +177,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             float[] topUV = new float[]{min, 16 - height, max, 16};
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, 0, -height), new Vector3f(max, height, -height),
                             renderColor, edgeUVFlipped,
                             sheet.top[15], EnumFacing.NORTH, rot, false
@@ -186,7 +185,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, height, -height), new Vector3f(max, height, 0),
                             renderColor, topUV,
                             sheet.top[15], EnumFacing.UP, rot, false
@@ -194,7 +193,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, 0, -height), new Vector3f(min, height, 0),
                             renderColor, edgeUV,
                             sheet.edge, EnumFacing.WEST, rot, false
@@ -202,7 +201,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(max, 0, -height), new Vector3f(max, height, 0),
                             renderColor, edgeUVFlipped,
                             sheet.edge, EnumFacing.EAST, rot, false
@@ -212,7 +211,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             float[] topUV = new float[]{min, 0, max, height};
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, 0, 16 + height), new Vector3f(max, height, 16 + height),
                             renderColor, edgeUVFlipped,
                             sheet.top[15], EnumFacing.SOUTH, rot, false
@@ -220,7 +219,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, height, 16), new Vector3f(max, height, 16 + height),
                             renderColor, topUV,
                             sheet.top[15], EnumFacing.UP, rot, false
@@ -228,7 +227,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, 0, 16), new Vector3f(min, height, 16 + height),
                             renderColor, edgeUV,
                             sheet.edge, EnumFacing.WEST, rot, false
@@ -236,7 +235,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(max, 0, 16), new Vector3f(max, height, 16 + height),
                             renderColor, edgeUVFlipped,
                             sheet.edge, EnumFacing.EAST, rot, false
@@ -246,7 +245,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             float[] topUV = new float[]{16 - height, min, 16, max};
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(-height, height, min), new Vector3f(0, height, max),
                             renderColor, topUV,
                             sheet.top[15], EnumFacing.UP, rot, false
@@ -254,7 +253,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(-height, 0, min), new Vector3f(-height, height, max),
                             renderColor, edgeUV,
                             sheet.top[15], EnumFacing.WEST, rot, false
@@ -262,7 +261,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(-height, 0, min), new Vector3f(0, height, min),
                             renderColor, edgeUVFlipped,
                             sheet.edge, EnumFacing.NORTH, rot, false
@@ -270,7 +269,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(-height, 0, max), new Vector3f(0, height, max),
                             renderColor, edgeUV,
                             sheet.edge, EnumFacing.SOUTH, rot, false
@@ -280,7 +279,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             float[] topUV = new float[]{0, min, height, max};
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(16, height, min), new Vector3f(16 + height, height, max),
                             renderColor, topUV,
                             sheet.top[15], EnumFacing.UP, rot, false
@@ -288,7 +287,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(16 + height, 0, min), new Vector3f(16 + height, height, max),
                             renderColor, edgeUV,
                             sheet.top[15], EnumFacing.EAST, rot, false
@@ -296,7 +295,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(16, 0, min), new Vector3f(16 + height, height, min),
                             renderColor, edgeUVFlipped,
                             sheet.edge, EnumFacing.NORTH, rot, false
@@ -304,7 +303,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             );
 
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(16, 0, max), new Vector3f(16 + height, height, max),
                             renderColor, edgeUV,
                             sheet.edge, EnumFacing.SOUTH, rot, false
@@ -366,7 +365,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
         }
 
         quads.add(
-                faceBakery.makeBakedQuad(
+                RenderUtils.BAKERY.makeBakedQuad(
                         from, to,
                         renderColor, new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
                         sheet.top[cmc], EnumFacing.UP,
@@ -377,7 +376,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
         from.setY(0.0F);
         to.setY(0.0F);
         quads.add(
-                faceBakery.makeBakedQuad(
+                RenderUtils.BAKERY.makeBakedQuad(
                         from, to,
                         renderColor, new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
                         sheet.top[cmc], EnumFacing.DOWN, rot, true
@@ -397,7 +396,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         // getIcon(false, cmc == 1, crossroadsX, EnumFacing.WEST)
         quads.add(
-                faceBakery.makeBakedQuad(
+                RenderUtils.BAKERY.makeBakedQuad(
                         fromX, toX,
                         renderColor, new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
                         sheet.side, EnumFacing.WEST, rot, false
@@ -406,7 +405,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         // getIcon(false, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH)
         quads.add(
-                faceBakery.makeBakedQuad(
+                RenderUtils.BAKERY.makeBakedQuad(
                         fromZ, toZ,
                         renderColor, new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
                         sheet.side, EnumFacing.NORTH, rot, false
@@ -421,7 +420,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         // getIcon(false, cmc == 2, crossroadsX, EnumFacing.EAST)
         quads.add(
-                faceBakery.makeBakedQuad(
+                RenderUtils.BAKERY.makeBakedQuad(
                         fromX, toX,
                         renderColor, new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
                         sheet.side, EnumFacing.EAST, rot, false
@@ -430,7 +429,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         // getIcon(false, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH)
         quads.add(
-                faceBakery.makeBakedQuad(
+                RenderUtils.BAKERY.makeBakedQuad(
                         fromZ, toZ,
                         renderColor, new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
                         sheet.side, EnumFacing.SOUTH, rot, false
@@ -443,7 +442,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         if (connectionMatrix[0]) {
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
                             renderColor, edgeUVFlipped,
                             sheet.edge, EnumFacing.NORTH, rot, false
@@ -453,7 +452,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         if (connectionMatrix[1]) {
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
                             renderColor, edgeUV,
                             sheet.edge, EnumFacing.SOUTH, rot, false
@@ -463,7 +462,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         if (connectionMatrix[2]) {
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
                             renderColor, edgeUV,
                             sheet.edge, EnumFacing.WEST, rot, false
@@ -473,7 +472,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
 
         if (connectionMatrix[3]) {
             quads.add(
-                    faceBakery.makeBakedQuad(
+                    RenderUtils.BAKERY.makeBakedQuad(
                             new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
                             renderColor, edgeUVFlipped,
                             sheet.edge, EnumFacing.EAST, rot, false
