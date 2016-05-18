@@ -226,7 +226,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					if (model == null) {
 						Vector3f from = TANK_FROM[i];
 						Vector3f to = TANK_TO[i];
-						to = to.translate(0f, (from.y - to.y) * (1f - ((float) tank.amount / tank.getCapacity())), 0f);
+						to = new Vector3f(to.x, to.y + ((from.y - to.y) * (1f - ((float) tank.amount / tank.getCapacity()))), to.z);
 						model = renderFluidCube(world, pos, from, to, entry, buffer);
 						fluidModelCache.put(entry, model);
 					}
