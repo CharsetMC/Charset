@@ -57,12 +57,30 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 
 	private final class ItemModelTransformer implements ModelTransformer.IVertexTransformer {
 		private final float[] offset = new float[3];
+		private EnumFacing direction;
 		private boolean isBlock;
 
 		@Override
 		public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
 			if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {
 				float size = isBlock ? 0.35f : 0.4f;
+				if (direction != null) {
+					float z = data[0];
+					switch (direction) {
+						case WEST:
+							data[0] = 1.0f - data[0];
+							data[2] = 1.0f - data[2];
+							break;
+						case NORTH:
+							data[0] = data[2];
+							data[2] = 1.0f - z;
+							break;
+						case SOUTH:
+							data[0] = 1.0f - data[2];
+							data[2] = z;
+							break;
+					}
+				}
 				for (int i = 0; i < 3; i++) {
 					data[i] = ((data[i] - 0.5f) * size) + offset[i];
 				}
@@ -266,6 +284,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 				}
 
 				ITEM_MODEL_TRANSFORMER.isBlock = stack.getItem() instanceof ItemBlock;
+				ITEM_MODEL_TRANSFORMER.direction = id;
 				ITEM_MODEL_TRANSFORMER.offset[0] = ix;
 				ITEM_MODEL_TRANSFORMER.offset[1] = iy;
 				ITEM_MODEL_TRANSFORMER.offset[2] = iz;

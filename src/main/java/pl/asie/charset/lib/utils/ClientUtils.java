@@ -87,29 +87,37 @@ public final class ClientUtils {
 	public static BakedQuad recolorQuad(BakedQuad quad, int color) {
 		int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
 		int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-		int cc = quad.getFace() != null ? getFaceColor(color, quad.getFace()) : color;
+		//int cc = quad.getFace() != null ? getFaceColor(color, quad.getFace()) : color;
 		int[] vertexData = quad.getVertexData();
 		for (int i = 0; i < 4; i++) {
-			vertexData[v * i + c] = cc;
+			vertexData[v * i + c] = multiplyColor(vertexData[v * i + c], color);
 		}
 		return quad;
+	}
+
+	private static int multiplyColor(int src, int dst) {
+		int out = 0;
+		for (int i = 0; i < 32; i += 8) {
+			out |= ((((src >> i) & 0xFF) * ((dst >> i) & 0xFF) / 0xFF) & 0xFF) << i;
+		}
+		return out;
 	}
 
 	public static void addRecoloredQuads(List<BakedQuad> src, int color, List<BakedQuad> target, EnumFacing facing) {
 		boolean hasColor = false;
 		int col = 0;
-		if (facing != null) {
+		/* if (facing != null) {
 			hasColor = true;
 			col = getFaceColor(color, facing);
-		}
+		} */
 		for (BakedQuad quad : src) {
 			BakedQuad quad1 = clone(quad);
 			int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
 			int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-			int cc = hasColor ? col : getFaceColor(color, quad1.getFace());
+			//int cc = hasColor ? col : getFaceColor(color, quad1.getFace());
 			int[] vertexData = quad1.getVertexData();
 			for (int i = 0; i < 4; i++) {
-				vertexData[v * i + c] = cc;
+				vertexData[v * i + c] = multiplyColor(vertexData[v * i + c], color);
 			}
 			target.add(quad1);
 		}

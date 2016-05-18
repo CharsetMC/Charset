@@ -4,13 +4,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.render.ModelPipeLike;
-import pl.asie.charset.lib.utils.ClientUtils;
 
-/**
- * Created by asie on 5/17/16.
- */
 public class ModelPipe extends ModelPipeLike<PartPipe> {
-    public static final ResourceLocation PIPE_TEXTURE_LOC = new ResourceLocation("charsetpipes:blocks/pipe");
+    public static final ResourceLocation PIPE_TEXTURE_LOC = new ResourceLocation("charsetpipes", "blocks/pipe");
+    public static TextureAtlasSprite[] sprites;
 
     public ModelPipe() {
         super(PartPipe.PROPERTY);
@@ -22,17 +19,22 @@ public class ModelPipe extends ModelPipeLike<PartPipe> {
     }
 
     @Override
+    public int getInsideColor(EnumFacing facing) {
+        return facing.getAxis() == EnumFacing.Axis.Y ? 0xFFA0A0A0 : 0xFFC8C8C8;
+    }
+
+    @Override
     public boolean isOpaque() {
         return false;
     }
 
     @Override
     public TextureAtlasSprite getTexture(EnumFacing side, int connectionMatrix) {
-        return ClientUtils.textureGetter.apply(PIPE_TEXTURE_LOC);
+        return sprites != null ? sprites[connectionMatrix] : null;
     }
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return ClientUtils.textureGetter.apply(PIPE_TEXTURE_LOC);
+        return sprites != null ? sprites[15] : null;
     }
 }

@@ -12,6 +12,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.render.ModelPipeLike;
+import pl.asie.charset.lib.render.SpritesheetFactory;
 
 public class ProxyClient extends ProxyCommon {
 	private SpecialRendererPipe rendererPipe;
@@ -35,7 +36,7 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		event.getMap().registerSprite(ModelPipe.PIPE_TEXTURE_LOC);
+		ModelPipe.sprites = SpritesheetFactory.register(event.getMap(), ModelPipe.PIPE_TEXTURE_LOC, 4, 4);
 		rendererPipe.clearCache();
 	}
 }
