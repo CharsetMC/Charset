@@ -17,6 +17,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IInteractionObject;
 
+import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.storage.ModCharsetStorage;
@@ -24,7 +25,7 @@ import pl.asie.charset.storage.ModCharsetStorage;
 /**
  * Created by asie on 1/10/16.
  */
-public class TileBackpack extends TileEntity implements IInteractionObject, IInventory, IInventoryOwner {
+public class TileBackpack extends TileBase implements IInteractionObject, IInventory, IInventoryOwner {
 	private InventorySimple inventory = new InventorySimple(27, this);
 	private int color = -1;
 
@@ -42,61 +43,36 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 		return null;
 	}
 
-	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		if (color >= 0) {
-			NBTTagCompound tag = new NBTTagCompound();
-			tag.setInteger("color", color);
-			return new SPacketUpdateTileEntity(getPos(), getBlockMetadata(), tag);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-		if (pkt != null && pkt.getNbtCompound() != null && pkt.getNbtCompound().hasKey("color")) {
-			int oldColor = color;
-			color = pkt.getNbtCompound().getInteger("color");
-			if (oldColor != color) {
-				worldObj.markBlockRangeForRenderUpdate(pos, pos);
-			}
-		}
-	}
-
 	public void readFromItemStack(ItemStack stack) {
-		readCustomData(stack.getTagCompound());
+		readNBTData(stack.getTagCompound(), false);
 	}
 
 	public ItemStack writeToItemStack() {
 		ItemStack stack = new ItemStack(ModCharsetStorage.backpackBlock);
 		stack.setTagCompound(new NBTTagCompound());
-		writeCustomData(stack.getTagCompound());
+		writeNBTData(stack.getTagCompound(), false);
 		return stack;
 	}
 
-	public void readCustomData(NBTTagCompound nbt) {
+	@Override
+	public void readNBTData(NBTTagCompound nbt, boolean isClient) {
+		int oldColor = color;
 		color = nbt.hasKey("color") ? nbt.getInteger("color") : -1;
-		inventory.readFromNBT(nbt, "items");
+		if (!isClient) {
+			inventory.readFromNBT(nbt, "items");
+		} else if (oldColor != color) {
+			worldObj.markBlockRangeForRenderUpdate(pos, pos);
+		}
 	}
 
-	public void writeCustomData(NBTTagCompound nbt) {
+	@Override
+	public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
 		if (color >= 0) {
 			nbt.setInteger("color", color);
 		}
-		inventory.writeToNBT(nbt, "items");
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
-		super.readFromNBT(nbt);
-		readCustomData(nbt);
-	}
-
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-		writeCustomData(nbt);
+		if (!isClient) {
+			inventory.writeToNBT(nbt, "items");
+		}
 		return nbt;
 	}
 

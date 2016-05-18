@@ -95,7 +95,7 @@ public class BlockBackpack extends BlockContainer {
 		if (stack.hasTagCompound()) {
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile instanceof TileBackpack) {
-				((TileBackpack) tile).readCustomData(stack.getTagCompound());
+				((TileBackpack) tile).readNBTData(stack.getTagCompound(), false);
 			}
 		}
 	}

@@ -195,35 +195,25 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		}
 	}
 
-	// TODO: Replace with custom packet for redstone level-only sync
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		NBTTagCompound tag = new NBTTagCompound();
-		writeToNBT(tag);
-		return new SPacketUpdateTileEntity(pos, 2, tag);
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-		readFromNBT(pkt.getNbtCompound());
-		worldObj.markBlockRangeForRenderUpdate(pos, pos);
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
-		super.readFromNBT(nbt);
+	public void readNBTData(NBTTagCompound nbt, boolean isClient) {
 		redstoneLevel = nbt.getByte("rs");
+
 		NBTTagList filterList = nbt.getTagList("filters", 10);
 		for (int i = 0; i < Math.min(filterList.tagCount(), filters.length); i++) {
 			NBTTagCompound cpd = filterList.getCompoundTagAt(i);
 			filters[i] = ItemStack.loadItemStackFromNBT(cpd);
 		}
+
+		if (isClient) {
+			worldObj.markBlockRangeForRenderUpdate(pos, pos);
+		}
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
+	public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
 		nbt.setByte("rs", (byte) redstoneLevel);
+
 		NBTTagList filterList = new NBTTagList();
 		for (int i = 0; i < filters.length; i++) {
 			NBTTagCompound fnbt = new NBTTagCompound();
@@ -233,6 +223,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			filterList.appendTag(fnbt);
 		}
 		nbt.setTag("filters", filterList);
+
 		return nbt;
 	}
 
