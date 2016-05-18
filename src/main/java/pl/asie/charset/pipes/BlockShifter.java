@@ -170,7 +170,7 @@ public class BlockShifter extends BlockContainer {
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighborBlock) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock) {
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile instanceof TileShifter) {
 			((TileShifter) tile).updateRedstoneLevel();

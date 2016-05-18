@@ -45,9 +45,10 @@ public class PartWireBundled extends PartWireBase implements IBundledReceiver, I
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setIntArray("s", signalLevel);
+		return nbt;
 	}
 
 	private void propagate(int color, byte[][] nValues) {

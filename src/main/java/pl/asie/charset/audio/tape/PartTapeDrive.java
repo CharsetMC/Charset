@@ -102,12 +102,13 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		inventory.writeToNBT(nbt, "items");
 		nbt.setByte("facing", (byte) facing.ordinal());
 		NBTTagCompound stateNbt = state.serializeNBT();
 		nbt.setTag("state", stateNbt);
+		return nbt;
 	}
 
 	@Override

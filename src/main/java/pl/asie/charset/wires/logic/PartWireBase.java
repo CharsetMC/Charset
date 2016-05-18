@@ -5,7 +5,7 @@ import java.util.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import mcmultipart.client.multipart.AdvancedEffectRenderer;
+import mcmultipart.client.multipart.AdvancedParticleManager;
 import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
@@ -118,9 +118,9 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addDestroyEffects(AdvancedEffectRenderer advancedEffectRenderer) {
+	public boolean addDestroyEffects(AdvancedParticleManager AdvancedParticleManager) {
 		// TODO
-		//advancedEffectRenderer.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.handlePartState(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())).getParticleTexture());
+		//AdvancedParticleManager.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.handlePartState(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())).getParticleTexture());
 		return true;
 	}
 
@@ -133,7 +133,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
+	public boolean addHitEffects(PartMOP partMOP, AdvancedParticleManager AdvancedParticleManager) {
 		return true;
 	}
 
@@ -241,7 +241,7 @@ public abstract class PartWireBase extends Multipart implements
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		nbt.setByte("t", (byte) type.ordinal());
 		nbt.setByte("l", (byte) location.ordinal());
 		nbt.setByte("iC", internalConnections);
@@ -251,6 +251,7 @@ public abstract class PartWireBase extends Multipart implements
 		}
 		nbt.setByte("oS", occludedSides);
 		nbt.setByte("coS", cornerOccludedSides);
+		return nbt;
 	}
 
 	@Override

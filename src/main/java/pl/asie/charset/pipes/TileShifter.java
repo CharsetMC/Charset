@@ -197,7 +197,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	// TODO: Replace with custom packet for redstone level-only sync
 	@Override
-	public Packet getDescriptionPacket() {
+	public SPacketUpdateTileEntity getUpdatePacket() {
 		NBTTagCompound tag = new NBTTagCompound();
 		writeToNBT(tag);
 		return new SPacketUpdateTileEntity(pos, 2, tag);
@@ -221,7 +221,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setByte("rs", (byte) redstoneLevel);
 		NBTTagList filterList = new NBTTagList();
@@ -233,6 +233,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			filterList.appendTag(fnbt);
 		}
 		nbt.setTag("filters", filterList);
+		return nbt;
 	}
 
 	public void updateRedstoneLevel() {

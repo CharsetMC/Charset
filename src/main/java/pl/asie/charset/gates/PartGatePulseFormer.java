@@ -21,9 +21,10 @@ public class PartGatePulseFormer extends PartGate {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		tag.setByte("pl", pulse);
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
+		tag.setByte("pl", pulse);
+		return tag;
 	}
 
 	@Override

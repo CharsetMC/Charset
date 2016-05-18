@@ -43,7 +43,7 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 	}
 
 	@Override
-	public Packet getDescriptionPacket() {
+	public SPacketUpdateTileEntity getUpdatePacket() {
 		if (color >= 0) {
 			NBTTagCompound tag = new NBTTagCompound();
 			tag.setInteger("color", color);
@@ -94,9 +94,10 @@ public class TileBackpack extends TileEntity implements IInteractionObject, IInv
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		writeCustomData(nbt);
+		return nbt;
 	}
 
 	@Override

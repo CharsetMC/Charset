@@ -579,7 +579,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag.setByteArray("in", inputs);
 		tag.setByte("f", (byte) side.ordinal());
 		tag.setByte("t", (byte) top.ordinal());
@@ -589,6 +589,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		if (pendingTick != 0) {
 			tag.setByte("p", (byte) pendingTick);
 		}
+		return tag;
 	}
 
 	public void readItemNBT(NBTTagCompound tag) {

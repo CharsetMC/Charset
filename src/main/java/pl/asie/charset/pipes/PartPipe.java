@@ -11,7 +11,7 @@ import java.util.Set;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import mcmultipart.client.multipart.AdvancedEffectRenderer;
+import mcmultipart.client.multipart.AdvancedParticleManager;
 import mcmultipart.client.multipart.IFastMSRPart;
 import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
@@ -177,7 +177,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addDestroyEffects(AdvancedEffectRenderer advancedEffectRenderer) {
+	public boolean addDestroyEffects(AdvancedParticleManager advancedEffectRenderer) {
 		advancedEffectRenderer.addBlockDestroyEffects(getPos(),
 				Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())));
 		return true;
@@ -185,7 +185,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addHitEffects(PartMOP partMOP, AdvancedEffectRenderer advancedEffectRenderer) {
+	public boolean addHitEffects(PartMOP partMOP, AdvancedParticleManager advancedEffectRenderer) {
 		return true;
 	}
 
@@ -340,7 +340,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		writeItems(nbt);
 
@@ -354,6 +354,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		if (shifterDistance != null) {
 			nbt.setIntArray("shifterDist", shifterDistance);
 		}
+		return nbt;
 	}
 
 	@Override
@@ -421,7 +422,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		TileEntity tile;
 
 		while ((pipe = PipeUtils.getPipe(getWorld(), p, dirO)) instanceof PartPipe) {
-			p.offsetMutable(dirO);
+			p.move(dirO);
 			dist++;
 
 			if (!pipe.connects(dirO)) {

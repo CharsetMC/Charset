@@ -89,6 +89,7 @@ public class TileIronNote extends TileEntity {
 
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
+		super.readFromNBT(compound);
 		lastInput = compound.getByteArray("lastInput");
 		if (lastInput == null || lastInput.length != 16) {
 			lastInput = new byte[16];
@@ -96,8 +97,10 @@ public class TileIronNote extends TileEntity {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound compound) {
+	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+		super.writeToNBT(compound);
 		compound.setByteArray("lastInput", lastInput);
+		return compound;
 	}
 
 	private void onBundledInputChanged(EnumFacing face) {

@@ -72,9 +72,10 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setShort("s", (short) signalLevel);
+		return nbt;
 	}
 
 	@Override

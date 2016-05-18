@@ -28,8 +28,9 @@ public class PartSlab extends Multipart implements ISlottedPart, INormallyOcclud
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag.setBoolean("t", isTop);
+		return tag;
 	}
 
 	@Override

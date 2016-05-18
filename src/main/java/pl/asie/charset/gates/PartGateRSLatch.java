@@ -79,10 +79,11 @@ public class PartGateRSLatch extends PartGate {
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+		super.writeToNBT(tag);
 		tag.setBoolean("tg", toggled);
 		tag.setBoolean("br", burnt);
-		super.writeToNBT(tag);
+		return tag;
 	}
 
 	@Override
