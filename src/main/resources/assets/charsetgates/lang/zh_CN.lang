@@ -1,0 +1,11 @@
+part.charset.gate.nand=与非门(NAND)
+part.charset.gate.nand.i=与门(AND)
+part.charset.gate.nor=或非门(NOR)
+part.charset.gate.nor.i=或门(OR)
+part.charset.gate.xor=异或门(XOR)
+part.charset.gate.xor.i=同或门(XNOR)
+part.charset.gate.pulse_former=脉冲发生器
+part.charset.gate.multiplexer=数据选择器
+part.charset.gate.rs_latch=RS锁存器
+
+item.charset.screwdriver.name=螺丝刀
