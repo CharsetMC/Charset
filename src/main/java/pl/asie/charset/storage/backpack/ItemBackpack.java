@@ -45,6 +45,7 @@ public class ItemBackpack extends ItemBlock implements IDyeableItem {
 
 	public ItemBackpack(Block block) {
 		super(block);
+		setMaxStackSize(1);
 	}
 
 	public static ItemStack getBackpack(EntityPlayer player) {

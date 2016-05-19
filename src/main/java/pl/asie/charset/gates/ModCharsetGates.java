@@ -74,12 +74,13 @@ public class ModCharsetGates {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		packet = new PacketRegistry(ModCharsetGates.MODID);
-		registerGateStack(ItemGate.getStack(new PartGateNOR().setInvertedSides(0b0001)), "scs", "scs", "sss");
-		registerGateStack(ItemGate.getStack(new PartGateNAND().setInvertedSides(0b0001)), "wcw", "ccc", "sws");
-		registerGateStack(ItemGate.getStack(new PartGateXOR()), "wsw", "cwc", "scs");
-		registerGateStack(ItemGate.getStack(new PartGateNOR()), "sws", "scs", "sss");
-		registerGateStack(ItemGate.getStack(new PartGateNAND()), "www", "ccc", "sws");
-		registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)), "wcw", "cwc", "scs");
+
+		registerGateStack(ItemGate.getStack(new PartGateNOR().setInvertedSides(0b0001)), "sts", "scs", "sss");
+		registerGateStack(ItemGate.getStack(new PartGateNAND().setInvertedSides(0b0001)), "wtw", "ccc", "sws");
+		registerGateStack(ItemGate.getStack(new PartGateXOR()), "w w", "cwc", "scs");
+		registerGateStack(ItemGate.getStack(new PartGateNOR()), "s s", "scs", "sss");
+		registerGateStack(ItemGate.getStack(new PartGateNAND()), "w w", "ccc", "sws");
+		registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)), "wtw", "cwc", "scs");
 		registerGateStack(ItemGate.getStack(new PartGatePulseFormer()), "wcw", "cwc", "wws");
 		registerGateStack(ItemGate.getStack(new PartGateMultiplexer()), "wcw", "csc", "wcw");
 		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs");

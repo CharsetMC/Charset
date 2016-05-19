@@ -84,14 +84,13 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 	}
 
 	private final class ItemModelTransformer implements ModelTransformer.IVertexTransformer {
-		private final float[] offset = new float[3];
+		private float[] offset;
+		private float scale;
 		private EnumFacing direction;
-		private boolean isBlock;
 
 		@Override
 		public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
 			if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {
-				float size = isBlock ? 0.35f : 0.4f;
 				if (direction != null) {
 					float z = data[0];
 					switch (direction) {
@@ -110,7 +109,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					}
 				}
 				for (int i = 0; i < 3; i++) {
-					data[i] = ((data[i] - 0.5f) * size) + offset[i];
+					data[i] = ((data[i] - 0.5f) * scale) + offset[i];
 				}
 			}
 			return data;
@@ -200,6 +199,42 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 
 	private final Set<PipeItem> SLOW_ITEMS = new HashSet<>();
 
+	private float getItemScale(PipeItem item) {
+		return item.stack.getItem() instanceof ItemBlock ? 0.35f : 0.4f;
+	}
+
+	private float[] calculateItemOffset(PipeItem item, float partialTicks) {
+		EnumFacing id = item.getDirection();
+		float[] offset;
+
+		if (id == null) {
+			return new float[] { 0.5f, 0.5f, 0.5f };
+		} else if (partialTicks == 0 || item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
+			offset = new float[] { item.getX(), item.getY(), item.getZ() };
+		} else {
+			float partialMul = partialTicks * PipeItem.SPEED / PipeItem.MAX_PROGRESS;
+			offset = new float[]{
+				item.getX() + (partialMul * id.getFrontOffsetX()),
+				item.getY() + (partialMul * id.getFrontOffsetY()),
+				item.getZ() + (partialMul * id.getFrontOffsetZ())
+			};
+		}
+
+		PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
+
+		switch (id.getAxis()) {
+			case Y:
+			case X:
+				offset[0] += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+				break;
+			case Z:
+				offset[2] += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+				break;
+		}
+
+		return offset;
+	}
+
 	@Override
 	public void renderMultipartFast(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
 		if (part == null) {
@@ -241,8 +276,6 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 			}
 		}
 
-		float ix, iy, iz;
-
 		synchronized (part.getPipeItems()) {
 			for (PipeItem item : part.getPipeItems()) {
 				EnumFacing id = item.getDirection();
@@ -266,40 +299,9 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					continue;
 				}
 
-				if (id == null) {
-					ix = 0.5f;
-					iy = 0.5f;
-					iz = 0.5f;
-				} else if (item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
-					ix = item.getX();
-					iy = item.getY();
-					iz = item.getZ();
-				} else {
-					float partialMul = partialTicks * PipeItem.SPEED / PipeItem.MAX_PROGRESS;
-					ix = item.getX() + (partialMul * id.getFrontOffsetX());
-					iy = item.getY() + (partialMul * id.getFrontOffsetY());
-					iz = item.getZ() + (partialMul * id.getFrontOffsetZ());
-				}
-
-				if (id != null) {
-					PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
-
-					switch (id.getAxis()) {
-						case Y:
-						case X:
-							ix += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-							break;
-						case Z:
-							iz += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-							break;
-					}
-				}
-
-				ITEM_MODEL_TRANSFORMER.isBlock = stack.getItem() instanceof ItemBlock;
+				ITEM_MODEL_TRANSFORMER.scale = getItemScale(item);
 				ITEM_MODEL_TRANSFORMER.direction = id;
-				ITEM_MODEL_TRANSFORMER.offset[0] = ix;
-				ITEM_MODEL_TRANSFORMER.offset[1] = iy;
-				ITEM_MODEL_TRANSFORMER.offset[2] = iz;
+				ITEM_MODEL_TRANSFORMER.offset = calculateItemOffset(item, partialTicks);
 
 				renderer.renderModel(getWorld(), ModelTransformer.transform(model, DEFAULT_STATE, 0L, ITEM_MODEL_TRANSFORMER), DEFAULT_STATE, pos, buffer, false);
 			}
@@ -326,56 +328,22 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		GlStateManager.popMatrix();
 
 		if (SLOW_ITEMS.size() > 0) {
-			float ix, iy, iz;
 
 			for (PipeItem item : SLOW_ITEMS) {
 				EnumFacing id = item.getDirection();
 				ItemStack stack = item.getStack();
-
-				if (id == null) {
-					ix = 0.5f;
-					iy = 0.5f;
-					iz = 0.5f;
-				} else if (item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
-					ix = item.getX();
-					iy = item.getY();
-					iz = item.getZ();
-				} else {
-					float partialMul = partialTicks * PipeItem.SPEED / PipeItem.MAX_PROGRESS;
-					ix = item.getX() + (partialMul * id.getFrontOffsetX());
-					iy = item.getY() + (partialMul * id.getFrontOffsetY());
-					iz = item.getZ() + (partialMul * id.getFrontOffsetZ());
-				}
+				float scale = getItemScale(item);
+				float[] offset = calculateItemOffset(item, partialTicks);
 
 				GlStateManager.pushMatrix();
-
-				if (id != null) {
-					PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
-
-					switch (id.getAxis()) {
-						case Y:
-						case X:
-							ix += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-							break;
-						case Z:
-							iz += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-							break;
-					}
-				}
 
 				IBakedModel model = itemModelCache.getIfPresent(stack);
 				if (model == null) {
 					model = renderItem.getItemModelWithOverrides(stack, part.getWorld(), null);
 				}
 
-				GlStateManager.translate(x + ix, y + iy, z + iz);
-
-				if (stack.getItem() instanceof ItemBlock) {
-					GlStateManager.scale(0.35f, 0.35f, 0.35f);
-				} else {
-					GlStateManager.scale(0.4f, 0.4f, 0.4f);
-				}
-
+				GlStateManager.translate(x + offset[0], y + offset[1], z + offset[2]);
+				GlStateManager.scale(scale, scale, scale);
 				if (id != null) {
 					GlStateManager.rotate(270.0f - id.getHorizontalAngle(), 0, 1, 0);
 				}

@@ -545,7 +545,7 @@ public class PipeItem {
 				(double) owner.getPos().getX() + 0.5 + (dir != null ? dir.getFrontOffsetX() : 0) * 0.75,
 				(double) owner.getPos().getY() + 0.5 + (dir != null ? dir.getFrontOffsetY() : 0) * 0.75,
 				(double) owner.getPos().getZ() + 0.5 + (dir != null ? dir.getFrontOffsetZ() : 0) * 0.75,
-				stack, 0, 0, 0);
+				stack, 0, 0, 0, 0);
 
 		stack = null;
 	}

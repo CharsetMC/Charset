@@ -17,6 +17,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -24,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.capabilities.Capability;
@@ -40,6 +43,7 @@ import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.render.IRenderComparable;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
 
@@ -74,11 +78,19 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
+	private static final Vec3d[][] HIT_VECTORS = new Vec3d[6][];
 	private final RedstoneCommunications[] COMMS = new RedstoneCommunications[4];
 
 	static {
 		for (int i = 0; i < 6; i++) {
-			BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, 0, 1, 0.125, 1), EnumFacing.getFront(i));
+			EnumFacing facing = EnumFacing.getFront(i);
+			BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, 0, 1, 0.125, 1), facing);
+
+			HIT_VECTORS[i] = new Vec3d[4];
+			HIT_VECTORS[i][0] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 0.0f), EnumFacing.getFront(i));
+			HIT_VECTORS[i][1] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 1.0f), EnumFacing.getFront(i));
+			HIT_VECTORS[i][2] = RotationUtils.rotateVec(new Vec3d(0.0f, 0.125f, 0.5f), EnumFacing.getFront(i));
+			HIT_VECTORS[i][3] = RotationUtils.rotateVec(new Vec3d(1.0f, 0.125f, 0.5f), EnumFacing.getFront(i));
 		}
 	}
 
@@ -288,9 +300,9 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		boolean changed = false;
 
 		for (int i = 0; i <= 3; i++) {
-			Connection conn = getType(side);
+			Connection conn = getType(EnumFacing.getFront(i + 2));
 			if (conn.isOutput() && conn.isRedstone()) {
-				oldOutput[i] = getOutputOutside(side);
+				oldOutput[i] = getOutputOutside(EnumFacing.getFront(i + 2));
 			}
 		}
 
@@ -334,9 +346,9 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 		if (!changed) {
 			for (int i = 0; i <= 3; i++) {
-				Connection conn = getType(side);
+				Connection conn = getType(EnumFacing.getFront(i + 2));
 				if (conn.isOutput() && conn.isRedstone()) {
-					if (getOutputOutside(side) != oldOutput[i]) {
+					if (getOutputOutside(EnumFacing.getFront(i + 2)) != oldOutput[i]) {
 						changed = true;
 						break;
 					}
@@ -352,7 +364,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	protected byte getInputInside(EnumFacing side) {
-		if (isSideInverted(side)) {
+		if (isSideInverted(side) && isSideOpen(side)) {
 			return inputs[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
 		} else {
 			return inputs[side.ordinal() - 2];
@@ -368,7 +380,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		if (isSideInverted(side)) {
 			return getOutputInside(side) != 0 ? 0 : (byte) 15;
 		} else {
-			return (byte) getOutputInside(side);
+			return getOutputInside(side);
 		}
 	}
 
@@ -486,51 +498,100 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		return false;
 	}
 
-	@Override
-	public boolean onActivated(EntityPlayer playerIn, EnumHand hand, ItemStack stack, PartMOP hit) {
-		if (!playerIn.worldObj.isRemote) {
-			if (stack != null) {
-				if (stack.getItem() instanceof ItemScrewdriver) {
-					if (playerIn.isSneaking()) {
-						top = top.rotateY();
-					} else {
-						int z = 32;
-						enabledSides = (byte) ((enabledSides + 1) & 15);
-						while (z > 0 && ((~getSideMask() & enabledSides) != 0
-								|| isInvalidEnabled() || enabledSides == 0)) {
-							enabledSides = (byte) ((enabledSides + 1) & 15);
-							z--;
-						}
-						if (z == 0) {
-							enabledSides = getSideMask();
-						}
-					}
-
-					notifyBlockUpdate();
-					onChanged();
-					sendUpdatePacket();
-					return true;
-				}
-			} else {
-				/* if (playerIn.isSneaking()) {
-                    int z = 32;
-                    invertedSides = (byte) ((invertedSides + 1) & 15);
-                    while (z > 0 && ((~getSideMask() & invertedSides) != 0
-                            || isInvalidInverted() || invertedSides == 0)) {
-                        invertedSides = (byte) ((invertedSides + 1) & 15);
-                        z--;
-                    }
-                    if (z == 0) {
-                        invertedSides = getSideMask();
-                    }
-
-                    notifyBlockUpdate();
-                    sendUpdatePacket();
-                    return true;
-                } */
+	private EnumFacing getClosestFace(Vec3d vec) {
+		Vec3d[] compare = HIT_VECTORS[getSide().ordinal()];
+		int closestFace = -1;
+		double distance = Double.MAX_VALUE;
+		for (int i = 0; i < 4; i++) {
+			double d = compare[i].distanceTo(vec);
+			if (d < distance) {
+				closestFace = i;
+				distance = d;
 			}
 		}
-		return false;
+
+		if (closestFace >= 0) {
+			EnumFacing dir = EnumFacing.getFront(closestFace + 2);
+			EnumFacing itop = top;
+			while (itop != EnumFacing.NORTH) {
+				dir = dir.rotateYCCW();
+				itop = itop.rotateYCCW();
+			}
+			return dir;
+		} else {
+			return null;
+		}
+	}
+
+	public boolean onActivated(EntityPlayer playerIn, ItemStack stack, Vec3d vec) {
+		boolean changed = false;
+		boolean remote = getWorld().isRemote;
+
+		if (stack != null) {
+			if (stack.getItem() instanceof ItemScrewdriver) {
+				if (playerIn.isSneaking()) {
+					if (!remote) {
+						top = top.rotateY();
+					}
+					changed = true;
+				} else {
+					EnumFacing closestFace = getClosestFace(vec.subtract(getPos().getX(), getPos().getY(), getPos().getZ()));
+
+					if (closestFace != null) {
+						if (canBlockSide(closestFace)) {
+							if (!remote) {
+								enabledSides ^= (1 << (closestFace.ordinal() - 2));
+							}
+							changed = true;
+						}
+					}
+				}
+			} else if (stack.getItem() instanceof ItemBlock) {
+				Block block = Block.getBlockFromItem(stack.getItem());
+				if (block == Blocks.REDSTONE_TORCH || block == Blocks.UNLIT_REDSTONE_TORCH) {
+					EnumFacing closestFace = getClosestFace(vec.subtract(getPos().getX(), getPos().getY(), getPos().getZ()));
+
+					if (closestFace != null) {
+						if (canInvertSide(closestFace) && !isSideInverted(closestFace)) {
+							if (!remote) {
+								invertedSides |= (1 << (closestFace.ordinal() - 2));
+								stack.stackSize--;
+							}
+							changed = true;
+						}
+					}
+				}
+			}
+		} else {
+			EnumFacing closestFace = getClosestFace(vec.subtract(getPos().getX(), getPos().getY(), getPos().getZ()));
+
+			if (closestFace != null) {
+				if (canInvertSide(closestFace) && isSideInverted(closestFace)) {
+					if (!remote) {
+						invertedSides &= ~(1 << (closestFace.ordinal() - 2));
+						ItemUtils.spawnItemEntity(getWorld(), vec.xCoord, vec.yCoord, vec.zCoord,
+								new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
+					}
+					changed = true;
+				}
+			}
+		}
+
+		if (changed) {
+			if (!remote) {
+				notifyBlockUpdate();
+				onChanged();
+				sendUpdatePacket();
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean onActivated(EntityPlayer playerIn, EnumHand hand, ItemStack stack, PartMOP hit) {
+		return onActivated(playerIn, stack, hit.hitVec);
 	}
 
 	@Override
@@ -556,7 +617,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	public boolean canConnectRedstone(EnumFacing direction) {
 		if (side.getAxis() != direction.getAxis()) {
 			EnumFacing dir = realToGate(direction);
-			if (isSideOpen(dir)) {
+			if (dir != null && isSideOpen(dir)) {
 				return getType(dir).isRedstone();
 			}
 		}
@@ -566,7 +627,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	@Override
 	public int getWeakSignal(EnumFacing facing) {
 		EnumFacing dir = realToGate(facing);
-		if (getType(dir).isOutput() && getType(dir).isRedstone() && isSideOpen(dir)) {
+		if (dir != null && getType(dir).isOutput() && getType(dir).isRedstone() && isSideOpen(dir)) {
 			return getOutputOutside(dir);
 		} else {
 			return 0;
@@ -581,10 +642,10 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag.setByteArray("in", inputs);
-		tag.setByte("f", (byte) side.ordinal());
-		tag.setByte("t", (byte) top.ordinal());
 		tag.setByte("e", enabledSides);
 		tag.setByte("i", invertedSides);
+		tag.setByte("f", (byte) side.ordinal());
+		tag.setByte("t", (byte) top.ordinal());
 		tag.setBoolean("m", mirrored);
 		if (pendingTick != 0) {
 			tag.setByte("p", (byte) pendingTick);

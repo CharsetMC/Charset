@@ -2,10 +2,29 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.Vec3d;
 
 public final class RotationUtils {
 	private RotationUtils() {
 
+	}
+
+	public static Vec3d rotateVec(Vec3d vec, EnumFacing facing) {
+		switch (facing) {
+			case DOWN:
+			default:
+				return vec;
+			case UP:
+				return new Vec3d(vec.xCoord, 1 - vec.yCoord, vec.zCoord);
+			case NORTH:
+				return new Vec3d(vec.xCoord, vec.zCoord, vec.yCoord);
+			case SOUTH:
+				return new Vec3d(vec.xCoord, vec.zCoord, 1 - vec.yCoord);
+			case WEST:
+				return new Vec3d(vec.yCoord, vec.zCoord, vec.xCoord);
+			case EAST:
+				return new Vec3d(1 - vec.yCoord, vec.zCoord, vec.xCoord);
+		}
 	}
 
 	public static AxisAlignedBB rotateFace(AxisAlignedBB box, EnumFacing facing) {

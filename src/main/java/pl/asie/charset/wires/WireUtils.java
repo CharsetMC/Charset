@@ -242,25 +242,26 @@ public final class WireUtils {
 	}
 
 	public static int getRedstoneLevel(World world, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face, boolean weak) {
+		EnumFacing facingOpposite = facing == null ? null : facing.getOpposite();
 		int power = 0;
 
 		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
 		if (container != null) {
-			if (getWire(container, face) != null || getWire(container, WireFace.get(facing.getOpposite())) != null) {
+			if (getWire(container, face) != null || getWire(container, WireFace.get(facingOpposite)) != null) {
 				return 0;
 			}
 
 			for (IMultipart part : container.getParts()) {
 				if (!(part instanceof PartWireBase)) {
 					if (part instanceof IRedstonePart) {
-						power = Math.max(power, ((IRedstonePart) part).getWeakSignal(facing.getOpposite()));
+						power = Math.max(power, ((IRedstonePart) part).getWeakSignal(facingOpposite));
 					}
 				}
 			}
 		}
 
-		if (MultipartUtils.hasCapability(Capabilities.REDSTONE_EMITTER, world, pos, WireUtils.getSlotForFace(face), facing)) {
-			power = Math.max(power, MultipartUtils.getCapability(Capabilities.REDSTONE_EMITTER, world, pos, WireUtils.getSlotForFace(face), facing).getRedstoneSignal());
+		if (MultipartUtils.hasCapability(Capabilities.REDSTONE_EMITTER, world, pos, WireUtils.getSlotForFace(face), facingOpposite)) {
+			power = Math.max(power, MultipartUtils.getCapability(Capabilities.REDSTONE_EMITTER, world, pos, WireUtils.getSlotForFace(face), facingOpposite).getRedstoneSignal());
 		}
 
 		Block block = state.getBlock();
