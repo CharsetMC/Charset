@@ -17,11 +17,11 @@ group= "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-    version = "1.9.4-12.16.1.1908-1.9.4"
+    version = "1.9.4-12.17.0.1909-1.9.4"
     
     runDir = "run"
     useDepAts = true
-    mappings = "snapshot_20160518"
+    mappings = "snapshot_20160519"
 
     replace '@VERSION@', project.version
     replace '@MC_VERSION@', version
@@ -46,8 +46,8 @@ repositories {
     }
 }
 dependencies {
-    deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_65:universal"
-    deobfCompile "mezz.jei:jei_1.9:3.3.3.200"
+    deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_68:universal"
+    deobfCompile "mezz.jei:jei_1.9.4:3.4.0.202"
 }
 
 processResources

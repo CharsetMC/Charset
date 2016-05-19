@@ -86,9 +86,11 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
 	final PipeFluidContainer fluid = new PipeFluidContainer(this);
-	protected int[] shifterDistance = new int[6];
-	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
+	boolean renderFast = false;
 
+	protected int[] shifterDistance = new int[6];
+
+	private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
 	private byte connectionCache = 0;
 	private boolean neighborBlockChanged;
 	private boolean requestUpdate;
@@ -519,6 +521,9 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 				}
 			}
 
+			if (renderFast && ModCharsetPipes.proxy.stopsRenderFast(getWorld(), item.stack)) {
+				renderFast = false;
+			}
 			itemSet.add(item);
 		}
 	}
@@ -548,6 +553,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 				if (!simulate) {
 					itemSet.add(item);
+
+					if (renderFast && ModCharsetPipes.proxy.stopsRenderFast(getWorld(), item.stack)) {
+						renderFast = false;
+					}
 				}
 			}
 
@@ -673,6 +682,6 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public boolean hasFastRenderer() {
-		return true;
+		return itemSet.size() == 0 || renderFast;
 	}
 }

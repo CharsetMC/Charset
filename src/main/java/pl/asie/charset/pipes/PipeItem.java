@@ -10,6 +10,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
 import mcmultipart.multipart.IMultipart;
@@ -20,6 +22,7 @@ import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.inventory.InventoryUtils;
 import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 public class PipeItem {
 	public static final int MAX_PROGRESS = 128;
@@ -28,15 +31,16 @@ public class PipeItem {
 	private static short nextId;
 
 	public final short id;
-	private int activeShifterDistance;
-	private PartPipe owner;
-	private boolean stuck;
+	byte blocksSinceSync;
 
 	protected EnumFacing input, output;
 	protected boolean reachedCenter;
 	protected ItemStack stack;
 	protected int progress;
-	protected int blocksSinceSync;
+
+	private int activeShifterDistance;
+	private PartPipe owner;
+	private boolean stuck;
 
 	public PipeItem(PartPipe owner, ItemStack stack, EnumFacing side) {
 		this.id = nextId++;
@@ -233,32 +237,34 @@ public class PipeItem {
 		PartPipe pipe = output != null ? PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite()) : null;
 
 		if (owner.getWorld().isRemote) {
-			// Last resort security mechanism for stray packets.
-			blocksSinceSync++;
-
 			if (blocksSinceSync < 2) {
-				passToPipe(pipe, output, false);
-			}
-			return;
-		}
-
-		if (output != null) {
-			if (passToPipe(pipe, output, false)) {
-				// Pipe passing does not take into account stack size
-				// subtraction, as it re-uses the same object instance.
-				// Therefore, we need to quit here.
-				return;
+				if (passToPipe(pipe, output, false)) {
+					blocksSinceSync++;
+				} else {
+					stack = null;
+				}
 			} else {
-				TileEntity tile = owner.getNeighbourTile(output);
+				stack = null;
+			}
+		} else {
+			if (output != null) {
+				if (passToPipe(pipe, output, false)) {
+					// Pipe passing does not take into account stack size
+					// subtraction, as it re-uses the same object instance.
+					// Therefore, we need to quit here.
+					return;
+				} else {
+					TileEntity tile = owner.getNeighbourTile(output);
 
-				if (!passToInjectable(tile, output, false)) {
-					addToItemHandler(tile, output, false);
+					if (!passToInjectable(tile, output, false)) {
+						addToItemHandler(tile, output, false);
+					}
 				}
 			}
-		}
 
-		if (stack != null && stack.stackSize > 0) {
-			dropItem(true);
+			if (stack != null && stack.stackSize > 0) {
+				dropItem(true);
+			}
 		}
 	}
 
@@ -550,6 +556,10 @@ public class PipeItem {
 		this.reachedCenter = false;
 		this.stuck = false;
 		this.progress = 0;
+
+		if (owner.getWorld().isRemote) {
+
+		}
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {

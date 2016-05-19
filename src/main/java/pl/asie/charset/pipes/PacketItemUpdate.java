@@ -63,11 +63,13 @@ public class PacketItemUpdate extends PacketPart {
 			}
 		}
 
-		item.blocksSinceSync = 0;
 		item.input = DirectionUtils.get(dirs & 7);
 		item.output = DirectionUtils.get((dirs >> 3) & 7);
 		item.reachedCenter = (flags & 0x01) != 0;
-		item.progress = progress;
+		item.blocksSinceSync = 0;
+		if (addWhenDone) {
+			item.progress = progress;
+		}
 
 		boolean stuck = (flags & 0x02) != 0;
 

@@ -1,21 +1,23 @@
 package pl.asie.charset.pipes;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockModelRenderer;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
@@ -27,6 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.render.ModelTransformer;
 import pl.asie.charset.lib.render.SimpleBakedModel;
@@ -195,6 +198,8 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 		}
 	}
 
+	private final Set<PipeItem> SLOW_ITEMS = new HashSet<>();
+
 	@Override
 	public void renderMultipartFast(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
 		if (part == null) {
@@ -246,6 +251,21 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					continue;
 				}
 
+				IBakedModel model = itemModelCache.getIfPresent(stack);
+				if (model == null) {
+					model = renderItem.getItemModelWithOverrides(stack, part.getWorld(), null);
+					itemModelCache.put(stack, model);
+				}
+
+				if (model.isBuiltInRenderer()) {
+					if (!part.renderFast) {
+						SLOW_ITEMS.add(item);
+					} else {
+						part.renderFast = false;
+					}
+					continue;
+				}
+
 				if (id == null) {
 					ix = 0.5f;
 					iy = 0.5f;
@@ -275,15 +295,6 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					}
 				}
 
-				IBakedModel model = itemModelCache.getIfPresent(stack);
-				if (model == null) {
-					model = renderItem.getItemModelWithOverrides(stack, part.getWorld(), null);
-					if (model.isBuiltInRenderer()) {
-						model = renderItem.getItemModelWithOverrides(new ItemStack(Blocks.BARRIER), part.getWorld(), null);
-					}
-					itemModelCache.put(stack, model);
-				}
-
 				ITEM_MODEL_TRANSFORMER.isBlock = stack.getItem() instanceof ItemBlock;
 				ITEM_MODEL_TRANSFORMER.direction = id;
 				ITEM_MODEL_TRANSFORMER.offset[0] = ix;
@@ -297,7 +308,86 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 
 	@Override
 	public void renderMultipartAt(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage) {
-		// No. Use the Fast one, please.
+		if (part == null) {
+			return;
+		}
+
+		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+		GlStateManager.pushMatrix();
+		GlStateManager.disableLighting();
+
+		VertexBuffer buffer = Tessellator.getInstance().getBuffer();
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+		renderMultipartFast(part, x, y, z, partialTicks, destroyStage, buffer);
+		Tessellator.getInstance().draw();
+
+		GlStateManager.enableLighting();
+		GlStateManager.popMatrix();
+
+		if (SLOW_ITEMS.size() > 0) {
+			float ix, iy, iz;
+
+			for (PipeItem item : SLOW_ITEMS) {
+				EnumFacing id = item.getDirection();
+				ItemStack stack = item.getStack();
+
+				if (id == null) {
+					ix = 0.5f;
+					iy = 0.5f;
+					iz = 0.5f;
+				} else if (item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
+					ix = item.getX();
+					iy = item.getY();
+					iz = item.getZ();
+				} else {
+					float partialMul = partialTicks * PipeItem.SPEED / PipeItem.MAX_PROGRESS;
+					ix = item.getX() + (partialMul * id.getFrontOffsetX());
+					iy = item.getY() + (partialMul * id.getFrontOffsetY());
+					iz = item.getZ() + (partialMul * id.getFrontOffsetZ());
+				}
+
+				GlStateManager.pushMatrix();
+
+				if (id != null) {
+					PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
+
+					switch (id.getAxis()) {
+						case Y:
+						case X:
+							ix += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+							break;
+						case Z:
+							iz += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
+							break;
+					}
+				}
+
+				IBakedModel model = itemModelCache.getIfPresent(stack);
+				if (model == null) {
+					model = renderItem.getItemModelWithOverrides(stack, part.getWorld(), null);
+				}
+
+				GlStateManager.translate(x + ix, y + iy, z + iz);
+
+				if (stack.getItem() instanceof ItemBlock) {
+					GlStateManager.scale(0.35f, 0.35f, 0.35f);
+				} else {
+					GlStateManager.scale(0.4f, 0.4f, 0.4f);
+				}
+
+				if (id != null) {
+					GlStateManager.rotate(270.0f - id.getHorizontalAngle(), 0, 1, 0);
+				}
+
+				renderItem.renderItem(stack, model);
+				GlStateManager.popMatrix();
+			}
+
+			SLOW_ITEMS.clear();
+		} else {
+			part.renderFast = true;
+		}
 	}
 
 	public void clearCache() {

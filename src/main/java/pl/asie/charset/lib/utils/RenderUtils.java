@@ -3,8 +3,12 @@ package pl.asie.charset.lib.utils;
 import java.util.List;
 
 import com.google.common.base.Function;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -32,8 +36,19 @@ public final class RenderUtils {
 		}
 	};
 
+	private static RenderItem renderItem;
+
 	private RenderUtils() {
 
+	}
+
+	public static boolean isDynamicItemRenderer(World world, ItemStack stack) {
+		if (renderItem == null) {
+			renderItem = Minecraft.getMinecraft().getRenderItem();
+		}
+
+		IBakedModel model = renderItem.getItemModelWithOverrides(stack, world, null);
+		return model != null && model.isBuiltInRenderer();
 	}
 
 	public static void glColor(int color) {
