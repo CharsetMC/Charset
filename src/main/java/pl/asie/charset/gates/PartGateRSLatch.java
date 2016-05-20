@@ -16,13 +16,13 @@ public class PartGateRSLatch extends PartGate {
 
 	@Override
 	protected boolean tick() {
-		boolean oldIS = getInputInside(EnumFacing.WEST) != 0;
-		boolean oldIR = getInputInside(EnumFacing.EAST) != 0;
+		boolean oldIS = getValueInside(EnumFacing.WEST) != 0;
+		boolean oldIR = getValueInside(EnumFacing.EAST) != 0;
 
 		super.tick();
 
-		boolean newIS = getInputInside(EnumFacing.WEST) != 0;
-		boolean newIR = getInputInside(EnumFacing.EAST) != 0;
+		boolean newIS = getValueInside(EnumFacing.WEST) != 0;
+		boolean newIR = getValueInside(EnumFacing.EAST) != 0;
 
 		int state = ((oldIR != newIR && newIR) ? 1 : 0) | ((oldIS != newIS && newIS) ? 2 : 0);
 
@@ -100,9 +100,9 @@ public class PartGateRSLatch extends PartGate {
 		}
 		switch (id) {
 			case 1:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH));
+				return State.input(getValueInside(EnumFacing.NORTH));
 			case 0:
-				return State.input(getOutputInsideClient(EnumFacing.SOUTH));
+				return State.input(getValueInside(EnumFacing.SOUTH));
 		}
 		return null;
 	}
@@ -114,15 +114,15 @@ public class PartGateRSLatch extends PartGate {
 		}
 		switch (id) {
 			case 0:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH));
+				return State.input(getValueInside(EnumFacing.NORTH));
 			case 1:
-				return State.input(getOutputInsideClient(EnumFacing.SOUTH));
+				return State.input(getValueInside(EnumFacing.SOUTH));
 		}
 		return null;
 	}
 
 	@Override
-	public byte getOutputInside(EnumFacing facing) {
+	public byte calculateOutputInside(EnumFacing facing) {
 		if (burnt) {
 			return 0;
 		}

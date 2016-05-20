@@ -71,7 +71,8 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 		@Override
 		public int getRedstoneSignal() {
-			return getOutputOutside(side);
+			Connection type = getType(side);
+			return type.isOutput() && type.isRedstone() ? getValueOutside(side) : 0;
 		}
 
 		@Override
@@ -90,10 +91,21 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 			BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, 0, 1, 0.125, 1), facing);
 
 			HIT_VECTORS[i] = new Vec3d[4];
-			HIT_VECTORS[i][0] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 0.0f), EnumFacing.getFront(i));
-			HIT_VECTORS[i][1] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 1.0f), EnumFacing.getFront(i));
-			HIT_VECTORS[i][2] = RotationUtils.rotateVec(new Vec3d(0.0f, 0.125f, 0.5f), EnumFacing.getFront(i));
-			HIT_VECTORS[i][3] = RotationUtils.rotateVec(new Vec3d(1.0f, 0.125f, 0.5f), EnumFacing.getFront(i));
+			if (facing.getAxis() != EnumFacing.Axis.Y) {
+				HIT_VECTORS[i][1] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 0.0f), facing);
+				HIT_VECTORS[i][0] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 1.0f), facing);
+			} else {
+				HIT_VECTORS[i][0] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 0.0f), facing);
+				HIT_VECTORS[i][1] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 1.0f), facing);
+			}
+
+			if (facing == EnumFacing.SOUTH || facing == EnumFacing.WEST) {
+				HIT_VECTORS[i][3] = RotationUtils.rotateVec(new Vec3d(0.0f, 0.125f, 0.5f), facing);
+				HIT_VECTORS[i][2] = RotationUtils.rotateVec(new Vec3d(1.0f, 0.125f, 0.5f), facing);
+			} else {
+				HIT_VECTORS[i][2] = RotationUtils.rotateVec(new Vec3d(0.0f, 0.125f, 0.5f), facing);
+				HIT_VECTORS[i][3] = RotationUtils.rotateVec(new Vec3d(1.0f, 0.125f, 0.5f), facing);
+			}
 		}
 	}
 
@@ -188,8 +200,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	protected boolean mirrored;
 
 	private int pendingTick;
-	private byte[] inputs = new byte[4];
-	private byte[] outputClient = new byte[4];
+	private byte[] values = new byte[4];
 
 	private EnumFacing side = EnumFacing.DOWN;
 	private EnumFacing top = EnumFacing.NORTH;
@@ -321,105 +332,81 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	private boolean updateInputs() {
-		byte[] oldOutput = new byte[4];
+		byte[] oldValues = new byte[4];
 		boolean changed = false;
 
-		for (int i = 0; i <= 3; i++) {
-			Connection conn = getType(EnumFacing.getFront(i + 2));
-			if (conn.isOutput() && conn.isRedstone()) {
-				oldOutput[i] = getOutputOutside(EnumFacing.getFront(i + 2));
-			}
-		}
+		System.arraycopy(values, 0, oldValues, 0, 4);
 
 		for (int i = 0; i <= 3; i++) {
-			EnumFacing side = EnumFacing.getFront(i + 2);
-			Connection conn = getType(side);
+			EnumFacing facing = EnumFacing.getFront(i + 2);
+			Connection conn = getType(facing);
 			if (conn.isInput() && conn.isRedstone()) {
-				byte oi = inputs[i];
-				inputs[i] = 0;
-				
-				EnumFacing real = gateToReal(side);
-				World w = getWorld();
-				BlockPos p = getPos().offset(real);
-				IMultipartContainer container = MultipartHelper.getPartContainer(w, p);
-				if (container != null) {
-					inputs[i] = (byte) MultipartRedstoneHelper.getWeakSignal(container, real.getOpposite(), this.side);
-				} else {
-					TileEntity tile = w.getTileEntity(p);
-					if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
-						inputs[i] = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
+				values[i] = 0;
+
+				if (isSideOpen(facing)) {
+					EnumFacing real = gateToReal(facing);
+					World w = getWorld();
+					BlockPos p = getPos().offset(real);
+					IMultipartContainer container = MultipartHelper.getPartContainer(w, p);
+					if (container != null) {
+						values[i] = (byte) MultipartRedstoneHelper.getWeakSignal(container, real.getOpposite(), side);
 					} else {
-						IBlockState s = w.getBlockState(p);
-						if (RedstoneUtils.canConnectFace(w, p, s, real, this.side)) {
-							if (s.getBlock() instanceof BlockRedstoneWire) {
-								inputs[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
-							} else {
-								inputs[i] = (byte) s.getBlock().getWeakPower(s, w, p, real);
+						TileEntity tile = w.getTileEntity(p);
+						if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
+							values[i] = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
+						} else {
+							IBlockState s = w.getBlockState(p);
+							if (RedstoneUtils.canConnectFace(w, p, s, real, side)) {
+								if (s.getBlock() instanceof BlockRedstoneWire) {
+									values[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
+								} else {
+									values[i] = (byte) s.getBlock().getWeakPower(s, w, p, real);
+								}
 							}
 						}
 					}
-				}
 
-				if (conn.isDigital()) {
-					inputs[i] = inputs[i] != 0 ? (byte) 15 : 0;
-				}
-				if (inputs[i] != oi) {
-					changed = true;
+					if (conn.isDigital()) {
+						values[i] = values[i] != 0 ? (byte) 15 : 0;
+					}
+
+					if (isSideInverted(facing)) {
+						values[i] = values[i] != 0 ? 0 : (byte) 15;
+					}
 				}
 			}
 		}
 
-		if (!changed) {
-			for (int i = 0; i <= 3; i++) {
-				Connection conn = getType(EnumFacing.getFront(i + 2));
-				if (conn.isOutput() && conn.isRedstone()) {
-					if (getOutputOutside(EnumFacing.getFront(i + 2)) != oldOutput[i]) {
-						changed = true;
-						break;
-					}
-				}
+		for (int i = 0; i <= 3; i++) {
+			EnumFacing facing = EnumFacing.getFront(i + 2);
+			Connection conn = getType(facing);
+			if (conn.isOutput() && conn.isRedstone()) {
+				values[i] = calculateOutputInside(facing);
+			}
+
+			if (values[i] != oldValues[i]) {
+				changed = true;
 			}
 		}
 
 		return changed;
 	}
 
-	public byte getInputOutside(EnumFacing side) {
-		return inputs[side.ordinal() - 2];
+	public byte getValueInside(EnumFacing side) {
+		return values[side.ordinal() - 2];
 	}
 
-	protected byte getInputInside(EnumFacing side) {
+	protected byte getValueOutside(EnumFacing side) {
 		if (isSideInverted(side) && isSideOpen(side)) {
-			return inputs[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
+			return values[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
 		} else {
-			return inputs[side.ordinal() - 2];
+			return values[side.ordinal() - 2];
 		}
 	}
 
 	public boolean getInverterState(EnumFacing facing) {
-		byte value = getType(facing).isInput() ? getInputOutside(facing) : getOutputInsideClient(facing);
+		byte value = getType(facing).isInput() ? getValueOutside(facing) : getValueInside(facing);
 		return value == 0;
-	}
-
-	protected byte getOutputOutside(EnumFacing side) {
-		if (isSideInverted(side)) {
-			return getOutputInside(side) != 0 ? 0 : (byte) 15;
-		} else {
-			return getOutputInside(side);
-		}
-	}
-
-	public byte getOutputInsideClient(EnumFacing side) {
-		return outputClient[side.ordinal() - 2];
-	}
-
-
-	public byte getOutputOutsideClient(EnumFacing side) {
-		if (isSideInverted(side)) {
-			return outputClient[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
-		} else {
-			return outputClient[side.ordinal() - 2];
-		}
 	}
 
 	protected void onChanged() {
@@ -493,7 +480,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		return j;
 	}
 
-	protected abstract byte getOutputInside(EnumFacing side);
+	protected abstract byte calculateOutputInside(EnumFacing side);
 
 	public boolean isSideOpen(EnumFacing side) {
 		return (enabledSides & (1 << (side.ordinal() - 2))) != 0;
@@ -501,26 +488,6 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	public boolean isSideInverted(EnumFacing side) {
 		return (invertedSides & (1 << (side.ordinal() - 2))) != 0;
-	}
-
-	private boolean isInvalidInverted() {
-		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-			if (isSideInverted(facing) && !canInvertSide(facing)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private boolean isInvalidEnabled() {
-		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-			if (!isSideOpen(facing) && !canBlockSide(facing)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private EnumFacing getClosestFace(Vec3d vec) {
@@ -653,7 +620,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	public int getWeakSignal(EnumFacing facing) {
 		EnumFacing dir = realToGate(facing);
 		if (dir != null && getType(dir).isOutput() && getType(dir).isRedstone() && isSideOpen(dir)) {
-			return getOutputOutside(dir);
+			return getValueOutside(dir);
 		} else {
 			return 0;
 		}
@@ -666,7 +633,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
-		tag.setByteArray("in", inputs);
+		tag.setByteArray("v", values);
 		tag.setByte("e", enabledSides);
 		tag.setByte("i", invertedSides);
 		tag.setByte("f", (byte) side.ordinal());
@@ -696,26 +663,37 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
-		inputs = tag.getByteArray("in");
-		if (inputs == null || inputs.length != 4) {
-			inputs = new byte[4];
+		if (tag.hasKey("v")) {
+			values = tag.getByteArray("v");
+			pendingTick = tag.getByte("p");
+		} else {
+			if (tag.hasKey("in")) {
+				values = tag.getByteArray("in");
+			} else {
+				values = null;
+			}
+			pendingTick = 2;
 		}
+
+		if (values == null || values.length != 4) {
+			values = new byte[4];
+		}
+
 		enabledSides = tag.getByte("e");
 		invertedSides = tag.getByte("i");
 		side = EnumFacing.getFront(tag.getByte("f"));
 		top = EnumFacing.getFront(tag.getByte("t"));
 		mirrored = tag.getBoolean("m");
-		pendingTick = tag.getByte("p");
 	}
 
 	@Override
 	public void writeUpdatePacket(PacketBuffer buf) {
 		buf.writeByte((mirrored ? 0x40 : 0) | (side.ordinal() << 3) | top.ordinal());
 		buf.writeByte(enabledSides | (invertedSides << 4));
-		for (int i = 0; i <= 3; i++) {
-			EnumFacing dir = EnumFacing.getFront(i + 2);
-			if (getType(dir) != Connection.NONE) {
-				buf.writeByte(getType(dir).isInput() ? inputs[i] : getOutputInside(dir));
+		for (int i = 0; i < 4; i++) {
+			EnumFacing facing = EnumFacing.getFront(i + 2);
+			if (isSideOpen(facing)) {
+				buf.writeByte(values[i]);
 			}
 		}
 	}
@@ -724,16 +702,10 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		int sides = buf.readUnsignedByte();
 		enabledSides = (byte) (sides & 15);
 		invertedSides = (byte) (sides >> 4);
-
-		for (int i = 0; i <= 3; i++) {
-			inputs[i] = outputClient[i] = 0;
-			EnumFacing dir = EnumFacing.getFront(i + 2);
-			if (getType(dir) != Connection.NONE) {
-				if (getType(dir).isInput()) {
-					inputs[i] = buf.readByte();
-				} else {
-					outputClient[i] = buf.readByte();
-				}
+		for (int i = 0; i < 4; i++) {
+			EnumFacing facing = EnumFacing.getFront(i + 2);
+			if (isSideOpen(facing)) {
+				values[i] = buf.readByte();
 			}
 		}
 		markRenderUpdate();
@@ -861,12 +833,8 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	private int getUniqueSideRenderID(EnumFacing side) {
-		int rid = (isSideInverted(side) ? 16 : 0) | (isSideOpen(side) ? 32 : 0);
-		if (!getType(side).isBundled()) {
-			rid |= getType(side) == Connection.INPUT ? getInputInside(side) : getOutputInsideClient(side);
-		}
-		return rid;
- 	}
+		return (isSideInverted(side) ? 16 : 0) | (isSideOpen(side) ? 32 : 0) | getValueInside(side);
+	}
 
 	@Override
 	public boolean renderEquals(PartGate other) {

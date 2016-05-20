@@ -29,16 +29,16 @@ public class PartGateBuffer extends PartGate {
 				if (!isSideOpen(EnumFacing.WEST)) {
 					return State.DISABLED;
 				}
-				return State.input(getOutputInsideClient(EnumFacing.WEST));
+				return State.input(getValueInside(EnumFacing.WEST));
 			case 1:
 				if (!isSideOpen(EnumFacing.EAST)) {
 					return State.DISABLED;
 				}
-				return State.input(getOutputInsideClient(EnumFacing.EAST));
+				return State.input(getValueInside(EnumFacing.EAST));
 			case 2:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
+				return State.input(getValueInside(EnumFacing.NORTH)).invert();
 			case 3:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH));
+				return State.input(getValueInside(EnumFacing.NORTH));
 		}
 		return State.OFF;
 	}
@@ -47,24 +47,24 @@ public class PartGateBuffer extends PartGate {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH));
+				return State.input(getValueInside(EnumFacing.NORTH));
 			case 1:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
+				return State.input(getValueInside(EnumFacing.NORTH)).invert();
 		}
 		return State.ON;
 	}
 
 	@Override
-	protected byte getOutputInside(EnumFacing side) {
+	protected byte calculateOutputInside(EnumFacing side) {
 		switch (side) {
 			case NORTH:
-				return getInputInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
+				return getValueInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
 			case WEST:
 			case EAST:
 				if (isSideInverted(EnumFacing.NORTH)) {
-					return getInputInside(EnumFacing.SOUTH);
+					return getValueInside(EnumFacing.SOUTH);
 				} else {
-					return getInputInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
+					return getValueInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
 				}
 			default:
 				return 0;

@@ -38,7 +38,7 @@ public class PartGatePulseFormer extends PartGate {
 		if (pulse == 0) {
 			boolean changed = super.tick();
 			if (changed) {
-				pulse = getInputInside(EnumFacing.SOUTH);
+				pulse = getValueInside(EnumFacing.SOUTH);
 				if (pulse != 0) {
 					scheduleTick();
 				}
@@ -69,17 +69,17 @@ public class PartGatePulseFormer extends PartGate {
 
 	@Override
 	public State getLayerState(int id) {
-		boolean hasSignal = getInputInside(EnumFacing.SOUTH) != 0;
+		boolean hasSignal = getValueInside(EnumFacing.SOUTH) != 0;
 		switch (id) {
 			case 0:
-				return State.input(getInputInside(EnumFacing.SOUTH));
+				return State.input(getValueInside(EnumFacing.SOUTH));
 			case 1:
 			case 2:
 				return State.bool(!hasSignal);
 			case 3:
 				return State.bool(hasSignal);
 			case 4:
-				return State.input(getOutputOutsideClient(EnumFacing.NORTH));
+				return State.input(getValueOutside(EnumFacing.NORTH));
 		}
 		return State.OFF;
 	}
@@ -88,17 +88,17 @@ public class PartGatePulseFormer extends PartGate {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getInputInside(EnumFacing.SOUTH)).invert();
+				return State.input(getValueInside(EnumFacing.SOUTH)).invert();
 			case 1:
-				return State.input(getInputInside(EnumFacing.SOUTH));
+				return State.input(getValueInside(EnumFacing.SOUTH));
 			case 2:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
+				return State.input(getValueInside(EnumFacing.NORTH)).invert();
 		}
 		return State.ON;
 	}
 
 	@Override
-	protected byte getOutputInside(EnumFacing side) {
+	protected byte calculateOutputInside(EnumFacing side) {
 		return pulse;
 	}
 }

@@ -7,24 +7,24 @@ public class PartGateNOR extends PartGate {
 	public State getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getOutputOutsideClient(EnumFacing.NORTH));
+				return State.input(getValueOutside(EnumFacing.NORTH));
 			case 1:
 				if (!isSideOpen(EnumFacing.WEST)) {
 					return State.DISABLED;
 				}
-				return State.input(getInputInside(EnumFacing.WEST));
+				return State.input(getValueInside(EnumFacing.WEST));
 			case 2:
 				if (!isSideOpen(EnumFacing.EAST)) {
 					return State.DISABLED;
 				}
-				return State.input(getInputInside(EnumFacing.EAST));
+				return State.input(getValueInside(EnumFacing.EAST));
 			case 3:
 				if (!isSideOpen(EnumFacing.SOUTH)) {
 					return State.DISABLED;
 				}
-				return State.input(getInputInside(EnumFacing.SOUTH));
+				return State.input(getValueInside(EnumFacing.SOUTH));
 			case 4:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH));
+				return State.input(getValueInside(EnumFacing.NORTH));
 		}
 		return State.OFF;
 	}
@@ -33,19 +33,19 @@ public class PartGateNOR extends PartGate {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH)).invert();
+				return State.input(getValueInside(EnumFacing.NORTH)).invert();
 			case 1:
-				return State.input(getOutputInsideClient(EnumFacing.NORTH));
+				return State.input(getValueInside(EnumFacing.NORTH));
 		}
 		return State.ON;
 	}
 
 	@Override
-	public byte getOutputInside(EnumFacing side) {
+	public byte calculateOutputInside(EnumFacing side) {
 		if (side == EnumFacing.NORTH) {
 			for (EnumFacing facing : EnumFacing.HORIZONTALS) {
 				if (isSideOpen(facing) && facing != EnumFacing.NORTH) {
-					if (getInputInside(facing) != 0) {
+					if (getValueInside(facing) != 0) {
 						return 0;
 					}
 				}
