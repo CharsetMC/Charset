@@ -65,6 +65,7 @@ public class ModCharsetGates {
 		registerGate("pulse_former", PartGatePulseFormer.class, 3);
 		registerGate("multiplexer", PartGateMultiplexer.class, 4);
 		registerGate("rs_latch", PartGateRSLatch.class, 5);
+		registerGate("buffer", PartGateBuffer.class, 6);
 
 		ModCharsetLib.proxy.registerItemModel(itemScrewdriver, 0, "charsetgates:screwdriver");
 
@@ -84,24 +85,28 @@ public class ModCharsetGates {
 		registerGateStack(ItemGate.getStack(new PartGatePulseFormer()), "wcw", "cwc", "wws");
 		registerGateStack(ItemGate.getStack(new PartGateMultiplexer()), "wcw", "csc", "wcw");
 		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs");
+		registerGateStack(ItemGate.getStack(new PartGateBuffer()));
+		registerGateStack(ItemGate.getStack(new PartGateBuffer().setInvertedSides(0b0001)));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemScrewdriver), "  i", "si ", "ws ", 'i', "ingotIron", 's', "stickWood",
 				'w', new ItemStack(Blocks.WOOL, 1, EnumDyeColor.PINK.getMetadata())));
 	}
 
 	private void registerGateStack(ItemStack stack, Object... recipe) {
-		List<Object> data = new ArrayList<Object>();
-		for (Object o : recipe) {
-			data.add(o);
-		}
+		if (recipe.length > 0) {
+			List<Object> data = new ArrayList<Object>();
+			for (Object o : recipe) {
+				data.add(o);
+			}
 
-		data.add('c');
-		data.add(new ItemStack(Blocks.REDSTONE_TORCH));
-		data.add('w');
-		data.add(Loader.isModLoaded("CharsetWires") ? Item.getByNameOrId("CharsetWires:wire") : Items.REDSTONE);
-		data.add('s');
-		data.add(new ItemStack(Blocks.STONE_SLAB));
-		GameRegistry.addRecipe(new ShapedOreRecipe(stack, data.toArray(new Object[data.size()])));
+			data.add('c');
+			data.add(new ItemStack(Blocks.REDSTONE_TORCH));
+			data.add('w');
+			data.add(Loader.isModLoaded("CharsetWires") ? Item.getByNameOrId("CharsetWires:wire") : Items.REDSTONE);
+			data.add('s');
+			data.add(new ItemStack(Blocks.STONE_SLAB));
+			GameRegistry.addRecipe(new ShapedOreRecipe(stack, data.toArray(new Object[data.size()])));
+		}
 
 		registerGateStack(stack);
 	}
