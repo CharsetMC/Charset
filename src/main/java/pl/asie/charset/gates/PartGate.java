@@ -15,9 +15,12 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -276,6 +279,28 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	@Override
 	public List<ItemStack> getDrops() {
 		return Arrays.asList(ItemGate.getStack(this, false));
+	}
+
+	public List<ItemStack> getDrops(EntityPlayer player) {
+		return Arrays.asList(ItemGate.getStack(this, EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getHeldItemMainhand()) > 0));
+	}
+
+	// Refer to Multipart.class when updating
+	@Override
+	public void harvest(EntityPlayer player, PartMOP hit) {
+		World world = getWorld();
+		BlockPos pos = getPos();
+		double x = pos.getX() + 0.5, y = pos.getY() + 0.25, z = pos.getZ() + 0.5;
+
+		if ((player == null || !player.capabilities.isCreativeMode) && !world.isRemote && world.getGameRules().getBoolean("doTileDrops")
+				&& !world.restoringBlockSnapshots) {
+			for (ItemStack stack : getDrops(player)) {
+				EntityItem item = new EntityItem(world, x, y, z, stack);
+				item.setDefaultPickupDelay();
+				world.spawnEntityInWorld(item);
+			}
+		}
+		getContainer().removePart(this);
 	}
 
 	@Override

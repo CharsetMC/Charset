@@ -20,7 +20,7 @@ public class ModelPipe extends ModelPipeLike<PartPipe> {
 
     @Override
     public int getInsideColor(EnumFacing facing) {
-        return facing.getAxis() == EnumFacing.Axis.Y ? 0xFFA0A0A0 : 0xFFC8C8C8;
+        return facing.getAxis() == EnumFacing.Axis.Y ? 0xFFC8C8C8 : 0xFFE8E8E8;
     }
 
     @Override

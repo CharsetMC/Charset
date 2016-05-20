@@ -14,8 +14,10 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
+import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
@@ -38,6 +40,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 	protected static BlockModelRenderer renderer;
 	protected static RenderItem renderItem;
+	protected static ItemColors itemColors;
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
 	private static final float ITEM_RANDOM_OFFSET = 0.01F;
 
@@ -84,6 +87,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 	}
 
 	private final class ItemModelTransformer implements ModelTransformer.IVertexTransformer {
+		private ItemStack stack;
 		private float[] offset;
 		private float scale;
 		private EnumFacing direction;
@@ -110,6 +114,15 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 				}
 				for (int i = 0; i < 3; i++) {
 					data[i] = ((data[i] - 0.5f) * scale) + offset[i];
+				}
+			} else if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR && quad.hasTintIndex()) {
+				int k = itemColors.getColorFromItemstack(stack, quad.getTintIndex());
+				if (EntityRenderer.anaglyphEnable) {
+					k = TextureUtil.anaglyphColor(k);
+				}
+
+				for (int i = 0; i < Math.min(data.length, 3); i++) {
+					data[i] = data[i] * ((k >> ((2 - i) * 8)) & 0xFF) / 255.0f;
 				}
 			}
 			return data;
@@ -249,6 +262,10 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 			renderItem = Minecraft.getMinecraft().getRenderItem();
 		}
 
+		if (itemColors == null) {
+			itemColors = Minecraft.getMinecraft().getItemColors();
+		}
+
 		BlockPos pos = part.getPos();
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
@@ -299,6 +316,7 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 					continue;
 				}
 
+				ITEM_MODEL_TRANSFORMER.stack = stack;
 				ITEM_MODEL_TRANSFORMER.scale = getItemScale(item);
 				ITEM_MODEL_TRANSFORMER.direction = id;
 				ITEM_MODEL_TRANSFORMER.offset = calculateItemOffset(item, partialTicks);
@@ -306,6 +324,8 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 				renderer.renderModel(getWorld(), ModelTransformer.transform(model, DEFAULT_STATE, 0L, ITEM_MODEL_TRANSFORMER), DEFAULT_STATE, pos, buffer, false);
 			}
 		}
+
+		buffer.setTranslation(0, 0, 0);
 	}
 
 	@Override
