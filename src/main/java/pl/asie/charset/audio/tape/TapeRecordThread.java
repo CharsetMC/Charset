@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.laszlosystems.libresample4j.Resampler;
 import org.apache.commons.io.FilenameUtils;
 
 import net.minecraftforge.fml.common.Loader;
@@ -15,7 +16,6 @@ import paulscode.sound.SoundBuffer;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
 import pl.asie.charset.audio.ModCharsetAudio;
-import pl.asie.charset.audio.repack.com.laszlosystems.libresample4j.Resampler;
 import pl.asie.charset.lib.utils.DFPWM;
 
 public class TapeRecordThread implements Runnable {

@@ -1,34 +1,62 @@
 buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-    }
+	repositories {
+		jcenter()
+		maven {
+			name = "forge"
+			url = "http://files.minecraftforge.net/maven"
+		}
+	}
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+	}
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
-
-version = "0.3.0-pre5"
-group= "pl.asie.charset"
-archivesBaseName = "Charset"
-
-minecraft {
-    version = "1.9.4-12.17.0.1909-1.9.4"
-    
-    runDir = "run"
-    useDepAts = true
-    mappings = "snapshot_20160519"
-
-    replace '@VERSION@', project.version
-    replace '@MC_VERSION@', version
-}
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+version = "0.3.0-pre5"
+group = "pl.asie.charset"
+archivesBaseName = "Charset"
+
+minecraft {
+	version = "1.9.4-12.17.0.1909-1.9.4"
+
+	runDir = "run"
+	useDepAts = true
+	makeObfSourceJar = false
+	mappings = "snapshot_20160520"
+
+	replace '@VERSION@', project.version
+	replace '@MC_VERSION@', version
+}
+
+repositories {
+	maven { url "http://maven.amadornes.com/" }
+	maven {
+		name 'DVS1 Maven FS'
+		url 'http://dvs1.progwml6.com/files/maven'
+	}
+	ivy {
+		name 'asie dependency mirror'
+		artifactPattern "http://asie.pl/javadeps/[module]-[revision](-[classifier]).[ext]"
+	}
+}
+
+configurations {
+	shadow
+	compile.extendsFrom shadow
+}
+
+dependencies {
+	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_68:universal"
+	deobfCompile "mezz.jei:jei_1.9.4:3.4.0.202"
+	shadow name: "libresample4j", version: "bc0a030"
+	shadow name: "JTraits", version: "18c8227"
+}
 
 sourceSets {
 	main {
@@ -38,43 +66,46 @@ sourceSets {
 	}
 }
 
-repositories {
-    maven { url "http://maven.amadornes.com/" }
-    maven {
-        name 'DVS1 Maven FS'
-        url 'http://dvs1.progwml6.com/files/maven'
-    }
-}
-dependencies {
-    deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_68:universal"
-    deobfCompile "mezz.jei:jei_1.9.4:3.4.0.202"
+processResources {
+	// this will ensure that this task is redone when the versions change.
+	inputs.property "version", project.version
+	inputs.property "mcversion", project.minecraft.version
+
+	// replace stuff in mcmod.info, nothing else
+	from(sourceSets.main.resources.srcDirs) {
+		include 'mcmod.info'
+		
+		// replace version and mcversion
+		expand 'version':project.version, 'mcversion':project.minecraft.version
+	}
+
+	// copy everything else, thats not the mcmod.info
+	from(sourceSets.main.resources.srcDirs) {
+		exclude 'mcmod.info'
+	}
 }
 
-processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+jar.dependsOn shadowJar
+jar.enabled = false
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+shadowJar {
+	archiveName = tasks.jar.archiveName
+	configurations = [project.configurations.shadow]
+	relocate 'com.amadornes.jtraits', 'pl.asie.charset.lib.jtraits'
+	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.audio.libresample4j'
 }
+
+reobfJar {
+	setJar(tasks.shadowJar.archivePath)
+}
+reobfJar.dependsOn shadowJar
 
 task deobfJar(type: Jar) {
-    from(sourceSets.main.output) {
-        classifier = "deobf"
-    }
+	from(sourceSets.main.output) {
+		classifier = "deobf"
+	}
 }
+
 artifacts {
-    archives deobfJar
+	archives deobfJar
 }
