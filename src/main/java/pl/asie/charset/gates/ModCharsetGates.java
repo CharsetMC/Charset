@@ -41,7 +41,6 @@ public class ModCharsetGates {
 
 	public static PacketRegistry packet;
 	public static ItemGate itemGate;
-	public static ItemScrewdriver itemScrewdriver;
 
 	static final String[] gateMeta = new String[64]; // TODO: why 64 lol
 	static final String[] gateUN = new String[64];
@@ -56,9 +55,6 @@ public class ModCharsetGates {
 		itemGate = new ItemGate();
 		GameRegistry.register(itemGate.setRegistryName("gate"));
 
-		itemScrewdriver = new ItemScrewdriver();
-		GameRegistry.register(itemScrewdriver.setRegistryName("screwdriver"));
-
 		registerGate("nand", PartGateNAND.class, 0);
 		registerGate("nor", PartGateNOR.class, 1);
 		registerGate("xor", PartGateXOR.class, 2);
@@ -66,8 +62,6 @@ public class ModCharsetGates {
 		registerGate("multiplexer", PartGateMultiplexer.class, 4);
 		registerGate("rs_latch", PartGateRSLatch.class, 5);
 		registerGate("buffer", PartGateBuffer.class, 6);
-
-		ModCharsetLib.proxy.registerItemModel(itemScrewdriver, 0, "charsetgates:screwdriver");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 	}
@@ -87,9 +81,6 @@ public class ModCharsetGates {
 		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs");
 		registerGateStack(ItemGate.getStack(new PartGateBuffer()));
 		registerGateStack(ItemGate.getStack(new PartGateBuffer().setInvertedSides(0b0001)));
-
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(itemScrewdriver), "  i", "si ", "ws ", 'i', "ingotIron", 's', "stickWood",
-				'w', new ItemStack(Blocks.WOOL, 1, EnumDyeColor.PINK.getMetadata())));
 	}
 
 	private void registerGateStack(ItemStack stack, Object... recipe) {

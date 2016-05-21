@@ -457,6 +457,10 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 			} else {
 				top = top.rotateYCCW();
 			}
+
+			notifyBlockUpdate();
+			onChanged();
+			sendUpdatePacket();
 			return true;
 		}
 		return false;
@@ -520,25 +524,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		boolean remote = getWorld().isRemote;
 
 		if (stack != null) {
-			if (stack.getItem() instanceof ItemScrewdriver) {
-				if (playerIn.isSneaking()) {
-					if (!remote) {
-						top = top.rotateY();
-					}
-					changed = true;
-				} else {
-					EnumFacing closestFace = getClosestFace(vec.subtract(getPos().getX(), getPos().getY(), getPos().getZ()));
-
-					if (closestFace != null) {
-						if (canBlockSide(closestFace)) {
-							if (!remote) {
-								enabledSides ^= (1 << (closestFace.ordinal() - 2));
-							}
-							changed = true;
-						}
-					}
-				}
-			} else if (stack.getItem() instanceof ItemBlock) {
+			if (stack.getItem() instanceof ItemBlock) {
 				Block block = Block.getBlockFromItem(stack.getItem());
 				if (block == Blocks.REDSTONE_TORCH || block == Blocks.UNLIT_REDSTONE_TORCH) {
 					EnumFacing closestFace = getClosestFace(vec.subtract(getPos().getX(), getPos().getY(), getPos().getZ()));
@@ -565,6 +551,15 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 								new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
 					}
 					changed = true;
+				} else if (playerIn.isSneaking()) {
+					if (closestFace != null) {
+						if (canBlockSide(closestFace)) {
+							if (!remote) {
+								enabledSides ^= (1 << (closestFace.ordinal() - 2));
+							}
+							changed = true;
+						}
+					}
 				}
 			}
 		}
