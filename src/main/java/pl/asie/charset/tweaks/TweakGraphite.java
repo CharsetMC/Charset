@@ -27,7 +27,7 @@ public class TweakGraphite extends Tweak {
 	@Override
 	public boolean preInit() {
 		graphite = new Item().setCreativeTab(ModCharsetLib.CREATIVE_TAB).setUnlocalizedName("charset.graphite");
-		GameRegistry.registerItem(graphite, "graphite");
+		GameRegistry.register(graphite.setRegistryName("graphite"));
 
 		ModCharsetLib.proxy.registerItemModel(graphite, 0, "charsettweaks:graphite");
 		return true;

@@ -244,7 +244,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			}
 		}
 
-		if (!OcclusionHelper.occlusionTest(getContainer().getParts(), p -> p == this, BOXES[side.ordinal()])) {
+		if (!OcclusionHelper.occlusionTest(OcclusionHelper.boxes(BOXES[side.ordinal()]), p -> p == this, getContainer())) {
 			return false;
 		}
 

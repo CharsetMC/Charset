@@ -31,7 +31,7 @@ public class TweakGlassShards extends Tweak {
 	@Override
 	public boolean preInit() {
 		shardItem = new ItemShard();
-		GameRegistry.registerItem(shardItem, "shard");
+		GameRegistry.register(shardItem.setRegistryName("shard"));
 
 		ModCharsetLib.proxy.registerItemModel(shardItem, 0, "charsettweaks:shard");
 		for (int i = 1; i <= ItemShard.MAX_SHARD; i++) {

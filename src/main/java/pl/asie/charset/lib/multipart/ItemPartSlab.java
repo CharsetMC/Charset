@@ -32,11 +32,11 @@ public abstract class ItemPartSlab extends ItemMultiPart {
 		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
 		if (container != null) {
 			boolean occupiedDown = false;
-			if (container.getPartInSlot(PartSlot.DOWN) != null || !OcclusionHelper.occlusionTest(container.getParts(), PartSlab.BOXES[0])) {
+			if (container.getPartInSlot(PartSlot.DOWN) != null || !OcclusionHelper.occlusionTest(OcclusionHelper.boxes(PartSlab.BOXES[0]), container.getParts())) {
 				slab.isTop = true;
 				occupiedDown = true;
 			}
-			if (slab.isTop && (container.getPartInSlot(PartSlot.UP) != null || !OcclusionHelper.occlusionTest(container.getParts(), PartSlab.BOXES[1]))) {
+			if (slab.isTop && (container.getPartInSlot(PartSlot.UP) != null || !OcclusionHelper.occlusionTest(OcclusionHelper.boxes(PartSlab.BOXES[1]), container.getParts()))) {
 				if (occupiedDown) {
 					return null;
 				} else {

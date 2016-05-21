@@ -1,9 +1,6 @@
 package pl.asie.charset.audio.storage;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -12,6 +9,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.ModCharsetLib;
 
 public class DataStorageImpl implements IDataStorage {
 	private String uniqueId;
@@ -156,13 +154,18 @@ public class DataStorageImpl implements IDataStorage {
 		}
 
 		int position = 0;
-		while (position < this.data.length) {
-			int s = stream.read(this.data, position, this.data.length - position);
-			if (s >= 0) {
-				position += s;
-			} else {
-				break;
+		try {
+			while (position < this.data.length) {
+				int s = stream.read(this.data, position, this.data.length - position);
+				if (s >= 0) {
+					position += s;
+				} else {
+					break;
+				}
 			}
+		} catch (EOFException e) {
+			ModCharsetLib.logger.warn("Tape " + getUniqueId() + " might have been corrupted.");
+			dirty = true;
 		}
 
 		stream.close();

@@ -273,10 +273,10 @@ public final class WireUtils {
 				}
 
 				return block.shouldCheckWeakPower(state, world, pos, facing)
-						? block.getStrongPower(state, world, pos, facing)
-						: block.getWeakPower(state, world, pos, facing);
+						? state.getStrongPower(world, pos, facing)
+						: state.getWeakPower(world, pos, facing);
 			} else {
-				return block.getStrongPower(state, world, pos, facing);
+				return state.getStrongPower(world, pos, facing);
 			}
 		} else {
 			return power;

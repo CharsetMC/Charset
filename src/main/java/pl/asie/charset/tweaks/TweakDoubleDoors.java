@@ -70,7 +70,7 @@ public class TweakDoubleDoors extends Tweak {
 
 	private IBlockState getActualState(IBlockAccess access, BlockPos pos) {
 		IBlockState state = access.getBlockState(pos);
-		return state.getBlock().getActualState(state, access, pos);
+		return state.getActualState(access, pos);
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOW)

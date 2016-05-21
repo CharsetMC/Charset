@@ -360,7 +360,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 								if (s.getBlock() instanceof BlockRedstoneWire) {
 									values[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
 								} else {
-									values[i] = (byte) s.getBlock().getWeakPower(s, w, p, real);
+									values[i] = (byte) s.getWeakPower(w, p, real);
 								}
 							}
 						}

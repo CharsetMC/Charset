@@ -503,7 +503,7 @@ public abstract class PartWireBase extends Multipart implements
 					boolean found = false;
 					AxisAlignedBB mask = getBox(i + 1);
 					if (mask != null) {
-						if (!OcclusionHelper.occlusionTest(parts, p -> p == this, mask)) {
+						if (!OcclusionHelper.occlusionTest(OcclusionHelper.boxes(mask), p -> p == this, parts)) {
 							occludedSides |= 1 << connFaces[i].ordinal();
 							validSides.remove(face);
 							found = true;
@@ -516,14 +516,14 @@ public abstract class PartWireBase extends Multipart implements
 						if (cornerMask != null) {
 							IMultipartContainer cornerContainer = MultipartHelper.getPartContainer(getWorld(), cPos);
 							if (cornerContainer != null) {
-								if (!OcclusionHelper.occlusionTest(cornerContainer.getParts(), cornerMask)) {
+								if (!OcclusionHelper.occlusionTest(OcclusionHelper.boxes(cornerMask), cornerContainer.getParts())) {
 									cornerOccludedSides |= 1 << connFaces[i].ordinal();
 									invalidCornerSides.add(face);
 								}
 							} else {
 								List<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
 								IBlockState cState = getWorld().getBlockState(cPos);
-								cState.getBlock().addCollisionBoxToList(cState, getWorld(), cPos,
+								cState.addCollisionBoxToList(getWorld(), cPos,
 										cornerMask.offset(cPos.getX(), cPos.getY(), cPos.getZ()), boxes, null);
 								if (boxes.size() > 0) {
 									cornerOccludedSides |= 1 << connFaces[i].ordinal();
@@ -539,7 +539,7 @@ public abstract class PartWireBase extends Multipart implements
 		if (validSides.contains(WireFace.CENTER)) {
 			AxisAlignedBB mask = getCenterBox(1 + location.ordinal());
 			if (mask != null) {
-				if (!OcclusionHelper.occlusionTest(parts, p -> p == this, mask)) {
+				if (!OcclusionHelper.occlusionTest(OcclusionHelper.boxes(mask), p -> p == this, parts)) {
 					occludedSides |= 1 << 6;
 					validSides.remove(WireFace.CENTER);
 				}

@@ -33,7 +33,7 @@ public final class RedstoneUtils {
 			return iblockstate.getValue(BlockRedstoneWire.POWER);
 		}
 
-		return block.shouldCheckWeakPower(iblockstate, world, pos, facing) ? world.getStrongPower(pos) : block.getWeakPower(iblockstate, world, pos, facing);
+		return block.shouldCheckWeakPower(iblockstate, world, pos, facing) ? world.getStrongPower(pos) : iblockstate.getWeakPower(world, pos, facing);
 	}
 
 	public static boolean canConnectFace(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side, EnumFacing face) {
