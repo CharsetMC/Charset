@@ -28,4 +28,7 @@ done
 
 cd "$OUTDIR"
 cp modules.json releases/"$1"/
+if [ -f changelog/"$1".txt ]; then
+  cp changelog/"$1".txt releases/"$1"/changelog.txt
+fi
 rm -rf $TMPDIR

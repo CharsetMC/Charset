@@ -43,14 +43,21 @@
 	"storage": {
 		"char": "#",
 		"default": true,
-		"description": "Things useful for storage (Backpacks, Locks)",
+		"description": "Things useful for storage (Backpacks, Locks, etc.)",
 		"dependencies": ["lib"],
 		"stability": "staging"
 	},
 	"drama": {
 		"char": "!",
-		"default": true,
+		"default": false,
 		"description": "Drama Generator in Minecraft. Joke module.",
+		"dependencies": ["lib"],
+		"stability": "stable"
+	},
+	"wrench": {
+		"char": "/",
+		"default": true,
+		"description": "A wrench which happens to rotate multiparts.",
 		"dependencies": ["lib"],
 		"stability": "stable"
 	}
