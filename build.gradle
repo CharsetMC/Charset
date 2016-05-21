@@ -18,7 +18,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.3.0-pre5"
+version = "0.3.0"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
@@ -55,7 +55,7 @@ dependencies {
 	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_70:universal"
 	deobfCompile "mezz.jei:jei_1.9.4:3.4.0.202"
 	shadow name: "libresample4j", version: "bc0a030"
-	shadow name: "JTraits", version: "18c8227"
+//	shadow name: "JTraits", version: "18c8227"
 }
 
 sourceSets {

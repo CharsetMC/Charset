@@ -3,6 +3,7 @@ package pl.asie.charset.pipes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.Sys;
 import pl.asie.charset.lib.render.ModelPipeLike;
 
 public class ModelPipe extends ModelPipeLike<PartPipe> {

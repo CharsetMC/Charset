@@ -63,11 +63,12 @@ public class ModCharsetPipes {
 
 		ModCharsetLib.proxy.registerItemModel(itemPipe, 0, "charsetpipes:pipe");
 		ModCharsetLib.proxy.registerItemModel(shifterBlock, 0, "charsetpipes:shifter");
+
+		MinecraftForge.EVENT_BUS.register(proxy);
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(proxy);
 		proxy.registerRenderers();
 
 		packet = new PacketRegistry(ModCharsetPipes.MODID);

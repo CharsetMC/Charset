@@ -68,9 +68,6 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
     public abstract boolean isOpaque();
     public abstract TextureAtlasSprite getTexture(EnumFacing side, int connectionMatrix);
 
-    @Override
-    public abstract TextureAtlasSprite getParticleTexture();
-
     protected List<BakedQuad> generateQuads(boolean[] connections) {
         List<BakedQuad> quads = new ArrayList<>();
         Vector3f from, to;
@@ -128,6 +125,7 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
 
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+
         if (side != null) {
             return Collections.emptyList();
         }

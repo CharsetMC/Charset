@@ -10,7 +10,7 @@ mv mcmod.info mcmod-orig.info
 
 for i in `jq -r keys[] "$OUTDIR"/modules.json`; do
 	echo "[" > mcmod.info
-	jq '.[] | select((.modid | ascii_downcase) == "charset'$i'")' mcmod-orig.info >> mcmod.info
+	jq '.modList[] | select((.modid | ascii_downcase) == "charset'$i'")' mcmod-orig.info >> mcmod.info
 	echo "]" >> mcmod.info
 	if [ "$i" = "lib" ]; then
 		jar cvf "$OUTDIR"/releases/"$1"/charset-"$1"-"$i".jar \

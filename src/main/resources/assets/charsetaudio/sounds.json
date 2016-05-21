@@ -1,3 +1,3 @@
 {
-	"tape_rewind": {"category": "block", "sounds": [{"name": "tape_rewind", "stream": false}]}
+	"tape_rewind": {"category": "block", "sounds": [{"name": "charsetaudio:tape_rewind", "stream": false}]}
 }
