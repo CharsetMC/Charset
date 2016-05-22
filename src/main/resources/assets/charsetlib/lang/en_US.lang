@@ -1,1 +1,86 @@
+# CharsetAudio
+item.charset.tape.name=Tape
+item.charset.tapedrive.name=Tape Drive
+item.charset.tapereel.name=Tape Reel
+item.charset.tapeitem.name=Magnetic Tape
+
+item.charset.tape.iron.name=Iron Tape
+item.charset.tape.gold.name=Gold Tape
+item.charset.tape.diamond.name=Diamond Tape
+item.charset.tape.emerald.name=Emerald Tape
+item.charset.tape.quartz.name=Quartz Tape
+item.charset.tape.dark_iron.name=Dark Iron Tape
+item.charset.tape.ruby.name=Ruby Tape
+item.charset.tape.sapphire.name=Sapphire Tape
+
+item.charset.tape.gold.tip=Shiny
+item.charset.tape.diamond.tip=Audiophile
+item.charset.tape.dark_iron.tip=Dank
+item.charset.tape.quartz.tip=Precise
+item.charset.tape.emerald.tip=Best of Trade
+
+tile.charset.ironNoteBlock.name=Iron Note Block
+
+tooltip.charset.tape.none=No Tape
+tooltip.charset.tape.unnamed=Unnamed Tape
+
+# CharsetDrama
+item.charset.dramaInABottle.name=Drama in a Bottle
+
+# CharsetGates
+part.charset.gate.nand=NAND Gate
+part.charset.gate.nand.i=AND Gate
+part.charset.gate.nor=NOR Gate
+part.charset.gate.nor.i=OR Gate
+part.charset.gate.xor=XOR Gate
+part.charset.gate.xor.i=XNOR Gate
+part.charset.gate.buffer=Inverted Buffer Gate
+part.charset.gate.buffer.i=Buffer Gate
+part.charset.gate.pulse_former=Pulse Former
+part.charset.gate.multiplexer=Multiplexer
+part.charset.gate.rs_latch=RS Latch
+
+# CharsetLib
+charset.color.black=Black
+charset.color.red=Red
+charset.color.green=Green
+charset.color.brown=Brown
+charset.color.blue=Blue
+charset.color.purple=Purple
+charset.color.cyan=Cyan
+charset.color.silver=Light Gray
+charset.color.gray=Gray
+charset.color.pink=Pink
+charset.color.lime=Lime
+charset.color.yellow=Yellow
+charset.color.lightBlue=Light Blue
+charset.color.magenta=Magenta
+charset.color.orange=Orange
+charset.color.white=White
+
 itemGroup.charset=The Charset Project
+
+# CharsetPipes
+item.charset.pipe.name=Pipe
+tile.charset.shifter.name=Shifter
+
+# CharsetStorage
+key.charset.backpackOpen=Open Backpack
+item.charset.key.name=Key
+item.charset.lock.name=Lock
+item.charset.masterKey.name=Master Key
+tile.charset.backpack.name=Backpack
+
+# CharsetTweaks
+item.charset.graphite.name=Graphite
+item.charset.shard.colored.name=%s Glass Shard
+item.charset.shard.name=Glass Shard
+
+# CharsetWires
+tile.charset.wire.name=Redstone Cable
+tile.charset.wire.insulated.name=%s Insulated Cable
+tile.charset.wire.bundled.name=Bundled Cable
+tile.charset.wire.freestanding.name=Freestanding %s
+
+# CharsetWrench
+item.charset.wrench.name=Wrench

@@ -9,10 +9,12 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.ColorUtils;
 
 /**
  * Created by asie on 1/15/16.
@@ -43,8 +45,16 @@ public class ItemShard extends Item {
 	}
 
 	@Override
+	public String getItemStackDisplayName(ItemStack stack) {
+		if (stack.getItemDamage() > 0 && stack.getItemDamage() <= 16) {
+			return I18n.translateToLocalFormatted("item.charset.shard.colored.name", I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", stack.getItemDamage() - 1)));
+		} else {
+			return I18n.translateToLocal("item.charset.shard.name");
+		}
+	}
+	@Override
 	public String getUnlocalizedName(ItemStack stack) {
-		return "item.charset.shard." + stack.getItemDamage();
+		return "item.charset.shard.name";
 	}
 
 	@Override

@@ -13,18 +13,18 @@ public final class ColorUtils {
 			0x664C33, 0x667F33, 0x993333, 0x191919
 	};
 
-	private static final String[] WOOL_TO_NAME = new String[]{
-			"white", "orange", "magenta", "light.blue",
-			"yellow", "lime", "pink", "gray",
-			"light.gray", "cyan", "purple", "blue",
-			"brown", "green", "red", "black"
-	};
-
-	private static final String[] OREDICT_DYE_SUFFIXES = new String[]{
+	private static final String[] UPPERCASE_DYE_SUFFIXES = new String[]{
 			"White", "Orange", "Magenta", "LightBlue",
 			"Yellow", "Lime", "Pink", "Gray",
 			"LightGray", "Cyan", "Purple", "Blue",
 			"Brown", "Green", "Red", "Black"
+	};
+
+	private static final String[] LOWERCASE_DYE_SUFFIXES = new String[]{
+			"white", "orange", "magenta", "lightBlue",
+			"yellow", "lime", "pink", "gray",
+			"lightGray", "cyan", "purple", "blue",
+			"brown", "green", "red", "black"
 	};
 
 	private static final int[] OREDICT_DYE_IDS = new int[16];
@@ -40,7 +40,7 @@ public final class ColorUtils {
 
 	public static void initialize() {
 		for (int i = 0; i < 16; i++) {
-			OREDICT_DYE_IDS[i] = OreDictionary.getOreID("dye" + OREDICT_DYE_SUFFIXES[i]);
+			OREDICT_DYE_IDS[i] = OreDictionary.getOreID("dye" + UPPERCASE_DYE_SUFFIXES[i]);
 		}
 	}
 
@@ -73,12 +73,12 @@ public final class ColorUtils {
 		return WOOL_TO_RGB[wool & 15];
 	}
 
-	public static String getNameSuffix(int wool) {
-		return WOOL_TO_NAME[wool & 15];
+	public static String getOreDictEntry(String prefix, int wool) {
+		return prefix + UPPERCASE_DYE_SUFFIXES[wool & 15];
 	}
 
-	public static String getOreDictEntry(String prefix, int wool) {
-		return prefix + OREDICT_DYE_SUFFIXES[wool & 15];
+	public static String getLangEntry(String prefix, int wool) {
+		return prefix + LOWERCASE_DYE_SUFFIXES[wool & 15];
 	}
 
 	public static String getFormatting(int wool) {

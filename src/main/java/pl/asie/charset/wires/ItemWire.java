@@ -20,6 +20,7 @@ import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 import pl.asie.charset.wires.logic.PartWireProvider;
 
@@ -64,7 +65,7 @@ public class ItemWire extends ItemMultiPart {
 				name = I18n.translateToLocal("tile.charset.wire.name");
 				break;
 			case INSULATED:
-				name = String.format(I18n.translateToLocal("tile.charset.wire.insulated.suffix"), I18n.translateToLocal("charset.color." + EnumDyeColor.byMetadata(kind.color()).getUnlocalizedName()));
+				name = String.format(I18n.translateToLocal("tile.charset.wire.insulated.name"), I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", kind.color())));
 				break;
 			case BUNDLED:
 				name = I18n.translateToLocal("tile.charset.wire.bundled.name");
@@ -72,7 +73,7 @@ public class ItemWire extends ItemMultiPart {
 		}
 
 		if (isFreestanding(stack)) {
-			name = String.format(I18n.translateToLocal("tile.charset.wire.freestanding.prefix"), name);
+			name = String.format(I18n.translateToLocal("tile.charset.wire.freestanding.name"), name);
 		}
 
 		return name;

@@ -293,7 +293,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	public List<ItemStack> getDrops(EntityPlayer player) {
-		return Arrays.asList(ItemGate.getStack(this, EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getHeldItemMainhand()) > 0));
+		return Arrays.asList(ItemGate.getStack(this, player != null ? (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getHeldItemMainhand()) > 0) : false));
 	}
 
 	// Refer to Multipart.class when updating

@@ -23,8 +23,6 @@ public class ModCharsetWrench {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		MultipartRegistry.registerPartFactory(new PartWireProvider(), "charsetwires:wire");
-
 		wrench = new ItemWrench();
 		GameRegistry.register(wrench.setRegistryName("wrench"));
 		ModCharsetLib.proxy.registerItemModel(wrench, 0, "charsetwrench:wrench");
