@@ -1,74 +1,93 @@
-[
-	{
-		"modid": "CharsetLib",
-		"name": "‽",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "Shared library mod",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	},
-	{
-		"modid": "CharsetAudio",
-		"name": "♫",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "Audio playback",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	},
-	{
-		"modid": "CharsetPipes",
-		"name": "|",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "Item transport system",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	},
-	{
-		"modid": "CharsetTweaks",
-		"name": "*",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "Miscellanous gameplay tweaks",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	},
-	{
-		"modid": "CharsetWires",
-		"name": "+",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "RedPower-style wires",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	},
-	{
-		"modid": "CharsetGates",
-		"name": "&",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "Various logic gates",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	},
-	{
-		"modid": "CharsetStorage",
-		"name": "#",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "Objects which help store things",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	},
-	{
-		"modid": "CharsetDrama",
-		"name": "!",
-		"version": "${version}",
-		"mcversion": "${mcversion}",
-		"description": "Straight Outta Reddit",
-		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
-	}
-]
+{
+    "modListVersion": 2,
+    "modList": [
+        {
+            "modid": "CharsetLib",
+            "name": "‽",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Base library mod",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetPipes",
+            "name": "|",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Item transport system",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetTweaks",
+            "name": "*",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Gameplay/aesthetic tweaks to vanilla",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetWires",
+            "name": "+",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Redstone cabling with analog support",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetGates",
+            "name": "&",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Simple redstone gates",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetAudio",
+            "name": "♫",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Tape Drives, Iron Note Block, etc.",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetStorage",
+            "name": "#",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Things useful for storage (Backpacks, Locks, etc.)",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetDrama",
+            "name": "!",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Drama Generator in Minecraft. Joke module.",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        }
+    ]
+}

@@ -12,12 +12,12 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "0.2.4"
+version = "0.2.6"
 group= "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-    version = "1.8.9-11.15.1.1808"
+    version = "1.8.9-11.15.1.1902-1.8.9"
     runDir = "run"
     useDepAts = true
     

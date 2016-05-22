@@ -1,0 +1,2 @@
+* [Pipes] Fixed ConcurrentModificationException in item update packet
+* [Wires] Fix redstone propagation bug
