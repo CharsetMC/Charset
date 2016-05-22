@@ -8,7 +8,7 @@ cd $TMPDIR/in
 unzip "$OUTDIR"/build/libs/Charset-"$1".jar
 mv mcmod.info mcmod-orig.info
 
-for i in `jq -r keys[] "$OUTDIR"/modules.json`; do
+for i in `jq -r '.modules | keys[]' "$OUTDIR"/modules.json`; do
 	echo "[" > mcmod.info
 	jq '.modList[] | select((.modid | ascii_downcase) == "charset'$i'")' mcmod-orig.info >> mcmod.info
 	echo "]" >> mcmod.info

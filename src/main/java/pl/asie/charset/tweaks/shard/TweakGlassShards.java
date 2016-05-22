@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
 
@@ -45,13 +46,15 @@ public class TweakGlassShards extends Tweak {
 		ModCharsetTweaks.proxy.initShardsTweakClient();
 		MinecraftForge.EVENT_BUS.register(this);
 
+		OreDictionary.registerOre("shardGlass", new ItemStack(shardItem, 1, OreDictionary.WILDCARD_VALUE));
+
 		GameRegistry.addShapedRecipe(new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(shardItem, 1, 0));
+		OreDictionary.registerOre("shardGlassColorless", new ItemStack(shardItem, 1, 0));
+
 		for (int i = 0; i < 16; i++) {
 			GameRegistry.addShapedRecipe(new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(shardItem, 1, i + 1));
+			OreDictionary.registerOre(ColorUtils.getOreDictEntry("shardGlass", i), new ItemStack(shardItem, 1, i + 1));
 		}
-
-		OreDictionary.registerOre("shardGlassColorless", new ItemStack(shardItem, 1, 0));
-		OreDictionary.registerOre("shardGlass", new ItemStack(shardItem, 1, OreDictionary.WILDCARD_VALUE));
 		return true;
 	}
 

@@ -1,65 +1,76 @@
 {
-	"lib": {
-		"char": "‽",
-		"default": true,
-		"description": "Base library mod",
-		"stability": "stable"
+	"mcversion": "1.9.4",
+	"modules": {
+		"lib": {
+			"char": "‽",
+			"default": true,
+			"description": "Base library mod",
+			"stability": "stable"
+		},
+		"pipes": {
+			"char": "|",
+			"default": true,
+			"description": "Item transport system",
+			"dependencies": ["lib", "mod:MCMultiPart"],
+			"stability": "stable"
+		},
+		"tweaks": {
+			"char": "*",
+			"default": true,
+			"description": "Gameplay/aesthetic tweaks to vanilla",
+			"dependencies": ["lib"],
+			"stability": "stable"
+		},
+		"wires": {
+			"char": "+",
+			"default": true,
+			"description": "Redstone cabling with analog support",
+			"dependencies": ["lib", "mod:MCMultiPart"],
+			"stability": "staging"
+		},
+		"gates": {
+			"char": "&",
+			"default": true,
+			"description": "Simple redstone gates",
+			"dependencies": ["lib", "mod:MCMultiPart"],
+			"stability": "staging"
+		},
+		"audio": {
+			"char": "♫",
+			"default": true,
+			"description": "Tape Drives, Iron Note Block, etc.",
+			"dependencies": ["lib", "mod:MCMultiPart"],
+			"recommendations": {
+				"mod:NotEnoughCodecs": "MP3/MP4/AAC/FLAC support in Tape Drives"
+			},
+			"stability": "staging"
+		},
+		"storage": {
+			"char": "#",
+			"default": true,
+			"description": "Things useful for storage (Backpacks, Locks, etc.)",
+			"dependencies": ["lib"],
+			"stability": "staging"
+		},
+		"drama": {
+			"char": "!",
+			"default": false,
+			"description": "Drama Generator in Minecraft. Joke module.",
+			"dependencies": ["lib"],
+			"stability": "stable"
+		},
+		"wrench": {
+			"char": "/",
+			"default": true,
+			"description": "A wrench which happens to rotate multiparts.",
+			"dependencies": ["lib"],
+			"stability": "stable"
+		}
 	},
-	"pipes": {
-		"char": "|",
-		"default": true,
-		"description": "Item transport system",
-		"dependencies": ["lib", "mod:MCMultiPart"],
-		"stability": "stable"
-	},
-	"tweaks": {
-		"char": "*",
-		"default": true,
-		"description": "Gameplay/aesthetic tweaks to vanilla",
-		"dependencies": ["lib"],
-		"stability": "stable"
-	},
-	"wires": {
-		"char": "+",
-		"default": true,
-		"description": "Redstone cabling with analog support",
-		"dependencies": ["lib", "mod:MCMultiPart"],
-		"stability": "staging"
-	},
-	"gates": {
-		"char": "&",
-		"default": true,
-		"description": "Simple redstone gates",
-		"dependencies": ["lib", "mod:MCMultiPart"],
-		"stability": "staging"
-	},
-	"audio": {
-		"char": "♫",
-		"default": true,
-		"description": "Tape Drives, Iron Note Block, etc.",
-		"dependencies": ["lib", "mod:MCMultiPart"],
-		"stability": "staging"
-	},
-	"storage": {
-		"char": "#",
-		"default": true,
-		"description": "Things useful for storage (Backpacks, Locks, etc.)",
-		"dependencies": ["lib"],
-		"stability": "staging"
-	},
-	"drama": {
-		"char": "!",
-		"default": false,
-		"description": "Drama Generator in Minecraft. Joke module.",
-		"dependencies": ["lib"],
-		"stability": "stable"
-	},
-	"wrench": {
-		"char": "/",
-		"default": true,
-		"description": "A wrench which happens to rotate multiparts.",
-		"dependencies": ["lib"],
-		"stability": "stable"
+	"mods": {
+		"NotEnoughCodecs": {
+			"url": "http://minecraft.curseforge.com/projects/notenoughcodecs/files"
+		}
 	}
 }
 
