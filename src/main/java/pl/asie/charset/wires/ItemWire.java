@@ -16,15 +16,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import mcmultipart.item.ItemMultiPart;
-import mcmultipart.multipart.IMultipart;
+import net.minecraftforge.fmp.item.ItemMultipart;
+import net.minecraftforge.fmp.multipart.IMultipart;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.wires.logic.PartWireBase;
 import pl.asie.charset.wires.logic.PartWireProvider;
 
-public class ItemWire extends ItemMultiPart {
+public class ItemWire extends ItemMultipart {
 	public ItemWire() {
 		super();
 		setHasSubtypes(true);

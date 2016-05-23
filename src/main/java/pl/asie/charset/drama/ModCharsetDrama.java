@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 
 @Mod(modid = ModCharsetDrama.MODID, name = ModCharsetDrama.NAME, version = ModCharsetDrama.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetDrama {
 	public static final String MODID = "CharsetDrama";
 	public static final String NAME = "!";

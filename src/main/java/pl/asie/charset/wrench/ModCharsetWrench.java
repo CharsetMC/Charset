@@ -1,6 +1,6 @@
 package pl.asie.charset.wrench;
 
-import mcmultipart.multipart.MultipartRegistry;
+import net.minecraftforge.fmp.multipart.MultipartRegistry;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -13,7 +13,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.wires.logic.PartWireProvider;
 
 @Mod(modid = ModCharsetWrench.MODID, name = ModCharsetWrench.NAME, version = ModCharsetWrench.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetWrench {
 	public static final String MODID = "CharsetWrench";
 	public static final String NAME = "/";

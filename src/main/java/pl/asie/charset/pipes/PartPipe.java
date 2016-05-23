@@ -11,9 +11,11 @@ import java.util.Set;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import mcmultipart.client.multipart.AdvancedParticleManager;
-import mcmultipart.client.multipart.IFastMSRPart;
-import mcmultipart.multipart.*;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraftforge.fmp.ForgeMultipart;
+import net.minecraftforge.fmp.client.multipart.AdvancedParticleManager;
+import net.minecraftforge.fmp.client.multipart.IFastMSRPart;
+import net.minecraftforge.fmp.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -44,13 +46,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 
-import mcmultipart.MCMultiPartMod;
-import mcmultipart.microblock.IMicroblock;
-import mcmultipart.raytrace.PartMOP;
+import net.minecraftforge.fmp.microblock.IMicroblock;
 import pl.asie.charset.api.pipes.IPipe;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
-import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable, IFastMSRPart {
@@ -142,7 +141,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	// Block logic
 
 	@Override
-	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+	public ItemStack getPickPart(EntityPlayer player, RayTraceResult hit) {
 		return new ItemStack(ModCharsetPipes.itemPipe);
 	}
 
@@ -161,7 +160,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	}
 
 	@Override
-	public float getHardness(PartMOP hit) {
+	public float getHardness(RayTraceResult hit) {
 		return 0.3F;
 	}
 
@@ -187,7 +186,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addHitEffects(PartMOP partMOP, AdvancedParticleManager advancedEffectRenderer) {
+	public boolean addHitEffects(RayTraceResult partMOP, AdvancedParticleManager advancedEffectRenderer) {
 		return true;
 	}
 
@@ -672,7 +671,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
+		return new ExtendedBlockState(ForgeMultipart.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
 	@Override

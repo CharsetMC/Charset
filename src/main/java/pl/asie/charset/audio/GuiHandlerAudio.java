@@ -6,10 +6,10 @@ import net.minecraft.world.World;
 
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.PartSlot;
+import net.minecraftforge.fmp.multipart.IMultipartContainer;
+import net.minecraftforge.fmp.multipart.ISlottedPart;
+import net.minecraftforge.fmp.multipart.MultipartHelper;
+import net.minecraftforge.fmp.multipart.PartSlot;
 import pl.asie.charset.audio.tape.ContainerTapeDrive;
 import pl.asie.charset.audio.tape.GuiTapeDrive;
 import pl.asie.charset.audio.tape.PartTapeDrive;

@@ -1,6 +1,6 @@
 package pl.asie.charset.wires.logic;
 
-import mcmultipart.multipart.IMultipartContainer;
+import net.minecraftforge.fmp.multipart.IMultipartContainer;
 import pl.asie.charset.api.wires.IWireInsulated;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.wires.WireUtils;

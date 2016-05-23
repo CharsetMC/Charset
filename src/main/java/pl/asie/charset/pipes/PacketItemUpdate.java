@@ -9,7 +9,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.network.INetHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import mcmultipart.multipart.IMultipart;
+import net.minecraftforge.fmp.multipart.IMultipart;
 import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.network.PacketPart;
 

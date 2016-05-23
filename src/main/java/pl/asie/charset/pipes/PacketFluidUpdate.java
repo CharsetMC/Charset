@@ -1,7 +1,7 @@
 package pl.asie.charset.pipes;
 
 import io.netty.buffer.ByteBuf;
-import mcmultipart.multipart.IMultipart;
+import net.minecraftforge.fmp.multipart.IMultipart;
 import net.minecraft.network.INetHandler;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;

@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public final class RayTraceUtils {
+
 	public static class Result {
 		public final AxisAlignedBB box;
 		public final RayTraceResult hit;
@@ -30,22 +31,27 @@ public final class RayTraceUtils {
 
 	}
 
-	public static Result getCollision(World world, BlockPos pos, EntityPlayer player, List<AxisAlignedBB> list) {
-		double reachDistance = player instanceof EntityPlayerMP ? ((EntityPlayerMP) player).interactionManager.getBlockReachDistance() : 5.0d;
+	public static Vec3d getStart(EntityPlayer player) {
+		return new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+	}
 
+	public static Vec3d getEnd(EntityPlayer player) {
+		double reachDistance = player instanceof EntityPlayerMP ? ((EntityPlayerMP) player).interactionManager.getBlockReachDistance() : 5.0d;
 		Vec3d lookVec = player.getLookVec();
-		Vec3d origin = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-		Vec3d direction = origin.addVector(lookVec.xCoord * reachDistance, lookVec.yCoord * reachDistance, lookVec.zCoord * reachDistance);
+
+		return getStart(player).addVector(lookVec.xCoord * reachDistance, lookVec.yCoord * reachDistance, lookVec.zCoord * reachDistance);
+	}
+
+	public static Result getCollision(World world, BlockPos pos, EntityPlayer player, List<AxisAlignedBB> list) {
+		Vec3d origin = getStart(player);
+		Vec3d direction = getEnd(player);
 
 		return getCollision(world, pos, origin, direction, list);
 	}
 
 	public static RayTraceResult getCollision(World world, BlockPos pos, EntityPlayer player, AxisAlignedBB aabb, int subHit) {
-		double reachDistance = player instanceof EntityPlayerMP ? ((EntityPlayerMP) player).interactionManager.getBlockReachDistance() : 5.0d;
-
-		Vec3d lookVec = player.getLookVec();
-		Vec3d origin = new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-		Vec3d direction = origin.addVector(lookVec.xCoord * reachDistance, lookVec.yCoord * reachDistance, lookVec.zCoord * reachDistance);
+		Vec3d origin = getStart(player);
+		Vec3d direction = getEnd(player);
 
 		return getCollision(pos, origin, direction, aabb, subHit);
 	}

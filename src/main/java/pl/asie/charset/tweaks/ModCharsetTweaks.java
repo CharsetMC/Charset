@@ -21,7 +21,7 @@ import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
 import pl.asie.charset.tweaks.shard.TweakGlassShards;
 
 @Mod(modid = ModCharsetTweaks.MODID, name = ModCharsetTweaks.NAME, version = ModCharsetTweaks.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetTweaks {
 	public static final String MODID = "CharsetTweaks";
 	public static final String NAME = "*";

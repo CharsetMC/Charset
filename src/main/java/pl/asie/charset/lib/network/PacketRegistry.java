@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 
-import mcmultipart.multipart.IMultipart;
+import net.minecraftforge.fmp.multipart.IMultipart;
 
 public class PacketRegistry {
 	private EnumMap<Side, FMLEmbeddedChannel> channels;

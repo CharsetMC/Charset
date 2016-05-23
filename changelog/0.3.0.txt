@@ -3,6 +3,7 @@
 * [Global] Ported to Minecraft 1.9.4
 * [Global] Add caching to most dynamic models (wires, gates)
 * [Global] Countless bugfixes across the mod
+* [Global] Move to Forge-internal multiparts
 * [Audio] Rewrite internal audio management logic, add API for future Audio Cables/Speakers
 * [Gates] Add a Buffer Gate which can also function as a NOT gate
 * [Gates] Change gate toggling mechanics - shift-right click to disable a specific side, no more screwdriver

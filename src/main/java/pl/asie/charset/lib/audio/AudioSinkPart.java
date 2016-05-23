@@ -1,6 +1,6 @@
 package pl.asie.charset.lib.audio;
 
-import mcmultipart.multipart.IMultipart;
+import net.minecraftforge.fmp.multipart.IMultipart;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import pl.asie.charset.api.audio.AudioPacket;

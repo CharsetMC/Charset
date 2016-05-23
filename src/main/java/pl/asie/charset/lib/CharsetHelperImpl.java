@@ -8,9 +8,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.MultipartHelper;
+import net.minecraftforge.fmp.multipart.IMultipart;
+import net.minecraftforge.fmp.multipart.IMultipartContainer;
+import net.minecraftforge.fmp.multipart.MultipartHelper;
 import pl.asie.charset.api.lib.CharsetHelper;
 import pl.asie.charset.lib.utils.MultipartUtils;
 

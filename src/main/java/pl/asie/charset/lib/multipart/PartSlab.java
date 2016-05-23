@@ -3,7 +3,7 @@ package pl.asie.charset.lib.multipart;
 import java.util.EnumSet;
 import java.util.List;
 
-import mcmultipart.multipart.*;
+import net.minecraftforge.fmp.multipart.*;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;

@@ -25,12 +25,12 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-import mcmultipart.multipart.MultipartRegistry;
+import net.minecraftforge.fmp.multipart.MultipartRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 @Mod(modid = ModCharsetGates.MODID, name = ModCharsetGates.NAME, version = ModCharsetGates.VERSION,
-		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetGates {
 	public static final String MODID = "CharsetGates";
 	public static final String NAME = "&";
@@ -117,7 +117,7 @@ public class ModCharsetGates {
 		gateMeta[meta] = name;
 		gateUN[meta] = unl;
 		metaGate.put(name, meta);
-		MultipartRegistry.registerPart(clazz, name);
+		MultipartRegistry.registerPart(clazz, new ResourceLocation(name));
 		ModCharsetLib.proxy.registerItemModel(itemGate, meta, name);
 	}
 

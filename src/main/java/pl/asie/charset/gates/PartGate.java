@@ -8,7 +8,9 @@ import java.util.Objects;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import mcmultipart.multipart.*;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraftforge.fmp.ForgeMultipart;
+import net.minecraftforge.fmp.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.properties.IProperty;
@@ -37,9 +39,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-import mcmultipart.MCMultiPartMod;
-import mcmultipart.capabilities.ISlottedCapabilityProvider;
-import mcmultipart.raytrace.PartMOP;
+import net.minecraftforge.fmp.capabilities.ISlottedCapabilityProvider;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -283,7 +283,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	@Override
-	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+	public ItemStack getPickPart(EntityPlayer player, RayTraceResult hit) {
 		return ItemGate.getStack(this, true);
 	}
 
@@ -298,7 +298,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	// Refer to Multipart.class when updating
 	@Override
-	public void harvest(EntityPlayer player, PartMOP hit) {
+	public void harvest(EntityPlayer player, RayTraceResult hit) {
 		World world = getWorld();
 		BlockPos pos = getPos();
 		double x = pos.getX() + 0.5, y = pos.getY() + 0.25, z = pos.getZ() + 0.5;
@@ -445,12 +445,12 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	@Override
-	public EnumFacing[] getValidRotations() {
-		return new EnumFacing[]{side, side.getOpposite()};
+	public boolean canRotatePartAround(EnumFacing axis) {
+		return axis.getAxis() == side.getAxis();
 	}
 
 	@Override
-	public boolean rotatePart(EnumFacing axis) {
+	public void rotatePartAround(EnumFacing axis) {
 		if (axis.getAxis() == side.getAxis()) {
 			if (axis.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE) {
 				top = top.rotateY();
@@ -461,9 +461,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 			notifyBlockUpdate();
 			onChanged();
 			sendUpdatePacket();
-			return true;
 		}
-		return false;
 	}
 
 	public EnumFacing getSide() {
@@ -577,12 +575,12 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer playerIn, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onActivated(EntityPlayer playerIn, EnumHand hand, ItemStack stack, RayTraceResult hit) {
 		return onActivated(playerIn, stack, hit.hitVec);
 	}
 
 	@Override
-	public float getHardness(PartMOP hit) {
+	public float getHardness(RayTraceResult hit) {
 		return 0.5F;
 	}
 
@@ -760,7 +758,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	@Override
 	public BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
+		return new ExtendedBlockState(ForgeMultipart.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
 	@Override

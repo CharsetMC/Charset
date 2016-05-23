@@ -13,9 +13,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.MultipartRedstoneHelper;
+import net.minecraftforge.fmp.multipart.IMultipartContainer;
+import net.minecraftforge.fmp.multipart.MultipartHelper;
+import net.minecraftforge.fmp.multipart.MultipartRedstoneHelper;
 
 /**
  * Created by asie on 1/6/16.

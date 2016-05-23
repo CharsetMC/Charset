@@ -8,9 +8,9 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.MultipartHelper;
+import net.minecraftforge.fmp.multipart.IMultipart;
+import net.minecraftforge.fmp.multipart.IMultipartContainer;
+import net.minecraftforge.fmp.multipart.MultipartHelper;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public abstract class PacketPart extends Packet {

@@ -9,7 +9,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 
-import mcmultipart.capabilities.CapabilityWrapperRegistry;
+import net.minecraftforge.fmp.capabilities.CapabilityWrapperRegistry;
 import pl.asie.charset.api.audio.IAudioSink;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.wires.IBundledEmitter;
@@ -39,21 +39,12 @@ public class Capabilities {
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter.class);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter.class);
-
 		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver.class);
-
 		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver.class);
 
-		if (Loader.isModLoaded("mcmultipart")) {
-			initMultiplePants();
-		}
- 	}
-
-	@Optional.Method(modid = "mcmultipart")
-	private static void initMultiplePants() {
 		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledEmitterWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneEmitterWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledReceiverWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneReceiverWrapper());
-	}
+ 	}
 }

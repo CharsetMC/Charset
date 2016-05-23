@@ -4,11 +4,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-import mcmultipart.microblock.IMicroblock;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.PartSlot;
+import net.minecraftforge.fmp.microblock.IMicroblock;
+import net.minecraftforge.fmp.multipart.IMultipartContainer;
+import net.minecraftforge.fmp.multipart.ISlottedPart;
+import net.minecraftforge.fmp.multipart.MultipartHelper;
+import net.minecraftforge.fmp.multipart.PartSlot;
 
 public final class PipeUtils {
 	private PipeUtils() {

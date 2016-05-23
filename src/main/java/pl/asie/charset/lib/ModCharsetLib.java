@@ -28,7 +28,7 @@ import pl.asie.charset.lib.utils.ColorUtils;
 /**
  * Created by asie on 11/12/15.
  */
-@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart")
+@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetLib {
 	public static final boolean INDEV = true;
 
@@ -36,8 +36,7 @@ public class ModCharsetLib {
 	public static final String MODID = "CharsetLib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart";
-	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
+	public static final String DEP_LIB = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION;
 
 	@Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;

@@ -26,7 +26,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
-import mcmultipart.client.multipart.MultipartSpecialRenderer;
+import net.minecraftforge.fmp.client.multipart.MultipartSpecialRenderer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;

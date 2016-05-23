@@ -8,6 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import mcmultipart.multipart.MultipartRegistry;
+import net.minecraftforge.fmp.multipart.MultipartRegistry;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -29,7 +30,7 @@ import pl.asie.charset.pipes.capability.ShifterImpl;
 import pl.asie.charset.pipes.capability.ShifterStorage;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
-		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetPipes {
 	public static final String MODID = "CharsetPipes";
 	public static final String NAME = "|";
@@ -55,7 +56,7 @@ public class ModCharsetPipes {
 
 		itemPipe = new ItemPipe();
 		GameRegistry.register(itemPipe.setRegistryName("pipe"));
-		MultipartRegistry.registerPart(PartPipe.class, "CharsetPipes:pipe");
+		MultipartRegistry.registerPart(PartPipe.class, new ResourceLocation("CharsetPipes:pipe"));
 
 		shifterBlock = new BlockShifter();
 		ModCharsetLib.proxy.registerBlock(shifterBlock, "shifter");

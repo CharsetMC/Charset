@@ -15,16 +15,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.*;
 
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fmp.ForgeMultipart;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
-import mcmultipart.MCMultiPartMod;
-import mcmultipart.multipart.PartSlot;
-import mcmultipart.raytrace.PartMOP;
+import net.minecraftforge.fmp.multipart.PartSlot;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.audio.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
@@ -49,7 +49,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
-	public float getHardness(PartMOP hit) {
+	public float getHardness(RayTraceResult hit) {
 		return 3.0F;
 	}
 
@@ -59,7 +59,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
-	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
+	public ItemStack getPickPart(EntityPlayer player, RayTraceResult hit) {
 		return asItemStack();
 	}
 
@@ -90,7 +90,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
-	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, PartMOP hit) {
+	public boolean onActivated(EntityPlayer player, EnumHand hand, ItemStack stack, RayTraceResult hit) {
 		player.openGui(ModCharsetAudio.instance, isTop ? PartSlot.UP.ordinal() : PartSlot.DOWN.ordinal(), getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
 		if (!player.worldObj.isRemote) {
 			ModCharsetAudio.packet.sendToWatching(new PacketDriveState(this, getState()), this);
@@ -145,7 +145,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 
 	@Override
 	public BlockStateContainer createBlockState() {
-		return new BlockStateContainer(MCMultiPartMod.multipart, PartSlab.IS_TOP, Properties.FACING4);
+		return new BlockStateContainer(ForgeMultipart.multipart, PartSlab.IS_TOP, Properties.FACING4);
 	}
 
 	@Override

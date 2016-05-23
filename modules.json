@@ -11,7 +11,7 @@
 			"char": "|",
 			"default": true,
 			"description": "Item transport system",
-			"dependencies": ["lib", "mod:MCMultiPart"],
+			"dependencies": ["lib"],
 			"stability": "stable"
 		},
 		"tweaks": {
@@ -25,21 +25,21 @@
 			"char": "+",
 			"default": true,
 			"description": "Redstone cabling with analog support",
-			"dependencies": ["lib", "mod:MCMultiPart"],
+			"dependencies": ["lib"],
 			"stability": "staging"
 		},
 		"gates": {
 			"char": "&",
 			"default": true,
 			"description": "Simple redstone gates",
-			"dependencies": ["lib", "mod:MCMultiPart"],
+			"dependencies": ["lib"],
 			"stability": "staging"
 		},
 		"audio": {
 			"char": "♫",
 			"default": true,
 			"description": "Tape Drives, Iron Note Block, etc.",
-			"dependencies": ["lib", "mod:MCMultiPart"],
+			"dependencies": ["lib"],
 			"recommendations": {
 				"mod:NotEnoughCodecs": "MP3/MP4/AAC/FLAC support in Tape Drives"
 			},
