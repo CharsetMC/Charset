@@ -97,12 +97,11 @@ public final class ColorUtils {
 		return prefix + LOWERCASE_DYE_SUFFIXES[wool & 15];
 	}
 
-	public static String getFormatting(int wool) {
-		return "\u00a7" + WOOL_TO_CHAT[wool & 15];
+	public static String ampersandToColor(String chat) {
+		return chat.replaceAll("&(?=[0-9A-FK-ORa-fk-or])", "\u00a7");
 	}
 
-	public static String getFormattingTooltip(int wool) {
-		return "\u00a7" + (WOOL_TO_CHAT[wool & 15] == '0' ? '8' : WOOL_TO_CHAT[wool & 15]);
+	public static String stripColor(String chat) {
+		return chat.replaceAll("[&§][0-9A-FK-ORa-fk-or]", "");
 	}
-
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@API(apiVersion = "0.3", owner = "CharsetLib", provides = "CharsetAPI|Pipes")
+@API(apiVersion = "0.3", owner = "CharsetAPI", provides = "CharsetAPI|Pipes")
 package pl.asie.charset.api.pipes;
 
 import net.minecraftforge.fml.common.API;

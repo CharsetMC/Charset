@@ -49,14 +49,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
+import pl.asie.charset.lib.multipart.MultipartSpecialRendererBase;
 import pl.asie.charset.lib.render.ModelTransformer;
 import pl.asie.charset.lib.render.SimpleBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
-	protected static BlockModelRenderer renderer;
-	protected static RenderItem renderItem;
-	protected static ItemColors itemColors;
+public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
 	private static final float ITEM_RANDOM_OFFSET = 0.01F;
 
@@ -81,6 +79,9 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 			new Vector3f(TANK_MAX, TANK_MAX, TANK_MAX)
 	};
 
+	private final BlockModelRenderer renderer = mc.getBlockRendererDispatcher().getBlockModelRenderer();
+	private final RenderItem renderItem = mc.getRenderItem();
+	private final ItemColors itemColors = mc.getItemColors();
 	private final IBlockState DEFAULT_STATE = Blocks.AIR.getDefaultState();
 	private final ItemModelTransformer ITEM_MODEL_TRANSFORMER = new ItemModelTransformer();
 
@@ -270,18 +271,6 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 			return;
 		}
 
-		if (renderer == null) {
-			renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
-		}
-
-		if (renderItem == null) {
-			renderItem = Minecraft.getMinecraft().getRenderItem();
-		}
-
-		if (itemColors == null) {
-			itemColors = Minecraft.getMinecraft().getItemColors();
-		}
-
 		BlockPos pos = part.getPos();
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
@@ -350,21 +339,9 @@ public class SpecialRendererPipe extends MultipartSpecialRenderer<PartPipe> {
 			return;
 		}
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-
-		VertexBuffer buffer = Tessellator.getInstance().getBuffer();
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-		renderMultipartFast(part, x, y, z, partialTicks, destroyStage, buffer);
-		Tessellator.getInstance().draw();
-
-		GlStateManager.enableLighting();
-		GlStateManager.popMatrix();
+		renderMultipartFastFromSlow(part, x, y, z, partialTicks, destroyStage);
 
 		if (SLOW_ITEMS.size() > 0) {
-
 			for (PipeItem item : SLOW_ITEMS) {
 				EnumFacing id = item.getDirection();
 				ItemStack stack = item.getStack();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@API(apiVersion = "0.1", owner = "CharsetLib", provides = "CharsetAPI|Storage")
+@API(apiVersion = "0.1", owner = "CharsetAPI", provides = "CharsetAPI|Storage")
 package pl.asie.charset.api.storage;
 
 import net.minecraftforge.fml.common.API;

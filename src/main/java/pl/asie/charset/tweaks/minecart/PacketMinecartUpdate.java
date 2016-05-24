@@ -40,7 +40,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 	}
 
 	private static void update(EntityMinecart minecart, int color) {
-		IMinecartDyeable properties = IMinecartDyeable.get(minecart);
+		MinecartDyeable properties = MinecartDyeable.get(minecart);
 		if (properties != null) {
 			properties.setColor(color);
 		}
@@ -71,7 +71,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 		super.writeData(buf);
 
 		EntityMinecart minecart = (EntityMinecart) entity;
-		IMinecartDyeable properties = IMinecartDyeable.get(minecart);
+		MinecartDyeable properties = MinecartDyeable.get(minecart);
 		buf.writeInt(properties != null ? properties.getColor() : -1);
 	}
 }

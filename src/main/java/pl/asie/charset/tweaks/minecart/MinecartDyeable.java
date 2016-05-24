@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.utils;
+package pl.asie.charset.tweaks.minecart;
 
-public final class MiscUtils {
-	private static final char[] hexArray = "0123456789abcdef".toCharArray();
+import net.minecraft.entity.item.EntityMinecart;
 
-	private MiscUtils() {
+public class MinecartDyeable {
+	private int color = -1;
 
+	public int getColor() {
+		return color;
 	}
 
-	public static String asHexString(byte[] bytes) {
-		char[] hexChars = new char[bytes.length * 2];
-
-		for (int j = 0; j < bytes.length; ++j) {
-			int v = bytes[j] & 255;
-			hexChars[j * 2] = hexArray[v >>> 4];
-			hexChars[j * 2 + 1] = hexArray[v & 15];
+	public void setColor(int color) {
+		if (color >= 0 && color <= 0xFFFFFF) {
+			this.color = color;
+		} else {
+			this.color = -1;
 		}
+	}
 
-		return new String(hexChars);
+	public static MinecartDyeable get(EntityMinecart entity) {
+		return entity.getCapability(TweakDyeableMinecarts.MINECART_DYEABLE, null);
 	}
 }

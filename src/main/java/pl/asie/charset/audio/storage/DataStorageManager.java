@@ -21,8 +21,8 @@ import java.util.Random;
 
 import net.minecraftforge.common.DimensionManager;
 
+import org.apache.commons.codec.binary.Hex;
 import pl.asie.charset.audio.ModCharsetAudio;
-import pl.asie.charset.lib.utils.MiscUtils;
 
 public class DataStorageManager {
 	private static final Random rand = new Random();
@@ -53,7 +53,7 @@ public class DataStorageManager {
 			while (i > 0) {
 				byte[] nameHex = new byte[16];
 				rand.nextBytes(nameHex);
-				String name = MiscUtils.asHexString(nameHex);
+				String name = Hex.encodeHexString(nameHex);
 				if (!exists(name)) {
 					return name;
 				}

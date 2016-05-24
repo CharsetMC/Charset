@@ -36,7 +36,7 @@ import pl.asie.charset.tweaks.Tweak;
 
 public class TweakDyeableMinecarts extends Tweak {
 	public static class CapabilityProvider implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
-		private final IMinecartDyeable dyeable = new IMinecartDyeable.Impl();
+		private final MinecartDyeable dyeable = new MinecartDyeable();
 
 		@Override
 		public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
@@ -59,8 +59,8 @@ public class TweakDyeableMinecarts extends Tweak {
 		}
 	}
 
-	@CapabilityInject(IMinecartDyeable.class)
-	public static Capability<IMinecartDyeable> MINECART_DYEABLE;
+	@CapabilityInject(MinecartDyeable.class)
+	public static Capability<MinecartDyeable> MINECART_DYEABLE;
 	public static ResourceLocation MINECART_DYEABLE_KEY = new ResourceLocation("charsettweaks:minecart_dyeable");
 
 	public TweakDyeableMinecarts() {
@@ -74,9 +74,9 @@ public class TweakDyeableMinecarts extends Tweak {
 
 	@Override
 	public void enable() {
-		CapabilityManager.INSTANCE.register(IMinecartDyeable.class, new Capability.IStorage<IMinecartDyeable>() {
+		CapabilityManager.INSTANCE.register(MinecartDyeable.class, new Capability.IStorage<MinecartDyeable>() {
 			@Override
-			public NBTBase writeNBT(Capability<IMinecartDyeable> capability, IMinecartDyeable instance, EnumFacing side) {
+			public NBTBase writeNBT(Capability<MinecartDyeable> capability, MinecartDyeable instance, EnumFacing side) {
 				if (instance != null) {
 					NBTTagCompound compound = new NBTTagCompound();
 					compound.setInteger("color", instance.getColor());
@@ -87,7 +87,7 @@ public class TweakDyeableMinecarts extends Tweak {
 			}
 
 			@Override
-			public void readNBT(Capability<IMinecartDyeable> capability, IMinecartDyeable instance, EnumFacing side, NBTBase nbt) {
+			public void readNBT(Capability<MinecartDyeable> capability, MinecartDyeable instance, EnumFacing side, NBTBase nbt) {
 				if (nbt instanceof NBTTagCompound && instance != null) {
 					NBTTagCompound compound = (NBTTagCompound) nbt;
 					if (compound.hasKey("color")) {
@@ -95,7 +95,7 @@ public class TweakDyeableMinecarts extends Tweak {
 					}
 				}
 			}
-		}, IMinecartDyeable.Impl.class);
+		}, MinecartDyeable.class);
 		ModCharsetTweaks.proxy.initMinecartTweakClient();
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -124,7 +124,7 @@ public class TweakDyeableMinecarts extends Tweak {
 		 if (!event.getTarget().worldObj.isRemote
 				&& event.getTarget() instanceof EntityMinecart
 				&& ColorUtils.isDye(event.getEntityPlayer().getHeldItem(event.getHand()))) {
-			IMinecartDyeable properties = IMinecartDyeable.get((EntityMinecart) event.getTarget());
+			MinecartDyeable properties = MinecartDyeable.get((EntityMinecart) event.getTarget());
 			if (properties != null) {
 				properties.setColor(ColorUtils.getRGBColor(ColorUtils.getColorIDFromDye(event.getEntityPlayer().getHeldItem(event.getHand()))));
 

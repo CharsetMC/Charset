@@ -44,11 +44,7 @@ public final class ItemUtils {
 			}
 
 			if (matchNBT) {
-				if (source.getTagCompound() == null) {
-					return target.getTagCompound() == null || target.getTagCompound().hasNoTags();
-				} else if (target.getTagCompound() == null) {
-					return source.getTagCompound() == null || source.getTagCompound().hasNoTags();
-				} else if (!source.getTagCompound().equals(target.getTagCompound())) {
+				if (!ItemStack.areItemStackTagsEqual(source, target)) {
 					return false;
 				}
 			}

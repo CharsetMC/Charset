@@ -33,7 +33,7 @@ public class ModelMinecartWrapped extends ModelBase {
 	public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale) {
 		if (entityIn instanceof EntityMinecart) {
 			EntityMinecart minecart = (EntityMinecart) entityIn;
-			IMinecartDyeable dyeable = IMinecartDyeable.get(minecart);
+			MinecartDyeable dyeable = MinecartDyeable.get(minecart);
 			if (dyeable != null && dyeable.getColor() >= 0) {
 				Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("charsettweaks:textures/entity/minecart.png"));
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@API(apiVersion = "0.0", owner = "CharsetAudio", provides = "CharsetAPI|Audio")
+@API(apiVersion = "0.0", owner = "CharsetAPI", provides = "CharsetAPI|Audio")
 package pl.asie.charset.api.audio;
 
 import net.minecraftforge.fml.common.API;

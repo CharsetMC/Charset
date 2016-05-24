@@ -28,7 +28,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public final class RayTraceUtils {
-
 	public static class Result {
 		public final AxisAlignedBB box;
 		public final RayTraceResult hit;

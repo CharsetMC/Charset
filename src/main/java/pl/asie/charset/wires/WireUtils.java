@@ -27,6 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+import net.minecraftforge.fmp.capabilities.MultipartCapabilityHelper;
 import net.minecraftforge.fmp.microblock.IMicroblock;
 import net.minecraftforge.fmp.multipart.IMultipart;
 import net.minecraftforge.fmp.multipart.IMultipartContainer;
