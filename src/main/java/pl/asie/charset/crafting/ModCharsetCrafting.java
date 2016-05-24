@@ -14,41 +14,34 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.wrench;
+package pl.asie.charset.crafting;
 
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pl.asie.charset.lib.ModCharsetLib;
 
-@Mod(modid = ModCharsetWrench.MODID, name = ModCharsetWrench.NAME, version = ModCharsetWrench.VERSION,
+@Mod(modid = ModCharsetCrafting.MODID, name = ModCharsetCrafting.NAME, version = ModCharsetCrafting.VERSION,
 		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetWrench {
-	public static final String MODID = "CharsetWrench";
-	public static final String NAME = "/";
+public class ModCharsetCrafting {
+	public static final String MODID = "CharsetCrafting";
+	public static final String NAME = ">";
 	public static final String VERSION = "@VERSION@";
 
-	public static ItemWrench wrench;
+	@Mod.Instance(MODID)
+	public static ModCharsetCrafting instance;
 
-	@EventHandler
+	public static Logger logger;
+
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		wrench = new ItemWrench();
-		GameRegistry.register(wrench.setRegistryName("wrench"));
-		ModCharsetLib.proxy.registerItemModel(wrench, 0, "charsetwrench:wrench");
+		logger = LogManager.getLogger(ModCharsetCrafting.MODID);
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wrench),
-				" i ", " si", "i  ", 's', "stickWood", 'i', "ingotIron"));
-	}
 
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
 	}
 }

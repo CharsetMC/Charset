@@ -1,15 +1,16 @@
 /*
-DFPWM implementation in Java
-operates on 8-bit signed PCM data and little-endian DFPWM data
-
-by Ben "GreaseMonkey" Russell, 2013 - Public Domain
-
-NOTE, len is in bytes relative to DFPWM (len*8 PCM bytes)
-also the main() function takes unsigned 8-bit data and converts it to suit
-*/
+ * by Ben "GreaseMonkey" Russell, 2013 - Public Domain
+ */
 
 package pl.asie.charset.lib.utils;
 
+/**
+ * DFPWM implementation in Java
+ * operates on 8-bit signed PCM data and little-endian DFPWM data
+ *
+ * NOTE, len is in bytes relative to DFPWM (len*8 PCM bytes)
+ * also the main() function takes unsigned 8-bit data and converts it to suit
+ */
 public class DFPWM {
 	private final int RESP_INC = 7;
 	private final int RESP_DEC = 20;
