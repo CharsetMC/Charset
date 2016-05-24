@@ -16,9 +16,16 @@
 
 package pl.asie.charset.api.wires;
 
+import javax.annotation.Nullable;
+
+/**
+ * Implement this class as a capability if you want to
+ * emit a bundled cable signal.
+ */
 public interface IBundledEmitter {
 	/**
-	 * Get the signal strength of a bundled signal emitter.
+	 * Get the signal values of a bundled signal emitter.
+	 * @return A byte array of length 16 with each value in it being in the range <0, 15> or null.
 	 */
-	byte[] getBundledSignal();
+	@Nullable byte[] getBundledSignal();
 }

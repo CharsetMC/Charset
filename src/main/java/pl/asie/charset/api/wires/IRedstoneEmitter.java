@@ -16,6 +16,15 @@
 
 package pl.asie.charset.api.wires;
 
+/**
+ * Implement this class as a capability if you want to
+ * emit a redstone cable signal. Keep in mind, however,
+ * that this does not replace vanilla redstone APIs.
+ */
 public interface IRedstoneEmitter {
+	/**
+	 * Get the signal values of a redstone signal emitter.
+	 * @return An integer in the range <0, 15>.
+	 */
 	int getRedstoneSignal();
 }

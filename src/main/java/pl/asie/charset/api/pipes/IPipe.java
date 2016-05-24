@@ -21,6 +21,12 @@ import net.minecraft.util.EnumFacing;
 
 import pl.asie.charset.api.lib.IItemInjectable;
 
+import javax.annotation.Nullable;
+
+/**
+ * This interface is implemented by Charset's pipes.
+ * Please do not implement it yourself.
+ */
 public interface IPipe extends IItemInjectable {
 	/**
 	 * Get the stack closest to the middle of a given side of the pipe.
@@ -30,5 +36,5 @@ public interface IPipe extends IItemInjectable {
 	 * @param side The side (null - center)
 	 * @return The closest stack found.
 	 */
-	ItemStack getTravellingStack(EnumFacing side);
+	@Nullable ItemStack getTravellingStack(@Nullable EnumFacing side);
 }

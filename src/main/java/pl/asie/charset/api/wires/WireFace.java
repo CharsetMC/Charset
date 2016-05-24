@@ -18,6 +18,9 @@ package pl.asie.charset.api.wires;
 
 import net.minecraft.util.EnumFacing;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public enum WireFace {
 	DOWN,
 	UP,
@@ -34,7 +37,10 @@ public enum WireFace {
 	public static final WireFace[] VALUES = values();
 	public final EnumFacing facing;
 
-	public static WireFace get(EnumFacing facing) {
+	/**
+	 * Creates a WireFace from the given EnumFacing.
+     */
+	public static @Nonnull WireFace get(@Nullable EnumFacing facing) {
 		return facing != null ? VALUES[facing.ordinal()] : CENTER;
 	}
 }

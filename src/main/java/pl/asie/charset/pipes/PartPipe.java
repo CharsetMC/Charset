@@ -657,6 +657,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 						continue;
 					}
 				} else {
+					if (p.getDirection() == null) {
+						continue;
+					}
+
 					if (p.getProgress() <= 0.25f && side == p.getDirection().getOpposite()) {
 						error = Math.abs(p.getProgress() - 0.125f);
 					} else if (p.getProgress() >= 0.75f && side == p.getDirection()) {

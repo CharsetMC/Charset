@@ -16,6 +16,16 @@
 
 package pl.asie.charset.api.wires;
 
+import javax.annotation.Nonnull;
+
+/**
+ * This interface is implemented by Charset's wire parts.
+ * Please do not implement it yourself.
+ */
 public interface IWire {
-	WireType getWireType();
+	/**
+	 * Get the type of this wire.
+	 * @return The type of the wire.
+     */
+	@Nonnull WireType getWireType();
 }

@@ -17,8 +17,13 @@
 package pl.asie.charset.api.wires;
 
 /**
- * Created by asie on 1/24/16.
+ * This interface is implemented by Charset's insulated wire parts.
+ * Please do not implement it yourself.
  */
 public interface IWireInsulated extends IWire {
+	/**
+	 * Get the color of the insulated wire.
+	 * @return A number in the range <0, 15> corresponding to a wool color.
+     */
 	int getWireColor();
 }

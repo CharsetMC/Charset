@@ -40,6 +40,8 @@ import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import javax.annotation.Nullable;
+
 public class PipeItem {
 	public static final int MAX_PROGRESS = 128;
 	public static final int CENTER_PROGRESS = MAX_PROGRESS / 2;
@@ -116,7 +118,7 @@ public class PipeItem {
 		return stack;
 	}
 
-	public EnumFacing getDirection() {
+	public @Nullable EnumFacing getDirection() {
 		return reachedCenter ? output : (input != null ? input.getOpposite() : null);
 	}
 
