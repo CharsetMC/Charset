@@ -33,7 +33,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 
-import pl.asie.charset.api.lib.CharsetHelper;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.handlers.PlayerDeathHandler;
@@ -79,8 +78,6 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		CharsetHelper.instance = new CharsetHelperImpl();
-
 		logger = LogManager.getLogger(MODID);
 
 		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");

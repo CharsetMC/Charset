@@ -32,7 +32,7 @@ public class PlayerDeathHandler {
 	private Predicate<ItemStack> itemKeepPredicate;
 
 	public PlayerDeathHandler() {
-		
+
 	}
 
 	public boolean hasPredicate() {
