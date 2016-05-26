@@ -609,6 +609,18 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 		return itemSet;
 	}
 
+	PipeItem getItemByID(int id) {
+		synchronized (itemSet) {
+			for (PipeItem p : itemSet) {
+				if (p.id == id) {
+					return p;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	protected void onSyncRequest() {
 		// TODO: HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
 		synchronized (itemSet) {

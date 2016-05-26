@@ -50,12 +50,7 @@ public class PacketItemUpdate extends PacketPart {
 
 		if (item == null) {
 			PartPipe pipe = (PartPipe) part;
-			for (PipeItem p : pipe.getPipeItems()) {
-				if (p.id == id) {
-					item = p;
-					break;
-				}
-			}
+			item = pipe.getItemByID(id);
 		}
 
 		if (item == null) {
