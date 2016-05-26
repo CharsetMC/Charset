@@ -13,15 +13,17 @@ for i in `jq -r '.modules | keys[]' "$OUTDIR"/modules.json`; do
 	jq '.modList[] | select((.modid | ascii_downcase) == "charset'$i'")' mcmod-orig.info >> mcmod.info
 	echo "]" >> mcmod.info
 	if [ "$i" = "lib" ]; then
+		jar cvf "$OUTDIR"/releases/"$1"/charset-"$1"-api.jar \
+			pl/asie/charset/api LICENSE-2.0 NOTICE
 		jar cvf "$OUTDIR"/releases/"$1"/charset-"$1"-"$i".jar \
 			assets/charset"$i" \
 			pl/asie/charset/"$i" pl/asie/charset/api \
-			mcmod.info LICENSE*
+			mcmod.info LICENSE* NOTICE
 	else
 		jar cvf "$OUTDIR"/releases/"$1"/charset-"$1"-"$i".jar \
 			assets/charset"$i" \
 			pl/asie/charset/"$i" \
-			mcmod.info LICENSE*
+			mcmod.info LICENSE* NOTICE
 	fi
 	rm mcmod.info
 done
