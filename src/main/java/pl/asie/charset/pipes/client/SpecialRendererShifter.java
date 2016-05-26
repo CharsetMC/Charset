@@ -87,11 +87,9 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 
 			GlStateManager.scale(0.5F, 0.5F, 0.5F);
 
-			GlStateManager.pushAttrib();
 			RenderHelper.enableStandardItemLighting();
 			this.itemRenderer.renderItem(entityitem.getEntityItem(), ItemCameraTransforms.TransformType.FIXED);
 			RenderHelper.disableStandardItemLighting();
-			GlStateManager.popAttrib();
 
 			if (textureatlassprite != null && textureatlassprite.getFrameCount() > 0) {
 				textureatlassprite.updateAnimation();
