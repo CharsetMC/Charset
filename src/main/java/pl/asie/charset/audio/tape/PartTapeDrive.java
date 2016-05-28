@@ -36,13 +36,13 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.fmp.ForgeMultipart;
+import net.minecraftforge.fmp.ForgeMultipartModContainer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import net.minecraftforge.fmp.multipart.PartSlot;
 import pl.asie.charset.api.audio.IAudioSource;
-import pl.asie.charset.api.audio.IDataStorage;
+import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
@@ -161,7 +161,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 
 	@Override
 	public BlockStateContainer createBlockState() {
-		return new BlockStateContainer(ForgeMultipart.multipart, PartSlab.IS_TOP, Properties.FACING4);
+		return new BlockStateContainer(ForgeMultipartModContainer.multipart, PartSlab.IS_TOP, Properties.FACING4);
 	}
 
 	@Override

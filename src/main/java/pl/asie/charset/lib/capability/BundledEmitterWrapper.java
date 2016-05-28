@@ -26,11 +26,6 @@ import pl.asie.charset.lib.Capabilities;
 
 public class BundledEmitterWrapper implements ICapabilityWrapper<IBundledEmitter> {
 	@Override
-	public Capability<IBundledEmitter> getCapability() {
-		return Capabilities.BUNDLED_EMITTER;
-	}
-
-	@Override
 	public IBundledEmitter wrapImplementations(Collection<IBundledEmitter> collection) {
 		byte[] data = new byte[16];
 

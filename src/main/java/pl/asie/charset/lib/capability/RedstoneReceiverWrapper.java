@@ -41,11 +41,6 @@ public class RedstoneReceiverWrapper implements ICapabilityWrapper<IRedstoneRece
 	}
 
 	@Override
-	public Capability<IRedstoneReceiver> getCapability() {
-		return Capabilities.REDSTONE_RECEIVER;
-	}
-
-	@Override
 	public IRedstoneReceiver wrapImplementations(Collection<IRedstoneReceiver> collection) {
 		return new WrappedReceiver(collection);
 	}

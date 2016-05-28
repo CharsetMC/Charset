@@ -191,16 +191,19 @@ public class PartWireBundled extends PartWireBase implements IBundledReceiver, I
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
-				TileEntity tile = getWorld().getTileEntity(getPos().offset(facing));
-
+				BlockPos posFacing = getPos().offset(facing);
 				IBundledEmitter emitter = null;
 
-				if (tile instanceof TileMultipartContainer) {
-					if (((TileMultipartContainer) tile).hasCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite())) {
-						emitter = ((TileMultipartContainer) tile).getCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite());
+				IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), posFacing);
+				if (container != null) {
+					if (container.hasCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite())) {
+						emitter = container.getCapability(Capabilities.BUNDLED_EMITTER, WireUtils.getSlotForFace(location), facing.getOpposite());
 					}
-				} else if (tile.hasCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite())) {
-					emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite());
+				} else {
+					TileEntity tile = getWorld().getTileEntity(posFacing);
+					if (tile.hasCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite())) {
+						emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, facing.getOpposite());
+					}
 				}
 
 				if (emitter != null && !(emitter instanceof IWire)) {

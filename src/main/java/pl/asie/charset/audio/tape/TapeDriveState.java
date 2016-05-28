@@ -28,8 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
-import pl.asie.charset.api.audio.IAudioSink;
-import pl.asie.charset.api.audio.IDataStorage;
+import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.audio.*;
@@ -38,14 +37,12 @@ import pl.asie.charset.lib.inventory.InventorySimple;
 public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompound> {
 	protected int counter;
 	private final PartTapeDrive owner;
-	private final AudioSinkPart internalSpeaker;
 	private final InventorySimple inventory;
 	private State state = State.STOPPED, lastState;
 	private Integer sourceId;
 
 	public TapeDriveState(PartTapeDrive owner, InventorySimple inventory) {
 		this.owner = owner;
-		this.internalSpeaker = new AudioSinkPart(this.owner);
 		this.inventory = inventory;
 	}
 
@@ -83,8 +80,7 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 						byte[] data = new byte[300];
 						int len = storage.read(data, false);
 
-						AudioPacketDFPWM packetDFPWM = new AudioPacketDFPWM(sourceId, data, 1);
-						packetDFPWM.beginPropagation();
+						AudioPacketDFPWM packetDFPWM = new AudioPacketDFPWM(sourceId, data, 50);
 
 						World world = owner.getWorld();
 						BlockPos pos = owner.getPos();
@@ -95,11 +91,11 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 							}
 						}
 
-						if (packetDFPWM.sinkCount() == 0) {
-							internalSpeaker.receive(packetDFPWM);
+						if (packetDFPWM.getSinkCount() == 0) {
+							new AudioSinkBlock(owner.getWorld(), owner.getPos()).receive(packetDFPWM);
 						}
 
-						packetDFPWM.endPropagation();
+						packetDFPWM.finishPropagation();
 
 						if (len < data.length) {
 							setState(State.STOPPED);

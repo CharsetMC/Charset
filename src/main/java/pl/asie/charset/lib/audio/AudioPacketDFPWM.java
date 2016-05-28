@@ -16,13 +16,49 @@
 
 package pl.asie.charset.lib.audio;
 
+import pl.asie.charset.api.audio.AudioPacket;
+import pl.asie.charset.lib.utils.DFPWM;
+
 public class AudioPacketDFPWM extends AudioPacketCharset {
+    protected byte[] decodedData;
+    private static final DFPWM dfpwm = new DFPWM();
+
+    public AudioPacketDFPWM() {
+
+    }
+
     public AudioPacketDFPWM(int id, byte[] data, int time) {
         super(id, data, time);
     }
 
     @Override
-    public PacketAudioData.Codec getCodec() {
-        return PacketAudioData.Codec.DFPWM;
+    public AudioPacket clone() {
+        return new AudioPacketDFPWM(id, data, time);
+    }
+
+    @Override
+    public int getPCMSampleRate() {
+        int samples = data.length * 8;
+        return samples * 1000 / time;
+    }
+
+    @Override
+    public int getPCMSampleSizeBits() {
+        return 8;
+    }
+
+    @Override
+    public boolean getPCMSigned() {
+        return true;
+    }
+
+    @Override
+    public byte[] getPCMData() {
+        if (decodedData == null) {
+            decodedData = new byte[data.length * 8];
+			dfpwm.decompress(decodedData, data, 0, 0, data.length);
+        }
+
+        return decodedData;
     }
 }

@@ -41,11 +41,6 @@ public class BundledReceiverWrapper implements ICapabilityWrapper<IBundledReceiv
 	}
 
 	@Override
-	public Capability<IBundledReceiver> getCapability() {
-		return Capabilities.BUNDLED_RECEIVER;
-	}
-
-	@Override
 	public IBundledReceiver wrapImplementations(Collection<IBundledReceiver> collection) {
 		return new WrappedReceiver(collection);
 	}

@@ -26,11 +26,6 @@ import pl.asie.charset.lib.Capabilities;
 
 public class RedstoneEmitterWrapper implements ICapabilityWrapper<IRedstoneEmitter> {
 	@Override
-	public Capability<IRedstoneEmitter> getCapability() {
-		return Capabilities.REDSTONE_EMITTER;
-	}
-
-	@Override
 	public IRedstoneEmitter wrapImplementations(Collection<IRedstoneEmitter> collection) {
 		int data = 0;
 

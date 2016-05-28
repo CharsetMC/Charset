@@ -39,7 +39,7 @@ public class ProxyClient extends ProxyCommon {
 
 	@Override
 	public void registerRenderers() {
-		MultipartRegistryClient.bindMultipartSpecialRenderer(PartPipe.class, rendererPipe = new SpecialRendererPipe());
+		MultipartRegistryClient.bindMultipartSpecialRenderer(new ResourceLocation("CharsetPipes:pipe"), rendererPipe = new SpecialRendererPipe());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileShifter.class, new SpecialRendererShifter());
 	}
 

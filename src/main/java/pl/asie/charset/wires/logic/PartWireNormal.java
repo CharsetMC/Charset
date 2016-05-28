@@ -34,7 +34,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import net.minecraftforge.fmp.ForgeMultipart;
+import net.minecraftforge.fmp.ForgeMultipartModContainer;
 import net.minecraftforge.fmp.multipart.IMultipartContainer;
 import net.minecraftforge.fmp.multipart.MultipartHelper;
 import net.minecraftforge.fmp.multipart.PartSlot;
@@ -263,7 +263,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 					} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing) {
 						TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
 						if (!(nt instanceof IRedstoneReceiver)) {
-							getWorld().notifyBlockOfStateChange(getPos().offset(facing), ForgeMultipart.multipart);
+							getWorld().notifyBlockOfStateChange(getPos().offset(facing), ForgeMultipartModContainer.multipart);
 						}
 					}
 				}
@@ -283,7 +283,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 						} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing) {
 							TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
 							if (!(nt instanceof IRedstoneReceiver)) {
-								getWorld().notifyBlockOfStateChange(getPos().offset(facing), ForgeMultipart.multipart);
+								getWorld().notifyBlockOfStateChange(getPos().offset(facing), ForgeMultipartModContainer.multipart);
 							}
 						}
 					}
@@ -297,13 +297,13 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 
 				if (location != WireFace.CENTER) {
 					BlockPos uPos = getPos().offset(location.facing);
-					getWorld().notifyNeighborsOfStateExcept(uPos, ForgeMultipart.multipart, location.facing.getOpposite());
+					getWorld().notifyNeighborsOfStateExcept(uPos, ForgeMultipartModContainer.multipart, location.facing.getOpposite());
 				}
 			}
 		} else {
 			if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
 				if (location != WireFace.CENTER) {
-					getWorld().notifyBlockOfStateChange(getPos().offset(location.facing), ForgeMultipart.multipart);
+					getWorld().notifyBlockOfStateChange(getPos().offset(location.facing), ForgeMultipartModContainer.multipart);
 				}
 			}
 		}

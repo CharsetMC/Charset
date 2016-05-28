@@ -33,6 +33,9 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 
+import pl.asie.charset.api.audio.AudioAPI;
+import pl.asie.charset.lib.audio.AudioPacketDFPWM;
+import pl.asie.charset.lib.audio.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.handlers.PlayerDeathHandler;
@@ -107,6 +110,9 @@ public class ModCharsetLib {
 
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+
+		AudioAPI.PACKET_REGISTRY.register(AudioPacketDFPWM.class);
+		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class);
 	}
 
 	@Mod.EventHandler

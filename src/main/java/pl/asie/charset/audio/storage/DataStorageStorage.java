@@ -24,7 +24,7 @@ import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.capabilities.Capability;
 
-import pl.asie.charset.api.audio.IDataStorage;
+import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 
 public class DataStorageStorage implements Capability.IStorage<IDataStorage> {

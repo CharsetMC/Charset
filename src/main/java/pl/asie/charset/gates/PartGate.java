@@ -25,7 +25,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.fmp.ForgeMultipart;
+import net.minecraftforge.fmp.ForgeMultipartModContainer;
 import net.minecraftforge.fmp.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
@@ -774,7 +774,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 
 	@Override
 	public BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(ForgeMultipart.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
+		return new ExtendedBlockState(ForgeMultipartModContainer.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
 	@Override

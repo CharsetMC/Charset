@@ -28,9 +28,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.fmp.ForgeMultipart;
+import net.minecraftforge.fmp.ForgeMultipartModContainer;
 import net.minecraftforge.fmp.client.multipart.AdvancedParticleManager;
-import net.minecraftforge.fmp.client.multipart.IFastMSRPart;
 import net.minecraftforge.fmp.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -68,7 +67,7 @@ import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable, IFastMSRPart {
+public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable {
 	public static final Property PROPERTY = new Property();
 
 	private static class Property implements IUnlistedProperty<PartPipe> {
@@ -691,7 +690,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(ForgeMultipart.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
+		return new ExtendedBlockState(ForgeMultipartModContainer.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
 	@Override

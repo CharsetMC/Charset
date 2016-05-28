@@ -16,20 +16,53 @@
 
 package pl.asie.charset.api.audio;
 
+import com.google.common.collect.ImmutableSet;
+import io.netty.buffer.ByteBuf;
+
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AudioPacket {
-    protected Set<IAudioSink> sinks = new HashSet<IAudioSink>();
+public abstract class AudioPacket implements Cloneable {
+    protected Set<AudioSink> sinks = new HashSet<AudioSink>();
 
-    public boolean add(IAudioSink sink) {
+    public boolean add(AudioSink sink) {
         return sinks.add(sink);
     }
+    public Set<AudioSink> getSinks() {
+        return ImmutableSet.copyOf(sinks);
+    }
 
-    public int sinkCount() {
+    public int getSinkCount() {
         return sinks.size();
     }
 
-    public abstract void beginPropagation();
-    public abstract void endPropagation();
+    public abstract AudioPacket clone();
+    public abstract void finishPropagation();
+
+    public void writeData(ByteBuf buffer) {
+        buffer.writeShort(AudioAPI.PACKET_REGISTRY.getId(this.getClass()));
+        buffer.writeShort(sinks.size());
+        for (AudioSink sink : sinks) {
+            sink.writeData(buffer);
+        }
+    }
+
+    public void readData(ByteBuf buffer) {
+        int sinkLen = buffer.readUnsignedShort();
+        sinks.clear();
+        for (int i = 0; i < sinkLen; i++) {
+            sinks.add(AudioSink.create(buffer));
+        }
+    }
+
+    public static AudioPacket create(ByteBuf buffer) {
+        try {
+            AudioPacket packet = AudioAPI.PACKET_REGISTRY.get(buffer.readUnsignedShort()).newInstance();
+            packet.readData(buffer);
+            return packet;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

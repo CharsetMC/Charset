@@ -16,12 +16,13 @@
 
 package pl.asie.charset.lib.audio;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import pl.asie.charset.api.audio.AudioPacket;
-import pl.asie.charset.api.audio.IAudioSink;
+import pl.asie.charset.api.audio.AudioSink;
+import pl.asie.charset.api.audio.IPCMPacket;
 import pl.asie.charset.lib.ModCharsetLib;
 
 import java.util.HashMap;
@@ -29,10 +30,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class AudioPacketCharset extends AudioPacket {
-    protected final int id;
-    protected final byte[] data;
-    protected final int time;
+public abstract class AudioPacketCharset extends AudioPacket implements IPCMPacket {
+    protected int id;
+    protected byte[] data;
+    protected int time;
+
+    public AudioPacketCharset() {
+
+    }
 
     public AudioPacketCharset(int id, byte[] data, int time) {
         this.id = id;
@@ -40,19 +45,38 @@ public abstract class AudioPacketCharset extends AudioPacket {
         this.time = time;
     }
 
-    public abstract PacketAudioData.Codec getCodec();
+    public int getId() {
+        return id;
+    }
 
-    @Override
-    public void beginPropagation() {
-
+    public byte[] getData() {
+        return data;
     }
 
     @Override
-    public void endPropagation() {
-        PacketAudioData packet = new PacketAudioData(id, getCodec(), sinks, data, time);
+    public void readData(ByteBuf buf) {
+        super.readData(buf);
+        id = buf.readInt();
+        time = buf.readMedium();
+        data = new byte[buf.readUnsignedShort()];
+        buf.readBytes(data);
+    }
 
-        Map<WorldServer, Set<IAudioSink>> worlds = new HashMap<>();
-        for (IAudioSink sink : sinks) {
+    @Override
+    public void writeData(ByteBuf buf) {
+        super.writeData(buf);
+        buf.writeInt(id);
+        buf.writeMedium(time);
+        buf.writeShort(data.length);
+        buf.writeBytes(data);
+    }
+
+    @Override
+    public void finishPropagation() {
+        PacketAudioData packet = new PacketAudioData(this);
+
+        Map<WorldServer, Set<AudioSink>> worlds = new HashMap<>();
+        for (AudioSink sink : sinks) {
             if (sink.getVolume() <= 0.0f || sink.getHearingDistance() <= 0.0f) {
                 continue;
             }
@@ -60,7 +84,7 @@ public abstract class AudioPacketCharset extends AudioPacket {
             if (worlds.containsKey(sink.getWorld())) {
                 worlds.get(sink.getWorld()).add(sink);
             } else {
-                HashSet<IAudioSink> sinkLocal = new HashSet<>();
+                HashSet<AudioSink> sinkLocal = new HashSet<>();
                 sinkLocal.add(sink);
                 worlds.put((WorldServer) sink.getWorld(), sinkLocal);
             }
@@ -69,7 +93,7 @@ public abstract class AudioPacketCharset extends AudioPacket {
         for (WorldServer world : worlds.keySet()) {
             for (EntityPlayerMP player : world.getMinecraftServer().getPlayerList().getPlayerList()) {
                 if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
-                    for (IAudioSink sink : worlds.get(world)) {
+                    for (AudioSink sink : worlds.get(world)) {
                        BlockPos pos = new BlockPos(sink.getPos());
                         if (world.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
                             ModCharsetLib.packet.sendTo(packet, player);

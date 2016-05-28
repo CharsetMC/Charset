@@ -21,7 +21,7 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
 import net.minecraftforge.fmp.capabilities.CapabilityWrapperRegistry;
-import pl.asie.charset.api.audio.IAudioSink;
+import pl.asie.charset.api.audio.AudioSink;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
@@ -32,8 +32,8 @@ import pl.asie.charset.lib.capability.*;
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)
 	public static Capability<IAudioSource> AUDIO_SOURCE;
-	@CapabilityInject(IAudioSink.class)
-	public static Capability<IAudioSink> AUDIO_SINK;
+	@CapabilityInject(AudioSink.class)
+	public static Capability<AudioSink> AUDIO_SINK;
 
 	@CapabilityInject(IBundledEmitter.class)
 	public static Capability<IBundledEmitter> BUNDLED_EMITTER;
@@ -46,16 +46,16 @@ public class Capabilities {
 
 	public static void init() {
 		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource.class);
-		CapabilityManager.INSTANCE.register(IAudioSink.class, new NullCapabilityStorage<IAudioSink>(), DefaultAudioSink.class);
+		CapabilityManager.INSTANCE.register(AudioSink.class, new NullCapabilityStorage<AudioSink>(), DefaultAudioSink.class);
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter.class);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter.class);
 		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver.class);
 		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver.class);
 
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledEmitterWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneEmitterWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledReceiverWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneReceiverWrapper());
+		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.BUNDLED_EMITTER, new BundledEmitterWrapper());
+		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.REDSTONE_EMITTER, new RedstoneEmitterWrapper());
+		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.BUNDLED_RECEIVER, new BundledReceiverWrapper());
+		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.REDSTONE_RECEIVER, new RedstoneReceiverWrapper());
  	}
 }

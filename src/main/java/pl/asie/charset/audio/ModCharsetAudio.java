@@ -44,7 +44,7 @@ import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import net.minecraftforge.fmp.multipart.MultipartRegistry;
-import pl.asie.charset.api.audio.IDataStorage;
+import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.note.BlockIronNote;
 import pl.asie.charset.audio.note.PacketNoteParticle;
 import pl.asie.charset.audio.note.TileIronNote;
