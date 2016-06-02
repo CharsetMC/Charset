@@ -129,13 +129,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                 return is;
             }
 
-            // TODO
-            //worldObj.markChunkDirty(pos, this.);
-
             if (topStack == null) {
                 if (!simulate) {
                     topStack = is.copy();
                     sync();
+                    markChunkDirty();
                 }
                 return null;
             } else {
@@ -143,6 +141,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                 if (!simulate) {
                     topStack.stackSize += inserted;
                     sync();
+                    markChunkDirty();
                 }
                 if (inserted == is.stackSize) {
                     return null;
@@ -182,6 +181,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                     bottomStack.stackSize -= amount;
                     sync();
                     cleanBarrel();
+                    markChunkDirty();
                 }
                 return stack;
             } else {
@@ -206,6 +206,10 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
     }
     private int last_mentioned_count = -1;
+
+    private void markChunkDirty() {
+        worldObj.markChunkDirty(pos, this);
+    }
 
     @Override
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
@@ -456,7 +460,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     @Override
     public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
         RayTraceResult hit = RayTraceUtils.getCollision(getWorld(), getPos(), placer, Block.FULL_BLOCK_AABB, 0);
-        orientation = SpaceUtil.getOrientation(placer, hit.sideHit, hit.hitVec);
+        orientation = SpaceUtil.getOrientation(placer, hit.sideHit, hit.hitVec.subtract(new Vec3d(getPos())));
         loadFromStack(stack);
         needLogic();
     }
@@ -630,7 +634,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return isTopOrBack(facing) || isBottom(facing);
+            return isTop(facing) || isBottom(facing) || facing == null;
         } else {
             return false;
         }
@@ -653,7 +657,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                 return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handlers[0]);
             } else if (isTop(facing)) {
                 return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handlers[1]);
-            } else if (isBack(facing)) {
+            } else if (facing == null) {
                 return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handlers[2]);
             }
         }
@@ -701,12 +705,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         boolean veryNew = taint(held);
 
         if (!itemMatch(held)) {
-            // TODO
-            /* if (LangUtil.getTranslationKey(held.getItem()).equals(LangUtil.getTranslationKey(item))) {
-                new Notice(notice_target, "That item is different").send(entityplayer);
-            } else {
-                info(entityplayer);
-            } */
             info(entityplayer);
             return true;
         }
@@ -732,14 +730,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (held != null) {
             taint(held);
         }
-        /*if (held != null && !itemMatch(held)) {
-            if (Core.getTranslationKey(held).equals(Core.getTranslationKey(item))) {
-                new Notice(notice_target, "That item is different").send(entityplayer);
-            } else {
-                info(entityplayer);
-            }
-            return;
-        }*/
         InventoryPlayer inv = entityplayer.inventory;
         int total_delta = 0;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -1007,11 +997,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         NBTTagCompound compound = ItemUtils.getTagCompound(barrel_item, true);
         ItemUtils.writeToNBT(log, compound, "log");
         ItemUtils.writeToNBT(slab, compound, "slab");
-        /* int dmg = log.getItem().getRegistryName().hashCode() * 16 + log.getItemDamage();
-        dmg %= 1000;
-        dmg *= 10;
-        dmg += type.ordinal();
-        barrel_item.setItemDamage(dmg); */
         return barrel_item;
     }
 
