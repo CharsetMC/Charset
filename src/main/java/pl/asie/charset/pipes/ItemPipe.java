@@ -23,11 +23,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import net.minecraftforge.fmp.item.ItemMultipart;
-import net.minecraftforge.fmp.multipart.IMultipart;
+import mcmultipart.item.ItemMultiPart;
+import mcmultipart.multipart.IMultipart;
 import pl.asie.charset.lib.ModCharsetLib;
 
-public class ItemPipe extends ItemMultipart {
+public class ItemPipe extends ItemMultiPart {
 	public ItemPipe() {
 		setUnlocalizedName("charset.pipe");
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);

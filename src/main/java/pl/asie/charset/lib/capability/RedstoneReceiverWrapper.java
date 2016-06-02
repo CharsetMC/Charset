@@ -19,7 +19,7 @@ package pl.asie.charset.lib.capability;
 import java.util.Collection;
 
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fmp.capabilities.ICapabilityWrapper;
+import mcmultipart.capabilities.ICapabilityWrapper;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.Capabilities;
 
@@ -37,6 +37,11 @@ public class RedstoneReceiverWrapper implements ICapabilityWrapper<IRedstoneRece
 				r.onRedstoneInputChange();
 			}
 		}
+	}
+
+	@Override
+	public Capability<IRedstoneReceiver> getCapability() {
+		return Capabilities.REDSTONE_RECEIVER;
 	}
 
 	@Override

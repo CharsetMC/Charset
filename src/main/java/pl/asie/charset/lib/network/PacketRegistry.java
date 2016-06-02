@@ -36,7 +36,7 @@ import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fmp.multipart.IMultipart;
+import mcmultipart.multipart.IMultipart;
 
 public class PacketRegistry {
 	private EnumMap<Side, FMLEmbeddedChannel> channels;

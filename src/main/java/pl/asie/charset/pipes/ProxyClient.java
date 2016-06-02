@@ -24,7 +24,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
-import net.minecraftforge.fmp.client.multipart.MultipartRegistryClient;
+import mcmultipart.client.multipart.MultipartRegistryClient;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -39,7 +39,7 @@ public class ProxyClient extends ProxyCommon {
 
 	@Override
 	public void registerRenderers() {
-		MultipartRegistryClient.bindMultipartSpecialRenderer(new ResourceLocation("CharsetPipes:pipe"), rendererPipe = new SpecialRendererPipe());
+		MultipartRegistryClient.bindMultipartSpecialRenderer(PartPipe.class, rendererPipe = new SpecialRendererPipe());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileShifter.class, new SpecialRendererShifter());
 	}
 

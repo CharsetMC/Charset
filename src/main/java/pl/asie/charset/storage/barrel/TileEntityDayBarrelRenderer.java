@@ -211,14 +211,11 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.pushMatrix();
         GlStateManager.rotate(180, 0, 0, 1);
         float labelD = hasLabel ? 0F : -1F/16F;
-
-        {
-            GlStateManager.translate(0, labelD, 1F/16F);
-            float scale = 1F/32F;
-            GlStateManager.scale(scale, scale, scale);
-            GlStateManager.scale(1, 1, -0.02F);
-            Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(is, 0, 0);
-        }
+        GlStateManager.translate(0, labelD, 1F/16F);
+        float scale = 1F/32F;
+        GlStateManager.scale(scale, scale, scale);
+        GlStateManager.scale(1, 1, -0.02F);
+        Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(is, 0, 0);
         GlStateManager.popMatrix();
     }
 }

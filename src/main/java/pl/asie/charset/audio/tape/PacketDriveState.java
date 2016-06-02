@@ -21,7 +21,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.INetHandler;
 import net.minecraft.server.MinecraftServer;
 
-import net.minecraftforge.fmp.multipart.IMultipart;
+import mcmultipart.multipart.IMultipart;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketPart;

@@ -29,18 +29,6 @@
             }
         },
         "inventory": [{
-            "transform": {
-                "gui": {
-                    "rotation": [0, 1, 0, 0],
-                    "scale": 1.33,
-                    "translation": [0, 0.125, 0]
-                },
-                "thirdperson": {
-                    "rotation": [0.92, 0, 0.21, 0],
-                    "scale": 0.5,
-                    "translation": [0.05, 0, -0.121875]
-                }
-            },
             "submodel": {
                 "lr": {
                     "model": "charsetstorage:backpack_lr"

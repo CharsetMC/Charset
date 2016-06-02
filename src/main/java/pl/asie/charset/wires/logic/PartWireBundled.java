@@ -18,7 +18,7 @@ package pl.asie.charset.wires.logic;
 
 import java.util.Arrays;
 
-import net.minecraftforge.fmp.block.TileMultipartContainer;
+import mcmultipart.block.TileMultipartContainer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -28,9 +28,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import net.minecraftforge.fmp.multipart.IMultipartContainer;
-import net.minecraftforge.fmp.multipart.MultipartHelper;
-import net.minecraftforge.fmp.multipart.PartSlot;
+import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IWire;

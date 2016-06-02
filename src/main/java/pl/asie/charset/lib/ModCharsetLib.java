@@ -43,7 +43,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 
-@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL)
+@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart")
 public class ModCharsetLib {
 	public static final boolean INDEV = true;
 
@@ -51,7 +51,8 @@ public class ModCharsetLib {
 	public static final String MODID = "CharsetLib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_LIB = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION;
+	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart";
+	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
 
 	@Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;

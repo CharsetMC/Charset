@@ -21,10 +21,8 @@ import java.util.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.fmp.ForgeMultipartModContainer;
-import net.minecraftforge.fmp.client.multipart.AdvancedParticleManager;
-import net.minecraftforge.fmp.multipart.*;
+import mcmultipart.client.multipart.AdvancedParticleManager;
+import mcmultipart.multipart.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
@@ -50,7 +48,10 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import net.minecraftforge.fmp.capabilities.ISlottedCapabilityProvider;
+import mcmultipart.MCMultiPartMod;
+import mcmultipart.capabilities.ISlottedCapabilityProvider;
+import mcmultipart.client.multipart.ICustomHighlightPart;
+import mcmultipart.raytrace.PartMOP;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
@@ -58,11 +59,12 @@ import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.wires.ModCharsetWires;
+import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
 public abstract class PartWireBase extends Multipart implements
-		IRedstonePart.ISlottedRedstonePart, IRenderComparable<PartWireBase>,
+		IRedstonePart.ISlottedRedstonePart, IRenderComparable<PartWireBase>, ICustomHighlightPart,
 		INormallyOccludingPart, ITickable, ISlottedCapabilityProvider, IWire {
 	protected static final boolean DEBUG = false;
 	private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
@@ -116,7 +118,7 @@ public abstract class PartWireBase extends Multipart implements
 	public abstract int getRedstoneLevel();
 
 	@Override
-	public float getHardness(RayTraceResult hit) {
+	public float getHardness(PartMOP hit) {
 		return 0.2F;
 	}
 
@@ -147,7 +149,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean addHitEffects(RayTraceResult partMOP, AdvancedParticleManager AdvancedParticleManager) {
+	public boolean addHitEffects(PartMOP partMOP, AdvancedParticleManager AdvancedParticleManager) {
 		return true;
 	}
 
@@ -177,7 +179,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(ForgeMultipartModContainer.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
+		return new ExtendedBlockState(MCMultiPartMod.multipart, new IProperty[0], new IUnlistedProperty[]{PROPERTY});
 	}
 
 	@Override
@@ -190,7 +192,7 @@ public abstract class PartWireBase extends Multipart implements
 	}
 
 	@Override
-	public ItemStack getPickPart(EntityPlayer player, RayTraceResult hit) {
+	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
 		return getItemStack();
 	}
 
@@ -402,7 +404,7 @@ public abstract class PartWireBase extends Multipart implements
 		if (getContainer() != null) {
 			for (IMultipart multipart : getContainer().getParts()) {
 				if (multipart instanceof PartWireBase) {
-					multipart.onNeighborBlockChange(ForgeMultipartModContainer.multipart);
+					multipart.onNeighborBlockChange(MCMultiPartMod.multipart);
 				}
 			}
 		}
@@ -410,9 +412,9 @@ public abstract class PartWireBase extends Multipart implements
 		World world = this.getWorld();
 		BlockPos pos = this.getPos();
 		if (world != null) {
-			world.notifyNeighborsRespectDebug(pos, ForgeMultipartModContainer.multipart);
+			world.notifyNeighborsRespectDebug(pos, MCMultiPartMod.multipart);
 			for (EnumFacing facing : EnumFacing.VALUES) {
-				world.notifyNeighborsOfStateExcept(pos.offset(facing), ForgeMultipartModContainer.multipart, facing.getOpposite());
+				world.notifyNeighborsOfStateExcept(pos.offset(facing), MCMultiPartMod.multipart, facing.getOpposite());
 			}
 		}
 	}
@@ -656,7 +658,7 @@ public abstract class PartWireBase extends Multipart implements
 			}
 
 			if (type.type() != WireType.BUNDLED && !found) {
-				getWorld().notifyBlockOfStateChange(getPos().offset(facing), ForgeMultipartModContainer.multipart);
+				getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
 			}
 		}
 
@@ -725,7 +727,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean drawHighlight(RayTraceResult hit, EntityPlayer player, float v) {
+	public boolean drawHighlight(PartMOP partMOP, EntityPlayer player, float v) {
 		ModCharsetWires.proxy.drawWireHighlight(this);
 		return true;
 	}

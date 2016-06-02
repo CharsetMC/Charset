@@ -1,13 +1,13 @@
 package pl.asie.charset.lib.multipart;
 
+import mcmultipart.client.multipart.MultipartSpecialRenderer;
+import mcmultipart.multipart.IMultipart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fmp.client.multipart.MultipartSpecialRenderer;
-import net.minecraftforge.fmp.multipart.IMultipart;
 import org.lwjgl.opengl.GL11;
 
 public abstract class MultipartSpecialRendererBase<T extends IMultipart> extends MultipartSpecialRenderer<T> {

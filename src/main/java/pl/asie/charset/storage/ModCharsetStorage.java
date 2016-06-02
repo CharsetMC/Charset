@@ -18,6 +18,8 @@ package pl.asie.charset.storage;
 
 import com.google.common.base.Predicate;
 import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -42,6 +44,8 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.utils.MiscUtils;
+import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.storage.backpack.HandlerBackpack;
 import pl.asie.charset.storage.backpack.BlockBackpack;
 import pl.asie.charset.storage.backpack.ItemBackpack;
@@ -63,7 +67,7 @@ import java.util.Random;
 import java.util.UUID;
 
 @Mod(modid = ModCharsetStorage.MODID, name = ModCharsetStorage.NAME, version = ModCharsetStorage.VERSION,
-		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetStorage {
 	public static final String MODID = "CharsetStorage";
 	public static final String NAME = "#";
@@ -222,17 +226,65 @@ public class ModCharsetStorage {
 		RecipeSorter.register("charsetstorage:lockDye", RecipeDyeLock.class, RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
 	}
 
+	private void checkPlankForBarrel(ItemStack log) {
+		InventoryCrafting plankCrafting = RecipeUtils.getCraftingInventory(3, 3);
+		plankCrafting.setInventorySlotContents(0, log);
+		IRecipe plankRecipe = RecipeUtils.getMatchingRecipe(plankCrafting, null);
+
+		if (plankRecipe != null) {
+			ItemStack plank = plankRecipe.getCraftingResult(plankCrafting);
+			if (plank != null) {
+				plank.stackSize = 1;
+
+				// The great slab search
+				ItemStack slab = plank;
+
+				InventoryCrafting slabCrafting = RecipeUtils.getCraftingInventory(3, 3);
+				slabCrafting.setInventorySlotContents(6, plank);
+				slabCrafting.setInventorySlotContents(7, plank);
+				slabCrafting.setInventorySlotContents(8, plank);
+				IRecipe slabRecipe = RecipeUtils.getMatchingRecipe(slabCrafting, null);
+
+				if (slabRecipe != null) {
+					ItemStack potentialSlab = slabRecipe.getCraftingResult(slabCrafting);
+					if (potentialSlab != null && potentialSlab.getItem() != Item.getItemFromBlock(Blocks.WOODEN_SLAB)) {
+						slab = potentialSlab;
+					}
+				}
+
+				BarrelRegistry.INSTANCE.registerCraftable(log, slab);
+			}
+		}
+	}
+
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE, new ItemStack(Blocks.BEDROCK), new ItemStack(Blocks.DIAMOND_BLOCK));
 		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
 
-		// TODO: add modwood support
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 1));
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 2), new ItemStack(Blocks.WOODEN_SLAB, 1, 2));
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 3), new ItemStack(Blocks.WOODEN_SLAB, 1, 3));
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 4));
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 5));
+
+		for (ItemStack log : OreDictionary.getOres("logWood", false)) {
+			if (log.getItem() == Item.getItemFromBlock(Blocks.LOG) || log.getItem() == Item.getItemFromBlock(Blocks.LOG2)) {
+				continue;
+			}
+
+			try {
+				if (log.getMetadata() == OreDictionary.WILDCARD_VALUE) {
+					for (int i = 0; i < 128; i++) { // I know Forestry and Binnie's Mods might be going high. Hopefully not higher.
+						checkPlankForBarrel(new ItemStack(log.getItem(), 1, i));
+					}
+				} else {
+					checkPlankForBarrel(log);
+				}
+			} catch (Exception e) {
+
+			}
+		}
 	}
 }

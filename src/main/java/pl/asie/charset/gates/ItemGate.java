@@ -32,11 +32,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import net.minecraftforge.fmp.item.ItemMultipart;
-import net.minecraftforge.fmp.multipart.IMultipart;
+import mcmultipart.item.ItemMultiPart;
+import mcmultipart.multipart.IMultipart;
 import pl.asie.charset.lib.ModCharsetLib;
 
-public class ItemGate extends ItemMultipart {
+public class ItemGate extends ItemMultiPart {
 	public ItemGate() {
 		setHasSubtypes(true);
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);

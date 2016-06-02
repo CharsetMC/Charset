@@ -18,7 +18,7 @@ package pl.asie.charset.audio.tape;
 
 import io.netty.buffer.ByteBuf;
 
-import net.minecraftforge.fmp.multipart.IMultipart;
+import mcmultipart.multipart.IMultipart;
 import net.minecraft.network.INetHandler;
 import pl.asie.charset.lib.network.PacketPart;
 

@@ -20,7 +20,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -32,13 +31,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-import net.minecraftforge.fmp.multipart.MultipartRegistry;
+import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.wires.logic.PartWireProvider;
 
 @Mod(modid = ModCharsetWires.MODID, name = ModCharsetWires.NAME, version = ModCharsetWires.VERSION,
-		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetWires {
 	public static final String MODID = "CharsetWires";
 	public static final String NAME = "+";
@@ -53,7 +52,7 @@ public class ModCharsetWires {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		MultipartRegistry.registerPartFactory(new PartWireProvider(), new ResourceLocation("charsetwires:wire"));
+		MultipartRegistry.registerPartFactory(new PartWireProvider(), "charsetwires:wire");
 
 		wire = new ItemWire();
 		GameRegistry.register(wire.setRegistryName("wire"));

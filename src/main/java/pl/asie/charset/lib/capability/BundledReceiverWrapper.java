@@ -20,7 +20,7 @@ import java.util.Collection;
 
 import net.minecraftforge.common.capabilities.Capability;
 
-import net.minecraftforge.fmp.capabilities.ICapabilityWrapper;
+import mcmultipart.capabilities.ICapabilityWrapper;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.lib.Capabilities;
 
@@ -38,6 +38,11 @@ public class BundledReceiverWrapper implements ICapabilityWrapper<IBundledReceiv
 				r.onBundledInputChange();
 			}
 		}
+	}
+
+	@Override
+	public Capability<IBundledReceiver> getCapability() {
+		return Capabilities.BUNDLED_RECEIVER;
 	}
 
 	@Override

@@ -19,8 +19,8 @@ package pl.asie.charset.wires.logic;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 
-import net.minecraftforge.fmp.multipart.IMultipart;
-import net.minecraftforge.fmp.multipart.IPartFactory;
+import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IPartFactory;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.wires.WireKind;
 

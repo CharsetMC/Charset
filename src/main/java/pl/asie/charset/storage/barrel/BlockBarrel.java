@@ -75,6 +75,9 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         // TODO
         // NORELEASE.fixme("Test adventure mode barrel breaking");
     }};
+
+    private static final boolean SHOW_ALL_BARRELS = false;
+
     public BlockBarrel() {
         super(materialBarrel);
         setUnlocalizedName("charset.barrel");
@@ -82,16 +85,26 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public boolean canRotateBlockAround(World world, BlockPos pos, EnumFacing axis) {
-        return true;
+    public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityDayBarrel) {
+            return ((TileEntityDayBarrel) tile).getFlamability();
+        }
+
+        return 0;
     }
 
     @Override
-    public void rotateBlockAround(World world, BlockPos pos, EnumFacing axis) {
+    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {
-            ((TileEntityDayBarrel) tile).rotate(axis);
+            if (((TileEntityDayBarrel) tile).canRotate(axis)) {
+                ((TileEntityDayBarrel) tile).rotate(axis);
+                return true;
+            }
         }
+
+        return false;
     }
 
     @Override
@@ -201,7 +214,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
                 todaysBarrels.add(rep.getPickedBlock());
             }
             barrelsToAdd--;
-            if (barrelsToAdd <= 0) {
+            if (!SHOW_ALL_BARRELS && barrelsToAdd <= 0) {
                 break;
             }
         }

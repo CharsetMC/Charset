@@ -17,7 +17,6 @@
 package pl.asie.charset.audio;
 
 import net.minecraft.item.ItemBlock;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,8 +42,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-import net.minecraftforge.fmp.multipart.MultipartRegistry;
 import pl.asie.charset.api.tape.IDataStorage;
+import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.audio.note.BlockIronNote;
 import pl.asie.charset.audio.note.PacketNoteParticle;
 import pl.asie.charset.audio.note.TileIronNote;
@@ -64,7 +63,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 @Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION,
-		dependencies = ModCharsetLib.DEP_LIB, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetAudio {
 	public static final String MODID = "CharsetAudio";
 	public static final String NAME = "♫";
@@ -104,7 +103,7 @@ public class ModCharsetAudio {
 		GameRegistry.register(magneticTapeItem.setRegistryName("tapeMagnetic"));
 		GameRegistry.register(tapeReelItem.setRegistryName("tapeReel"));
 
-		MultipartRegistry.registerPart(PartTapeDrive.class, new ResourceLocation("charsetaudio:tapedrive"));
+		MultipartRegistry.registerPart(PartTapeDrive.class, "charsetaudio:tapedrive");
 
 		ModCharsetLib.proxy.registerItemModel(partTapeDriveItem, 0, "charsetaudio:tapedrive");
 		ModCharsetLib.proxy.registerItemModel(tapeItem, 0, "charsetaudio:tape");

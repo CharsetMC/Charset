@@ -20,11 +20,16 @@ import java.util.Collection;
 
 import net.minecraftforge.common.capabilities.Capability;
 
-import net.minecraftforge.fmp.capabilities.ICapabilityWrapper;
+import mcmultipart.capabilities.ICapabilityWrapper;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.lib.Capabilities;
 
 public class BundledEmitterWrapper implements ICapabilityWrapper<IBundledEmitter> {
+	@Override
+	public Capability<IBundledEmitter> getCapability() {
+		return Capabilities.BUNDLED_EMITTER;
+	}
+
 	@Override
 	public IBundledEmitter wrapImplementations(Collection<IBundledEmitter> collection) {
 		byte[] data = new byte[16];

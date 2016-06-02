@@ -23,15 +23,15 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import net.minecraftforge.fmp.item.ItemMultipart;
-import net.minecraftforge.fmp.multipart.IMultipart;
-import net.minecraftforge.fmp.multipart.IMultipartContainer;
-import net.minecraftforge.fmp.multipart.MultipartHelper;
-import net.minecraftforge.fmp.multipart.OcclusionHelper;
-import net.minecraftforge.fmp.multipart.PartSlot;
+import mcmultipart.item.ItemMultiPart;
+import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.OcclusionHelper;
+import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.lib.ModCharsetLib;
 
-public abstract class ItemPartSlab extends ItemMultipart {
+public abstract class ItemPartSlab extends ItemMultiPart {
 	public ItemPartSlab() {
 		super();
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);

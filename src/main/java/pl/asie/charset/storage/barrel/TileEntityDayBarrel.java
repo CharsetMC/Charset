@@ -1066,20 +1066,24 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return barrel;
     }
 
-    public boolean rotate(EnumFacing axis) {
-        if (axis == null) {
-            return false;
-        }
+    public boolean canRotate(EnumFacing axis) {
+        return axis != null;
+    }
+
+    public void rotate(EnumFacing axis) {
+        FzOrientation oldOrientation = orientation;
+
         if (axis == orientation.facing || axis.getOpposite() == orientation.facing) {
             orientation = orientation.getNextRotationOnFace();
-            return true;
-        }
-        if (axis == orientation.top || axis.getOpposite() == orientation.top) {
+        } else if (axis == orientation.top || axis.getOpposite() == orientation.top) {
             orientation = orientation.getNextRotationOnTop();
-            return true;
+        } else {
+            orientation = FzOrientation.fromDirection(axis);
         }
-        orientation = FzOrientation.fromDirection(axis);
-        return true;
+
+        if (orientation != oldOrientation) {
+            markBlockForUpdate();
+        }
     }
 
     public ItemStack getPickedBlock() {
@@ -1132,8 +1136,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     public int getFlamability() {
-        // The creative barrel I give you can't burn, so won't check for CREATIVE.
-        return isWooden() ? 20 : 0;
+        try {
+            return ItemUtils.getBlockState(woodLog).getBlock().getFlammability(getWorld(), getPos(), null);
+        } catch (Exception e) {
+            return isWooden() ? 20 : 0;
+        }
     }
 
     enum BarrelMessage {

@@ -19,7 +19,7 @@ package pl.asie.charset.lib.multipart;
 import java.util.EnumSet;
 import java.util.List;
 
-import net.minecraftforge.fmp.multipart.*;
+import mcmultipart.multipart.*;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;

@@ -31,9 +31,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
-import net.minecraftforge.fmp.multipart.IMultipart;
-import net.minecraftforge.fmp.multipart.IMultipartContainer;
-import net.minecraftforge.fmp.multipart.PartSlot;
+import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.inventory.InventoryUtils;
