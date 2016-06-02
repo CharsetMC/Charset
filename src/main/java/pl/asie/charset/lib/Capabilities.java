@@ -20,6 +20,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
+import net.minecraftforge.fmp.capabilities.CapabilityWrapperRegistry;
 import pl.asie.charset.api.audio.AudioSink;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.wires.IBundledEmitter;
@@ -52,9 +53,9 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver.class);
 		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver.class);
 
-		/* CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.BUNDLED_EMITTER, new BundledEmitterWrapper());
+		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.BUNDLED_EMITTER, new BundledEmitterWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.REDSTONE_EMITTER, new RedstoneEmitterWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.BUNDLED_RECEIVER, new BundledReceiverWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.REDSTONE_RECEIVER, new RedstoneReceiverWrapper()); */
+		CapabilityWrapperRegistry.registerCapabilityWrapper(Capabilities.REDSTONE_RECEIVER, new RedstoneReceiverWrapper());
  	}
 }

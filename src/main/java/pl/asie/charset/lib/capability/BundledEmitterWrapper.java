@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import net.minecraftforge.common.capabilities.Capability;
 
+import net.minecraftforge.fmp.capabilities.ICapabilityWrapper;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.lib.Capabilities;
 
