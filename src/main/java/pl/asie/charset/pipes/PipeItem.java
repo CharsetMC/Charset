@@ -26,6 +26,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
@@ -396,8 +397,8 @@ public class PipeItem {
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
 				return;
-			} else if (owner.getShifterStrength(dir) == owner.getShifterStrength(dir.getOpposite())
-					&& pressureList.contains(dir) && pressureList.contains(dir.getOpposite())) {
+			} else if (pressureList.contains(dir.getOpposite())
+					&& owner.getShifterStrength(dir) == owner.getShifterStrength(dir.getOpposite())) {
 				// Pressurizers freezing an item in place.
 				this.output = dir;
 				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
@@ -420,10 +421,13 @@ public class PipeItem {
 			if (directionList.contains(input.getOpposite())) {
 				dir = input.getOpposite();
 				directionList.remove(input.getOpposite());
-			} else if (directionList.size() > 0) {
+			} else if (directionList.size() > 1) {
 				Collections.shuffle(directionList);
 				dir = directionList.get(0);
 				i = 1;
+			} else if (directionList.size() == 1) {
+				this.output = directionList.get(0);
+				return;
 			} else {
 				this.output = null;
 				return;
@@ -559,11 +563,11 @@ public class PipeItem {
 			}
 		}
 
-		ItemUtils.spawnItemEntity(owner.getWorld(),
+		ItemUtils.spawnItemEntity(owner.getWorld(), new Vec3d(
 				(double) owner.getPos().getX() + 0.5 + (dir != null ? dir.getFrontOffsetX() : 0) * 0.75,
 				(double) owner.getPos().getY() + 0.5 + (dir != null ? dir.getFrontOffsetY() : 0) * 0.75,
-				(double) owner.getPos().getZ() + 0.5 + (dir != null ? dir.getFrontOffsetZ() : 0) * 0.75,
-				stack, 0, 0, 0, 0);
+				(double) owner.getPos().getZ() + 0.5 + (dir != null ? dir.getFrontOffsetZ() : 0) * 0.75
+		), stack, 0, 0, 0, 0);
 
 		stack = null;
 	}

@@ -32,7 +32,7 @@ import pl.asie.charset.wires.logic.PartWireBase;
 import pl.asie.charset.wires.render.RendererWire;
 
 public class ProxyClient extends ProxyCommon {
-	public static RendererWire rendererWire = new RendererWire();
+	public static final RendererWire rendererWire = new RendererWire();
 
 	@Override
 	public void drawWireHighlight(PartWireBase wire) {

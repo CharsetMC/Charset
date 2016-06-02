@@ -28,6 +28,7 @@ import net.minecraftforge.fmp.multipart.IMultipart;
 import net.minecraftforge.fmp.multipart.IMultipartContainer;
 import net.minecraftforge.fmp.multipart.MultipartHelper;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.network.Packet;
 
 public abstract class PacketPart extends Packet {
 	protected IMultipart part;
@@ -67,6 +68,10 @@ public abstract class PacketPart extends Packet {
 		buf.writeShort(part.getPos().getY());
 		buf.writeInt(part.getPos().getZ());
 		UUID id = part.getContainer().getPartID(part);
+		if (id == null) {
+			// FIXME: TODO: HACK! HACK!
+			id = UUID.randomUUID();
+		}
 		buf.writeLong(id.getMostSignificantBits());
 		buf.writeLong(id.getLeastSignificantBits());
 	}

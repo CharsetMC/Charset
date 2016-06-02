@@ -23,9 +23,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
@@ -48,7 +51,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
             if (originalModel instanceof ModelFactory) {
                 ModelFactory factory = (ModelFactory) originalModel;
                 IRenderComparable o = factory.fromItemStack(stack);
-                return factory.getModel(o);
+                return factory.getModel(o, null);
             } else {
                 return originalModel;
             }
@@ -72,23 +75,23 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         }
     }
 
-    public abstract IBakedModel bake(T object);
+    public abstract IBakedModel bake(T object, boolean isItem, BlockRenderLayer layer);
     public abstract T fromItemStack(ItemStack stack);
 
-    public IBakedModel getModel(T object) {
+    public IBakedModel getModel(T object, BlockRenderLayer layer) {
         if (object == null) {
             return null;
         }
 
-        ModelKey<T> key = new ModelKey<>(object);
+        ModelKey<T> key = new ModelKey<>(object, layer);
         if (DISABLE_CACHE) {
-            return bake(object);
+            return bake(object, layer == null, layer);
         } else {
             IBakedModel model = cache.getIfPresent(key);
             if (model != null) {
                 return model;
             } else {
-                model = bake(object);
+                model = bake(object, layer == null, layer);
                 cache.put(key, model);
                 return model;
             }
@@ -98,7 +101,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
         if (state instanceof IExtendedBlockState) {
-            IBakedModel model = getModel(((IExtendedBlockState) state).getValue(property));
+            IBakedModel model = getModel(((IExtendedBlockState) state).getValue(property), MinecraftForgeClient.getRenderLayer());
             if (model != null) {
                 return model.getQuads(state, side, rand);
             }

@@ -26,14 +26,6 @@ public abstract class AudioSink {
     public abstract World getWorld();
     public abstract Vec3d getPos();
 
-    public float getVolume() {
-        return 1.0F;
-    }
-
-    public float getHearingDistance() {
-        return 32.0F;
-    }
-
     public boolean receive(AudioPacket packet) {
         return packet.add(this);
     }

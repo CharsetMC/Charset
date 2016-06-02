@@ -19,7 +19,9 @@ package pl.asie.charset.storage;
 import com.google.common.base.Predicate;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,8 +40,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-import pl.asie.charset.audio.tape.RecipeTape;
-import pl.asie.charset.audio.tape.RecipeTapeReel;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.storage.backpack.HandlerBackpack;
@@ -47,6 +47,15 @@ import pl.asie.charset.storage.backpack.BlockBackpack;
 import pl.asie.charset.storage.backpack.ItemBackpack;
 import pl.asie.charset.storage.backpack.PacketBackpackOpen;
 import pl.asie.charset.storage.backpack.TileBackpack;
+import pl.asie.charset.storage.barrel.BarrelCartRecipe;
+import pl.asie.charset.storage.barrel.BarrelEventListener;
+import pl.asie.charset.storage.barrel.BarrelRegistry;
+import pl.asie.charset.storage.barrel.BarrelUpgradeRecipes;
+import pl.asie.charset.storage.barrel.BlockBarrel;
+import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
+import pl.asie.charset.storage.barrel.ItemDayBarrel;
+import pl.asie.charset.storage.barrel.ItemMinecartDayBarrel;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 import pl.asie.charset.storage.locking.*;
 
 import javax.annotation.Nullable;
@@ -79,6 +88,12 @@ public class ModCharsetStorage {
 	public static boolean enableBackpackOpenKey;
 	public static boolean enableKeyKeepInventory;
 
+	public static BlockBarrel barrelBlock;
+	public static ItemDayBarrel barrelItem;
+	public static ItemMinecartDayBarrel barrelCartItem;
+
+	public static boolean renderBarrelText, renderBarrelItem;
+
 	private Configuration config;
 
 	@Mod.EventHandler
@@ -90,6 +105,15 @@ public class ModCharsetStorage {
 		GameRegistry.register(backpackBlock.setRegistryName("backpack"));
 		GameRegistry.register(new ItemBackpack(backpackBlock).setRegistryName("backpack"));
 
+		barrelBlock = new BlockBarrel();
+		barrelItem = new ItemDayBarrel(barrelBlock);
+		barrelCartItem = new ItemMinecartDayBarrel();
+		GameRegistry.register(barrelBlock.setRegistryName("barrel"));
+		GameRegistry.register(barrelItem.setRegistryName("barrel"));
+		GameRegistry.register(barrelCartItem.setRegistryName("barrelCart"));
+
+		MinecraftForge.EVENT_BUS.register(new BarrelEventListener());
+
 		masterKeyItem = new ItemMasterKey();
 		GameRegistry.register(masterKeyItem.setRegistryName("masterKey"));
 
@@ -99,6 +123,8 @@ public class ModCharsetStorage {
 		lockItem = new ItemLock();
 		GameRegistry.register(lockItem.setRegistryName("lock"));
 
+		ModCharsetLib.proxy.registerItemModel(barrelItem, 0, "charsetstorage:barrel");
+		ModCharsetLib.proxy.registerItemModel(barrelCartItem, 0, "charsetstorage:barrelCart");
 		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
 		ModCharsetLib.proxy.registerItemModel(masterKeyItem, 0, "charsetstorage:masterKey");
 		ModCharsetLib.proxy.registerItemModel(keyItem, 0, "charsetstorage:key");
@@ -109,6 +135,9 @@ public class ModCharsetStorage {
 		enableBackpackOpenKey = config.getBoolean("enableOpenKeyBinding", "backpack", true, "Should backpacks be openable with a key binding?");
 		enableKeyKeepInventory = config.getBoolean("keepKeysOnDeath", "locks", true, "Should keys be kept in inventory on death?");
 
+		renderBarrelItem = config.getBoolean("renderItem", "barrels", true, "Should items be rendered on barrels?");
+		renderBarrelText = config.getBoolean("renderText", "barrels", true, "Should text be rendered on barrels?");
+
 		config.save();
 
 		proxy.preInit();
@@ -117,7 +146,9 @@ public class ModCharsetStorage {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
+		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
 		EntityRegistry.registerModEntity(EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, true);
+		EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
 
 		proxy.init();
 
@@ -136,6 +167,11 @@ public class ModCharsetStorage {
 				}
 			});
 		}
+
+		GameRegistry.addRecipe(new BarrelCartRecipe());
+		BarrelUpgradeRecipes.addUpgradeRecipes();
+
+		RecipeSorter.register("charsetstorage:barrelCart", BarrelCartRecipe.class, RecipeSorter.Category.SHAPELESS, "");
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lwl",
 				'l', Items.LEATHER, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold", 'w', Blocks.WOOL));
@@ -184,5 +220,19 @@ public class ModCharsetStorage {
 
 		GameRegistry.addRecipe(new RecipeDyeLock());
 		RecipeSorter.register("charsetstorage:lockDye", RecipeDyeLock.class, RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
+	}
+
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE, new ItemStack(Blocks.BEDROCK), new ItemStack(Blocks.DIAMOND_BLOCK));
+		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
+
+		// TODO: add modwood support
+		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
+		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 1));
+		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 2), new ItemStack(Blocks.WOODEN_SLAB, 1, 2));
+		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 3), new ItemStack(Blocks.WOODEN_SLAB, 1, 3));
+		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 4));
+		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 5));
 	}
 }

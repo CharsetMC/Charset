@@ -18,6 +18,7 @@ package pl.asie.charset.lib.utils;
 
 import java.util.List;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -46,25 +47,25 @@ public final class RayTraceUtils {
 
 	}
 
-	public static Vec3d getStart(EntityPlayer player) {
+	public static Vec3d getStart(EntityLivingBase player) {
 		return new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
 	}
 
-	public static Vec3d getEnd(EntityPlayer player) {
+	public static Vec3d getEnd(EntityLivingBase player) {
 		double reachDistance = player instanceof EntityPlayerMP ? ((EntityPlayerMP) player).interactionManager.getBlockReachDistance() : 5.0d;
 		Vec3d lookVec = player.getLookVec();
 
 		return getStart(player).addVector(lookVec.xCoord * reachDistance, lookVec.yCoord * reachDistance, lookVec.zCoord * reachDistance);
 	}
 
-	public static Result getCollision(World world, BlockPos pos, EntityPlayer player, List<AxisAlignedBB> list) {
+	public static Result getCollision(World world, BlockPos pos, EntityLivingBase player, List<AxisAlignedBB> list) {
 		Vec3d origin = getStart(player);
 		Vec3d direction = getEnd(player);
 
 		return getCollision(world, pos, origin, direction, list);
 	}
 
-	public static RayTraceResult getCollision(World world, BlockPos pos, EntityPlayer player, AxisAlignedBB aabb, int subHit) {
+	public static RayTraceResult getCollision(World world, BlockPos pos, EntityLivingBase player, AxisAlignedBB aabb, int subHit) {
 		Vec3d origin = getStart(player);
 		Vec3d direction = getEnd(player);
 

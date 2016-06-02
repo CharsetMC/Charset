@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector3f;
@@ -505,7 +506,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
     }
 
     @Override
-    public IBakedModel bake(PartWireBase wire) {
+    public IBakedModel bake(PartWireBase wire, boolean isItem, BlockRenderLayer layer) {
         WireSheet sheet = sheetMap.get(wire.getWireType());
         if (sheet == null) {
             return null;

@@ -66,10 +66,21 @@ tile.charset.shifter.name=Shifter
 
 # CharsetStorage
 key.charset.backpackOpen=Open Backpack
+item.charset.barrelCart.name=Barrel Cart
+item.charset.barrelCart.known.name=Barrel Cart: %s
 item.charset.key.name=Key
 item.charset.lock.name=Lock
 item.charset.masterKey.name=Master Key
 tile.charset.backpack.name=Backpack
+tile.charset.barrel.name=Barrel
+tile.charset.barrel.format=%2$s Barrel
+tile.charset.barrel.format2=%1$s %2$s Barrel
+tile.charset.barrel.SILKY.name=Silky
+tile.charset.barrel.SILKY.silkhint=Use a silk touch axe
+tile.charset.barrel.HOPPING.name=Hopping
+tile.charset.barrel.LARGER.name=Larger
+tile.charset.barrel.STICKY.name=Sticky
+tile.charset.barrel.CREATIVE.name=Creative
 
 # CharsetTweaks
 item.charset.graphite.name=Graphite

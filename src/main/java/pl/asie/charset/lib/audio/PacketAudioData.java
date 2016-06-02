@@ -22,7 +22,7 @@ import net.minecraft.network.INetHandler;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.AudioSink;
 import pl.asie.charset.api.audio.IPCMPacket;
-import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.audio.manager.AudioStreamOpenAL;
 import pl.asie.charset.lib.audio.manager.IAudioStream;
@@ -54,7 +54,7 @@ public class PacketAudioData extends Packet {
 
 		IPCMPacket pcmPacket = (IPCMPacket) packet;
 		if (pcmPacket.getPCMSampleSizeBits() != 8) {
-			ModCharsetAudio.logger.error("PacketAudioData cannot read non-8-bit packets!");
+			ModCharsetLib.logger.error("PacketAudioData cannot read non-8-bit packets!");
 			return;
 		}
 
@@ -78,8 +78,9 @@ public class PacketAudioData extends Packet {
 		stream.push(data);
 
 		for (AudioSink sink : packet.getSinks()) {
+			// TODO
 			stream.play((float) sink.getPos().xCoord, (float) sink.getPos().yCoord, (float) sink.getPos().zCoord,
-					sink.getHearingDistance(), sink.getVolume());
+					32.0F, 1.0F);
 		}
 	}
 }

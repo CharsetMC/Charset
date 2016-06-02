@@ -16,20 +16,28 @@
 
 package pl.asie.charset.lib.render;
 
+import net.minecraft.util.BlockRenderLayer;
+
 import javax.annotation.Nonnull;
 
 public class ModelKey<T extends IRenderComparable<T>> {
     T object;
+    BlockRenderLayer layer;
     Class objectClass;
 
-    public ModelKey(@Nonnull T object) {
+    public ModelKey(@Nonnull T object, @Nonnull BlockRenderLayer layer) {
         this.object = object;
+        this.layer = layer;
         this.objectClass = object.getClass();
     }
 
     @Override
     public boolean equals(Object other) {
         if (other == null || !(other instanceof ModelKey) ){
+            return false;
+        }
+
+        if (layer != ((ModelKey) other).layer) {
             return false;
         }
 
@@ -44,6 +52,10 @@ public class ModelKey<T extends IRenderComparable<T>> {
 
     @Override
     public int hashCode() {
-        return object.renderHashCode();
+        if (layer == null) {
+            return object.renderHashCode() * 3;
+        } else {
+            return object.renderHashCode() * 3 + layer.ordinal() + 1;
+        }
     }
 }

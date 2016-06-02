@@ -561,7 +561,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 				if (canInvertSide(closestFace) && isSideInverted(closestFace)) {
 					if (!remote) {
 						invertedSides &= ~(1 << (closestFace.ordinal() - 2));
-						ItemUtils.spawnItemEntity(getWorld(), vec.xCoord, vec.yCoord, vec.zCoord,
+						ItemUtils.spawnItemEntity(getWorld(), vec,
 								new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
 					}
 					changed = true;

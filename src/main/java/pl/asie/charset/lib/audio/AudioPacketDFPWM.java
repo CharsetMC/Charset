@@ -17,7 +17,11 @@
 package pl.asie.charset.lib.audio;
 
 import pl.asie.charset.api.audio.AudioPacket;
+import pl.asie.charset.api.audio.IAudioModifier;
 import pl.asie.charset.lib.utils.DFPWM;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
 
 public class AudioPacketDFPWM extends AudioPacketCharset {
     protected byte[] decodedData;
@@ -33,7 +37,9 @@ public class AudioPacketDFPWM extends AudioPacketCharset {
 
     @Override
     public AudioPacket clone() {
-        return new AudioPacketDFPWM(id, data, time);
+        AudioPacketDFPWM packet = new AudioPacketDFPWM(id, data, time);
+        packet.addAll(this.getSinks());
+        return packet;
     }
 
     @Override

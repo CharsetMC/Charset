@@ -17,6 +17,7 @@
 package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -42,11 +43,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.lib.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.storage.ModCharsetStorage;
 
-public class BlockBackpack extends BlockContainer {
+public class BlockBackpack extends BlockBase implements ITileEntityProvider {
 	public static class Color implements IBlockColor {
 		@Override
 		@SideOnly(Side.CLIENT)
@@ -98,18 +100,6 @@ public class BlockBackpack extends BlockContainer {
 				world.setBlockToAir(pos);
 
 				player.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack);
-			}
-		}
-	}
-
-	@Override
-	public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-		super.onBlockPlacedBy(world, pos, state, placer, stack);
-
-		if (stack.hasTagCompound()) {
-			TileEntity tile = world.getTileEntity(pos);
-			if (tile instanceof TileBackpack) {
-				((TileBackpack) tile).readNBTData(stack.getTagCompound(), false);
 			}
 		}
 	}

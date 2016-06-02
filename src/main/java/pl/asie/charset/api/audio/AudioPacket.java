@@ -19,15 +19,22 @@ package pl.asie.charset.api.audio;
 import com.google.common.collect.ImmutableSet;
 import io.netty.buffer.ByteBuf;
 
+import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AudioPacket implements Cloneable {
+public abstract class AudioPacket implements Cloneable, IAudioModifierContainer {
     protected Set<AudioSink> sinks = new HashSet<AudioSink>();
 
-    public boolean add(AudioSink sink) {
+    public boolean add(@Nonnull AudioSink sink) {
         return sinks.add(sink);
     }
+
+    public boolean addAll(@Nonnull Collection<AudioSink> sinks) {
+        return sinks.addAll(sinks);
+    }
+
     public Set<AudioSink> getSinks() {
         return ImmutableSet.copyOf(sinks);
     }
@@ -36,7 +43,7 @@ public abstract class AudioPacket implements Cloneable {
         return sinks.size();
     }
 
-    public abstract AudioPacket clone();
+    public abstract void beginPropagation();
     public abstract void finishPropagation();
 
     public void writeData(ByteBuf buffer) {

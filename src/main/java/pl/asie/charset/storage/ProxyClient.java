@@ -17,8 +17,11 @@
 package pl.asie.charset.storage;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
@@ -43,6 +46,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.storage.backpack.*;
+import pl.asie.charset.storage.barrel.BarrelModel;
+import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
+import pl.asie.charset.storage.barrel.RenderMinecartDayBarrel;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrelRenderer;
 import pl.asie.charset.storage.locking.EntityLock;
 import pl.asie.charset.storage.locking.ItemLock;
 import pl.asie.charset.storage.locking.RenderLock;
@@ -51,6 +59,7 @@ public class ProxyClient extends ProxyCommon {
 	public static final KeyBinding backpackOpenKey = new KeyBinding("key.charset.backpackOpen", Keyboard.KEY_C, "key.categories.gameplay");
 	public static final IBakedModel[] backpackTopModel = new IBakedModel[4];
 	public static final IBakedModel[] backpackModel = new IBakedModel[4];
+	public static final BarrelModel barrelModel = new BarrelModel();
 
 	@Override
 	public void preInit() {
@@ -60,11 +69,19 @@ public class ProxyClient extends ProxyCommon {
 				return new RenderLock(manager);
 			}
 		});
+
+		RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, new IRenderFactory<EntityMinecartDayBarrel>() {
+			@Override
+			public Render<? super EntityMinecartDayBarrel> createRenderFor(RenderManager manager) {
+				return new RenderMinecartDayBarrel(manager);
+			}
+		});
 	}
 
 	@Override
 	public void init() {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileBackpack.class, new RendererBackpack.Tile());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
 		ClientRegistry.registerKeyBinding(backpackOpenKey);
 
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(new BlockBackpack.Color(), ModCharsetStorage.backpackBlock);
@@ -94,7 +111,16 @@ public class ProxyClient extends ProxyCommon {
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
+	public void onTextureMap(TextureStitchEvent.Pre event) {
+		BarrelModel.onTextureLoad(event.getMap());
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:barrel", "normal"), barrelModel);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:barrel", "inventory"), barrelModel);
+
 		IModel backpackModelBase = RenderUtils.getModel(new ResourceLocation("charsetstorage:block/backpack"));
 		IModel backpackTopModelBase = RenderUtils.getModel(new ResourceLocation("charsetstorage:block/backpack_top"));
 		for (int i = 0; i < 4; i++) {
@@ -105,5 +131,7 @@ public class ProxyClient extends ProxyCommon {
 					new TRSRTransformation(EnumFacing.getFront(i + 2)),
 					DefaultVertexFormats.BLOCK, RenderUtils.textureGetter);
 		}
+
+		BarrelModel.template = (IRetexturableModel) RenderUtils.getModel(new ResourceLocation("charsetstorage:block/barrel"));
 	}
 }

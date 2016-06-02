@@ -17,28 +17,58 @@
 package pl.asie.charset.storage.backpack;
 
 import net.minecraft.block.SoundType;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IInteractionObject;
 
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.storage.ModCharsetStorage;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
 public class TileBackpack extends TileBase implements IInteractionObject, IInventory, IInventoryOwner {
+	private IItemHandler handler = new InvWrapper(this);
 	private InventorySimple inventory = new InventorySimple(27, this);
 	private int color = -1;
 
 	public int getColor() {
 		return color >= 0 ? color : BlockBackpack.DEFAULT_COLOR;
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handler);
+		}
+
+		return null;
+	}
+
+	@Override
+	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+		if (stack.hasTagCompound()) {
+			readNBTData(stack.getTagCompound(), false);
+		}
 	}
 
 	@Override
@@ -82,6 +112,11 @@ public class TileBackpack extends TileBase implements IInteractionObject, IInven
 			inventory.writeToNBT(nbt, "items");
 		}
 		return nbt;
+	}
+
+	@Override
+	public void dropContents() {
+		InventoryHelper.dropInventoryItems(getWorld(), pos, this);
 	}
 
 	@Override

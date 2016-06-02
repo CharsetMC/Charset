@@ -37,7 +37,7 @@ public class TweakMobControl extends Tweak {
 	private Configuration config;
 
 	public TweakMobControl() {
-		super("tweaks", "mobControl", "Control mob spawning. Upon enabling, refer to 'tweaks-mobcontrol.cfg'.", false);
+		super("mobs", "mobControl", "Control mob spawning. Upon enabling, refer to 'tweaks-mobcontrol.cfg'.", false);
 	}
 
 	private void reloadConfig() {

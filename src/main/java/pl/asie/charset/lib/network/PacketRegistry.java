@@ -36,7 +36,6 @@ import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
-
 import net.minecraftforge.fmp.multipart.IMultipart;
 
 public class PacketRegistry {
@@ -79,6 +78,12 @@ public class PacketRegistry {
 		sendToWatching(message, tile.getWorld(), tile.getPos());
 	}
 
+	public void sendToAllAround(Packet packet, IMultipart entity,
+								double d) {
+		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimension(),
+				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
+	}
+
 	public void sendToWatching(Packet message, TileEntity tile) {
 		sendToWatching(message, tile.getWorld(), tile.getPos());
 	}
@@ -104,12 +109,6 @@ public class PacketRegistry {
 	public void sendToServer(Packet message) {
 		channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.TOSERVER);
 		channels.get(Side.CLIENT).writeOutbound(message);
-	}
-
-	public void sendToAllAround(Packet packet, IMultipart entity,
-								double d) {
-		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimension(),
-				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
 	}
 
 	public void sendToAllAround(Packet packet, TileEntity entity,

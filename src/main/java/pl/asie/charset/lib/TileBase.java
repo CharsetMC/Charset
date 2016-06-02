@@ -17,12 +17,19 @@
 package pl.asie.charset.lib;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class TileBase extends TileEntity {
 	private boolean initialized = false;
@@ -33,6 +40,14 @@ public class TileBase extends TileEntity {
 
 	public boolean hasDataPacket() {
 		return true;
+	}
+
+	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+
+	}
+
+	public int getComparatorValue() {
+		return 0;
 	}
 
 	@Override
@@ -88,5 +103,9 @@ public class TileBase extends TileEntity {
 	public void markBlockForUpdate() {
 		IBlockState state = worldObj.getBlockState(pos);
 		worldObj.notifyBlockUpdate(pos, state, state, 3);
+	}
+
+	public void dropContents() {
+
 	}
 }

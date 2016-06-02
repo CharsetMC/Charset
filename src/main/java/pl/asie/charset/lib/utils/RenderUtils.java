@@ -58,6 +58,14 @@ public final class RenderUtils {
 
 	}
 
+	public static TextureAtlasSprite getSprite(ItemStack stack) {
+		if (renderItem == null) {
+			renderItem = Minecraft.getMinecraft().getRenderItem();
+		}
+
+		return renderItem.getItemModelWithOverrides(stack, null, null).getParticleTexture();
+	}
+
 	public static boolean isDynamicItemRenderer(World world, ItemStack stack) {
 		if (renderItem == null) {
 			renderItem = Minecraft.getMinecraft().getRenderItem();

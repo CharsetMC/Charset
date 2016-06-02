@@ -20,6 +20,7 @@ import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 
@@ -62,7 +63,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 	}
 
 	@Override
-	public IBakedModel bake(PartGate gate) {
+	public IBakedModel bake(PartGate gate, boolean isItem, BlockRenderLayer blockRenderLayer) {
 		SimpleBakedModel result = new SimpleBakedModel(this);
 		ModelStateComposition transform = new ModelStateComposition(
 				new TRSRTransformation(ROTATIONS_SIDE[gate.getSide().ordinal()]),

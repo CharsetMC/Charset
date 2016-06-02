@@ -8,7 +8,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.IForgeRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
-import pl.asie.charset.pipes.PartPipe;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 
 import java.util.ArrayList;
 import java.util.HashMap;

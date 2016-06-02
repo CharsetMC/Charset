@@ -22,9 +22,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.AudioSink;
+import pl.asie.charset.api.audio.IAudioModifier;
 import pl.asie.charset.api.audio.IPCMPacket;
 import pl.asie.charset.lib.ModCharsetLib;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -72,14 +75,28 @@ public abstract class AudioPacketCharset extends AudioPacket implements IPCMPack
     }
 
     @Override
+    public void beginPropagation() {
+
+    }
+
+    @Nullable
+    @Override
+    public Collection<IAudioModifier> getModifiers() {
+        return null;
+    }
+    
+    @Override
     public void finishPropagation() {
         PacketAudioData packet = new PacketAudioData(this);
 
         Map<WorldServer, Set<AudioSink>> worlds = new HashMap<>();
         for (AudioSink sink : sinks) {
+            // TODO
+            /*
             if (sink.getVolume() <= 0.0f || sink.getHearingDistance() <= 0.0f) {
                 continue;
             }
+            */
 
             if (worlds.containsKey(sink.getWorld())) {
                 worlds.get(sink.getWorld()).add(sink);

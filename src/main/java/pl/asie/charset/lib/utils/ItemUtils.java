@@ -16,13 +16,41 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public final class ItemUtils {
 	private ItemUtils() {
 
+	}
+
+	public static NBTTagCompound getTagCompound(ItemStack stack, boolean create) {
+		if (create && !stack.hasTagCompound()) {
+			stack.setTagCompound(new NBTTagCompound());
+		}
+		return stack.getTagCompound();
+	}
+
+	public static void writeToNBT(ItemStack stack, NBTTagCompound compound, String key) {
+		NBTTagCompound compound1 = new NBTTagCompound();
+		if (stack != null) {
+			stack.writeToNBT(compound1);
+		}
+		compound.setTag(key, compound1);
+	}
+
+	public static IBlockState getBlockState(ItemStack stack) {
+		return stack == null ? Blocks.AIR.getDefaultState() : Block.getBlockFromItem(stack.getItem()).getDefaultState();
+	}
+
+	public static boolean canMerge(ItemStack source, ItemStack target) {
+		return equals(source, target, false, true, true);
 	}
 
 	public static boolean equals(ItemStack source, ItemStack target, boolean matchStackSize, boolean matchDamage, boolean matchNBT) {
@@ -53,8 +81,8 @@ public final class ItemUtils {
 		}
 	}
 
-	public static void spawnItemEntity(World world, double x, double y, double z, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
-		EntityItem entityItem = new EntityItem(world, x, y, z, stack);
+	public static void spawnItemEntity(World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
+		EntityItem entityItem = new EntityItem(world, loc.xCoord, loc.yCoord, loc.zCoord, stack);
 		entityItem.setDefaultPickupDelay();
 		if (randomness <= 0.0f) {
 			entityItem.motionX = mXm;
