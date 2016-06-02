@@ -36,11 +36,11 @@
 
 package pl.asie.charset.storage.barrel;
 
-import io.netty.buffer.ByteBuf;
+import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.NoticeUpdater;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -48,7 +48,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -62,14 +61,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.factorization.FzOrientation;
 import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.lib.utils.CapabilityUtils;
@@ -79,9 +72,7 @@ import pl.asie.charset.lib.utils.PlayerUtils;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class TileEntityDayBarrel extends TileBase implements ITickable {
     public ItemStack item;
@@ -698,8 +689,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
 
         if (!worldObj.isRemote && isNested(held) && (item == null || itemMatch(held))) {
-            // TODO
-            //new Notice(notice_target, "No.").send(entityplayer);
+            new Notice(notice_target, "No.").sendTo(entityplayer);
             return true;
         }
 
@@ -938,8 +928,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     void info(final EntityPlayer entityplayer) {
-        // TODO
-        /* new Notice(notice_target, new NoticeUpdater() {
+        new Notice(notice_target, new NoticeUpdater() {
             @Override
             public void update(Notice msg) {
                 if (item == null && getItemCount() == 0) {
@@ -954,7 +943,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                     msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
                 }
             }
-        }).sendTo(entityplayer); */
+        }).sendTo(entityplayer);
     }
 
     private ItemStack makeStack(int count) {

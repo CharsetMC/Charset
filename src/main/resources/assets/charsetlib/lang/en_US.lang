@@ -57,6 +57,7 @@ charset.color.lightBlue=Light Blue
 charset.color.magenta=Magenta
 charset.color.orange=Orange
 charset.color.white=White
+charset.point.toofar=You can't point that far!
 
 itemGroup.charset=The Charset Project
 
