@@ -36,6 +36,7 @@
 
 package pl.asie.charset.storage.barrel;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -218,9 +219,17 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.translate(0.25, -0.25 - labelD, 0);
 
         boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null).isGui3d();
+        boolean isFullBlock = false;
+        Block block = Block.getBlockFromItem(is.getItem());
+        if (block != null) {
+            isFullBlock = block.getDefaultState().isFullCube();
+        }
+
         if (isBlock) {
             GlStateManager.scale(0.75F, 0.75F, 0.75F);
-            GlStateManager.translate(0, 0, -0.1);
+            if (isFullBlock) {
+                GlStateManager.translate(0, 0, -0.1);
+            }
         } else {
             GlStateManager.scale(0.5F, 0.5F, 0.5F);
         }

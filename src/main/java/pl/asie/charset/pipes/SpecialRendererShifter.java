@@ -16,6 +16,7 @@
 
 package pl.asie.charset.pipes;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -52,6 +53,11 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 			EntityItem entityitem = new EntityItem(shifter.getWorld(), tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), filters[i]);
 			EnumFacing itemDir = EnumFacing.getFront(i);
 			boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(filters[i], null, null).isGui3d();
+			boolean isFullBlock = false;
+			Block block = Block.getBlockFromItem(filters[i].getItem());
+			if (block != null) {
+				isFullBlock = block.getDefaultState().isFullCube();
+			}
 
 			float translationConstant = 0.49375F;
 
@@ -87,7 +93,9 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 
 			if (isBlock) {
 				GlStateManager.scale(2.0F, 2.0F, 2.0F);
-				GlStateManager.translate(0, 0, -0.044F);
+				if (isFullBlock) {
+					GlStateManager.translate(0, 0, -0.044F);
+				}
 			} else {
 				GlStateManager.scale(1.25F, 1.25F, 1.25F);
 				GlStateManager.translate(0, 0, 0.005F);
