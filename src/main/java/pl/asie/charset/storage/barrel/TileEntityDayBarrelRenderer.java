@@ -39,15 +39,22 @@ package pl.asie.charset.storage.barrel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.factorization.FzOrientation;
 import pl.asie.charset.lib.factorization.Quaternion;
@@ -63,8 +70,8 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             GlStateManager.translate(face.getDirectionVec().getX(), face.getDirectionVec().getY(), face.getDirectionVec().getZ());
         }
         GlStateManager.translate(
-                0.5*(1 - Math.abs(face.getDirectionVec().getX())), 
-                0.5*(1 - Math.abs(face.getDirectionVec().getY())), 
+                0.5*(1 - Math.abs(face.getDirectionVec().getX())),
+                0.5*(1 - Math.abs(face.getDirectionVec().getY())),
                 0.5*(1 - Math.abs(face.getDirectionVec().getZ()))
                 );
         
@@ -86,12 +93,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
 
         boolean hasLabel = renderItemCount(is, barrel);
         handleRenderItem(is, barrel, hasLabel);
-
-        GlStateManager.enableLighting();
     }
 
     //Another optimization: don't render if the barrel's facing a solid block
-    //(A third optimization: somehow get the SBRH to cull faces. Complicated & expensive?)
     @Override
     public void renderTileEntityAt(TileEntityDayBarrel barrel, double x, double y, double z, float partialTicks, int destroyStage) {
         ItemStack is = barrel.item;
@@ -112,6 +116,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         doDraw(barrel, is);
 
         GlStateManager.popMatrix();
+        RenderHelper.enableStandardItemLighting();
         Minecraft.getMinecraft().mcProfiler.endSection();
     }
 
@@ -207,15 +212,21 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
 
     public void handleRenderItem(ItemStack is, TileEntityDayBarrel barrel, boolean hasLabel) {
         if (!ModCharsetStorage.renderBarrelItem) return;
-        //Got problems? Consider looking at ForgeHooksClient.renderInventoryItem, that might be better than this here.
         GlStateManager.pushMatrix();
-        GlStateManager.rotate(180, 0, 0, 1);
+        GlStateManager.rotate(180, 0, 1, 0);
         float labelD = hasLabel ? 0F : -1F/16F;
-        GlStateManager.translate(0, labelD, 1F/16F);
-        float scale = 1F/32F;
-        GlStateManager.scale(scale, scale, scale);
-        GlStateManager.scale(1, 1, -0.02F);
-        Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(is, 0, 0);
+        GlStateManager.translate(0.25, -0.25 - labelD, 0);
+
+        boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null).isGui3d();
+        if (isBlock) {
+            GlStateManager.scale(0.75F, 0.75F, 0.75F);
+            GlStateManager.translate(0, 0, -0.1);
+        } else {
+            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+        }
+
+        RenderHelper.enableStandardItemLighting();
+        Minecraft.getMinecraft().getRenderItem().renderItem(is, ItemCameraTransforms.TransformType.FIXED);
         GlStateManager.popMatrix();
     }
 }

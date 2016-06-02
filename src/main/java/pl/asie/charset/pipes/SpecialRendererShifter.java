@@ -51,14 +51,12 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 
 			EntityItem entityitem = new EntityItem(shifter.getWorld(), tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), filters[i]);
 			EnumFacing itemDir = EnumFacing.getFront(i);
-			boolean isBlock = this.itemRenderer.getItemModelMesher().getItemModel(filters[i]) instanceof IPerspectiveAwareModel.MapWrapper
-					&& filters[i].getItem() instanceof ItemBlock;
+			boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(filters[i], null, null).isGui3d();
 
 			float translationConstant = 0.49375F;
 
 			entityitem.hoverStart = 0.0F;
 			GlStateManager.pushMatrix();
-			GlStateManager.disableLighting();
 			GlStateManager.translate(
 					x + 0.5 + translationConstant * itemDir.getFrontOffsetX(),
 					y + 0.5 + translationConstant * itemDir.getFrontOffsetY(),
@@ -88,10 +86,11 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 			}
 
 			if (isBlock) {
-				GlStateManager.translate(0, 0, -0.0625F);
 				GlStateManager.scale(2.0F, 2.0F, 2.0F);
+				GlStateManager.translate(0, 0, -0.044F);
 			} else {
-				GlStateManager.scale(1.33F, 1.33F, 1.33F);
+				GlStateManager.scale(1.25F, 1.25F, 1.25F);
+				GlStateManager.translate(0, 0, 0.005F);
 			}
 
 			int l = tileEntity.getWorld().getCombinedLight(tileEntity.getPos().offset(itemDir), tileEntity.getWorld().getSkylightSubtracted());
@@ -99,20 +98,12 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 			int k = l / 65536;
 			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
 
-			TextureAtlasSprite textureatlassprite = null;
-
 			GlStateManager.scale(0.5F, 0.5F, 0.5F);
 
 			RenderHelper.enableStandardItemLighting();
 			this.itemRenderer.renderItem(entityitem.getEntityItem(), ItemCameraTransforms.TransformType.FIXED);
-			RenderHelper.disableStandardItemLighting();
-
-			if (textureatlassprite != null && textureatlassprite.getFrameCount() > 0) {
-				textureatlassprite.updateAnimation();
-			}
-
-			GlStateManager.enableLighting();
 			GlStateManager.popMatrix();
 		}
+		RenderHelper.enableStandardItemLighting();
 	}
 }
