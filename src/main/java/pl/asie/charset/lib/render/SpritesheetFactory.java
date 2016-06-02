@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -53,15 +54,8 @@ public class SpritesheetFactory {
         @Override
         public boolean load(IResourceManager manager, ResourceLocation loc) {
             if (sheet == null) {
-                try {
-                    ResourceLocation pngLocation = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {"textures", location.getResourcePath(), ".png"}));
-                    IResource resource = manager.getResource(pngLocation);
-                    sheet = TextureUtil.readBufferedImage(resource.getInputStream());
-                    if (sheet == null) {
-                        return false;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                sheet = RenderUtils.getBufferedImage(location);
+                if (sheet == null) {
                     return false;
                 }
             }

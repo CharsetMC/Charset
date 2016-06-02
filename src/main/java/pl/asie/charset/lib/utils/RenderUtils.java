@@ -16,6 +16,8 @@
 
 package pl.asie.charset.lib.utils;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -23,6 +25,8 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
+import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
@@ -56,6 +60,17 @@ public final class RenderUtils {
 
 	private RenderUtils() {
 
+	}
+
+	public static BufferedImage getBufferedImage(ResourceLocation location) {
+		try {
+			ResourceLocation pngLocation = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {"textures", location.getResourcePath(), ".png"}));
+			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(pngLocation);
+			return TextureUtil.readBufferedImage(resource.getInputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static TextureAtlasSprite getSprite(ItemStack stack) {
@@ -125,7 +140,7 @@ public final class RenderUtils {
 		return quad;
 	}
 
-	private static int multiplyColor(int src, int dst) {
+	public static int multiplyColor(int src, int dst) {
 		int out = 0;
 		for (int i = 0; i < 32; i += 8) {
 			out |= ((((src >> i) & 0xFF) * ((dst >> i) & 0xFF) / 0xFF) & 0xFF) << i;

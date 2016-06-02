@@ -46,6 +46,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
+import org.lwjgl.opengl.GL11;
 import pl.asie.charset.storage.ProxyClient;
 
 public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBarrel> {
@@ -64,6 +65,7 @@ public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBar
         GlStateManager.pushMatrix();
         GlStateManager.enableAlpha();
         GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
                 ProxyClient.barrelModel, state, minecart.getBrightness(partialTicks), true);
         GlStateManager.disableBlend();

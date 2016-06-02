@@ -52,6 +52,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -82,6 +83,16 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         super(materialBarrel);
         setUnlocalizedName("charset.barrel");
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityDayBarrel) {
+            return ((TileEntityDayBarrel) tile).getPickedBlock();
+        }
+
+        return new ItemStack(this);
     }
 
     @Override

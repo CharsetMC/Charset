@@ -48,6 +48,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     final TextureAtlasSprite log, plank;
+    final String logName;
     final TileEntityDayBarrel.Type type;
     final FzOrientation orientation;
     final boolean isMetal;
@@ -77,8 +78,9 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         return result;
     }
 
-    private BarrelCacheInfo(TextureAtlasSprite log, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, FzOrientation orientation, boolean isMetal) {
+    private BarrelCacheInfo(TextureAtlasSprite log, String logName, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, FzOrientation orientation, boolean isMetal) {
         this.log = log;
+        this.logName = logName;
         this.plank = plank;
         this.type = type;
         this.orientation = orientation;
@@ -91,7 +93,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         TextureAtlasSprite slab = RenderUtils.getSprite(barrel.woodSlab);
         FzOrientation fzo = barrel.orientation;
         TileEntityDayBarrel.Type type = barrel.type;
-        return new BarrelCacheInfo(log, slab, type, fzo, isMetal(barrel.woodLog));
+        return new BarrelCacheInfo(log, barrel.woodLog.toString(), slab, type, fzo, isMetal(barrel.woodLog));
     }
 
 

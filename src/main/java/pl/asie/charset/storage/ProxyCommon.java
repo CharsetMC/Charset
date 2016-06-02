@@ -24,4 +24,8 @@ public class ProxyCommon {
 	public void init() {
 
 	}
+
+	public void postInit() {
+
+	}
 }

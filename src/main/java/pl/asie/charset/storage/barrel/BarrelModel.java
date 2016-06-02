@@ -36,30 +36,97 @@
 
 package pl.asie.charset.storage.barrel;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.model.IModelState;
-import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.render.WrappedBakedModel;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
+    public static final Colorizer COLORIZER = new Colorizer();
+
     public BarrelModel() {
         super(BlockBarrel.BARREL_INFO, TextureMap.LOCATION_MISSING_TEXTURE);
         addDefaultBlockTransforms();
+    }
+
+    public static class Colorizer implements IBlockColor, IItemColor {
+        private final TObjectIntMap<String> colorMap = new TObjectIntHashMap<>();
+        private final int DEFAULT_COLOR = 0x735e39;
+
+        public void clear() {
+            colorMap.clear();
+        }
+
+        private int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
+            if (!info.isMetal && !info.type.isHopping()) {
+                if (!colorMap.containsKey(info.logName)) {
+                    if (info.log.getIconName().endsWith("missingno")) {
+                        colorMap.put(info.logName, DEFAULT_COLOR | 0xFF000000);
+                    } else {
+                        int[] data = info.log.getFrameTextureData(0)[0];
+                        int[] avgColor = new int[3];
+                        // Only take the first and last row into account. This might tile better.
+                        for (int j = 0; j < 2; j++) {
+                            for (int i = 0; i < info.log.getIconWidth(); i++) {
+                                int c = data[j > 0 ? (data.length - 1 - i) : i];
+                                avgColor[0] += (c & 0xFF);
+                                avgColor[1] += ((c >> 8) & 0xFF);
+                                avgColor[2] += ((c >> 16) & 0xFF);
+                            }
+                        }
+                        for (int i = 0; i < 3; i++) {
+                            avgColor[i] = (avgColor[i] / (info.log.getIconWidth() * 2)) & 0xFF;
+                        }
+                        colorMap.put(info.logName, avgColor[0] | (avgColor[1] << 8) | (avgColor[2] << 16) | 0xFF000000);
+                    }
+                }
+
+                return colorMap.get(info.logName);
+            }
+            return -1;
+        }
+
+        @Override
+        public int colorMultiplier(IBlockState state, @Nullable IBlockAccess worldIn, @Nullable BlockPos pos, int tintIndex) {
+            if (state instanceof IExtendedBlockState) {
+                BarrelCacheInfo info = ((IExtendedBlockState) state).getValue(BlockBarrel.BARREL_INFO);
+                if (info != null) {
+                    return colorMultiplier(info, tintIndex);
+                }
+            }
+            return -1;
+        }
+
+        @Override
+        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+            BarrelCacheInfo info = BarrelCacheInfo.from(stack);
+            if (info != null) {
+                return colorMultiplier(info, tintIndex);
+            }
+            return -1;
+        }
     }
 
     public static class BarrelGroup {
@@ -80,6 +147,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
 
     public static void onTextureLoad(TextureMap map) {
         TEXTURE_MAP.clear();
+        COLORIZER.clear();
         new BarrelGroup("hopping", map);
         new BarrelGroup("sticky", map);
         new BarrelGroup("silky", map);
@@ -87,21 +155,24 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         font = map.registerSprite(new ResourceLocation("charsetstorage:blocks/barrel/font"));
     }
 
+    private String getGroupName(TileEntityDayBarrel.Type type) {
+        if (type.isHopping()) {
+            return "hopping";
+        } else if (type == TileEntityDayBarrel.Type.SILKY) {
+            return "silky";
+        } else if (type == TileEntityDayBarrel.Type.STICKY) {
+            return "sticky";
+        } else {
+            return "normal";
+        }
+    }
+
     @Override
     public IBakedModel bake(BarrelCacheInfo info, boolean isItem, BlockRenderLayer layer) {
         TextureAtlasSprite log = info.log;
         TextureAtlasSprite plank = info.plank;
-        BarrelGroup group;
-        TileEntityDayBarrel.Type type = info.type;
-        if (type.isHopping()) {
-            group = TEXTURE_MAP.get("hopping");
-        } else if (type == TileEntityDayBarrel.Type.SILKY) {
-            group = TEXTURE_MAP.get("silky");
-        } else if (type == TileEntityDayBarrel.Type.STICKY) {
-            group = TEXTURE_MAP.get("sticky");
-        } else {
-            group = TEXTURE_MAP.get("normal");
-        }
+        String groupName = getGroupName(info.type);
+        BarrelGroup group = TEXTURE_MAP.get(groupName);
         TextureAtlasSprite top = info.isMetal ? group.top_metal : group.top;
         TextureAtlasSprite front = group.front;
         TextureAtlasSprite side = group.side;
@@ -128,18 +199,10 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         map.put(new ResourceLocation(top.getIconName()), top);
         map.put(new ResourceLocation(front.getIconName()), front);
         map.put(new ResourceLocation(side.getIconName()), side);
-        Function<ResourceLocation, TextureAtlasSprite> lookup = new Function<ResourceLocation, TextureAtlasSprite>() {
-            @Nullable
-            @Override
-            public TextureAtlasSprite apply(@Nullable ResourceLocation input) {
-                return map.get(input);
-            }
-        };
-
         IModelState state = info.orientation.toTransformation();
         ImmutableMap<String, String> textureMap = ImmutableMap.copyOf(textures);
         IModel retexture = template.retexture(textureMap);
-        return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, lookup)).addDefaultBlockTransforms();
+        return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter)).addDefaultBlockTransforms();
     }
 
     @Override

@@ -3,8 +3,8 @@
         {   "from": [ 0, 0, 0 ],
             "to": [ 16, 16, 16 ],
             "faces": {
-                "down":  { "texture": "#top", "cullface": "down" },
-                "up":    { "texture": "#top", "cullface": "up" },
+                "down":  { "texture": "#top", "cullface": "down", "tintindex": 0 },
+                "up":    { "texture": "#top", "cullface": "up", "tintindex": 0 },
                 "north": { "texture": "#log", "cullface": "north" },
                 "south": { "texture": "#log", "cullface": "south" },
                 "west":  { "texture": "#log", "cullface": "west" },
