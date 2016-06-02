@@ -1,14 +1,16 @@
-(The changelog shows changes since 0.2.x, -pre versions are skipped)
-
 * [Global] Ported to Minecraft 1.9.4
 * [Global] Add caching to most dynamic models (wires, gates)
+* [Global] Change license to Apache 2.0
 * [Global] Countless bugfixes across the mod
+* [Global] Add translations - in German, Polish, Slovak and Chinese
 * [Audio] Rewrite internal audio management logic, add API for future Audio Cables/Speakers
 * [Gates] Add a Buffer Gate which can also function as a NOT gate
 * [Gates] Change gate toggling mechanics - shift-right click to disable a specific side, no more screwdriver
 * [Gates] Add ability to place and remove redstone torches from gate edges
+* [Lib] Incorporate neptunepink's in-world notification system
 * [Pipes] Add preliminary implementation of fluid in pipes - still heavily subject to change
 * [Pipes] Rewritten static and dynamic renderers - major potential FPS improvements
+* [Storage] Add barrels from Factorization, with minor improvements
 * [Storage] Add keys and locks - block player interaction on supported containers! (WIP)
 * [Tweaks] Add option to keep inventory on death (even though /gamerule already does this?)
 * [Wrench] New module, adds a wrench for rotating objects - also supports multiparts!
