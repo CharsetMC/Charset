@@ -34,13 +34,14 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseBakedModel {
-    private static final boolean DISABLE_CACHE = true;
+    private static final boolean DISABLE_CACHE = ModCharsetLib.INDEV;
     private static final Set<ModelFactory> FACTORIES = new HashSet<>();
 
     private static class MFItemOverride extends ItemOverrideList {

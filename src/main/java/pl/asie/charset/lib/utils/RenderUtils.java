@@ -89,7 +89,7 @@ public final class RenderUtils {
 				break;
 		}
 
-		return BAKERY.makeBakedQuad(fFrom, fTo, tintIndex, sprite, facing, ModelRotation.X0_Y0, false);
+		return BAKERY.makeBakedQuad(fFrom, fTo, tintIndex, sprite, facing, ModelRotation.X0_Y0, true);
 	}
 
 	public static int getAverageColor(TextureAtlasSprite sprite, AveragingMode mode) {

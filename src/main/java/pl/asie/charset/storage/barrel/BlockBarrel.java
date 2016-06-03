@@ -78,7 +78,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         // NORELEASE.fixme("Test adventure mode barrel breaking");
     }};
 
-    private static final boolean SHOW_ALL_BARRELS = false;
+    private static final boolean SHOW_ALL_BARRELS = ModCharsetLib.INDEV;
 
     public BlockBarrel() {
         super(materialBarrel);
@@ -214,42 +214,40 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
     @Override
     public void getSubBlocks(Item me, CreativeTabs tab, List<ItemStack> itemList) {
-        if (todaysBarrels != null) {
-            itemList.addAll(todaysBarrels);
-            return;
-        }
-        Calendar cal = ModCharsetLib.calendar.get();
-        int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
+        if (todaysBarrels == null) {
+            todaysBarrels = new ArrayList<ItemStack>();
 
-        ArrayList<ItemStack> weeklyBarrels = new ArrayList<>();
-        todaysBarrels = new ArrayList<ItemStack>();
+            ArrayList<ItemStack> weeklyBarrels = new ArrayList<>();
+            Calendar cal = ModCharsetLib.calendar.get();
+            int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
 
-        for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels()) {
-            TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
-            if (type == TileEntityDayBarrel.Type.NORMAL) {
-                weeklyBarrels.add(barrel);
-            } else if (type == TileEntityDayBarrel.Type.CREATIVE) {
-                todaysBarrels.add(barrel);
+            for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels()) {
+                TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
+                if (type == TileEntityDayBarrel.Type.NORMAL) {
+                    weeklyBarrels.add(barrel);
+                } else if (type == TileEntityDayBarrel.Type.CREATIVE) {
+                    todaysBarrels.add(barrel);
+                }
             }
-        }
 
-        if (!SHOW_ALL_BARRELS) {
-            Collections.shuffle(weeklyBarrels, new Random(doy));
-        }
-        int barrelsToAdd = 1;
-
-        TileEntityDayBarrel rep = new TileEntityDayBarrel();
-        for (ItemStack barrel : weeklyBarrels) {
-            rep.loadFromStack(barrel);
-            for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
-                if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
-                if (type == TileEntityDayBarrel.Type.LARGER) continue;
-                rep.type = type;
-                todaysBarrels.add(rep.getPickedBlock());
+            if (!SHOW_ALL_BARRELS) {
+                Collections.shuffle(weeklyBarrels, new Random(doy));
             }
-            barrelsToAdd--;
-            if (!SHOW_ALL_BARRELS && barrelsToAdd <= 0) {
-                break;
+            int barrelsToAdd = 1;
+
+            TileEntityDayBarrel rep = new TileEntityDayBarrel();
+            for (ItemStack barrel : weeklyBarrels) {
+                rep.loadFromStack(barrel);
+                for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
+                    if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
+                    if (type == TileEntityDayBarrel.Type.LARGER) continue;
+                    rep.type = type;
+                    todaysBarrels.add(rep.getPickedBlock());
+                }
+                barrelsToAdd--;
+                if (!SHOW_ALL_BARRELS && barrelsToAdd <= 0) {
+                    break;
+                }
             }
         }
 

@@ -62,6 +62,7 @@ import pl.asie.charset.storage.barrel.ItemMinecartDayBarrel;
 import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 import pl.asie.charset.storage.crate.BlockCrate;
 import pl.asie.charset.storage.crate.CrateRegistry;
+import pl.asie.charset.storage.crate.ItemCrate;
 import pl.asie.charset.storage.crate.TileEntityCrate;
 import pl.asie.charset.storage.locking.*;
 
@@ -115,10 +116,10 @@ public class ModCharsetStorage {
 		GameRegistry.register(backpackBlock.setRegistryName("backpack"));
 		GameRegistry.register(new ItemBackpack(backpackBlock).setRegistryName("backpack"));
 
-		/* crateBlock = new BlockCrate();
-		crateItem = new ItemBlock(crateBlock);
+		crateBlock = new BlockCrate();
+		crateItem = new ItemCrate(crateBlock);
 		GameRegistry.register(crateBlock.setRegistryName("crate"));
-		GameRegistry.register(crateItem.setRegistryName("crate")); */
+		GameRegistry.register(crateItem.setRegistryName("crate"));
 
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
@@ -138,7 +139,7 @@ public class ModCharsetStorage {
 		lockItem = new ItemLock();
 		GameRegistry.register(lockItem.setRegistryName("lock"));
 
-		// ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
+		ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
 		ModCharsetLib.proxy.registerItemModel(barrelItem, 0, "charsetstorage:barrel");
 		ModCharsetLib.proxy.registerItemModel(barrelCartItem, 0, "charsetstorage:barrelCart");
 		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
@@ -164,7 +165,7 @@ public class ModCharsetStorage {
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
 		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
-		// GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
+		GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
 
 		EntityRegistry.registerModEntity(EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, true);
 		EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
@@ -255,9 +256,9 @@ public class ModCharsetStorage {
 				ItemStack slab = plank;
 
 				InventoryCrafting slabCrafting = RecipeUtils.getCraftingInventory(3, 3);
-				slabCrafting.setInventorySlotContents(6, plank);
-				slabCrafting.setInventorySlotContents(7, plank);
-				slabCrafting.setInventorySlotContents(8, plank);
+				slabCrafting.setInventorySlotContents(6, plank.copy());
+				slabCrafting.setInventorySlotContents(7, plank.copy());
+				slabCrafting.setInventorySlotContents(8, plank.copy());
 				IRecipe slabRecipe = RecipeUtils.getMatchingRecipe(slabCrafting, null);
 
 				if (slabRecipe != null) {
@@ -273,8 +274,8 @@ public class ModCharsetStorage {
 				ItemStack stick = new ItemStack(Items.STICK);
 
 				InventoryCrafting stickCrafting = RecipeUtils.getCraftingInventory(3, 3);
-				slabCrafting.setInventorySlotContents(0, plank);
-				slabCrafting.setInventorySlotContents(3, plank);
+				slabCrafting.setInventorySlotContents(0, plank.copy());
+				slabCrafting.setInventorySlotContents(3, plank.copy());
 				IRecipe stickRecipe = RecipeUtils.getMatchingRecipe(slabCrafting, null);
 
 				if (stickRecipe != null) {
@@ -303,7 +304,7 @@ public class ModCharsetStorage {
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 5));
 
 		for (int i = 0; i < 6; i++) {
-			CrateRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.WOODEN_SLAB, 1, i), new ItemStack(Items.STICK));
+			CrateRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.PLANKS, 1, i), new ItemStack(Items.STICK));
 		}
 
 		for (ItemStack log : OreDictionary.getOres("logWood", false)) {
@@ -313,11 +314,12 @@ public class ModCharsetStorage {
 
 			try {
 				if (log.getMetadata() == OreDictionary.WILDCARD_VALUE) {
-					for (int i = 0; i < 128; i++) { // I know Forestry and Binnie's Mods might be going high. Hopefully not higher.
-						checkPlankForWoods(new ItemStack(log.getItem(), 1, i));
+					for (int i = 0; i < (log.getItem() instanceof ItemBlock ? 16 : 128); i++) {
+						ItemStack stack = new ItemStack(log.getItem(), 1, i);
+						checkPlankForWoods(stack);
 					}
 				} else {
-					checkPlankForWoods(log);
+					checkPlankForWoods(log.copy());
 				}
 			} catch (Exception e) {
 

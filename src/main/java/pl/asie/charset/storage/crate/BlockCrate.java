@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 public class BlockCrate extends BlockBase implements ITileEntityProvider {
-    public static final boolean SHOW_ALL_CRATES = false;
+    public static final boolean SHOW_ALL_CRATES = ModCharsetLib.INDEV;
     public static final GenericExtendedProperty<CrateCacheInfo> PROPERTY = new GenericExtendedProperty<CrateCacheInfo>("cache", CrateCacheInfo.class);
 
     public BlockCrate() {
@@ -56,30 +56,26 @@ public class BlockCrate extends BlockBase implements ITileEntityProvider {
 
     @Override
     public void getSubBlocks(Item me, CreativeTabs tab, List<ItemStack> itemList) {
-        if (todaysCrates != null) {
-            itemList.addAll(todaysCrates);
-            return;
-        }
-        Calendar cal = ModCharsetLib.calendar.get();
-        int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
+        if (todaysCrates == null) {
+            todaysCrates = new ArrayList<ItemStack>();
 
-        ArrayList<ItemStack> weeklyCrates = new ArrayList<>();
-        todaysCrates = new ArrayList<ItemStack>();
+            Calendar cal = ModCharsetLib.calendar.get();
+            int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
 
-        for (ItemStack crate : CrateRegistry.INSTANCE.getCrates()) {
-            weeklyCrates.add(crate);
-        }
+            ArrayList<ItemStack> weeklyCrates = new ArrayList<>();
+            weeklyCrates.addAll(CrateRegistry.INSTANCE.getCrates());
+            if (!SHOW_ALL_CRATES) {
+                Collections.shuffle(weeklyCrates, new Random(doy));
+            }
 
-        if (!SHOW_ALL_CRATES) {
-            Collections.shuffle(weeklyCrates, new Random(doy));
-        }
-        int cratesToAdd = 1;
+            int cratesToAdd = 1;
 
-        for (ItemStack crate : weeklyCrates) {
-            todaysCrates.add(crate);
-            cratesToAdd--;
-            if (!SHOW_ALL_CRATES && cratesToAdd <= 0) {
-                break;
+            for (ItemStack crate : weeklyCrates) {
+                todaysCrates.add(crate);
+                cratesToAdd--;
+                if (!SHOW_ALL_CRATES && cratesToAdd <= 0) {
+                    break;
+                }
             }
         }
 

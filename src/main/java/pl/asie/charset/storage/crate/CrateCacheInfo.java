@@ -8,21 +8,27 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 public class CrateCacheInfo implements IRenderComparable<CrateCacheInfo> {
     public final ItemStack plank;
-    public final byte connectionMap;
+    public final int connectionMap;
     private final int hash;
 
-    public CrateCacheInfo(ItemStack plank, byte connectionMap) {
+    public CrateCacheInfo(ItemStack plank, int connectionMap) {
         this.plank = plank;
         this.connectionMap = connectionMap;
 
         int hash = 0;
-        hash = (hash * 3) + (Item.getIdFromItem(plank.getItem()) * 7) + plank.getMetadata();
+        if (plank != null) {
+            hash = (hash * 3) + (Item.getIdFromItem(plank.getItem()) * 7) + plank.getMetadata();
+        }
         hash = (hash * 3) + connectionMap;
         this.hash = hash;
     }
 
     public boolean isConnected(EnumFacing side) {
         return (connectionMap & (1 << side.ordinal())) != 0;
+    }
+
+    public boolean isCorner(int x, int y, int z) {
+        return (connectionMap & (1 << (6 + (x * 4) + (y * 2) + z))) != 0;
     }
 
     @Override

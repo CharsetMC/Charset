@@ -67,7 +67,7 @@ public class ProxyClient extends ProxyCommon {
 	public static final IBakedModel[] backpackTopModel = new IBakedModel[4];
 	public static final IBakedModel[] backpackModel = new IBakedModel[4];
 	public static final BarrelModel barrelModel = new BarrelModel();
-	// public static final CrateModel crateModel = new CrateModel();
+	public static final CrateModel crateModel = new CrateModel();
 
 	@Override
 	public void preInit() {
@@ -100,8 +100,8 @@ public class ProxyClient extends ProxyCommon {
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(barrelModel.COLORIZER, ModCharsetStorage.barrelBlock);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(barrelModel.COLORIZER, ModCharsetStorage.barrelItem);
 
-		// Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(crateModel.colorizer, ModCharsetStorage.crateBlock);
-		// Minecraft.getMinecraft().getItemColors().registerItemColorHandler(crateModel.colorizer, ModCharsetStorage.crateItem);
+		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(crateModel.colorizer, ModCharsetStorage.crateBlock);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(crateModel.colorizer, ModCharsetStorage.crateItem);
 
 		MinecraftForge.EVENT_BUS.register(new RendererBackpack.Armor());
 	}
@@ -127,7 +127,7 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onTextureMap(TextureStitchEvent.Pre event) {
 		BarrelModel.onTextureLoad(event.getMap());
-		// CrateModel.onTextureLoad(event.getMap());
+		CrateModel.onTextureLoad(event.getMap());
 	}
 
 	@SubscribeEvent
@@ -135,8 +135,8 @@ public class ProxyClient extends ProxyCommon {
 	public void onPostBake(ModelBakeEvent event) {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:barrel", "normal"), barrelModel);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:barrel", "inventory"), barrelModel);
-		// event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:crate", "normal"), crateModel);
-		// event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:crate", "inventory"), crateModel);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:crate", "normal"), crateModel);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:crate", "inventory"), crateModel);
 
 		IModel backpackModelBase = RenderUtils.getModel(new ResourceLocation("charsetstorage:block/backpack"));
 		IModel backpackTopModelBase = RenderUtils.getModel(new ResourceLocation("charsetstorage:block/backpack_top"));
