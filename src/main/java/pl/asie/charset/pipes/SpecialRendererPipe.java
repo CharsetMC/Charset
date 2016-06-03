@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.sun.org.apache.regexp.internal.RE;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
@@ -189,36 +190,9 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 		}
 
 		SimpleBakedModel smodel = new SimpleBakedModel();
-		smodel.addQuad(null, RenderUtils.BAKERY.makeBakedQuad(
-				new Vector3f(from.x, from.y, from.z),
-				new Vector3f(to.x, from.y, to.z),
-				-1, sprite, EnumFacing.DOWN, ModelRotation.X0_Y0, false
-		));
-		smodel.addQuad(null, RenderUtils.BAKERY.makeBakedQuad(
-				new Vector3f(from.x, to.y, from.z),
-				new Vector3f(to.x, to.y, to.z),
-				-1, sprite, EnumFacing.UP, ModelRotation.X0_Y0, false
-		));
-		smodel.addQuad(null, RenderUtils.BAKERY.makeBakedQuad(
-				new Vector3f(from.x, from.y, from.z),
-				new Vector3f(from.x, to.y, to.z),
-				-1, sprite, EnumFacing.WEST, ModelRotation.X0_Y0, false
-		));
-		smodel.addQuad(null, RenderUtils.BAKERY.makeBakedQuad(
-				new Vector3f(to.x, from.y, from.z),
-				new Vector3f(to.x, to.y, to.z),
-				-1, sprite, EnumFacing.EAST, ModelRotation.X0_Y0, false
-		));
-		smodel.addQuad(null, RenderUtils.BAKERY.makeBakedQuad(
-				new Vector3f(from.x, from.y, from.z),
-				new Vector3f(to.x, to.y, from.z),
-				-1, sprite, EnumFacing.NORTH, ModelRotation.X0_Y0, false
-		));
-		smodel.addQuad(null, RenderUtils.BAKERY.makeBakedQuad(
-				new Vector3f(from.x, from.y, to.z),
-				new Vector3f(to.x, to.y, to.z),
-				-1, sprite, EnumFacing.SOUTH, ModelRotation.X0_Y0, false
-		));
+		for (EnumFacing facing : EnumFacing.VALUES) {
+			smodel.addQuad(null, RenderUtils.bakeFace(from, to, facing, sprite, -1));
+		}
 
 		if (entry.color == -1) {
 			return smodel;

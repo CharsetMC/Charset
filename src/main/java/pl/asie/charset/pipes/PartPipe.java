@@ -67,38 +67,11 @@ import pl.asie.charset.api.pipes.IPipe;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public class PartPipe extends Multipart implements IConnectable, ISlottedPart, INormallyOccludingPart, IPipe, ITickable, IFastMSRPart {
-	public static final Property PROPERTY = new Property();
-
-	private static class Property implements IUnlistedProperty<PartPipe> {
-		private Property() {
-
-		}
-
-		@Override
-		public String getName() {
-			return "pipeTile";
-		}
-
-		@Override
-		public boolean isValid(PartPipe value) {
-			return true;
-		}
-
-		@Override
-		public Class<PartPipe> getType() {
-			return PartPipe.class;
-		}
-
-		@Override
-		public String valueToString(PartPipe value) {
-			return "!?";
-		}
-	}
-
-
+	public static final GenericExtendedProperty<PartPipe> PROPERTY = new GenericExtendedProperty<PartPipe>("part", PartPipe.class);
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 
 	final PipeFluidContainer fluid = new PipeFluidContainer(this);

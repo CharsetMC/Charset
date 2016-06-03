@@ -56,6 +56,7 @@ import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.render.ModelColorizer;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.render.WrappedBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -65,40 +66,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
-    public static final Colorizer COLORIZER = new Colorizer();
-
-    public BarrelModel() {
-        super(BlockBarrel.BARREL_INFO, TextureMap.LOCATION_MISSING_TEXTURE);
-        addDefaultBlockTransforms();
-    }
-
-    public static class Colorizer implements IBlockColor, IItemColor {
-        private int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
+    public final ModelColorizer<BarrelCacheInfo> COLORIZER = new ModelColorizer<BarrelCacheInfo>(this) {
+        @Override
+        public int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
             if (!info.isMetal && !info.type.isHopping()) {
                 return ColorLookupHandler.INSTANCE.getColor(info.logStack, RenderUtils.AveragingMode.V_EDGES_ONLY);
             }
             return -1;
         }
+    };
 
-        @Override
-        public int colorMultiplier(IBlockState state, @Nullable IBlockAccess worldIn, @Nullable BlockPos pos, int tintIndex) {
-            if (state instanceof IExtendedBlockState) {
-                BarrelCacheInfo info = ((IExtendedBlockState) state).getValue(BlockBarrel.BARREL_INFO);
-                if (info != null) {
-                    return colorMultiplier(info, tintIndex);
-                }
-            }
-            return -1;
-        }
-
-        @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
-            BarrelCacheInfo info = BarrelCacheInfo.from(stack);
-            if (info != null) {
-                return colorMultiplier(info, tintIndex);
-            }
-            return -1;
-        }
+    public BarrelModel() {
+        super(BlockBarrel.BARREL_INFO, TextureMap.LOCATION_MISSING_TEXTURE);
+        addDefaultBlockTransforms();
     }
 
     public static class BarrelGroup {

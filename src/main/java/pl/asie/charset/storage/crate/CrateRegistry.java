@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.storage.barrel;
+package pl.asie.charset.storage.crate;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class BarrelRegistry {
-    public static final BarrelRegistry INSTANCE = new BarrelRegistry();
-    private final ArrayList<ItemStack> BARRELS = new ArrayList<>();
+public class CrateRegistry {
+    public static final CrateRegistry INSTANCE = new CrateRegistry();
+    private final ArrayList<ItemStack> CRATES = new ArrayList<>();
 
     private static boolean verifyRecipePart(Object o) {
         return o instanceof ItemStack || (o instanceof String && OreDictionary.doesOreNameExist((String) o));
@@ -47,29 +47,28 @@ public class BarrelRegistry {
         }
     }
 
-    public void registerCraftable(Object log, Object slab) {
-        if (!verifyRecipePart(log) || !verifyRecipePart(slab)) {
+    public void registerCraftable(Object plank, Object stick) {
+        if (!verifyRecipePart(plank) || !verifyRecipePart(stick)) {
             return;
         }
 
-        ItemStack logStack = getRecipeStack(log);
-        ItemStack slabStack = getRecipeStack(slab);
+        ItemStack plankStack = getRecipeStack(plank);
 
-        ItemStack barrel = register(TileEntityDayBarrel.Type.NORMAL, logStack, slabStack);
+        ItemStack barrel = register(plankStack);
         GameRegistry.addRecipe(new ShapedOreRecipe(barrel,
-                "W-W",
-                "W W",
-                "WWW",
-                'W', log, '-', slab));
+                "sWs",
+                "WsW",
+                "sWs",
+                'W', plank, 's', stick));
     }
 
-    public ItemStack register(TileEntityDayBarrel.Type type, ItemStack log, ItemStack slab) {
-        ItemStack ret = TileEntityDayBarrel.makeBarrel(type, log, slab);
-        BARRELS.add(ret);
+    public ItemStack register(ItemStack plank) {
+        ItemStack ret = TileEntityCrate.create(plank);
+        CRATES.add(ret);
         return ret;
     }
 
-    public Collection<ItemStack> getBarrels() {
-        return Collections.unmodifiableList(BARRELS);
+    public Collection<ItemStack> getCrates() {
+        return Collections.unmodifiableList(CRATES);
     }
 }

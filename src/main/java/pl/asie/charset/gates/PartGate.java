@@ -62,9 +62,11 @@ import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.render.IRenderComparable;
+import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
+import pl.asie.charset.pipes.PartPipe;
 
 public abstract class PartGate extends Multipart implements IRenderComparable<PartGate>,
 		IRedstonePart.ISlottedRedstonePart, INormallyOccludingPart, ISlottedCapabilityProvider, ITickable {
@@ -97,6 +99,7 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 		}
 	}
 
+	public static final GenericExtendedProperty<PartGate> PROPERTY = new GenericExtendedProperty<PartGate>("part", PartGate.class);
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
 	private static final Vec3d[][] HIT_VECTORS = new Vec3d[6][];
 	private final RedstoneCommunications[] COMMS = new RedstoneCommunications[4];
@@ -122,32 +125,6 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 				HIT_VECTORS[i][2] = RotationUtils.rotateVec(new Vec3d(0.0f, 0.125f, 0.5f), facing);
 				HIT_VECTORS[i][3] = RotationUtils.rotateVec(new Vec3d(1.0f, 0.125f, 0.5f), facing);
 			}
-		}
-	}
-
-	private static class Property implements IUnlistedProperty<PartGate> {
-		private Property() {
-
-		}
-
-		@Override
-		public String getName() {
-			return "gate";
-		}
-
-		@Override
-		public boolean isValid(PartGate value) {
-			return true;
-		}
-
-		@Override
-		public Class<PartGate> getType() {
-			return PartGate.class;
-		}
-
-		@Override
-		public String valueToString(PartGate value) {
-			return "!?";
 		}
 	}
 
@@ -766,8 +743,6 @@ public abstract class PartGate extends Multipart implements IRenderComparable<Pa
 			list.add(box);
 		}
 	}
-
-	public static final Property PROPERTY = new Property();
 
 	@Override
 	public IBlockState getExtendedState(IBlockState state) {

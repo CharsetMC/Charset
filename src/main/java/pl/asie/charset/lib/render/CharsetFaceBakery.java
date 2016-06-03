@@ -30,13 +30,16 @@ public class CharsetFaceBakery extends FaceBakery {
 
     public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex, float[] uv,
                                    TextureAtlasSprite icon, EnumFacing facing, ModelRotation rot, boolean uvLocked) {
+        boolean hasColorIndex = tintIndex != -1 && ((tintIndex & 0xFF000000) == 0);
+        boolean hasColor = tintIndex != -1 && ((tintIndex & 0xFF000000) != 0);
+
         BakedQuad quad = makeBakedQuad(
                 min, max,
-                new BlockPartFace(null, -1, "", new BlockFaceUV(uv, 0)),
+                new BlockPartFace(null, hasColorIndex ? tintIndex : -1, "", new BlockFaceUV(uv, 0)),
                 icon, facing, rot, null, uvLocked, true
         );
 
-        if (tintIndex != -1) {
+        if (hasColor) {
             RenderUtils.recolorQuad(quad, tintIndex);
         }
 

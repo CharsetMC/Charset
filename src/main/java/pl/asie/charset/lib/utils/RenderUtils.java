@@ -48,6 +48,9 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.render.CharsetFaceBakery;
+import pl.asie.charset.lib.render.SimpleBakedModel;
+
+import javax.annotation.Nonnull;
 
 public final class RenderUtils {
 	public static final CharsetFaceBakery BAKERY = new CharsetFaceBakery();
@@ -67,6 +70,26 @@ public final class RenderUtils {
 
 	private RenderUtils() {
 
+	}
+
+	public static BakedQuad bakeFace(Vector3f from, Vector3f to, @Nonnull EnumFacing facing,
+							   TextureAtlasSprite sprite, int tintIndex) {
+		Vector3f fFrom = new Vector3f(from);
+		Vector3f fTo = new Vector3f(to);
+		EnumFacing.AxisDirection facingDir = facing.getAxisDirection();
+		switch (facing.getAxis()) {
+			case X:
+				fFrom.x = fTo.x = facingDir == EnumFacing.AxisDirection.POSITIVE ? to.x : from.x;
+				break;
+			case Y:
+				fFrom.y = fTo.y = facingDir == EnumFacing.AxisDirection.POSITIVE ? to.y : from.y;
+				break;
+			case Z:
+				fFrom.z = fTo.z = facingDir == EnumFacing.AxisDirection.POSITIVE ? to.z : from.z;
+				break;
+		}
+
+		return BAKERY.makeBakedQuad(fFrom, fTo, tintIndex, sprite, facing, ModelRotation.X0_Y0, false);
 	}
 
 	public static int getAverageColor(TextureAtlasSprite sprite, AveragingMode mode) {
@@ -111,7 +134,7 @@ public final class RenderUtils {
 		for (int i = 0; i < 3; i++) {
 			avgColor[i] = (avgColor[i] / pixelCount) & 0xFF;
 		}
-		return avgColor[0] | (avgColor[1] << 8) | (avgColor[2] << 16);
+		return 0xFF000000 | avgColor[0] | (avgColor[1] << 8) | (avgColor[2] << 16);
 	}
 
 	public static BufferedImage getBufferedImage(ResourceLocation location) {

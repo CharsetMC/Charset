@@ -73,7 +73,6 @@ public class ColorLookupHandler {
     public int getColor(ItemStack stack, RenderUtils.AveragingMode mode) {
         Key key = new Key(stack, mode);
         if (!COLOR_MAP.containsKey(key)) {
-            System.out.println("!ck");
             TextureAtlasSprite sprite = RenderUtils.getSprite(stack);
             if (sprite.getIconName().endsWith("missingno")) {
                 COLOR_MAP.put(key, getDefaultColor(stack));

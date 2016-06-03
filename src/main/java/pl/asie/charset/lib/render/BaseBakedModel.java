@@ -37,11 +37,11 @@ public abstract class BaseBakedModel implements IPerspectiveAwareModel {
     private final ResourceLocation particle;
 
     public BaseBakedModel() {
-        this.particle = TextureMap.LOCATION_MISSING_TEXTURE;
+        this(null);
     }
 
     public BaseBakedModel(ResourceLocation particle) {
-        this.particle = particle;
+        this.particle = particle != null ? particle : TextureMap.LOCATION_MISSING_TEXTURE;
     }
 
     @Override

@@ -57,7 +57,9 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.render.IRenderComparable;
+import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.lib.utils.RotationUtils;
+import pl.asie.charset.pipes.PartPipe;
 import pl.asie.charset.wires.ModCharsetWires;
 import pl.asie.charset.wires.ProxyClient;
 import pl.asie.charset.wires.WireKind;
@@ -66,38 +68,11 @@ import pl.asie.charset.wires.WireUtils;
 public abstract class PartWireBase extends Multipart implements
 		IRedstonePart.ISlottedRedstonePart, IRenderComparable<PartWireBase>, ICustomHighlightPart,
 		INormallyOccludingPart, ITickable, ISlottedCapabilityProvider, IWire {
+	public static final GenericExtendedProperty<PartWireBase> PROPERTY = new GenericExtendedProperty<PartWireBase>("part", PartWireBase.class);
 	protected static final boolean DEBUG = false;
 	private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
 
 	static boolean PROPAGATING = false;
-
-	public static final Property PROPERTY = new Property();
-
-	private static class Property implements IUnlistedProperty<PartWireBase> {
-		private Property() {
-
-		}
-
-		@Override
-		public String getName() {
-			return "wireTile";
-		}
-
-		@Override
-		public boolean isValid(PartWireBase value) {
-			return true;
-		}
-
-		@Override
-		public Class<PartWireBase> getType() {
-			return PartWireBase.class;
-		}
-
-		@Override
-		public String valueToString(PartWireBase value) {
-			return "!?";
-		}
-	}
 
 	public WireKind type;
 	public WireFace location;

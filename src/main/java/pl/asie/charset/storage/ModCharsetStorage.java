@@ -19,6 +19,7 @@ package pl.asie.charset.storage;
 import com.google.common.base.Predicate;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -44,7 +45,6 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
-import pl.asie.charset.lib.utils.MiscUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.storage.backpack.HandlerBackpack;
 import pl.asie.charset.storage.backpack.BlockBackpack;
@@ -60,6 +60,9 @@ import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
 import pl.asie.charset.storage.barrel.ItemDayBarrel;
 import pl.asie.charset.storage.barrel.ItemMinecartDayBarrel;
 import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
+import pl.asie.charset.storage.crate.BlockCrate;
+import pl.asie.charset.storage.crate.CrateRegistry;
+import pl.asie.charset.storage.crate.TileEntityCrate;
 import pl.asie.charset.storage.locking.*;
 
 import javax.annotation.Nullable;
@@ -96,6 +99,9 @@ public class ModCharsetStorage {
 	public static ItemDayBarrel barrelItem;
 	public static ItemMinecartDayBarrel barrelCartItem;
 
+	public static BlockCrate crateBlock;
+	public static ItemBlock crateItem;
+
 	public static boolean renderBarrelText, renderBarrelItem, renderBarrelItem3D;
 
 	private Configuration config;
@@ -108,6 +114,11 @@ public class ModCharsetStorage {
 		backpackBlock = new BlockBackpack();
 		GameRegistry.register(backpackBlock.setRegistryName("backpack"));
 		GameRegistry.register(new ItemBackpack(backpackBlock).setRegistryName("backpack"));
+
+		/* crateBlock = new BlockCrate();
+		crateItem = new ItemBlock(crateBlock);
+		GameRegistry.register(crateBlock.setRegistryName("crate"));
+		GameRegistry.register(crateItem.setRegistryName("crate")); */
 
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
@@ -127,6 +138,7 @@ public class ModCharsetStorage {
 		lockItem = new ItemLock();
 		GameRegistry.register(lockItem.setRegistryName("lock"));
 
+		// ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
 		ModCharsetLib.proxy.registerItemModel(barrelItem, 0, "charsetstorage:barrel");
 		ModCharsetLib.proxy.registerItemModel(barrelCartItem, 0, "charsetstorage:barrelCart");
 		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
@@ -152,6 +164,8 @@ public class ModCharsetStorage {
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
 		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
+		// GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
+
 		EntityRegistry.registerModEntity(EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, true);
 		EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
 
@@ -227,7 +241,7 @@ public class ModCharsetStorage {
 		RecipeSorter.register("charsetstorage:lockDye", RecipeDyeLock.class, RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
 	}
 
-	private void checkPlankForBarrel(ItemStack log) {
+	private void checkPlankForWoods(ItemStack log) {
 		InventoryCrafting plankCrafting = RecipeUtils.getCraftingInventory(3, 3);
 		plankCrafting.setInventorySlotContents(0, log);
 		IRecipe plankRecipe = RecipeUtils.getMatchingRecipe(plankCrafting, null);
@@ -254,6 +268,23 @@ public class ModCharsetStorage {
 				}
 
 				BarrelRegistry.INSTANCE.registerCraftable(log, slab);
+
+				// The slightly greater stick search
+				ItemStack stick = new ItemStack(Items.STICK);
+
+				InventoryCrafting stickCrafting = RecipeUtils.getCraftingInventory(3, 3);
+				slabCrafting.setInventorySlotContents(0, plank);
+				slabCrafting.setInventorySlotContents(3, plank);
+				IRecipe stickRecipe = RecipeUtils.getMatchingRecipe(slabCrafting, null);
+
+				if (stickRecipe != null) {
+					ItemStack potentialStick = stickRecipe.getCraftingResult(stickCrafting);
+					if (potentialStick != null) {
+						stick = potentialStick;
+					}
+				}
+
+				CrateRegistry.INSTANCE.registerCraftable(plank, stick);
 			}
 		}
 	}
@@ -271,6 +302,10 @@ public class ModCharsetStorage {
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 4));
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 5));
 
+		for (int i = 0; i < 6; i++) {
+			CrateRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.WOODEN_SLAB, 1, i), new ItemStack(Items.STICK));
+		}
+
 		for (ItemStack log : OreDictionary.getOres("logWood", false)) {
 			if (log.getItem() == Item.getItemFromBlock(Blocks.LOG) || log.getItem() == Item.getItemFromBlock(Blocks.LOG2)) {
 				continue;
@@ -279,10 +314,10 @@ public class ModCharsetStorage {
 			try {
 				if (log.getMetadata() == OreDictionary.WILDCARD_VALUE) {
 					for (int i = 0; i < 128; i++) { // I know Forestry and Binnie's Mods might be going high. Hopefully not higher.
-						checkPlankForBarrel(new ItemStack(log.getItem(), 1, i));
+						checkPlankForWoods(new ItemStack(log.getItem(), 1, i));
 					}
 				} else {
-					checkPlankForBarrel(log);
+					checkPlankForWoods(log);
 				}
 			} catch (Exception e) {
 

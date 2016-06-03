@@ -78,7 +78,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         // NORELEASE.fixme("Test adventure mode barrel breaking");
     }};
 
-    private static final boolean SHOW_ALL_BARRELS = true;
+    private static final boolean SHOW_ALL_BARRELS = false;
 
     public BlockBarrel() {
         super(materialBarrel);
@@ -233,7 +233,9 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
             }
         }
 
-        Collections.shuffle(weeklyBarrels, new Random(doy));
+        if (!SHOW_ALL_BARRELS) {
+            Collections.shuffle(weeklyBarrels, new Random(doy));
+        }
         int barrelsToAdd = 1;
 
         TileEntityDayBarrel rep = new TileEntityDayBarrel();
