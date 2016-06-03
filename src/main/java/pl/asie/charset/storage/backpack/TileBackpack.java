@@ -158,7 +158,7 @@ public class TileBackpack extends TileBase implements IInteractionObject, IInven
 	public void openInventory(EntityPlayer player) {
 		inventory.openInventory(player);
 		if (inventory.watchers.size() == 1) {
-			worldObj.playSound( getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
+			worldObj.playSound(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
 					SoundType.SNOW.getStepSound(), SoundCategory.BLOCKS, 1.0f, 0.6f, false);
 		}
 	}

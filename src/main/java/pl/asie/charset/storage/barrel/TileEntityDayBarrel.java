@@ -1058,12 +1058,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     public void rotate(EnumFacing axis) {
         FzOrientation oldOrientation = orientation;
 
-        if (axis == orientation.facing || axis.getOpposite() == orientation.facing) {
+        if (axis == orientation.facing) {
             orientation = orientation.getNextRotationOnFace();
-        } else if (axis == orientation.top || axis.getOpposite() == orientation.top) {
-            orientation = orientation.getNextRotationOnTop();
+        } else if (axis == orientation.facing.getOpposite()) {
+            orientation = orientation.getPrevRotationOnFace();
         } else {
-            orientation = FzOrientation.fromDirection(axis);
+            orientation = FzOrientation.getOrientation(FzOrientation.fromDirection(axis.getOpposite()).ordinal() & (~3) | (orientation.ordinal() & 3));
         }
 
         if (orientation != oldOrientation) {

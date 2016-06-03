@@ -51,7 +51,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     final boolean isMetal;
 
     // Used as a cache field only
-    final String logName;
+    final ItemStack logStack;
 
     @Override
     public boolean equals(Object o) {
@@ -78,9 +78,9 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         return result;
     }
 
-    private BarrelCacheInfo(TextureAtlasSprite log, String logName, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, FzOrientation orientation, boolean isMetal) {
+    private BarrelCacheInfo(TextureAtlasSprite log, ItemStack logStack, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, FzOrientation orientation, boolean isMetal) {
         this.log = log;
-        this.logName = logName;
+        this.logStack = logStack;
         this.plank = plank;
         this.type = type;
         this.orientation = orientation;
@@ -92,7 +92,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         TextureAtlasSprite slab = RenderUtils.getSprite(barrel.woodSlab);
         FzOrientation fzo = barrel.orientation;
         TileEntityDayBarrel.Type type = barrel.type;
-        return new BarrelCacheInfo(log, barrel.woodLog.toString(), slab, type, fzo, isMetal(barrel.woodLog));
+        return new BarrelCacheInfo(log, barrel.woodLog, slab, type, fzo, isMetal(barrel.woodLog));
     }
 
     public static BarrelCacheInfo from(ItemStack is) {

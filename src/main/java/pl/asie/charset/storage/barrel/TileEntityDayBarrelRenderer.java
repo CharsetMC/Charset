@@ -43,28 +43,33 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.factorization.FzOrientation;
 import pl.asie.charset.lib.factorization.Quaternion;
 import pl.asie.charset.lib.factorization.SpaceUtil;
+import pl.asie.charset.lib.render.ModelTransformer;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
 
-    void doDraw(TileEntityDayBarrel barrel, ItemStack is) {
+    void doDraw(TileEntityDayBarrel barrel, ItemStack is, float partialTicks) {
         FzOrientation bo = barrel.orientation;
         EnumFacing face = bo.facing;
         if (SpaceUtil.sign(face) == 1) {
@@ -81,9 +86,9 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.rotate(90, 0, 1, 0);
         GlStateManager.translate(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
         if (barrel.type.isHopping()) {
-            double time = barrel.getWorld().getTotalWorldTime();
-            if (Math.sin(time/20) > 0) {
-                double delta = Math.max(0, Math.sin(time/2)/16);
+            double time = barrel.getWorld().getTotalWorldTime() + partialTicks;
+            if (Math.sin(time/22.5) > 0) {
+                double delta = Math.max(0, Math.sin(time/2.25)/16);
                 GlStateManager.translate(0, delta, 0);
             }
         }
@@ -96,29 +101,38 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         handleRenderItem(is, barrel, hasLabel);
     }
 
-    //Another optimization: don't render if the barrel's facing a solid block
     @Override
     public void renderTileEntityAt(TileEntityDayBarrel barrel, double x, double y, double z, float partialTicks, int destroyStage) {
+        if (barrel == null) {
+            return;
+        }
+
         ItemStack is = barrel.item;
         if (is == null || barrel.getItemCount() <= 0) {
             return;
         }
+
+        EnumFacing facing = barrel.orientation.facing;
+        BlockPos facingPos = barrel.getPos().offset(facing);
+        if (barrel.getWorld().isSideSolid(facingPos, facing.getOpposite())) {
+            return;
+        }
+
         Minecraft.getMinecraft().mcProfiler.startSection("barrel");
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
 
-        if (barrel.orientation.facing != null) {
-            int l = barrel.getWorld().getCombinedLight(barrel.getPos().offset(barrel.orientation.facing), barrel.getWorld().getSkylightSubtracted());
-            int j = l % 65536;
-            int k = l / 65536;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
-        }
+        int l = barrel.getWorld().getCombinedLight(facingPos, barrel.getWorld().getSkylightSubtracted());
+        int j = l % 65536;
+        int k = l / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
 
-        doDraw(barrel, is);
+        doDraw(barrel, is, partialTicks);
 
         GlStateManager.popMatrix();
-        RenderHelper.enableStandardItemLighting();
         Minecraft.getMinecraft().mcProfiler.endSection();
+
+        RenderHelper.enableStandardItemLighting();
     }
 
     String getCountLabel(ItemStack item, TileEntityDayBarrel barrel) {
@@ -218,24 +232,53 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         float labelD = hasLabel ? 0F : -1F/16F;
         GlStateManager.translate(0.25, -0.25 - labelD, 0);
 
-        boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null).isGui3d();
-        boolean isFullBlock = false;
-        Block block = Block.getBlockFromItem(is.getItem());
-        if (block != null) {
-            isFullBlock = block.getDefaultState().isFullCube();
-        }
-
-        if (isBlock) {
-            GlStateManager.scale(0.75F, 0.75F, 0.75F);
-            if (isFullBlock) {
-                GlStateManager.translate(0, 0, -0.1);
+        if (ModCharsetStorage.renderBarrelItem3D) {
+            boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null).isGui3d();
+            boolean isFullBlock = false;
+            Block block = Block.getBlockFromItem(is.getItem());
+            if (block != null) {
+                isFullBlock = block.getDefaultState().isFullCube();
             }
-        } else {
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        }
 
-        RenderHelper.enableStandardItemLighting();
-        Minecraft.getMinecraft().getRenderItem().renderItem(is, ItemCameraTransforms.TransformType.FIXED);
+            if (isBlock) {
+                GlStateManager.scale(0.75F, 0.75F, 0.75F);
+                if (isFullBlock) {
+                    GlStateManager.translate(0, 0, -0.1);
+                }
+            } else {
+                GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            }
+
+            RenderHelper.enableStandardItemLighting();
+            Minecraft.getMinecraft().getRenderItem().renderItem(is, ItemCameraTransforms.TransformType.FIXED);
+        } else {
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.pushMatrix();
+            RenderHelper.enableStandardItemLighting();
+            GlStateManager.popMatrix();
+
+            GlStateManager.scale(0.5F, 0.5F, 0.01F);
+
+            IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null);
+            model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GUI, false);
+
+            // TODO: This might be the ugliest hack in all of barrels. FIXME
+            if (model.isGui3d() && !model.isBuiltInRenderer()) {
+                model = ModelTransformer.transform(model, null, 0, new ModelTransformer.IVertexTransformer() {
+                    @Override
+                    public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
+                        if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
+                            data[0] /= 1.5f;
+                            data[2] *= 1.7f;
+                        }
+                        return data;
+                    }
+                });
+            }
+
+            Minecraft.getMinecraft().getRenderItem().renderItem(is, model);
+            GlStateManager.disableRescaleNormal();
+        }
         GlStateManager.popMatrix();
     }
 }

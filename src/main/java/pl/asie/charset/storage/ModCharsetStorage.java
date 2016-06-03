@@ -96,7 +96,7 @@ public class ModCharsetStorage {
 	public static ItemDayBarrel barrelItem;
 	public static ItemMinecartDayBarrel barrelCartItem;
 
-	public static boolean renderBarrelText, renderBarrelItem;
+	public static boolean renderBarrelText, renderBarrelItem, renderBarrelItem3D;
 
 	private Configuration config;
 
@@ -139,6 +139,7 @@ public class ModCharsetStorage {
 		enableBackpackOpenKey = config.getBoolean("enableOpenKeyBinding", "backpack", true, "Should backpacks be openable with a key binding?");
 		enableKeyKeepInventory = config.getBoolean("keepKeysOnDeath", "locks", true, "Should keys be kept in inventory on death?");
 
+		renderBarrelItem3D = config.getBoolean("renderItem3D", "barrels", false, "Should items use fancy 3D rendering?");
 		renderBarrelItem = config.getBoolean("renderItem", "barrels", true, "Should items be rendered on barrels?");
 		renderBarrelText = config.getBoolean("renderText", "barrels", true, "Should text be rendered on barrels?");
 

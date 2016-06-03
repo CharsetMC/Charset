@@ -55,6 +55,7 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.render.WrappedBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -72,38 +73,9 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
     }
 
     public static class Colorizer implements IBlockColor, IItemColor {
-        private final TObjectIntMap<String> colorMap = new TObjectIntHashMap<>();
-        private final int DEFAULT_COLOR = 0x735e39;
-
-        public void clear() {
-            colorMap.clear();
-        }
-
         private int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
             if (!info.isMetal && !info.type.isHopping()) {
-                if (!colorMap.containsKey(info.logName)) {
-                    if (info.log.getIconName().endsWith("missingno")) {
-                        colorMap.put(info.logName, DEFAULT_COLOR | 0xFF000000);
-                    } else {
-                        int[] data = info.log.getFrameTextureData(0)[0];
-                        int[] avgColor = new int[3];
-                        // Only take the first and last row into account. This might tile better.
-                        for (int j = 0; j < 2; j++) {
-                            for (int i = 0; i < info.log.getIconWidth(); i++) {
-                                int c = data[j > 0 ? (data.length - 1 - i) : i];
-                                avgColor[0] += (c & 0xFF);
-                                avgColor[1] += ((c >> 8) & 0xFF);
-                                avgColor[2] += ((c >> 16) & 0xFF);
-                            }
-                        }
-                        for (int i = 0; i < 3; i++) {
-                            avgColor[i] = (avgColor[i] / (info.log.getIconWidth() * 2)) & 0xFF;
-                        }
-                        colorMap.put(info.logName, avgColor[0] | (avgColor[1] << 8) | (avgColor[2] << 16) | 0xFF000000);
-                    }
-                }
-
-                return colorMap.get(info.logName);
+                return ColorLookupHandler.INSTANCE.getColor(info.logStack, RenderUtils.AveragingMode.V_EDGES_ONLY);
             }
             return -1;
         }
@@ -147,7 +119,6 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
 
     public static void onTextureLoad(TextureMap map) {
         TEXTURE_MAP.clear();
-        COLORIZER.clear();
         new BarrelGroup("hopping", map);
         new BarrelGroup("sticky", map);
         new BarrelGroup("silky", map);

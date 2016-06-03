@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Function;
+import gnu.trove.function.TIntFunction;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -56,10 +57,61 @@ public final class RenderUtils {
 		}
 	};
 
+	public enum AveragingMode {
+		FULL,
+		H_EDGES_ONLY,
+		V_EDGES_ONLY,
+	};
+
 	private static RenderItem renderItem;
 
 	private RenderUtils() {
 
+	}
+
+	public static int getAverageColor(TextureAtlasSprite sprite, AveragingMode mode) {
+		int pixelCount = 0;
+		int[] data = sprite.getFrameTextureData(0)[0];
+		int[] avgColor = new int[3];
+		switch (mode) {
+			case FULL:
+				pixelCount = sprite.getIconHeight() * sprite.getIconWidth();
+				for (int j = 0; j < sprite.getIconHeight(); j++) {
+					for (int i = 0; i < sprite.getIconWidth(); i++) {
+						int c = data[j * sprite.getIconWidth() + i];
+						avgColor[0] += (c & 0xFF);
+						avgColor[1] += ((c >> 8) & 0xFF);
+						avgColor[2] += ((c >> 16) & 0xFF);
+					}
+				}
+				break;
+			case H_EDGES_ONLY:
+				pixelCount = sprite.getIconHeight() * 2;
+				for (int j = 0; j < 2; j++) {
+					for (int i = 0; i < sprite.getIconHeight(); i++) {
+						int c = data[i * sprite.getIconWidth() + (j > 0 ? sprite.getIconWidth() - 1 : 0)];
+						avgColor[0] += (c & 0xFF);
+						avgColor[1] += ((c >> 8) & 0xFF);
+						avgColor[2] += ((c >> 16) & 0xFF);
+					}
+				}
+				break;
+			case V_EDGES_ONLY:
+				pixelCount = sprite.getIconWidth() * 2;
+				for (int j = 0; j < 2; j++) {
+					for (int i = 0; i < sprite.getIconWidth(); i++) {
+						int c = data[j > 0 ? (data.length - 1 - i) : i];
+						avgColor[0] += (c & 0xFF);
+						avgColor[1] += ((c >> 8) & 0xFF);
+						avgColor[2] += ((c >> 16) & 0xFF);
+					}
+				}
+				break;
+		}
+		for (int i = 0; i < 3; i++) {
+			avgColor[i] = (avgColor[i] / pixelCount) & 0xFF;
+		}
+		return avgColor[0] | (avgColor[1] << 8) | (avgColor[2] << 16);
 	}
 
 	public static BufferedImage getBufferedImage(ResourceLocation location) {

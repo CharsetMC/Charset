@@ -20,8 +20,11 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -31,6 +34,7 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -108,6 +112,13 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         }
 
         return ImmutableList.of();
+    }
+
+    @Override
+    public TextureAtlasSprite getParticleTexture() {
+        // TODO: If IBlockState-sensitive getParticleTexture ever hits,
+        // check for the barrel texture
+        return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.LOG.getDefaultState());
     }
 
     @Override

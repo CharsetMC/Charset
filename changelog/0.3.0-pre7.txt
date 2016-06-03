@@ -1,0 +1,6 @@
+* [Pipes] Minor tweaks to shifter filter rendering.
+* [Storage] Barrel top and bottom overlays now roughly match the log color.
+* [Storage] Fix placing barrels not working correctly.
+* [Storage] Make barrel rotation with wrenches more intuitive.
+* [Storage] Minor barrel rendering optimizations.
+* [Storage] Tweak barrel item rendering - "fix" lighting and add 3D rendering option.

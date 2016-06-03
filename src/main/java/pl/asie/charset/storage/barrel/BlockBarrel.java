@@ -77,7 +77,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         // NORELEASE.fixme("Test adventure mode barrel breaking");
     }};
 
-    private static final boolean SHOW_ALL_BARRELS = false;
+    private static final boolean SHOW_ALL_BARRELS = true;
 
     public BlockBarrel() {
         super(materialBarrel);

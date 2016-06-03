@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
+import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.ModelFactory;
 
 public class ProxyClient extends ProxyCommon {
@@ -37,6 +38,7 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		ModelFactory.clearCaches();
+		ColorLookupHandler.INSTANCE.clear();
 	}
 
 	@Override
