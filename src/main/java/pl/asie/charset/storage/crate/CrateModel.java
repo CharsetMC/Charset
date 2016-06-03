@@ -102,6 +102,25 @@ public class CrateModel extends ModelFactory<CrateCacheInfo> {
                 if (!crate.isConnected(dir)) {
                     bsPos |= (1 << (3 - i));
                 } else {
+                    // Check for corner line
+                    EnumFacing.Axis diffAxis = null;
+                    for (EnumFacing.Axis axis : EnumFacing.Axis.values()) {
+                        if (axis != dir.getAxis() && axis != facing.getAxis()) {
+                            diffAxis = axis;
+                        }
+                    }
+                    int corner1 = 0;
+                    if (facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE) {
+                        corner1 |= (1 << (2 - facing.getAxis().ordinal()));
+                    }
+                    if (dir.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE) {
+                        corner1 |= (1 << (2 - dir.getAxis().ordinal()));
+                    }
+                    int corner2 = corner1 | (1 << (2 - diffAxis.ordinal()));
+                    if ((crate.isCorner(corner1) && crate.isCorner(corner2))) {
+                        //bsPos |= (1 << (3 - i));
+                    }
+
                     EnumFacing.AxisDirection axisDir = dir.getAxisDirection();
                     if (axisDir == EnumFacing.AxisDirection.POSITIVE) {
                         set(toBase, dir.getAxis(), 16);
@@ -117,7 +136,6 @@ public class CrateModel extends ModelFactory<CrateCacheInfo> {
             model.addQuad(null, RenderUtils.bakeFace(fromCross, toCross, facing, crossSprite, 1));
             if (!crate.isConnected(facing)) {
                 model.addQuad(facing, RenderUtils.bakeFace(from[0], to[0], facing, borderSprite[bsPos], 1));
-                //model.addQuad(null, RenderUtils.bakeFace(to[0], from[0], facing.getOpposite(), borderSprite[bsPos], 1));
 
                 // inner border
                 Vector3f fromIB = new Vector3f(from[0]);
@@ -149,7 +167,6 @@ public class CrateModel extends ModelFactory<CrateCacheInfo> {
             for (int y = 0; y < 2; y++) {
                 for (int x = 0; x < 2; x++) {
                     if (crate.isCorner(x, y, z)) {
-                        System.out.println("C " + x + " " + y + " " + z);
                         Vector3f fFrom = new Vector3f(
                                 x == 1 ? 15 + zOffset : 0,
                                 y == 1 ? 15 + zOffset : 0,

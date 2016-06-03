@@ -55,6 +55,16 @@ public class TileEntityCrate extends TileBase {
         readNBTData(compound != null ? stack.getTagCompound() : new NBTTagCompound(), true);
     }
 
+    private boolean hasCrate(BlockPos pos) {
+        TileEntity oTile = getWorld().getTileEntity(pos);
+        if (oTile instanceof TileEntityCrate
+                && ItemStack.areItemStacksEqual(((TileEntityCrate) oTile).getMaterial(), getMaterial())) {
+            return true;
+        }
+
+        return false;
+    }
+
     public CrateCacheInfo getCacheInfo() {
         int connectionMatrix = 0;
         Set<EnumFacing> facingSet = EnumSet.noneOf(EnumFacing.class);
@@ -72,10 +82,33 @@ public class TileEntityCrate extends TileBase {
         for (int z = 0; z < 2; z++) {
             for (int y = 0; y < 2; y++) {
                 for (int x = 0; x < 2; x++) {
-                    int c = (facingSet.contains(x == 0 ? EnumFacing.WEST : EnumFacing.EAST) ? 1 : 0)
-                            + (facingSet.contains(y == 0 ? EnumFacing.DOWN : EnumFacing.UP) ? 1 : 0)
-                            + (facingSet.contains(z == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH) ? 1 : 0);
-                    if (c >= 2) {
+                    EnumFacing fx = x == 0 ? EnumFacing.WEST : EnumFacing.EAST;
+                    EnumFacing fy = y == 0 ? EnumFacing.DOWN : EnumFacing.UP;
+                    EnumFacing fz = z == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH;
+                    boolean match = false;
+
+                    if (facingSet.contains(fx) && facingSet.contains(fz)) {
+                        if (hasCrate(getPos().offset(fx).offset(fz))) {
+                            continue;
+                        }
+                        match = true;
+                    }
+
+                    if (facingSet.contains(fy) && facingSet.contains(fz)) {
+                        if (hasCrate(getPos().offset(fy).offset(fz))) {
+                            continue;
+                        }
+                        match = true;
+                    }
+
+                    if (facingSet.contains(fx) && facingSet.contains(fy)) {
+                        if (hasCrate(getPos().offset(fx).offset(fy))) {
+                            continue;
+                        }
+                        match = true;
+                    }
+
+                    if (match) {
                         connectionMatrix |= (1 << (6 + (x * 4) + (y * 2) + z));
                     }
                 }

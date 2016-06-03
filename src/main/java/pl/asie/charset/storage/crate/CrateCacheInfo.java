@@ -31,6 +31,10 @@ public class CrateCacheInfo implements IRenderComparable<CrateCacheInfo> {
         return (connectionMap & (1 << (6 + (x * 4) + (y * 2) + z))) != 0;
     }
 
+    public boolean isCorner(int c) {
+        return (connectionMap & (1 << (6 + c))) != 0;
+    }
+
     @Override
     public boolean equals(Object other) {
         return (other instanceof CrateCacheInfo) ? renderEquals((CrateCacheInfo) other) : false;
