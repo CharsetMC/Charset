@@ -17,7 +17,11 @@
 package pl.asie.charset.lib;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +57,13 @@ public class ModCharsetLib {
 	public static final String VERSION = "@VERSION@";
 	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart";
 	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
+
+	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
+		@Override
+		public Calendar get() {
+			return Calendar.getInstance();
+		}
+	}, 1, TimeUnit.MINUTES);
 
 	@Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;

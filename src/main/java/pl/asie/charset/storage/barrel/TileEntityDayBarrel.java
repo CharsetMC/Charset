@@ -460,7 +460,13 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     @Override
     public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
         RayTraceResult hit = RayTraceUtils.getCollision(getWorld(), getPos(), placer, Block.FULL_BLOCK_AABB, 0);
-        orientation = SpaceUtil.getOrientation(placer, hit.sideHit, hit.hitVec.subtract(new Vec3d(getPos())));
+        if (hit != null) {
+            if (hit.hitVec != null) {
+                orientation = SpaceUtil.getOrientation(placer, hit.sideHit, hit.hitVec.subtract(new Vec3d(getPos())));
+            } else if (hit.sideHit != null) {
+                orientation = FzOrientation.fromDirection(hit.sideHit);
+            }
+        }
         loadFromStack(stack);
         needLogic();
     }
@@ -761,8 +767,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
     }
 
-    static int last_hit_side = -1;
-
     static boolean isStairish(World w, BlockPos pos) {
         IBlockState b = w.getBlockState(pos);
         // TODO
@@ -785,10 +789,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (distance <= 0) {
             return false;
         }
-        EnumFacing dir = SpaceUtil.getOrientation(last_hit_side).getOpposite();
-        if (dir == null) {
+        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), player, Block.FULL_BLOCK_AABB, 0);
+        if (result == null || result.sideHit == null) {
             return false;
         }
+        EnumFacing dir = result.sideHit.getOpposite();
         BlockPos src = getPos();
         BlockPos next = src;
         FzOrientation newOrientation = orientation;
@@ -862,7 +867,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         this.validate();
         getWorld().setBlockState(next, ModCharsetStorage.barrelBlock.getDefaultState());
         getWorld().setTileEntity(next, this);
-        last_hit_side = -1;
         player.addExhaustion(0.5F);
         ItemStack is = player.getHeldItem(hand);
         if (is != null && is.isItemStackDamageable() && worldObj.rand.nextInt(4) == 0) {
@@ -875,7 +879,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return true;
     }
 
-    public void click(EntityPlayer entityplayer, EnumHand hand) {
+    public void click(EntityPlayer entityplayer) {
+        EnumHand hand = EnumHand.MAIN_HAND;
         // left click: remove a stack, or punt if properly equipped
         if (punt(entityplayer, hand)) {
             return;
@@ -884,6 +889,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             info(entityplayer);
             return;
         }
+
         ItemStack origHeldItem = entityplayer.getHeldItem(hand);
         if (ForgeHooks.canToolHarvestBlock(worldObj, pos, origHeldItem)) {
             return;
@@ -897,9 +903,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             to_remove--;
         }
         BlockPos dropPos = getPos();
-        EnumFacing dropOffset = SpaceUtil.getOrientation(last_hit_side);
-        if (dropOffset != null) {
-            dropPos = dropPos.offset(dropOffset);
+        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), entityplayer, Block.FULL_BLOCK_AABB, 0);
+        if (result != null && result.sideHit != null) {
+            dropPos = dropPos.offset(result.sideHit);
         }
         ItemUtils.spawnItemEntity(worldObj, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), makeStack(to_remove), 0.2f, 0.2f, 0.2f, 1);
         Entity ent = null;
@@ -914,7 +920,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
         changeItemCount(-to_remove);
         cleanBarrel();
-        last_hit_side = -1;
     }
 
     void info(final EntityPlayer entityplayer) {
@@ -1058,10 +1063,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     public void rotate(EnumFacing axis) {
         FzOrientation oldOrientation = orientation;
 
-        if (axis == orientation.facing) {
+        if (axis == orientation.facing.getOpposite()) {
             orientation = orientation.getNextRotationOnFace();
-        } else if (axis == orientation.facing.getOpposite()) {
-            orientation = orientation.getPrevRotationOnFace();
         } else {
             orientation = FzOrientation.getOrientation(FzOrientation.fromDirection(axis.getOpposite()).ordinal() & (~3) | (orientation.ordinal() & 3));
         }
@@ -1111,7 +1114,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (player.worldObj.isRemote) {
             player.swingArm(EnumHand.MAIN_HAND); // TODO
         } else {
-            click(player, EnumHand.MAIN_HAND);
+            click(player);
         }
         return true;
     }

@@ -27,6 +27,10 @@ tooltip.charset.tape.unnamed=Unnamed Tape
 # CharsetDrama
 item.charset.dramaInABottle.name=Drama in a Bottle
 
+# CharsetFarming
+item.charset.clayBucket.filled.name=%s Clay Bucket
+item.charset.clayBucket.empty.name=Clay Bucket
+
 # CharsetGates
 part.charset.gate.nand=NAND Gate
 part.charset.gate.nand.i=AND Gate

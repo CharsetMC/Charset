@@ -58,17 +58,6 @@ import pl.asie.charset.storage.ModCharsetStorage;
 
 public class BarrelEventListener {
     @SubscribeEvent
-    public void clickEvent(PlayerInteractEvent event) {
-        if (!event.getEntityPlayer().worldObj.isRemote
-                && event.getFace() != null) {
-            TileEntity tile = event.getWorld().getTileEntity(event.getPos());
-            if (tile instanceof TileEntityDayBarrel) {
-                ((TileEntityDayBarrel) tile).last_hit_side = event.getFace().ordinal();
-            }
-        }
-    }
-
-    @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void renderHilightArrow(RenderWorldLastEvent event) {
         Minecraft mc = Minecraft.getMinecraft();

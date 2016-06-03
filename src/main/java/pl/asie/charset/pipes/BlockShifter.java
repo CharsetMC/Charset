@@ -45,7 +45,7 @@ public class BlockShifter extends BlockContainer {
 		super(Material.IRON);
 		setUnlocalizedName("charset.shifter");
 		setDefaultState(this.blockState.getBaseState().withProperty(Properties.FACING, EnumFacing.NORTH));
-		setHardness(0.5F);
+		setHardness(1.5F);
 	}
 
 	public boolean isValidFacing(World world, BlockPos pos, EnumFacing facing) {

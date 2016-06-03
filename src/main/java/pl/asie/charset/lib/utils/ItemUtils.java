@@ -46,7 +46,16 @@ public final class ItemUtils {
 	}
 
 	public static IBlockState getBlockState(ItemStack stack) {
-		return stack == null ? Blocks.AIR.getDefaultState() : Block.getBlockFromItem(stack.getItem()).getDefaultState();
+		if (stack == null) {
+			return Blocks.AIR.getDefaultState();
+		} else {
+			Block block = Block.getBlockFromItem(stack.getItem());
+			if (block == null) {
+				return Blocks.AIR.getDefaultState();
+			} else {
+				return block.getDefaultState();
+			}
+		}
 	}
 
 	public static boolean canMerge(ItemStack source, ItemStack target) {

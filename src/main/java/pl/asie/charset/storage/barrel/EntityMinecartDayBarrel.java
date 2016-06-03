@@ -239,7 +239,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     public boolean attackEntityFrom(DamageSource source, float f) {
         if (source.getEntity() instanceof EntityPlayer) {
             int oldItemCount = barrel.getItemCount();
-            barrel.click((EntityPlayer) source.getEntity(), EnumHand.MAIN_HAND); // TODO
+            barrel.click((EntityPlayer) source.getEntity()); // TODO
             updateDataWatcher(false);
             if (source.getEntity().isSneaking()) {
                 return super.attackEntityFrom(source, f);

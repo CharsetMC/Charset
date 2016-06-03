@@ -37,6 +37,8 @@
 package pl.asie.charset.storage.barrel;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -51,24 +53,23 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.factorization.FzOrientation;
 import pl.asie.charset.lib.factorization.Quaternion;
 import pl.asie.charset.lib.factorization.SpaceUtil;
 import pl.asie.charset.lib.render.ModelTransformer;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
-public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
+import java.util.Calendar;
 
+public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
     void doDraw(TileEntityDayBarrel barrel, ItemStack is, float partialTicks) {
         FzOrientation bo = barrel.orientation;
         EnumFacing face = bo.facing;
@@ -96,6 +97,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.enableAlpha();
         GlStateManager.enableLighting();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         boolean hasLabel = renderItemCount(is, barrel);
         handleRenderItem(is, barrel, hasLabel);
@@ -132,13 +134,19 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.popMatrix();
         Minecraft.getMinecraft().mcProfiler.endSection();
 
+        GlStateManager.disableBlend();
         RenderHelper.enableStandardItemLighting();
     }
 
     String getCountLabel(ItemStack item, TileEntityDayBarrel barrel) {
+        if (barrel.type == TileEntityDayBarrel.Type.CREATIVE) {
+            return "i";
+        }
         int ms = item.getMaxStackSize();
         int count = barrel.getItemCount();
-        if (count == 1) return "";
+        if (count == 1) {
+            return "";
+        }
         String t = "";
         if (ms == 1 || count == ms) {
             t += count;
@@ -158,8 +166,19 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         if (barrel.canLose()) {
             t = "!" + t + "!";
         }
-        if (barrel.type == TileEntityDayBarrel.Type.CREATIVE) {
-            t = "i";
+
+        Calendar cal = ModCharsetLib.calendar.get();
+        if (cal.get(Calendar.MONTH) == 8 && cal.get(Calendar.DAY_OF_MONTH) == 9) {
+            IBlockState state = ItemUtils.getBlockState(item);
+            if (state != null && (state.getMaterial() == Material.ICE || state.getMaterial() == Material.PACKED_ICE)) {
+                if (t.startsWith("9")) {
+                    t = "c" + t.substring(1);
+                }
+
+                if (t.endsWith("9")) {
+                    t = t.substring(0, t.length() - 1) + "c";
+                }
+            }
         }
         return t;
     }
@@ -168,7 +187,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         "0123",
         "4567",
         "89*+",
-        "i!  " // 'i' stands in for ∞, '!' stands in for '!!'
+        "i! c" // 'i' stands in for ∞, '!' stands in for '!!', 'c' stands in for U+2468
     };
     
     boolean renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
@@ -252,12 +271,17 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             RenderHelper.enableStandardItemLighting();
             Minecraft.getMinecraft().getRenderItem().renderItem(is, ItemCameraTransforms.TransformType.FIXED);
         } else {
+            bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+
             GlStateManager.enableRescaleNormal();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             GlStateManager.pushMatrix();
             RenderHelper.enableStandardItemLighting();
             GlStateManager.popMatrix();
 
-            GlStateManager.scale(0.5F, 0.5F, 0.01F);
+            GlStateManager.scale(0.5F, 0.5F, 0.02F);
 
             IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null);
             model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GUI, false);
@@ -278,6 +302,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
 
             Minecraft.getMinecraft().getRenderItem().renderItem(is, model);
             GlStateManager.disableRescaleNormal();
+            Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
         }
         GlStateManager.popMatrix();
     }

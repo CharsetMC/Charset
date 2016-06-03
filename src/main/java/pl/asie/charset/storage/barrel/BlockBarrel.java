@@ -37,6 +37,7 @@
 package pl.asie.charset.storage.barrel;
 
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -81,9 +82,25 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
     public BlockBarrel() {
         super(materialBarrel);
-        setUnlocalizedName("charset.barrel");
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+        setHardness(2.5F);
+        setHarvestLevel("axe", 0);
+        setSoundType(SoundType.WOOD);
+        setUnlocalizedName("charset.barrel");
     }
+
+    @Override
+    public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityDayBarrel) {
+            if (((TileEntityDayBarrel) tile).type == TileEntityDayBarrel.Type.CREATIVE) {
+                return -1.0F;
+            }
+        }
+
+        return this.blockHardness;
+    }
+
 
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
@@ -154,7 +171,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (world.isRemote) {
+        if (world == null || world.isRemote) {
             return true;
         }
 
@@ -174,9 +191,13 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
     @Override
     public void onBlockClicked(World world, BlockPos pos, EntityPlayer playerIn) {
+        if (world == null || world.isRemote) {
+            return;
+        }
+
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {
-            ((TileEntityDayBarrel) tile).click(playerIn, playerIn.getActiveHand());
+            ((TileEntityDayBarrel) tile).click(playerIn);
         }
     }
 
@@ -197,7 +218,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
             itemList.addAll(todaysBarrels);
             return;
         }
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = ModCharsetLib.calendar.get();
         int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
 
         ArrayList<ItemStack> weeklyBarrels = new ArrayList<>();
