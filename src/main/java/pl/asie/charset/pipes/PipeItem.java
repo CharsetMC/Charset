@@ -513,6 +513,10 @@ public class PipeItem {
 			int stackSize = stack.stackSize;
 			IItemHandler handler = InventoryUtils.getItemHandler(tile, dir.getOpposite());
 			if (handler != null) {
+				if (owner.getWorld().isRemote) {
+					return true;
+				}
+
 				for (int i = 0; i < handler.getSlots(); i++) {
 					ItemStack remain = handler.insertItem(i, stack, simulate);
 					int added = stack.stackSize;

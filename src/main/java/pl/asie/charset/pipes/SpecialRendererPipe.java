@@ -64,19 +64,19 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 	private static final Vector3f[] TANK_FROM = new Vector3f[] {
 			new Vector3f(TANK_MIN, 0, TANK_MIN),
 			new Vector3f(TANK_MIN, TANK_MAX, TANK_MIN),
-			new Vector3f(0, TANK_MIN, TANK_MIN),
-			new Vector3f(TANK_MAX, TANK_MIN, TANK_MIN),
 			new Vector3f(TANK_MIN, TANK_MIN, 0),
 			new Vector3f(TANK_MIN, TANK_MIN, TANK_MAX),
+			new Vector3f(0, TANK_MIN, TANK_MIN),
+			new Vector3f(TANK_MAX, TANK_MIN, TANK_MIN),
 			new Vector3f(TANK_MIN, TANK_MIN, TANK_MIN)
 	};
 	private final Vector3f[] TANK_TO = new Vector3f[] {
 			new Vector3f(TANK_MAX, TANK_MIN, TANK_MAX),
 			new Vector3f(TANK_MAX, 16, TANK_MAX),
-			new Vector3f(TANK_MIN, TANK_MAX, TANK_MAX),
-			new Vector3f(16, TANK_MAX, TANK_MAX),
 			new Vector3f(TANK_MAX, TANK_MAX, TANK_MIN),
 			new Vector3f(TANK_MAX, TANK_MAX, 16),
+			new Vector3f(TANK_MIN, TANK_MAX, TANK_MAX),
+			new Vector3f(16, TANK_MAX, TANK_MAX),
 			new Vector3f(TANK_MAX, TANK_MAX, TANK_MAX)
 	};
 

@@ -134,7 +134,7 @@ public class CrateModel extends ModelFactory<CrateCacheInfo> {
 
             model.addQuad(null, RenderUtils.bakeFace(fromBase, toBase, facing, baseSprite, 0));
             model.addQuad(null, RenderUtils.bakeFace(fromCross, toCross, facing, crossSprite, 1));
-            if (!crate.isConnected(facing)) {
+            if (bsPos != 0 && !crate.isConnected(facing)) {
                 model.addQuad(facing, RenderUtils.bakeFace(from[0], to[0], facing, borderSprite[bsPos], 1));
 
                 // inner border

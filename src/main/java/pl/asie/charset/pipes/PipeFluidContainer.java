@@ -21,11 +21,65 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fluids.*;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.utils.FluidUtils;
 
-public class PipeFluidContainer implements IFluidHandler, ITickable {
-    public class Tank {
+import javax.annotation.Nullable;
+
+public class PipeFluidContainer implements ITickable {
+    private static boolean CAN_BE_DRAINED = false;
+
+    public class Properties implements IFluidTankProperties {
+        private final FluidStack stack;
+        private final int capacity;
+
+        public Properties(FluidStack stack, int amount, int capacity) {
+            if (stack != null) {
+                this.stack = stack.copy();
+                this.stack.amount = amount;
+            } else {
+                this.stack = null;
+            }
+            this.capacity = capacity;
+        }
+
+        @Nullable
+        @Override
+        public FluidStack getContents() {
+            return stack;
+        }
+
+        @Override
+        public int getCapacity() {
+            return capacity;
+        }
+
+        @Override
+        public boolean canFill() {
+            return stack == null || stack.amount < capacity;
+        }
+
+        @Override
+        public boolean canDrain() {
+            return CAN_BE_DRAINED && stack != null && stack.amount > 0;
+        }
+
+        @Override
+        public boolean canFillFluidType(FluidStack fluidStack) {
+            return stack == null || (stack.amount < capacity && stack.isFluidEqual(fluidStack));
+        }
+
+        @Override
+        public boolean canDrainFluidType(FluidStack fluidStack) {
+            return CAN_BE_DRAINED && stack != null && stack.amount > 0 && stack.isFluidEqual(fluidStack);
+        }
+    }
+
+    public class Tank implements IFluidHandler {
         public final EnumFacing location;
         public int amount;
         private boolean dirty;
@@ -82,6 +136,64 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
 
         public int getCapacity() {
             return TANK_SIZE;
+        }
+
+        @Override
+        public IFluidTankProperties[] getTankProperties() {
+            return new IFluidTankProperties[]{new Properties(fluidStack, amount, TANK_SIZE)};
+        }
+
+        @Override
+        public int fill(FluidStack resource, boolean doFill) {
+            if (resource == null || resource.amount == 0) {
+                return 0;
+            }
+
+            if (fluidStack == null) {
+                if (doFill) {
+                    fluidStack = resource.copy();
+                    fluidDirty = true;
+                }
+            } else if (!fluidStack.isFluidEqual(resource)) {
+                return 0;
+            }
+
+            return add(resource.amount, !doFill);
+        }
+
+        @Nullable
+        @Override
+        public FluidStack drain(FluidStack resource, boolean doDrain) {
+            if (resource == null || resource.amount == 0) {
+                return null;
+            }
+
+            if (CAN_BE_DRAINED) {
+                return fluidStack != null && resource.isFluidEqual(fluidStack) ? drain(resource.amount, doDrain) : null;
+            } else {
+                return null;
+            }
+        }
+
+        @Nullable
+        @Override
+        public FluidStack drain(int maxDrain, boolean doDrain) {
+            if (fluidStack == null) {
+                return null;
+            }
+
+            if (CAN_BE_DRAINED && maxDrain > 0) {
+                FluidStack stack = fluidStack.copy();
+                int r = remove(maxDrain, !doDrain);
+                if (r <= 0) {
+                    return null;
+                } else {
+                    stack.amount = r;
+                    return stack;
+                }
+            } else {
+                return null;
+            }
         }
     }
 
@@ -169,6 +281,8 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
             }
         }
 
+        CAN_BE_DRAINED = true;
+
         if (pushDir != null) {
             pushAll(pushDir);
         } else if (owner.connects(EnumFacing.DOWN)) {
@@ -236,6 +350,8 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
             } */
         }
 
+        CAN_BE_DRAINED = false;
+
         checkPacketUpdate();
     }
 
@@ -264,99 +380,18 @@ public class PipeFluidContainer implements IFluidHandler, ITickable {
     }
 
     private void pushAll(EnumFacing pushDir) {
-        push(tanks[pushDir.ordinal()], getTankBlockNeighbor(owner.getPos(), pushDir), pushDir.getOpposite(), TANK_RATE);
-        push(tanks[6], tanks[pushDir.ordinal()], TANK_RATE);
+        FluidUtils.push(tanks[pushDir.ordinal()], getTankBlockNeighbor(owner.getPos(), pushDir), TANK_RATE);
+        FluidUtils.push(tanks[6], tanks[pushDir.ordinal()], TANK_RATE);
         for (EnumFacing facing : EnumFacing.VALUES) {
             if (facing != pushDir && owner.connects(facing)) {
-                push(tanks[facing.ordinal()], tanks[6], TANK_RATE);
+                FluidUtils.push(tanks[facing.ordinal()], tanks[6], TANK_RATE);
             }
-        }
-    }
-
-    private void push(Tank from, Tank to, int maxAmount) {
-        if (from.amount == 0 || (to.getType() != null && !to.getType().isFluidEqual(from.getType()))) {
-            return;
-        }
-
-        int amount = Math.min(from.amount, maxAmount);
-        if (amount > 0) {
-            int amt = to.add(amount, false);
-            from.remove(amt, false);
-        }
-    }
-
-    private void push(Tank from, IFluidHandler to, EnumFacing toSide, int maxAmount) {
-        if (from.amount == 0 || !to.canFill(toSide, from.getType().getFluid())) {
-            return;
-        }
-
-        FluidStack out = fluidStack.copy();
-        out.amount = Math.min(from.amount, maxAmount);
-        if (out.amount > 0) {
-            int amt = to.fill(toSide, out, true);
-            from.remove(amt, false);
         }
     }
 
     public IFluidHandler getTankBlockNeighbor(BlockPos pos, EnumFacing direction) {
         BlockPos p = pos.offset(direction);
-        PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), p, direction.getOpposite());
-        if (pipe != null) {
-            return pipe.fluid;
-        } else {
-            TileEntity tile = owner.getWorld().getTileEntity(p);
-            if (tile instanceof IFluidHandler) {
-                return ((IFluidHandler) tile);
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
-        if (resource == null || resource.amount == 0 || !canFill(from, resource.getFluid())) {
-            return 0;
-        }
-
-        if (fluidStack == null) {
-            if (doFill) {
-                fluidStack = resource.copy();
-                fluidDirty = true;
-            }
-        } else if (!fluidStack.isFluidEqual(resource)) {
-            return 0;
-        }
-
-        return tanks[from.ordinal()].add(resource.amount, !doFill);
-    }
-
-    @Override
-    public boolean canFill(EnumFacing from, Fluid fluid) {
-        return owner.connects(from) && (fluidStack == null || fluidStack.getFluid() == fluid);
-    }
-
-    @Override
-    public FluidTankInfo[] getTankInfo(EnumFacing from) {
-        return new FluidTankInfo[]{
-                tanks[from == null ? 6 : from.ordinal()].getInfo()
-        };
-    }
-
-    // Ha! Cannot drain me, for I drain myself just fine!
-
-    @Override
-    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
-        return null;
-    }
-
-    @Override
-    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
-        return null;
-    }
-
-    @Override
-    public boolean canDrain(EnumFacing from, Fluid fluid) {
-        return false;
+        TileEntity tile = owner.getWorld().getTileEntity(p);
+        return FluidUtils.getFluidHandler(tile, direction.getOpposite());
     }
 }

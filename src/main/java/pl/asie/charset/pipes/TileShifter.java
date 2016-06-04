@@ -31,13 +31,15 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
-import net.minecraftforge.fluids.IFluidHandler;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.TileBase;
 import pl.asie.charset.lib.inventory.InventoryUtils;
 import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 
@@ -59,7 +61,18 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	}
 
 	private boolean isInput(TileEntity input, EnumFacing direction) {
-		return input != null && (input instanceof IFluidHandler || InventoryUtils.getItemHandler(input, direction) != null);
+		if (input != null) {
+			if (InventoryUtils.getItemHandler(input, direction) != null) {
+				return true;
+			}
+
+			IFluidHandler fluidHandler = FluidUtils.getFluidHandler(input, direction);
+			if (fluidHandler != null) {
+				return !(fluidHandler instanceof PipeFluidContainer.Tank);
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -84,10 +97,13 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	}
 
 	@Override
-	public void initialize() {
-		if (!worldObj.isRemote) {
+	public boolean initialize() {
+		if (getWorld() != null && !getWorld().isRemote) {
 			updateRedstoneLevel();
+			return true;
 		}
+
+		return false;
 	}
 
 	public int getShiftDistance() {
@@ -169,19 +185,12 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
 			if (input != null && output != null) {
-				if (input instanceof IFluidHandler) {
-					FluidStack stack = ((IFluidHandler) input).drain(direction, PipeFluidContainer.TANK_RATE, false);
-					if (stack != null) {
-						boolean matches = matches(stack);
-
-						if (matches) {
-							int filled = output.fluid.fill(direction.getOpposite(), stack, false);
-							if (filled > 0) {
-								stack.amount = filled;
-								stack = ((IFluidHandler) input).drain(direction, stack, true);
-								output.fluid.fill(direction.getOpposite(), stack, true);
-							}
-						}
+				IFluidHandler inTank = FluidUtils.getFluidHandler(input, direction);
+				if (inTank != null) {
+					FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
+					if (stack != null && matches(stack)) {
+						PipeFluidContainer.Tank outTank = output.fluid.tanks[direction.getOpposite().ordinal()];
+						FluidUtils.push(inTank, outTank, stack);
 					}
 				}
 

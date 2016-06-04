@@ -99,7 +99,7 @@ public class TileBackpack extends TileBase implements IInteractionObject, IInven
 		if (!isClient) {
 			inventory.readFromNBT(nbt, "items");
 		} else if (oldColor != color) {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
+			markBlockForRenderUpdate();
 		}
 	}
 

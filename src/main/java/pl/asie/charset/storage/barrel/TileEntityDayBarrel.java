@@ -1074,8 +1074,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
     }
 
+    @Override
     public ItemStack getPickedBlock() {
-        // TODO?
         return getDroppedBlock();
     }
 

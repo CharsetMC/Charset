@@ -21,13 +21,16 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import pl.asie.charset.storage.backpack.TileBackpack;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
 public abstract class BlockBase extends Block {
 	private boolean isTileProvider = this instanceof ITileEntityProvider;
@@ -47,6 +50,18 @@ public abstract class BlockBase extends Block {
 		}
 
 		super.breakBlock(worldIn, pos, state);
+	}
+
+	@Override
+	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+		if (isTileProvider) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile instanceof TileBase) {
+				return ((TileBase) tile).getPickedBlock();
+			}
+		}
+
+		return new ItemStack(this);
 	}
 
 	@Override

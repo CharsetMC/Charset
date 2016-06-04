@@ -34,12 +34,12 @@ import net.minecraft.world.World;
 public class TileBase extends TileEntity {
 	private boolean initialized = false;
 
-	protected void initialize() {
-
+	protected boolean initialize() {
+		return true;
 	}
 
-	public boolean hasDataPacket() {
-		return true;
+	public ItemStack getPickedBlock() {
+		return new ItemStack(getBlockType());
 	}
 
 	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
@@ -50,8 +50,20 @@ public class TileBase extends TileEntity {
 		return 0;
 	}
 
+	public boolean hasDataPacket() {
+		return true;
+	}
+
+	public void readNBTData(NBTTagCompound compound, boolean isClient) {
+
+	}
+
+	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
+		return compound;
+	}
+
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
+	public final SPacketUpdateTileEntity getUpdatePacket() {
 		return hasDataPacket() ? new SPacketUpdateTileEntity(getPos(), getBlockMetadata(), writeNBTData(new NBTTagCompound(), true)) : null;
 	}
 
@@ -81,23 +93,18 @@ public class TileBase extends TileEntity {
 		return writeNBTData(compound, false);
 	}
 
-	public void readNBTData(NBTTagCompound compound, boolean isClient) {
-
-	}
-
-	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
-		return compound;
-	}
-
 	public void update() {
 		if (!initialized) {
-			initialize();
-			initialized = true;
+			initialized = initialize();
 		}
 	}
 
 	public TileEntity getNeighbourTile(EnumFacing side) {
 		return worldObj != null && side != null ? worldObj.getTileEntity(pos.offset(side)) : null;
+	}
+
+	public void markBlockForRenderUpdate() {
+		worldObj.markBlockRangeForRenderUpdate(pos, pos);
 	}
 
 	public void markBlockForUpdate() {

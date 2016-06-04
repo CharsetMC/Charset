@@ -1,5 +1,6 @@
 package pl.asie.charset.storage.crate;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -9,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -17,6 +19,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import pl.asie.charset.lib.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +35,24 @@ public class BlockCrate extends BlockBase implements ITileEntityProvider {
         super(Material.WOOD);
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
         setUnlocalizedName("charset.crate");
+    }
+
+    @Override
+    public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityCrate) {
+            return ((TileEntityCrate) tile).getFlamability();
+        }
+
+        return 0;
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityCrate) {
+            ((TileEntityCrate) tile).neighborChanged(block);
+        }
     }
 
     @Override

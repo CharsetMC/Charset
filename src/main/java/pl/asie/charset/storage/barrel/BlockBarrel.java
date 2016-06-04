@@ -101,17 +101,6 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         return this.blockHardness;
     }
 
-
-    @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof TileEntityDayBarrel) {
-            return ((TileEntityDayBarrel) tile).getPickedBlock();
-        }
-
-        return new ItemStack(this);
-    }
-
     @Override
     public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
         TileEntity tile = world.getTileEntity(pos);
