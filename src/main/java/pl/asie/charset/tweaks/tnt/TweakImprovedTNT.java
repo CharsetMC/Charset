@@ -46,8 +46,10 @@ public class TweakImprovedTNT extends Tweak {
 	public void onEntitySpawn(EntityJoinWorldEvent event) {
 		if (event.getEntity() instanceof EntityTNTPrimed && !(event.getEntity() instanceof EntityTNTImproved)) {
 			event.setCanceled(true);
-			event.getWorld().spawnEntityInWorld(new EntityTNTImproved(event.getWorld(), event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ,
-					((EntityTNTPrimed) event.getEntity()).getTntPlacedBy()));
+			EntityTNTImproved tnt = new EntityTNTImproved(event.getWorld(), event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ,
+					((EntityTNTPrimed) event.getEntity()).getTntPlacedBy());
+			tnt.setFuse(((EntityTNTPrimed) event.getEntity()).getFuse());
+			event.getWorld().spawnEntityInWorld(tnt);
 		}
 	}
 }

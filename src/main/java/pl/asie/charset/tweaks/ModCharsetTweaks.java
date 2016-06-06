@@ -76,7 +76,6 @@ public class ModCharsetTweaks {
 		tweakSet.add(new TweakImprovedTNT());
 		tweakSet.add(new TweakMobControl());
 		tweakSet.add(new TweakNoSprinting());
-		tweakSet.add(new TweakProjectilePhysics());
 
 		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
 		canAddTweaks = false;
