@@ -116,10 +116,13 @@ public class ModCharsetStorage {
 		GameRegistry.register(backpackBlock.setRegistryName("backpack"));
 		GameRegistry.register(new ItemBackpack(backpackBlock).setRegistryName("backpack"));
 
-		crateBlock = new BlockCrate();
-		crateItem = new ItemCrate(crateBlock);
-		GameRegistry.register(crateBlock.setRegistryName("crate"));
-		GameRegistry.register(crateItem.setRegistryName("crate"));
+		if (ModCharsetLib.INDEV) {
+			crateBlock = new BlockCrate();
+			crateItem = new ItemCrate(crateBlock);
+			GameRegistry.register(crateBlock.setRegistryName("crate"));
+			GameRegistry.register(crateItem.setRegistryName("crate"));
+			ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
+		}
 
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
@@ -139,7 +142,6 @@ public class ModCharsetStorage {
 		lockItem = new ItemLock();
 		GameRegistry.register(lockItem.setRegistryName("lock"));
 
-		ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
 		ModCharsetLib.proxy.registerItemModel(barrelItem, 0, "charsetstorage:barrel");
 		ModCharsetLib.proxy.registerItemModel(barrelCartItem, 0, "charsetstorage:barrelCart");
 		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
@@ -165,7 +167,9 @@ public class ModCharsetStorage {
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
 		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
-		GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
+		if (ModCharsetLib.INDEV) {
+			GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
+		}
 
 		EntityRegistry.registerModEntity(EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, true);
 		EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
@@ -285,7 +289,9 @@ public class ModCharsetStorage {
 					}
 				}
 
-				CrateRegistry.INSTANCE.registerCraftable(plank, stick);
+				if (ModCharsetLib.INDEV) {
+					CrateRegistry.INSTANCE.registerCraftable(plank, stick);
+				}
 			}
 		}
 	}
@@ -303,8 +309,10 @@ public class ModCharsetStorage {
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 4));
 		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 5));
 
-		for (int i = 0; i < 6; i++) {
-			CrateRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.PLANKS, 1, i), new ItemStack(Items.STICK));
+		if (ModCharsetLib.INDEV) {
+			for (int i = 0; i < 6; i++) {
+				CrateRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.PLANKS, 1, i), new ItemStack(Items.STICK));
+			}
 		}
 
 		for (ItemStack log : OreDictionary.getOres("logWood", false)) {

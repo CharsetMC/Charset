@@ -23,6 +23,9 @@ public final class DirectionUtils {
 
 	}
 
+	public static final EnumFacing[] NEGATIVES = {EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.WEST};
+	public static final EnumFacing[] POSITIVES = {EnumFacing.UP, EnumFacing.SOUTH, EnumFacing.EAST};
+
 	public static int ordinal(EnumFacing side) {
 		return side == null ? 6 : side.ordinal();
 	}

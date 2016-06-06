@@ -111,21 +111,36 @@ public class CrateShapeCache {
         }
     }
 
-    public boolean add(TileEntityCrate crate) {
-        BlockPos pos = crate.getPos();
-        if (master == null) {
-            master = crate;
-            posMin = posMax = pos;
+    public boolean matches(TileEntityCrate crate) {
+        if (crate == null) {
+            return false;
+        } else if (master == null) {
+            return true;
         } else {
             if (!ItemStack.areItemStacksEqual(master.getMaterial(), crate.getMaterial())) {
                 return false;
             }
+
+            return true;
+        }
+    }
+
+    public boolean add(TileEntityCrate crate) {
+        if (!matches(crate)) {
+            return false;
+        }
+
+        BlockPos pos = crate.getPos();
+        if (master == null) {
+            master = crate;
+            posMin = posMax = pos;
         }
 
         if (positions.add(pos)) {
             crates.add(crate);
             if (pos.getX() <= posMin.getX() && pos.getY() <= posMin.getY() && pos.getZ() <= posMin.getZ()) {
                 posMin = pos;
+                master = crate;
             }
             if (pos.getX() >= posMax.getX() && pos.getY() >= posMax.getY() && pos.getZ() >= posMax.getZ()) {
                 posMax = pos;

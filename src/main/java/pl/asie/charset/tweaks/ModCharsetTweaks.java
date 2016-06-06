@@ -35,6 +35,7 @@ import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
 import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
 import pl.asie.charset.tweaks.shard.TweakGlassShards;
+import pl.asie.charset.tweaks.tnt.TweakImprovedTNT;
 
 @Mod(modid = ModCharsetTweaks.MODID, name = ModCharsetTweaks.NAME, version = ModCharsetTweaks.VERSION,
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -44,6 +45,9 @@ public class ModCharsetTweaks {
 	public static final String VERSION = "@VERSION@";
 
 	public static PacketRegistry packet;
+
+	@Mod.Instance(MODID)
+	public static ModCharsetTweaks instance;
 
 	@SidedProxy(clientSide = "pl.asie.charset.tweaks.ProxyClient", serverSide = "pl.asie.charset.tweaks.ProxyCommon")
 	public static pl.asie.charset.tweaks.ProxyCommon proxy;
@@ -69,8 +73,10 @@ public class ModCharsetTweaks {
 		tweakSet.add(new TweakDyeableMinecarts());
 		tweakSet.add(new TweakGlassShards());
 		tweakSet.add(new TweakGraphite());
+		tweakSet.add(new TweakImprovedTNT());
 		tweakSet.add(new TweakMobControl());
 		tweakSet.add(new TweakNoSprinting());
+		tweakSet.add(new TweakProjectilePhysics());
 
 		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
 		canAddTweaks = false;

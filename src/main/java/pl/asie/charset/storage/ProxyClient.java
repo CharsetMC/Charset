@@ -20,14 +20,12 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
@@ -46,10 +44,10 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.storage.backpack.*;
 import pl.asie.charset.storage.barrel.BarrelModel;
-import pl.asie.charset.storage.barrel.BarrelRegistry;
 import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
 import pl.asie.charset.storage.barrel.RenderMinecartDayBarrel;
 import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
@@ -58,9 +56,6 @@ import pl.asie.charset.storage.crate.CrateModel;
 import pl.asie.charset.storage.locking.EntityLock;
 import pl.asie.charset.storage.locking.ItemLock;
 import pl.asie.charset.storage.locking.RenderLock;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ProxyClient extends ProxyCommon {
 	public static final KeyBinding backpackOpenKey = new KeyBinding("key.charset.backpackOpen", Keyboard.KEY_C, "key.categories.gameplay");
@@ -97,11 +92,13 @@ public class ProxyClient extends ProxyCommon {
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), ModCharsetStorage.keyItem);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), ModCharsetStorage.lockItem);
 
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(barrelModel.COLORIZER, ModCharsetStorage.barrelBlock);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(barrelModel.COLORIZER, ModCharsetStorage.barrelItem);
+		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelBlock);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelItem);
 
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(crateModel.colorizer, ModCharsetStorage.crateBlock);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(crateModel.colorizer, ModCharsetStorage.crateItem);
+		if (ModCharsetLib.INDEV) {
+			Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(crateModel.colorizer, ModCharsetStorage.crateBlock);
+			Minecraft.getMinecraft().getItemColors().registerItemColorHandler(crateModel.colorizer, ModCharsetStorage.crateItem);
+		}
 
 		MinecraftForge.EVENT_BUS.register(new RendererBackpack.Armor());
 	}

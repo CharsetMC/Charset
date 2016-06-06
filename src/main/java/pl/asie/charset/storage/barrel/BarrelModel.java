@@ -66,7 +66,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
-    public final ModelColorizer<BarrelCacheInfo> COLORIZER = new ModelColorizer<BarrelCacheInfo>(this) {
+    public final ModelColorizer<BarrelCacheInfo> colorizer = new ModelColorizer<BarrelCacheInfo>(this) {
         @Override
         public int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
             if (!info.isMetal && !info.type.isHopping()) {

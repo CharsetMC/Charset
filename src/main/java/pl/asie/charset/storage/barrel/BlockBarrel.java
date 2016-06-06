@@ -72,16 +72,11 @@ import java.util.List;
 import java.util.Random;
 
 public class BlockBarrel extends BlockBase implements ITileEntityProvider {
-    public static final Material materialBarrel = new Material(MapColor.WOOD) {{
-        setAdventureModeExempt();
-        // TODO
-        // NORELEASE.fixme("Test adventure mode barrel breaking");
-    }};
-
     private static final boolean SHOW_ALL_BARRELS = ModCharsetLib.INDEV;
 
     public BlockBarrel() {
-        super(materialBarrel);
+        // TODO: Adventure mode support (the Material trick doesn't work)
+        super(Material.WOOD);
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
         setHardness(2.5F);
         setHarvestLevel("axe", 0);

@@ -11,6 +11,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.lib.TileBase;
+import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
@@ -44,8 +45,9 @@ public class TileEntityCrate extends TileBase {
     }
 
     private void initCache() {
-        if (cache == null) {
-            for (EnumFacing facing : EnumFacing.VALUES) {
+        if (cache == null || !cache.isValid()) {
+            // We only pick up caches lower than our own - they're closer to the master.
+            for (EnumFacing facing : DirectionUtils.NEGATIVES) {
                 TileEntity tile = getNeighbourTile(facing);
                 if (tile instanceof TileEntityCrate) {
                     TileEntityCrate other = (TileEntityCrate) tile;
@@ -56,9 +58,7 @@ public class TileEntityCrate extends TileBase {
                     }
                 }
             }
-        }
 
-        if (cache == null || !cache.isValid()) {
             cache = new CrateShapeCache(this);
         }
     }

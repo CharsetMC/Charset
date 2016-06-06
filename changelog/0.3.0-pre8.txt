@@ -1,0 +1,2 @@
+* [Tweaks] New tweak: improved TNT! Pew!
+* [Tweaks] New tweak: proper projectile physics - from Factorization
