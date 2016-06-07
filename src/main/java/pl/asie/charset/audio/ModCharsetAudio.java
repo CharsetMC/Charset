@@ -17,6 +17,7 @@
 package pl.asie.charset.audio;
 
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -168,7 +169,7 @@ public class ModCharsetAudio {
 	}
 
 	@Mod.EventHandler
-	public void serverStart(FMLServerAboutToStartEvent event) {
+	public void serverStart(FMLServerStartedEvent event) {
 		storage = new DataStorageManager();
 	}
 

@@ -619,10 +619,6 @@ public final class SpaceUtil {
         return new Vec3d(0, 0, 0);
     }
 
-    public static BlockPos newPos() {
-        return new BlockPos(0, 0, 0);
-    }
-
     public static AxisAlignedBB newBoxAround(BlockPos pos) {
         return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(),
                 pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);

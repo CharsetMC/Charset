@@ -52,34 +52,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.items.ItemMinecartCharset;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 import java.util.List;
 
-/*
- * Created by asie on 6/11/15.
- */
-// @Optional.Interface(iface = "mods.railcraft.api.core.items.IMinecartItem", modid = "Railcraft")
-public class ItemMinecartDayBarrel extends ItemMinecart {
+public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     public ItemMinecartDayBarrel() {
-        super(EntityMinecart.Type.RIDEABLE); // yeah, right
-        setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+        super();
         setUnlocalizedName("charset.barrelCart");
-        setHasSubtypes(true);
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World w, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!BlockRailBase.isRailBlock(w.getBlockState(pos))) {
-            return EnumActionResult.FAIL;
-        } else {
-            if (!w.isRemote) {
-                placeCart(null, stack, w, pos);
-            }
-
-            stack.stackSize--;
-            return EnumActionResult.SUCCESS;
-        }
+    protected EntityMinecart createCart(GameProfile owner, ItemStack cart, World world, double x, double y, double z) {
+        EntityMinecartDayBarrel minecart = new EntityMinecartDayBarrel(world, x + 0.5F, y + 0.5F, z + 0.5F);
+        minecart.initFromStack(cart);
+        return minecart;
     }
 
     @Override
@@ -95,25 +83,6 @@ public class ItemMinecartDayBarrel extends ItemMinecart {
             return I18n.translateToLocalFormatted("item.charset.barrelCart.known.name", name);
         }
         return super.getItemStackDisplayName(is);
-    }
-
-    /* NORELEASE: Railcraft?
-    @Override
-    public boolean canBePlacedByNonPlayer(ItemStack cart) {
-        return true;
-    }
-
-    */
-
-    public EntityMinecart placeCart(GameProfile owner, ItemStack cart, World world, BlockPos pos) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-        EntityMinecartDayBarrel minecart = new EntityMinecartDayBarrel(world, x + 0.5F, y + 0.5F, z + 0.5F);
-        minecart.initFromStack(cart);
-        cart.stackSize--;
-        world.spawnEntityInWorld(minecart);
-        return minecart;
     }
 
     ItemStack creative_cart = null;

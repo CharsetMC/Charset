@@ -36,8 +36,6 @@
 
 package pl.asie.charset.storage.barrel;
 
-import java.io.IOException;
-
 import com.google.common.base.Optional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecart;
@@ -74,7 +72,6 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     protected TileEntityDayBarrel barrel;
     private IItemHandler itemHandler = new MinecartItemHandler();
     private int activatorRailTicks = 0;
-    private boolean activatorRailPowered;
 
     public class MinecartItemHandler implements IItemHandler {
         @Override
@@ -145,11 +142,11 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         updateDataWatcher(true);
     }
 
-    private void create_barrel() {
+    private void createBarrel() {
         if (barrel != null) return;
         barrel = new TileEntityDayBarrel();
         barrel.setWorldObj(worldObj);
-        barrel.setPos(SpaceUtil.newPos());
+        barrel.setPos(BlockPos.ORIGIN);
         barrel.validate();
         barrel.orientation = FzOrientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
@@ -171,7 +168,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     @Override
     protected void entityInit() {
         super.entityInit();
-        create_barrel();
+        createBarrel();
 
         dataManager.register(BARREL_ITEM, Optional.fromNullable(barrel.item));
         dataManager.register(BARREL_ITEM_COUNT, barrel.getItemCount());

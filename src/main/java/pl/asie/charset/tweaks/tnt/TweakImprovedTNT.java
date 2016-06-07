@@ -28,7 +28,7 @@ import pl.asie.charset.tweaks.Tweak;
 
 public class TweakImprovedTNT extends Tweak {
 	public TweakImprovedTNT() {
-		super("tweaks", "improvedTNT", "Makes TNT less likely to bring down your server. And pushable by players.", true);
+		super("tweaks", "improvedTNT", "Makes primed TNT hittable.", true);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class TweakImprovedTNT extends Tweak {
 
 	@SubscribeEvent
 	public void onEntitySpawn(EntityJoinWorldEvent event) {
-		if (event.getEntity() instanceof EntityTNTPrimed && !(event.getEntity() instanceof EntityTNTImproved)) {
+		if (event.getEntity().getClass() == EntityTNTPrimed.class) {
 			event.setCanceled(true);
 			EntityTNTImproved tnt = new EntityTNTImproved(event.getWorld(), event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ,
 					((EntityTNTPrimed) event.getEntity()).getTntPlacedBy());
