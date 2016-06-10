@@ -48,7 +48,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -62,34 +61,19 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 
-@Mod(
-        modid = NotifyImplementation.modId,
-        name = NotifyImplementation.name,
-        version = NotifyImplementation.version
-)
 public class NotifyImplementation {
-    public static final String modId = "factorization.notify";
-    public static final String name = "Factorization Notification System";
-    public static final String version = "1.0";
-    
     @SidedProxy(clientSide = "pl.asie.charset.lib.notify.RenderMessages", serverSide = "pl.asie.charset.lib.notify.RenderMessagesProxy")
     public static RenderMessagesProxy proxy;
     public static NotifyNetwork net = new NotifyNetwork();
     
     public static NotifyImplementation instance;
     
-    {
-        NotifyImplementation.instance = this;
-        loadBus(this);
+    public static void init() {
+        NotifyImplementation.instance = new NotifyImplementation();
+        MinecraftForge.EVENT_BUS.register(NotifyImplementation.instance);
         PointNetworkHandler.INSTANCE.initialize();
     }
-    
-    static void loadBus(Object obj) {
-        // A copy of Core.loadBus(), for the sake of independence.
-        MinecraftForge.EVENT_BUS.register(obj);
-    }
-    
-    @EventHandler
+
     public void registerServerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new MutterCommand());
     }

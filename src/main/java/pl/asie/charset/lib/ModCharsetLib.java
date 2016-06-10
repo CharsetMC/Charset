@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +45,7 @@ import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.handlers.PlayerDeathHandler;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 
@@ -106,6 +108,7 @@ public class ModCharsetLib {
 		proxy.registerItemModel(charsetIconItem, 0, "charsetlib:icon");
 
 		Capabilities.init();
+		NotifyImplementation.init();
 	}
 
 	@Mod.EventHandler
@@ -132,6 +135,11 @@ public class ModCharsetLib {
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);
 		}
+	}
+
+	@Mod.EventHandler
+	public void serverStarting(FMLServerStartingEvent event) {
+		NotifyImplementation.instance.registerServerCommands(event);
 	}
 
 	@Mod.EventHandler

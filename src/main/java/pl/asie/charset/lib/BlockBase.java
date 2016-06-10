@@ -28,15 +28,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.storage.backpack.TileBackpack;
 import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class BlockBase extends Block {
+	protected final Map<IBlockAccess, TileEntity> lastBrokenMap = new HashMap<>();
 	private boolean isTileProvider = this instanceof ITileEntityProvider;
 
 	public BlockBase(Material materialIn) {
 		super(materialIn);
+	}
+
+	protected TileEntity getTileAfterBreak(IBlockAccess world, BlockPos pos) {
+		TileEntity tile = world.getTileEntity(pos);
+		if (tile == null) {
+			TileEntity lastBroken = lastBrokenMap.get(world);
+			if (lastBroken != null && lastBroken.getPos().equals(pos)) {
+				tile = lastBroken;
+			}
+		}
+		return tile;
 	}
 
 	@Override
@@ -45,6 +61,7 @@ public abstract class BlockBase extends Block {
 			TileEntity tile = worldIn.getTileEntity(pos);
 
 			if (tile instanceof TileBase) {
+				lastBrokenMap.put(worldIn, tile);
 				((TileBase) tile).dropContents();
 			}
 		}

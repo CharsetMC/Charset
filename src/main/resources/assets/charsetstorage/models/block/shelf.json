@@ -1,0 +1,18 @@
+{
+  "elements": [
+    { "from": [ 0, 1, 12 ],
+      "to": [ 16, 2, 16 ],
+      "faces": {
+        "down": { "texture": "#wood", "tintIndex": 0 },
+        "up": { "texture": "#wood", "tintIndex": 0 },
+        "north": { "texture": "#wood", "cullface": "north", "tintIndex": 0 },
+        "south": { "texture": "#wood", "cullface": "south", "tintIndex": 0 },
+        "west":  { "texture": "#wood", "cullface": "west", "tintIndex": 0 },
+        "east":  { "texture": "#wood", "cullface": "east", "tintIndex": 0 }
+      }
+    }
+  ],
+  "textures": {
+    "wood": "minecraft:blocks/planks_oak"
+  }
+}

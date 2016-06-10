@@ -64,9 +64,13 @@ public class PartSlab extends Multipart implements ISlottedPart, INormallyOcclud
 		isTop = buf.readBoolean();
 	}
 
+	protected AxisAlignedBB getBox() {
+		return BOXES[isTop ? 1 : 0];
+	}
+
 	@Override
 	public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
-		AxisAlignedBB box = BOXES[isTop ? 1 : 0];
+		AxisAlignedBB box = getBox();
 		if (mask.intersectsWith(box)) {
 			list.add(box);
 		}
@@ -74,12 +78,12 @@ public class PartSlab extends Multipart implements ISlottedPart, INormallyOcclud
 
 	@Override
 	public void addSelectionBoxes(List<AxisAlignedBB> list) {
-		list.add(BOXES[isTop ? 1 : 0]);
+		list.add(getBox());
 	}
 
 	@Override
 	public void addOcclusionBoxes(List<AxisAlignedBB> list) {
-		list.add(BOXES[isTop ? 1 : 0]);
+		list.add(getBox());
 	}
 
 	@Override

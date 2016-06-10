@@ -52,6 +52,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
@@ -64,7 +65,7 @@ public class RenderMessages extends RenderMessagesProxy {
     static final List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<ClientMessage>());
     
     {
-        NotifyImplementation.loadBus(this);
+        MinecraftForge.EVENT_BUS.register(this);
         ClientCommandHandler.instance.registerCommand(new PointCommand());
     }
 

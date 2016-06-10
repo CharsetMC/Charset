@@ -1,2 +1,6 @@
+* [Audio] Fix tape drives rendering on top no matter where they were placed
+* [Audio] Fix the tape storage directory not being found in certain cases
+* [Decoration] New module! Adds Posters from Factorization!
+* [Storage] Add notice if trying to put on backpack while wearing chestplate
+* [Storage] Fix barrels not dropping the correct barrel type
 * [Tweaks] New tweak: improved TNT! Pew!
-* [Tweaks] New tweak: proper projectile physics - from Factorization

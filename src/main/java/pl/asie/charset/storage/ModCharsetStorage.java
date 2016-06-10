@@ -17,11 +17,14 @@
 package pl.asie.charset.storage;
 
 import com.google.common.base.Predicate;
+import mcmultipart.multipart.MultipartRegistry;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -43,6 +46,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import pl.asie.charset.audio.tape.PartTapeDrive;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RecipeUtils;
@@ -65,6 +69,8 @@ import pl.asie.charset.storage.crate.CrateRegistry;
 import pl.asie.charset.storage.crate.ItemCrate;
 import pl.asie.charset.storage.crate.TileEntityCrate;
 import pl.asie.charset.storage.locking.*;
+import pl.asie.charset.storage.shelf.ItemPartShelf;
+import pl.asie.charset.storage.shelf.PartShelf;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -107,6 +113,17 @@ public class ModCharsetStorage {
 
 	private Configuration config;
 
+	@Optional.Method(modid = "mcmultipart")
+	private void initMultiplePants() {
+		if (ModCharsetLib.INDEV) {
+			ItemPartShelf itemPartShelf = new ItemPartShelf();
+			GameRegistry.register(itemPartShelf.setRegistryName("shelf"));
+			ModCharsetLib.proxy.registerItemModel(itemPartShelf, 0, "charsetstorage:shelf");
+
+			MultipartRegistry.registerPart(PartShelf.class, "charsetstorage:shelf");
+		}
+	}
+
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(ModCharsetStorage.MODID);
@@ -122,6 +139,10 @@ public class ModCharsetStorage {
 			GameRegistry.register(crateBlock.setRegistryName("crate"));
 			GameRegistry.register(crateItem.setRegistryName("crate"));
 			ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
+		}
+
+		if (Loader.isModLoaded("mcmultipart")) {
+			initMultiplePants();
 		}
 
 		barrelBlock = new BlockBarrel();

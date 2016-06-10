@@ -51,6 +51,10 @@ public class PlayerUtils {
 		return null;
 	}
 
+	public static boolean isCreative(EntityPlayer player) {
+		return player.capabilities.isCreativeMode;
+	}
+
 	// Weird Factorization stuff
 	public static int getPuntStrengthOrWeakness(EntityPlayer player) {
 		if (player == null) return 1;

@@ -52,6 +52,13 @@
 			"dependencies": ["lib"],
 			"stability": "staging"
 		},
+		"decoration": {
+			"char": "⚐",
+			"default": true,
+			"description": "Various decorative objects.",
+			"dependencies": ["lib"],
+			"stability": "staging"
+		},
 		"drama": {
 			"char": "!",
 			"default": false,

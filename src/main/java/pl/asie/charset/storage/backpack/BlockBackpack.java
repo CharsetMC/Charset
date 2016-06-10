@@ -45,6 +45,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.refs.Properties;
 import pl.asie.charset.storage.ModCharsetStorage;
 
@@ -91,15 +92,19 @@ public class BlockBackpack extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-		if (player.isSneaking() && player.getItemStackFromSlot(EntityEquipmentSlot.CHEST) == null) {
+		if (player.isSneaking()) {
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile instanceof TileBackpack) {
-				ItemStack stack = ((TileBackpack) tile).writeToItemStack();
+				if (player.getItemStackFromSlot(EntityEquipmentSlot.CHEST) != null) {
+					new Notice(tile, "notice.charset.backpack.chestplate").sendTo(player);
+				} else {
+					ItemStack stack = ((TileBackpack) tile).writeToItemStack();
 
-				world.removeTileEntity(pos);
-				world.setBlockToAir(pos);
+					world.removeTileEntity(pos);
+					world.setBlockToAir(pos);
 
-				player.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack);
+					player.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack);
+				}
 			}
 		}
 	}

@@ -62,6 +62,13 @@ public final class ItemUtils {
 		return equals(source, target, false, true, true);
 	}
 
+	public static boolean equalsMeta(ItemStack source, ItemStack target) {
+		if (source == null || target == null) {
+			return source == target;
+		}
+		return equals(source, target, false, !source.getItem().isDamageable(), false);
+	}
+
 	public static boolean equals(ItemStack source, ItemStack target, boolean matchStackSize, boolean matchDamage, boolean matchNBT) {
 		if (source == target) {
 			return true;
@@ -90,7 +97,7 @@ public final class ItemUtils {
 		}
 	}
 
-	public static void spawnItemEntity(World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
+	public static EntityItem spawnItemEntity(World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
 		EntityItem entityItem = new EntityItem(world, loc.xCoord, loc.yCoord, loc.zCoord, stack);
 		entityItem.setDefaultPickupDelay();
 		if (randomness <= 0.0f) {
@@ -103,5 +110,6 @@ public final class ItemUtils {
 			entityItem.motionZ = ((1.0f - randomness) + (((world.rand.nextDouble() - 0.5) * 2.0f) * randomness)) * mZm;
 		}
 		world.spawnEntityInWorld(entityItem);
+		return entityItem;
 	}
 }

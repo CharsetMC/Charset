@@ -155,7 +155,7 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	}
 
 	@Override
-	public IBlockState getExtendedState(IBlockState state) {
+	public IBlockState getActualState(IBlockState state) {
 		return state.withProperty(PartSlab.IS_TOP, isTop()).withProperty(Properties.FACING4, facing);
 	}
 
