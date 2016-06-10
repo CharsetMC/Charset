@@ -79,6 +79,17 @@
             "url": "http://charset.asie.pl"
         },
         {
+            "modid": "CharsetDecoration",
+            "name": "⚐",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Various decorative objects.",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
             "modid": "CharsetDrama",
             "name": "!",
             "version": "${version}",

@@ -36,7 +36,6 @@
 
 package pl.asie.charset.storage.barrel;
 
-import com.sun.org.apache.xml.internal.security.utils.I18n;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.NoticeUpdater;
 import net.minecraft.block.Block;
@@ -58,6 +57,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
@@ -929,14 +929,19 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             public void update(Notice msg) {
                 if (item == null && getItemCount() == 0) {
                     msg.setMessage("notice.charset.barrel.empty");
-                } else if (getItemCount() >= getMaxSize()) {
-                    msg.withItem(item).setMessage("notice.charset.barrel.full", "{ITEM_NAME}{ITEM_INFOS_NEWLINE}");
                 } else {
-                    String count = "" + getItemCount();
+                    String countMsg = null;
                     if (type == Type.CREATIVE) {
-                        count = I18n.translate("notice.charset.barrel.infinite");
+                        countMsg = "notice.charset.barrel.infinite";
+                    } else {
+                        int count = getItemCount();
+                        if (count >= getMaxSize()) {
+                            countMsg = "notice.charset.barrel.full";
+                        } else {
+                            countMsg = "" + count;
+                        }
                     }
-                    msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", count);
+                    msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", countMsg);
                 }
             }
         }).sendTo(entityplayer);
