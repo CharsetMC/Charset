@@ -16,12 +16,59 @@
 
 package pl.asie.charset.lib.audio;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldServer;
+import pl.asie.charset.api.audio.AudioPacket;
+import pl.asie.charset.api.audio.AudioSink;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public final class AudioUtils {
     private AudioUtils() {
 
+    }
+
+    public static void send(int id, AudioPacket audio) {
+        if (audio.getVolume() <= 0.0f) {
+            return;
+        }
+
+        PacketAudioData packet = new PacketAudioData(id, audio);
+
+        Map<WorldServer, Set<AudioSink>> worlds = new HashMap<>();
+        for (AudioSink sink : audio.getSinks()) {
+            if (sink.getVolume() <= 0.0f || sink.getDistance() <= 0.0f) {
+                continue;
+            }
+
+            if (worlds.containsKey(sink.getWorld())) {
+                worlds.get(sink.getWorld()).add(sink);
+            } else {
+                HashSet<AudioSink> sinkLocal = new HashSet<>();
+                sinkLocal.add(sink);
+                worlds.put((WorldServer) sink.getWorld(), sinkLocal);
+            }
+        }
+
+        for (WorldServer world : worlds.keySet()) {
+            for (EntityPlayerMP player : world.getMinecraftServer().getPlayerList().getPlayerList()) {
+                if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
+                    for (AudioSink sink : worlds.get(world)) {
+                        BlockPos pos = new BlockPos(sink.getPos());
+                        if (world.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
+                            ModCharsetLib.packet.sendTo(packet, player);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static int start() {

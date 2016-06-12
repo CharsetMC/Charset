@@ -43,16 +43,19 @@ public abstract class ItemPartSlab extends ItemMultiPart {
 	@Override
 	public IMultipart createPart(World world, BlockPos pos, EnumFacing facing, Vec3d hit, ItemStack stack, EntityPlayer player) {
 		PartSlab slab = createPartSlab(world, pos, facing, hit, stack, player);
-		slab.isTop = facing == EnumFacing.UP || (hit.yCoord >= 0.5 && facing != EnumFacing.DOWN);
 
 		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
 		if (container != null) {
 			boolean occupiedDown = false;
-			if (container.getPartInSlot(PartSlot.DOWN) != null || !OcclusionHelper.occlusionTest(OcclusionHelper.boxes(PartSlab.BOXES[0]), container.getParts())) {
+			slab.isTop = false;
+			if (!OcclusionHelper.occlusionTest(OcclusionHelper.boxes(slab.getBox()), container.getParts())) {
 				slab.isTop = true;
 				occupiedDown = true;
 			}
-			if (slab.isTop && (container.getPartInSlot(PartSlot.UP) != null || !OcclusionHelper.occlusionTest(OcclusionHelper.boxes(PartSlab.BOXES[1]), container.getParts()))) {
+			if (!slab.isTop) {
+				slab.isTop = hit.yCoord >= 0.5;
+			}
+			if (slab.isTop && !OcclusionHelper.occlusionTest(OcclusionHelper.boxes(slab.getBox()), container.getParts())) {
 				if (occupiedDown) {
 					return null;
 				} else {

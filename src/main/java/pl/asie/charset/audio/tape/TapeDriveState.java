@@ -28,6 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.Capabilities;
@@ -80,22 +81,22 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 						byte[] data = new byte[300];
 						int len = storage.read(data, false);
 
-						AudioPacketDFPWM packetDFPWM = new AudioPacketDFPWM(sourceId, data, 50);
+						AudioPacket packet = new AudioPacket(new AudioDataDFPWM(data, 50), 1.0F);
 
 						World world = owner.getWorld();
 						BlockPos pos = owner.getPos();
 						for (EnumFacing facing : EnumFacing.VALUES) {
 							TileEntity tile = world.getTileEntity(pos.offset(facing));
 							if (tile != null && tile.hasCapability(Capabilities.AUDIO_SINK, facing.getOpposite())) {
-								tile.getCapability(Capabilities.AUDIO_SINK, facing.getOpposite()).receive(packetDFPWM);
+								tile.getCapability(Capabilities.AUDIO_SINK, facing.getOpposite()).receive(packet);
 							}
 						}
 
-						if (packetDFPWM.getSinkCount() == 0) {
-							new AudioSinkBlock(owner.getWorld(), owner.getPos()).receive(packetDFPWM);
+						if (packet.getSinkCount() == 0) {
+							new AudioSinkBlock(owner.getWorld(), owner.getPos()).receive(packet);
 						}
 
-						packetDFPWM.finishPropagation();
+						AudioUtils.send(sourceId, packet);
 
 						if (len < data.length) {
 							setState(State.STOPPED);

@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 
 import pl.asie.charset.api.audio.AudioAPI;
-import pl.asie.charset.lib.audio.AudioPacketDFPWM;
+import pl.asie.charset.lib.audio.AudioDataDFPWM;
 import pl.asie.charset.lib.audio.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
@@ -51,7 +51,7 @@ import pl.asie.charset.lib.utils.ColorUtils;
 
 @Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart")
 public class ModCharsetLib {
-	public static final boolean INDEV = false;
+	public static final boolean INDEV = true;
 
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "CharsetLib";
@@ -126,7 +126,7 @@ public class ModCharsetLib {
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 
-		AudioAPI.PACKET_REGISTRY.register(AudioPacketDFPWM.class);
+		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
 		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class);
 	}
 

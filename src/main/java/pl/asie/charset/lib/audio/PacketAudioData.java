@@ -19,9 +19,10 @@ package pl.asie.charset.lib.audio;
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.network.INetHandler;
+import pl.asie.charset.api.audio.AudioData;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.AudioSink;
-import pl.asie.charset.api.audio.IPCMPacket;
+import pl.asie.charset.api.audio.IDataPCM;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.audio.manager.AudioStreamOpenAL;
@@ -29,37 +30,40 @@ import pl.asie.charset.lib.audio.manager.IAudioStream;
 import pl.asie.charset.lib.network.Packet;
 
 public class PacketAudioData extends Packet {
+	private int id;
 	private AudioPacket packet;
 
 	public PacketAudioData() {
 		super();
 	}
 
-	protected PacketAudioData(AudioPacketCharset packet) {
+	public PacketAudioData(int id, AudioPacket packet) {
 		super();
+		this.id = id;
 		this.packet = packet;
 	}
 
 	@Override
 	public void writeData(ByteBuf buf) {
+		buf.writeInt(id);
 		packet.writeData(buf);
 	}
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		AudioPacket packet = AudioPacket.create(buf);
-		if (!(packet instanceof AudioPacketCharset)) {
+		int id = buf.readInt();
+		AudioPacket packet = new AudioPacket();
+		packet.readData(buf);
+
+		AudioData audioData = packet.getData();
+		if (!(audioData instanceof IDataPCM) || ((IDataPCM) audioData).getSampleSize() != 1) {
+			// Nope!
 			return;
 		}
 
-		IPCMPacket pcmPacket = (IPCMPacket) packet;
-		if (pcmPacket.getPCMSampleSizeBits() != 8) {
-			ModCharsetLib.logger.error("PacketAudioData cannot read non-8-bit packets!");
-			return;
-		}
-
-		byte[] data = pcmPacket.getPCMData();
-		if (pcmPacket.getPCMSigned()) {
+		IDataPCM pcmPacket = (IDataPCM) audioData;
+		byte[] data = pcmPacket.getSamplePCMData();
+		if (pcmPacket.isSampleSigned()) {
 			byte[] data2 = new byte[data.length];
 			for (int i = 0; i < data.length; i++) {
 				data2[i] = (byte) (data[i] ^ 0x80);
@@ -67,20 +71,18 @@ public class PacketAudioData extends Packet {
 			data = data2;
 		}
 
-		int id = ((AudioPacketCharset) packet).getId();
 		IAudioStream stream = AudioStreamManagerClient.INSTANCE.get(id);
 		if (stream == null) {
 			stream = new AudioStreamOpenAL(false, false, 8);
 			AudioStreamManagerClient.INSTANCE.put(id, stream);
 		}
 
-		stream.setSampleRate(pcmPacket.getPCMSampleRate());
+		stream.setSampleRate(pcmPacket.getSampleRate());
 		stream.push(data);
 
 		for (AudioSink sink : packet.getSinks()) {
-			// TODO
 			stream.play((float) sink.getPos().xCoord, (float) sink.getPos().yCoord, (float) sink.getPos().zCoord,
-					32.0F, 1.0F);
+					sink.getDistance(), sink.getVolume() * packet.getVolume());
 		}
 	}
 }

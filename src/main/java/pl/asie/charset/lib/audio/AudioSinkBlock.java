@@ -31,6 +31,16 @@ public class AudioSinkBlock extends AudioSink {
     }
 
     @Override
+    public float getDistance() {
+        return 32.0F;
+    }
+
+    @Override
+    public float getVolume() {
+        return 1.0F;
+    }
+
+    @Override
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
         buf.writeInt(world.provider.getDimension());

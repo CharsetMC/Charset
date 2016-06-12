@@ -33,4 +33,14 @@ public class DefaultAudioSink extends AudioSink {
     public Vec3d getPos() {
         return null;
     }
+
+    @Override
+    public float getDistance() {
+        return 0;
+    }
+
+    @Override
+    public float getVolume() {
+        return 0;
+    }
 }

@@ -22,6 +22,9 @@ import java.util.Arrays;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -46,7 +49,8 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		PLAY,
 		STOP,
 		FAST_FORWARD,
-		RECORD
+		RECORD_FILE,
+		RECORD_AUDIO
 	}
 	private PartTapeDrive tapeDrive;
 	private int counter;
@@ -55,7 +59,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	private TapeRecordThread tapeRecord;
 	private Thread tapeRecordThread;
 
-	public boolean isRecording() {
+	public boolean isRecordingFromFile() {
 		return tapeRecordThread != null && tapeRecordThread.isAlive();
 	}
 	
@@ -69,7 +73,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			return true;
 		}
 
-		if (isRecording() && button == Button.RECORD) {
+		if (isRecordingFromFile() && button == Button.RECORD_FILE) {
 			return true;
 		}
 
@@ -80,6 +84,8 @@ public class GuiTapeDrive extends GuiContainerCharset {
 				return button == Button.PLAY;
 			case REWINDING:
 				return button == Button.REWIND;
+			case RECORDING:
+				return button == Button.RECORD_AUDIO;
 			case STOPPED:
 			default:
 				return false;
@@ -99,7 +105,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	}
 	
 	public void handleButtonPress(Button button) {
-		if (isRecording()) {
+		if (isRecordingFromFile()) {
 			return;
 		}
 
@@ -118,7 +124,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			case STOP:
 				setState(State.STOPPED);
 				break;
-			case RECORD:
+			case RECORD_FILE:
 				if (tapeDrive.inventory.getStackInSlot(0) != null) {
 					setState(State.STOPPED);
 					if (Minecraft.getMinecraft().isFullScreen()) {
@@ -138,6 +144,9 @@ public class GuiTapeDrive extends GuiContainerCharset {
 					}
 				}
 				break;
+			case RECORD_AUDIO:
+				setState(State.RECORDING);
+				break;
 		}
 	}
 
@@ -150,7 +159,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		if (isRecording()) {
+		if (isRecordingFromFile()) {
 			if (keyCode == 1 || keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
 				return;
 			}
@@ -161,7 +170,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 
 	@Override
 	public void mouseClicked(int x, int y, int mb) throws IOException {
-		if (isRecording()) {
+		if (isRecordingFromFile()) {
 			return;
 		}
 
@@ -189,7 +198,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	
 	@Override
 	public void mouseReleased(int x, int y, int which) {
-		if (isRecording()) {
+		if (isRecordingFromFile()) {
 			return;
 		}
 
@@ -218,6 +227,19 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			return label;
 		} else return null;
 	}
+
+	public void drawTexturedModalRectFloatY(int x, int y, int textureX, float textureY, int width, int height) {
+		float f = 0.00390625F;
+		float f1 = 0.00390625F;
+		Tessellator tessellator = Tessellator.getInstance();
+		VertexBuffer vertexbuffer = tessellator.getBuffer();
+		vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+		vertexbuffer.pos((double)(x + 0), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + 0) * f), (double)((float)(textureY + height) * f1)).endVertex();
+		vertexbuffer.pos((double)(x + width), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + width) * f), (double)((float)(textureY + height) * f1)).endVertex();
+		vertexbuffer.pos((double)(x + width), (double)(y + 0), (double)this.zLevel).tex((double)((float)(textureX + width) * f), (double)((float)(textureY + 0) * f1)).endVertex();
+		vertexbuffer.pos((double)(x + 0), (double)(y + 0), (double)this.zLevel).tex((double)((float)(textureX + 0) * f), (double)((float)(textureY + 0) * f1)).endVertex();
+		tessellator.draw();
+	}
 	
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
@@ -228,14 +250,14 @@ public class GuiTapeDrive extends GuiContainerCharset {
 
 		// Draw buttons
 		for(Button button: Button.values()) {
-			int button_ty = 170 + (button.ordinal() * 15);
+			int button_ty = 166 + (button.ordinal() * 15);
 			int button_tx = isButtonPressed(button) ? 20 : 0;
 			int button_x = BUTTON_START_X + (button.ordinal() * 20);
 			this.drawTexturedModalRect(this.xCenter + button_x, this.yCenter + BUTTON_START_Y, button_tx, button_ty, 20, 15);
 		}
 
 		if (ctrResetHover) {
-			this.drawTexturedModalRect(this.xCenter + 122, this.yCenter + 39, 121, 38, 5, 6);
+			this.drawTexturedModalRect(this.xCenter + 121, this.yCenter + 39, 121, 38, 6, 6);
 		}
 
 		// Draw counter
@@ -259,9 +281,9 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		}
 
 		for (int c = 0; c < 3; c++) {
-			int cpy = Math.round(counterPos[c] * 10);
+			float cpy = counterPos[c] * 10;
 			if (cpy < 0) cpy += 100;
-			this.drawTexturedModalRect(this.xCenter + 98 + (c * 7), this.yCenter + 38, 248, cpy, 8, 9);
+			this.drawTexturedModalRectFloatY(this.xCenter + 98 + (c * 7), this.yCenter + 38, 248, cpy, 8, 9);
 		}
 
 		GlStateManager.enableBlend();
@@ -272,7 +294,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		String label = getLabel();
 		int labelColor = 0xFFFFFF;
 
-		if (isRecording()) {
+		if (isRecordingFromFile()) {
 			label = tapeRecord.getStatusBar();
 			labelColor = 0x90E0B0;
 		} else {

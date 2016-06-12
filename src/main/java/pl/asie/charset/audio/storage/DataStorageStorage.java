@@ -34,6 +34,7 @@ public class DataStorageStorage implements Capability.IStorage<IDataStorage> {
 			NBTTagCompound compound = new NBTTagCompound();
 
 			compound.setInteger("size", instance.getSize());
+			compound.setInteger("pos", instance.getPosition());
 			compound.setString("uid", instance.getUniqueId());
 
 			try {
@@ -54,7 +55,7 @@ public class DataStorageStorage implements Capability.IStorage<IDataStorage> {
 		if (nbt instanceof NBTTagCompound) {
 			NBTTagCompound compound = (NBTTagCompound) nbt;
 			if (compound.hasKey("uid")) {
-				instance.initialize(compound.getString("uid"), 0, compound.getInteger("size"));
+				instance.initialize(compound.getString("uid"), compound.getInteger("pos"), compound.getInteger("size"));
 			}
 		}
 	}

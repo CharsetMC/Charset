@@ -20,5 +20,6 @@ public enum State {
 	STOPPED,
 	PLAYING,
 	REWINDING,
-	FORWARDING, State;
+	FORWARDING,
+	RECORDING, State;
 }

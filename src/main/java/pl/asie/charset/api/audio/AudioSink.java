@@ -25,6 +25,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 public abstract class AudioSink {
     public abstract World getWorld();
     public abstract Vec3d getPos();
+    public abstract float getDistance();
+    public abstract float getVolume();
 
     public boolean receive(AudioPacket packet) {
         return packet.add(this);

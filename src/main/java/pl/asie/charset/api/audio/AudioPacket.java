@@ -24,8 +24,27 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AudioPacket implements Cloneable, IAudioModifierContainer {
+public final class AudioPacket {
     protected Set<AudioSink> sinks = new HashSet<AudioSink>();
+    protected AudioData data;
+    protected float volume;
+
+    public AudioPacket(AudioPacket parent) {
+        this(parent.getData(), parent.getVolume());
+    }
+
+    public AudioPacket(AudioData data, float volume) {
+        this.data = data;
+        this.volume = volume;
+    }
+
+    public AudioPacket() {
+
+    }
+
+    public float getVolume() {
+        return volume;
+    }
 
     public boolean add(@Nonnull AudioSink sink) {
         return sinks.add(sink);
@@ -33,6 +52,10 @@ public abstract class AudioPacket implements Cloneable, IAudioModifierContainer 
 
     public boolean addAll(@Nonnull Collection<AudioSink> sinks) {
         return sinks.addAll(sinks);
+    }
+
+    public AudioData getData() {
+        return data;
     }
 
     public Set<AudioSink> getSinks() {
@@ -43,11 +66,10 @@ public abstract class AudioPacket implements Cloneable, IAudioModifierContainer 
         return sinks.size();
     }
 
-    public abstract void beginPropagation();
-    public abstract void finishPropagation();
-
     public void writeData(ByteBuf buffer) {
-        buffer.writeShort(AudioAPI.PACKET_REGISTRY.getId(this.getClass()));
+        buffer.writeFloat(volume);
+        buffer.writeShort(AudioAPI.DATA_REGISTRY.getId(data.getClass()));
+        data.writeData(buffer);
         buffer.writeShort(sinks.size());
         for (AudioSink sink : sinks) {
             sink.writeData(buffer);
@@ -55,21 +77,13 @@ public abstract class AudioPacket implements Cloneable, IAudioModifierContainer 
     }
 
     public void readData(ByteBuf buffer) {
+        volume = buffer.readFloat();
+        data = AudioAPI.DATA_REGISTRY.create(buffer.readUnsignedShort());
+        data.readData(buffer);
         int sinkLen = buffer.readUnsignedShort();
         sinks.clear();
         for (int i = 0; i < sinkLen; i++) {
             sinks.add(AudioSink.create(buffer));
-        }
-    }
-
-    public static AudioPacket create(ByteBuf buffer) {
-        try {
-            AudioPacket packet = AudioAPI.PACKET_REGISTRY.get(buffer.readUnsignedShort()).newInstance();
-            packet.readData(buffer);
-            return packet;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
     }
 }

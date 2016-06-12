@@ -54,6 +54,12 @@ public class DataStorageImpl implements IDataStorage {
 		this.size = size;
 		this.data = new byte[size];
 
+		if (this.position >= size) {
+			this.position = size - 1;
+		} else if (this.position < 0) {
+			this.position = 0;
+		}
+
 		if (!file.exists()) {
 			try {
 				file.createNewFile();
@@ -100,7 +106,6 @@ public class DataStorageImpl implements IDataStorage {
 	public int seek(int dir) {
 		int seek = trySeek(dir);
 		position += seek;
-		dirty = true;
 		return seek;
 	}
 
@@ -110,7 +115,6 @@ public class DataStorageImpl implements IDataStorage {
 		if (simulate) {
 			return (int) data[position] & 0xFF;
 		} else {
-			dirty = true;
 			return (int) data[position++] & 0xFF;
 		}
 	}
@@ -121,7 +125,6 @@ public class DataStorageImpl implements IDataStorage {
 		System.arraycopy(data, position + offset, v, 0, len);
 		if (!simulate) {
 			position += len;
-			dirty = true;
 		}
 
 		return len;
@@ -155,8 +158,7 @@ public class DataStorageImpl implements IDataStorage {
 		GZIPInputStream stream = new GZIPInputStream(fileStream);
 
 		int version = stream.read();
-		if (version >= 1) {
-			// Read position
+		if (version == 1) {
 			int b1 = stream.read() & 0xFF;
 			int b2 = stream.read() & 0xFF;
 			int b3 = stream.read() & 0xFF;
@@ -165,16 +167,14 @@ public class DataStorageImpl implements IDataStorage {
 			if (position < 0 || position >= size) {
 				position = 0;
 			}
-		} else {
-			this.position = 0;
 		}
 
-		int position = 0;
+		int dataPos = 0;
 		try {
-			while (position < this.data.length) {
-				int s = stream.read(this.data, position, this.data.length - position);
+			while (dataPos < this.data.length) {
+				int s = stream.read(this.data, dataPos, this.data.length - dataPos);
 				if (s >= 0) {
-					position += s;
+					dataPos += s;
 				} else {
 					break;
 				}
@@ -193,11 +193,7 @@ public class DataStorageImpl implements IDataStorage {
 			FileOutputStream fileStream = new FileOutputStream(file);
 			GZIPOutputStream stream = new GZIPOutputStream(fileStream);
 
-			stream.write(1);
-			stream.write(this.position & 0xFF);
-			stream.write((this.position >>> 8) & 0xFF);
-			stream.write((this.position >>> 16) & 0xFF);
-			stream.write((this.position >>> 24) & 0xFF);
+			stream.write(2);
 			stream.write(data);
 			stream.finish();
 			stream.flush();
