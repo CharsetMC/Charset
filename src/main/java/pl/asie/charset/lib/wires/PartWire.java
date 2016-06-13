@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.wires.logic;
-
-import java.util.*;
+package pl.asie.charset.lib.wires;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
+import mcmultipart.MCMultiPartMod;
+import mcmultipart.capabilities.ISlottedCapabilityProvider;
 import mcmultipart.client.multipart.AdvancedParticleManager;
-import mcmultipart.multipart.*;
+import mcmultipart.client.multipart.ICustomHighlightPart;
+import mcmultipart.multipart.IMultipart;
+import mcmultipart.multipart.IMultipartContainer;
+import mcmultipart.multipart.INormallyOccludingPart;
+import mcmultipart.multipart.ISlottedPart;
+import mcmultipart.multipart.Multipart;
+import mcmultipart.multipart.MultipartHelper;
+import mcmultipart.multipart.MultipartRegistry;
+import mcmultipart.multipart.OcclusionHelper;
+import mcmultipart.multipart.PartSlot;
+import mcmultipart.raytrace.PartMOP;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
@@ -33,64 +42,78 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import mcmultipart.MCMultiPartMod;
-import mcmultipart.capabilities.ISlottedCapabilityProvider;
-import mcmultipart.client.multipart.ICustomHighlightPart;
-import mcmultipart.raytrace.PartMOP;
-import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.api.wires.WireType;
-import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.lib.utils.RotationUtils;
-import pl.asie.charset.pipes.PartPipe;
-import pl.asie.charset.wires.ModCharsetWires;
-import pl.asie.charset.wires.ProxyClient;
-import pl.asie.charset.wires.WireKind;
-import pl.asie.charset.wires.WireUtils;
 
-public abstract class PartWireBase extends Multipart implements
-		IRedstonePart.ISlottedRedstonePart, IRenderComparable<PartWireBase>, ICustomHighlightPart,
-		INormallyOccludingPart, ITickable, ISlottedCapabilityProvider, IWire {
-	public static final GenericExtendedProperty<PartWireBase> PROPERTY = new GenericExtendedProperty<PartWireBase>("part", PartWireBase.class);
-	protected static final boolean DEBUG = false;
-	private static final Map<WireKind, AxisAlignedBB[]> BOXES = new HashMap<WireKind, AxisAlignedBB[]>();
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
-	static boolean PROPAGATING = false;
+public abstract class PartWire extends Multipart implements
+		IRenderComparable<PartWire>, ICustomHighlightPart, ISlottedPart,
+		INormallyOccludingPart, ITickable, ISlottedCapabilityProvider {
+	public static final GenericExtendedProperty<PartWire> PROPERTY = new GenericExtendedProperty<PartWire>("part", PartWire.class);
+	private static final Map<WireFactory, AxisAlignedBB[]> BOXES = new HashMap<WireFactory, AxisAlignedBB[]>();
 
-	public WireKind type;
 	public WireFace location;
 	protected byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
-	private boolean suPropagation, suRender, suConnection;
+	private boolean suLogic, suRender, suConnection;
 	private int suNeighbor;
+	private WireFactory type;
 
-	private final EnumSet<EnumFacing> propagationDirs = EnumSet.noneOf(EnumFacing.class);
-
-	public PartWireBase() {
+	public PartWire() {
 		scheduleConnectionUpdate();
 	}
 
-	public abstract void propagate(int color);
+	public PartWire(WireFactory factory) {
+		this();
+		setFactory(factory);
+	}
 
-	public abstract int getSignalLevel();
+	@Override
+	public ResourceLocation getType() {
+		return getFactory().getRegistryName();
+	}
 
-	public abstract int getRedstoneLevel();
+	protected WireFactory getFactory() {
+		return type;
+	}
+
+	public void setFactory(WireFactory factory) {
+		this.type = factory;
+	}
+
+	public boolean calculateConnectionWire(PartWire wire) {
+		return wire.getFactory() == getFactory();
+	}
+
+	public boolean calculateConnectionNonWire(BlockPos pos, EnumFacing direction) {
+		return false;
+	}
+
+	public String getDisplayName() {
+		return "wire.null";
+	}
 
 	@Override
 	public float getHardness(PartMOP hit) {
@@ -99,12 +122,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public ResourceLocation getModelPath() {
-		return getType();
-	}
-
-	@Override
-	public ResourceLocation getType() {
-		return new ResourceLocation("charsetwires:wire");
+		return new ResourceLocation("charsetlib:wire");
 	}
 
 	@Override
@@ -131,20 +149,13 @@ public abstract class PartWireBase extends Multipart implements
 	@Override
 	public void onPartChanged(IMultipart part) {
 		scheduleConnectionUpdate();
-		schedulePropagationUpdate();
+		scheduleLogicUpdate();
 	}
 
 	@Override
 	public void onNeighborBlockChange(Block block) {
-		if (location != WireFace.CENTER) {
-			if (!WireUtils.canPlaceWire(getWorld(), getPos().offset(location.facing), location.facing.getOpposite())) {
-				harvest(null, null);
-				return;
-			}
-		}
-
 		scheduleConnectionUpdate();
-		schedulePropagationUpdate();
+		scheduleLogicUpdate();
 	}
 
 	@Override
@@ -162,8 +173,8 @@ public abstract class PartWireBase extends Multipart implements
 		return EnumSet.of(WireUtils.getSlotForFace(location));
 	}
 
-	private ItemStack getItemStack() {
-		return new ItemStack(ModCharsetWires.wire, 1, type.ordinal() << 1 | (location == WireFace.CENTER ? 1 : 0));
+	protected ItemStack getItemStack() {
+		return new ItemStack(WireManager.ITEM, 1, WireManager.REGISTRY.getId(getFactory()) << 1 | (location == WireFace.CENTER ? 1 : 0));
 	}
 
 	@Override
@@ -178,7 +189,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public void writeUpdatePacket(PacketBuffer buf) {
-		buf.writeByte(type.ordinal());
+		buf.writeByte(WireManager.REGISTRY.getId(getFactory()));
 		buf.writeByte(location.ordinal());
 		buf.writeByte(internalConnections);
 		buf.writeByte(externalConnections);
@@ -188,6 +199,8 @@ public abstract class PartWireBase extends Multipart implements
 	}
 
 	public void handlePacket(ByteBuf buf) {
+		location = WireFace.VALUES[buf.readByte()];
+
 		int oldIC = internalConnections;
 		int oldEC = externalConnections;
 		int oldCC = cornerConnections;
@@ -203,8 +216,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public final void readUpdatePacket(PacketBuffer buf) {
-		type = WireKind.VALUES[buf.readByte()];
-		location = WireFace.VALUES[buf.readByte()];
+		setFactory(WireManager.REGISTRY.getObjectById(buf.readByte()));
 
 		if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
 			final ByteBuf buf2 = Unpooled.copiedBuffer(buf);
@@ -222,7 +234,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		type = WireKind.VALUES[nbt.getByte("t")];
+		setFactory(WireManager.REGISTRY.getObjectById(nbt.getByte("f")));
 		location = WireFace.VALUES[nbt.getByte("l")];
 		internalConnections = nbt.getByte("iC");
 		externalConnections = nbt.getByte("eC");
@@ -233,7 +245,7 @@ public abstract class PartWireBase extends Multipart implements
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		nbt.setByte("t", (byte) type.ordinal());
+		nbt.setByte("f", (byte) WireManager.REGISTRY.getId(getFactory()));
 		nbt.setByte("l", (byte) location.ordinal());
 		nbt.setByte("iC", internalConnections);
 		nbt.setByte("eC", externalConnections);
@@ -248,12 +260,12 @@ public abstract class PartWireBase extends Multipart implements
 	@Override
 	public void onAdded() {
 		scheduleConnectionUpdate();
-		schedulePropagationUpdate();
+		scheduleLogicUpdate();
 	}
 
 	@Override
 	public void onRemoved() {
-		pokeExtendedNeighbors();
+		neighborUpdate(0);
 	}
 
 	private AxisAlignedBB[] getBoxes() {
@@ -261,9 +273,9 @@ public abstract class PartWireBase extends Multipart implements
 
 		if (boxes == null) {
 			boxes = new AxisAlignedBB[43 + 24];
-			float xMin = 0.5f - WireUtils.getWireHitboxWidth(this) / 2;
-			float xMax = 0.5f + WireUtils.getWireHitboxWidth(this) / 2;
-			float y = WireUtils.getWireHitboxHeight(this);
+			float xMin = 0.5f - type.getWidth() / 2;
+			float xMax = 0.5f + type.getWidth() / 2;
+			float y = type.getHeight();
 
 			for (int j = 0; j < 6; j++) {
 				EnumFacing f = EnumFacing.getFront(j);
@@ -348,6 +360,8 @@ public abstract class PartWireBase extends Multipart implements
 		}
 	}
 
+	protected abstract void logicUpdate();
+
 	@Override
 	public void addCollisionBoxes(AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
 		AxisAlignedBB bb = getBox(0);
@@ -375,10 +389,10 @@ public abstract class PartWireBase extends Multipart implements
 		return layer == BlockRenderLayer.CUTOUT;
 	}
 
-	private void pokeExtendedNeighbors() {
+	protected void neighborUpdate(int sides) {
 		if (getContainer() != null) {
 			for (IMultipart multipart : getContainer().getParts()) {
-				if (multipart instanceof PartWireBase) {
+				if (multipart instanceof PartWire) {
 					multipart.onNeighborBlockChange(MCMultiPartMod.multipart);
 				}
 			}
@@ -414,22 +428,18 @@ public abstract class PartWireBase extends Multipart implements
 		if (suNeighbor != 0) {
 			int it = suNeighbor;
 			suNeighbor = 0;
-			propagateExternalTiles(it);
-			pokeExtendedNeighbors();
+			neighborUpdate(it);
 		}
 
-		if (suPropagation) {
-			suPropagation = false;
-			if (!world.isRemote) {
-				onSignalChanged(-1);
-			}
+		if (suLogic) {
+			suLogic = false;
+			logicUpdate();
 		}
 
 		if (suNeighbor != 0) {
 			int it = suNeighbor;
 			suNeighbor = 0;
-			propagateExternalTiles(it);
-			pokeExtendedNeighbors();
+			neighborUpdate(it);
 		}
 
 		if (suRender) {
@@ -482,7 +492,7 @@ public abstract class PartWireBase extends Multipart implements
 		EnumFacing[] connFaces = WireUtils.getConnectionsForRender(location);
 		List<IMultipart> parts = new ArrayList<IMultipart>();
 		for (IMultipart p : getContainer().getParts()) {
-			if (p != this && p instanceof INormallyOccludingPart && !(p instanceof PartWireBase)) {
+			if (p != this && p instanceof INormallyOccludingPart && !(p instanceof PartWire)) {
 				parts.add(p);
 			}
 		}
@@ -555,28 +565,8 @@ public abstract class PartWireBase extends Multipart implements
 
 		if (oldConnectionCache != newConnectionCache) {
 			scheduleNeighborUpdate((oldConnectionCache ^ newConnectionCache) >> 6);
-			schedulePropagationUpdate();
+			scheduleLogicUpdate();
 			scheduleRenderUpdate();
-		}
-	}
-
-	protected void propagateExternalTiles(int i) {
-		for (int j = 0; j < 6; j++) {
-			if ((i & (1 << j)) != 0) {
-				EnumFacing facing = EnumFacing.getFront(j);
-				TileEntity tile = getWorld().getTileEntity(getPos().offset(facing));
-				if (tile != null) {
-					if (type.type() == WireType.BUNDLED) {
-						if (tile.hasCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite())) {
-							tile.getCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite()).onBundledInputChange();
-						}
-					} else {
-						if (tile.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite())) {
-							tile.getCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()).onRedstoneInputChange();
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -588,56 +578,12 @@ public abstract class PartWireBase extends Multipart implements
 		scheduleNeighborUpdate(0);
 	}
 
-	protected void schedulePropagationUpdate() {
-		suPropagation = true;
+	protected void scheduleLogicUpdate() {
+		suLogic = true;
 	}
 
 	protected void scheduleConnectionUpdate() {
 		suConnection = true;
-	}
-
-	protected abstract void onSignalChanged(int color);
-
-	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction, int color) {
-		PartWireBase wire = WireUtils.getWire(MultipartHelper.getPartContainer(getWorld(), getPos().offset(side).offset(direction)), WireFace.get(direction.getOpposite()));
-		if (wire != null) {
-			wire.onSignalChanged(color);
-		}
-	}
-
-	protected void propagateNotify(EnumFacing facing, int color) {
-		PartWireBase wire = WireUtils.getWire(MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing)), location);
-		if (wire != null) {
-			wire.onSignalChanged(color);
-		} else {
-			propagationDirs.add(facing);
-		}
-	}
-
-	protected void finishPropagation() {
-		for (EnumFacing facing : propagationDirs) {
-			TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
-			boolean found = false;
-			if (nt != null) {
-				if (type.type() == WireType.BUNDLED) {
-					if (nt.hasCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite())) {
-						nt.getCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite()).onBundledInputChange();
-						found = true;
-					}
-				} else {
-					if (nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite())) {
-						nt.getCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()).onRedstoneInputChange();
-						found = true;
-					}
-				}
-			}
-
-			if (type.type() != WireType.BUNDLED && !found) {
-				getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
-			}
-		}
-
-		propagationDirs.clear();
 	}
 
 	public boolean connectsInternal(WireFace side) {
@@ -665,60 +611,11 @@ public abstract class PartWireBase extends Multipart implements
 		return -1;
 	}
 
-	public int getBundledSignalLevel(int i) {
-		return 0;
-	}
-
-	@Override
-	public boolean canConnectRedstone(EnumFacing facing) {
-		return WireUtils.WIRES_CONNECT && type.type() != WireType.BUNDLED && connectsExternal(facing);
-	}
-
-	@Override
-	public int getWeakSignal(EnumFacing facing) {
-		if (!PROPAGATING && connectsWeak(facing)) {
-			return getRedstoneLevel();
-		} else {
-			return 0;
-		}
-	}
-
-	public boolean connectsWeak(EnumFacing facing) {
-		if (type.type() == WireType.BUNDLED) {
-			return false;
-		}
-
-		// Block any signals if there's a wire on the target face
-		if (location.facing == facing) {
-			return true;
-		} else {
-			if (connects(facing) || type.type() == WireType.NORMAL) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean drawHighlight(PartMOP partMOP, EntityPlayer player, float v) {
-		ModCharsetWires.proxy.drawWireHighlight(this);
+		ModCharsetLib.proxy.drawWireHighlight(this);
 		return true;
-	}
-
-	@Override
-	public WireType getWireType() {
-		return type.type();
-	}
-
-	@Override
-	public int getStrongSignal(EnumFacing facing) {
-		if (type.type() == WireType.NORMAL && location.facing == facing) {
-			return getRedstoneLevel();
-		} else {
-			return 0;
-		}
 	}
 
 	public void setConnectionsForItemRender() {
@@ -728,17 +625,16 @@ public abstract class PartWireBase extends Multipart implements
 	}
 
 	@Override
-	public boolean renderEquals(PartWireBase other) {
+	public boolean renderEquals(PartWire other) {
 		return other.type == type
 				&& other.location == location
 				&& other.internalConnections == internalConnections
 				&& other.externalConnections == externalConnections
-				&& other.cornerConnections == cornerConnections
-				&& (getWireType() == WireType.INSULATED || other.getRedstoneLevel() == getRedstoneLevel());
+				&& other.cornerConnections == cornerConnections;
 	}
 
 	@Override
 	public int renderHashCode() {
-		return Objects.hash(type, location, internalConnections, externalConnections, cornerConnections, getWireType() == WireType.INSULATED ? 0 : getRedstoneLevel());
+		return Objects.hash(type, location, internalConnections, externalConnections, cornerConnections);
 	}
 }

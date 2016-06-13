@@ -41,7 +41,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.recipe.IDyeableItem;
+import pl.asie.charset.lib.items.IDyeableItem;
 
 public class ItemTape extends Item implements IDyeableItem {
 	public static final Map<String, Material> materialByName = new HashMap<String, Material>();

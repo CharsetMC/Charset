@@ -34,7 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
-import pl.asie.charset.lib.recipe.IDyeableItem;
+import pl.asie.charset.lib.items.IDyeableItem;
 
 public class ItemBackpack extends ItemBlock implements IDyeableItem {
 	public class InventoryOwnerBackpack implements IInventoryOwner {

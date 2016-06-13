@@ -46,8 +46,12 @@ import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.handlers.PlayerDeathHandler;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
+import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.wires.ItemWire;
+import pl.asie.charset.lib.wires.WireFactory;
+import pl.asie.charset.lib.wires.WireManager;
 
 @Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart")
 public class ModCharsetLib {
@@ -105,12 +109,18 @@ public class ModCharsetLib {
 		charsetIconItem = new IconCharset();
 		GameRegistry.register(charsetIconItem.setRegistryName("icon"));
 
+		WireManager.ITEM = new ItemWire();
+		GameRegistry.register(WireManager.ITEM.setRegistryName("wire"));
+
+		for (int i = 0; i < 512; i++) { // TODO
+			ModCharsetLib.proxy.registerItemModel(WireManager.ITEM, i, "charsetlib:wire");
+		}
+
 		proxy.registerItemModel(charsetIconItem, 0, "charsetlib:icon");
 
 		Capabilities.init();
 		NotifyImplementation.init();
 	}
-
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		proxy.init();
@@ -125,6 +135,7 @@ public class ModCharsetLib {
 
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
 
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
 		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class);

@@ -22,11 +22,19 @@ import net.minecraft.network.PacketBuffer;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IPartFactory;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.wires.WireKind;
 
 public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
-	public static PartWireBase createPart(int type) {
-		PartWireBase part = null;
+	@Override
+	public IMultipart createPart(ResourceLocation type, PacketBuffer buf) {
+		return null;
+	}
+
+	@Override
+	public IMultipart createPart(ResourceLocation type, NBTTagCompound tag) {
+		return null;
+	}
+	/* public static PartWireSignalBase createPart(int type) {
+		PartWireSignalBase part = null;
 		WireKind kind = WireKind.VALUES[type];
 
 		switch (kind.type()) {
@@ -52,15 +60,15 @@ public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
 	public IMultipart createPart(ResourceLocation id, PacketBuffer buf) {
 		int type = buf.readByte();
 		buf.readerIndex(buf.readerIndex() - 1);
-		PartWireBase part = createPart(type);
+		PartWireSignalBase part = createPart(type);
 		part.readUpdatePacket(buf);
 		return part;
 	}
 
 	@Override
 	public IMultipart createPart(ResourceLocation id, NBTTagCompound nbt) {
-		PartWireBase part = createPart(nbt.getByte("t"));
+		PartWireSignalBase part = createPart(nbt.getByte("t"));
 		part.readFromNBT(nbt);
 		return part;
-	}
+	} */
 }

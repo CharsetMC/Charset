@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
@@ -56,6 +57,7 @@ public class SpritesheetFactory {
             if (sheet == null) {
                 sheet = RenderUtils.getBufferedImage(location);
                 if (sheet == null) {
+                    ModCharsetLib.logger.warn("Could not find texture sheet " + location + "!");
                     return false;
                 }
             }
@@ -93,8 +95,11 @@ public class SpritesheetFactory {
         TextureAtlasSprite[] sprites = new TextureAtlasSprite[width * height];
         for (int i = 0; i < sprites.length; i++) {
             String s = String.format(location.toString() + "#%d", i);
-            sprites[i] = new SliceSprite(new ResourceLocation(s), location, i, width, height);
-            map.setTextureEntry(s, sprites[i]);
+            sprites[i] = map.getTextureExtry(s);
+            if (sprites[i] == null) {
+                sprites[i] = new SliceSprite(new ResourceLocation(s), location, i, width, height);
+                map.setTextureEntry(s, sprites[i]);
+            }
         }
         return sprites;
     }

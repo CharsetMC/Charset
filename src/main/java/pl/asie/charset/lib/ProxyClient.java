@@ -19,8 +19,10 @@ package pl.asie.charset.lib;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
@@ -32,13 +34,50 @@ import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.ModelFactory;
+import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.lib.wires.PartWire;
+import pl.asie.charset.lib.wires.RendererWire;
+import pl.asie.charset.lib.wires.WireFactory;
+import pl.asie.charset.lib.wires.WireManager;
+import pl.asie.charset.lib.wires.WireUtils;
 
 public class ProxyClient extends ProxyCommon {
+	public static final RendererWire rendererWire = new RendererWire();
+
+	@Override
+	public void drawWireHighlight(PartWire wire) {
+		int lineMaskCenter = 0xFFF;
+		EnumFacing[] faces = WireUtils.getConnectionsForRender(wire.location);
+		for (int i = 0; i < faces.length; i++) {
+			EnumFacing face = faces[i];
+			if (wire.connectsAny(face)) {
+				int lineMask = 0xfff;
+				lineMask &= ~RenderUtils.getLineMask(face.getOpposite());
+				RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(i + 1), lineMask);
+				lineMaskCenter &= ~RenderUtils.getLineMask(face);
+			}
+		}
+		if (lineMaskCenter != 0) {
+			RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(0), lineMaskCenter);
+		}
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onPostBake(ModelBakeEvent event) {
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "multipart"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "inventory"), rendererWire);
+	}
+
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		ModelFactory.clearCaches();
 		ColorLookupHandler.INSTANCE.clear();
+
+		for (WireFactory factory : WireManager.REGISTRY.getValues()) {
+			rendererWire.registerSheet(event.getMap(), factory);
+		}
 	}
 
 	@Override

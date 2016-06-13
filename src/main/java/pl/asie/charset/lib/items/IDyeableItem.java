@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.recipe;
+package pl.asie.charset.lib.items;
 
 import net.minecraft.item.ItemStack;
 

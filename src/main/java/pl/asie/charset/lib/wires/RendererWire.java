@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.wires.render;
+package pl.asie.charset.lib.wires;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -29,20 +29,16 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.render.SimpleBakedModel;
 import pl.asie.charset.lib.render.SpritesheetFactory;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.wires.ItemWire;
-import pl.asie.charset.wires.WireUtils;
-import pl.asie.charset.wires.logic.PartWireBase;
-import pl.asie.charset.wires.logic.PartWireProvider;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class RendererWire extends ModelFactory<PartWireBase> {
+public class RendererWire extends ModelFactory<PartWire> {
     private static class WireSheet {
         TextureAtlasSprite[] top;
         TextureAtlasSprite side, edge, particle;
@@ -58,15 +54,16 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             ModelRotation.X270_Y90
     };
 
-    private final TIntObjectMap<PartWireBase> stackMap = new TIntObjectHashMap<>();
-    private final EnumMap<WireType, WireSheet> sheetMap = new EnumMap<>(WireType.class);
+    private final TIntObjectMap<PartWire> stackMap = new TIntObjectHashMap<>();
+    private final Map<WireFactory, WireSheet> sheetMap = new HashMap<>();
 
     public RendererWire() {
-        super(PartWireBase.PROPERTY, new ResourceLocation("charsetwires:blocks/normal_cross"));
+        super(PartWire.PROPERTY, new ResourceLocation("charsetwires:blocks/wire_normal_particle"));
         addDefaultBlockTransforms();
     }
 
-    public void registerSheet(TextureMap map, WireType type, ResourceLocation location) {
+    public void registerSheet(TextureMap map, WireFactory type) {
+        ResourceLocation location = type.getTexturePrefix();
         String domain = location.getResourceDomain();
         String path = location.getResourcePath();
         WireSheet sheet = new WireSheet();
@@ -76,23 +73,23 @@ public class RendererWire extends ModelFactory<PartWireBase> {
         sheet.edge = map.registerSprite(new ResourceLocation(domain, path + "_edge"));
         sheet.side = map.registerSprite(new ResourceLocation(domain, path + "_side"));
 
-        sheet.width = WireUtils.width(type);
-        sheet.height = WireUtils.height(type);
+        sheet.width = (int) (type.getWidth() * 16);
+        sheet.height = (int) (type.getHeight() * 16);
 
         sheetMap.put(type, sheet);
     }
 
-    private boolean wc(PartWireBase wire, EnumFacing facing) {
+    private boolean wc(PartWire wire, EnumFacing facing) {
         return wire.connects(facing);
     }
 
-    private boolean isCenterEdge(PartWireBase wire, WireFace side) {
+    private boolean isCenterEdge(PartWire wire, WireFace side) {
         // TODO
         //return wire.getWireType(side) != wire.getWireType(WireFace.CENTER);
         return false;
     }
 
-    private float getCL(PartWireBase wire, WireFace side) {
+    private float getCL(PartWire wire, WireFace side) {
         // TODO
         //float h = wire != null && wire.hasWire(side) ? wire.getWireKind(side).height() : 0;
         float h = 0;
@@ -101,14 +98,14 @@ public class RendererWire extends ModelFactory<PartWireBase> {
             h = 0;
         }
 
-        if (!wc(wire, side.facing)) {
-            h = 8.0f - (wire.type.width() / 2);
+        if (!wc(wire, side.facing) && wire.getFactory() != null) {
+            h = 8.0f - (sheetMap.get(wire.getFactory()).width / 2); // TODO: Replace with WireFactory call?
         }
 
         return side.facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;
     }
 
-    public void addWireFreestanding(PartWireBase wire, WireSheet sheet, int renderColor, List<BakedQuad> quads) {
+    public void addWireFreestanding(PartWire wire, WireSheet sheet, int renderColor, List<BakedQuad> quads) {
         float min = 8.0f - (sheet.width / 2);
         float max = 8.0f + (sheet.width / 2);
         Vector3f minX = new Vector3f(min, getCL(wire, WireFace.DOWN), getCL(wire, WireFace.NORTH));
@@ -177,7 +174,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
         }
     }
 
-    public void addCorner(PartWireBase wire, WireSheet sheet, EnumFacing dir, int renderColor, List<BakedQuad> quads) {
+    public void addCorner(PartWire wire, WireSheet sheet, EnumFacing dir, int renderColor, List<BakedQuad> quads) {
         int width = sheet.width;
         int height = sheet.height;
 
@@ -329,7 +326,7 @@ public class RendererWire extends ModelFactory<PartWireBase> {
         }
     }
 
-    public void addWire(PartWireBase wire, WireSheet sheet, List<BakedQuad> quads) {
+    public void addWire(PartWire wire, WireSheet sheet, List<BakedQuad> quads) {
         WireFace side = wire.location;
         int renderColorWire = wire.getRenderColor();
         int renderColor = renderColorWire == -1 ? renderColorWire :
@@ -506,27 +503,24 @@ public class RendererWire extends ModelFactory<PartWireBase> {
     }
 
     @Override
-    public IBakedModel bake(PartWireBase wire, boolean isItem, BlockRenderLayer layer) {
-        WireSheet sheet = sheetMap.get(wire.getWireType());
-        if (sheet == null) {
-            return null;
-        }
-
+    public IBakedModel bake(PartWire wire, boolean isItem, BlockRenderLayer layer) {
+        WireSheet sheet = sheetMap.get(wire.getFactory());
         SimpleBakedModel model = new SimpleBakedModel(this);
-        model.setParticle(sheet.particle);
-        addWire(wire, sheet, model.getQuads(null, null, 0));
+        if (sheet != null) {
+            model.setParticle(sheet.particle);
+            addWire(wire, sheet, model.getQuads(null, null, 0));
+        }
 
         return model;
     }
 
     @Override
-    public PartWireBase fromItemStack(ItemStack stack) {
+    public PartWire fromItemStack(ItemStack stack) {
         int md = stack.getItemDamage();
         if (stackMap.containsKey(md)) {
             return stackMap.get(md);
         } else {
-            PartWireBase wire = PartWireProvider.createPart(md >> 1);
-            wire.location = ItemWire.isFreestanding(stack) ? WireFace.CENTER : WireFace.DOWN;
+            PartWire wire = WireManager.ITEM.fromStack(stack, EnumFacing.DOWN);
             wire.setConnectionsForItemRender();
 
             stackMap.put(md, wire);

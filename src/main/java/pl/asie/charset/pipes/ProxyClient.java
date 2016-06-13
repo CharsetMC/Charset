@@ -18,7 +18,6 @@ package pl.asie.charset.pipes;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -28,7 +27,6 @@ import mcmultipart.client.multipart.MultipartRegistryClient;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.render.ModelPipeLike;
 import pl.asie.charset.lib.render.SpritesheetFactory;
 import pl.asie.charset.lib.utils.RenderUtils;

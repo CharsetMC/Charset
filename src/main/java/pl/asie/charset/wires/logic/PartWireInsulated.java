@@ -24,13 +24,13 @@ import pl.asie.charset.wires.WireUtils;
 public class PartWireInsulated extends PartWireNormal implements IWireInsulated {
 	@Override
 	protected int getRedstoneLevel(IMultipartContainer container, WireFace location) {
-		return WireUtils.getInsulatedWireLevel(container, location, type.color());
+		return WireUtils.getInsulatedWireLevel(container, location, getColor());
 	}
 
 	@Override
 	protected void onSignalChanged(int color) {
 		if (getWorld() != null && !getWorld().isRemote) {
-			if (color == type.color() || color == -1) {
+			if (color == getColor() || color == -1) {
 				propagate(color);
 			}
 		}
@@ -38,6 +38,6 @@ public class PartWireInsulated extends PartWireNormal implements IWireInsulated 
 
 	@Override
 	public int getWireColor() {
-		return type.color();
+		return getColor();
 	}
 }

@@ -43,17 +43,16 @@ import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.Capabilities;
-import pl.asie.charset.wires.WireKind;
 import pl.asie.charset.wires.WireUtils;
 
-public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IRedstoneReceiver {
+public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitter, IRedstoneReceiver {
 	private int signalLevel;
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getRenderColor() {
-		if (type.type() == WireType.INSULATED) {
-			return EnumDyeColor.byMetadata(type.color()).getMapColor().colorValue;
+		if (getWireType() == WireType.INSULATED) {
+			return EnumDyeColor.byMetadata(getColor()).getMapColor().colorValue;
 		} else {
 			int signalValue = signalLevel >> 8;
 			int v = (signalValue > 0 ? 0x96 : 0x78) + (signalValue * 7);
@@ -64,7 +63,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 	@Override
 	public void handlePacket(ByteBuf data) {
 		super.handlePacket(data);
-		if (type == WireKind.NORMAL) {
+		if (getWireType() == WireType.NORMAL) {
 			byte d = data.readByte();
 			signalLevel = d << 8;
 			markRenderUpdate();
@@ -74,7 +73,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 	@Override
 	public void writeUpdatePacket(PacketBuffer data) {
 		super.writeUpdatePacket(data);
-		if (type == WireKind.NORMAL) {
+		if (getWireType() == WireType.NORMAL) {
 			data.writeByte(signalLevel >> 8);
 		}
 	}
@@ -118,9 +117,9 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 		boolean[] isWire = new boolean[7];
 		boolean hasRedstoneWire = false;
 
-		PartWireBase.PROPAGATING = true;
+		PartWireSignalBase.PROPAGATING = true;
 
-		if (type == WireKind.NORMAL) {
+		if (getWireType() == WireType.NORMAL) {
 			if (location != WireFace.CENTER) {
 				EnumFacing facing = location.facing;
 
@@ -147,7 +146,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			int facidx = facing.ordinal();
 
-			if (facing == location.facing && type == WireKind.NORMAL) {
+			if (facing == location.facing && getWireType() == WireType.NORMAL) {
 				BlockPos pos = getPos().offset(facing);
 				int i = 0;
 
@@ -207,7 +206,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 			}
 		}
 
-		PartWireBase.PROPAGATING = false;
+		PartWireSignalBase.PROPAGATING = false;
 
 		int maxSignalNonWire = 0;
 
@@ -246,7 +245,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (connectsInternal(nLoc)) {
 					if (neighborLevel[nLoc.ordinal()] > 0) {
-						WireUtils.getWire(getContainer(), nLoc).onSignalChanged(type.color());
+						WireUtils.getWire(getContainer(), nLoc).onSignalChanged(getColor());
 					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
@@ -254,13 +253,13 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 					if (connectsExternal(facing)) {
 						IMultipartContainer container = MultipartHelper.getPartContainer(getWorld(), getPos().offset(facing));
 						if (container == null || WireUtils.getWire(container, location) == null || neighborLevel[facing.ordinal()] > 0) {
-							propagateNotify(facing, type.color());
+							propagateNotify(facing, getColor());
 						}
 					} else if (connectsCorner(facing)) {
 						if (neighborLevel[nLoc.ordinal()] > 0) {
-							propagateNotifyCorner(location.facing, facing, type.color());
+							propagateNotifyCorner(location.facing, facing, getColor());
 						}
-					} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing) {
+					} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != location.facing) {
 						TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
 						if (!(nt instanceof IRedstoneReceiver)) {
 							getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
@@ -272,15 +271,15 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (neighborLevel[nLoc.ordinal()] < signalLevel - 1 || neighborLevel[nLoc.ordinal()] > (signalLevel + 1)) {
 					if (connectsInternal(nLoc)) {
-						WireUtils.getWire(getContainer(), nLoc).onSignalChanged(type.color());
+						WireUtils.getWire(getContainer(), nLoc).onSignalChanged(getColor());
 					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing;
 
 						if (connectsExternal(facing)) {
-							propagateNotify(facing, type.color());
+							propagateNotify(facing, getColor());
 						} else if (connectsCorner(facing)) {
-							propagateNotifyCorner(location.facing, facing, type.color());
-						} else if (type == WireKind.NORMAL && facing.getOpposite() != location.facing) {
+							propagateNotifyCorner(location.facing, facing, getColor());
+						} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != location.facing) {
 							TileEntity nt = getWorld().getTileEntity(getPos().offset(facing));
 							if (!(nt instanceof IRedstoneReceiver)) {
 								getWorld().notifyBlockOfStateChange(getPos().offset(facing), MCMultiPartMod.multipart);
@@ -291,7 +290,7 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 			}
 		}
 
-		if (type == WireKind.NORMAL) {
+		if (getWireType() == WireType.NORMAL) {
 			if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
 				scheduleRenderUpdate();
 
@@ -362,6 +361,6 @@ public class PartWireNormal extends PartWireBase implements IRedstoneEmitter, IR
 
 	@Override
 	public void onRedstoneInputChange() {
-		schedulePropagationUpdate();
+		scheduleLogicUpdate();
 	}
 }
