@@ -56,6 +56,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.ProxyClient;
 import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.lib.utils.RotationUtils;
@@ -128,8 +129,7 @@ public abstract class PartWire extends Multipart implements
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean addDestroyEffects(AdvancedParticleManager AdvancedParticleManager) {
-		// TODO
-		//AdvancedParticleManager.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.handlePartState(getExtendedState(MultipartRegistry.getDefaultState(this).getBaseState())).getParticleTexture());
+		// AdvancedParticleManager.addBlockDestroyEffects(getPos(), ProxyClient.rendererWire.getSheet(getFactory()).particle);
 		return true;
 	}
 

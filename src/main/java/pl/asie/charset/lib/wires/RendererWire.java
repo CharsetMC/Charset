@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RendererWire extends ModelFactory<PartWire> {
-    private static class WireSheet {
+    public static class WireSheet {
         TextureAtlasSprite[] top;
         TextureAtlasSprite side, edge, particle;
         int width, height;
@@ -60,6 +60,10 @@ public class RendererWire extends ModelFactory<PartWire> {
     public RendererWire() {
         super(PartWire.PROPERTY, new ResourceLocation("charsetwires:blocks/wire_normal_particle"));
         addDefaultBlockTransforms();
+    }
+
+    public WireSheet getSheet(WireFactory type) {
+        return sheetMap.get(type);
     }
 
     public void registerSheet(TextureMap map, WireFactory type) {

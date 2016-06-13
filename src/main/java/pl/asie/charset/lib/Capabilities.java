@@ -24,6 +24,7 @@ import mcmultipart.capabilities.CapabilityWrapperRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import pl.asie.charset.api.audio.AudioSink;
+import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
@@ -34,8 +35,8 @@ import pl.asie.charset.lib.capability.*;
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)
 	public static Capability<IAudioSource> AUDIO_SOURCE;
-	@CapabilityInject(AudioSink.class)
-	public static Capability<AudioSink> AUDIO_SINK;
+	@CapabilityInject(IAudioReceiver.class)
+	public static Capability<IAudioReceiver> AUDIO_RECEIVER;
 
 	@CapabilityInject(IBundledEmitter.class)
 	public static Capability<IBundledEmitter> BUNDLED_EMITTER;
@@ -48,7 +49,7 @@ public class Capabilities {
 
 	public static void init() {
 		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource.class);
-		CapabilityManager.INSTANCE.register(AudioSink.class, new NullCapabilityStorage<AudioSink>(), DefaultAudioSink.class);
+		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<IAudioReceiver>(), DefaultAudioReceiver.class);
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter.class);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter.class);

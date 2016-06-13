@@ -14,33 +14,9 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.capability;
+package pl.asie.charset.api.audio;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import pl.asie.charset.api.audio.AudioPacket;
-import pl.asie.charset.api.audio.AudioSink;
-
-// TODO: Make this work?
-public class DefaultAudioSink extends AudioSink {
-    @Override
-    public World getWorld() {
-        return null;
-    }
-
-    @Override
-    public Vec3d getPos() {
-        return null;
-    }
-
-    @Override
-    public float getDistance() {
-        return 0;
-    }
-
-    @Override
-    public float getVolume() {
-        return 0;
-    }
+public interface IAudioReceiver {
+    boolean receive(AudioPacket packet);
 }
+

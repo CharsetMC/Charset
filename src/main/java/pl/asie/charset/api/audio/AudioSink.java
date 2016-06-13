@@ -22,12 +22,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public abstract class AudioSink {
+public abstract class AudioSink implements IAudioReceiver {
     public abstract World getWorld();
     public abstract Vec3d getPos();
     public abstract float getDistance();
     public abstract float getVolume();
 
+    @Override
     public boolean receive(AudioPacket packet) {
         return packet.add(this);
     }

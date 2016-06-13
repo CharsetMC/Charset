@@ -87,8 +87,8 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 						BlockPos pos = owner.getPos();
 						for (EnumFacing facing : EnumFacing.VALUES) {
 							TileEntity tile = world.getTileEntity(pos.offset(facing));
-							if (tile != null && tile.hasCapability(Capabilities.AUDIO_SINK, facing.getOpposite())) {
-								tile.getCapability(Capabilities.AUDIO_SINK, facing.getOpposite()).receive(packet);
+							if (tile != null && tile.hasCapability(Capabilities.AUDIO_RECEIVER, facing.getOpposite())) {
+								tile.getCapability(Capabilities.AUDIO_RECEIVER, facing.getOpposite()).receive(packet);
 							}
 						}
 
