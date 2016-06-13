@@ -26,15 +26,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.utils.ColorUtils;
-import pl.asie.charset.wires.WireUtils;
-import pl.asie.charset.wires.logic.PartWireProvider;
 
 import java.util.List;
 
@@ -97,5 +93,9 @@ public class ItemWire extends ItemMultiPart {
 
 	public static boolean isFreestanding(ItemStack stack) {
 		return (stack.getItemDamage() & 1) == 1;
+	}
+
+	public ItemStack getStack(WireFactory factory, boolean freestanding) {
+		return new ItemStack(this, 1, WireManager.REGISTRY.getId(factory) << 1 | (freestanding ? 1 : 0));
 	}
 }

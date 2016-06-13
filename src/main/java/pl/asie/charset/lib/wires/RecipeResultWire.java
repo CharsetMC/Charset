@@ -3,10 +3,11 @@ package pl.asie.charset.lib.wires;
 import com.google.common.base.Function;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import pl.asie.charset.lib.recipe.IRecipeResult;
 
 import javax.annotation.Nullable;
 
-public class RecipeResultWire implements Function<InventoryCrafting, ItemStack> {
+public class RecipeResultWire implements IRecipeResult {
     private final WireFactory factory;
     private final boolean freestanding;
     private final int size;
@@ -25,5 +26,10 @@ public class RecipeResultWire implements Function<InventoryCrafting, ItemStack> 
                 size,
                 WireManager.REGISTRY.getId(factory) << 1 | (freestanding ? 1 : 0)
         );
+    }
+
+    @Override
+    public Object preview() {
+        return apply(null);
     }
 }

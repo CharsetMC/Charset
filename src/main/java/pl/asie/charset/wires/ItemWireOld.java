@@ -25,7 +25,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,11 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mcmultipart.item.ItemMultiPart;
 import mcmultipart.multipart.IMultipart;
-import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.utils.ColorUtils;
-import pl.asie.charset.wires.logic.PartWireSignalBase;
-import pl.asie.charset.wires.logic.PartWireProvider;
 
 public class ItemWireOld extends ItemMultiPart {
 	public ItemWireOld() {
@@ -57,7 +52,7 @@ public class ItemWireOld extends ItemMultiPart {
 
 	@Override
 	public IMultipart createPart(World world, BlockPos blockPos, EnumFacing facing, Vec3d vec3, ItemStack stack, EntityPlayer player) {
-		/* PartWireSignalBase part = PartWireProvider.createPart(stack.getItemDamage() >> 1);
+		/* PartWireSignalBase part = WireMigrationProvider.createPart(stack.getItemDamage() >> 1);
 		part.location = isFreestanding(stack) ? WireFace.CENTER : WireFace.get(facing);
 		return part; */
 		return null;

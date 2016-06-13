@@ -234,7 +234,9 @@ public abstract class PartWire extends Multipart implements
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		setFactory(WireManager.REGISTRY.getObjectById(nbt.getByte("f")));
+		if (nbt.hasKey("f")) { // Migration stuffs
+			setFactory(WireManager.REGISTRY.getObjectById(nbt.getByte("f")));
+		}
 		location = WireFace.VALUES[nbt.getByte("l")];
 		internalConnections = nbt.getByte("iC");
 		externalConnections = nbt.getByte("eC");

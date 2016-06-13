@@ -4,4 +4,5 @@ import net.minecraft.item.ItemStack;
 
 public interface IRecipeObject {
     boolean matches(ItemStack stack);
+    Object preview();
 }

@@ -29,23 +29,17 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.recipe.RecipeCharset;
-import pl.asie.charset.lib.wires.PartWire;
 import pl.asie.charset.lib.wires.RecipeObjectWire;
 import pl.asie.charset.lib.wires.RecipeResultWire;
 import pl.asie.charset.lib.wires.WireFactory;
 import pl.asie.charset.lib.wires.WireManager;
-import pl.asie.charset.wires.logic.PartWireBundled;
-import pl.asie.charset.wires.logic.PartWireInsulated;
-import pl.asie.charset.wires.logic.PartWireNormal;
-import pl.asie.charset.wires.logic.PartWireProvider;
+import pl.asie.charset.wires.logic.WireMigrationProvider;
 import pl.asie.charset.wires.logic.WireSignalFactory;
 
 @Mod(modid = ModCharsetWires.MODID, name = ModCharsetWires.NAME, version = ModCharsetWires.VERSION,
@@ -59,8 +53,6 @@ public class ModCharsetWires {
 
 	@SidedProxy(clientSide = "pl.asie.charset.wires.ProxyClient", serverSide = "pl.asie.charset.wires.ProxyCommon")
 	public static ProxyCommon proxy;
-
-	public static ItemWireOld wire;
 
 	public static WireFactory[] wireFactories = new WireFactory[18];
 
@@ -76,8 +68,7 @@ public class ModCharsetWires {
 			WireManager.register(wireFactories[i]);
 		}
 
-		wire = new ItemWireOld();
-		GameRegistry.register(wire.setRegistryName("wire"));
+		MultipartRegistry.registerPartFactory(new WireMigrationProvider(), "charsetwires:wire");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 	}

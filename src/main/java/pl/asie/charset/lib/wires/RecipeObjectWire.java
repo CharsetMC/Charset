@@ -1,5 +1,6 @@
 package pl.asie.charset.lib.wires;
 
+import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.recipe.IRecipeObject;
@@ -18,5 +19,10 @@ public class RecipeObjectWire implements IRecipeObject {
     public boolean matches(ItemStack stack) {
         int id = WireManager.REGISTRY.getId(factory) << 1 | (freestanding ? 1 : 0);
         return stack != null && stack.getItem() == WireManager.ITEM && stack.getMetadata() == id;
+    }
+
+    @Override
+    public Object preview() {
+        return WireManager.ITEM.getStack(factory, freestanding);
     }
 }

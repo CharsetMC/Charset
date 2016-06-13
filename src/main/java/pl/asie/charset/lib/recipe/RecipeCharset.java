@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -19,7 +18,7 @@ import java.util.Set;
 
 public class RecipeCharset extends RecipeBase {
     protected IRecipeObject[] input = null;
-    protected Function<InventoryCrafting, ItemStack> output;
+    protected IRecipeResult output;
     protected int width = 0;
     protected int height = 0;
     protected boolean mirrored = false;
@@ -109,7 +108,6 @@ public class RecipeCharset extends RecipeBase {
     }
 
     public static class Builder {
-        private String[] layout;
         private RecipeCharset recipe;
 
         private static IRecipeObject toRecipeObject(Object o) {
@@ -136,7 +134,7 @@ public class RecipeCharset extends RecipeBase {
             return objects;
         }
 
-        public static Builder create(Function<InventoryCrafting, ItemStack> output) {
+        public static Builder create(IRecipeResult output) {
             Builder builder = new Builder();
             builder.recipe = new RecipeCharset();
             builder.recipe.output = output;
@@ -144,11 +142,16 @@ public class RecipeCharset extends RecipeBase {
         }
 
         public static Builder create(ItemStack output) {
-            return create(new Function<InventoryCrafting, ItemStack>() {
+            return create(new IRecipeResult() {
+                @Override
+                public Object preview() {
+                    return output;
+                }
+
                 @Nullable
                 @Override
                 public ItemStack apply(@Nullable InventoryCrafting input) {
-                    return output;
+                    return output.copy();
                 }
             });
         }

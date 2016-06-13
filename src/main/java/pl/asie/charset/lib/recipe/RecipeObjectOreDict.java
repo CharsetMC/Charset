@@ -15,4 +15,9 @@ public class RecipeObjectOreDict implements IRecipeObject {
     public boolean matches(ItemStack stack) {
         return stack != null && MiscUtils.contains(OreDictionary.getOreIDs(stack), id);
     }
+
+    @Override
+    public Object preview() {
+        return OreDictionary.getOres(OreDictionary.getOreName(id));
+    }
 }

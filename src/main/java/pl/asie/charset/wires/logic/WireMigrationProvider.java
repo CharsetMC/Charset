@@ -22,47 +22,16 @@ import net.minecraft.network.PacketBuffer;
 import mcmultipart.multipart.IMultipart;
 import mcmultipart.multipart.IPartFactory;
 import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.wires.ModCharsetWires;
 
-public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
-	@Override
-	public IMultipart createPart(ResourceLocation type, PacketBuffer buf) {
-		return null;
-	}
-
-	@Override
-	public IMultipart createPart(ResourceLocation type, NBTTagCompound tag) {
-		return null;
-	}
-	/* public static PartWireSignalBase createPart(int type) {
-		PartWireSignalBase part = null;
-		WireKind kind = WireKind.VALUES[type];
-
-		switch (kind.type()) {
-			case NORMAL:
-				part = new PartWireNormal();
-				break;
-			case INSULATED:
-				part = new PartWireInsulated();
-				break;
-			case BUNDLED:
-				part = new PartWireBundled();
-				break;
-		}
-
-		if (part != null) {
-			part.type = kind;
-		}
-
-		return part;
+public class WireMigrationProvider implements IPartFactory.IAdvancedPartFactory {
+	public static PartWireSignalBase createPart(int type) {
+		return (PartWireSignalBase) ModCharsetWires.wireFactories[type].createPart(null, false);
 	}
 
 	@Override
 	public IMultipart createPart(ResourceLocation id, PacketBuffer buf) {
-		int type = buf.readByte();
-		buf.readerIndex(buf.readerIndex() - 1);
-		PartWireSignalBase part = createPart(type);
-		part.readUpdatePacket(buf);
-		return part;
+		return null;
 	}
 
 	@Override
@@ -70,5 +39,5 @@ public class PartWireProvider implements IPartFactory.IAdvancedPartFactory {
 		PartWireSignalBase part = createPart(nbt.getByte("t"));
 		part.readFromNBT(nbt);
 		return part;
-	} */
+	}
 }

@@ -44,6 +44,12 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.recipe.IRecipeObject;
+import pl.asie.charset.lib.recipe.RecipeCharset;
+import pl.asie.charset.lib.wires.WireFactory;
+import pl.asie.charset.lib.wires.WireManager;
+import pl.asie.charset.wires.ModCharsetWires;
+import pl.asie.charset.wires.logic.WireSignalFactory;
 
 @Mod(modid = ModCharsetGates.MODID, name = ModCharsetGates.NAME, version = ModCharsetGates.VERSION,
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -109,10 +115,31 @@ public class ModCharsetGates {
 			data.add('c');
 			data.add(new ItemStack(Blocks.REDSTONE_TORCH));
 			data.add('w');
-			data.add(Loader.isModLoaded("CharsetWires") ? Item.getByNameOrId("CharsetWires:wire") : Items.REDSTONE);
+			data.add(Loader.isModLoaded("CharsetWires") ? new IRecipeObject() {
+				@Override
+				public boolean matches(ItemStack stack) {
+					if (stack != null && stack.getItem() == WireManager.ITEM) {
+						return WireManager.ITEM.getFactory(stack).getRegistryName().getResourceDomain().equals("charsetwires");
+					} else {
+						return false;
+					}
+				}
+
+				@Override
+				public Object preview() {
+					List<ItemStack> stacks = new ArrayList<>();
+					for (WireFactory f : WireManager.REGISTRY.getValues()) {
+						if (f.getRegistryName().getResourceDomain().equals("charsetwires")) {
+							stacks.add(WireManager.ITEM.getStack(f, false));
+							stacks.add(WireManager.ITEM.getStack(f, true));
+						}
+					}
+					return stacks;
+				}
+			} : Items.REDSTONE);
 			data.add('s');
 			data.add(new ItemStack(Blocks.STONE_SLAB));
-			GameRegistry.addRecipe(new ShapedOreRecipe(stack, data.toArray(new Object[data.size()])));
+			GameRegistry.addRecipe(RecipeCharset.Builder.create(stack).shaped(data.toArray(new Object[data.size()])).build());
 		}
 
 		registerGateStack(stack);
