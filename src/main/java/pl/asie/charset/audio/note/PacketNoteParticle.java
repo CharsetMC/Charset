@@ -43,10 +43,8 @@ public class PacketNoteParticle extends PacketTile {
 		note = buf.readByte();
 		if (tile != null) {
 			BlockPos pos = tile.getPos();
-			double noteX = (((note - TileIronNote.MIN_NOTE) % 6) + 0.5D) / 5.0D;
-			double noteZ = (((note - TileIronNote.MIN_NOTE) / 6) + 0.5D) / 5.0D;
-			tile.getWorld().spawnParticle(EnumParticleTypes.NOTE, (double) pos.getX() + noteX, (double) pos.getY() + 1.2D, (double) pos.getZ() + noteZ,
-					(double) (note - TileIronNote.MIN_NOTE) / (double) (TileIronNote.MAX_NOTE - TileIronNote.MIN_NOTE), 0.0D, 0.0D, new int[0]);
+			tile.getWorld().spawnParticle(EnumParticleTypes.NOTE, (double) pos.getX() + 0.5D, (double) pos.getY() + 1.2D, (double) pos.getZ() + 0.5D,
+					(double) note / 24.0D, 0.0D, 0.0D, new int[0]);
 		}
 	}
 

@@ -37,7 +37,6 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -47,7 +46,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.api.tape.IDataStorage;
 import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.audio.note.BlockIronNote;
-import pl.asie.charset.audio.note.NoteEventHandler;
+import pl.asie.charset.audio.note.NoteBlockManager;
 import pl.asie.charset.audio.note.PacketNoteParticle;
 import pl.asie.charset.audio.note.TileIronNote;
 import pl.asie.charset.audio.storage.DataStorageImpl;
@@ -135,7 +134,7 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(new NoteEventHandler());
+		MinecraftForge.EVENT_BUS.register(new NoteBlockManager());
 		OreDictionary.registerOre("blockNoteIron", ironNoteBlock);
 
 		packet = new PacketRegistry(ModCharsetAudio.MODID);

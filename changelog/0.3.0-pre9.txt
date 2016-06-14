@@ -1,0 +1,6 @@
+* [Audio] Add a more-or-less finalized Audio API
+* [Audio] Add note block support for the Audio API
+* [Audio] Add option in Tape Drives to record audio from other plugged-in devices
+* [Audio] Fix having a GUI open while a tape is being played lag everything
+* [Audio] Fix tape drives disappearing on world load
+* [Wires] Large refactor of wire code - wires not placed in-world will disappear!

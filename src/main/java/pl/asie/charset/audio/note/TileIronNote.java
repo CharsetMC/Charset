@@ -46,9 +46,6 @@ public class TileIronNote extends TileEntity {
 		}
 	}
 
-	public static final int MIN_NOTE = 0;
-	public static final int MAX_NOTE = 24;
-
 	private static final String[] INSTRUMENTS = {"harp", "bd", "snare", "hat", "bassattack"};
 	private final RedstoneCommunications[] COMMS = new RedstoneCommunications[6];
 	private byte[] lastInput = new byte[16];
