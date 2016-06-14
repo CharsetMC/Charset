@@ -28,19 +28,32 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import pl.asie.charset.api.audio.AudioData;
 import pl.asie.charset.api.audio.AudioPacket;
+import pl.asie.charset.api.audio.IAudioReceiver;
+import pl.asie.charset.api.audio.IDataPCM;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.audio.*;
+import pl.asie.charset.lib.audio.codec.DFPWM;
 import pl.asie.charset.lib.inventory.InventorySimple;
 
-public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompound> {
+import javax.sound.sampled.AudioFormat;
+import java.util.Arrays;
+import java.util.Random;
+
+public class TapeDriveState implements ITickable, IAudioReceiver, INBTSerializable<NBTTagCompound> {
 	protected int counter;
 	private final PartTapeDrive owner;
 	private final InventorySimple inventory;
 	private State state = State.STOPPED, lastState;
 	private Integer sourceId;
+
+	private DFPWM recordDFPWM;
+	private AudioPacket receivedPacket;
+	private int receivedPacketPos;
 
 	public TapeDriveState(PartTapeDrive owner, InventorySimple inventory) {
 		this.owner = owner;
@@ -50,6 +63,11 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 	public void setState(State state) {
 		this.lastState = this.state;
 		this.state = state;
+
+		if (state != State.RECORDING) {
+			receivedPacket = null;
+			recordDFPWM = null;
+		}
 	}
 
 	public int getCounter() {
@@ -58,6 +76,22 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 
 	public void resetCounter() {
 		counter = 0;
+	}
+
+	private void applyNoise(byte[] data, float noiseThreshold) {
+		Random rand = owner.getWorld().rand;
+
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (rand.nextFloat() <= noiseThreshold) {
+					if (rand.nextBoolean()) {
+						data[i] |= 1 << j;
+					} else {
+						data[i] &= ~(1 << j);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -101,6 +135,49 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 						if (len < data.length) {
 							setState(State.STOPPED);
 						}
+					} else if (state == State.RECORDING) {
+						byte[] dataOut = new byte[ItemTape.DEFAULT_SAMPLE_RATE / (20 * 8)];
+
+						if (receivedPacket != null) {
+							AudioData data = receivedPacket.getData();
+							if (data instanceof IDataPCM) {
+								IDataPCM pcm = (IDataPCM) data;
+								byte[] audioData = pcm.getSamplePCMData();
+								int perTick = audioData.length * 50 / data.getTime();
+								int pos = receivedPacketPos;
+								int len = perTick;
+								if (pos + len > audioData.length) {
+									len = audioData.length - pos;
+								}
+
+								if (len > 0) {
+									byte[] targetData = new byte[len];
+									System.arraycopy(audioData, pos, targetData, 0, len);
+									receivedPacketPos += len;
+
+									byte[] preEncodeOutput = TapeResampler.toSigned8(
+											targetData, pcm.getSampleSize() * 8, 1, false,
+											pcm.isSampleSigned(), pcm.getSampleRate(), ItemTape.DEFAULT_SAMPLE_RATE,
+											false);
+
+									System.out.println(Arrays.toString(targetData));
+									System.out.println(Arrays.toString(preEncodeOutput));
+									System.out.println("---");
+
+									if (preEncodeOutput != null) {
+										if (recordDFPWM == null) {
+											recordDFPWM = new DFPWM();
+										}
+
+										recordDFPWM.compress(dataOut, preEncodeOutput, 0, 0, Math.min(dataOut.length, preEncodeOutput.length / 8));
+									}
+								} else {
+									receivedPacketPos = audioData.length;
+								}
+							}
+						}
+
+						storage.write(dataOut);
 					} else {
 						int offset = 3072 * (state == State.FORWARDING ? 1 : -1);
 						int len = storage.seek(offset);
@@ -177,6 +254,17 @@ public class TapeDriveState implements ITickable, INBTSerializable<NBTTagCompoun
 		PacketDriveCounter packetDriveCounter = new PacketDriveCounter(owner, counter);
 		for (EntityPlayer player : inventory.watchers) {
 			ModCharsetAudio.packet.sendTo(packetDriveCounter, (EntityPlayerMP) player);
+		}
+	}
+
+	@Override
+	public boolean receive(AudioPacket packet) {
+		if (state == State.RECORDING) {
+			receivedPacket = packet;
+			receivedPacketPos = 0;
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

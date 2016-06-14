@@ -2,7 +2,7 @@
  * by Ben "GreaseMonkey" Russell, 2013 - Public Domain
  */
 
-package pl.asie.charset.lib.utils;
+package pl.asie.charset.lib.audio.codec;
 
 /**
  * DFPWM implementation in Java
@@ -11,7 +11,7 @@ package pl.asie.charset.lib.utils;
  * NOTE, len is in bytes relative to DFPWM (len*8 PCM bytes)
  * also the main() function takes unsigned 8-bit data and converts it to suit
  */
-public class DFPWM {
+public class DFPWM implements ICodec {
 	private final int RESP_INC = 7;
 	private final int RESP_DEC = 20;
 	private final int LPF_STRENGTH = 100;

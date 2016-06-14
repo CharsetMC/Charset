@@ -69,6 +69,10 @@ public class DataStorageManager {
 		return get(name).exists();
 	}
 
+	public boolean ready() {
+		return saveDir != null;
+	}
+
 	public File get(String name) {
 		return new File(saveDir, filename(name));
 	}

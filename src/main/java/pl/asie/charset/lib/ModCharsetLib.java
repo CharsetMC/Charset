@@ -40,6 +40,7 @@ import net.minecraftforge.oredict.RecipeSorter;
 
 import pl.asie.charset.api.audio.AudioAPI;
 import pl.asie.charset.lib.audio.AudioDataDFPWM;
+import pl.asie.charset.lib.audio.AudioDataSound;
 import pl.asie.charset.lib.audio.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
@@ -138,6 +139,7 @@ public class ModCharsetLib {
 		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
 
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
+		AudioAPI.DATA_REGISTRY.register(AudioDataSound.class);
 		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class);
 	}
 

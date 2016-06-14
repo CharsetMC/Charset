@@ -41,6 +41,8 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
+import pl.asie.charset.api.audio.AudioPacket;
+import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
@@ -215,7 +217,8 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
 		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
-				|| capability == Capabilities.AUDIO_SOURCE;
+				|| capability == Capabilities.AUDIO_SOURCE
+				|| capability == Capabilities.AUDIO_RECEIVER;
 	}
 
 	@Override
@@ -225,6 +228,9 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 		}
 		if (capability == Capabilities.AUDIO_SOURCE) {
 			return Capabilities.AUDIO_SOURCE.cast(this);
+		}
+		if (capability == Capabilities.AUDIO_RECEIVER) {
+			return Capabilities.AUDIO_RECEIVER.cast(state);
 		}
 		return null;
 	}

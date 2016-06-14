@@ -32,7 +32,7 @@ import paulscode.sound.SoundBuffer;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
 import pl.asie.charset.audio.ModCharsetAudio;
-import pl.asie.charset.lib.utils.DFPWM;
+import pl.asie.charset.lib.audio.codec.DFPWM;
 
 public class TapeRecordThread implements Runnable {
 	public static String[] getSupportedExtensions() {
@@ -50,16 +50,11 @@ public class TapeRecordThread implements Runnable {
 	}
 
 	private static final int PACKET_SIZE = 8192;
-	private static final Resampler RESAMPLER = new Resampler(true, 0.01, 100);
 	private static final DFPWM CODEC = new DFPWM();
 	private final File file;
 	private final PartTapeDrive owner;
 	private int sampleRate = ItemTape.DEFAULT_SAMPLE_RATE;
 	private String statusBar = "Encoding...";
-
-	private float clamp(float in, float min, float max) {
-		return in < min ? min : (in > max ? max : in);
-	}
 
 	public TapeRecordThread(File f, PartTapeDrive owner) {
 		this.file = f;
@@ -115,69 +110,10 @@ public class TapeRecordThread implements Runnable {
 
 			statusBar = "Reticulating splines...";
 
-			float[] output = new float[buffer.audioData.length / buffer.audioFormat.getChannels() / (buffer.audioFormat.getSampleSizeInBits() / 8)];
-			int si = 0;
-
-			float min = 0.0f;
-			float max = 0.0f;
-
-			for(int i = 0; i < output.length; i++) {
-				int v = 0;
-
-				for(int j = 0; j < buffer.audioFormat.getChannels(); j++) {
-					int s = 0;
-					if (buffer.audioFormat.getSampleSizeInBits() >= 32) {
-						si++;
-					}
-
-					if (buffer.audioFormat.getSampleSizeInBits() >= 24) {
-						int l = 0xFF&(int)buffer.audioData[si++];
-						int m = 0xFF&(int)buffer.audioData[si++];
-						int h = 0xFF&(int)buffer.audioData[si++];
-						s = buffer.audioFormat.isBigEndian() ? ((l << 16) | (m << 8) | h) : (l | (m << 8) | (h << 16));
-						s &= 0xFFFFFF;
-					} else if (buffer.audioFormat.getSampleSizeInBits() >= 16) {
-						int l = 0xFF&(int)buffer.audioData[si++];
-						int h = 0xFF&(int)buffer.audioData[si++];
-						s = buffer.audioFormat.isBigEndian() ? ((l << 8) | h) : (l | (h<<8));
-						s &= 0xFFFF;
-						s <<= 8;
-					} else {
-						s = buffer.audioData[si++];
-						s &= 0xFF;
-						s <<= 16;
-					}
-
-					if (buffer.audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED) {
-						s = (s >= 0x800000 ? s - 0x1000000 : s);
-					} else {
-						s -= 0x800000;
-					}
-
-					v += s;
-				}
-
-				v = (v*2+buffer.audioFormat.getChannels())/(buffer.audioFormat.getChannels()*2);
-				output[i] = clamp((float) v / 0x800000, -1.0f, 1.0f);
-				if (output[i] < min) {
-					min = output[i];
-				}
-				if (output[i] > max) {
-					max = output[i];
-				}
-			}
-
-			float multiplier = min != 0.0f || max != 0.0f ? 1.0f / Math.max(0 - min, max) : 1.0f;
-
-			double factor = sampleRate / buffer.audioFormat.getSampleRate();
-			FloatBuffer resampledBuffer = FloatBuffer.allocate((int) Math.ceil(output.length * factor) + 1024);
-			RESAMPLER.process(factor, FloatBuffer.wrap(output), true, resampledBuffer);
-			float[] resampledOutput = resampledBuffer.array();
-			byte[] preEncodeOutput = new byte[resampledBuffer.position()];
-
-			for (int i = 0; i < preEncodeOutput.length; i++) {
-				preEncodeOutput[i] = (byte) (clamp(resampledOutput[i] * multiplier, -1.0f, 1.0f) * 127);
-			} 
+			byte[] preEncodeOutput = TapeResampler.toSigned8(buffer.audioData, buffer.audioFormat.getSampleSizeInBits(),
+					buffer.audioFormat.getChannels(), buffer.audioFormat.isBigEndian(),
+					buffer.audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED,
+					(int) buffer.audioFormat.getSampleRate(), sampleRate, true);
 
 			statusBar = "Encoding...";
 

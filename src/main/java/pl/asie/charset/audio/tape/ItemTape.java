@@ -40,6 +40,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.audio.storage.DataStorageImpl;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.items.IDyeableItem;
 
@@ -114,10 +115,20 @@ public class ItemTape extends Item implements IDyeableItem {
 
 		@Override
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-			if (dataStorage != null && !dataStorage.isInitialized()) {
-				dataStorage.initialize(null, 0, stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE);
+			if (dataStorage != null) {
+				if (!dataStorage.isInitialized()) {
+					dataStorage.initialize(null, 0, stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE);
+				}
+
+				if (capability == ModCharsetAudio.CAP_STORAGE) {
+					if (!((DataStorageImpl) dataStorage).makeReady()) { // HACK
+						return null;
+					}
+
+					return ModCharsetAudio.CAP_STORAGE.cast(dataStorage);
+				}
 			}
-			return capability == ModCharsetAudio.CAP_STORAGE ? (T) dataStorage : null;
+			return null;
 		}
 
 		@Override

@@ -42,6 +42,28 @@ public class DataStorageImpl implements IDataStorage {
 		return data != null;
 	}
 
+	public boolean makeReady() {
+		if (file == null && ModCharsetAudio.storage.ready()) {
+			this.file = ModCharsetAudio.storage.get(this.uniqueId);
+			if (!file.exists()) {
+				try {
+					file.createNewFile();
+					writeFile();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					readFile();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return file != null;
+	}
+
 	public void initialize(String id, int position, int size) {
 		if (id == null || id.length() == 0) {
 			this.uniqueId = ModCharsetAudio.storage.generateUID();
@@ -49,7 +71,6 @@ public class DataStorageImpl implements IDataStorage {
 			this.uniqueId = id;
 		}
 
-		this.file = ModCharsetAudio.storage.get(this.uniqueId);
 		this.position = position;
 		this.size = size;
 		this.data = new byte[size];
@@ -60,20 +81,6 @@ public class DataStorageImpl implements IDataStorage {
 			this.position = 0;
 		}
 
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-				writeFile();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				readFile();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public String getUniqueId() {

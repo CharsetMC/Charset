@@ -18,7 +18,14 @@ package pl.asie.charset.lib.audio;
 
 import io.netty.buffer.ByteBuf;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import pl.asie.charset.api.audio.AudioData;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.AudioSink;
@@ -56,6 +63,19 @@ public class PacketAudioData extends Packet {
 		packet.readData(buf);
 
 		AudioData audioData = packet.getData();
+		if (audioData instanceof IDataSound) {
+			IDataSound sound = (IDataSound) audioData;
+			for (AudioSink sink : packet.getSinks()) {
+				System.out.println("sink " + sink.getVolume() + " " + packet.getVolume() + " " + sound.getSoundPitch() + " " + sound.getSoundName());
+				Minecraft.getMinecraft().getSoundHandler().playSound(
+						new PositionedSoundRecord(new SoundEvent(new ResourceLocation(sound.getSoundName())),
+								SoundCategory.BLOCKS, 3.0F * sink.getVolume() * packet.getVolume(),
+								sound.getSoundPitch(), new BlockPos(sink.getPos()))
+				);
+			}
+			return;
+		}
+
 		if (!(audioData instanceof IDataPCM) || ((IDataPCM) audioData).getSampleSize() != 1) {
 			// Nope!
 			return;

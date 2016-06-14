@@ -19,7 +19,7 @@ package pl.asie.charset.lib.audio;
 import io.netty.buffer.ByteBuf;
 import pl.asie.charset.api.audio.AudioData;
 import pl.asie.charset.api.audio.IDataPCM;
-import pl.asie.charset.lib.utils.DFPWM;
+import pl.asie.charset.lib.audio.codec.DFPWM;
 
 public class AudioDataDFPWM extends AudioData implements IDataPCM {
     protected byte[] decodedData;
