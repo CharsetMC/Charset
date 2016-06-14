@@ -17,6 +17,7 @@
 package pl.asie.charset.audio;
 
 import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.oredict.OreDictionary;
@@ -61,8 +62,10 @@ import pl.asie.charset.audio.tape.PacketDriveState;
 import pl.asie.charset.audio.tape.PartTapeDrive;
 import pl.asie.charset.audio.tape.RecipeTape;
 import pl.asie.charset.audio.tape.RecipeTapeReel;
+import pl.asie.charset.audio.transport.AudioCableFactory;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.wires.WireManager;
 
 @Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION,
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -85,6 +88,7 @@ public class ModCharsetAudio {
 	public static PacketRegistry packet;
 	public static DataStorageManager storage;
 
+	public static AudioCableFactory audioCableFactory;
 	public static BlockIronNote ironNoteBlock;
 	public static ItemPartTapeDrive partTapeDriveItem;
 	public static ItemTape tapeItem;
@@ -93,6 +97,9 @@ public class ModCharsetAudio {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(ModCharsetAudio.MODID);
+
+		audioCableFactory = (AudioCableFactory) new AudioCableFactory().setRegistryName(new ResourceLocation("charsetaudio:cable"));
+		WireManager.register(audioCableFactory);
 
 		partTapeDriveItem = new ItemPartTapeDrive();
 		GameRegistry.register(partTapeDriveItem.setRegistryName("tapeDrive"));

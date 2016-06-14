@@ -51,6 +51,8 @@ import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.wires.ItemWire;
+import pl.asie.charset.lib.wires.RecipeObjectWire;
+import pl.asie.charset.lib.wires.RecipeResultWire;
 import pl.asie.charset.lib.wires.WireFactory;
 import pl.asie.charset.lib.wires.WireManager;
 
@@ -122,6 +124,7 @@ public class ModCharsetLib {
 		Capabilities.init();
 		NotifyImplementation.init();
 	}
+
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		proxy.init();
@@ -137,6 +140,13 @@ public class ModCharsetLib {
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
+
+		for (WireFactory factory : WireManager.REGISTRY.getValues()) {
+			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, false, 1))
+					.shapeless(new RecipeObjectWire(factory, true)).build());
+			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, true, 1))
+					.shapeless(new RecipeObjectWire(factory, false)).build());
+		}
 
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
 		AudioAPI.DATA_REGISTRY.register(AudioDataSound.class);

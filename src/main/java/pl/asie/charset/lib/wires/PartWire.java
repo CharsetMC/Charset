@@ -86,11 +86,6 @@ public abstract class PartWire extends Multipart implements
 		scheduleConnectionUpdate();
 	}
 
-	public PartWire(WireFactory factory) {
-		this();
-		setFactory(factory);
-	}
-
 	@Override
 	public ResourceLocation getType() {
 		return getFactory().getRegistryName();
@@ -100,8 +95,9 @@ public abstract class PartWire extends Multipart implements
 		return type;
 	}
 
-	public void setFactory(WireFactory factory) {
+	public PartWire setFactory(WireFactory factory) {
 		this.type = factory;
+		return this;
 	}
 
 	public boolean calculateConnectionWire(PartWire wire) {
@@ -154,6 +150,13 @@ public abstract class PartWire extends Multipart implements
 
 	@Override
 	public void onNeighborBlockChange(Block block) {
+		if (location != WireFace.CENTER) {
+			if (!getFactory().canPlace(getWorld(), getPos(), location)) {
+				harvest(null, null);
+				return;
+			}
+		}
+
 		scheduleConnectionUpdate();
 		scheduleLogicUpdate();
 	}

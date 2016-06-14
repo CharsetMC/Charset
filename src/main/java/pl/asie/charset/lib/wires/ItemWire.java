@@ -59,7 +59,7 @@ public class ItemWire extends ItemMultiPart {
 	@Override
 	public boolean place(World world, BlockPos pos, EnumFacing side, Vec3d hit, ItemStack stack, EntityPlayer player) {
 		WireFactory factory = getFactory(stack);
-		if (factory == null || (!isFreestanding(stack) && !factory.canPlace(world, pos.offset(side), WireFace.get(side.getOpposite())))) {
+		if (factory == null || (!isFreestanding(stack) && !factory.canPlace(world, pos, WireFace.get(side)))) {
 			return false;
 		}
 

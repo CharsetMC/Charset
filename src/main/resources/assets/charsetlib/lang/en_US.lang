@@ -19,6 +19,7 @@ item.charset.tape.dark_iron.tip=Dank
 item.charset.tape.quartz.tip=Precise
 item.charset.tape.emerald.tip=Best of Trade
 
+tile.charset.audioCable.name=Audio Cable
 tile.charset.ironNoteBlock.name=Iron Note Block
 
 tooltip.charset.tape.none=No Tape

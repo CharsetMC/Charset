@@ -116,17 +116,18 @@ public class TapeDriveState implements ITickable, IAudioReceiver, INBTSerializab
 						int len = storage.read(data, false);
 
 						AudioPacket packet = new AudioPacket(new AudioDataDFPWM(data, 50).setSourceId(sourceId), 1.0F);
+						boolean received = false;
 
 						World world = owner.getWorld();
 						BlockPos pos = owner.getPos();
 						for (EnumFacing facing : EnumFacing.VALUES) {
 							TileEntity tile = world.getTileEntity(pos.offset(facing));
 							if (tile != null && tile.hasCapability(Capabilities.AUDIO_RECEIVER, facing.getOpposite())) {
-								tile.getCapability(Capabilities.AUDIO_RECEIVER, facing.getOpposite()).receive(packet);
+								received |= tile.getCapability(Capabilities.AUDIO_RECEIVER, facing.getOpposite()).receive(packet);
 							}
 						}
 
-						if (packet.getSinkCount() == 0) {
+						if (!received) {
 							new AudioSinkBlock(owner.getWorld(), owner.getPos()).receive(packet);
 						}
 

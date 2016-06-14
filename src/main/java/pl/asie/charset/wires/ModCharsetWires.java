@@ -97,13 +97,6 @@ public class ModCharsetWires {
 		GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[17], true, 1))
 				.shaped("sws", "www", "sws", 'w', new RecipeObjectSignalWire(WireType.INSULATED, true), 's', Items.STRING)
 				.build());
-
-		for (int i = 0; i < 18; i++) {
-			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[i], false, 1))
-					.shapeless(new RecipeObjectWire(wireFactories[i], true)).build());
-			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[i], true, 1))
-					.shapeless(new RecipeObjectWire(wireFactories[i], false)).build());
-		}
 	}
 
 	@EventHandler

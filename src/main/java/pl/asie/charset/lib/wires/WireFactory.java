@@ -14,7 +14,10 @@ public abstract class WireFactory implements IForgeRegistryEntry<WireFactory>, I
 
     public abstract PartWire createPart(ItemStack stack);
 
-    public abstract boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face);
+    public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
+        return face == WireFace.CENTER || access.isSideSolid(pos.offset(face.facing), face.facing.getOpposite(), false);
+    }
+
     public abstract float getWidth();
     public abstract float getHeight();
     public abstract ResourceLocation getTexturePrefix();

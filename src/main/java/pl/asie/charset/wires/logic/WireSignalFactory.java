@@ -27,20 +27,17 @@ public class WireSignalFactory extends WireFactory {
         switch (type) {
             case NORMAL:
                 wire = new PartWireNormal();
-                wire.setFactory(this);
                 break;
             case INSULATED:
                 wire = new PartWireInsulated();
                 wire.setColor(color);
-                wire.setFactory(this);
                 break;
             case BUNDLED:
                 wire = new PartWireBundled();
-                wire.setFactory(this);
                 break;
         }
 
-        return wire;
+        return wire.setFactory(this);
     }
 
     @Override
@@ -55,7 +52,7 @@ public class WireSignalFactory extends WireFactory {
 
     @Override
     public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
-        return WireUtils.canPlaceWire(access, pos, face.facing != null ? face.facing.getOpposite() : null);
+        return face == WireFace.CENTER || WireUtils.canPlaceWire(access, pos.offset(face.facing), face.facing != null ? face.facing.getOpposite() : null);
     }
 
     @Override

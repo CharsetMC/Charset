@@ -169,28 +169,6 @@ public abstract class PartWireSignalBase extends PartWire implements
 	public abstract int getRedstoneLevel();
 
 	@Override
-	public void onNeighborBlockChange(Block block) {
-		if (location != WireFace.CENTER) {
-			if (!WireUtils.canPlaceWire(getWorld(), getPos().offset(location.facing), location.facing.getOpposite())) {
-				harvest(null, null);
-				return;
-			}
-		}
-
-		super.onNeighborBlockChange(block);
-	}
-
-	@Override
-	public ItemStack getPickBlock(EntityPlayer player, PartMOP hit) {
-		return getItemStack();
-	}
-
-	@Override
-	public List<ItemStack> getDrops() {
-		return Arrays.asList(getItemStack());
-	}
-
-	@Override
 	public void writeUpdatePacket(PacketBuffer buf) {
 		super.writeUpdatePacket(buf);
 		buf.writeByte(color);
