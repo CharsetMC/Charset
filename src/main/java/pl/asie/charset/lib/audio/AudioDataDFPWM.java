@@ -18,6 +18,7 @@ package pl.asie.charset.lib.audio;
 
 import io.netty.buffer.ByteBuf;
 import pl.asie.charset.api.audio.AudioData;
+import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IDataPCM;
 import pl.asie.charset.lib.audio.codec.DFPWM;
 
@@ -27,6 +28,8 @@ public class AudioDataDFPWM extends AudioData implements IDataPCM {
     private int time;
     private static final DFPWM dfpwm = new DFPWM();
 
+    private transient int sourceId;
+
     public AudioDataDFPWM() {
 
     }
@@ -34,6 +37,11 @@ public class AudioDataDFPWM extends AudioData implements IDataPCM {
     public AudioDataDFPWM(byte[] data, int time) {
         this.data = data;
         this.time = time;
+    }
+
+    public AudioDataDFPWM setSourceId(int id) {
+        this.sourceId = id;
+        return this;
     }
 
     @Override
@@ -53,6 +61,11 @@ public class AudioDataDFPWM extends AudioData implements IDataPCM {
     }
 
     @Override
+    public boolean isSampleBigEndian() {
+        return false;
+    }
+
+    @Override
     public byte[] getSamplePCMData() {
         if (decodedData == null) {
             decodedData = new byte[data.length * 8];
@@ -68,11 +81,6 @@ public class AudioDataDFPWM extends AudioData implements IDataPCM {
     }
 
     @Override
-    public int getSize() {
-        return data.length;
-    }
-
-    @Override
     public void readData(ByteBuf buf) {
         time = buf.readUnsignedMedium();
         data = new byte[buf.readUnsignedShort()];
@@ -84,5 +92,10 @@ public class AudioDataDFPWM extends AudioData implements IDataPCM {
         buf.writeMedium(time);
         buf.writeShort(data.length);
         buf.writeBytes(data);
+    }
+
+    @Override
+    protected void sendClient(AudioPacket packet) {
+        AudioUtils.send(sourceId, packet);
     }
 }

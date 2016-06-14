@@ -66,7 +66,6 @@ public class PacketAudioData extends Packet {
 		if (audioData instanceof IDataSound) {
 			IDataSound sound = (IDataSound) audioData;
 			for (AudioSink sink : packet.getSinks()) {
-				System.out.println("sink " + sink.getVolume() + " " + packet.getVolume() + " " + sound.getSoundPitch() + " " + sound.getSoundName());
 				Minecraft.getMinecraft().getSoundHandler().playSound(
 						new PositionedSoundRecord(new SoundEvent(new ResourceLocation(sound.getSoundName())),
 								SoundCategory.BLOCKS, 3.0F * sink.getVolume() * packet.getVolume(),

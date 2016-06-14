@@ -17,11 +17,8 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.NoteBlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.api.audio.AudioPacket;
-import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.audio.AudioDataSound;
-import pl.asie.charset.lib.audio.AudioSinkBlock;
-import pl.asie.charset.lib.audio.AudioUtils;
 import pl.asie.charset.lib.capability.DefaultAudioSource;
 
 import javax.annotation.Nullable;
@@ -49,7 +46,7 @@ public class NoteEventHandler {
             }
 
             if (packet.getSinkCount() > 0) {
-                AudioUtils.send(0, packet);
+                packet.send();
                 event.setCanceled(true);
             }
         }

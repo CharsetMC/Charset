@@ -20,6 +20,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.api.audio.AudioData;
+import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IDataPCM;
 import pl.asie.charset.lib.audio.codec.DFPWM;
 
@@ -38,12 +39,7 @@ public class AudioDataSound extends AudioData implements IDataSound {
 
     @Override
     public int getTime() {
-        return 0;
-    }
-
-    @Override
-    public int getSize() {
-        return 0;
+        return 10;
     }
 
     @Override
@@ -56,6 +52,11 @@ public class AudioDataSound extends AudioData implements IDataSound {
     public void writeData(ByteBuf buf) {
         ByteBufUtils.writeUTF8String(buf, name);
         buf.writeFloat(pitch);
+    }
+
+    @Override
+    protected void sendClient(AudioPacket packet) {
+        AudioUtils.send(0, packet);
     }
 
     @Override

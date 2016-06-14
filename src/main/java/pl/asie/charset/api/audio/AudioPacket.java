@@ -42,6 +42,10 @@ public final class AudioPacket {
 
     }
 
+    public void send() {
+        data.sendClient(this);
+    }
+
     public float getVolume() {
         return volume;
     }

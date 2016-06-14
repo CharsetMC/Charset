@@ -115,7 +115,7 @@ public class TapeDriveState implements ITickable, IAudioReceiver, INBTSerializab
 						byte[] data = new byte[300];
 						int len = storage.read(data, false);
 
-						AudioPacket packet = new AudioPacket(new AudioDataDFPWM(data, 50), 1.0F);
+						AudioPacket packet = new AudioPacket(new AudioDataDFPWM(data, 50).setSourceId(sourceId), 1.0F);
 
 						World world = owner.getWorld();
 						BlockPos pos = owner.getPos();
@@ -130,7 +130,7 @@ public class TapeDriveState implements ITickable, IAudioReceiver, INBTSerializab
 							new AudioSinkBlock(owner.getWorld(), owner.getPos()).receive(packet);
 						}
 
-						AudioUtils.send(sourceId, packet);
+						packet.send();
 
 						if (len < data.length) {
 							setState(State.STOPPED);
@@ -156,13 +156,9 @@ public class TapeDriveState implements ITickable, IAudioReceiver, INBTSerializab
 									receivedPacketPos += len;
 
 									byte[] preEncodeOutput = TapeResampler.toSigned8(
-											targetData, pcm.getSampleSize() * 8, 1, false,
+											targetData, pcm.getSampleSize() * 8, 1, pcm.isSampleBigEndian(),
 											pcm.isSampleSigned(), pcm.getSampleRate(), ItemTape.DEFAULT_SAMPLE_RATE,
 											false);
-
-									System.out.println(Arrays.toString(targetData));
-									System.out.println(Arrays.toString(preEncodeOutput));
-									System.out.println("---");
 
 									if (preEncodeOutput != null) {
 										if (recordDFPWM == null) {
