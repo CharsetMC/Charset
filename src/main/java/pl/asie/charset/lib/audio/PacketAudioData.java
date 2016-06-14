@@ -104,7 +104,7 @@ public class PacketAudioData extends Packet {
 				stream.play((float) sink.getPos().xCoord, (float) sink.getPos().yCoord, (float) sink.getPos().zCoord,
 						sink.getDistance(), sink.getVolume() * packet.getVolume());
 			} catch (Exception e) {
-				
+
 			}
 		}
 	}

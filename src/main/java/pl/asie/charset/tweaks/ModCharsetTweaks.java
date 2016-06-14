@@ -34,6 +34,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
 import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
+import pl.asie.charset.tweaks.neptune.TweakZorro;
 import pl.asie.charset.tweaks.shard.TweakGlassShards;
 import pl.asie.charset.tweaks.tnt.TweakImprovedTNT;
 
@@ -76,6 +77,7 @@ public class ModCharsetTweaks {
 		tweakSet.add(new TweakImprovedTNT());
 		tweakSet.add(new TweakMobControl());
 		tweakSet.add(new TweakNoSprinting());
+		tweakSet.add(new TweakZorro());
 
 		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
 		canAddTweaks = false;
