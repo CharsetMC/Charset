@@ -46,10 +46,8 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.api.tape.IDataStorage;
 import mcmultipart.multipart.MultipartRegistry;
-import pl.asie.charset.audio.note.BlockIronNote;
 import pl.asie.charset.audio.note.NoteBlockManager;
 import pl.asie.charset.audio.note.PacketNoteParticle;
-import pl.asie.charset.audio.note.TileIronNote;
 import pl.asie.charset.audio.storage.DataStorageImpl;
 import pl.asie.charset.audio.storage.DataStorageManager;
 import pl.asie.charset.audio.storage.DataStorageStorage;
@@ -89,7 +87,6 @@ public class ModCharsetAudio {
 	public static DataStorageManager storage;
 
 	public static AudioCableFactory audioCableFactory;
-	public static BlockIronNote ironNoteBlock;
 	public static ItemPartTapeDrive partTapeDriveItem;
 	public static ItemTape tapeItem;
 	public static Item magneticTapeItem, tapeReelItem;
@@ -132,17 +129,11 @@ public class ModCharsetAudio {
 		}
 
 		CapabilityManager.INSTANCE.register(IDataStorage.class, new DataStorageStorage(), DataStorageImpl.class);
-
-		ironNoteBlock = new BlockIronNote();
-		GameRegistry.register(ironNoteBlock.setRegistryName("ironnoteblock"));
-		GameRegistry.register(new ItemBlock(ironNoteBlock).setRegistryName("ironnoteblock"));
-		ModCharsetLib.proxy.registerItemModel(ironNoteBlock, 0, "charsetaudio:ironnoteblock");
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new NoteBlockManager());
-		OreDictionary.registerOre("blockNoteIron", ironNoteBlock);
 
 		packet = new PacketRegistry(ModCharsetAudio.MODID);
 		packet.registerPacket(0x01, PacketNoteParticle.class);
@@ -150,10 +141,6 @@ public class ModCharsetAudio {
 		packet.registerPacket(0x10, PacketDriveState.class);
 		packet.registerPacket(0x13, PacketDriveRecord.class);
 		packet.registerPacket(0x14, PacketDriveCounter.class);
-
-		GameRegistry.registerTileEntity(TileIronNote.class, "charset:ironnoteblock");
-
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ironNoteBlock), "iii", "iNi", "iii", 'i', "ingotIron", 'N', Blocks.NOTEBLOCK));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(tapeReelItem), " i ", "ipi", " i ", 'i', "ingotIron", 'p', Items.PAPER));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(magneticTapeItem, 32), "ddd", "rir", "ddd", 'd', "dyeBlack", 'r', Items.REDSTONE, 'i', "ingotIron"));
