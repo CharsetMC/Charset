@@ -7,4 +7,6 @@
 * [Audio] Remove Iron Note Block
 * [Decoration] Fix poster not having a name
 * [Pipes] Fix ugly pipe item model
+* [Tweaks] Add support for tool class checks to AutoReplace
+* [Tweaks] Add Zorro (not the Amiga expansion bus!) from Factorization
 * [Wires] Large refactor of wire code - wires not placed in-world will disappear!

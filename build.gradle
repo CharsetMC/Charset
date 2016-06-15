@@ -18,7 +18,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.3.0-pre8"
+version = "0.3.0-pre9"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
