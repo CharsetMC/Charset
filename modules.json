@@ -38,7 +38,7 @@
 		"audio": {
 			"char": "♫",
 			"default": false,
-			"description": "Tape Drives, Iron Note Block, etc.",
+			"description": "Tape Drives and various audio transport methods",
 			"dependencies": ["lib", "mod:MCMultiPart"],
 			"recommendations": {
 				"mod:NotEnoughCodecs": "MP3/MP4/AAC/FLAC support in Tape Drives"
@@ -55,21 +55,21 @@
 		"decoration": {
 			"char": "⚐",
 			"default": true,
-			"description": "Various decorative objects.",
+			"description": "Various decorative objects",
 			"dependencies": ["lib"],
 			"stability": "staging"
 		},
 		"drama": {
 			"char": "!",
 			"default": false,
-			"description": "Drama Generator in Minecraft. Joke module.",
+			"description": "Drama Generator in Minecraft. Joke module",
 			"dependencies": ["lib"],
 			"stability": "stable"
 		},
 		"wrench": {
 			"char": "/",
 			"default": true,
-			"description": "A wrench which happens to rotate multiparts.",
+			"description": "A wrench which happens to rotate multiparts",
 			"dependencies": ["lib"],
 			"stability": "stable"
 		}

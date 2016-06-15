@@ -89,10 +89,10 @@ public class TweakAutoReplace extends Tweak {
 			ItemStack stackAbove = inv.getStackInSlot(slot);
 			if (!canReplace(stackAbove, event.getOriginal())) break;
 			int targetSlot = ((slot < 27) ? (slot + 9) : (slot - 27));
-			inv.setInventorySlotContents(targetSlot, stackAbove);
+			inv.setInventorySlotContents(targetSlot, stackAbove.copy());
 			inv.setInventorySlotContents(slot, null);
 			player.connection.sendPacket(
-					new SPacketSetSlot(0, slot + 9, stackAbove));
+					new SPacketSetSlot(0, slot + 9, stackAbove.copy()));
 		}
 
 		if (row < 2) {
