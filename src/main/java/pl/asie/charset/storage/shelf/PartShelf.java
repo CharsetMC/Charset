@@ -13,7 +13,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.lib.multipart.PartSlab;
-import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.Properties;
 
 import java.util.EnumSet;
 

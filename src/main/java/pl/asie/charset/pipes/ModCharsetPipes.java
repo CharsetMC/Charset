@@ -41,8 +41,15 @@ import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
-import pl.asie.charset.pipes.capability.ShifterImpl;
-import pl.asie.charset.pipes.capability.ShifterStorage;
+import pl.asie.charset.pipes.pipe.ItemPipe;
+import pl.asie.charset.pipes.pipe.PacketFluidUpdate;
+import pl.asie.charset.pipes.pipe.PacketItemUpdate;
+import pl.asie.charset.pipes.pipe.PacketPipeSyncRequest;
+import pl.asie.charset.pipes.pipe.PartPipe;
+import pl.asie.charset.pipes.shifter.BlockShifter;
+import pl.asie.charset.pipes.shifter.ShifterImpl;
+import pl.asie.charset.pipes.shifter.ShifterStorage;
+import pl.asie.charset.pipes.shifter.TileShifter;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
@@ -77,7 +84,7 @@ public class ModCharsetPipes {
 		ModCharsetLib.proxy.registerBlock(shifterBlock, "shifter");
 		GameRegistry.registerTileEntity(TileShifter.class, "CharsetPipes:shifter");
 
-		ModCharsetLib.proxy.registerItemModel(itemPipe, 0, "charsetpipes:pipe");
+		ModCharsetLib.proxy.registerItemModel(itemPipe, 0, "charsetpipes:pipe_item");
 		ModCharsetLib.proxy.registerItemModel(shifterBlock, 0, "charsetpipes:shifter");
 
 		MinecraftForge.EVENT_BUS.register(proxy);

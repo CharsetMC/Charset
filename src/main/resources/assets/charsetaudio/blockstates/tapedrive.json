@@ -8,7 +8,9 @@
   },
   "variants": {
     "normal": [{}],
-    "inventory": [{}],
+    "inventory": [{
+      "transform": "forge:default-block"
+    }],
     "facing=north,top=false": [{}],
     "facing=east,top=false": [{"transform": {"rotation": {"y": 270}}}],
     "facing=south,top=false": [{"transform": {"rotation": {"y": 180}}}],

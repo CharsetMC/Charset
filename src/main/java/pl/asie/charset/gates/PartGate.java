@@ -66,7 +66,6 @@ import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
-import pl.asie.charset.pipes.PartPipe;
 
 public abstract class PartGate extends Multipart implements IRenderComparable<PartGate>,
 		IRedstonePart.ISlottedRedstonePart, INormallyOccludingPart, ISlottedCapabilityProvider, ITickable {

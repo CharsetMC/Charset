@@ -34,7 +34,7 @@ import net.minecraftforge.client.model.animation.FastTESR;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.Properties;
 import pl.asie.charset.storage.ProxyClient;
 
 public final class RendererBackpack {

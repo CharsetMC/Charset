@@ -10,7 +10,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import pl.asie.charset.lib.TileBase;
+import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.storage.ModCharsetStorage;

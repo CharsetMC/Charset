@@ -25,6 +25,7 @@ import mcmultipart.multipart.IMultipartContainer;
 import mcmultipart.multipart.ISlottedPart;
 import mcmultipart.multipart.MultipartHelper;
 import mcmultipart.multipart.PartSlot;
+import pl.asie.charset.pipes.pipe.PartPipe;
 
 public final class PipeUtils {
 	private PipeUtils() {

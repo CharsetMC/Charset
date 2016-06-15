@@ -16,7 +16,6 @@
 
 package pl.asie.charset.storage.backpack;
 
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -43,10 +42,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.lib.BlockBase;
+import pl.asie.charset.lib.blocks.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.notify.Notice;
-import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.Properties;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 public class BlockBackpack extends BlockBase implements ITileEntityProvider {

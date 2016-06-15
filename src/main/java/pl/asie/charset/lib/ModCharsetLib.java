@@ -44,7 +44,7 @@ import pl.asie.charset.lib.audio.AudioDataSound;
 import pl.asie.charset.lib.audio.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
-import pl.asie.charset.lib.handlers.PlayerDeathHandler;
+import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.recipe.RecipeCharset;

@@ -16,11 +16,9 @@
 
 package pl.asie.charset.audio;
 
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
-import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,8 +56,8 @@ import pl.asie.charset.audio.tape.PacketDriveCounter;
 import pl.asie.charset.audio.tape.PacketDriveRecord;
 import pl.asie.charset.audio.tape.PacketDriveState;
 import pl.asie.charset.audio.tape.PartTapeDrive;
-import pl.asie.charset.audio.tape.RecipeTape;
-import pl.asie.charset.audio.tape.RecipeTapeReel;
+import pl.asie.charset.audio.recipe.RecipeTape;
+import pl.asie.charset.audio.recipe.RecipeTapeReel;
 import pl.asie.charset.audio.transport.AudioCableFactory;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;

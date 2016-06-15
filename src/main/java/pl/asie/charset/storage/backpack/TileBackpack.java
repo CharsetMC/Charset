@@ -35,11 +35,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import pl.asie.charset.lib.TileBase;
+import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.storage.ModCharsetStorage;
-import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
 public class TileBackpack extends TileBase implements IInteractionObject, IInventory, IInventoryOwner {
 	private IItemHandler handler = new InvWrapper(this);

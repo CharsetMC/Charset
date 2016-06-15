@@ -16,10 +16,9 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import pl.asie.charset.lib.BlockBase;
+import pl.asie.charset.lib.blocks.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
-import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
 import java.util.ArrayList;
 import java.util.Calendar;

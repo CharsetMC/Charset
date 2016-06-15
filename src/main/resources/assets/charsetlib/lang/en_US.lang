@@ -25,6 +25,9 @@ tile.charset.ironNoteBlock.name=Iron Note Block
 tooltip.charset.tape.none=No Tape
 tooltip.charset.tape.unnamed=Unnamed Tape
 
+# CharsetDecoration
+item.charset.poster.name=Poster
+
 # CharsetDrama
 item.charset.dramaInABottle.name=Drama in a Bottle
 

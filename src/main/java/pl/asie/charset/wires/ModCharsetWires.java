@@ -78,8 +78,8 @@ public class ModCharsetWires {
 		packet = new PacketRegistry(ModCharsetWires.MODID);
 
 		// Temporary recipes
-		GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[0], false, 16))
-				.shaped("r r", "rir", "r r", 'r', "dustRedstone", 'i', "ingotIron")
+		GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[0], false, 8))
+				.shaped(" r ", "rir", " r ", 'r', "dustRedstone", 'i', "ingotIron")
 				.build());
 
 		for (int i = 0; i < 16; i++) {

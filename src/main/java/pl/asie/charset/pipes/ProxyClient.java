@@ -30,6 +30,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.render.ModelPipeLike;
 import pl.asie.charset.lib.render.SpritesheetFactory;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.pipes.pipe.ModelPipe;
+import pl.asie.charset.pipes.pipe.PartPipe;
+import pl.asie.charset.pipes.pipe.SpecialRendererPipe;
+import pl.asie.charset.pipes.shifter.SpecialRendererShifter;
+import pl.asie.charset.pipes.shifter.TileShifter;
 
 public class ProxyClient extends ProxyCommon {
 	private SpecialRendererPipe rendererPipe;
@@ -47,7 +52,6 @@ public class ProxyClient extends ProxyCommon {
 		rendererPipeStatic = new ModelPipe();
 
 		event.getModelRegistry().putObject(new ModelResourceLocation("charsetpipes:pipe", "multipart"), rendererPipeStatic);
-		event.getModelRegistry().putObject(new ModelResourceLocation("charsetpipes:pipe", "inventory"), rendererPipeStatic);
 	}
 
 	@SubscribeEvent

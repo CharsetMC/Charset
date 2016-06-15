@@ -3,4 +3,8 @@
 * [Audio] Add option in Tape Drives to record audio from other plugged-in devices
 * [Audio] Fix having a GUI open while a tape is being played lag everything
 * [Audio] Fix tape drives disappearing on world load
+* [Audio] Fix Tape Drive item rendering
+* [Audio] Remove Iron Note Block
+* [Decoration] Fix poster not having a name
+* [Pipes] Fix ugly pipe item model
 * [Wires] Large refactor of wire code - wires not placed in-world will disappear!

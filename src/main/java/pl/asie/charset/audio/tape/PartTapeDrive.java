@@ -41,8 +41,6 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import mcmultipart.MCMultiPartMod;
 import mcmultipart.multipart.PartSlot;
 import mcmultipart.raytrace.PartMOP;
-import pl.asie.charset.api.audio.AudioPacket;
-import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
@@ -50,7 +48,7 @@ import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.lib.multipart.PartSlab;
-import pl.asie.charset.lib.refs.Properties;
+import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.utils.MachineSound;
 
 public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, IInventoryOwner, ICapabilityProvider {

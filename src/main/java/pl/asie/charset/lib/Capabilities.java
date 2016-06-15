@@ -65,6 +65,7 @@ public class Capabilities {
 
 	@Optional.Method(modid = "mcmultipart")
 	private static void initMultiplePants() {
+		CapabilityWrapperRegistry.registerCapabilityWrapper(new AudioReceiverWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledEmitterWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneEmitterWrapper());
 		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledReceiverWrapper());
