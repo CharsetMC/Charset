@@ -17,15 +17,23 @@
 package pl.asie.charset.audio.storage;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import net.minecraftforge.common.DimensionManager;
 
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.codec.binary.Hex;
 import pl.asie.charset.audio.ModCharsetAudio;
 
 public class DataStorageManager {
 	private static final Random rand = new Random();
+	private final Set<DataStorageImpl> dirtySet = new HashSet<>();
+	private long lastSave = 0L;
 	private File saveDir;
 
 	public DataStorageManager() {
@@ -37,6 +45,47 @@ public class DataStorageManager {
 			}
 		} else {
 			ModCharsetAudio.logger.error("Could not create save directory! " + saveDirParent.getAbsolutePath());
+		}
+
+		lastSave = time();
+	}
+
+	private long time() {
+		return new Date().getTime();
+	}
+
+	@SubscribeEvent
+	public void onTick(TickEvent.ServerTickEvent event) {
+		if (event.phase == TickEvent.Phase.END) {
+			boolean shouldStore;
+			synchronized (dirtySet) {
+				shouldStore = dirtySet.size() > 0;
+			}
+			if (shouldStore && (lastSave + 30000L) < time()) {
+				try {
+					save();
+				} catch (IOException e) {
+
+				}
+			}
+		}
+	}
+
+	void markDirty(DataStorageImpl impl) {
+		synchronized (dirtySet) {
+			dirtySet.add(impl);
+		}
+	}
+
+	public void save() throws IOException {
+		Set<DataStorageImpl> dirtySetClone = new HashSet<>();
+		synchronized (dirtySet) {
+			dirtySetClone.addAll(dirtySet);
+			dirtySet.clear();
+		}
+
+		for (DataStorageImpl impl : dirtySetClone) {
+			impl.writeFile();
 		}
 	}
 

@@ -63,6 +63,8 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.wires.WireManager;
 
+import java.io.IOException;
+
 @Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION,
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetAudio {
@@ -165,10 +167,19 @@ public class ModCharsetAudio {
 	@Mod.EventHandler
 	public void serverStart(FMLServerStartedEvent event) {
 		storage = new DataStorageManager();
+		MinecraftForge.EVENT_BUS.register(storage);
 	}
 
 	@Mod.EventHandler
 	public void serverStop(FMLServerStoppedEvent event) {
+		if (storage != null) {
+			try {
+				storage.save();
+			} catch (IOException e) {
+
+			}
+			MinecraftForge.EVENT_BUS.unregister(storage);
+		}
 		storage = null;
 	}
 }

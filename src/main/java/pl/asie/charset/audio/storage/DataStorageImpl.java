@@ -17,6 +17,7 @@
 package pl.asie.charset.audio.storage;
 
 import java.io.*;
+import java.util.Date;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -33,7 +34,7 @@ public class DataStorageImpl implements IDataStorage {
 	private int size;
 	private byte[] data;
 	private int position;
-	private boolean dirty = false;
+	private boolean dirty;
 
 	public DataStorageImpl() {
 	}
@@ -195,7 +196,7 @@ public class DataStorageImpl implements IDataStorage {
 		fileStream.close();
 	}
 
-	public void writeFile() throws IOException {
+	void writeFile() throws IOException {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			FileOutputStream fileStream = new FileOutputStream(file);
 			GZIPOutputStream stream = new GZIPOutputStream(fileStream);
@@ -213,7 +214,7 @@ public class DataStorageImpl implements IDataStorage {
 
 	public void onUnload() throws IOException {
 		if (dirty) {
-			writeFile();
+			ModCharsetAudio.storage.markDirty(this);
 		}
 	}
 }
