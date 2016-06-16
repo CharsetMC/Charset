@@ -162,6 +162,10 @@ public class DataStorageImpl implements IDataStorage {
 
 
 	public void readFile() throws IOException {
+		// Before reading the file, save any previous potential copies to
+		// prevent race conditions.
+		ModCharsetAudio.storage.save();
+
 		FileInputStream fileStream = new FileInputStream(file);
 		GZIPInputStream stream = new GZIPInputStream(fileStream);
 

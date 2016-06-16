@@ -26,6 +26,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.audio.AudioData;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.AudioSink;
@@ -56,6 +58,17 @@ public class PacketAudioData extends Packet {
 		packet.writeData(buf);
 	}
 
+	@SideOnly(Side.CLIENT)
+	private void playSoundNote(AudioPacket packet, IDataSound sound) {
+		for (AudioSink sink : packet.getSinks()) {
+			Minecraft.getMinecraft().getSoundHandler().playSound(
+					new PositionedSoundRecord(new SoundEvent(new ResourceLocation(sound.getSoundName())),
+							SoundCategory.BLOCKS, 3.0F * sink.getVolume() * packet.getVolume(),
+							sound.getSoundPitch(), new BlockPos(sink.getPos()))
+			);
+		}
+	}
+
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		int id = buf.readInt();
@@ -65,13 +78,7 @@ public class PacketAudioData extends Packet {
 		AudioData audioData = packet.getData();
 		if (audioData instanceof IDataSound) {
 			IDataSound sound = (IDataSound) audioData;
-			for (AudioSink sink : packet.getSinks()) {
-				Minecraft.getMinecraft().getSoundHandler().playSound(
-						new PositionedSoundRecord(new SoundEvent(new ResourceLocation(sound.getSoundName())),
-								SoundCategory.BLOCKS, 3.0F * sink.getVolume() * packet.getVolume(),
-								sound.getSoundPitch(), new BlockPos(sink.getPos()))
-				);
-			}
+			playSoundNote(packet, sound);
 			return;
 		}
 

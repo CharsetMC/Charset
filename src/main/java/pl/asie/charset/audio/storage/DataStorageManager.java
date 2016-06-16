@@ -19,7 +19,9 @@ package pl.asie.charset.audio.storage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ import pl.asie.charset.audio.ModCharsetAudio;
 
 public class DataStorageManager {
 	private static final Random rand = new Random();
-	private final Set<DataStorageImpl> dirtySet = new HashSet<>();
+	private final Map<String, DataStorageImpl> dirtyMap = new HashMap<>();
 	private long lastSave = 0L;
 	private File saveDir;
 
@@ -58,8 +60,8 @@ public class DataStorageManager {
 	public void onTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
 			boolean shouldStore;
-			synchronized (dirtySet) {
-				shouldStore = dirtySet.size() > 0;
+			synchronized (dirtyMap) {
+				shouldStore = dirtyMap.size() > 0;
 			}
 			if (shouldStore && (lastSave + 30000L) < time()) {
 				try {
@@ -72,16 +74,18 @@ public class DataStorageManager {
 	}
 
 	void markDirty(DataStorageImpl impl) {
-		synchronized (dirtySet) {
-			dirtySet.add(impl);
+		if (impl.getUniqueId() != null) {
+			synchronized (dirtyMap) {
+				dirtyMap.put(impl.getUniqueId(), impl);
+			}
 		}
 	}
 
 	public void save() throws IOException {
 		Set<DataStorageImpl> dirtySetClone = new HashSet<>();
-		synchronized (dirtySet) {
-			dirtySetClone.addAll(dirtySet);
-			dirtySet.clear();
+		synchronized (dirtyMap) {
+			dirtySetClone.addAll(dirtyMap.values());
+			dirtyMap.clear();
 		}
 
 		for (DataStorageImpl impl : dirtySetClone) {
