@@ -18,17 +18,17 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.3.0-pre9"
+version = "0.3.0-pre10"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.9.4-12.17.0.1957"
+	version = "1.9.4-12.17.0.1963"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20160609"
+	mappings = "snapshot_20160615"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -53,7 +53,7 @@ configurations {
 
 dependencies {
 	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_72:universal"
-	deobfCompile "mezz.jei:jei_1.9.4:3.6.2.211"
+	deobfCompile "mezz.jei:jei_1.9.4:3.6.3.212"
 	shadow name: "libresample4j", version: "bc0a030"
 //	shadow name: "JTraits", version: "18c8227"
 }

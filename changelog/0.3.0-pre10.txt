@@ -1,0 +1,3 @@
+* [Audio] Fix server-side crash on Tape Drive/etc. usage
+* [Audio] Fix tape drive GUI lag once and for all, hopefully
+* [Tweaks] Remove AutoReplace for the time being - buggy on 1.9+
