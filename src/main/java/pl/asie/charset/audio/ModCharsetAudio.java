@@ -93,6 +93,9 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_AUDIO))
+			return;
+		
 		logger = LogManager.getLogger(ModCharsetAudio.MODID);
 
 		audioCableFactory = (AudioCableFactory) new AudioCableFactory().setRegistryName(new ResourceLocation("charsetaudio:cable"));
@@ -133,6 +136,9 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_AUDIO))
+			return;
+		
 		MinecraftForge.EVENT_BUS.register(new NoteBlockManager());
 
 		packet = new PacketRegistry(ModCharsetAudio.MODID);
@@ -159,6 +165,9 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_AUDIO))
+			return;
+		
 		if (Loader.isModLoaded("NotEnoughCodecs")) {
 			logger.info("NotEnoughCodecs present, MP3 and MP4 support available");
 		}
@@ -166,12 +175,18 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void serverStart(FMLServerStartedEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_AUDIO))
+			return;
+		
 		storage = new DataStorageManager();
 		MinecraftForge.EVENT_BUS.register(storage);
 	}
 
 	@Mod.EventHandler
 	public void serverStop(FMLServerStoppedEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_AUDIO))
+			return;
+		
 		if (storage != null) {
 			try {
 				storage.save();

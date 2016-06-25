@@ -53,6 +53,9 @@ public class ModCharsetDecoration {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_DECORATION))
+			return;
+		
 		logger = LogManager.getLogger(ModCharsetDecoration.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("decoration.cfg"));
 
@@ -65,6 +68,9 @@ public class ModCharsetDecoration {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_DECORATION))
+			return;
+		
 		EntityRegistry.registerModEntity(EntityPoster.class, "charsetdecoration:poster", 1, this, 64, 3, true);
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(posterItem),

@@ -126,6 +126,9 @@ public class ModCharsetStorage {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_STORAGE))
+			return;
+		
 		logger = LogManager.getLogger(ModCharsetStorage.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("storage.cfg"));
 
@@ -186,6 +189,9 @@ public class ModCharsetStorage {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_STORAGE))
+			return;
+		
 		GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
 		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
 		if (ModCharsetLib.INDEV) {
@@ -319,6 +325,9 @@ public class ModCharsetStorage {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_STORAGE))
+			return;
+		
 		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE, new ItemStack(Blocks.BEDROCK), new ItemStack(Blocks.DIAMOND_BLOCK));
 		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
 

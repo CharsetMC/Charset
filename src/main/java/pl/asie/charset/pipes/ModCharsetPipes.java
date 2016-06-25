@@ -74,6 +74,9 @@ public class ModCharsetPipes {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_PIPES))
+			return;
+		
 		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
 
 		itemPipe = new ItemPipe();
@@ -92,6 +95,9 @@ public class ModCharsetPipes {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_PIPES))
+			return;
+		
 		proxy.registerRenderers();
 
 		packet = new PacketRegistry(ModCharsetPipes.MODID);
@@ -116,9 +122,5 @@ public class ModCharsetPipes {
 				"g",
 				"m",
 				'g', Blocks.GLASS, 'm', Blocks.OBSIDIAN);
-	}
-
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
 	}
 }

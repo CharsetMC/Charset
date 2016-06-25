@@ -47,6 +47,9 @@ public class ModCharsetDrama {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_DRAMA))
+			return;
+		
 		logger = LogManager.getLogger(ModCharsetDrama.MODID);
 
 		dramaInABottle = new ItemDramaInABottle();
@@ -60,6 +63,9 @@ public class ModCharsetDrama {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_DRAMA))
+			return;
+		
 		BrewingRecipeRegistry.addRecipe(new ItemStack(Items.POTIONITEM, 1, 16), "dyePink", new ItemStack(dramaInABottle));
 	}
 }

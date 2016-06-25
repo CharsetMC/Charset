@@ -58,6 +58,9 @@ public class ModCharsetWires {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_TWEAKS))
+			return;
+		
 		wireFactories[0] = new WireSignalFactory(WireType.NORMAL, -1).setRegistryName(new ResourceLocation("charsetwires:rsWireN"));
 		for (int i = 0; i < 16; i++) {
 			wireFactories[i + 1] = new WireSignalFactory(WireType.INSULATED, i).setRegistryName(new ResourceLocation("charsetwires:rsWireI." + i));
@@ -75,6 +78,9 @@ public class ModCharsetWires {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_TWEAKS))
+			return;
+		
 		packet = new PacketRegistry(ModCharsetWires.MODID);
 
 		// Temporary recipes
@@ -97,9 +103,5 @@ public class ModCharsetWires {
 		GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[17], true, 1))
 				.shaped("sws", "www", "sws", 'w', new RecipeObjectSignalWire(WireType.INSULATED, true), 's', Items.STRING)
 				.build());
-	}
-
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
 	}
 }

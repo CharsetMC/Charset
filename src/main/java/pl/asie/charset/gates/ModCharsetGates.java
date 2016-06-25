@@ -74,6 +74,9 @@ public class ModCharsetGates {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_GATES))
+			return;
+		
 		itemGate = new ItemGate();
 		GameRegistry.register(itemGate.setRegistryName("gate"));
 
@@ -90,6 +93,9 @@ public class ModCharsetGates {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_GATES))
+			return;
+		
 		packet = new PacketRegistry(ModCharsetGates.MODID);
 
 		registerGateStack(ItemGate.getStack(new PartGateNOR().setInvertedSides(0b0001)), "sts", "scs", "sss");
