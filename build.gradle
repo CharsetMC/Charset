@@ -33,7 +33,9 @@ minecraft {
 }
 
 repositories {
-	maven { url "http://maven.amadornes.com/" }
+	maven { 
+		url "http://maven.amadornes.com/" 
+	}
 	maven {
 		name 'DVS1 Maven FS'
 		url 'http://dvs1.progwml6.com/files/maven'
@@ -46,8 +48,8 @@ repositories {
 
 
 dependencies {
-	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_72:universal"
-	deobfCompile "mezz.jei:jei_1.10:3.7.0.218"
+	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_73:universal"
+	deobfCompile "mezz.jei:jei_1.10:3.7.0.218:api"
 }
 
 sourceSets {
@@ -87,3 +89,5 @@ task deobfJar(type: Jar) {
 artifacts {
 	archives deobfJar
 }
+
+defaultTasks 'build'
