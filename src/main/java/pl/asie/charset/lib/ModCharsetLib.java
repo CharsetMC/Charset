@@ -18,26 +18,28 @@ package pl.asie.charset.lib;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableSet;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
-
 import pl.asie.charset.api.audio.AudioAPI;
 import pl.asie.charset.lib.audio.AudioDataDFPWM;
 import pl.asie.charset.lib.audio.AudioDataSound;
@@ -67,8 +69,24 @@ public class ModCharsetLib {
 	public static final String VERSION = "@VERSION@";
 	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart@[1.3.0,)";
 	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
-	public static final String ACCEPTABLE_REMOTE_VERSIONS = "@VERSION@";
+	public static final String ACCEPTABLE_REMOTE_VERSIONS = "[0.3.5,0.3.6]";
 
+	public static final String MODULE_PIPES = "pipes";
+	public static final String MODULE_TWEAKS = "tweaks";
+	public static final String MODULE_WIRES = "wires";
+	public static final String MODULE_GATES = "gates";
+	public static final String MODULE_AUDIO = "audio";
+	public static final String MODULE_STORAGE = "storage";
+	public static final String MODULE_DECORATION = "decoration";
+	public static final String MODULE_DRAMA = "drama";
+	public static final String MODULE_WRENCH = "wrench";
+	
+	public static final String[] MODULES = {
+		MODULE_PIPES, MODULE_TWEAKS, MODULE_WIRES, MODULE_GATES, MODULE_AUDIO, MODULE_STORAGE, MODULE_DECORATION, MODULE_DRAMA, MODULE_WRENCH
+	};
+	private static final ImmutableSet<String> DISABLED_MODULES_BY_DEFAULT = ImmutableSet.of(MODULE_AUDIO, MODULE_DRAMA);
+	private static final HashMap<String, Boolean> moduleStatus = new HashMap();
+	
 	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
 		@Override
 		public Calendar get() {
@@ -98,8 +116,16 @@ public class ModCharsetLib {
 
 	private File configurationDirectory;
 
+	public File getModuleConfigFile() {
+		return getConfigFile("_modules.cfg");
+	}
+	
 	public File getConfigFile(String filename) {
 		return new File(configurationDirectory, filename);
+	}
+	
+	public static boolean moduleEnabled(String module) {
+		return moduleStatus.get(module);
 	}
 
 	@Mod.EventHandler
@@ -125,6 +151,13 @@ public class ModCharsetLib {
 
 		Capabilities.init();
 		NotifyImplementation.init();
+		
+		Configuration config = new Configuration(getModuleConfigFile());
+		config.load();
+		for(String s : MODULES)
+			moduleStatus.put(s, config.getBoolean(s, config.CATEGORY_GENERAL, !DISABLED_MODULES_BY_DEFAULT.contains(s), ""));
+		if(config.hasChanged())
+			config.save();
 	}
 
 	@Mod.EventHandler

@@ -69,6 +69,9 @@ public class ModCharsetTweaks {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_TWEAKS))
+			return;
+
 		// addTweak(new TweakAutoReplace());
 		addTweak(new TweakDisableVanillaTools());
 		addTweak(new TweakDoubleDoors());
@@ -99,6 +102,9 @@ public class ModCharsetTweaks {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_TWEAKS))
+			return;
+		
 		packet = new PacketRegistry(ModCharsetTweaks.MODID);
 		packet.registerPacket(0x01, PacketMinecartUpdate.class);
 		packet.registerPacket(0x02, PacketMinecartRequest.class);
@@ -115,6 +121,9 @@ public class ModCharsetTweaks {
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_TWEAKS))
+			return;
+		
 		for (Tweak t : tweakSet) {
 			if (t.isEnabled()) {
 				t.enable();

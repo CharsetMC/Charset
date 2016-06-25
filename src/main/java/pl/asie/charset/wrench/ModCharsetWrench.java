@@ -37,6 +37,9 @@ public class ModCharsetWrench {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_WRENCH))
+			return;
+		
 		wrench = new ItemWrench();
 		GameRegistry.register(wrench.setRegistryName("wrench"));
 		ModCharsetLib.proxy.registerItemModel(wrench, 0, "charsetwrench:wrench");
@@ -44,11 +47,11 @@ public class ModCharsetWrench {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_WRENCH))
+			return;
+		
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wrench),
 				" i ", " si", "i  ", 's', "stickWood", 'i', "ingotIron"));
 	}
 
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-	}
 }
