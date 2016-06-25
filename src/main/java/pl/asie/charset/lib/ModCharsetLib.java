@@ -75,12 +75,13 @@ public class ModCharsetLib {
 	public static final String MODULE_GATES = "gates";
 	public static final String MODULE_AUDIO = "audio";
 	public static final String MODULE_STORAGE = "storage";
+	public static final String MODULE_FARMING = "farming";
 	public static final String MODULE_DECORATION = "decoration";
 	public static final String MODULE_DRAMA = "drama";
 	public static final String MODULE_WRENCH = "wrench";
 	
 	public static final String[] MODULES = {
-		MODULE_PIPES, MODULE_TWEAKS, MODULE_WIRES, MODULE_GATES, MODULE_AUDIO, MODULE_STORAGE, MODULE_DECORATION, MODULE_DRAMA, MODULE_WRENCH
+		MODULE_PIPES, MODULE_TWEAKS, MODULE_WIRES, MODULE_GATES, MODULE_AUDIO, MODULE_STORAGE, MODULE_FARMING, MODULE_DECORATION, MODULE_DRAMA, MODULE_WRENCH
 	};
 	private static final ImmutableSet<String> DISABLED_MODULES_BY_DEFAULT = ImmutableSet.of(MODULE_AUDIO, MODULE_DRAMA);
 	private static final HashMap<String, Boolean> moduleStatus = new HashMap();
