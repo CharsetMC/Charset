@@ -207,7 +207,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             barrel.setItemCount(dataManager.get(BARREL_ITEM_COUNT));
             barrel.woodLog = dataManager.get(BARREL_LOG).or(TileEntityDayBarrel.DEFAULT_LOG);
             barrel.woodSlab = dataManager.get(BARREL_SLAB).or(TileEntityDayBarrel.DEFAULT_SLAB);
-            barrel.orientation = FzOrientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
+            barrel.orientation = FzOrientation.getOrientation(dataManager.get(BARREL_ORIENTATION).intValue());
             barrel.type = TileEntityDayBarrel.Type.values()[dataManager.get(BARREL_TYPE)];
         }
 

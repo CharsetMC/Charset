@@ -17,16 +17,14 @@
 package pl.asie.charset.audio.tape;
 
 import java.io.File;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.laszlosystems.libresample4j.Resampler;
+import javax.sound.sampled.AudioFormat;
+
 import org.apache.commons.io.FilenameUtils;
 
 import net.minecraftforge.fml.common.Loader;
-
-import javax.sound.sampled.AudioFormat;
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.codecs.CodecJOrbis;

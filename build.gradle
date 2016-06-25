@@ -8,27 +8,25 @@ buildscript {
 	}
 	dependencies {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
 	}
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.3.0-pre10"
+version = "0.3.0-pre11"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.9.4-12.17.0.1963"
+	version = "1.10-12.18.0.1986-1.10.0"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20160615"
+	mappings = "snapshot_20160518"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -46,16 +44,10 @@ repositories {
 	}
 }
 
-configurations {
-	shadow
-	compile.extendsFrom shadow
-}
 
 dependencies {
 	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.2.0_72:universal"
-	deobfCompile "mezz.jei:jei_1.9.4:3.6.3.212"
-	shadow name: "libresample4j", version: "bc0a030"
-//	shadow name: "JTraits", version: "18c8227"
+	deobfCompile "mezz.jei:jei_1.10:3.7.0.218"
 }
 
 sourceSets {
@@ -85,21 +77,6 @@ processResources {
 		exclude 'mcmod.info'
 	}
 }
-
-jar.dependsOn shadowJar
-jar.enabled = false
-
-shadowJar {
-	archiveName = tasks.jar.archiveName
-	configurations = [project.configurations.shadow]
-	relocate 'com.amadornes.jtraits', 'pl.asie.charset.lib.jtraits'
-	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.audio.libresample4j'
-}
-
-reobfJar {
-	setJar(tasks.shadowJar.archivePath)
-}
-reobfJar.dependsOn shadowJar
 
 task deobfJar(type: Jar) {
 	from(sourceSets.main.output) {

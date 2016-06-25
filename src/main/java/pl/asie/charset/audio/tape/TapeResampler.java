@@ -1,8 +1,8 @@
 package pl.asie.charset.audio.tape;
 
-import com.laszlosystems.libresample4j.Resampler;
-
 import java.nio.FloatBuffer;
+
+import pl.asie.charset.audio.libresample4j.Resampler;
 
 public final class TapeResampler {
     private static final Resampler RESAMPLER = new Resampler(true, 0.01, 100);
