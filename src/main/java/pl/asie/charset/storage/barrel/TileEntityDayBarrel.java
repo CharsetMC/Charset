@@ -308,7 +308,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                         boolean inserted = false;
                         for (int i = 0; i < handler.getSlots(); i++) {
                             ItemStack got = handler.insertItem(i, toPush, false);
-                            if (got != null) {
+                            if (got == null) {
                                 inserted = true;
                                 updateStacks();
                                 cleanBarrel();
