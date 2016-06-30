@@ -16,7 +16,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.3.0-pre11"
+version = "0.3.0-pre12"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
