@@ -84,7 +84,7 @@ public class ModCharsetLib {
 	public static final String[] MODULES = {
 		MODULE_PIPES, MODULE_TWEAKS, MODULE_WIRES, MODULE_GATES, MODULE_AUDIO, MODULE_STORAGE, MODULE_DECORATION, MODULE_DRAMA, MODULE_WRENCH
 	};
-	private static final ImmutableSet<String> DISABLED_MODULES_BY_DEFAULT = ImmutableSet.of(MODULE_AUDIO, MODULE_DRAMA);
+	private static final ImmutableSet<String> DISABLED_MODULES_BY_DEFAULT = ImmutableSet.of(MODULE_DRAMA, MODULE_FARMING);
 	private static final HashMap<String, Boolean> moduleStatus = new HashMap();
 	
 	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
