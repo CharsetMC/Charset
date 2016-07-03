@@ -92,6 +92,7 @@ public class DFPWM implements ICodec {
 			int d = 0;
 			for(int j = 0; j < 8; j++)
 			{
+				if (srcoffs >= src.length) return;
 				int inlevel = src[srcoffs++];
 				boolean curbit = (inlevel > level || (inlevel == level && level == 127));
 				d = (curbit ? (d>>1)+128 : d>>1);

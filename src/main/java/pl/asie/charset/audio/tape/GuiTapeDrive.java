@@ -39,6 +39,19 @@ import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.container.GuiContainerCharset;
 
 public class GuiTapeDrive extends GuiContainerCharset {
+	public class DialogThread implements Runnable {
+		public JFileChooser chooser = new JFileChooser();
+		public int result;
+
+		@Override
+		public void run() {
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+			chooser.setFileFilter(new FileNameExtensionFilter("Audio file " + Arrays.toString(TapeRecordThread.getSupportedExtensions()), TapeRecordThread.getSupportedExtensions()));
+			result = chooser.showOpenDialog(Display.getParent());
+		}
+	}
+
 	private static final ResourceLocation TEXTURE = new ResourceLocation("charsetaudio:textures/gui/tape_drive.png");
 	private static final int BUTTON_START_X = 88 - (Button.values().length * 10);
 	private static final int BUTTON_START_Y = 58;
@@ -56,10 +69,15 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	private int counter;
 	private Button buttonHovering = null;
 	private boolean ctrResetHover = false;
+	private DialogThread tapeDialog;
 	private TapeRecordThread tapeRecord;
-	private Thread tapeRecordThread;
+	private Thread tapeRecordThread, tapeDialogThread;
 
-	public boolean isRecordingFromFile() {
+	public boolean isRecordingFromFile(boolean inProgress) {
+		if (!inProgress && tapeDialogThread != null && tapeDialogThread.isAlive()) {
+			return true;
+		}
+
 		return tapeRecordThread != null && tapeRecordThread.isAlive();
 	}
 	
@@ -73,7 +91,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 			return true;
 		}
 
-		if (isRecordingFromFile() && button == Button.RECORD_FILE) {
+		if (isRecordingFromFile(false) && button == Button.RECORD_FILE) {
 			return true;
 		}
 
@@ -105,7 +123,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	}
 	
 	public void handleButtonPress(Button button) {
-		if (isRecordingFromFile()) {
+		if (isRecordingFromFile(false)) {
 			return;
 		}
 
@@ -131,17 +149,9 @@ public class GuiTapeDrive extends GuiContainerCharset {
 						Minecraft.getMinecraft().toggleFullscreen();
 					}
 
-					JFileChooser chooser = new JFileChooser();
-					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-					chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-					chooser.setFileFilter(new FileNameExtensionFilter("Audio file " + Arrays.toString(TapeRecordThread.getSupportedExtensions()), TapeRecordThread.getSupportedExtensions()));
-					if (chooser.showOpenDialog(Display.getParent()) == JFileChooser.APPROVE_OPTION) {
-						if (chooser.getSelectedFile() != null) {
-							tapeRecord = new TapeRecordThread(chooser.getSelectedFile(), tapeDrive);
-							tapeRecordThread = new Thread(tapeRecord);
-							tapeRecordThread.start();
-						}
-					}
+					tapeDialog = new DialogThread();
+					tapeDialogThread = new Thread(tapeDialog);
+					tapeDialogThread.start();
 				}
 				break;
 			case RECORD_AUDIO:
@@ -155,11 +165,23 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		super.updateScreen();
 		this.state = tapeDrive.getState();
 		this.counter = tapeDrive.state.counter;
+
+		if (tapeDialogThread != null && !tapeDialogThread.isAlive()) {
+			if (tapeDialog.result == JFileChooser.APPROVE_OPTION) {
+				if (tapeDialog.chooser.getSelectedFile() != null) {
+					tapeRecord = new TapeRecordThread(tapeDialog.chooser.getSelectedFile(), tapeDrive);
+					tapeRecordThread = new Thread(tapeRecord);
+					tapeRecordThread.start();
+				}
+			}
+			tapeDialogThread = null;
+			tapeDialog = null;
+		}
 	}
 
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
-		if (isRecordingFromFile()) {
+		if (isRecordingFromFile(false)) {
 			if (keyCode == 1 || keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
 				return;
 			}
@@ -170,7 +192,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 
 	@Override
 	public void mouseClicked(int x, int y, int mb) throws IOException {
-		if (isRecordingFromFile()) {
+		if (isRecordingFromFile(false)) {
 			return;
 		}
 
@@ -198,7 +220,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 	
 	@Override
 	public void mouseReleased(int x, int y, int which) {
-		if (isRecordingFromFile()) {
+		if (isRecordingFromFile(false)) {
 			return;
 		}
 
@@ -294,7 +316,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		String label = getLabel();
 		int labelColor = 0xFFFFFF;
 
-		if (isRecordingFromFile()) {
+		if (isRecordingFromFile(true)) {
 			label = tapeRecord.getStatusBar();
 			labelColor = 0x90E0B0;
 		} else {
