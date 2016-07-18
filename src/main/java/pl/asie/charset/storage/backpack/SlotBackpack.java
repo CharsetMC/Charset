@@ -58,6 +58,6 @@ public class SlotBackpack extends Slot {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public String getSlotTexture() {
-		return ItemArmor.EMPTY_SLOT_NAMES[1];
+		return ItemArmor.EMPTY_SLOT_NAMES[2];
 	}
 }
