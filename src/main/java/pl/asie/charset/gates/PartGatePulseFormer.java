@@ -58,6 +58,7 @@ public class PartGatePulseFormer extends PartGate {
 				if (pulse != 0) {
 					scheduleTick();
 				}
+				super.tick();
 				notifyBlockUpdate();
 				sendUpdatePacket();
 			}
