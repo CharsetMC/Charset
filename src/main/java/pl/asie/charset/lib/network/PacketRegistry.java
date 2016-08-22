@@ -66,9 +66,7 @@ public class PacketRegistry {
 		for (EntityPlayerMP player : worldServer.getMinecraftServer().getPlayerList().getPlayerList()) {
 			if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
 				if (worldServer.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
-					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
-					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-					channels.get(Side.SERVER).writeOutbound(message);
+					sendTo(message, player);
 				}
 			}
 		}

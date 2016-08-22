@@ -33,6 +33,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -60,6 +61,8 @@ public class ModCharsetGates {
 
 	@SidedProxy(clientSide = "pl.asie.charset.gates.ProxyClient", serverSide = "pl.asie.charset.gates.ProxyCommon")
 	public static ProxyCommon proxy;
+	@Instance
+	public static ModCharsetGates INSTANCE;
 
 	public static PacketRegistry packet;
 	public static ItemGate itemGate;
@@ -105,7 +108,7 @@ public class ModCharsetGates {
 		registerGateStack(ItemGate.getStack(new PartGateBuffer().setInvertedSides(0b0001)));
 	}
 
-	private void registerGateStack(ItemStack stack, Object... recipe) {
+	public void registerGateStack(ItemStack stack, Object... recipe) {
 		if (recipe.length > 0) {
 			List<Object> data = new ArrayList<Object>();
 			for (Object o : recipe) {
@@ -145,8 +148,9 @@ public class ModCharsetGates {
 		registerGateStack(stack);
 	}
 
-	private void registerGateStack(ItemStack stack) {
-		gateStacks.add(stack);
+	public void registerGateStack(ItemStack stack) {
+		if(stack != null && (stack.getItem() instanceof ItemGate))
+			gateStacks.add(stack);
 	}
 
 	private void registerGate(String name, Class<? extends PartGate> clazz, int meta) {
