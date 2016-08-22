@@ -86,8 +86,10 @@ public class ProxyClient extends ProxyCommon {
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), ModCharsetStorage.keyItem);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), ModCharsetStorage.lockItem);
 
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelBlock);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelItem);
+		if(ModCharsetStorage.barrelsEnabled) {
+			Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelBlock);
+			Minecraft.getMinecraft().getItemColors().registerItemColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelItem);
+		}
 
 		if (ModCharsetLib.INDEV) {
 			Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(crateModel.colorizer, ModCharsetStorage.crateBlock);

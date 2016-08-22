@@ -50,6 +50,9 @@ public class ModCharsetFarming {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_FARMING))
+			return;
+
 		logger = LogManager.getLogger(ModCharsetFarming.MODID);
 
 		clayBucket = new UniversalClayBucket();
@@ -61,6 +64,9 @@ public class ModCharsetFarming {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_FARMING))
+			return;
+
 		GameRegistry.addRecipe(new ShapedOreRecipe(
 				new ItemStack(clayBucket),
 				"C C", " C ",
