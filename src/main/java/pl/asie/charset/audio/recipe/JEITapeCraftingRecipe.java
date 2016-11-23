@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import mezz.jei.api.ingredients.IIngredients;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 

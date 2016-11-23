@@ -50,11 +50,6 @@ import pl.asie.charset.audio.tape.PartTapeDrive;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RecipeUtils;
-import pl.asie.charset.storage.backpack.HandlerBackpack;
-import pl.asie.charset.storage.backpack.BlockBackpack;
-import pl.asie.charset.storage.backpack.ItemBackpack;
-import pl.asie.charset.storage.backpack.PacketBackpackOpen;
-import pl.asie.charset.storage.backpack.TileBackpack;
 import pl.asie.charset.storage.barrel.BarrelCartRecipe;
 import pl.asie.charset.storage.barrel.BarrelEventListener;
 import pl.asie.charset.storage.barrel.BarrelRegistry;
@@ -94,7 +89,6 @@ public class ModCharsetStorage {
 	public static PacketRegistry packet;
 	public static Logger logger;
 
-	public static BlockBackpack backpackBlock;
 	public static ItemMasterKey masterKeyItem;
 	public static ItemKey keyItem;
 	public static ItemLock lockItem;
@@ -129,10 +123,6 @@ public class ModCharsetStorage {
 		logger = LogManager.getLogger(ModCharsetStorage.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("storage.cfg"));
 
-		backpackBlock = new BlockBackpack();
-		GameRegistry.register(backpackBlock.setRegistryName("backpack"));
-		GameRegistry.register(new ItemBackpack(backpackBlock).setRegistryName("backpack"));
-
 		if (ModCharsetLib.INDEV) {
 			crateBlock = new BlockCrate();
 			crateItem = new ItemCrate(crateBlock);
@@ -165,7 +155,6 @@ public class ModCharsetStorage {
 
 		ModCharsetLib.proxy.registerItemModel(barrelItem, 0, "charsetstorage:barrel");
 		ModCharsetLib.proxy.registerItemModel(barrelCartItem, 0, "charsetstorage:barrelCart");
-		ModCharsetLib.proxy.registerItemModel(backpackBlock, 0, "charsetstorage:backpack");
 		ModCharsetLib.proxy.registerItemModel(masterKeyItem, 0, "charsetstorage:masterKey");
 		ModCharsetLib.proxy.registerItemModel(keyItem, 0, "charsetstorage:key");
 		ModCharsetLib.proxy.registerItemModel(lockItem, 0, "charsetstorage:lock");
@@ -186,7 +175,6 @@ public class ModCharsetStorage {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		GameRegistry.registerTileEntity(TileBackpack.class, "charset:backpack");
 		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
 		if (ModCharsetLib.INDEV) {
 			GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
@@ -198,10 +186,8 @@ public class ModCharsetStorage {
 		proxy.init();
 
 		packet = new PacketRegistry(ModCharsetStorage.MODID);
-		packet.registerPacket(0x01, PacketBackpackOpen.class);
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
 
-		MinecraftForge.EVENT_BUS.register(new HandlerBackpack());
 		MinecraftForge.EVENT_BUS.register(new LockEventHandler());
 
 		if (enableKeyKeepInventory) {
@@ -217,9 +203,6 @@ public class ModCharsetStorage {
 		BarrelUpgradeRecipes.addUpgradeRecipes();
 
 		RecipeSorter.register("charsetstorage:barrelCart", BarrelCartRecipe.class, RecipeSorter.Category.SHAPELESS, "");
-
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(backpackBlock), "lgl", "scs", "lwl",
-				'l', Items.LEATHER, 'c', "chestWood", 's', "stickWood", 'g', "ingotGold", 'w', Blocks.WOOL));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(keyItem), "ng", "ng", " g", 'n', "nuggetGold", 'g', "ingotGold") {
 			@Override
