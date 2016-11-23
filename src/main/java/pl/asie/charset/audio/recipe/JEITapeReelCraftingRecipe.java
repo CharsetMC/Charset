@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import mezz.jei.api.ingredients.IIngredients;
 import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.oredict.OreDictionary;
@@ -64,6 +65,11 @@ public class JEITapeReelCraftingRecipe extends BlankRecipeWrapper implements ISh
 		public boolean isRecipeValid(@Nonnull RecipeTapeReel recipe) {
 			return true;
 		}
+	}
+
+	@Override
+	public void getIngredients(IIngredients ingredients) {
+		// TODO
 	}
 
 	@Nonnull

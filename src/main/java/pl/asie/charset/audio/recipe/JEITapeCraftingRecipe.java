@@ -69,6 +69,11 @@ public class JEITapeCraftingRecipe extends BlankRecipeWrapper implements IShaped
 		}
 	}
 
+	@Override
+	public void getIngredients(IIngredients ingredients) {
+		// TODO
+	}
+
 	@Nonnull
 	@Override
 	public List getInputs() {

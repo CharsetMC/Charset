@@ -1,5 +1,6 @@
 package pl.asie.charset.lib.recipe;
 
+import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeWrapper;
 import mezz.jei.api.recipe.IRecipeHandler;
 import mezz.jei.api.recipe.IRecipeWrapper;
@@ -75,6 +76,11 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements ICraftingRec
 
     private JEIRecipeCharset(RecipeCharset recipe) {
         this.recipe = recipe;
+    }
+
+    @Override
+    public void getIngredients(IIngredients ingredients) {
+        // TODO
     }
 
     @Override

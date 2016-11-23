@@ -34,11 +34,6 @@
       "0": {},
       "1": {
         "textures": {
-          "arrow": "charsetpipes:blocks/shifter_side_weak"
-        }
-      },
-      "2": {
-        "textures": {
           "arrow": "charsetpipes:blocks/shifter_side_on"
         }
       }
