@@ -32,7 +32,6 @@ public abstract class ItemMinecartCharset extends ItemMinecart {
                 placeCart(null, stack, w, pos);
             }
 
-            stack.stackSize--;
             return EnumActionResult.SUCCESS;
         }
     }

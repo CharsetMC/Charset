@@ -95,7 +95,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 
 	@Override
 	protected void onSignalChanged(int color) {
-		if (getWorld() != null && !getWorld().isRemote) {
+		if (getWorld() != null && getPos() != null && !getWorld().isRemote) {
 			propagate(color);
 		}
 	}

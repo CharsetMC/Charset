@@ -36,6 +36,7 @@
 
 package pl.asie.charset.storage.barrel;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -59,6 +60,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.blocks.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
+import pl.asie.charset.pipes.shifter.TileShifter;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 import java.util.ArrayList;
@@ -92,6 +94,14 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         }
 
         return stacks;
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityDayBarrel) {
+            ((TileEntityDayBarrel) tile).neighborChanged();
+        }
     }
 
     @Override

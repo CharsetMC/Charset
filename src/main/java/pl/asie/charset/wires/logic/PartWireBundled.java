@@ -222,7 +222,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 	@Override
 	protected void onSignalChanged(int color) {
-		if (getWorld() != null && !getWorld().isRemote) {
+		if (getWorld() != null && getPos() != null && !getWorld().isRemote) {
 			propagate(color);
 		}
 	}

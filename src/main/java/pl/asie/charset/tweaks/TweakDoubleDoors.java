@@ -36,22 +36,27 @@
 
 package pl.asie.charset.tweaks;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class TweakDoubleDoors extends Tweak {
 	private final Set<BlockDoor> allowedDoors = new HashSet<BlockDoor>();
@@ -62,12 +67,20 @@ public class TweakDoubleDoors extends Tweak {
 
 	@Override
 	public boolean init() {
-		allowedDoors.add((BlockDoor) Blocks.ACACIA_DOOR);
-		allowedDoors.add((BlockDoor) Blocks.BIRCH_DOOR);
-		allowedDoors.add((BlockDoor) Blocks.JUNGLE_DOOR);
-		allowedDoors.add((BlockDoor) Blocks.OAK_DOOR);
-		allowedDoors.add((BlockDoor) Blocks.SPRUCE_DOOR);
-		allowedDoors.add((BlockDoor) Blocks.DARK_OAK_DOOR);
+		for (Block block : Block.REGISTRY) {
+			if (block != null && block instanceof BlockDoor) {
+				Class c = block.getClass();
+				Method m = ReflectionHelper.findMethod(c, block, new String[]{"onBlockActivated", "func_180639_a"},
+						World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
+						EnumHand.class, ItemStack.class, EnumFacing.class,
+						float.class, float.class, float.class);
+				if (m != null && m.getDeclaringClass() == BlockDoor.class) {
+					allowedDoors.add((BlockDoor) block);
+					System.out.println("Allowing " + block.getRegistryName().toString());
+				}
+			}
+		}
+
 		return true;
 	}
 

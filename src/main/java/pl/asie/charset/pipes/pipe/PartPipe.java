@@ -354,7 +354,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	@Override
 	public void onUnloaded() {
 		super.onUnloaded();
-		if (getWorld().isRemote) {
+		if (getWorld() != null && getWorld().isRemote) {
 			synchronized (itemSet) {
 				itemSet.clear();
 			}
@@ -363,8 +363,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public void onAdded() {
-		updateNeighborInfo(false);
-		onLoaded();
+		if (getWorld() != null) {
+			updateNeighborInfo(false);
+			onLoaded();
+		}
 		scheduleRenderUpdate();
 	}
 
@@ -379,7 +381,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
 		}
 
-		if (neighborBlockChanged) {
+		if (neighborBlockChanged && getWorld() != null) {
 			updateNeighborInfo(true);
 			neighborBlockChanged = false;
 		}
@@ -499,7 +501,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	}
 
 	protected void addItemClientSide(PipeItem item) {
-		if (!getWorld().isRemote) {
+		if (getWorld() == null || !getWorld().isRemote) {
 			return;
 		}
 
@@ -521,7 +523,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	}
 
 	protected void removeItemClientSide(PipeItem item) {
-		if (getWorld().isRemote) {
+		if (getWorld() != null && getWorld().isRemote) {
 			synchronized (itemSet) {
 				itemSet.remove(item);
 			}
@@ -569,7 +571,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 	@Override
 	public int injectItem(ItemStack stack, EnumFacing direction, boolean simulate) {
-		if (getWorld().isRemote || !connects(direction)) {
+		if (getWorld() == null || getWorld().isRemote || !connects(direction)) {
 			return 0;
 		}
 
@@ -583,7 +585,9 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	}
 
 	protected void scheduleRenderUpdate() {
-		getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+		if (getWorld() != null) {
+			getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
+		}
 	}
 
 	@Override
