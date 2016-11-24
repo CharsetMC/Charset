@@ -12,7 +12,7 @@ import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.utils.CapabilityUtils;
 import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.lib.wires.PartWire;
-import pl.asie.charset.wires.WireUtils;
+import pl.asie.charset.lib.wires.WireUtils;
 
 import java.util.HashSet;
 import java.util.Set;
