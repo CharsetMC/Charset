@@ -16,18 +16,51 @@
 
 package pl.asie.charset.lib.utils;
 
+import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.ai.attributes.AttributeMap;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 public final class ItemUtils {
 	private ItemUtils() {
 
+	}
+
+	public static boolean isOreType(ItemStack stack, String ore) {
+		int oreId = OreDictionary.getOreID(ore);
+		for (int i : OreDictionary.getOreIDs(stack)) {
+			if (oreId == i)
+				return true;
+		}
+
+		return false;
+	}
+
+	public static double getAttributeValue(EntityEquipmentSlot slot, ItemStack is, IAttribute attr) {
+		if (is != null) {
+			Multimap<String, AttributeModifier> attrs = is.getItem().getAttributeModifiers(slot, is);
+			if (attrs != null) {
+				AttributeMap map = new AttributeMap();
+				map.applyAttributeModifiers(attrs);
+				IAttributeInstance instance = map.getAttributeInstance(attr);
+				if (instance != null) {
+					return instance.getAttributeValue();
+				}
+			}
+		}
+
+		return 0;
 	}
 
 	public static NBTTagCompound getTagCompound(ItemStack stack, boolean create) {

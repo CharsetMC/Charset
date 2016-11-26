@@ -23,7 +23,6 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import mcmultipart.capabilities.CapabilityWrapperRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
-import pl.asie.charset.api.audio.AudioSink;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.wires.IBundledEmitter;
@@ -31,6 +30,10 @@ import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.capability.*;
+import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
+import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
+import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
+import pl.asie.charset.lib.capability.redstone.*;
 
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)

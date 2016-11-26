@@ -36,6 +36,7 @@
 
 package pl.asie.charset.storage.barrel;
 
+import pl.asie.charset.lib.factorization.Orientation;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.NoticeUpdater;
 import net.minecraft.block.Block;
@@ -63,7 +64,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import pl.asie.charset.lib.factorization.FzOrientation;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.utils.CapabilityUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
@@ -86,7 +86,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         // TODO: Dynamic barrel sizes!
     }
 
-    public FzOrientation orientation = FzOrientation.FACE_UP_POINT_NORTH;
+    public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
     Object notice_target = this;
 
@@ -215,7 +215,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
         item = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("item"));
         setItemCount(compound.getInteger("count"));
-        orientation = FzOrientation.getOrientation(compound.getByte("dir"));
+        orientation = Orientation.getOrientation(compound.getByte("dir"));
         woodLog = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("log"));
         woodSlab = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("slab"));
         type = Type.VALUES[compound.getByte("type")];
@@ -464,7 +464,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             if (hit.hitVec != null) {
                 orientation = SpaceUtil.getOrientation(placer, hit.sideHit, hit.hitVec.subtract(new Vec3d(getPos())));
             } else if (hit.sideHit != null) {
-                orientation = FzOrientation.fromDirection(hit.sideHit);
+                orientation = Orientation.fromDirection(hit.sideHit);
             }
         }
         loadFromStack(stack);
@@ -796,7 +796,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         EnumFacing dir = result.sideHit.getOpposite();
         BlockPos src = getPos();
         BlockPos next = src;
-        FzOrientation newOrientation = orientation;
+        Orientation newOrientation = orientation;
         boolean doRotation = dir.getDirectionVec().getY() == 0;
         EnumFacing rotationAxis = null;
         if (doRotation) {
@@ -844,7 +844,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             for (int r = rotateCount; r > 0; r--) {
                 EnumFacing nTop = SpaceUtil.rotate(newOrientation.top, rotationAxis);
                 EnumFacing nFace = SpaceUtil.rotate(newOrientation.facing, rotationAxis);
-                newOrientation = FzOrientation.fromDirection(nFace).pointTopTo(nTop);
+                newOrientation = Orientation.fromDirection(nFace).pointTopTo(nTop);
             }
         }
         if (src.equals(next)) {
@@ -1066,12 +1066,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     public void rotate(EnumFacing axis) {
-        FzOrientation oldOrientation = orientation;
+        Orientation oldOrientation = orientation;
 
         if (axis == orientation.facing.getOpposite()) {
             orientation = orientation.getNextRotationOnFace();
         } else {
-            orientation = FzOrientation.getOrientation(FzOrientation.fromDirection(axis.getOpposite()).ordinal() & (~3) | (orientation.ordinal() & 3));
+            orientation = Orientation.getOrientation(Orientation.fromDirection(axis.getOpposite()).ordinal() & (~3) | (orientation.ordinal() & 3));
         }
 
         if (orientation != oldOrientation) {

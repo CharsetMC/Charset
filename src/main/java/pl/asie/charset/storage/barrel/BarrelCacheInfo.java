@@ -39,7 +39,7 @@ package pl.asie.charset.storage.barrel;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
-import pl.asie.charset.lib.factorization.FzOrientation;
+import pl.asie.charset.lib.factorization.Orientation;
 import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -47,7 +47,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     final TextureAtlasSprite log, plank;
     final TileEntityDayBarrel.Type type;
-    final FzOrientation orientation;
+    final Orientation orientation;
     final boolean isMetal;
 
     // Used as a cache field only
@@ -78,7 +78,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         return result;
     }
 
-    private BarrelCacheInfo(TextureAtlasSprite log, ItemStack logStack, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, FzOrientation orientation, boolean isMetal) {
+    private BarrelCacheInfo(TextureAtlasSprite log, ItemStack logStack, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, Orientation orientation, boolean isMetal) {
         this.log = log;
         this.logStack = logStack;
         this.plank = plank;
@@ -90,7 +90,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     public static BarrelCacheInfo from(TileEntityDayBarrel barrel) {
         TextureAtlasSprite log = RenderUtils.getSprite(barrel.woodLog);
         TextureAtlasSprite slab = RenderUtils.getSprite(barrel.woodSlab);
-        FzOrientation fzo = barrel.orientation;
+        Orientation fzo = barrel.orientation;
         TileEntityDayBarrel.Type type = barrel.type;
         return new BarrelCacheInfo(log, barrel.woodLog, slab, type, fzo, isMetal(barrel.woodLog));
     }
@@ -99,7 +99,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         TileEntityDayBarrel barrel = new TileEntityDayBarrel();
         assert barrel != null;
         barrel.loadFromStack(is);
-        barrel.orientation = FzOrientation.FACE_NORTH_POINT_UP;
+        barrel.orientation = Orientation.FACE_NORTH_POINT_UP;
         return BarrelCacheInfo.from(barrel);
     }
 

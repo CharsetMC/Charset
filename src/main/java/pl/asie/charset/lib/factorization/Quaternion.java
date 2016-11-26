@@ -236,7 +236,7 @@ public class Quaternion {
      * I think this is broken? Use Quaternion.fromOrientation
      */
     @Deprecated
-    public static Quaternion getRotationQuaternion(FzOrientation orient) {
+    public static Quaternion getRotationQuaternion(Orientation orient) {
         return getRotationQuaternionRadians(Math.toRadians(orient.getRotation()*90), orient.facing);
     }
     
@@ -258,12 +258,12 @@ public class Quaternion {
         return new Quaternion(Math.cos(halfAngle), ax*sin, ay*sin, az*sin);
     }
     
-    private static Quaternion[] quat_cache = new Quaternion[25 /*FzOrientation.values().length recursive reference, bleh*/];
+    private static Quaternion[] quat_cache = new Quaternion[25 /*Orientation.values().length recursive reference, bleh*/];
     /***
-     * @param orient An {@link FzOrientation}
+     * @param orient An {@link Orientation}
      * @return A {@link Quaternion} that should not be mutated.
      */
-    public static Quaternion fromOrientation(final FzOrientation orient) {
+    public static Quaternion fromOrientation(final Orientation orient) {
         final int ord = orient.ordinal();
         if (quat_cache[ord] != null) {
             return quat_cache[ord];

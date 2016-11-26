@@ -25,12 +25,10 @@ import javax.annotation.Nonnull;
 public class JEIPluginCharsetAudio implements IModPlugin {
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
-		// TODO
 	}
 
 	@Override
 	public void registerIngredients(IModIngredientRegistration registry) {
-		// TODO
 	}
 
 	@Override

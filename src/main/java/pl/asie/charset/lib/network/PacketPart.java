@@ -69,7 +69,9 @@ public abstract class PacketPart extends Packet {
 		buf.writeInt(part.getPos().getZ());
 		UUID id = part.getContainer().getPartID(part);
 		if (id == null) {
-			// FIXME: TODO: HACK! HACK!
+			// TODO: Figure out if this still happens. HACK!
+			ModCharsetLib.logger.warn("Part ID was null @ " + part.getPos().toString() + "! Please report to mod author!", new Throwable());
+			new Throwable().printStackTrace();
 			id = UUID.randomUUID();
 		}
 		buf.writeLong(id.getMostSignificantBits());

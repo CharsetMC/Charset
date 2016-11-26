@@ -36,7 +36,6 @@
 
 package pl.asie.charset.lib.factorization;
 
-import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -45,7 +44,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.vecmath.AxisAngle4f;
 
-public enum FzOrientation {
+public enum Orientation {
     FACE_DOWN_POINT_SOUTH(EnumFacing.DOWN, EnumFacing.SOUTH),
     FACE_DOWN_POINT_NORTH(EnumFacing.DOWN, EnumFacing.NORTH),
     FACE_DOWN_POINT_EAST(EnumFacing.DOWN, EnumFacing.EAST),
@@ -76,33 +75,6 @@ public enum FzOrientation {
     FACE_EAST_POINT_SOUTH(EnumFacing.EAST, EnumFacing.SOUTH),
     FACE_EAST_POINT_NORTH(EnumFacing.EAST, EnumFacing.NORTH);
 
-
-    
-    //#Java is an excellent language. Hence, this python script.
-    //dirs = "DOWN UP NORTH SOUTH WEST EAST".split()
-    //
-    //RM = ( #Imported from EnumFacing
-    //  (0, 1, 4, 5, 3, 2),
-    //  (0, 1, 5, 4, 2, 3),
-    //  (5, 4, 2, 3, 0, 1),
-    //  (4, 5, 2, 3, 1, 0),
-    //  (2, 3, 1, 0, 4, 5),
-    //  (3, 2, 0, 1, 4, 5),
-    //  (0, 1, 2, 3, 4, 5),
-    //)
-    //
-    //for i in range(len(RM)):
-    //  data = RM[i]
-    //  for j in data:
-    //     if data[j] == j:
-    //       continue
-    //     face = dirs[i]
-    //     point = dirs[data[j]]
-    //     name = "FACE_{0}_POINT_{1}".format(face, point)
-    //       print("{0}(EnumFacing.{1}, EnumFacing.{2}),".format(name, face, point))
-    //  print()
-    //print("FACE_UNKNOWN_POINT_UNKNOWN(null, null);")
-    
     /**
      * This value is what a Dispenser has. It can point in any of the 6 directions.
      */
@@ -113,34 +85,34 @@ public enum FzOrientation {
      */
     public final EnumFacing top;
     
-    private FzOrientation nextFaceRotation, prevFaceRotation;
+    private Orientation nextFaceRotation, prevFaceRotation;
     private int rotation;
-    private FzOrientation swapped;
+    private Orientation swapped;
     private EnumFacing[] dirRotations = new EnumFacing[EnumFacing.values().length]; // Admitedly we could just use values() here. But that's ugly.
     
-    private static FzOrientation[] valuesCache = values();
+    private static Orientation[] valuesCache = values();
     
-    FzOrientation(EnumFacing facing, EnumFacing top) {
+    Orientation(EnumFacing facing, EnumFacing top) {
         this.facing = facing;
         this.top = top;
     }
     
     static {
-        for (FzOrientation o : values()) {
+        for (Orientation o : values()) {
             o.setup();
         }
-        for (FzOrientation o : values()) {
+        for (Orientation o : values()) {
             o.setupRotation();
         }
-        for (FzOrientation o : values()) {
-            for (FzOrientation t : values()) {
+        for (Orientation o : values()) {
+            for (Orientation t : values()) {
                 if (o.facing == t.top && o.top == t.facing) {
                     o.swapped = t;
                     break;
                 }
             }
         }
-        for (FzOrientation o : values()) {
+        for (Orientation o : values()) {
             o.setupDirectionRotation();
         }
         if (valuesCache.length == 0) {
@@ -155,7 +127,7 @@ public enum FzOrientation {
     
     private void setupRotation() {
         int rcount = 0;
-        FzOrientation head = fromDirection(facing);
+        Orientation head = fromDirection(facing);
         for (int i = 0; i < 5; i++) {
             if (head == this) {
                 rotation = rcount;
@@ -173,8 +145,8 @@ public enum FzOrientation {
         }
     }
     
-    private static FzOrientation find(EnumFacing f, EnumFacing t) {
-        for (FzOrientation o : values()) {
+    private static Orientation find(EnumFacing f, EnumFacing t) {
+        for (Orientation o : values()) {
             if (o.facing == f && o.top == t) {
                 return o;
             }
@@ -183,17 +155,17 @@ public enum FzOrientation {
     }
     
     
-    public FzOrientation rotateOnFace(int count) {
+    public Orientation rotateOnFace(int count) {
         count = count % 4;
         if (count > 0) {
-            FzOrientation here = this;
+            Orientation here = this;
             while (count > 0) {
                 count--;
                 here = here.nextFaceRotation;
             }
             return here;
         } else if (count < 0) {
-            FzOrientation here = this;
+            Orientation here = this;
             while (count < 0) {
                 count++;
                 here = here.prevFaceRotation;
@@ -204,34 +176,34 @@ public enum FzOrientation {
         }
     }
     
-    public FzOrientation getNextRotationOnFace() {
+    public Orientation getNextRotationOnFace() {
         return nextFaceRotation;
     }
     
-    public FzOrientation getPrevRotationOnFace() {
+    public Orientation getPrevRotationOnFace() {
         return prevFaceRotation;
     }
     
-    public FzOrientation getNextRotationOnTop() {
+    public Orientation getNextRotationOnTop() {
         return getSwapped().getNextRotationOnFace().getSwapped();
     }
     
-    public FzOrientation getPrevRotationOnTop() {
+    public Orientation getPrevRotationOnTop() {
         return getSwapped().getPrevRotationOnFace().getSwapped();
     }
     
-    public FzOrientation rotateOnTop(int count) {
+    public Orientation rotateOnTop(int count) {
         return getSwapped().rotateOnFace(count).getSwapped();
     }
     
-    public static FzOrientation getOrientation(int index) {
+    public static Orientation getOrientation(int index) {
         if (index >= 0 && index < valuesCache.length) {
             return valuesCache[index];
         }
         return null;
     }
     
-    public static FzOrientation fromDirection(EnumFacing dir) {
+    public static Orientation fromDirection(EnumFacing dir) {
         if (dir == null) {
             return null;
         }
@@ -268,10 +240,10 @@ public enum FzOrientation {
     
     /**
      * @param newTop
-     * @return {@link FzOrientation} with the same direction, but facing newTop. If the top can't be change to that direction because it is already facing that direction, it returns UNKNOWN.
+     * @return {@link Orientation} with the same direction, but facing newTop. If the top can't be change to that direction because it is already facing that direction, it returns UNKNOWN.
      */
-    public FzOrientation pointTopTo(EnumFacing newTop) {
-        FzOrientation fzo = this;
+    public Orientation pointTopTo(EnumFacing newTop) {
+        Orientation fzo = this;
         for (int i = 0; i < 4; i++) {
             if (fzo.top == newTop) {
                 return fzo;
@@ -289,7 +261,7 @@ public enum FzOrientation {
         return new Vec3d(facing.getDirectionVec()).add(new Vec3d(top.getDirectionVec()));
     }
 
-    public FzOrientation getSwapped() {
+    public Orientation getSwapped() {
         return swapped;
     }
 

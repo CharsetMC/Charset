@@ -60,7 +60,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.factorization.FzOrientation;
+import pl.asie.charset.lib.factorization.Orientation;
 import pl.asie.charset.lib.factorization.Quaternion;
 import pl.asie.charset.lib.factorization.SpaceUtil;
 import pl.asie.charset.lib.render.ModelTransformer;
@@ -71,7 +71,7 @@ import java.util.Calendar;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
     void doDraw(TileEntityDayBarrel barrel, ItemStack is, float partialTicks) {
-        FzOrientation bo = barrel.orientation;
+        Orientation bo = barrel.orientation;
         EnumFacing face = bo.facing;
         if (SpaceUtil.sign(face) == 1) {
             GlStateManager.translate(face.getDirectionVec().getX(), face.getDirectionVec().getY(), face.getDirectionVec().getZ());

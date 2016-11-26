@@ -14,39 +14,38 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.capability;
+package pl.asie.charset.lib.capability.redstone;
 
 import java.util.Collection;
 
 import net.minecraftforge.common.capabilities.Capability;
-
 import mcmultipart.capabilities.ICapabilityWrapper;
-import pl.asie.charset.api.wires.IBundledReceiver;
+import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.Capabilities;
 
-public class BundledReceiverWrapper implements ICapabilityWrapper<IBundledReceiver> {
-	private class WrappedReceiver implements IBundledReceiver {
-		private final Collection<IBundledReceiver> receiverSet;
+public class RedstoneReceiverWrapper implements ICapabilityWrapper<IRedstoneReceiver> {
+	private class WrappedReceiver implements IRedstoneReceiver {
+		private final Collection<IRedstoneReceiver> receiverSet;
 
-		public WrappedReceiver(Collection<IBundledReceiver> receiverSet) {
+		public WrappedReceiver(Collection<IRedstoneReceiver> receiverSet) {
 			this.receiverSet = receiverSet;
 		}
 
 		@Override
-		public void onBundledInputChange() {
-			for (IBundledReceiver r : receiverSet) {
-				r.onBundledInputChange();
+		public void onRedstoneInputChange() {
+			for (IRedstoneReceiver r : receiverSet) {
+				r.onRedstoneInputChange();
 			}
 		}
 	}
 
 	@Override
-	public Capability<IBundledReceiver> getCapability() {
-		return Capabilities.BUNDLED_RECEIVER;
+	public Capability<IRedstoneReceiver> getCapability() {
+		return Capabilities.REDSTONE_RECEIVER;
 	}
 
 	@Override
-	public IBundledReceiver wrapImplementations(Collection<IBundledReceiver> collection) {
+	public IRedstoneReceiver wrapImplementations(Collection<IRedstoneReceiver> collection) {
 		return new WrappedReceiver(collection);
 	}
 }

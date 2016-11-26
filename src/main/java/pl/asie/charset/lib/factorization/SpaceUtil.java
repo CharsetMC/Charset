@@ -37,7 +37,6 @@
 package pl.asie.charset.lib.factorization;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
@@ -159,7 +158,7 @@ public final class SpaceUtil {
     public static Vec3d fromDirection(EnumFacing dir) {
         //return new Vec3d(pos.getX(), pos.getY(), pos.getZ());
         // TODO: NORELEASE.fixme("There may be more bad conversions like this; there is a direct coord query from EnumFacing.");
-        return new Vec3d(dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
+        return new Vec3d(dir.getDirectionVec());
     }
 
     /* public static SortedPair<Vec3d> sort(Vec3d left, Vec3d right) {
@@ -376,8 +375,8 @@ public final class SpaceUtil {
         return EnumFacing.VALUES[ordinal];
     }
 
-    public static FzOrientation getOrientation(EntityLivingBase player, EnumFacing facing, Vec3d hit) {
-        double u = 0.5, v = 0.5; //We pick the axiis based on which side gets clicked
+    public static Orientation getOrientation(EntityLivingBase player, EnumFacing facing, Vec3d hit) {
+        double u, v;
         if (facing == null) facing = EnumFacing.DOWN;
         assert facing != null;
         switch (facing) {
@@ -414,7 +413,7 @@ public final class SpaceUtil {
         int pointy = (int) (angle/90);
         pointy = (pointy + 1) % 4;
 
-        FzOrientation fo = FzOrientation.fromDirection(facing);
+        Orientation fo = Orientation.fromDirection(facing);
         for (int X = 0; X < pointy; X++) {
             fo = fo.getNextRotationOnFace();
         }
@@ -422,9 +421,9 @@ public final class SpaceUtil {
         if (orient.getAxis() != EnumFacing.Axis.Y
                 && facing.getAxis() == EnumFacing.Axis.Y) {
             facing = orient;
-            fo = orient == null ? null : FzOrientation.fromDirection(orient.getOpposite());
+            fo = orient == null ? null : Orientation.fromDirection(orient.getOpposite());
             if (fo != null) {
-                FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
+                Orientation perfect = fo.pointTopTo(EnumFacing.UP);
                 if (perfect != null) {
                     fo = perfect;
                 }
@@ -432,7 +431,7 @@ public final class SpaceUtil {
         }
         double dist = Math.max(Math.abs(u), Math.abs(v));
         if (dist < 0.33) {
-            FzOrientation perfect = fo.pointTopTo(EnumFacing.UP);
+            Orientation perfect = fo.pointTopTo(EnumFacing.UP);
             if (perfect != null) {
                 fo = perfect;
             }

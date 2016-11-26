@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.capability;
+package pl.asie.charset.lib.capability.redstone;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,25 +22,28 @@ import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.capabilities.Capability;
 
-import pl.asie.charset.api.wires.IRedstoneEmitter;
+import pl.asie.charset.api.wires.IBundledEmitter;
 
-public class DefaultRedstoneEmitterStorage implements Capability.IStorage<IRedstoneEmitter> {
+public class DefaultBundledEmitterStorage implements Capability.IStorage<IBundledEmitter> {
 	@Override
-	public NBTBase writeNBT(Capability<IRedstoneEmitter> capability, IRedstoneEmitter instance, EnumFacing side) {
-		if (instance instanceof DefaultRedstoneEmitter) {
+	public NBTBase writeNBT(Capability<IBundledEmitter> capability, IBundledEmitter instance, EnumFacing side) {
+		if (instance instanceof DefaultBundledEmitter) {
 			NBTTagCompound cpd = new NBTTagCompound();
-			cpd.setInteger("s", instance.getRedstoneSignal());
+			cpd.setByteArray("s", instance.getBundledSignal());
 			return cpd;
 		}
 		return null;
 	}
 
 	@Override
-	public void readNBT(Capability<IRedstoneEmitter> capability, IRedstoneEmitter instance, EnumFacing side, NBTBase nbt) {
-		if (instance instanceof DefaultRedstoneEmitter && nbt instanceof NBTTagCompound) {
+	public void readNBT(Capability<IBundledEmitter> capability, IBundledEmitter instance, EnumFacing side, NBTBase nbt) {
+		if (instance instanceof DefaultBundledEmitter && nbt instanceof NBTTagCompound) {
 			NBTTagCompound cpd = (NBTTagCompound) nbt;
 			if (cpd.hasKey("s")) {
-				((DefaultRedstoneEmitter) instance).emit(cpd.getInteger("s"));
+				byte[] data = cpd.getByteArray("s");
+				if (data != null && data.length == 16) {
+					((DefaultBundledEmitter) instance).emit(data);
+				}
 			}
 		}
 	}

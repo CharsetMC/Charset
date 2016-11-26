@@ -14,38 +14,35 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.capability;
+package pl.asie.charset.lib.capability.redstone;
 
 import java.util.Collection;
 
 import net.minecraftforge.common.capabilities.Capability;
+
 import mcmultipart.capabilities.ICapabilityWrapper;
-import pl.asie.charset.api.wires.IRedstoneReceiver;
+import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.lib.Capabilities;
 
-public class RedstoneReceiverWrapper implements ICapabilityWrapper<IRedstoneReceiver> {
-	private class WrappedReceiver implements IRedstoneReceiver {
-		private final Collection<IRedstoneReceiver> receiverSet;
+public class BundledEmitterWrapper implements ICapabilityWrapper<IBundledEmitter> {
+	@Override
+	public Capability<IBundledEmitter> getCapability() {
+		return Capabilities.BUNDLED_EMITTER;
+	}
 
-		public WrappedReceiver(Collection<IRedstoneReceiver> receiverSet) {
-			this.receiverSet = receiverSet;
-		}
+	@Override
+	public IBundledEmitter wrapImplementations(Collection<IBundledEmitter> collection) {
+		byte[] data = new byte[16];
 
-		@Override
-		public void onRedstoneInputChange() {
-			for (IRedstoneReceiver r : receiverSet) {
-				r.onRedstoneInputChange();
+		for (IBundledEmitter emitter : collection) {
+			byte[] dataIn = emitter.getBundledSignal();
+			if (dataIn != null) {
+				for (int i = 0; i < 16; i++) {
+					data[i] = (byte) Math.max(0xFF & (int) dataIn[i], 0xFF & (int) data[i]);
+				}
 			}
 		}
-	}
 
-	@Override
-	public Capability<IRedstoneReceiver> getCapability() {
-		return Capabilities.REDSTONE_RECEIVER;
-	}
-
-	@Override
-	public IRedstoneReceiver wrapImplementations(Collection<IRedstoneReceiver> collection) {
-		return new WrappedReceiver(collection);
+		return new DefaultBundledEmitter(data);
 	}
 }

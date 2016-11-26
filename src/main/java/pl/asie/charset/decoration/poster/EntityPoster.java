@@ -41,6 +41,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -227,47 +228,56 @@ public class EntityPoster extends Entity {
 
     @SideOnly(Side.CLIENT)
     public boolean canBeCollidedWith() {
+        // Only collide with the poster on the client side
         if (!worldObj.isRemote) return false;
+
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        if (player == null) return false;
-        if (locked && !PlayerUtils.isCreative(player)) return false;
-        if (player.isSneaking()) return true;
-        if (inv.getItem() == ModCharsetDecoration.posterItem) return true;
-        ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
-        if (held == null) return false;
-        Item it = held.getItem();
-        return it == ModCharsetDecoration.posterItem || ItemUtils.equalsMeta(inv, held);
+        if (player != null) {
+            if (!locked || PlayerUtils.isCreative(player)) {
+                if (player.isSneaking()) return true;
+                ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
+                return isItemTilting(held) || isItemRotating(held) || isItemScaling(held);
+            }
+        }
+
+        return false;
     }
 
     public boolean hitByEntity(Entity ent) {
-        if (worldObj.isRemote) return false;
-        if (!(ent instanceof EntityPlayer)) return false;
-        EntityPlayer player = (EntityPlayer) ent;
-        if (locked && !PlayerUtils.isCreative(player)) return false;
-        if (spin_normal != 0 || spin_vertical != 0 || spin_tilt != 0) {
-            spin_normal = spin_vertical = spin_tilt = 0;
-        } else if (delta_scale != 0) {
-            delta_scale = 0;
-        } else {
-            ItemStack droppedItem = inv;
-            inv = new ItemStack(ModCharsetDecoration.posterItem);
-            if (droppedItem.getItem() == ModCharsetDecoration.posterItem) {
-                setDead();
-            } else {
+        if (!worldObj.isRemote && ent instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) ent;
+            if (!locked || PlayerUtils.isCreative(player)) {
+                ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
+                if (isItemTilting(held) || isItemRotating(held) || isItemScaling(held)) {
+                    return false;
+                } else if (spin_normal != 0 || spin_vertical != 0 || spin_tilt != 0) {
+                    spin_normal = spin_vertical = spin_tilt = 0;
+                } else if (delta_scale != 0) {
+                    delta_scale = 0;
+                } else {
+                    ItemStack droppedItem = inv;
+                    inv = new ItemStack(ModCharsetDecoration.posterItem);
+                    if (droppedItem.getItem() == ModCharsetDecoration.posterItem) {
+                        setDead();
+                    } else {
+                        syncData();
+                    }
+                    if (player.capabilities.isCreativeMode) return false;
+                    Entity newItem = ItemUtils.spawnItemEntity(getEntityWorld(), getPositionVector(), droppedItem, 0, 0, 0, 0);
+                    if (newItem instanceof EntityItem) {
+                        EntityItem ei = (EntityItem) newItem;
+                        ei.setNoPickupDelay();
+                    }
+                    newItem.onCollideWithPlayer(player);
+                    return true;
+                }
+                updateValues();
                 syncData();
+                return true;
             }
-            if (player.capabilities.isCreativeMode) return false;
-            Entity newItem = ItemUtils.spawnItemEntity(getEntityWorld(), getPositionVector(), droppedItem, 0, 0, 0, 0);
-            if (newItem instanceof EntityItem) {
-                EntityItem ei = (EntityItem) newItem;
-                ei.setNoPickupDelay();
-            }
-            newItem.onCollideWithPlayer(player);
-            return true;
         }
-        updateValues();
-        syncData();
-        return true;
+
+        return false;
     }
 
     public void syncData() {
@@ -285,6 +295,19 @@ public class EntityPoster extends Entity {
     private static final double SCALE_INCR = 1.125;
     private static final double SPIN_PER_CLICK = Math.PI * 2 / 32;
 
+    public boolean isItemRotating(ItemStack held) {
+        return held.getItem() == ModCharsetDecoration.posterItem
+                || held.getItem().getToolClasses(held).contains("wrench");
+    }
+
+    public boolean isItemTilting(ItemStack held) {
+        return ItemUtils.isOreType(held, "stickWood");
+    }
+
+    public boolean isItemScaling(ItemStack held) {
+        return ItemUtils.equalsMeta(inv, held);
+    }
+
     @Override
     public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) {
         if (locked) return false;
@@ -298,17 +321,17 @@ public class EntityPoster extends Entity {
             return true;
         }
         int d = player.isSneaking() ? -1 : +1;
-        if (ItemUtils.equalsMeta(inv, held)) {
+        if (isItemScaling(held)) {
             delta_scale += d;
             updateValues();
             syncData();
             return true;
         }
-        final boolean hasPoster = held.getItem() == ModCharsetDecoration.posterItem;
-        final boolean hasLmp = false; // Ha ha, silly me, we don't have LMPs over here!
-        if (hasPoster || hasLmp) {
+        final boolean shouldTilt = isItemTilting(held);
+        final boolean shouldRotate = isItemRotating(held);
+        if (shouldRotate || shouldTilt) {
             EnumFacing clickDir = SpaceUtil.determineOrientation(player);
-            if (hasPoster) {
+            if (shouldRotate) {
                 if (clickDir == norm || clickDir == norm.getOpposite()) {
                     spin_normal -= d;
                 } else {

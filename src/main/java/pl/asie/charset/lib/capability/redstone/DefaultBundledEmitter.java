@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.capability;
+package pl.asie.charset.lib.capability.redstone;
 
-import pl.asie.charset.api.wires.IRedstoneEmitter;
+import pl.asie.charset.api.wires.IBundledEmitter;
 
-public class DefaultRedstoneEmitter implements IRedstoneEmitter {
-	private int data;
+public class DefaultBundledEmitter implements IBundledEmitter {
+	private byte[] data;
 
-	public DefaultRedstoneEmitter(int data) {
-		emit(data);
+	public DefaultBundledEmitter(byte[] data) {
+		this.data = data;
 	}
 
-	public DefaultRedstoneEmitter() {
-		emit(0);
+	public DefaultBundledEmitter() {
+		this.data = new byte[16];
 	}
 
 	@Override
-	public int getRedstoneSignal() {
+	public byte[] getBundledSignal() {
 		return data;
 	}
 
-	public void emit(int data) {
-		if (data > 15) {
-			this.data = 15;
-		} else if (data < 0) {
-			this.data = 0;
+	public void emit(byte[] data) {
+		if (data == null || data.length != 16) {
+			data = new byte[16];
 		} else {
 			this.data = data;
 		}

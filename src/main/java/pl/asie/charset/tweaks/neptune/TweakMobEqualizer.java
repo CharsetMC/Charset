@@ -39,9 +39,11 @@ package pl.asie.charset.tweaks.neptune;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLeashKnot;
 import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
@@ -57,6 +59,7 @@ import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.tweaks.Tweak;
 
 import java.util.ArrayList;
@@ -96,44 +99,49 @@ public class TweakMobEqualizer extends Tweak {
 		if (template == null) {
 			return;
 		}
-		/* int equipment_count = 0;
-		ItemStack[] armorCopies = new ItemStack[4];
-		ItemStack weaponCopy = null;
-		if (event.getEntity() instanceof IRangedAttackMob || event.getWorld().rand.nextBoolean()) {
-			for (int i = 0; i < 4; i++) {
-				ItemStack is = template.getCurrentArmor(i);
-				if (is != null && is.getItem().isValidArmor(is, 3 - i, ent)) {
-					armorCopies[i] = is.copy();
-					equipment_count++;
+		int equipmentCount = 0;
+		ItemStack[] equipmentCopies = new ItemStack[6];
+		boolean copyArmor = event.getEntity() instanceof IRangedAttackMob || event.getWorld().rand.nextBoolean();
+		boolean copyWeapon = !(event.getEntity() instanceof IRangedAttackMob) || event.getWorld().rand.nextBoolean();
+
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			ItemStack is = template.getItemStackFromSlot(slot);
+			if (is != null) {
+				if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && copyArmor) {
+					if (is.getItem().isValidArmor(is, slot, ent)) {
+						equipmentCopies[slot.ordinal()] = is.copy();
+						equipmentCount++;
+					}
 				}
-				//It's okay to leave slots empty
 			}
 		}
-		List<ItemStack> weapons = new ArrayList<ItemStack>();
-		if (!(ent instanceof IRangedAttackMob) || event.getWorld().rand.nextBoolean()) {
-			ItemStack orig_weapon = ent.getHeldItem();
-			double orig_damage = FzUtil.rateDamage(orig_weapon);
+
+		List<ItemStack> carriedWeapons = new ArrayList<ItemStack>();
+		if (copyWeapon) {
+			ItemStack currentWeapon = ent.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
+			double currentWeaponDmg = ItemUtils.getAttributeValue(EntityEquipmentSlot.MAINHAND, currentWeapon, SharedMonsterAttributes.ATTACK_DAMAGE);
 			for (int i = 0; i < 9; i++) {
-				ItemStack is = template.inventory.getStackInSlot(i);
-				if (is == null) continue;
-				if (is.stackSize != 1 || is.getMaxStackSize() != 1) {
+				ItemStack playerWeapon = template.inventory.getStackInSlot(i);
+				if (playerWeapon == null || playerWeapon.stackSize != 1 || playerWeapon.getMaxStackSize() != 1) {
 					continue;
 				}
-				EnumAction act = is.getItemUseAction();
+				EnumAction act = playerWeapon.getItemUseAction();
 				if (act != EnumAction.BLOCK && act != EnumAction.NONE && act != EnumAction.BOW) {
 					continue;
 				}
-				double new_damage = FzUtil.rateDamage(is);
-				if (new_damage > orig_damage) {
-					weapons.add(is.copy());
+				double playerWeaponDmg = ItemUtils.getAttributeValue(EntityEquipmentSlot.MAINHAND, playerWeapon, SharedMonsterAttributes.ATTACK_DAMAGE);
+				if (playerWeaponDmg > currentWeaponDmg) {
+					carriedWeapons.add(playerWeapon.copy());
 				}
 			}
 		}
-		if (!weapons.isEmpty()) {
-			weaponCopy = weapons.get(event.getWorld().rand.nextInt(weapons.size())).copy();
-			equipment_count++;
+
+		if (!carriedWeapons.isEmpty()) {
+			equipmentCopies[0] = carriedWeapons.get(event.getWorld().rand.nextInt(carriedWeapons.size())).copy();
+			equipmentCount++;
 		}
-		if (equipment_count <= 0) {
+
+		if (equipmentCount <= 0) {
 			return;
 		}
 
@@ -141,17 +149,13 @@ public class TweakMobEqualizer extends Tweak {
 		ent.onInitialSpawn(ent.worldObj.getDifficultyForLocation(new BlockPos(event.getEntity())), null);
 		// We need to cancel the event so that we can call this before the below happens
 		ent.setCanPickUpLoot(false);
-		if (weaponCopy != null) {
-			ent.setCurrentItemOrArmor(0, weaponCopy);
+
+		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+			if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR) {
+				ent.setItemStackToSlot(slot, equipmentCopies[slot.ordinal()]);
+			}
+			ent.setDropChance(slot, 0);
 		}
-		for (int i = 0; i < 4; i++) {
-			// Do we want to set the stacksize to 0?
-			// Perhaps increase the damage?
-			ent.setCurrentItemOrArmor(i + 1, armorCopies[i]);
-		}
-		for (int i = 0; i < 5; i++) {
-			ent.setEquipmentDropChance(i, 0);
-		} */
 	}
 
 	private EntityPlayer pickNearPlayer(LivingSpawnEvent.SpecialSpawn event) {

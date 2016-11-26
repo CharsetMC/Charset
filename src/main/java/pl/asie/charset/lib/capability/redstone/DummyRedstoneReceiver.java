@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.capability;
+package pl.asie.charset.lib.capability.redstone;
 
-import pl.asie.charset.api.audio.AudioPacket;
-import pl.asie.charset.api.audio.IAudioReceiver;
+import pl.asie.charset.api.wires.IBundledReceiver;
+import pl.asie.charset.api.wires.IRedstoneReceiver;
 
-public class DefaultAudioReceiver implements IAudioReceiver {
-    @Override
-    public boolean receive(AudioPacket packet) {
-        return false;
-    }
+public class DummyRedstoneReceiver implements IBundledReceiver, IRedstoneReceiver {
+	@Override
+	public void onBundledInputChange() {
+		
+	}
+
+	@Override
+	public void onRedstoneInputChange() {
+
+	}
 }

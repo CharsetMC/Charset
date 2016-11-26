@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.capability;
+package pl.asie.charset.lib.capability.audio;
 
 import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;

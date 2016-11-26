@@ -22,7 +22,7 @@ import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.audio.AudioDataSound;
-import pl.asie.charset.lib.capability.DefaultAudioSource;
+import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;

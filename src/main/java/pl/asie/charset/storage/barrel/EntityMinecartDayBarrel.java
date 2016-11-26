@@ -55,8 +55,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import pl.asie.charset.lib.factorization.FzOrientation;
-import pl.asie.charset.lib.factorization.SpaceUtil;
+import pl.asie.charset.lib.factorization.Orientation;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 import javax.annotation.Nullable;
@@ -148,7 +147,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         barrel.setWorldObj(worldObj);
         barrel.setPos(BlockPos.ORIGIN);
         barrel.validate();
-        barrel.orientation = FzOrientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
+        barrel.orientation = Orientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
     }
 
@@ -207,7 +206,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             barrel.setItemCount(dataManager.get(BARREL_ITEM_COUNT));
             barrel.woodLog = dataManager.get(BARREL_LOG).or(TileEntityDayBarrel.DEFAULT_LOG);
             barrel.woodSlab = dataManager.get(BARREL_SLAB).or(TileEntityDayBarrel.DEFAULT_SLAB);
-            barrel.orientation = FzOrientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
+            barrel.orientation = Orientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
             barrel.type = TileEntityDayBarrel.Type.values()[dataManager.get(BARREL_TYPE)];
         }
 

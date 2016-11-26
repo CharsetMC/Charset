@@ -34,6 +34,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
 import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
+import pl.asie.charset.tweaks.neptune.TweakMobEqualizer;
 import pl.asie.charset.tweaks.neptune.TweakZorro;
 import pl.asie.charset.tweaks.shard.TweakGlassShards;
 import pl.asie.charset.tweaks.tnt.TweakImprovedTNT;
@@ -68,16 +69,17 @@ public class ModCharsetTweaks {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		// tweakSet.add(new TweakAutoReplace());
-		tweakSet.add(new TweakDisableVanillaTools());
-		tweakSet.add(new TweakDoubleDoors());
-		tweakSet.add(new TweakDyeableMinecarts());
-		tweakSet.add(new TweakGlassShards());
-		tweakSet.add(new TweakGraphite());
-		tweakSet.add(new TweakImprovedTNT());
-		tweakSet.add(new TweakMobControl());
-		tweakSet.add(new TweakNoSprinting());
-		tweakSet.add(new TweakZorro());
+		// addTweak(new TweakAutoReplace());
+		addTweak(new TweakDisableVanillaTools());
+		addTweak(new TweakDoubleDoors());
+		addTweak(new TweakDyeableMinecarts());
+		addTweak(new TweakGlassShards());
+		addTweak(new TweakGraphite());
+		addTweak(new TweakImprovedTNT());
+		addTweak(new TweakMobControl());
+		// addTweak(new TweakMobEqualizer());
+		addTweak(new TweakNoSprinting());
+		addTweak(new TweakZorro());
 
 		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
 		canAddTweaks = false;
