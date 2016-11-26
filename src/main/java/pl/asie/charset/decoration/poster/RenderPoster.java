@@ -37,6 +37,7 @@
 package pl.asie.charset.decoration.poster;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.Render;
@@ -62,33 +63,26 @@ public class RenderPoster extends Render<EntityPoster> {
         final Minecraft mc = Minecraft.getMinecraft();
         final RayTraceResult mop = mc.objectMouseOver;
         boolean selected = mop != null && mop.entityHit == poster;
-        GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
         if (selected && !mc.gameSettings.hideGUI) {
-            GL11.glPushMatrix();
+            GlStateManager.pushMatrix();
             // They ordinarily don't move, so no need to bother w/ interpolation
-            GL11.glTranslated(-poster.posX, -poster.posY, -poster.posZ + 1 / 16.0);
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GlStateManager.translate(-poster.posX, -poster.posY, -poster.posZ + 1 / 16.0);
+            GlStateManager.disableTexture2D();
             RenderGlobal.drawSelectionBoundingBox(poster.getEntityBoundingBox(), 1.0f, 1.0f, 1.0f, 1.0f);
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glPopMatrix();
+            GlStateManager.enableTexture2D();
+            GlStateManager.popMatrix();
         }
-        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_ALPHA_TEST); // This should always be enabled; some other mod's derping things up tho; we can leave it on
-        GL11.glDisable(GL11.GL_BLEND); // seems to fix that 'no alpha' issue I was having?
         poster.rot.glRotate();
-        double s = poster.scale;
-        GL11.glScaled(s, s, s);
+        GlStateManager.scale(poster.scale, poster.scale, poster.scale);
         try {
             renderItem(poster.inv);
         } catch (Throwable t) {
             t.printStackTrace();
             poster.inv = new ItemStack(Blocks.FIRE); // Hopefully fire doesn't also somehow error out.
-        } finally {
-            GL11.glPopAttrib();
         }
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     @Override
@@ -106,11 +100,11 @@ public class RenderPoster extends Render<EntityPoster> {
 
         // Pre-emptively undo transformations that the item renderer does so
         // that we don't get a stupid angle. Minecraft render code is terrible.
-        GL11.glTranslatef(0, 0, -0.5F/16F);
+        GlStateManager.translate(0, 0, -0.5F/16F);
 
         // TODO
 
-        GL11.glRotated(180, 0, 1, 0);
+        GlStateManager.rotate(180, 0, 1, 0);
         // Why is this necessary? Changing the TransformType below does nothing...
 
         Minecraft.getMinecraft().getItemRenderer().renderItem(dummy_entity, is, ItemCameraTransforms.TransformType.NONE);

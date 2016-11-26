@@ -234,6 +234,7 @@ public class EntityPoster extends Entity {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         if (player != null) {
             if (!locked || PlayerUtils.isCreative(player)) {
+                if (inv.getItem() == ModCharsetDecoration.posterItem) return true;
                 if (player.isSneaking()) return true;
                 ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
                 return isItemTilting(held) || isItemRotating(held) || isItemScaling(held);
