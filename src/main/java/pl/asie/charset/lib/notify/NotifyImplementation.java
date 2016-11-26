@@ -86,7 +86,7 @@ public class NotifyImplementation {
             return;
         }
         format = styleMessage(style, format);
-        if ((player != null && player.worldObj.isRemote) || FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+        if ((player != null && player.world.isRemote) || FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             proxy.addMessage(where, item, format, args);
         } else {
             TargetPoint target = null;
@@ -105,7 +105,7 @@ public class NotifyImplementation {
                     pos = te.getPos();
                 } else if (where instanceof Entity) {
                     Entity ent = (Entity) where;
-                    world = ent.worldObj;
+                    world = ent.world;
                     x = (int) ent.posX;
                     y = (int) ent.posY;
                     z = (int) ent.posZ;
@@ -195,7 +195,7 @@ public class NotifyImplementation {
     }
     
     void doSendOnscreenMessage(EntityPlayer player, String message, String[] formatArgs) {
-        if (player.worldObj.isRemote) {
+        if (player.world.isRemote) {
             proxy.onscreen(message, formatArgs);
         } else {
             FMLProxyPacket packet = NotifyNetwork.onscreenPacket(message, formatArgs);
@@ -204,7 +204,7 @@ public class NotifyImplementation {
     }
     
     void sendReplacableChatMessage(EntityPlayer player, ITextComponent msg, int msgKey) {
-        if (player.worldObj.isRemote) {
+        if (player.world.isRemote) {
             proxy.replaceable(msg, msgKey);
         } else {
             FMLProxyPacket packet = NotifyNetwork.replaceableChatPacket(msg, msgKey);

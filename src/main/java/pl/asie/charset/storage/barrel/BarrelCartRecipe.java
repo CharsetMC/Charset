@@ -49,14 +49,17 @@ public class BarrelCartRecipe extends RecipeBase {
         boolean found_barrel = false, found_cart = false;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack is = inv.getStackInSlot(i);
-            if (is == null) continue;
-            if (is.getItem() == ModCharsetStorage.barrelItem) {
-                if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
+            if (!is.isEmpty()) {
+                if (is.getItem() == ModCharsetStorage.barrelItem) {
+                    if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
+                        return false;
+                    }
+                    found_barrel = true;
+                } else if (is.getItem() == Items.MINECART) {
+                    found_cart = true;
+                } else {
                     return false;
                 }
-                found_barrel = true;
-            } else if (is.getItem() == Items.MINECART) {
-                found_cart = true;
             } else {
                 return false;
             }
@@ -68,12 +71,12 @@ public class BarrelCartRecipe extends RecipeBase {
     public ItemStack getCraftingResult(InventoryCrafting inv) {
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack is = inv.getStackInSlot(i);
-            if (is == null) continue;
-            if (is.getItem() != ModCharsetStorage.barrelItem) continue;
-            if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
-                return null;
+            if (is.getItem() == ModCharsetStorage.barrelItem) {
+                if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
+                    return null;
+                }
+                return ModCharsetStorage.barrelCartItem.makeBarrel(is);
             }
-            return ModCharsetStorage.barrelCartItem.makeBarrel(is);
         }
         return new ItemStack(ModCharsetStorage.barrelCartItem);
     }

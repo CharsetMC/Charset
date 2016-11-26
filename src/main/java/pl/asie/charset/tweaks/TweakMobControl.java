@@ -23,6 +23,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -43,10 +44,10 @@ public class TweakMobControl extends Tweak {
 	private void reloadConfig() {
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks-mobcontrol.cfg"));
 
-		for (String s : EntityList.getEntityNameList()) {
-			Class<? extends Entity> entity = EntityList.NAME_TO_CLASS.get(s);
+		for (ResourceLocation s : EntityList.getEntityNameList()) {
+			Class<? extends Entity> entity = EntityList.getClass(s);
 			if (entity != null && EntityLiving.class.isAssignableFrom(entity)) {
-				boolean enabled = config.get("allow", s, true, null).getBoolean();
+				boolean enabled = config.get("allow", s.toString(), true, null).getBoolean();
 				if (!enabled) {
 					disabledClasses.add(entity);
 				}

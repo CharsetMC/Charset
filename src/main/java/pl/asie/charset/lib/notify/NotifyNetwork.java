@@ -76,7 +76,7 @@ public class NotifyNetwork {
     @SideOnly(Side.CLIENT)
     public void recievePacket(ClientCustomPacketEvent event) {
         try {
-            handleNotify(event.getPacket().payload(), Minecraft.getMinecraft().thePlayer);
+            handleNotify(event.getPacket().payload(), Minecraft.getMinecraft().player);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,26 +84,26 @@ public class NotifyNetwork {
 
     @SideOnly(Side.CLIENT)
     void handleNotify(ByteBuf input, EntityPlayer me) throws IOException {
-        Object target = null;
+        Object target;
         BlockPos pos;
         switch (input.readByte()) {
         case COORD:
             pos = new BlockPos(input.readInt(), input.readInt(), input.readInt());
-            target = new NotificationCoord(me.worldObj, pos);
+            target = new NotificationCoord(me.world, pos);
             break;
         case ENTITY:
             int id = input.readInt();
             if (id == me.getEntityId()) {
                 target = me; //bebna
             } else {
-                target = me.worldObj.getEntityByID(id);
+                target = me.world.getEntityByID(id);
             }
             break;
         case TILEENTITY:
             pos = new BlockPos(input.readInt(), input.readInt(), input.readInt());
-            target = me.worldObj.getTileEntity(pos);
+            target = me.world.getTileEntity(pos);
             if (target == null) {
-                target = new NotificationCoord(me.worldObj, pos);
+                target = new NotificationCoord(me.world, pos);
             }
             break;
         case VEC3:
@@ -190,12 +190,8 @@ public class NotifyNetwork {
             } else {
                 return null;
             }
-            
-            if (item != null && item.getItem() == null) {
-                item = null;
-            }
-            ByteBufUtils.writeItemStack(output, item);
 
+            ByteBufUtils.writeItemStack(output, item);
             ByteBufUtils.writeUTF8String(output, format);
             writeStrings(output, args);
             return generate(output);

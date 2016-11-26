@@ -46,12 +46,6 @@ public class JEITapeReelCraftingRecipe extends BlankRecipeWrapper implements ISh
 
 		@Nonnull
 		@Override
-		public String getRecipeCategoryUid() {
-			return VanillaRecipeCategoryUid.CRAFTING;
-		}
-
-		@Nonnull
-		@Override
 		public String getRecipeCategoryUid(@Nonnull RecipeTapeReel recipe) {
 			return VanillaRecipeCategoryUid.CRAFTING;
 		}

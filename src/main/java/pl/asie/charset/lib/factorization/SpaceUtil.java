@@ -70,7 +70,7 @@ public final class SpaceUtil {
 
     public static EnumFacing determineFlatOrientation(EntityLivingBase player) {
         //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
-        int var7 = MathHelper.floor_double((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
+        int var7 = MathHelper.floor((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
         int r = var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
         return EnumFacing.VALUES[r];
     }
@@ -105,7 +105,7 @@ public final class SpaceUtil {
     public static Vec3d fromPlayerEyePos(EntityPlayer ent) {
         // This is all iChun's fault. :/
         // Uh...
-        if (ent.worldObj.isRemote) {
+        if (ent.world.isRemote) {
             return new Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);
         } else {
             return new Vec3d(ent.posX, ent.posY + ent.getEyeHeight(), ent.posZ);
@@ -450,7 +450,7 @@ public final class SpaceUtil {
 
     public static EnumFacing round(Vec3d vec, EnumFacing not) {
         if (isZero(vec)) return null;
-        Vec3i work = null;
+        Vec3i work;
         double bestAngle = Double.POSITIVE_INFINITY;
         EnumFacing closest = null;
         for (EnumFacing dir : EnumFacing.VALUES) {

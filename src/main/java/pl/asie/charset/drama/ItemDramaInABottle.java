@@ -28,16 +28,17 @@ import net.minecraft.world.World;
 
 public class ItemDramaInABottle extends Item {
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
-		if (!worldIn.isRemote) {
-			if (itemStackIn.hasTagCompound() && itemStackIn.getTagCompound().hasKey("drama")) {
-				playerIn.addChatComponentMessage(new TextComponentString(itemStackIn.getTagCompound().getString("drama")));
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		ItemStack stack = player.getHeldItem(hand);
+		if (!world.isRemote) {
+			if (stack.hasTagCompound() && stack.getTagCompound().hasKey("drama")) {
+				player.sendMessage(new TextComponentString(stack.getTagCompound().getString("drama")));
 			} else {
-				itemStackIn.setTagCompound(new NBTTagCompound());
-				itemStackIn.getTagCompound().setString("drama", DramaGenerator.INSTANCE.createDrama());
-				playerIn.addChatComponentMessage(new TextComponentString(itemStackIn.getTagCompound().getString("drama")));
+				stack.setTagCompound(new NBTTagCompound());
+				stack.getTagCompound().setString("drama", DramaGenerator.INSTANCE.createDrama());
+				player.sendMessage(new TextComponentString(stack.getTagCompound().getString("drama")));
 			}
 		}
-		return ActionResult.newResult(EnumActionResult.SUCCESS, itemStackIn);
+		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 	}
 }

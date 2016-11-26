@@ -62,7 +62,7 @@ public class NotificationCoord {
         return w == o.w && pos.equals(o.pos);
     }
 
-    public static NotificationCoord fromMop(World worldObj, RayTraceResult mop) {
-        return new NotificationCoord(worldObj, mop.getBlockPos());
+    public static NotificationCoord fromMop(World world, RayTraceResult mop) {
+        return new NotificationCoord(world, mop.getBlockPos());
     }
 }

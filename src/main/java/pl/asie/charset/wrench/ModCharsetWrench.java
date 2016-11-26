@@ -29,7 +29,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 @Mod(modid = ModCharsetWrench.MODID, name = ModCharsetWrench.NAME, version = ModCharsetWrench.VERSION,
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetWrench {
-	public static final String MODID = "CharsetWrench";
+	public static final String MODID = "charsetwrench";
 	public static final String NAME = "/";
 	public static final String VERSION = "@VERSION@";
 

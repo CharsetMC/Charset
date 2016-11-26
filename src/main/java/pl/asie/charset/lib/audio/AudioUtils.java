@@ -57,8 +57,8 @@ public final class AudioUtils {
         }
 
         for (WorldServer world : worlds.keySet()) {
-            for (EntityPlayerMP player : world.getMinecraftServer().getPlayerList().getPlayerList()) {
-                if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
+            for (EntityPlayerMP player : world.getMinecraftServer().getPlayerList().getPlayers()) {
+                if (player.world.provider.getDimension() == world.provider.getDimension()) {
                     for (AudioSink sink : worlds.get(world)) {
                         BlockPos pos = new BlockPos(sink.getPos());
                         if (world.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {

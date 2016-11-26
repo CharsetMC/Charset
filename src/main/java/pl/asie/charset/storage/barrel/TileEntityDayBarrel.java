@@ -36,6 +36,9 @@
 
 package pl.asie.charset.storage.barrel;
 
+import gnu.trove.map.TLongLongMap;
+import gnu.trove.map.hash.TLongLongHashMap;
+import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.factorization.Orientation;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.NoticeUpdater;
@@ -73,24 +76,23 @@ import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 import java.util.ArrayList;
+import java.util.WeakHashMap;
 
 public class TileEntityDayBarrel extends TileBase implements ITickable {
-    public ItemStack item;
-    private ItemStack topStack;
-    private int middleCount;
-    private ItemStack bottomStack;
-    static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.LOG);
-    static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.PLANKS);
-    public ItemStack woodLog = DEFAULT_LOG.copy(), woodSlab = DEFAULT_SLAB.copy();
-    {
-        // TODO: Dynamic barrel sizes!
-    }
+    public ItemStack item = ItemStack.EMPTY;
+    private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.LOG);
+    private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.PLANKS);
+    public ItemStack woodLog = DEFAULT_LOG, woodSlab = DEFAULT_SLAB;
+    // TODO: Dynamic barrel sizes!
 
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
     Object notice_target = this;
 
     private static final int maxStackDrop = 64*64*2;
+    protected final InsertionHandler insertionView = new InsertionHandler();
+    protected final ExtractionHandler extractionView = new ExtractionHandler();
+    protected final ReadableItemHandler readOnlyView = new ReadableItemHandler();
 
     public abstract class BaseItemHandler implements IItemHandler {
         @Override
@@ -105,51 +107,48 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return null;
+            return ItemStack.EMPTY;
         }
     }
 
     public class InsertionHandler extends BaseItemHandler {
         @Override
         public ItemStack getStackInSlot(int slot) {
-            updateStacks();
-            return topStack;
+            ItemStack stack = item.copy();
+            if (stack.getCount() > 64)
+                stack.setCount(64);
+            return stack;
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack is, boolean simulate) {
-            updateStacks();
-
-            if (is == null || !taint(is)) {
-                if (!spammed) {
-                    ModCharsetStorage.logger.warn("Bye bye, %s", is);
-                    Thread.dumpStack();
-                    spammed = true;
-                }
+            if (is.isEmpty() || !canInsert(is)) {
                 return is;
             }
 
-            if (topStack == null) {
-                if (!simulate) {
-                    topStack = is.copy();
-                    sync();
-                    markChunkDirty();
-                }
-                return null;
-            } else {
-                int inserted = Math.min(topStack.getMaxStackSize() - topStack.stackSize, is.stackSize);
-                if (!simulate) {
-                    topStack.stackSize += inserted;
-                    sync();
-                    markChunkDirty();
-                }
-                if (inserted == is.stackSize) {
-                    return null;
+            if (type == Type.CREATIVE && !item.isEmpty()) {
+                return is;
+            }
+
+            int inserted = Math.min(getMaxSize() - item.getCount(), is.getCount());
+
+            if (!simulate) {
+                if (item.isEmpty()) {
+                    item = is.copy();
+                    item.setCount(inserted);
+                    onItemChange(true);
                 } else {
-                    ItemStack leftover = is.copy();
-                    leftover.stackSize -= inserted;
-                    return leftover;
+                    item.grow(inserted);
+                    onItemChange(false);
                 }
+            }
+
+            if (inserted == is.getCount()) {
+                return ItemStack.EMPTY;
+            } else {
+                ItemStack leftover = is.copy();
+                leftover.shrink(inserted);
+                return leftover;
             }
         }
     }
@@ -157,36 +156,40 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     public class ReadableItemHandler extends BaseItemHandler {
         @Override
         public ItemStack getStackInSlot(int slot) {
-            updateStacks();
-            return topStack;
+            ItemStack stack = item.copy();
+            if (stack.getCount() > 64)
+                stack.setCount(64);
+            return stack;
         }
     }
 
     public class ExtractionHandler extends BaseItemHandler {
         @Override
         public ItemStack getStackInSlot(int slot) {
-            updateStacks();
-            return bottomStack;
+            ItemStack stack = item.copy();
+            if (type == Type.STICKY)
+                stack.shrink(1);
+            if (stack.getCount() > 64)
+                stack.setCount(64);
+            return stack;
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            updateStacks();
-
-            int amt = Math.min(amount, bottomStack != null ? bottomStack.stackSize : 0);
-            if (amt > 0) {
-                ItemStack stack = bottomStack.copy();
-                stack.stackSize = amount;
-                if (!simulate) {
-                    bottomStack.stackSize -= amount;
-                    sync();
-                    cleanBarrel();
-                    markChunkDirty();
+            if (!item.isEmpty()) {
+                int amt = Math.min(amount, getExtractableItemCount());
+                if (amt > 0) {
+                    ItemStack stack = item.copy();
+                    stack.setCount(amt);
+                    if (!simulate && type != Type.CREATIVE) {
+                        item.shrink(amt);
+                        onItemChange(item.isEmpty());
+                    }
+                    return stack;
                 }
-                return stack;
-            } else {
-                return null;
             }
+
+            return ItemStack.EMPTY;
         }
     }
 
@@ -208,41 +211,45 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     private int last_mentioned_count = -1;
 
     private void markChunkDirty() {
-        worldObj.markChunkDirty(pos, this);
+        world.markChunkDirty(pos, this);
     }
 
     @Override
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
-        item = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("item"));
-        setItemCount(compound.getInteger("count"));
+        woodLog = DEFAULT_LOG;
+        woodSlab = DEFAULT_SLAB;
+
+        item = new ItemStack(compound.getCompoundTag("item"));
+        item.setCount(compound.getInteger("count"));
         orientation = Orientation.getOrientation(compound.getByte("dir"));
-        woodLog = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("log"));
-        woodSlab = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("slab"));
         type = Type.VALUES[compound.getByte("type")];
-        if (woodLog == null) {
-            woodLog = DEFAULT_LOG;
+        if (!compound.hasKey("log")) {
+            woodLog = new ItemStack(compound.getCompoundTag("log"));
+            if (woodLog.isEmpty()) {
+                woodLog = DEFAULT_LOG;
+            }
         }
-        if (woodSlab == null) {
-            woodSlab = DEFAULT_SLAB;
+        if (compound.hasKey("slab")) {
+            woodSlab = new ItemStack(compound.getCompoundTag("slab"));
+            if (woodSlab.isEmpty()) {
+                woodSlab = DEFAULT_SLAB;
+            }
         }
         last_mentioned_count = getItemCount();
     }
 
     @Override
     public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
-        if (woodLog == null) {
-            woodLog = DEFAULT_LOG;
-        }
-        if (woodSlab == null) {
-            woodSlab = DEFAULT_SLAB;
-        }
-
         ItemUtils.writeToNBT(item, compound, "item");
-        ItemUtils.writeToNBT(woodLog, compound, "log");
-        ItemUtils.writeToNBT(woodSlab, compound, "slab");
+        if (!woodLog.isEmpty()) {
+            ItemUtils.writeToNBT(woodLog, compound, "log");
+        }
+        if (!woodSlab.isEmpty()) {
+            ItemUtils.writeToNBT(woodSlab, compound, "slab");
+        }
         compound.setByte("dir", (byte) orientation.ordinal());
         compound.setByte("type", (byte) type.ordinal());
-        compound.setInteger("count", getItemCount());
+        compound.setInteger("count", item.getCount());
         return compound;
     }
 
@@ -265,17 +272,22 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         tick();
     }
 
+    private void onItemChange(boolean typeChanged) {
+        sync();
+        markChunkDirty();
+    }
+
     void tick() {
         if (!type.isHopping() || orientation == null) {
             return;
         }
-        if (notice_target == this && worldObj.getStrongPower(pos) > 0) {
+        if (notice_target == this && world.getStrongPower(pos) > 0) {
             return;
         }
 
-        boolean youve_changed_jim = false;
-        int itemCount = getItemCount();
-        if (itemCount < getMaxSize()) {
+        boolean itemChanged = false;
+
+        if (getItemCount() < getMaxSize()) {
             BlockPos upPos = getPos().offset(orientation.top);
             IItemHandler handler = CapabilityUtils.getCapability(getWorld(), upPos,
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top.getOpposite(),
@@ -284,46 +296,36 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             if (handler != null) {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack got = handler.extractItem(i, 1, true);
-                    if (got != null && taint(got)) {
+                    if (insertionView.insertItem(0, got, true).isEmpty()) {
                         got = handler.extractItem(i, 1, false);
-                        taint(got);
-                        changeItemCount(1);
-                        updateStacks();
-                        youve_changed_jim = true;
+                        insertionView.insertItem(0, got, false);
+                        itemChanged = true;
                     }
                 }
             }
         }
-        if (itemCount > 0) {
+
+        if (getExtractableItemCount() > 0) {
             BlockPos downPos = getPos().offset(orientation.top.getOpposite());
             IItemHandler handler = CapabilityUtils.getCapability(getWorld(), downPos,
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top,
                     true, true);
 
             if (handler != null) {
-                ItemStack bottom_item = getStackInSlot(1);
-                if (bottom_item != null) {
-                    ItemStack toPush = bottom_item.splitStack(1);
-                    if (handler != null) {
-                        boolean inserted = false;
-                        for (int i = 0; i < handler.getSlots(); i++) {
-                            ItemStack got = handler.insertItem(i, toPush, false);
-                            if (got == null) {
-                                inserted = true;
-                                updateStacks();
-                                cleanBarrel();
-                                youve_changed_jim = true;
-                                break;
-                            }
-                        }
-                        if (!inserted) {
-                            bottom_item.stackSize++;
-                        }
+                ItemStack toPush = item.copy();
+                toPush.setCount(1);
+                for (int i = 0; i < handler.getSlots(); i++) {
+                    ItemStack got = handler.insertItem(i, toPush, false);
+                    if (got.isEmpty()) {
+                        item.shrink(1);
+                        itemChanged = true;
+                        break;
                     }
                 }
             }
         }
-        if (youve_changed_jim) {
+
+        if (itemChanged) {
             markDirty();
         }
     }
@@ -332,38 +334,33 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         scheduledTick = true;
     }
 
-    public void neighborChanged() {
-        if (type.isHopping()) {
+    public void neighborChanged(BlockPos pos, BlockPos fromPos) {
+        // X/Z can be equal, as we only care about top/bottom neighbors
+        if (type.isHopping() && pos.getX() == fromPos.getX() && pos.getZ() == fromPos.getZ()) {
             needLogic();
         }
     }
 
     public int getItemCount() {
-        if (item == null) {
+        if (item.isEmpty()) {
             return 0;
-        }
-        if (type == Type.CREATIVE) {
+        } else if (type == Type.CREATIVE) {
             return 32*item.getMaxStackSize();
+        } else {
+            return item.getCount();
         }
-        if (topStack == null || !itemMatch(topStack)) {
-            topStack = item.copy();
-            topStack.stackSize = 0;
-        }
-        if (bottomStack == null || !itemMatch(bottomStack)) {
-            bottomStack = item.copy();
-            bottomStack.stackSize = 0;
-        }
-        int ret = bottomStack.stackSize + middleCount + topStack.stackSize;
-        return ret;
     }
 
-    public int getItemCountSticky() {
-        int count = getItemCount();
-        if (type == Type.STICKY) {
-            count--;
-            return Math.max(0, count);
+    public int getExtractableItemCount() {
+        if (item.isEmpty()) {
+            return 0;
+        } else if (type == Type.CREATIVE) {
+            return item.getMaxStackSize();
+        } else if (type == Type.STICKY) {
+            return Math.min(item.getCount() - 1, item.getMaxStackSize());
+        } else {
+            return Math.min(item.getCount(), item.getMaxStackSize());
         }
-        return count;
     }
 
     public int getMaxSize() {
@@ -384,16 +381,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return ItemUtils.canMerge(item, is);
     }
 
-    boolean taint(ItemStack is) {
-        if (is == null && item == null) {
-            return true;
-        }
-        if (is == null || isNested(is)) {
+    boolean canInsert(ItemStack is) {
+        if (is.isEmpty() || isNested(is)) {
             return false;
         }
-        if (item == null) {
-            item = is.copy();
-            item.stackSize = 0;
+        if (item.isEmpty()) {
             return true;
         }
         return ItemUtils.canMerge(item, is);
@@ -415,47 +407,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return d == orientation.facing.getOpposite();
     }
 
-    public void setItemCount(int val) {
-        topStack = bottomStack = null;
-        middleCount = val;
-        changeItemCount(0);
-    }
-
     private boolean spammed = false;
-    public void changeItemCount(int delta) {
-        middleCount = getItemCount() + delta;
-        if (middleCount < 0) {
-            if (!spammed) {
-                ModCharsetStorage.logger.error("Tried to set the item count to negative value " + middleCount + " at " + getPos());
-                Thread.dumpStack();
-                spammed = true;
-            }
-            middleCount = 0;
-            item = null;
-        }
-        if (middleCount == 0) {
-            topStack = bottomStack = item = null;
-            updateClients(BarrelMessage.BarrelCount);
-            markDirty();
-            return;
-        }
-        if (middleCount > getMaxSize() && !spammed && worldObj != null) {
-            ModCharsetStorage.logger.error("Factorization barrel size, " + middleCount + ", is larger than the maximum, " + getMaxSize() + ". Contents: " + item + " " + (item != null ? item.getItem() : "<null>") + " At: " + getPos() + " BarrelType = " + type);
-            ModCharsetStorage.logger.error("Did the max stack size go down, or is someone doing something bad?");
-            Thread.dumpStack();
-            spammed = true;
-        }
-        if (topStack == null) {
-            topStack = item.copy();
-        }
-        if (bottomStack == null) {
-            bottomStack = item.copy();
-        }
-        topStack.stackSize = bottomStack.stackSize = 0;
-        updateStacks();
-        updateClients(BarrelMessage.BarrelCount);
-        markDirty();
-    }
 
     @Override
     public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
@@ -478,11 +430,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (type == Type.SILKY && is.hasTagCompound()) {
             NBTTagCompound tag = is.getTagCompound();
             int loadCount = tag.getInteger("SilkCount");
-            if (loadCount != 0) {
+            if (loadCount > 0) {
                 ItemStack loadItem = getSilkedItem(is);
                 if (loadItem != null) {
                     item = loadItem;
-                    setItemCount(loadCount);
+                    item.setCount(loadCount);
                 }
             }
         }
@@ -494,7 +446,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
         NBTTagCompound tag = is.getTagCompound();
         if (tag.hasKey("SilkItem")) {
-            return ItemStack.loadItemStackFromNBT(is.getTagCompound().getCompoundTag("SilkItem"));
+            return new ItemStack(is.getTagCompound().getCompoundTag("SilkItem"));
         }
         return null;
     }
@@ -507,7 +459,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     //Network stuff TODO
 
     void updateClients(BarrelMessage messageType) {
-        if (hasWorldObj()) {
+        if (hasWorld()) {
             markBlockForUpdate();
         }
     }
@@ -524,7 +476,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     void updateClients(BarrelMessage messageType) {
-        if (worldObj == null || worldObj.isRemote) {
+        if (world == null || world.isRemote) {
             return;
         }
         broadcastMessage(null, getPacket(messageType));
@@ -547,26 +499,17 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
         if (messageType == BarrelMessage.BarrelDoubleClickHack) {
             Minecraft mc = Minecraft.getMinecraft();
-            mc.playerController.currentItemHittingBlock = mc.thePlayer.getHeldItem();
+            mc.playerController.currentItemHittingBlock = mc.player.getHeldItem();
             return true;
         }
         return false;
     } */
-
-    void cleanBarrel() {
-        if (getItemCount() == 0) {
-            topStack = bottomStack = item = null;
-            middleCount = 0;
-        }
-    }
 
     //Inventory code
 
     @Override
     public void markDirty() {
         super.markDirty();
-        cleanBarrel();
-        updateStacks();
         sync();
         if (type.isHopping()) {
             needLogic();
@@ -586,57 +529,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
     }
 
-    private void updateStacks() {
-        if (item == null) {
-            topStack = bottomStack = null;
-            middleCount = 0;
-            return;
-        }
-        int count = getItemCount();
-        if (count == 0) {
-            topStack = bottomStack = null;
-            middleCount = 0;
-            return;
-        }
-        if (bottomStack == null) {
-            bottomStack = item.copy();
-            bottomStack.stackSize = 0;
-        }
-        if (type == Type.STICKY) {
-            count--;
-            if (count < 0) {
-                return;
-            }
-        }
-        int upperLine = getMaxSize() - item.getMaxStackSize();
-        if (topStack == null) {
-            topStack = item.copy();
-        }
-        if (count > upperLine) {
-            topStack.stackSize = count - upperLine;
-            count -= topStack.stackSize;
-        } else {
-            topStack.stackSize = 0;
-        }
-        bottomStack.stackSize = Math.min(item.getMaxStackSize(), count);
-        count -= bottomStack.stackSize;
-        middleCount = count;
-        if (type == Type.STICKY) {
-            middleCount++;
-        }
-    }
-
-    public ItemStack getStackInSlot(int i) {
-        updateStacks();
-        if (i == 0) {
-            return topStack;
-        }
-        if (i == 1) {
-            return bottomStack;
-        }
-        return null;
-    }
-
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
@@ -646,25 +538,15 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
     }
 
-    private final IItemHandler[] handlers = new IItemHandler[] {
-            new ExtractionHandler(),
-            new InsertionHandler(),
-            new ReadableItemHandler()
-    };
-
-    IItemHandler getItemHandler(int id) {
-        return handlers[id];
-    }
-
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             if (isBottom(facing)) {
-                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handlers[0]);
+                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(extractionView);
             } else if (isTop(facing)) {
-                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handlers[1]);
+                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(insertionView);
             } else if (facing == null) {
-                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handlers[2]);
+                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(readOnlyView);
             }
         }
 
@@ -672,12 +554,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     public void clear() {
-        setItemCount(0);
+        item = ItemStack.EMPTY;
+        onItemChange(true);
     }
 
-    //Interaction
-
-    long lastClick = -1000; //NOTE: This really should be player-specific!
+    // Interaction
+    private final WeakHashMap<EntityPlayer, Long> lastClickMap = new WeakHashMap<>();
 
     //*             Left-Click         Right-Click
     //* No Shift:   Remove stack       Add item
@@ -685,20 +567,21 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     //* Double:                        Add all but 1 item
 
     public boolean activate(EntityPlayer entityplayer, EnumFacing side, EnumHand hand) {
-        // right click: put an item in
-        if (worldObj.getTotalWorldTime() - lastClick < 10 && item != null) {
+        // right click: put an item
+        Long lastClick = lastClickMap.get(entityplayer);
+        if (lastClick != null && world.getTotalWorldTime() - lastClick < 10 && !item.isEmpty()) {
             addAllItems(entityplayer, hand);
             return true;
         }
-        lastClick = worldObj.getTotalWorldTime();
+        lastClickMap.put(entityplayer, world.getTotalWorldTime());
 
         ItemStack held = entityplayer.getHeldItem(hand);
-        if (held == null) {
+        if (held.isEmpty()) {
             info(entityplayer);
             return true;
         }
 
-        if (!worldObj.isRemote && isNested(held) && (item == null || itemMatch(held))) {
+        if (!world.isRemote && isNested(held) && (item.isEmpty() || itemMatch(held))) {
             new Notice(notice_target, "notice.charset.barrel.no").sendTo(entityplayer);
             return true;
         }
@@ -708,34 +591,35 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             return false;
         }
 
-        boolean veryNew = taint(held);
-
-        if (!itemMatch(held)) {
+        if (!canInsert(held)) {
             info(entityplayer);
             return true;
         }
+
+        boolean veryNew = item.isEmpty();
+
         int free = getMaxSize() - getItemCount();
         if (free <= 0) {
             info(entityplayer);
             return true;
         }
-        int take = Math.min(free, held.stackSize);
-        held.stackSize -= take;
-        changeItemCount(take);
-        if (veryNew) {
-            updateClients(BarrelMessage.BarrelItem);
-        }
-        if (held.stackSize == 0) {
-            entityplayer.setHeldItem(hand, null);
+
+        int take = Math.min(free, held.getCount());
+        ItemStack leftover = insertionView.insertItem(0, held.splitStack(take), false);
+        take -= leftover.getCount();
+        if (take > 0) {
+            held.shrink(take);
+            if (veryNew) {
+                updateClients(BarrelMessage.BarrelItem);
+            }
+        } else {
+            info(entityplayer);
         }
         return true;
     }
 
     void addAllItems(EntityPlayer entityplayer, EnumHand hand) {
         ItemStack held = entityplayer.getHeldItem(hand);
-        if (held != null) {
-            taint(held);
-        }
         InventoryPlayer inv = entityplayer.inventory;
         int total_delta = 0;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
@@ -744,26 +628,20 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                 break;
             }
             ItemStack is = inv.getStackInSlot(i);
-            if (is == null || is.stackSize <= 0) {
+            if (is.isEmpty() || !itemMatch(is)) {
                 continue;
             }
-            if (!itemMatch(is)) {
-                continue;
-            }
-            int toAdd = Math.min(is.stackSize, free_space);
+            int toAdd = Math.min(is.getCount(), free_space);
             if (is == held && toAdd > 1) {
                 toAdd -= 1;
             }
             total_delta += toAdd;
-            is.stackSize -= toAdd;
-            if (is.stackSize <= 0) {
-                inv.setInventorySlotContents(i, null);
-            }
+            is.shrink(toAdd);
         }
-        changeItemCount(total_delta);
         if (total_delta > 0) {
+            item.grow(total_delta);
+            onItemChange(false);
             entityplayer.inventory.markDirty();
-            // Core.proxy.updatePlayerInventory(entityplayer);
         }
     }
 
@@ -869,9 +747,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         getWorld().setTileEntity(next, this);
         player.addExhaustion(0.5F);
         ItemStack is = player.getHeldItem(hand);
-        if (is != null && is.isItemStackDamageable() && worldObj.rand.nextInt(4) == 0) {
+        if (is != null && is.isItemStackDamageable() && world.rand.nextInt(4) == 0) {
             is.damageItem(distance, player);
-            if (is.stackSize <= 0) {
+            if (is.getCount() <= 0) {
                 player.setHeldItem(hand, null);
             }
         }
@@ -885,13 +763,14 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (punt(entityplayer, hand)) {
             return;
         }
-        if (getItemCount() == 0 || item == null) {
+
+        if (item.isEmpty()) {
             info(entityplayer);
             return;
         }
 
         ItemStack origHeldItem = entityplayer.getHeldItem(hand);
-        if (ForgeHooks.canToolHarvestBlock(worldObj, pos, origHeldItem)) {
+        if (ForgeHooks.canToolHarvestBlock(world, pos, origHeldItem)) {
             return;
         }
 
@@ -907,7 +786,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (result != null && result.sideHit != null) {
             dropPos = dropPos.offset(result.sideHit);
         }
-        ItemUtils.spawnItemEntity(worldObj, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), makeStack(to_remove), 0.2f, 0.2f, 0.2f, 1);
+        ItemUtils.spawnItemEntity(world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), makeStack(to_remove), 0.2f, 0.2f, 0.2f, 1);
+        item.shrink(to_remove);
+        onItemChange(false);
         Entity ent = null;
         // TODO
         //Entity ent = ItemUtil.giveItem(entityplayer, new Coord(this), makeStack(to_remove), SpaceUtil.getOrientation(last_hit_side));
@@ -918,15 +799,13 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
                 // broadcastMessage(entityplayer, BarrelMessage.BarrelDoubleClickHack);
             }
         }
-        changeItemCount(-to_remove);
-        cleanBarrel();
     }
 
     void info(final EntityPlayer entityplayer) {
         new Notice(notice_target, new NoticeUpdater() {
             @Override
             public void update(Notice msg) {
-                if (item == null && getItemCount() == 0) {
+                if (item.isEmpty()) {
                     msg.setMessage("notice.charset.barrel.empty");
                 } else {
                     String countMsg = null;
@@ -947,12 +826,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     private ItemStack makeStack(int count) {
-        if (item == null) {
-            return null;
+        if (item.isEmpty()) {
+            return ItemStack.EMPTY;
         }
         ItemStack ret = item.copy();
-        ret.stackSize = count;
-        assert ret.stackSize > 0 && ret.stackSize <= item.getMaxStackSize();
+        ret.setCount(count);
+        assert ret.getCount() > 0 && ret.getCount() <= item.getMaxStackSize();
         return ret;
     }
 
@@ -985,16 +864,13 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             int to_drop;
             to_drop = Math.min(item.getMaxStackSize(), count);
             count -= to_drop;
-            ItemUtils.spawnItemEntity(worldObj, new Vec3d(getPos()).addVector(0.5, 0.5, 0.5), makeStack(to_drop), 0.2f, 0.2f, 0.2f, 1);
+            ItemUtils.spawnItemEntity(world, new Vec3d(getPos()).addVector(0.5, 0.5, 0.5), makeStack(to_drop), 0.2f, 0.2f, 0.2f, 1);
             // TODO
             //ItemUtil.giveItem(null, new Coord(this), makeStack(to_drop), null);
             if (count <= 0) {
                 break;
             }
         }
-        topStack = null;
-        middleCount = 0;
-        bottomStack = null;
     }
 
     public boolean canLose() {
@@ -1043,7 +919,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     private static ItemStack get(ItemStack is, String name, ItemStack default_) {
         ItemStack stack = default_;
         if (is != null && is.hasTagCompound() && is.getTagCompound().hasKey(name)) {
-            ItemStack stack1 = ItemStack.loadItemStackFromNBT(is.getTagCompound().getCompoundTag(name));
+            ItemStack stack1 = new ItemStack(is.getTagCompound().getCompoundTag(name));
             if (stack1 != null) {
                 stack = stack1;
             }
@@ -1086,7 +962,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
     public ItemStack getDroppedBlock() {
         ItemStack is = makeBarrel(type, woodLog, woodSlab);
-        if (type == Type.SILKY && item != null && getItemCount() > 0) {
+        if (type == Type.SILKY && !item.isEmpty() && broken_with_silk_touch) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag == null) {
                 tag = new NBTTagCompound();
@@ -1096,7 +972,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             NBTTagCompound si = new NBTTagCompound();
             item.writeToNBT(si);
             tag.setTag("SilkItem", si);
-            tag.setLong("rnd", hashCode() + worldObj.getTotalWorldTime());
+            tag.setLong("rnd", hashCode() + world.getTotalWorldTime());
         }
         return is;
     }
@@ -1105,7 +981,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
     public boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
         if (cancelRemovedByPlayer(player)) return false;
-        broken_with_silk_touch = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getActiveItemStack()) > 0;
+        broken_with_silk_touch = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getHeldItem(EnumHand.MAIN_HAND)) > 0;
         return true;
     }
 
@@ -1116,7 +992,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (player == null || !player.capabilities.isCreativeMode || player.isSneaking()) {
             return false;
         }
-        if (player.worldObj.isRemote) {
+        if (player.world.isRemote) {
             player.swingArm(EnumHand.MAIN_HAND); // TODO
         } else {
             click(player);

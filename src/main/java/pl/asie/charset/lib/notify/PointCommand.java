@@ -54,12 +54,12 @@ import java.util.List;
 public class PointCommand extends CommandBase {
 
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "point";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender var1) {
+    public String getUsage(ICommandSender var1) {
         return "/point [optional text]";
     }
 
@@ -77,17 +77,17 @@ public class PointCommand extends CommandBase {
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
         String msg = Joiner.on(" ").join(args);
         Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer player = mc.thePlayer;
+        EntityPlayer player = mc.player;
         RayTraceResult mop = getMouseOver(player, 64);
         if (mop == null || mop.typeOfHit == RayTraceResult.Type.MISS) {
-            sender.addChatMessage(new TextComponentTranslation("charset.point.toofar"));
+            sender.sendMessage(new TextComponentTranslation("charset.point.toofar"));
             return;
         }
         try {
             switch (mop.typeOfHit) {
             default: return;
             case BLOCK:
-                PointNetworkHandler.INSTANCE.pointAtCoord(NotificationCoord.fromMop(player.worldObj, mop), msg);
+                PointNetworkHandler.INSTANCE.pointAtCoord(NotificationCoord.fromMop(player.world, mop), msg);
                 break;
             case ENTITY:
                 PointNetworkHandler.INSTANCE.pointAtEntity(mop.entityHit, msg);
@@ -100,7 +100,7 @@ public class PointCommand extends CommandBase {
 
     private static RayTraceResult getMouseOver(EntityPlayer player, double reachDistance) {
         float par1 = 1;
-        Entity pointedEntity = null;
+        Entity pointedEntity;
         double d0 = reachDistance;
         RayTraceResult objectMouseOver = player.rayTrace(d0, par1);
         double d1 = d0;
@@ -116,7 +116,7 @@ public class PointCommand extends CommandBase {
         pointedEntity = null;
         Vec3d vec33 = null;
         float f1 = 1.0F;
-        List list = player.worldObj.getEntitiesWithinAABBExcludingEntity(
+        List list = player.world.getEntitiesWithinAABBExcludingEntity(
                 player,
                 player.getEntityBoundingBox().addCoord(vec31.xCoord * d0,
                         vec31.yCoord * d0, vec31.zCoord * d0).expand(

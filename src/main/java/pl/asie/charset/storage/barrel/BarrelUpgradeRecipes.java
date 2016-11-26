@@ -90,7 +90,7 @@ public class BarrelUpgradeRecipes {
         ItemStack grabBarrel(InventoryCrafting container) {
             for (int i = 0; i < container.getSizeInventory(); i++) {
                 ItemStack is = container.getStackInSlot(i);
-                if (is == null || is.getItem() != ModCharsetStorage.barrelItem) {
+                if (is.getItem() != ModCharsetStorage.barrelItem) {
                     continue;
                 }
                 return is;

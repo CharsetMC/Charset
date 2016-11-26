@@ -28,11 +28,11 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerServer;
-import pl.asie.charset.lib.wires.PartWire;
 
 public class ProxyCommon {
-	public void drawWireHighlight(PartWire wire) {
-	}
+	// TODO 1.11
+//	public void drawWireHighlight(PartWire wire) {
+//	}
 
 	public void registerItemModel(Item item, int meta, String name) {
 

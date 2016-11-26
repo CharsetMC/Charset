@@ -150,10 +150,10 @@ public class BarrelEventListener {
     public void renderArrowHighlight(RenderWorldLastEvent event) {
         if (Minecraft.isGuiEnabled()) {
             Minecraft mc = Minecraft.getMinecraft();
-            EntityPlayer player = mc.thePlayer;
+            EntityPlayer player = mc.player;
             if (player != null) {
                 ItemStack is = player.getHeldItem(EnumHand.MAIN_HAND);
-                if (is != null && is.getItem() == ModCharsetStorage.barrelItem) {
+                if (!is.isEmpty() && is.getItem() == ModCharsetStorage.barrelItem) {
                     RayTraceResult mop = mc.objectMouseOver;
                     if (mop != null && mop.hitVec != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
                         drawArrowHighlight(player, mop, getCameraPos(event.getPartialTicks()));

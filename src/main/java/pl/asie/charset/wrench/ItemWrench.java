@@ -18,11 +18,6 @@ package pl.asie.charset.wrench;
 
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.MultipartContainer;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.raytrace.RayTraceUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -49,7 +44,8 @@ public class ItemWrench extends Item {
         return false;
     }
 
-    @Optional.Method(modid = "mcmultipart")
+    // TODO 1.11
+    /* @Optional.Method(modid = "mcmultipart")
     public EnumActionResult tryRotateMultipart(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing targetFacing) {
         IMultipartContainer container = MultipartHelper.getPartContainer(worldIn, pos);
         if (container != null) {
@@ -77,22 +73,22 @@ public class ItemWrench extends Item {
         } else {
             return EnumActionResult.PASS;
         }
-    }
+    } */
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) {
             EnumFacing targetFacing = facing != null ? facing : EnumFacing.UP;
             if (playerIn != null && playerIn.isSneaking()) {
                 targetFacing = targetFacing.getOpposite();
             }
 
-            if (Loader.isModLoaded("mcmultipart")) {
+            /* if (Loader.isModLoaded("mcmultipart")) {
                 EnumActionResult result = tryRotateMultipart(playerIn, worldIn, pos, targetFacing);
                 if (result != EnumActionResult.PASS) {
                     return result;
                 }
-            }
+            } */
 
             IBlockState state = worldIn.getBlockState(pos);
             if (state != null) {

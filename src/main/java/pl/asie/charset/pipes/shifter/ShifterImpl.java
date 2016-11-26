@@ -18,10 +18,11 @@ package pl.asie.charset.pipes.shifter;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidContainerItem;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.utils.FluidUtils;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 /**
  * Default implementation for the shifter.
@@ -76,13 +77,21 @@ public class ShifterImpl implements IShifter {
 
     @Override
     public boolean matches(ItemStack source) {
-        return filter == null || ItemStack.areItemStacksEqual(filter, source);
+        return filter.isEmpty() || ItemUtils.equals(filter, source, false, true, true);
     }
 
     @Override
     public boolean matches(FluidStack source) {
-        return source != null && (filter == null || FluidContainerRegistry.containsFluid(filter, source) ||
-                (filter.getItem() instanceof IFluidContainerItem && source.isFluidEqual(((IFluidContainerItem) filter.getItem()).getFluid(filter))));
+        if (source != null) {
+            if (filter.isEmpty()) {
+                return true;
+            } else {
+                IFluidHandler handler = FluidUtils.getFluidHandler(filter, null);
+                return handler != null ? FluidUtils.matches(handler, source) : true;
+            }
+        } else {
+            return false;
+        }
     }
 
     public void setMode(Mode mode) {
@@ -108,5 +117,4 @@ public class ShifterImpl implements IShifter {
     public void setFilter(ItemStack filter) {
         this.filter = filter;
     }
-
 }

@@ -85,6 +85,7 @@ public class TweakGlassShards extends Tweak {
 		int md = 0;
 
 		if (block == Blocks.GLASS) {
+			md = 0;
 		} else if (block == Blocks.STAINED_GLASS) {
 			md = 1 + block.getMetaFromState(event.getState());
 		} else if (block == Blocks.GLASS_PANE) {

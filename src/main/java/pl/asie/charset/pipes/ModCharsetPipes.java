@@ -37,24 +37,19 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
-import pl.asie.charset.pipes.pipe.ItemPipe;
-import pl.asie.charset.pipes.pipe.PacketFluidUpdate;
-import pl.asie.charset.pipes.pipe.PacketItemUpdate;
-import pl.asie.charset.pipes.pipe.PacketPipeSyncRequest;
-import pl.asie.charset.pipes.pipe.PartPipe;
+import pl.asie.charset.pipes.pipe.*;
 import pl.asie.charset.pipes.shifter.BlockShifter;
 import pl.asie.charset.pipes.shifter.ShifterImpl;
 import pl.asie.charset.pipes.shifter.ShifterStorage;
 import pl.asie.charset.pipes.shifter.TileShifter;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
-		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetPipes {
-	public static final String MODID = "CharsetPipes";
+	public static final String MODID = "charsetpipes";
 	public static final String NAME = "|";
 	public static final String VERSION = "@VERSION@";
 	public static final Random RANDOM = new Random();
@@ -70,21 +65,21 @@ public class ModCharsetPipes {
 	public static Capability<IShifter> CAP_SHIFTER;
 
 	public static Block shifterBlock;
-	public static Item itemPipe;
+	public static Block blockPipe;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
 
-		itemPipe = new ItemPipe();
-		GameRegistry.register(itemPipe.setRegistryName("pipe"));
-		MultipartRegistry.registerPart(PartPipe.class, "CharsetPipes:pipe");
+		blockPipe = new BlockPipe();
+		ModCharsetLib.proxy.registerBlock(blockPipe, "pipe");
+		GameRegistry.registerTileEntity(TilePipe.class, "CharsetPipes:pipe");
 
 		shifterBlock = new BlockShifter();
 		ModCharsetLib.proxy.registerBlock(shifterBlock, "shifter");
 		GameRegistry.registerTileEntity(TileShifter.class, "CharsetPipes:shifter");
 
-		ModCharsetLib.proxy.registerItemModel(itemPipe, 0, "charsetpipes:pipe_item");
+		ModCharsetLib.proxy.registerItemModel(blockPipe, 0, "charsetpipes:pipe_item");
 		ModCharsetLib.proxy.registerItemModel(shifterBlock, 0, "charsetpipes:shifter");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
@@ -106,12 +101,12 @@ public class ModCharsetPipes {
 				'c', Blocks.COBBLESTONE, 'P', Blocks.PISTON, 'r', Items.REDSTONE, '^', Items.ARROW);
 
 		if (!Loader.isModLoaded("BuildCraft|Transport")) {
-			ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
+			ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(blockPipe, 8),
 					"mgm",
 					'g', Blocks.GLASS, 'm', Blocks.OBSIDIAN);
 		}
 
-		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(itemPipe, 8),
+		ModCharsetLib.proxy.registerRecipeShaped(new ItemStack(blockPipe, 8),
 				"m",
 				"g",
 				"m",

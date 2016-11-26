@@ -38,7 +38,7 @@ public class ShifterStorage implements Capability.IStorage<IShifter> {
         tag.setBoolean("isShifting", instance.isShifting());
         tag.setBoolean("hasFilter", instance.hasFilter());
         ItemStack filter = ((ShifterImpl) instance).getFilter();
-        if(filter != null) {
+        if (!filter.isEmpty()) {
             tag.setTag("filter", filter.serializeNBT());
         }
         return tag;
@@ -54,7 +54,7 @@ public class ShifterStorage implements Capability.IStorage<IShifter> {
         shifter.setShifting(tag.getBoolean("isShifting"));
         shifter.setHasFilter(tag.getBoolean("hasFilter"));
         if(tag.hasKey("filter", Constants.NBT.TAG_COMPOUND)) {
-            shifter.setFilter(ItemStack.loadItemStackFromNBT(tag.getCompoundTag("filter")));
+            shifter.setFilter(new ItemStack(tag.getCompoundTag("filter")));
         }
     }
 }

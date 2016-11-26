@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import org.apache.logging.log4j.LogManager;
@@ -50,22 +51,17 @@ import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
-import pl.asie.charset.lib.wires.ItemWire;
-import pl.asie.charset.lib.wires.RecipeObjectWire;
-import pl.asie.charset.lib.wires.RecipeResultWire;
-import pl.asie.charset.lib.wires.WireFactory;
-import pl.asie.charset.lib.wires.WireManager;
 
-@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart;after:JEI@[3.13.3.373,)")
+@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart;after:jei@[3.13.3.373,)")
 public class ModCharsetLib {
 	public static final boolean INDEV = false;
 
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
-	public static final String MODID = "CharsetLib";
+	public static final String MODID = "charsetlib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart@[1.3.0,2.0.0)";
-	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
+	public static final String DEP_MCMP = "required-after:forge@[13.19.0.2160,);required-after:charsetlib@" + VERSION + ";required-after:mcmultipart@[1.3.0,2.0.0)";
+	public static final String DEP_NO_MCMP = "required-after:forge@[13.19.0.2160,);required-after:charsetlib@" + VERSION + ";after:mcmultipart";
 
 	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
 		@Override
@@ -84,12 +80,13 @@ public class ModCharsetLib {
 
 	public static PlayerDeathHandler deathHandler = new PlayerDeathHandler();
 
-	public static IconCharset charsetIconItem;
+	public static Item charsetIconItem;
+	public static ItemStack charsetIconStack;
 
 	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs("charset") {
 		@Override
-		public Item getTabIconItem() {
-			return charsetIconItem;
+		public ItemStack getTabIconItem() {
+			return charsetIconStack;
 		}
 	};
 	public static Logger logger;
@@ -111,13 +108,15 @@ public class ModCharsetLib {
 
 		charsetIconItem = new IconCharset();
 		GameRegistry.register(charsetIconItem.setRegistryName("icon"));
+		charsetIconStack = new ItemStack(charsetIconItem);
 
-		WireManager.ITEM = new ItemWire();
-		GameRegistry.register(WireManager.ITEM.setRegistryName("wire"));
+		// TODO 1.11
+//		WireManager.ITEM = new ItemWire();
+//		GameRegistry.register(WireManager.ITEM.setRegistryName("wire"));
 
-		for (int i = 0; i < 512; i++) { // TODO
-			ModCharsetLib.proxy.registerItemModel(WireManager.ITEM, i, "charsetlib:wire");
-		}
+//		for (int i = 0; i < 512; i++) { // TODO
+//			ModCharsetLib.proxy.registerItemModel(WireManager.ITEM, i, "charsetlib:wire");
+//		}
 
 		proxy.registerItemModel(charsetIconItem, 0, "charsetlib:icon");
 
@@ -141,12 +140,12 @@ public class ModCharsetLib {
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
 
-		for (WireFactory factory : WireManager.REGISTRY.getValues()) {
-			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, false, 1))
-					.shapeless(new RecipeObjectWire(factory, true)).build());
-			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, true, 1))
-					.shapeless(new RecipeObjectWire(factory, false)).build());
-		}
+//		for (WireFactory factory : WireManager.REGISTRY.getValues()) {
+//			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, false, 1))
+//					.shapeless(new RecipeObjectWire(factory, true)).build());
+//			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, true, 1))
+//					.shapeless(new RecipeObjectWire(factory, false)).build());
+//		}
 
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
 		AudioAPI.DATA_REGISTRY.register(AudioDataSound.class);

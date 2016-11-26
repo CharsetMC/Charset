@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.audio.tape;
+package pl.asie.charset.audio.util;
 
 import java.util.List;
 

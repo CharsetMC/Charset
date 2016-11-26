@@ -94,7 +94,7 @@ class ClientMessage {
         String item_name = "null", item_info = "", item_info_newline = "";
         if (item != null) {
             item_name = item.getDisplayName();
-            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+            EntityPlayer player = Minecraft.getMinecraft().player;
             ArrayList<String> bits = new ArrayList<String>();
             try {
                 item.getItem().addInformation(item, player, bits, false);

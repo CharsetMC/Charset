@@ -48,12 +48,6 @@ public class JEITapeCraftingRecipe extends BlankRecipeWrapper implements IShaped
 
 		@Nonnull
 		@Override
-		public String getRecipeCategoryUid() {
-			return VanillaRecipeCategoryUid.CRAFTING;
-		}
-
-		@Nonnull
-		@Override
 		public String getRecipeCategoryUid(@Nonnull RecipeTape recipe) {
 			return VanillaRecipeCategoryUid.CRAFTING;
 		}

@@ -110,7 +110,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         }
 
         ItemStack is = barrel.item;
-        if (is == null || barrel.getItemCount() <= 0) {
+        if (barrel.getItemCount() <= 0) {
             return;
         }
 

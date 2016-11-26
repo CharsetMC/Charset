@@ -64,7 +64,8 @@ public class ItemLock extends Item {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack stack = playerIn.getHeldItem(hand);
         if (getKey(stack) == null) {
             return EnumActionResult.FAIL;
         }
@@ -74,13 +75,13 @@ public class ItemLock extends Item {
         if (facing != EnumFacing.DOWN && facing != EnumFacing.UP && playerIn.canPlayerEdit(blockpos, facing, stack)) {
             EntityLock lockEntity = new EntityLock(worldIn, stack, blockpos, facing);
 
-            if (lockEntity != null && lockEntity.onValidSurface()) {
+            if (lockEntity.onValidSurface()) {
                 if (!worldIn.isRemote) {
                     lockEntity.playPlaceSound();
-                    worldIn.spawnEntityInWorld(lockEntity);
+                    worldIn.spawnEntity(lockEntity);
                 }
 
-                stack.stackSize--;
+                stack.shrink(1);
             }
 
             return EnumActionResult.SUCCESS;

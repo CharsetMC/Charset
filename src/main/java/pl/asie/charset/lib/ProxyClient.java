@@ -35,13 +35,10 @@ import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.lib.wires.PartWire;
-import pl.asie.charset.lib.wires.RendererWire;
-import pl.asie.charset.lib.wires.WireFactory;
-import pl.asie.charset.lib.wires.WireManager;
-import pl.asie.charset.lib.wires.WireUtils;
 
 public class ProxyClient extends ProxyCommon {
+	// TODO 1.11
+	/*
 	public static final RendererWire rendererWire = new RendererWire();
 
 	@Override
@@ -61,12 +58,13 @@ public class ProxyClient extends ProxyCommon {
 			RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(0), lineMaskCenter);
 		}
 	}
+	*/
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
-		event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "multipart"), rendererWire);
-		event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "inventory"), rendererWire);
+	//	event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "multipart"), rendererWire);
+	//	event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "inventory"), rendererWire);
 	}
 
 	@SubscribeEvent
@@ -75,9 +73,9 @@ public class ProxyClient extends ProxyCommon {
 		ModelFactory.clearCaches();
 		ColorLookupHandler.INSTANCE.clear();
 
-		for (WireFactory factory : WireManager.REGISTRY.getValues()) {
-			rendererWire.registerSheet(event.getMap(), factory);
-		}
+	//	for (WireFactory factory : WireManager.REGISTRY.getValues()) {
+	//		rendererWire.registerSheet(event.getMap(), factory);
+	//	}
 	}
 
 	@Override
@@ -97,7 +95,7 @@ public class ProxyClient extends ProxyCommon {
 	@Override
 	public World getLocalWorld(int dim) {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-			World w = Minecraft.getMinecraft().theWorld;
+			World w = Minecraft.getMinecraft().world;
 			if (w != null && w.provider.getDimension() == dim) {
 				return w;
 			} else {

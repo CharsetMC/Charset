@@ -83,14 +83,14 @@ public enum PointNetworkHandler {
             case COORD: {
                 BlockPos pos = new BlockPos(input.readInt(), input.readInt(), input.readInt());
                 String msg = buildMessage(player, input);
-                NotificationCoord at = new NotificationCoord(player.worldObj, pos);
+                NotificationCoord at = new NotificationCoord(player.world, pos);
                 notice = new Notice(at, msg);
                 break;
             }
             case ENTITY: {
                 int entityId = input.readInt();
                 String msg = buildMessage(player, input);
-                Entity ent = player.worldObj.getEntityByID(entityId);
+                Entity ent = player.world.getEntityByID(entityId);
                 if (ent == null) return;
                 notice = new Notice(ent, msg);
                 break;
@@ -98,7 +98,7 @@ public enum PointNetworkHandler {
         }
         notice.withStyle(Style.DRAWFAR, Style.VERY_LONG, Style.SCALE_SIZE, Style.EXACTPOSITION);
         double maxDist = 0xFF * 0xFF;
-        for (EntityPlayer viewer : player.worldObj.playerEntities) {
+        for (EntityPlayer viewer : player.world.playerEntities) {
             if (player.getDistanceSqToEntity(viewer) > maxDist) continue;
             notice.sendTo(viewer);
         }

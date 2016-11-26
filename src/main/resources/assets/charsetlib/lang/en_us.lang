@@ -72,6 +72,7 @@ itemGroup.charset=The Charset Project
 
 # CharsetPipes
 item.charset.pipe.name=Pipe
+tile.charset.pipe.name=Pipe
 tile.charset.shifter.name=Shifter
 
 # CharsetStorage

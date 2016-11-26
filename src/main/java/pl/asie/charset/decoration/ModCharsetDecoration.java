@@ -19,6 +19,7 @@ package pl.asie.charset.decoration;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -36,7 +37,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 @Mod(modid = ModCharsetDecoration.MODID, name = ModCharsetDecoration.NAME, version = ModCharsetDecoration.VERSION,
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetDecoration {
-	public static final String MODID = "CharsetDecoration";
+	public static final String MODID = "charsetdecoration";
 	public static final String NAME = "^";
 	public static final String VERSION = "@VERSION@";
 
@@ -65,7 +66,7 @@ public class ModCharsetDecoration {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		EntityRegistry.registerModEntity(EntityPoster.class, "charsetdecoration:poster", 1, this, 64, 3, true);
+		EntityRegistry.registerModEntity(new ResourceLocation("charsetdecoration:poster"), EntityPoster.class, "charsetdecoration:poster", 1, this, 64, 3, true);
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(posterItem),
 				"0",

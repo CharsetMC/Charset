@@ -18,16 +18,17 @@ package pl.asie.charset.pipes.pipe;
 
 import io.netty.buffer.ByteBuf;
 
-import mcmultipart.multipart.IMultipart;
 import net.minecraft.network.INetHandler;
+import net.minecraft.tileentity.TileEntity;
 import pl.asie.charset.lib.network.PacketPart;
+import pl.asie.charset.lib.network.PacketTile;
 
-public class PacketPipeSyncRequest extends PacketPart {
+public class PacketPipeSyncRequest extends PacketTile {
 	public PacketPipeSyncRequest() {
 		super();
 	}
 
-	public PacketPipeSyncRequest(IMultipart part) {
+	public PacketPipeSyncRequest(TileEntity part) {
 		super(part);
 	}
 
@@ -35,10 +36,10 @@ public class PacketPipeSyncRequest extends PacketPart {
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
 
-		if (part == null || !(part instanceof PartPipe)) {
+		if (tile == null || !(tile instanceof TilePipe)) {
 			return;
 		}
 
-		((PartPipe) part).onSyncRequest();
+		((TilePipe) tile).onSyncRequest();
 	}
 }

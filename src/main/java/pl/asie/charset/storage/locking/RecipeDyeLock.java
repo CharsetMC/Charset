@@ -19,6 +19,7 @@ package pl.asie.charset.storage.locking;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 
 import java.util.Optional;
@@ -51,10 +52,10 @@ public class RecipeDyeLock extends RecipeDyeableItem {
 
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack source = inv.getStackInSlot(i);
-            if (source != null) {
+            if (!source.isEmpty()) {
                 if (isTarget(source)) {
                     target = source.copy();
-                    target.stackSize = 1;
+                    target.setCount(1);
                 } else if (getColor(source) != null) {
                     dyeCount++;
                 }
@@ -79,11 +80,9 @@ public class RecipeDyeLock extends RecipeDyeableItem {
     }
 
     @Override
-    public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-        ItemStack[] stacks = new ItemStack[inv.getSizeInventory()];
-
+    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
         // Nothing shall remain, for it is the key itself! We don't want to clone it.
 
-        return stacks;
+        return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
 }

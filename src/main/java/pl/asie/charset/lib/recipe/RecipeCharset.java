@@ -25,14 +25,14 @@ public class RecipeCharset extends RecipeBase {
     protected boolean shapeless = false;
 
     @Override
-    public boolean matches(InventoryCrafting inv, World worldIn) {
+    public boolean matches(InventoryCrafting inv, @Nullable World worldIn) {
         if (shapeless) {
             Set<IRecipeObject> objectSet = new HashSet<>();
             Collections.addAll(objectSet, input);
             for (int y = 0; y < inv.getHeight(); y++) {
                 for (int x = 0; x < inv.getWidth(); x++) {
                     ItemStack stack = inv.getStackInRowAndColumn(x, y);
-                    if (stack != null) {
+                    if (!stack.isEmpty()) {
                         boolean matches = false;
 
                         for (IRecipeObject o : objectSet) {
@@ -62,7 +62,7 @@ public class RecipeCharset extends RecipeBase {
                         int y = i / width + yo;
 
                         if (ro == null) {
-                            if (inv.getStackInRowAndColumn(x, y) != null) {
+                            if (!inv.getStackInRowAndColumn(x, y).isEmpty()) {
                                 noMatch = true;
                             }
                         } else {
@@ -101,10 +101,9 @@ public class RecipeCharset extends RecipeBase {
         return input.length;
     }
 
-    @Nullable
     @Override
     public ItemStack getRecipeOutput() {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     public static class Builder {

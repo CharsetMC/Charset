@@ -82,19 +82,19 @@ public class TweakZorro extends Tweak {
 	@SubscribeEvent
 	public void doTheZorroThing(PlayerInteractEvent.EntityInteract event) {
 		EntityPlayer player = event.getEntityPlayer();
-		if (player.worldObj.isRemote) return;
+		if (player.world.isRemote) return;
 		if (player.isRiding()) return;
 		if (!(event.getTarget() instanceof EntityHorse)) return;
 		EntityHorse horse = (EntityHorse) event.getTarget();
 		if (player.fallDistance <= 2) return;
 		if (!horse.isHorseSaddled()) return;
-		ItemStack heldStack = player.getHeldItem(EnumHand.MAIN_HAND);
 		if (horse.getLeashed()) {
 			if (!(horse.getLeashedToEntity() instanceof EntityLeashKnot)) return;
-			horse.getLeashedToEntity().processInitialInteract(player, heldStack, EnumHand.MAIN_HAND);
+			horse.getLeashedToEntity().processInitialInteract(player, EnumHand.MAIN_HAND);
 		}
 		boolean awesome = false;
-		if (player.fallDistance > 5 && heldStack != null) {
+		ItemStack heldStack = player.getHeldItem(EnumHand.MAIN_HAND);
+		if (player.fallDistance > 5 && !heldStack.isEmpty()) {
 			Item held = heldStack.getItem();
 			boolean has_baby = false;
 			if (player.getRidingEntity() instanceof EntityAgeable) {
@@ -104,7 +104,7 @@ public class TweakZorro extends Tweak {
 			awesome = held instanceof ItemSword || held instanceof ItemBow || player.getRidingEntity() instanceof EntityPlayer || has_baby;
 			if (!awesome) {
 				Set<String> classes = held.getToolClasses(heldStack);
-				awesome |= (classes != null && classes.contains("axe"));
+				awesome |= classes.contains("axe");
 			}
 		}
 		if (awesome) {

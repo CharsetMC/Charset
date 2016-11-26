@@ -100,16 +100,16 @@ public class TileBase extends TileEntity {
 	}
 
 	public TileEntity getNeighbourTile(EnumFacing side) {
-		return worldObj != null && side != null ? worldObj.getTileEntity(pos.offset(side)) : null;
+		return world != null && side != null ? world.getTileEntity(pos.offset(side)) : null;
 	}
 
 	public void markBlockForRenderUpdate() {
-		worldObj.markBlockRangeForRenderUpdate(pos, pos);
+		world.markBlockRangeForRenderUpdate(pos, pos);
 	}
 
 	public void markBlockForUpdate() {
-		IBlockState state = worldObj.getBlockState(pos);
-		worldObj.notifyBlockUpdate(pos, state, state, 3);
+		IBlockState state = world.getBlockState(pos);
+		world.notifyBlockUpdate(pos, state, state, 3);
 	}
 
 	public void dropContents() {

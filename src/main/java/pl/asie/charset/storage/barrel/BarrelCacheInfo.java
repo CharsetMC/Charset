@@ -97,7 +97,6 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
 
     public static BarrelCacheInfo from(ItemStack is) {
         TileEntityDayBarrel barrel = new TileEntityDayBarrel();
-        assert barrel != null;
         barrel.loadFromStack(is);
         barrel.orientation = Orientation.FACE_NORTH_POINT_UP;
         return BarrelCacheInfo.from(barrel);

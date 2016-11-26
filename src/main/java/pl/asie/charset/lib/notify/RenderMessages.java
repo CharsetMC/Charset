@@ -77,11 +77,11 @@ public class RenderMessages extends RenderMessagesProxy {
     }
 
     private void addMessage0(Object locus, ItemStack item, String format, String... args) {
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-        if (player == null || player.worldObj == null) {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player == null || player.world == null) {
             return;
         }
-        ClientMessage msg = new ClientMessage(player.worldObj, locus, item, format, args);
+        ClientMessage msg = new ClientMessage(player.world, locus, item, format, args);
         if (msg.style.contains(Style.CLEAR)) {
             messages.clear();
             if (msg.msg == null || msg.msg.equals("")) return;
@@ -142,7 +142,7 @@ public class RenderMessages extends RenderMessagesProxy {
     }
     
     void renderMessages0(RenderWorldLastEvent event) {
-        World w = Minecraft.getMinecraft().theWorld;
+        World w = Minecraft.getMinecraft().world;
         if (w == null) {
             return;
         }
@@ -323,7 +323,8 @@ public class RenderMessages extends RenderMessagesProxy {
             targs[i] = net.minecraft.util.text.translation.I18n.translateToLocal(formatArgs[i]);
         }
         String msg = I18n.format(message, targs);
-        mc.ingameGUI.setRecordPlaying(msg, false);
+        // TODO 1.11 check
+        mc.ingameGUI.setRecordPlayingMessage(msg);
     }
     
     @Override

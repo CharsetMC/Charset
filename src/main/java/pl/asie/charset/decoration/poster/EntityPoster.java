@@ -106,8 +106,12 @@ public class EntityPoster extends Entity {
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound) {
-        inv = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("inv"));
-        if (inv == null) inv = new ItemStack(ModCharsetDecoration.posterItem);
+        if (!compound.hasKey("inv")) {
+            inv = new ItemStack(ModCharsetDecoration.posterItem);
+        } else {
+            inv = new ItemStack(compound.getCompoundTag("inv"));
+            if (inv.isEmpty()) inv = new ItemStack(ModCharsetDecoration.posterItem);
+        }
         rot = Quaternion.loadFromTag(compound, "rot");
         scale = compound.getDouble("scale");
         base_rotation = Quaternion.loadFromTag(compound, "base_rot");
@@ -122,7 +126,7 @@ public class EntityPoster extends Entity {
         tilt = DirectionUtils.get(compound.getByte("tilt"));
 
         updateSize();
-        if (!worldObj.isRemote) {
+        if (!world.isRemote) {
             syncData();
         }
     }
@@ -148,7 +152,7 @@ public class EntityPoster extends Entity {
     public void onUpdate() {
         super.onUpdate();
 
-        if (worldObj.isRemote) {
+        if (world.isRemote) {
             if (dataManager.isDirty()) {
                 readEntityFromNBT(dataManager.get(PARAMETER_TAG));
             }
@@ -176,14 +180,14 @@ public class EntityPoster extends Entity {
     }
 
     public void setItem(ItemStack item) {
-        if (item == null) {
+        if (item.isEmpty()) {
             item = new ItemStack(ModCharsetDecoration.posterItem);
         }
         inv = item;
     }
 
     public ItemStack getItem() {
-        if (inv != null && inv.getItem() == ModCharsetDecoration.posterItem) return null;
+        if (inv.getItem() == ModCharsetDecoration.posterItem) return null;
         return inv;
     }
 
@@ -229,15 +233,15 @@ public class EntityPoster extends Entity {
     @SideOnly(Side.CLIENT)
     public boolean canBeCollidedWith() {
         // Only collide with the poster on the client side
-        if (!worldObj.isRemote) return false;
+        if (!world.isRemote) return false;
 
-        EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayer player = Minecraft.getMinecraft().player;
         if (player != null) {
             if (!locked || PlayerUtils.isCreative(player)) {
                 if (inv.getItem() == ModCharsetDecoration.posterItem) return true;
                 if (player.isSneaking()) return true;
                 ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
-                return isItemTilting(held) || isItemRotating(held) || isItemScaling(held);
+                return !held.isEmpty() && (isItemTilting(held) || isItemRotating(held) || isItemScaling(held));
             }
         }
 
@@ -245,11 +249,11 @@ public class EntityPoster extends Entity {
     }
 
     public boolean hitByEntity(Entity ent) {
-        if (!worldObj.isRemote && ent instanceof EntityPlayer) {
+        if (!world.isRemote && ent instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) ent;
             if (!locked || PlayerUtils.isCreative(player)) {
                 ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
-                if (isItemTilting(held) || isItemRotating(held) || isItemScaling(held)) {
+                if (!held.isEmpty() && (isItemTilting(held) || isItemRotating(held) || isItemScaling(held))) {
                     return false;
                 } else if (spin_normal != 0 || spin_vertical != 0 || spin_tilt != 0) {
                     spin_normal = spin_vertical = spin_tilt = 0;
@@ -310,11 +314,11 @@ public class EntityPoster extends Entity {
     }
 
     @Override
-    public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) {
+    public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
         if (locked) return false;
-        if (worldObj.isRemote) return true;
+        if (world.isRemote) return true;
         ItemStack held = player.getHeldItem(hand);
-        if (held == null) return false;
+        if (held.isEmpty()) return false;
         if (inv.getItem() == ModCharsetDecoration.posterItem) {
             if (held.getItem() == ModCharsetDecoration.posterItem) return true;
             inv = held.splitStack(1);
@@ -349,7 +353,7 @@ public class EntityPoster extends Entity {
             syncData();
             return true;
         }
-        return super.processInitialInteract(player, stack, hand);
+        return super.processInitialInteract(player, hand);
     }
 
     @Override
@@ -368,11 +372,11 @@ public class EntityPoster extends Entity {
         } else if (front == EnumFacing.WEST) {
             dx = -1;
         }
-        int x = MathHelper.floor_double(posX + dx);
-        int y = MathHelper.floor_double(posY + dy);
-        int z = MathHelper.floor_double(posZ + dz);
+        int x = MathHelper.floor(posX + dx);
+        int y = MathHelper.floor(posY + dy);
+        int z = MathHelper.floor(posZ + dz);
         BlockPos blockpos = new BlockPos(x, y, z);
-        return worldObj.getCombinedLight(blockpos, 0);
+        return world.getCombinedLight(blockpos, 0);
     }
 
     @Override

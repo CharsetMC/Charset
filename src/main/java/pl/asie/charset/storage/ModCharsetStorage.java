@@ -17,12 +17,12 @@
 package pl.asie.charset.storage;
 
 import com.google.common.base.Predicate;
-import mcmultipart.multipart.MultipartRegistry;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -46,7 +46,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-import pl.asie.charset.audio.tape.PartTapeDrive;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RecipeUtils;
@@ -64,8 +63,6 @@ import pl.asie.charset.storage.crate.CrateRegistry;
 import pl.asie.charset.storage.crate.ItemCrate;
 import pl.asie.charset.storage.crate.TileEntityCrate;
 import pl.asie.charset.storage.locking.*;
-import pl.asie.charset.storage.shelf.ItemPartShelf;
-import pl.asie.charset.storage.shelf.PartShelf;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -74,7 +71,7 @@ import java.util.UUID;
 @Mod(modid = ModCharsetStorage.MODID, name = ModCharsetStorage.NAME, version = ModCharsetStorage.VERSION,
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetStorage {
-	public static final String MODID = "CharsetStorage";
+	public static final String MODID = "charsetstorage";
 	public static final String NAME = "#";
 	public static final String VERSION = "@VERSION@";
 	public static final int DEFAULT_LOCKING_COLOR = 0xFBDB6A;
@@ -107,17 +104,6 @@ public class ModCharsetStorage {
 
 	private Configuration config;
 
-	@Optional.Method(modid = "mcmultipart")
-	private void initMultiplePants() {
-		if (ModCharsetLib.INDEV) {
-			ItemPartShelf itemPartShelf = new ItemPartShelf();
-			GameRegistry.register(itemPartShelf.setRegistryName("shelf"));
-			ModCharsetLib.proxy.registerItemModel(itemPartShelf, 0, "charsetstorage:shelf");
-
-			MultipartRegistry.registerPart(PartShelf.class, "charsetstorage:shelf");
-		}
-	}
-
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(ModCharsetStorage.MODID);
@@ -129,10 +115,6 @@ public class ModCharsetStorage {
 			GameRegistry.register(crateBlock.setRegistryName("crate"));
 			GameRegistry.register(crateItem.setRegistryName("crate"));
 			ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
-		}
-
-		if (Loader.isModLoaded("mcmultipart")) {
-			initMultiplePants();
 		}
 
 		barrelBlock = new BlockBarrel();
@@ -180,8 +162,8 @@ public class ModCharsetStorage {
 			GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
 		}
 
-		EntityRegistry.registerModEntity(EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, false);
-		EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
+		EntityRegistry.registerModEntity(new ResourceLocation("charsetstorage:lock"), EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, false);
+		EntityRegistry.registerModEntity(new ResourceLocation("charsetstorage:barrelCart"), EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
 
 		proxy.init();
 
@@ -218,11 +200,11 @@ public class ModCharsetStorage {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
 				ItemStack key = inv.getStackInRowAndColumn(0, 2);
-				if (key == null) {
+				if (key.isEmpty()) {
 					key = inv.getStackInRowAndColumn(1, 2);
 				}
 
-				if (key != null && key.getItem() instanceof ItemKey) {
+				if (!key.isEmpty() && key.getItem() instanceof ItemKey) {
 					ItemStack result = output.copy();
 					result.setTagCompound(new NBTTagCompound());
 					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getRawKey(key));
@@ -236,7 +218,7 @@ public class ModCharsetStorage {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
 				ItemStack key = inv.getStackInRowAndColumn(1, 1);
-				if (key != null && key.getItem() instanceof ItemKey) {
+				if (!key.isEmpty() && key.getItem() instanceof ItemKey) {
 					ItemStack result = output.copy();
 					result.setTagCompound(new NBTTagCompound());
 					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getRawKey(key));
@@ -257,8 +239,8 @@ public class ModCharsetStorage {
 
 		if (plankRecipe != null) {
 			ItemStack plank = plankRecipe.getCraftingResult(plankCrafting);
-			if (plank != null) {
-				plank.stackSize = 1;
+			if (!plank.isEmpty()) {
+				plank.setCount(1);
 
 				// The great slab search
 				ItemStack slab = plank;
@@ -271,7 +253,7 @@ public class ModCharsetStorage {
 
 				if (slabRecipe != null) {
 					ItemStack potentialSlab = slabRecipe.getCraftingResult(slabCrafting);
-					if (potentialSlab != null && potentialSlab.getItem() != Item.getItemFromBlock(Blocks.WOODEN_SLAB)) {
+					if (!potentialSlab.isEmpty() && potentialSlab.getItem() != Item.getItemFromBlock(Blocks.WOODEN_SLAB)) {
 						slab = potentialSlab;
 					}
 				}
@@ -288,7 +270,7 @@ public class ModCharsetStorage {
 
 				if (stickRecipe != null) {
 					ItemStack potentialStick = stickRecipe.getCraftingResult(stickCrafting);
-					if (potentialStick != null) {
+					if (!potentialStick.isEmpty()) {
 						stick = potentialStick;
 					}
 				}

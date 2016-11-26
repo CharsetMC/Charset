@@ -80,12 +80,12 @@ public class MutterCommand extends CommandBase {
     }
     
     @Override
-    public String getCommandUsage(ICommandSender icommandsender) {
+    public String getUsage(ICommandSender icommandsender) {
         return "/mutter [--long] [--show-item] some text. Clears if empty";
     }
     
     @Override
-    public String getCommandName() {
+    public String getName() {
         return "mutter";
     }
     
@@ -98,10 +98,9 @@ public class MutterCommand extends CommandBase {
     public int getRequiredPermissionLevel() {
         return 0;
     }
-    
-    // o_ó eclipse has no trouble compiling without these two methods...
+
     @Override
     public int compareTo(ICommand otherCmd) {
-        return this.getCommandName().compareTo(otherCmd.getCommandName());
+        return this.getName().compareTo(otherCmd.getName());
     }
 }

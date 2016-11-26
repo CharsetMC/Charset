@@ -184,11 +184,11 @@ public class ItemPoster extends ItemBase {
         }
 
         public void spawn() {
-            w.spawnEntityInWorld(result);
+            w.spawnEntity(result);
             result.syncData();
 
             if (!player.capabilities.isCreativeMode) {
-                is.stackSize--;
+                is.shrink(1);
             }
         }
     }
@@ -200,7 +200,8 @@ public class ItemPoster extends ItemBase {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack stack = playerIn.getHeldItem(hand);
         final PosterPlacer placer = new PosterPlacer(stack, playerIn, worldIn, pos, facing);
         if (placer.calculate()) return EnumActionResult.FAIL;
         if (!worldIn.isRemote) {

@@ -61,7 +61,7 @@ public final class ColorUtils {
 	}
 
 	public static int getColorIDFromDye(ItemStack stack) {
-		if (stack == null || stack.getItem() == null) {
+		if (stack.isEmpty()) {
 			return -1;
 		}
 

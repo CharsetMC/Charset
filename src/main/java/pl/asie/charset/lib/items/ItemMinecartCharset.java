@@ -24,12 +24,12 @@ public abstract class ItemMinecartCharset extends ItemMinecart {
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World w, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(EntityPlayer playerIn, World w, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!BlockRailBase.isRailBlock(w.getBlockState(pos))) {
             return EnumActionResult.FAIL;
         } else {
             if (!w.isRemote) {
-                placeCart(null, stack, w, pos);
+                placeCart(null, playerIn.getHeldItem(hand), w, pos);
             }
 
             return EnumActionResult.SUCCESS;
@@ -46,12 +46,9 @@ public abstract class ItemMinecartCharset extends ItemMinecart {
     protected abstract EntityMinecart createCart(GameProfile owner, ItemStack cart, World world, double x, double y, double z);
 
     public EntityMinecart placeCart(GameProfile owner, ItemStack cart, World world, BlockPos pos) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
         EntityMinecart minecart = createCart(owner, cart, world, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F);
-        cart.stackSize--;
-        world.spawnEntityInWorld(minecart);
+        cart.shrink(1);
+        world.spawnEntity(minecart);
         return minecart;
     }
 }

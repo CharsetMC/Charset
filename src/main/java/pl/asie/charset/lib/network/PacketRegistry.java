@@ -36,7 +36,6 @@ import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
-import mcmultipart.multipart.IMultipart;
 
 public class PacketRegistry {
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
@@ -63,8 +62,8 @@ public class PacketRegistry {
 
 	public void sendToWatching(Packet message, World world, BlockPos pos) {
 		WorldServer worldServer = (WorldServer) world;
-		for (EntityPlayerMP player : worldServer.getMinecraftServer().getPlayerList().getPlayerList()) {
-			if (player.worldObj.provider.getDimension() == world.provider.getDimension()) {
+		for (EntityPlayerMP player : worldServer.getMinecraftServer().getPlayerList().getPlayers()) {
+			if (player.world.provider.getDimension() == world.provider.getDimension()) {
 				if (worldServer.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
@@ -73,7 +72,8 @@ public class PacketRegistry {
 			}
 		}
 	}
-
+	// TODO 1.11
+/*
 	public void sendToWatching(Packet message, IMultipart tile) {
 		sendToWatching(message, tile.getWorld(), tile.getPos());
 	}
@@ -83,7 +83,7 @@ public class PacketRegistry {
 		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimension(),
 				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
 	}
-
+*/
 	public void sendToWatching(Packet message, TileEntity tile) {
 		sendToWatching(message, tile.getWorld(), tile.getPos());
 	}

@@ -27,6 +27,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.translation.I18n;
@@ -41,6 +42,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.audio.storage.DataStorageImpl;
+import pl.asie.charset.audio.util.TapeUtils;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.items.IDyeableItem;
 
@@ -180,7 +182,7 @@ public class ItemTape extends Item implements IDyeableItem {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+	public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
 		for (Material mat : Material.values()) {
 			if (OreDictionary.doesOreNameExist(mat.oreDict)) {
 				subItems.add(asItemStack(480 / 8 * DEFAULT_SAMPLE_RATE, mat));

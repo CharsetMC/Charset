@@ -109,7 +109,7 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     public TileEntity getAttachedTile() {
         if (tileCached == null || tileCached.isInvalid()) {
             BlockPos pos = this.hangingPosition.offset(this.facingDirection.getOpposite());
-            tileCached = worldObj.getTileEntity(pos);
+            tileCached = world.getTileEntity(pos);
         }
 
         return tileCached;
@@ -124,11 +124,11 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     @Override
     public boolean hitByEntity(Entity entityIn) {
         if (entityIn instanceof EntityPlayer && entityIn.isSneaking()) {
-            if (!this.worldObj.isRemote) {
+            if (!this.world.isRemote) {
                 ItemStack stack = ((EntityPlayer) entityIn).getHeldItemMainhand();
-                if (stack == null || !(stack.getItem() instanceof ItemKey) || !(((ItemKey) stack.getItem()).canUnlock(prefixedLockKey, stack))) {
+                if (stack.isEmpty() || !(stack.getItem() instanceof ItemKey) || !(((ItemKey) stack.getItem()).canUnlock(prefixedLockKey, stack))) {
                     stack = ((EntityPlayer) entityIn).getHeldItemOffhand();
-                    if (stack == null || !(stack.getItem() instanceof ItemKey) || !(((ItemKey) stack.getItem()).canUnlock(prefixedLockKey, stack))) {
+                    if (stack.isEmpty() || !(stack.getItem() instanceof ItemKey) || !(((ItemKey) stack.getItem()).canUnlock(prefixedLockKey, stack))) {
                         return super.hitByEntity(entityIn);
                     }
                 }
@@ -151,7 +151,7 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     public void onUpdate() {
         super.onUpdate();
 
-        if (!worldObj.isRemote && lockKey != null && lockKey.length() > 0) {
+        if (!world.isRemote && lockKey != null && lockKey.length() > 0) {
             if (getAttachedTile() instanceof ILockableContainer) {
                 ILockableContainer container = (ILockableContainer) tileCached;
                 if (!container.isLocked() || !prefixedLockKey.equals(container.getLockCode().getLock())) {
@@ -162,17 +162,19 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     }
 
     @Override
-    public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, ItemStack stack, EnumHand hand) {
-        if (!worldObj.isRemote && hand == EnumHand.MAIN_HAND && lockKey != null) {
+    public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, EnumHand hand) {
+        if (!world.isRemote && hand == EnumHand.MAIN_HAND && lockKey != null) {
+            ItemStack stack = player.getHeldItem(hand);
+
             boolean canUnlock = false;
-            if (stack != null && stack.getItem() instanceof IKeyItem) {
+            if (!stack.isEmpty() && stack.getItem() instanceof IKeyItem) {
                 IKeyItem key = (IKeyItem) stack.getItem();
                 canUnlock = key.canUnlock(prefixedLockKey, stack);
             }
 
             if (!canUnlock) {
                 stack = player.getHeldItemOffhand();
-                if (stack != null && stack.getItem() instanceof IKeyItem) {
+                if (!stack.isEmpty() && stack.getItem() instanceof IKeyItem) {
                     IKeyItem key = (IKeyItem) stack.getItem();
                     canUnlock = key.canUnlock(prefixedLockKey, stack);
                 }
@@ -185,9 +187,9 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
                 }
 
                 BlockPos pos = this.hangingPosition.offset(this.facingDirection.getOpposite());
-                IBlockState state = worldObj.getBlockState(pos);
+                IBlockState state = world.getBlockState(pos);
 
-                state.getBlock().onBlockActivated(worldObj, pos, state, player, hand, stack, this.facingDirection,
+                state.getBlock().onBlockActivated(world, pos, state, player, hand, this.facingDirection,
                         0.5F + this.facingDirection.getFrontOffsetX() * 0.5F,
                         0.5F + this.facingDirection.getFrontOffsetY() * 0.5F,
                         0.5F + this.facingDirection.getFrontOffsetZ() * 0.5F
@@ -220,17 +222,17 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
             }
         }
 
-        if (!this.worldObj.getCollisionBoxes(this, this.getEntityBoundingBox()).isEmpty()) {
+        if (!this.world.getCollisionBoxes(this, this.getEntityBoundingBox()).isEmpty()) {
             return false;
         } else {
             BlockPos pos = this.hangingPosition.offset(this.facingDirection.getOpposite());
-            TileEntity tile = worldObj.getTileEntity(pos);
+            TileEntity tile = world.getTileEntity(pos);
 
             if (!(tile instanceof ILockableContainer)) {
                 return false;
             }
 
-            return this.worldObj.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), IS_HANGING_ENTITY).isEmpty();
+            return this.world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), IS_HANGING_ENTITY).isEmpty();
         }
     }
 

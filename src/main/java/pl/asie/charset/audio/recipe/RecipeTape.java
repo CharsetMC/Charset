@@ -64,12 +64,12 @@ public class RecipeTape extends RecipeBase {
 
 			switch (TAPE_PATTERN.charAt(i)) {
 				case ' ':
-					if (source != null) {
+					if (!source.isEmpty()) {
 						return false;
 					}
 					break;
 				case 'm':
-					if (source == null) {
+					if (source.isEmpty()) {
 						return false;
 					}
 					ItemTape.Material newMaterial = getMaterial(source, material);
@@ -80,12 +80,12 @@ public class RecipeTape extends RecipeBase {
 					}
 					break;
 				case 'r':
-					if (source == null || source.getItem() != ModCharsetAudio.tapeReelItem) {
+					if (source.isEmpty() || source.getItem() != ModCharsetAudio.tapeReelItem) {
 						return false;
 					}
 					break;
 				case 's':
-					if (source == null || source.getItem() != Item.getItemFromBlock(Blocks.STONE_SLAB)) {
+					if (source.isEmpty() || source.getItem() != Item.getItemFromBlock(Blocks.STONE_SLAB)) {
 						return false;
 					}
 					break;
@@ -107,7 +107,7 @@ public class RecipeTape extends RecipeBase {
 				case 'm':
 					ItemTape.Material newMaterial = getMaterial(source, material);
 					if (newMaterial == null) {
-						return null;
+						return ItemStack.EMPTY;
 					} else {
 						material = newMaterial;
 					}
@@ -122,12 +122,12 @@ public class RecipeTape extends RecipeBase {
 			int size = totalTapeItems * 15 * ItemTape.DEFAULT_SAMPLE_RATE / 8;
 			return ItemTape.asItemStack(size, material);
 		} else {
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return null;
+		return ItemStack.EMPTY;
 	}
 }

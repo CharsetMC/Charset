@@ -72,7 +72,7 @@ public class TweakDoubleDoors extends Tweak {
 				Class c = block.getClass();
 				Method m = ReflectionHelper.findMethod(c, block, new String[]{"onBlockActivated", "func_180639_a"},
 						World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
-						EnumHand.class, ItemStack.class, EnumFacing.class,
+						EnumHand.class, EnumFacing.class,
 						float.class, float.class, float.class);
 				if (m != null && m.getDeclaringClass() == BlockDoor.class) {
 					allowedDoors.add((BlockDoor) block);
@@ -125,7 +125,7 @@ public class TweakDoubleDoors extends Tweak {
 				other.getValue(BlockDoor.FACING) == direction &&
 				other.getValue(BlockDoor.OPEN) == isOpen &&
 				other.getValue(BlockDoor.HINGE) != isMirrored) {
-			door.onBlockActivated(event.getWorld(), pos, other, event.getEntityPlayer(), event.getHand(), event.getItemStack(), event.getFace(), 0, 0, 0);
+			door.onBlockActivated(event.getWorld(), pos, other, event.getEntityPlayer(), event.getHand(), event.getFace(), 0, 0, 0);
 		}
 	}
 }

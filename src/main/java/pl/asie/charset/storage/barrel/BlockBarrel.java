@@ -51,6 +51,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -60,7 +61,6 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.blocks.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
-import pl.asie.charset.pipes.shifter.TileShifter;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 import java.util.ArrayList;
@@ -97,10 +97,10 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock) {
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos fromPos) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {
-            ((TileEntityDayBarrel) tile).neighborChanged();
+            ((TileEntityDayBarrel) tile).neighborChanged(pos, fromPos);
         }
     }
 
@@ -174,7 +174,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (world == null || world.isRemote) {
             return true;
         }
@@ -217,7 +217,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public void getSubBlocks(Item me, CreativeTabs tab, List<ItemStack> itemList) {
+    public void getSubBlocks(Item me, CreativeTabs tab, NonNullList<ItemStack> itemList) {
         if (todaysBarrels == null) {
             todaysBarrels = new ArrayList<ItemStack>();
 

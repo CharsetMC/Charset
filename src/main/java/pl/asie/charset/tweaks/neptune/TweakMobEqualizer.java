@@ -105,13 +105,11 @@ public class TweakMobEqualizer extends Tweak {
 		boolean copyWeapon = !(event.getEntity() instanceof IRangedAttackMob) || event.getWorld().rand.nextBoolean();
 
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-			ItemStack is = template.getItemStackFromSlot(slot);
-			if (is != null) {
-				if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && copyArmor) {
-					if (is.getItem().isValidArmor(is, slot, ent)) {
-						equipmentCopies[slot.ordinal()] = is.copy();
-						equipmentCount++;
-					}
+			if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && copyArmor) {
+				ItemStack is = template.getItemStackFromSlot(slot);
+				if (!is.isEmpty() && is.getItem().isValidArmor(is, slot, ent)) {
+					equipmentCopies[slot.ordinal()] = is.copy();
+					equipmentCount++;
 				}
 			}
 		}
@@ -122,7 +120,7 @@ public class TweakMobEqualizer extends Tweak {
 			double currentWeaponDmg = ItemUtils.getAttributeValue(EntityEquipmentSlot.MAINHAND, currentWeapon, SharedMonsterAttributes.ATTACK_DAMAGE);
 			for (int i = 0; i < 9; i++) {
 				ItemStack playerWeapon = template.inventory.getStackInSlot(i);
-				if (playerWeapon == null || playerWeapon.stackSize != 1 || playerWeapon.getMaxStackSize() != 1) {
+				if (playerWeapon.isEmpty() || playerWeapon.getCount() != 1 || playerWeapon.getMaxStackSize() != 1) {
 					continue;
 				}
 				EnumAction act = playerWeapon.getItemUseAction();
@@ -146,7 +144,7 @@ public class TweakMobEqualizer extends Tweak {
 		}
 
 		event.setCanceled(true);
-		ent.onInitialSpawn(ent.worldObj.getDifficultyForLocation(new BlockPos(event.getEntity())), null);
+		ent.onInitialSpawn(ent.world.getDifficultyForLocation(new BlockPos(event.getEntity())), null);
 		// We need to cancel the event so that we can call this before the below happens
 		ent.setCanPickUpLoot(false);
 

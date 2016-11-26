@@ -33,6 +33,7 @@ import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
@@ -42,14 +43,15 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.animation.FastTESR;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.lib.multipart.MultipartSpecialRendererBase;
+import pl.asie.charset.lib.render.DualTESR;
 import pl.asie.charset.lib.render.ModelTransformer;
 import pl.asie.charset.lib.render.SimpleBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> {
+public class SpecialRendererPipe extends DualTESR<TilePipe> {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
 	private static final float ITEM_RANDOM_OFFSET = 0.01F;
 
@@ -234,7 +236,7 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 	}
 
 	@Override
-	public void renderMultipartFast(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
+	public void renderTileEntityFast(TilePipe part, double x, double y, double z, float partialTicks, int destroyStage, VertexBuffer buffer) {
 		if (part == null) {
 			return;
 		}
@@ -302,12 +304,12 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 	}
 
 	@Override
-	public void renderMultipartAt(PartPipe part, double x, double y, double z, float partialTicks, int destroyStage) {
+	public void renderTileEntityAt(TilePipe part, double x, double y, double z, float partialTicks, int destroyStage) {
 		if (part == null) {
 			return;
 		}
 
-		renderMultipartFastFromSlow(part, x, y, z, partialTicks, destroyStage);
+		renderTileEntityFastFromSlow(part, x, y, z, partialTicks, destroyStage);
 
 		if (SLOW_ITEMS.size() > 0) {
 			for (PipeItem item : SLOW_ITEMS) {

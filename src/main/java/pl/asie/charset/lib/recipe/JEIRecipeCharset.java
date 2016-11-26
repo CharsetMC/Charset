@@ -25,12 +25,6 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements ICraftingRec
 
         @Nonnull
         @Override
-        public String getRecipeCategoryUid() {
-            return VanillaRecipeCategoryUid.CRAFTING;
-        }
-
-        @Nonnull
-        @Override
         public String getRecipeCategoryUid(@Nonnull RecipeCharset recipe) {
             return VanillaRecipeCategoryUid.CRAFTING;
         }
@@ -88,7 +82,7 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements ICraftingRec
             inputs.add(o != null ? o.preview() : null);
         }
 
-        ingredients.setInputLists(ItemStack.class, JEIPluginCharsetLib.STACKS.expandRecipeItemStackInputs(Arrays.asList(inputs)));
+        ingredients.setInputLists(ItemStack.class, JEIPluginCharsetLib.STACKS.expandRecipeItemStackInputs(inputs));
         if (output instanceof ItemStack) {
             ingredients.setOutputs(ItemStack.class, JEIPluginCharsetLib.STACKS.getSubtypes((ItemStack) output));
         } else if (output instanceof List) {

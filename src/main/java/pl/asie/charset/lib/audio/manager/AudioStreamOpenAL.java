@@ -83,7 +83,7 @@ public class AudioStreamOpenAL implements IAudioStream {
 
 	@SideOnly(Side.CLIENT)
 	private double getDistance(float x, float y, float z) {
-		Vec3d pos = Minecraft.getMinecraft().thePlayer.getPositionVector();
+		Vec3d pos = Minecraft.getMinecraft().player.getPositionVector();
 		return pos.distanceTo(new Vec3d(x, y, z));
 	}
 

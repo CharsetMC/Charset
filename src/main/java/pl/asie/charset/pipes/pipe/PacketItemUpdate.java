@@ -23,13 +23,14 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import net.minecraft.network.INetHandler;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import mcmultipart.multipart.IMultipart;
+import pl.asie.charset.lib.network.PacketTile;
 import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.network.PacketPart;
 
-public class PacketItemUpdate extends PacketPart {
+public class PacketItemUpdate extends PacketTile {
 	protected PipeItem item;
 	private static final TIntObjectMap<WeakReference<PipeItem>> itemIdCache = new TIntObjectHashMap<WeakReference<PipeItem>>();
 	private boolean syncStack;
@@ -38,14 +39,14 @@ public class PacketItemUpdate extends PacketPart {
 		super();
 	}
 
-	public PacketItemUpdate(IMultipart part, PipeItem item, boolean syncStack) {
+	public PacketItemUpdate(TileEntity part, PipeItem item, boolean syncStack) {
 		super(part);
 		this.item = item;
 		this.syncStack = syncStack;
 	}
 
 	public void readItemData(ByteBuf buf) {
-		if (part == null || !(part instanceof PartPipe)) {
+		if (tile == null || !(tile instanceof TilePipe)) {
 			return;
 		}
 
@@ -59,20 +60,20 @@ public class PacketItemUpdate extends PacketPart {
 		item = ref != null ? ref.get() : null;
 		syncStack = (flags & 0x04) != 0;
 
-		if (item != null && (item.getOwner() != part || !item.getOwner().getPipeItems().contains(item))) {
+		if (item != null && (item.getOwner() != tile || !item.getOwner().getPipeItems().contains(item))) {
 			item.getOwner().removeItemClientSide(item);
 			itemIdCache.remove(id);
 			item = null;
 		}
 
 		if (item == null) {
-			PartPipe pipe = (PartPipe) part;
+			TilePipe pipe = (TilePipe) tile;
 			item = pipe.getItemByID(id);
 		}
 
 		if (item == null) {
 			if (syncStack) {
-				item = new PipeItem((PartPipe) part, id);
+				item = new PipeItem((TilePipe) tile, id);
 				addWhenDone = true;
 			} else {
 				return;
@@ -98,7 +99,7 @@ public class PacketItemUpdate extends PacketPart {
 		itemIdCache.put(id, new WeakReference<PipeItem>(item));
 
 		if (addWhenDone) {
-			((PartPipe) part).addItemClientSide(item);
+			((TilePipe) tile).addItemClientSide(item);
 		}
 	}
 

@@ -55,7 +55,7 @@ public final class AudioPacket {
     }
 
     public boolean addAll(@Nonnull Collection<AudioSink> sinks) {
-        return sinks.addAll(sinks);
+        return this.sinks.addAll(sinks);
     }
 
     public AudioData getData() {

@@ -99,7 +99,7 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onKey(InputEvent.KeyInputEvent event) {
 		Minecraft mc = Minecraft.getMinecraft();
-		EntityPlayer player = mc.thePlayer;
+		EntityPlayer player = mc.player;
 		if (!mc.inGameHasFocus || player == null) {
 			return;
 		}

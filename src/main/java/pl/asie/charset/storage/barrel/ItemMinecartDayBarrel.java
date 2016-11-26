@@ -48,6 +48,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -88,7 +89,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     ItemStack creative_cart = null;
 
     @Override
-    public void getSubItems(Item item, CreativeTabs tab, List list) {
+    public void getSubItems(Item item, CreativeTabs tab, NonNullList<ItemStack> list) {
         if (creative_cart == null) {
             ItemStack creative = null;
             for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels()) {
@@ -119,7 +120,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
 
     @Override
     public ItemStack getContainerItem(ItemStack stack) {
-        if (stack == null) return null;
+        if (stack.isEmpty()) return ItemStack.EMPTY;
         TileEntityDayBarrel barrel = new TileEntityDayBarrel();
         barrel.loadFromStack(stack);
         return barrel.getPickedBlock();

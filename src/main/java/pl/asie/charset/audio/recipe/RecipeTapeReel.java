@@ -28,7 +28,7 @@ public class RecipeTapeReel extends RecipeBase {
 		int newMeta = 0;
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			ItemStack source = inv.getStackInSlot(i);
-			if (source == null) {
+			if (source.isEmpty()) {
 				continue;
 			} else if (source.getItem() == ModCharsetAudio.magneticTapeItem) {
 				newMeta++;
@@ -53,12 +53,12 @@ public class RecipeTapeReel extends RecipeBase {
 		if (newMeta > 0 && newMeta <= 128) {
 			return new ItemStack(ModCharsetAudio.tapeReelItem, 1, newMeta);
 		} else {
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return null;
+		return ItemStack.EMPTY;
 	}
 }

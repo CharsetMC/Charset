@@ -49,7 +49,7 @@ public abstract class PacketEntity extends Packet {
 
 	@Override
 	public void writeData(ByteBuf buf) {
-		buf.writeInt(entity.worldObj.provider.getDimension());
+		buf.writeInt(entity.world.provider.getDimension());
 		buf.writeInt(entity.getEntityId());
 	}
 }

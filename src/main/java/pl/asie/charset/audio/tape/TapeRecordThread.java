@@ -32,6 +32,7 @@ import paulscode.sound.SoundBuffer;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.audio.util.AudioResampler;
 import pl.asie.charset.lib.audio.codec.DFPWM;
 
 public class TapeRecordThread implements Runnable {
@@ -52,13 +53,13 @@ public class TapeRecordThread implements Runnable {
 	private static final int PACKET_SIZE = 8192;
 	private static final DFPWM CODEC = new DFPWM();
 	private final File file;
-	private final PartTapeDrive owner;
+	// private final PartTapeDrive owner;
 	private int sampleRate = ItemTape.DEFAULT_SAMPLE_RATE;
 	private String statusBar = "Encoding...";
 
-	public TapeRecordThread(File f, PartTapeDrive owner) {
+	public TapeRecordThread(File f/*, PartTapeDrive owner*/) {
 		this.file = f;
-		this.owner = owner;
+		/* this.owner = owner; */
 	}
 
 	public String getStatusBar() {
@@ -110,7 +111,7 @@ public class TapeRecordThread implements Runnable {
 
 			statusBar = "Reticulating splines...";
 
-			byte[] preEncodeOutput = TapeResampler.toSigned8(buffer.audioData, buffer.audioFormat.getSampleSizeInBits(),
+			byte[] preEncodeOutput = AudioResampler.toSigned8(buffer.audioData, buffer.audioFormat.getSampleSizeInBits(),
 					buffer.audioFormat.getChannels(), buffer.audioFormat.isBigEndian(),
 					buffer.audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED,
 					(int) buffer.audioFormat.getSampleRate(), sampleRate, true);
@@ -127,7 +128,7 @@ public class TapeRecordThread implements Runnable {
 
 				statusBar = "Uploading (" + (i * 100 / finalOutput.length) + "%)...";
 
-				ModCharsetAudio.packet.sendToServer(new PacketDriveRecord(owner, data, finalOutput.length, (i + len) >= finalOutput.length));
+				// ModCharsetAudio.packet.sendToServer(new PacketDriveRecord(owner, data, finalOutput.length, (i + len) >= finalOutput.length));
 			}
 
 			statusBar = "Uploading (100%)...";

@@ -37,14 +37,14 @@ public class RecipeDyeableItem extends RecipeBase {
 
 	@Override
 	public boolean matches(InventoryCrafting inv, World worldIn) {
-		ItemStack target = null;
+		ItemStack target = ItemStack.EMPTY;
 		List<ItemStack> dyes = new ArrayList<ItemStack>();
 
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			ItemStack source = inv.getStackInSlot(i);
-			if (source != null) {
+			if (!source.isEmpty()) {
 				if (isTarget(source)) {
-					if (target != null) {
+					if (!target.isEmpty()) {
 						return false;
 					} else {
 						target = source;
@@ -57,11 +57,11 @@ public class RecipeDyeableItem extends RecipeBase {
 			}
 		}
 
-		return target != null && !dyes.isEmpty();
+		return !target.isEmpty() && !dyes.isEmpty();
 	}
 
 	protected int[] getColor(ItemStack stack) {
-		if (stack != null) {
+		if (!stack.isEmpty()) {
 			if (stack.getItem() instanceof IDyeableItem) {
 				IDyeableItem targetItem = (IDyeableItem) stack.getItem();
 
@@ -90,7 +90,7 @@ public class RecipeDyeableItem extends RecipeBase {
 		int scale = 0;
 		int count = 0;
 
-		if (base != null) {
+		if (!base.isEmpty()) {
 			int[] col = getColor(base);
 			if (col != null) {
 				scale += Math.max(col[0], Math.max(col[1], col[2]));
@@ -104,7 +104,7 @@ public class RecipeDyeableItem extends RecipeBase {
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			if (slotFilter == null || slotFilter.test(i)) {
 				ItemStack source = inv.getStackInSlot(i);
-				if (source != null && source != base) {
+				if (!source.isEmpty() && source != base) {
 					int[] col = getColor(source);
 					if (col != null) {
 						scale += Math.max(col[0], Math.max(col[1], col[2]));
@@ -134,16 +134,16 @@ public class RecipeDyeableItem extends RecipeBase {
 
 	@Override
 	public ItemStack getCraftingResult(InventoryCrafting inv) {
-		ItemStack target = null;
+		ItemStack target = ItemStack.EMPTY;
 		IDyeableItem targetItem = null;
 
 		for (int i = 0; i < inv.getSizeInventory(); i++) {
 			ItemStack source = inv.getStackInSlot(i);
-			if (source != null) {
+			if (!source.isEmpty()) {
 				if (source.getItem() instanceof IDyeableItem) {
 					targetItem = (IDyeableItem) source.getItem();
 					target = source.copy();
-					target.stackSize = 1;
+					target.setCount(1);
 				}
 			}
 		}
@@ -161,6 +161,6 @@ public class RecipeDyeableItem extends RecipeBase {
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return null;
+		return ItemStack.EMPTY;
 	}
 }

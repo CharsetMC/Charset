@@ -17,13 +17,15 @@
 package pl.asie.charset.pipes.pipe;
 
 import io.netty.buffer.ByteBuf;
-import mcmultipart.multipart.IMultipart;
 import net.minecraft.network.INetHandler;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.lib.network.PacketPart;
+import pl.asie.charset.lib.network.PacketTile;
 
-public class PacketFluidUpdate extends PacketPart {
+public class PacketFluidUpdate extends PacketTile {
 	protected PipeFluidContainer container;
 	private boolean ignoreDirty;
 
@@ -31,25 +33,25 @@ public class PacketFluidUpdate extends PacketPart {
 		super();
 	}
 
-	public PacketFluidUpdate(IMultipart part, PipeFluidContainer container, boolean ignoreDirty) {
+	public PacketFluidUpdate(TileEntity part, PipeFluidContainer container, boolean ignoreDirty) {
 		super(part);
 		this.container = container;
 		this.ignoreDirty = ignoreDirty;
 	}
 
 	public void readFluidData(ByteBuf buf) {
-		if (part == null || !(part instanceof PartPipe)) {
+		if (tile == null || !(tile instanceof TilePipe)) {
 			return;
 		}
 
-		container = ((PartPipe) part).fluid;
+		container = ((TilePipe) tile).fluid;
 		int sides = buf.readUnsignedByte();
 
 		if ((sides & 128) != 0) {
-			int fluidID = buf.readInt();
-			if (fluidID >= 0) {
+			String fluidString = ByteBufUtils.readUTF8String(buf);
+			if (fluidString.length() > 0) {
 				container.fluidColor = buf.readInt();
-				container.fluidStack = new FluidStack(FluidRegistry.getFluid(fluidID), 1000);
+				container.fluidStack = new FluidStack(FluidRegistry.getFluid(fluidString), 1000);
 			} else {
 				container.fluidColor = 0;
 				container.fluidStack = null;
@@ -86,9 +88,9 @@ public class PacketFluidUpdate extends PacketPart {
 
 		if ((sides & 128) != 0) {
 			if (container.fluidStack == null) {
-				buf.writeInt(-1);
+				ByteBufUtils.writeUTF8String(buf, "");
 			} else {
-				buf.writeInt(FluidRegistry.getFluidID(container.fluidStack.getFluid()));
+				ByteBufUtils.writeUTF8String(buf, FluidRegistry.getFluidName(container.fluidStack.getFluid()));
 				buf.writeInt(container.fluidStack.getFluid().getColor(container.fluidStack));
 			}
 		}

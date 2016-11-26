@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -47,7 +48,7 @@ public class BlockCrate extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block) {
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityCrate) {
             ((TileEntityCrate) tile).neighborChanged(block);
@@ -75,7 +76,7 @@ public class BlockCrate extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public void getSubBlocks(Item me, CreativeTabs tab, List<ItemStack> itemList) {
+    public void getSubBlocks(Item me, CreativeTabs tab, NonNullList<ItemStack> itemList) {
         if (todaysCrates == null) {
             todaysCrates = new ArrayList<ItemStack>();
 

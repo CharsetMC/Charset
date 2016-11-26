@@ -25,18 +25,14 @@ import net.minecraft.world.World;
 
 import net.minecraftforge.common.capabilities.Capability;
 
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.PartSlot;
-
 public final class MultipartUtils {
 	private MultipartUtils() {
 
 	}
 
-	public static boolean hasCapability(Capability cap, World world, BlockPos pos, PartSlot slot, EnumFacing side) {
+	// TODO 1.11
+
+/*	public static boolean hasCapability(Capability cap, World world, BlockPos pos, PartSlot slot, EnumFacing side) {
 		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
 		if (container == null) {
 			TileEntity tile = world.getTileEntity(pos);
@@ -146,5 +142,5 @@ public final class MultipartUtils {
 
 			return getInterface(clazz, container, side, face);
 		}
-	}
+	} */
 }

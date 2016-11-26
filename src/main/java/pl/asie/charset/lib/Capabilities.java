@@ -20,7 +20,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
-import mcmultipart.capabilities.CapabilityWrapperRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import pl.asie.charset.api.audio.IAudioReceiver;
@@ -68,10 +67,11 @@ public class Capabilities {
 
 	@Optional.Method(modid = "mcmultipart")
 	private static void initMultiplePants() {
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new AudioReceiverWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledEmitterWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneEmitterWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledReceiverWrapper());
-		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneReceiverWrapper());
+		// TODO 1.11
+//		CapabilityWrapperRegistry.registerCapabilityWrapper(new AudioReceiverWrapper());
+//		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledEmitterWrapper());
+//		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneEmitterWrapper());
+//		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledReceiverWrapper());
+//		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneReceiverWrapper());
 	}
 }

@@ -24,14 +24,12 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.MultipartHelper;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.Packet;
 
+// TODO 1.11
 public abstract class PacketPart extends Packet {
-	protected IMultipart part;
+/*	protected IMultipart part;
 
 	public PacketPart() {
 
@@ -76,5 +74,5 @@ public abstract class PacketPart extends Packet {
 		}
 		buf.writeLong(id.getMostSignificantBits());
 		buf.writeLong(id.getLeastSignificantBits());
-	}
+	} */
 }

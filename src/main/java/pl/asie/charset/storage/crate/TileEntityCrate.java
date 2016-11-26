@@ -139,9 +139,9 @@ public class TileEntityCrate extends TileBase {
 
     @Override
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
-        plank = ItemStack.loadItemStackFromNBT(compound.getCompoundTag("plank"));
+        plank = new ItemStack(compound.getCompoundTag("plank"));
 
-        if (plank == null) {
+        if (plank.isEmpty()) {
             plank = new ItemStack(Blocks.PLANKS);
         }
 

@@ -24,38 +24,44 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.blocks.TileBase;
-import pl.asie.charset.lib.inventory.InventoryUtils;
+import pl.asie.charset.lib.utils.InventoryUtils;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
-import pl.asie.charset.pipes.pipe.PartPipe;
+import pl.asie.charset.pipes.pipe.TilePipe;
 import pl.asie.charset.pipes.pipe.PipeFluidContainer;
 import pl.asie.charset.pipes.PipeUtils;
+
+import javax.annotation.Nullable;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
 	private ItemStack[] filters = new ItemStack[6];
 	private int redstoneLevel;
 	private int ticker = ModCharsetPipes.RANDOM.nextInt(256);
 
+	public TileShifter() {
+		for (int i = 0; i < filters.length; i++)
+			filters[i] = ItemStack.EMPTY;
+	}
+
 	public EnumFacing getDirection(IBlockState state) {
 		return state.getValue(Properties.FACING);
 	}
 
 	public EnumFacing getDirection() {
-		if (worldObj != null) {
-			return getDirection(worldObj.getBlockState(pos));
+		if (world != null) {
+			return getDirection(world.getBlockState(pos));
 		} else {
 			return EnumFacing.UP;
 		}
@@ -100,7 +106,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	@Override
 	public boolean initialize() {
 		if (getWorld() != null && !getWorld().isRemote) {
-			updateRedstoneLevel();
+			updateRedstoneLevel(null);
 			return true;
 		}
 
@@ -119,7 +125,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	@Override
 	public boolean hasFilter() {
 		for (ItemStack s : filters) {
-			if (s != null) {
+			if (!s.isEmpty()) {
 				return true;
 			}
 		}
@@ -132,7 +138,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		int filterCount = 0;
 		boolean matches = false;
 		for (int i = 0; i < 6; i++) {
-			if (filters[i] != null) {
+			if (!filters[i].isEmpty()) {
 				filterCount++;
 				if (ItemUtils.equals(source, filters[i], false, filters[i].getHasSubtypes(), false)) {
 					matches = true;
@@ -155,14 +161,10 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		}
 
 		for (ItemStack s : filters) {
-			if (s != null) {
-				if (FluidContainerRegistry.containsFluid(s, stack)) {
+			if (!s.isEmpty()) {
+				IFluidHandler handler = FluidUtils.getFluidHandler(s, null);
+				if (handler != null && FluidUtils.matches(handler, stack)) {
 					return true;
-				} else if (s.getItem() instanceof IFluidContainerItem) {
-					FluidStack filter = ((IFluidContainerItem) s.getItem()).getFluid(s);
-					if (filter != null && filter.amount > 0 && filter.isFluidEqual(stack)) {
-						return true;
-					}
 				}
 			}
 		}
@@ -174,7 +176,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	public void update() {
 		super.update();
 
-		if (worldObj.isRemote) {
+		if (world.isRemote) {
 			return;
 		}
 
@@ -184,7 +186,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			EnumFacing direction = getDirection();
 
 			TileEntity input = getNeighbourTile(direction.getOpposite());
-			PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
+			TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
 			if (input != null && output != null && output.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite())) {
 				IFluidHandler inTank = FluidUtils.getFluidHandler(input, direction);
 				if (inTank != null) {
@@ -199,13 +201,13 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 					if (handler != null) {
 						for (int i = 0; i < handler.getSlots(); i++) {
 							ItemStack source = handler.getStackInSlot(i);
-							if (source != null && matches(source)) {
+							if (!source.isEmpty() && matches(source)) {
 								int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
 								ItemStack stack = handler.extractItem(i, maxSize, true);
-								if (stack != null) {
-									if (output.injectItem(stack, direction.getOpposite(), true) == stack.stackSize) {
+								if (!stack.isEmpty()) {
+									if (output.injectItem(stack, direction.getOpposite(), true) == stack.getCount()) {
 										stack = handler.extractItem(i, maxSize, false);
-										if (stack != null) {
+										if (!stack.isEmpty()) {
 											output.injectItem(stack, direction.getOpposite(), false);
 										}
 
@@ -227,11 +229,11 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		NBTTagList filterList = nbt.getTagList("filters", 10);
 		for (int i = 0; i < Math.min(filterList.tagCount(), filters.length); i++) {
 			NBTTagCompound cpd = filterList.getCompoundTagAt(i);
-			filters[i] = ItemStack.loadItemStackFromNBT(cpd);
+			filters[i] = new ItemStack(cpd);
 		}
 
 		if (isClient) {
-			worldObj.markBlockRangeForRenderUpdate(pos, pos);
+			world.markBlockRangeForRenderUpdate(pos, pos);
 		}
 	}
 
@@ -242,9 +244,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		NBTTagList filterList = new NBTTagList();
 		for (int i = 0; i < filters.length; i++) {
 			NBTTagCompound fnbt = new NBTTagCompound();
-			if (filters[i] != null) {
-				filters[i].writeToNBT(fnbt);
-			}
+			filters[i].writeToNBT(fnbt);
 			filterList.appendTag(fnbt);
 		}
 		nbt.setTag("filters", filterList);
@@ -252,25 +252,25 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		return nbt;
 	}
 
-	public void updateRedstoneLevel() {
+	public void updateRedstoneLevel(@Nullable BlockPos neighborPos) {
 		int oldRedstoneLevel = redstoneLevel;
 
 		redstoneLevel = 0;
 		for (EnumFacing d : EnumFacing.VALUES) {
-			redstoneLevel = Math.max(redstoneLevel, RedstoneUtils.getRedstonePowerWithWire(worldObj, pos.offset(d), d));
+			redstoneLevel = Math.max(redstoneLevel, RedstoneUtils.getRedstonePowerWithWire(world, pos.offset(d), d));
 		}
 
 		if (oldRedstoneLevel != redstoneLevel) {
 			markBlockForUpdate();
-			worldObj.notifyBlockOfStateChange(pos, getBlockType());
+			// Necessary? world.neighborChanged(pos, getBlockType(), pos);
 		}
 
 		EnumFacing direction = getDirection();
-		PartPipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
+		TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
 		if (output != null) {
 			if ((getMode() == Mode.Extract && !output.connects(direction.getOpposite()))
 					|| (getMode() == Mode.Shift && output.connects(direction.getOpposite()))) {
-				worldObj.notifyBlockOfStateChange(pos.offset(getDirection()), getBlockType());
+				world.neighborChanged(pos.offset(getDirection()), getBlockType(), pos);
 			}
 		}
 	}

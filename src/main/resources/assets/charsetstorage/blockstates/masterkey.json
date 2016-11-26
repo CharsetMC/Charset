@@ -5,7 +5,7 @@
       "model": "forge:item-layer",
       "transform": "forge:default-item",
       "textures": {
-        "layer0": "charsetstorage:items/masterKey"
+        "layer0": "charsetstorage:items/master_key"
       }
     }
   }

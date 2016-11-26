@@ -29,13 +29,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.items.IItemHandler;
 
-import mcmultipart.multipart.IMultipart;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.PartSlot;
 import pl.asie.charset.api.lib.IItemInjectable;
 import pl.asie.charset.api.pipes.IShifter;
-import pl.asie.charset.lib.inventory.InventoryUtils;
 import pl.asie.charset.lib.utils.DirectionUtils;
+import pl.asie.charset.lib.utils.InventoryUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
@@ -53,27 +50,27 @@ public class PipeItem {
 
 	protected EnumFacing input, output;
 	protected boolean reachedCenter;
-	protected ItemStack stack;
+	protected ItemStack stack = ItemStack.EMPTY;
 	protected int progress;
 
 	private int activeShifterDistance;
-	private PartPipe owner;
+	private TilePipe owner;
 	private boolean stuck;
 
-	public PipeItem(PartPipe owner, ItemStack stack, EnumFacing side) {
+	public PipeItem(TilePipe owner, ItemStack stack, EnumFacing side) {
 		this.id = nextId++;
 		this.owner = owner;
 		this.stack = stack;
 		initializeFromEntrySide(side);
 	}
 
-	public PipeItem(PartPipe owner, NBTTagCompound nbt) {
+	public PipeItem(TilePipe owner, NBTTagCompound nbt) {
 		this.id = nextId++;
 		this.owner = owner;
 		readFromNBT(nbt);
 	}
 
-	protected PipeItem(PartPipe tile, short id) {
+	protected PipeItem(TilePipe tile, short id) {
 		this.owner = tile;
 		this.id = id;
 	}
@@ -83,7 +80,7 @@ public class PipeItem {
 	}
 
 	public boolean isValid() {
-		return stack != null && stack.getItem() != null && input != null;
+		return !stack.isEmpty() && input != null;
 	}
 
 	private float getTranslatedCoord(int offset) {
@@ -252,17 +249,17 @@ public class PipeItem {
 	}
 
 	private void onItemEnd() {
-		PartPipe pipe = output != null ? PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite()) : null;
+		TilePipe pipe = output != null ? PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(output), output.getOpposite()) : null;
 
 		if (owner.getWorld().isRemote) {
 			if (blocksSinceSync < 2) {
 				if (passToPipe(pipe, output, false)) {
 					blocksSinceSync++;
 				} else {
-					stack = null;
+					stack = ItemStack.EMPTY;
 				}
 			} else {
-				stack = null;
+				stack = ItemStack.EMPTY;
 			}
 		} else {
 			if (output != null) {
@@ -280,7 +277,7 @@ public class PipeItem {
 				}
 			}
 
-			if (stack != null && stack.stackSize > 0) {
+			if (!stack.isEmpty()) {
 				dropItem(true);
 			}
 		}
@@ -291,7 +288,7 @@ public class PipeItem {
 			return false;
 		}
 
-		PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
+		TilePipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
 
 		if (pipe != null) {
 			return pipe.canInjectItems(dir.getOpposite());
@@ -318,7 +315,7 @@ public class PipeItem {
 			return activeShifterDistance == 0;
 		}
 
-		PartPipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
+		TilePipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
 
 		/* if (isPickingDirection) {
 			// If we're picking the direction, only check for pipe *connection*,
@@ -467,7 +464,7 @@ public class PipeItem {
 		sendPacket(false);
 	}
 
-	protected void reset(PartPipe owner, EnumFacing input) {
+	protected void reset(TilePipe owner, EnumFacing input) {
 		this.owner = owner;
 		initializeFromEntrySide(input);
 
@@ -477,18 +474,21 @@ public class PipeItem {
 	}
 
 	private boolean passToInjectable(TileEntity tile, EnumFacing dir, boolean simulate) {
-		if (tile instanceof IMultipartContainer) {
+		/* if (tile instanceof IMultipartContainer) {
 			IMultipart part = ((IMultipartContainer) tile).getPartInSlot(PartSlot.CENTER);
-			if (part instanceof PartPipe) {
+			if (part instanceof TilePipe) {
 				return false;
 			}
+		} */
+		if (tile instanceof TilePipe) {
+			return false;
 		}
 
 		if (tile instanceof IItemInjectable) {
 			int added = ((IItemInjectable) tile).injectItem(stack, dir.getOpposite(), simulate);
 			if (added > 0) {
 				if (!simulate) {
-					stack.stackSize -= added;
+					stack.shrink(added);
 				}
 				return true;
 			}
@@ -497,7 +497,7 @@ public class PipeItem {
 		return false;
 	}
 
-	private boolean passToPipe(PartPipe pipe, EnumFacing dir, boolean simulate) {
+	private boolean passToPipe(TilePipe pipe, EnumFacing dir, boolean simulate) {
 		if (pipe != null) {
 			if (pipe.injectItemInternal(this, dir.getOpposite(), simulate)) {
 				return true;
@@ -509,7 +509,7 @@ public class PipeItem {
 
 	private boolean addToItemHandler(TileEntity tile, EnumFacing dir, boolean simulate) {
 		if (tile != null) {
-			int stackSize = stack.stackSize;
+			int stackSize = stack.getCount();
 			IItemHandler handler = InventoryUtils.getItemHandler(tile, dir.getOpposite());
 			if (handler != null) {
 				if (owner.getWorld().isRemote) {
@@ -518,25 +518,25 @@ public class PipeItem {
 
 				for (int i = 0; i < handler.getSlots(); i++) {
 					ItemStack remain = handler.insertItem(i, stack, simulate);
-					int added = stack.stackSize;
-					if (remain != null) {
-						added -= remain.stackSize;
+					int added = stack.getCount();
+					if (!remain.isEmpty()) {
+						added -= remain.getCount();
 					}
 					stackSize -= added;
 					if (stackSize == 0) {
 						if (!simulate) {
-							stack = null;
+							stack = ItemStack.EMPTY;
 						}
 						return true;
 					} else if (!simulate) {
 						stack = stack.copy();
-						stack.stackSize = stackSize;
+						stack.setCount(stackSize);
 					}
 				}
 
 				if (stackSize > 0 && !simulate) {
 					stack = stack.copy();
-					stack.stackSize = stackSize;
+					stack.setCount(stackSize);
 					return true;
 				}
 			}
@@ -572,7 +572,7 @@ public class PipeItem {
 				(double) owner.getPos().getZ() + 0.5 + (dir != null ? dir.getFrontOffsetZ() : 0) * 0.75
 		), stack, 0, 0, 0, 0);
 
-		stack = null;
+		stack = ItemStack.EMPTY;
 	}
 
 	private void initializeFromEntrySide(EnumFacing side) {
@@ -588,7 +588,7 @@ public class PipeItem {
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {
-		stack = ItemStack.loadItemStackFromNBT(nbt);
+		stack = new ItemStack(nbt);
 		progress = nbt.getShort("p");
 		input = DirectionUtils.get(nbt.getByte("in"));
 		output = DirectionUtils.get(nbt.getByte("out"));
@@ -625,7 +625,7 @@ public class PipeItem {
 		}
 	}
 
-	public PartPipe getOwner() {
+	public TilePipe getOwner() {
 		return owner;
 	}
 

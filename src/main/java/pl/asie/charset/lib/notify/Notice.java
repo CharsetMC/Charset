@@ -44,6 +44,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.CheckReturnValue;
 import java.util.EnumSet;
@@ -52,7 +53,7 @@ public class Notice {
     final Object where;
     private String message;
     private String[] messageParameters;
-    private ItemStack item;
+    private ItemStack item = ItemStack.EMPTY;
     private EnumSet<Style> style = EnumSet.noneOf(Style.class);
     private NoticeUpdater updater;
 
@@ -63,7 +64,7 @@ public class Notice {
     private boolean addedToRecurList = false;
     EntityPlayer targetPlayer = null;
     World world;
-    // NORELEASE: Support for IChatComponent?
+    // NORELEASE: Support for ITextComponent?
 
     private static final String[] emptyStringArray = new String[0];
 
@@ -105,7 +106,7 @@ public class Notice {
         if (where instanceof NotificationCoord) {
             world = ((NotificationCoord) where).getWorld();
         } else if (where instanceof Entity) {
-            world = ((Entity) where).worldObj;
+            world = ((Entity) where).world;
         } else if (where instanceof TileEntity) {
             world = ((TileEntity) where).getWorld();
         }
@@ -169,7 +170,9 @@ public class Notice {
             cmpIs(this.item, item);
             changedItem |= changed;
         }
-        this.item = item == null ? null : item.copy();
+        this.item = item.isEmpty() ? ItemStack.EMPTY : item.copy();
+        if (this.item.getCount() > this.item.getMaxStackSize())
+            this.item.setCount(item.getMaxStackSize());
         return this;
     }
 
@@ -240,12 +243,7 @@ public class Notice {
     }
     
     private void cmpIs(ItemStack a, ItemStack b) {
-        if (a == b) return;
-        if (a != null && b != null) {
-            changed |= !a.isItemEqual(b);
-        } else {
-            changed = true;
-        }
+        changed |= ItemUtils.equalsMeta(a, b);
     }
 
     int getLifetime() {
@@ -297,7 +295,7 @@ public class Notice {
             return;
         }
         if (world == null && player != null) {
-            world = player.worldObj;
+            world = player.world;
         }
         NotifyImplementation.instance.doSend(player, where, world, style, item, message, messageParameters);
         changed = false;
@@ -321,8 +319,8 @@ public class Notice {
      * Erases all Notifications a player has.
      */
     public static void clear(EntityPlayer player) {
-        NotificationCoord at = new NotificationCoord(player.worldObj, new BlockPos(player));
-        NotifyImplementation.instance.doSend(player, at, player.worldObj, EnumSet.of(Style.CLEAR), null, "", emptyStringArray);
+        NotificationCoord at = new NotificationCoord(player.world, new BlockPos(player));
+        NotifyImplementation.instance.doSend(player, at, player.world, EnumSet.of(Style.CLEAR), null, "", emptyStringArray);
     }
 
     /**
@@ -357,14 +355,14 @@ public class Notice {
      * (But it might have a problem with word-wrapping if the message is too long. By the grace of notch.) 
      * 
      * <code><pre>
-     * {@link ChatComponentTranslation} msg = new {@link ChatComponentTranslation}("mymod.currentTime", System.currentTimeMillis());
-     * Notice.chat(thePlayer, 914357, msg);
+     * {@link TextComponentTranslation} msg = new {@link TextComponentTranslation}("mymod.currentTime", System.currentTimeMillis());
+     * Notice.chat(player, 914357, msg);
      * </pre></code>
      * 
      * 
      * @param player Who to send the message to.
      * @param msgKey A non-zero, arbitrary, and consistent integer.
-     * @param msg The chat message to send, preferably a {@link ChatComponentTranslation}
+     * @param msg The chat message to send, preferably a {@link TextComponentTranslation}
      */
     public static void chat(EntityPlayer player, int msgKey, ITextComponent msg) {
         NotifyImplementation.instance.sendReplacableChatMessage(player, msg, msgKey);

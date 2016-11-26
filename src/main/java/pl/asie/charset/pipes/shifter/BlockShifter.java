@@ -36,7 +36,7 @@ import net.minecraft.world.World;
 
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.Properties;
-import pl.asie.charset.pipes.pipe.PartPipe;
+import pl.asie.charset.pipes.pipe.TilePipe;
 import pl.asie.charset.pipes.PipeUtils;
 
 public class BlockShifter extends BlockContainer {
@@ -94,19 +94,19 @@ public class BlockShifter extends BlockContainer {
 			return state
 					.withProperty(EXTRACT, shifter.getMode() == IShifter.Mode.Extract)
 					.withProperty(STRENGTH, /* shifter.getRedstoneLevel() >= 8 ? 2 : */ (shifter.getRedstoneLevel() > 0 ? 1 : 0))
-					.withProperty(Properties.DOWN, shifter.getFilters()[shiftedCoordinates[0]] != null)
-					.withProperty(Properties.UP, shifter.getFilters()[shiftedCoordinates[1]] != null)
-					.withProperty(Properties.NORTH, shifter.getFilters()[shiftedCoordinates[2]] != null)
-					.withProperty(Properties.SOUTH, shifter.getFilters()[shiftedCoordinates[3]] != null)
-					.withProperty(Properties.WEST, shifter.getFilters()[shiftedCoordinates[4]] != null)
-					.withProperty(Properties.EAST, shifter.getFilters()[shiftedCoordinates[5]] != null);
+					.withProperty(Properties.DOWN, !shifter.getFilters()[shiftedCoordinates[0]].isEmpty())
+					.withProperty(Properties.UP, !shifter.getFilters()[shiftedCoordinates[1]].isEmpty())
+					.withProperty(Properties.NORTH, !shifter.getFilters()[shiftedCoordinates[2]].isEmpty())
+					.withProperty(Properties.SOUTH, !shifter.getFilters()[shiftedCoordinates[3]].isEmpty())
+					.withProperty(Properties.WEST, !shifter.getFilters()[shiftedCoordinates[4]].isEmpty())
+					.withProperty(Properties.EAST, !shifter.getFilters()[shiftedCoordinates[5]].isEmpty());
 		} else {
 			return state;
 		}
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (side == null) {
 			return false;
 		}
@@ -120,15 +120,17 @@ public class BlockShifter extends BlockContainer {
 				return false;
 			}
 
-			if (shifter.getFilters()[side.ordinal()] != null) {
+			ItemStack heldItem = player.getHeldItem(hand);
+
+			if (!shifter.getFilters()[side.ordinal()].isEmpty()) {
 				if (!world.isRemote) {
-					shifter.setFilter(side.ordinal(), null);
+					shifter.setFilter(side.ordinal(), ItemStack.EMPTY);
 				}
 				return true;
-			} else if (heldItem != null) {
+			} else if (!heldItem.isEmpty()) {
 				if (!world.isRemote) {
 					ItemStack filter = heldItem.copy();
-					filter.stackSize = 1;
+					filter.setCount(1);
 					shifter.setFilter(side.ordinal(), filter);
 				}
 				return true;
@@ -139,13 +141,13 @@ public class BlockShifter extends BlockContainer {
 	}
 
 	@Override
-	public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		PartPipe partForward = PipeUtils.getPipe(world, pos.offset(facing), facing.getOpposite());
-		PartPipe partBackward = PipeUtils.getPipe(world, pos.offset(facing.getOpposite()), facing);
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		TilePipe partForward = PipeUtils.getPipe(world, pos.offset(facing), facing.getOpposite());
+		TilePipe partBackward = PipeUtils.getPipe(world, pos.offset(facing.getOpposite()), facing);
 
-		if (partBackward instanceof PartPipe) {
+		if (partBackward instanceof TilePipe) {
 			return this.getStateFromMeta(facing.getOpposite().ordinal());
-		} else if (partForward instanceof PartPipe) {
+		} else if (partForward instanceof TilePipe) {
 			return this.getStateFromMeta(facing.ordinal());
 		} else {
 			for (EnumFacing direction : EnumFacing.VALUES) {
@@ -188,10 +190,10 @@ public class BlockShifter extends BlockContainer {
 	}
 
 	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock) {
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile instanceof TileShifter) {
-			((TileShifter) tile).updateRedstoneLevel();
+			((TileShifter) tile).updateRedstoneLevel(neighborPos);
 		}
 	}
 

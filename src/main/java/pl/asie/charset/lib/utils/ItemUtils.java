@@ -26,6 +26,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
@@ -48,15 +49,13 @@ public final class ItemUtils {
 	}
 
 	public static double getAttributeValue(EntityEquipmentSlot slot, ItemStack is, IAttribute attr) {
-		if (is != null) {
-			Multimap<String, AttributeModifier> attrs = is.getItem().getAttributeModifiers(slot, is);
-			if (attrs != null) {
-				AttributeMap map = new AttributeMap();
-				map.applyAttributeModifiers(attrs);
-				IAttributeInstance instance = map.getAttributeInstance(attr);
-				if (instance != null) {
-					return instance.getAttributeValue();
-				}
+		Multimap<String, AttributeModifier> attrs = is.getItem().getAttributeModifiers(slot, is);
+		if (attrs != null) {
+			AttributeMap map = new AttributeMap();
+			map.applyAttributeModifiers(attrs);
+			IAttributeInstance instance = map.getAttributeInstance(attr);
+			if (instance != null) {
+				return instance.getAttributeValue();
 			}
 		}
 
@@ -72,22 +71,16 @@ public final class ItemUtils {
 
 	public static void writeToNBT(ItemStack stack, NBTTagCompound compound, String key) {
 		NBTTagCompound compound1 = new NBTTagCompound();
-		if (stack != null) {
-			stack.writeToNBT(compound1);
-		}
+		stack.writeToNBT(compound1);
 		compound.setTag(key, compound1);
 	}
 
 	public static IBlockState getBlockState(ItemStack stack) {
-		if (stack == null) {
+		Block block = Block.getBlockFromItem(stack.getItem());
+		if (block == null) {
 			return Blocks.AIR.getDefaultState();
 		} else {
-			Block block = Block.getBlockFromItem(stack.getItem());
-			if (block == null) {
-				return Blocks.AIR.getDefaultState();
-			} else {
-				return block.getDefaultState();
-			}
+			return block.getDefaultState();
 		}
 	}
 
@@ -96,8 +89,8 @@ public final class ItemUtils {
 	}
 
 	public static boolean equalsMeta(ItemStack source, ItemStack target) {
-		if (source == null || target == null) {
-			return source == target;
+		if (source.isEmpty()) {
+			return target.isEmpty();
 		}
 		return equals(source, target, false, !source.getItem().isDamageable(), false);
 	}
@@ -105,14 +98,14 @@ public final class ItemUtils {
 	public static boolean equals(ItemStack source, ItemStack target, boolean matchStackSize, boolean matchDamage, boolean matchNBT) {
 		if (source == target) {
 			return true;
-		} else if (source == null || target == null) {
-			return false;
+		} else if (source.isEmpty()) {
+			return target.isEmpty();
 		} else {
 			if (source.getItem() != target.getItem()) {
 				return false;
 			}
 
-			if (matchStackSize && source.stackSize != target.stackSize) {
+			if (matchStackSize && source.getCount() != target.getCount()) {
 				return false;
 			}
 
@@ -142,7 +135,7 @@ public final class ItemUtils {
 			entityItem.motionY = ((1.0f - randomness) + (((world.rand.nextDouble() - 0.5) * 2.0f) * randomness)) * mYm;
 			entityItem.motionZ = ((1.0f - randomness) + (((world.rand.nextDouble() - 0.5) * 2.0f) * randomness)) * mZm;
 		}
-		world.spawnEntityInWorld(entityItem);
+		world.spawnEntity(entityItem);
 		return entityItem;
 	}
 }

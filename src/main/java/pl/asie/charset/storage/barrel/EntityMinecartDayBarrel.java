@@ -61,9 +61,9 @@ import pl.asie.charset.storage.ModCharsetStorage;
 import javax.annotation.Nullable;
 
 public class EntityMinecartDayBarrel extends EntityMinecart {
-    private static final DataParameter<Optional<ItemStack>> BARREL_ITEM = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
-    private static final DataParameter<Optional<ItemStack>> BARREL_LOG = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
-    private static final DataParameter<Optional<ItemStack>> BARREL_SLAB = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    private static final DataParameter<ItemStack> BARREL_ITEM = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    private static final DataParameter<ItemStack> BARREL_LOG = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    private static final DataParameter<ItemStack> BARREL_SLAB = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
     private static final DataParameter<Byte> BARREL_ORIENTATION = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
     private static final DataParameter<Byte> BARREL_TYPE = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
     private static final DataParameter<Integer> BARREL_ITEM_COUNT = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.VARINT);
@@ -75,28 +75,28 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     public class MinecartItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
-            return 2;
+            return 1;
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
-            return barrel.getStackInSlot(slot);
+            return barrel.readOnlyView.getStackInSlot(slot);
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!simulate && slot == 0) {
+            if (!simulate) {
                 updateDataWatcher(false);
             }
-            return slot == 0 ? barrel.getItemHandler(1).insertItem(slot, stack, simulate) : stack;
+            return barrel.insertionView.insertItem(slot, stack, simulate);
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            if (!simulate && slot == 1) {
+            if (!simulate) {
                 updateDataWatcher(false);
             }
-            return slot == 1 ? barrel.getItemHandler(0).extractItem(slot, amount, simulate) : null;
+            return barrel.extractionView.extractItem(slot, amount, simulate);
         }
     }
 
@@ -144,7 +144,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     private void createBarrel() {
         if (barrel != null) return;
         barrel = new TileEntityDayBarrel();
-        barrel.setWorldObj(worldObj);
+        barrel.setWorld(world);
         barrel.setPos(BlockPos.ORIGIN);
         barrel.validate();
         barrel.orientation = Orientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
@@ -169,21 +169,21 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         super.entityInit();
         createBarrel();
 
-        dataManager.register(BARREL_ITEM, Optional.fromNullable(barrel.item));
+        dataManager.register(BARREL_ITEM, barrel.item);
         dataManager.register(BARREL_ITEM_COUNT, barrel.getItemCount());
-        dataManager.register(BARREL_LOG, Optional.fromNullable(barrel.woodLog));
-        dataManager.register(BARREL_SLAB, Optional.fromNullable(barrel.woodSlab));
+        dataManager.register(BARREL_LOG, barrel.woodLog);
+        dataManager.register(BARREL_SLAB, barrel.woodSlab);
         dataManager.register(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
         dataManager.register(BARREL_TYPE, (byte) barrel.type.ordinal());
     }
 
     private void updateDataWatcher(boolean full) {
-        if (!worldObj.isRemote) {
-            dataManager.set(BARREL_ITEM, Optional.fromNullable(barrel.item));
+        if (!world.isRemote) {
+            dataManager.set(BARREL_ITEM, barrel.item);
             dataManager.set(BARREL_ITEM_COUNT, barrel.getItemCount());
             if (full) {
-                dataManager.set(BARREL_LOG, Optional.fromNullable(barrel.woodLog));
-                dataManager.set(BARREL_SLAB, Optional.fromNullable(barrel.woodSlab));
+                dataManager.set(BARREL_LOG, barrel.woodLog);
+                dataManager.set(BARREL_SLAB, barrel.woodSlab);
                 dataManager.set(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
                 dataManager.set(BARREL_TYPE, (byte) barrel.type.ordinal());
             }
@@ -201,20 +201,20 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     public void onUpdate() {
         super.onUpdate();
 
-        if (worldObj.isRemote && dataManager.isDirty()) {
-            barrel.item = dataManager.get(BARREL_ITEM).orNull();
-            barrel.setItemCount(dataManager.get(BARREL_ITEM_COUNT));
-            barrel.woodLog = dataManager.get(BARREL_LOG).or(TileEntityDayBarrel.DEFAULT_LOG);
-            barrel.woodSlab = dataManager.get(BARREL_SLAB).or(TileEntityDayBarrel.DEFAULT_SLAB);
+        if (world.isRemote && dataManager.isDirty()) {
+            barrel.item = dataManager.get(BARREL_ITEM);
+            barrel.item.setCount(dataManager.get(BARREL_ITEM_COUNT));
+            barrel.woodLog = dataManager.get(BARREL_LOG);
+            barrel.woodSlab = dataManager.get(BARREL_SLAB);
             barrel.orientation = Orientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
             barrel.type = TileEntityDayBarrel.Type.values()[dataManager.get(BARREL_TYPE)];
         }
 
-        if (!worldObj.isRemote) {
+        if (!world.isRemote) {
             barrel.setPos(new BlockPos(this));
             if (activatorRailTicks > 0) activatorRailTicks--;
 
-            if (activatorRailTicks <= 0 && worldObj.getTotalWorldTime() % barrel.getLogicSpeed() == 0) {
+            if (activatorRailTicks <= 0 && world.getTotalWorldTime() % barrel.getLogicSpeed() == 0) {
                 barrel.tick();
                 updateDataWatcher(false);
             }
@@ -251,8 +251,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     }
 
     @Override
-    public boolean processInitialInteract(EntityPlayer player, @Nullable ItemStack stack, EnumHand hand) {
-        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.minecart.MinecartInteractEvent(this, player, stack, hand))) {
+    public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.minecart.MinecartInteractEvent(this, player, hand))) {
             return true;
         }
 

@@ -70,7 +70,7 @@ public class TweakAutoReplace extends Tweak {
 
 	@SubscribeEvent
 	public void onPlayerDestroyItem(PlayerDestroyItemEvent event) {
-		if (!(event.getEntity() instanceof EntityPlayerMP) || event.getEntity().worldObj.isRemote || event.getOriginal() == null) {
+		if (!(event.getEntity() instanceof EntityPlayerMP) || event.getEntity().world.isRemote || event.getOriginal().isEmpty()) {
 			return;
 		}
 
@@ -78,7 +78,7 @@ public class TweakAutoReplace extends Tweak {
 		InventoryPlayer inv = player.inventory;
 
 		ItemStack currentItem = inv.getCurrentItem();
-		if (currentItem != null && currentItem != event.getOriginal()) {
+		if (currentItem != event.getOriginal()) {
 			return;
 		}
 
@@ -90,14 +90,14 @@ public class TweakAutoReplace extends Tweak {
 			if (!canReplace(stackAbove, event.getOriginal())) break;
 			int targetSlot = ((slot < 27) ? (slot + 9) : (slot - 27));
 			inv.setInventorySlotContents(targetSlot, stackAbove.copy());
-			inv.setInventorySlotContents(slot, null);
+			inv.setInventorySlotContents(slot, ItemStack.EMPTY);
 			player.connection.sendPacket(
 					new SPacketSetSlot(0, slot + 9, stackAbove.copy()));
 		}
 
 		if (row < 2) {
 			player.connection.sendPacket(
-					new SPacketSetSlot(0, inv.currentItem + row * 9 + 18, null));
+					new SPacketSetSlot(0, inv.currentItem + row * 9 + 18, ItemStack.EMPTY));
 		}
 	}
 

@@ -37,18 +37,15 @@ public class InventorySimple implements IInventory {
 		this.size = size;
 		this.items = new ItemStack[size];
 		this.watchers = new HashSet<EntityPlayer>();
+		for (int i = 0; i < size; i++)
+			items[i] = ItemStack.EMPTY;
 	}
 
 	public void readFromNBT(NBTTagCompound nbt, String key) {
 		NBTTagList itemList = nbt.getTagList(key, 10);
 		for (int i = 0; i < Math.min(size, itemList.tagCount()); i++) {
 			NBTTagCompound cpd = itemList.getCompoundTagAt(i);
-			ItemStack stack = ItemStack.loadItemStackFromNBT(cpd);
-			if (stack != null) {
-				items[i] = stack;
-			} else {
-				items[i] = null;
-			}
+			items[i] = new ItemStack(cpd);
 		}
 	}
 
@@ -56,9 +53,7 @@ public class InventorySimple implements IInventory {
 		NBTTagList itemList = new NBTTagList();
 		for (int i = 0; i < size; i++) {
 			NBTTagCompound cpd = new NBTTagCompound();
-			if (items[i] != null) {
-				items[i].writeToNBT(cpd);
-			}
+			items[i].writeToNBT(cpd);
 			itemList.appendTag(cpd);
 		}
 		nbt.setTag(key, itemList);
@@ -70,38 +65,44 @@ public class InventorySimple implements IInventory {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		// TODO 1.11
+		return false;
+	}
+
+	@Override
 	public ItemStack getStackInSlot(int index) {
 		return items[index];
 	}
 
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		if (this.items[index] != null) {
-			if (this.items[index].stackSize <= count) {
+		if (!this.items[index].isEmpty()) {
+			if (this.items[index].getCount() <= count) {
 				ItemStack stack = this.items[index];
-				this.items[index] = null;
+				this.items[index] = ItemStack.EMPTY;
 
 				this.markDirty();
 				return stack;
 			} else {
 				ItemStack stack = this.items[index].splitStack(count);
 
-				if (this.items[index].stackSize == 0) {
-					this.items[index] = null;
+				if (this.items[index].getCount() <= 0) {
+					this.items[index] = ItemStack.EMPTY;
 				}
 
 				this.markDirty();
 				return stack;
 			}
 		} else {
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		ItemStack stack = items[index];
-		items[index] = null;
+		items[index] = ItemStack.EMPTY;
 		return stack;
 	}
 
@@ -121,7 +122,7 @@ public class InventorySimple implements IInventory {
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(EntityPlayer player) {
 		return true;
 	}
 

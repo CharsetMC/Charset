@@ -47,7 +47,7 @@ public abstract class Tweak {
 			if (maxMode <= 0) {
 				prop = new Property(configKey, isDefault ? "true" : "false", Property.Type.BOOLEAN);
 			} else {
-				prop = new Property(configKey, new Integer(maxMode).toString(), Property.Type.INTEGER);
+				prop = new Property(configKey, Integer.toString(maxMode), Property.Type.INTEGER);
 			}
 			prop.setRequiresMcRestart(!canTogglePostLoad());
 			cc.put(configKey, prop);

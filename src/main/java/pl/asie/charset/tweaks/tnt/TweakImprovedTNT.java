@@ -17,6 +17,7 @@
 package pl.asie.charset.tweaks.tnt;
 
 import net.minecraft.entity.item.EntityTNTPrimed;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -38,7 +39,7 @@ public class TweakImprovedTNT extends Tweak {
 
 	@Override
 	public void enable() {
-		EntityRegistry.registerModEntity(EntityTNTImproved.class, "charsettweaks:tnt", 1, ModCharsetTweaks.instance, 64, 1, true);
+		EntityRegistry.registerModEntity(new ResourceLocation("charsettweaks:tnt"), EntityTNTImproved.class, "charsettweaks:tnt", 1, ModCharsetTweaks.instance, 64, 1, true);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
@@ -49,7 +50,7 @@ public class TweakImprovedTNT extends Tweak {
 			EntityTNTImproved tnt = new EntityTNTImproved(event.getWorld(), event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ,
 					((EntityTNTPrimed) event.getEntity()).getTntPlacedBy());
 			tnt.setFuse(((EntityTNTPrimed) event.getEntity()).getFuse());
-			event.getWorld().spawnEntityInWorld(tnt);
+			event.getWorld().spawnEntity(tnt);
 		}
 	}
 }

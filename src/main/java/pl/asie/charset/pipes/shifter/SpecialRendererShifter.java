@@ -95,6 +95,8 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 				GlStateManager.translate(0, 0, 0.005F);
 			}
 
+			GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+
 			int l = tileEntity.getWorld().getCombinedLight(tileEntity.getPos().offset(itemDir), tileEntity.getWorld().getSkylightSubtracted());
 			int j = l % 65536;
 			int k = l / 65536;

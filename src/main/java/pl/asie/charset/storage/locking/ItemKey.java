@@ -51,8 +51,8 @@ public class ItemKey extends Item implements IKeyItem {
     @Override
     public ItemStack getContainerItem(ItemStack stack) {
         ItemStack result = stack.copy();
-        if (result.stackSize < 1) {
-            result.stackSize = 1;
+        if (result.getCount() < 1) {
+            result.setCount(1);
         }
         return result;
     }

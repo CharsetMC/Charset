@@ -16,24 +16,23 @@
 
 package pl.asie.charset.pipes;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import mcmultipart.microblock.IMicroblock;
-import mcmultipart.multipart.IMultipartContainer;
-import mcmultipart.multipart.ISlottedPart;
-import mcmultipart.multipart.MultipartHelper;
-import mcmultipart.multipart.PartSlot;
-import pl.asie.charset.pipes.pipe.PartPipe;
+import pl.asie.charset.pipes.pipe.TilePipe;
 
 public final class PipeUtils {
 	private PipeUtils() {
 
 	}
 
-	public static PartPipe getPipe(World world, BlockPos blockPos, EnumFacing side) {
-		IMultipartContainer container = MultipartHelper.getPartContainer(world, blockPos);
+	public static TilePipe getPipe(IBlockAccess world, BlockPos blockPos, EnumFacing side) {
+		TileEntity tile = world.getTileEntity(blockPos);
+		return tile instanceof TilePipe ? (TilePipe) tile : null;
+		/* IMultipartContainer container = MultipartHelper.getPartContainer(world, blockPos);
 		if (container == null) {
 			return null;
 		}
@@ -46,10 +45,10 @@ public final class PipeUtils {
 		}
 
 		ISlottedPart part = container.getPartInSlot(PartSlot.CENTER);
-		if (part instanceof PartPipe) {
-			return (PartPipe) part;
+		if (part instanceof TilePipe) {
+			return (TilePipe) part;
 		} else {
 			return null;
-		}
+		} */
 	}
 }

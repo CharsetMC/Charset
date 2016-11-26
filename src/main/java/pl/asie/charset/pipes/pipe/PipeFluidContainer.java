@@ -205,9 +205,9 @@ public class PipeFluidContainer implements ITickable {
     boolean fluidDirty;
 
     private static final int TANK_SIZE = 250;
-    private final PartPipe owner;
+    private final TilePipe owner;
 
-    public PipeFluidContainer(PartPipe owner) {
+    public PipeFluidContainer(TilePipe owner) {
         this.owner = owner;
         for (int i = 0; i < 7; i++) {
             tanks[i] = new Tank(i < 6 ? EnumFacing.getFront(i) : null);

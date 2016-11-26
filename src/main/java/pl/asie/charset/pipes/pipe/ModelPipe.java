@@ -21,12 +21,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.render.ModelPipeLike;
 
-public class ModelPipe extends ModelPipeLike<PartPipe> {
+public class ModelPipe extends ModelPipeLike<TilePipe> {
     public static final ResourceLocation PIPE_TEXTURE_LOC = new ResourceLocation("charsetpipes", "blocks/pipe");
     public static TextureAtlasSprite[] sprites;
 
     public ModelPipe() {
-        super(PartPipe.PROPERTY);
+        super(TilePipe.PROPERTY);
     }
 
     @Override

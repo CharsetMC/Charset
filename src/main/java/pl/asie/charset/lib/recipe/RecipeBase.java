@@ -19,6 +19,7 @@ package pl.asie.charset.lib.recipe;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.NonNullList;
 
 public abstract class RecipeBase implements IRecipe {
 	@Override
@@ -27,14 +28,14 @@ public abstract class RecipeBase implements IRecipe {
 	}
 
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-		ItemStack[] stacks = new ItemStack[inv.getSizeInventory()];
+	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+		NonNullList<ItemStack> list = NonNullList.<ItemStack>withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 
-		for (int i = 0; i < stacks.length; ++i) {
-			ItemStack stack = inv.getStackInSlot(i);
-			stacks[i] = net.minecraftforge.common.ForgeHooks.getContainerItem(stack);
+		for (int i = 0; i < list.size(); ++i) {
+			ItemStack itemstack = inv.getStackInSlot(i);
+			list.set(i, net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack));
 		}
 
-		return stacks;
+		return list;
 	}
 }

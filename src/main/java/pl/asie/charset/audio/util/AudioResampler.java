@@ -1,13 +1,13 @@
-package pl.asie.charset.audio.tape;
+package pl.asie.charset.audio.util;
 
 import com.laszlosystems.libresample4j.Resampler;
 
 import java.nio.FloatBuffer;
 
-public final class TapeResampler {
+public final class AudioResampler {
     private static final Resampler RESAMPLER = new Resampler(true, 0.01, 100);
 
-    private TapeResampler() {
+    private AudioResampler() {
 
     }
 

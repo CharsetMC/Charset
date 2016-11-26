@@ -52,7 +52,7 @@ public class PlayerDeathHandler {
 		if (event.isWasDeath()) {
 			for (int i = 0; i < Math.min(event.getEntityPlayer().inventory.getSizeInventory(), event.getOriginal().inventory.getSizeInventory()); i++) {
 				ItemStack s = event.getOriginal().inventory.getStackInSlot(i);
-				if (s != null && itemKeepPredicate.apply(s)) {
+				if (!s.isEmpty() && itemKeepPredicate.apply(s)) {
 					event.getEntityPlayer().inventory.setInventorySlotContents(i, s);
 				}
 			}
@@ -61,13 +61,12 @@ public class PlayerDeathHandler {
 
 	@SubscribeEvent
 	public void onPlayerDeath(PlayerDropsEvent event) {
-		String name = event.getEntityPlayer().getName();
 		Iterator<EntityItem> itemIterator = event.getDrops().iterator();
 
 		while (itemIterator.hasNext()) {
 			EntityItem entityItem = itemIterator.next();
 
-			if (entityItem == null || entityItem.getEntityItem() == null) {
+			if (entityItem == null || entityItem.getEntityItem().isEmpty()) {
 				continue;
 			}
 

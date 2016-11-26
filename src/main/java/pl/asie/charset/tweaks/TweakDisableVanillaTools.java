@@ -56,7 +56,7 @@ public class TweakDisableVanillaTools extends Tweak {
 			Iterator<IRecipe> iterator = CraftingManager.getInstance().getRecipeList().iterator();
 			while (iterator.hasNext()) {
 				ItemStack output = iterator.next().getRecipeOutput();
-				if (output != null && itemSet.contains(output.getItem())) {
+				if (!output.isEmpty() && itemSet.contains(output.getItem())) {
 					iterator.remove();
 					itemSet.remove(output.getItem());
 					ModCharsetLib.logger.info("Disabled " + Item.REGISTRY.getNameForObject(output.getItem()).toString() + " (removed recipe)");

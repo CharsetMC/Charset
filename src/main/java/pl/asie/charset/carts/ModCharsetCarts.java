@@ -21,6 +21,7 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemMinecart;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -45,7 +46,7 @@ import java.util.Map;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetCarts {
 	public static final Map<Class<? extends Entity>, Class<? extends EntityMinecart>> REPLACEMENT_MAP = new HashMap<>();
-	public static final String MODID = "CharsetCarts";
+	public static final String MODID = "charsetcarts";
 	public static final String NAME = "U";
 	public static final String VERSION = "@VERSION@";
 
@@ -59,7 +60,7 @@ public class ModCharsetCarts {
 	private Configuration config;
 
 	private void register(Class<? extends EntityMinecart> minecart, String name) {
-		EntityRegistry.registerModEntity(minecart, "charsetcarts:" + name, 2, this, 64, 1, true);
+		EntityRegistry.registerModEntity(new ResourceLocation("charsetcarts:" + name), minecart, "charsetcarts:" + name, 2, this, 64, 1, true);
 	}
 
 	private void register(Class<? extends EntityMinecart> minecart, String name, Class<? extends Entity> from) {
@@ -91,7 +92,7 @@ public class ModCharsetCarts {
 				EntityMinecart minecart = REPLACEMENT_MAP.get(classy).getConstructor(World.class, double.class, double.class, double.class).newInstance(
 						event.getWorld(), event.getEntity().posX, event.getEntity().posY, event.getEntity().posZ
 				);
-				event.getWorld().spawnEntityInWorld(minecart);
+				event.getWorld().spawnEntity(minecart);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

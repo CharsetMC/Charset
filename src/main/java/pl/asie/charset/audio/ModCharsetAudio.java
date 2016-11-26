@@ -43,32 +43,24 @@ import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.api.tape.IDataStorage;
-import mcmultipart.multipart.MultipartRegistry;
 import pl.asie.charset.audio.note.NoteBlockManager;
 import pl.asie.charset.audio.note.PacketNoteParticle;
 import pl.asie.charset.audio.storage.DataStorageImpl;
 import pl.asie.charset.audio.storage.DataStorageManager;
 import pl.asie.charset.audio.storage.DataStorageStorage;
-import pl.asie.charset.audio.tape.ItemPartTapeDrive;
 import pl.asie.charset.audio.tape.ItemTape;
 import pl.asie.charset.audio.tape.ItemTapeReel;
-import pl.asie.charset.audio.tape.PacketDriveCounter;
-import pl.asie.charset.audio.tape.PacketDriveRecord;
-import pl.asie.charset.audio.tape.PacketDriveState;
-import pl.asie.charset.audio.tape.PartTapeDrive;
 import pl.asie.charset.audio.recipe.RecipeTape;
 import pl.asie.charset.audio.recipe.RecipeTapeReel;
-import pl.asie.charset.audio.transport.AudioCableFactory;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
-import pl.asie.charset.lib.wires.WireManager;
 
 import java.io.IOException;
 
 @Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION,
-		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetAudio {
-	public static final String MODID = "CharsetAudio";
+	public static final String MODID = "charsetaudio";
 	public static final String NAME = "♫";
 	public static final String VERSION = "@VERSION@";
 
@@ -86,8 +78,8 @@ public class ModCharsetAudio {
 	public static PacketRegistry packet;
 	public static DataStorageManager storage;
 
-	public static AudioCableFactory audioCableFactory;
-	public static ItemPartTapeDrive partTapeDriveItem;
+	// public static AudioCableFactory audioCableFactory;
+	// public static ItemPartTapeDrive partTapeDriveItem;
 	public static ItemTape tapeItem;
 	public static Item magneticTapeItem, tapeReelItem;
 
@@ -95,11 +87,11 @@ public class ModCharsetAudio {
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(ModCharsetAudio.MODID);
 
-		audioCableFactory = (AudioCableFactory) new AudioCableFactory().setRegistryName(new ResourceLocation("charsetaudio:cable"));
-		WireManager.register(audioCableFactory);
+		// audioCableFactory = (AudioCableFactory) new AudioCableFactory().setRegistryName(new ResourceLocation("charsetaudio:cable"));
+		// WireManager.register(audioCableFactory);
 
-		partTapeDriveItem = new ItemPartTapeDrive();
-		GameRegistry.register(partTapeDriveItem.setRegistryName("tapeDrive"));
+		// partTapeDriveItem = new ItemPartTapeDrive();
+		// GameRegistry.register(partTapeDriveItem.setRegistryName("tapeDrive"));
 
 		tapeItem = new ItemTape();
 		GameRegistry.register(tapeItem.setRegistryName("tape"));
@@ -109,9 +101,9 @@ public class ModCharsetAudio {
 		GameRegistry.register(magneticTapeItem.setRegistryName("tapeMagnetic"));
 		GameRegistry.register(tapeReelItem.setRegistryName("tapeReel"));
 
-		MultipartRegistry.registerPart(PartTapeDrive.class, "charsetaudio:tapedrive");
+		// MultipartRegistry.registerPart(PartTapeDrive.class, "charsetaudio:tapedrive");
 
-		ModCharsetLib.proxy.registerItemModel(partTapeDriveItem, 0, "charsetaudio:tapedrive");
+		// ModCharsetLib.proxy.registerItemModel(partTapeDriveItem, 0, "charsetaudio:tapedrive");
 		ModCharsetLib.proxy.registerItemModel(tapeItem, 0, "charsetaudio:tape");
 		ModCharsetLib.proxy.registerItemModel(magneticTapeItem, 0, "charsetaudio:tapeMagnetic");
 		for (int i = 0; i <= 128; i++) {
@@ -138,13 +130,13 @@ public class ModCharsetAudio {
 		packet = new PacketRegistry(ModCharsetAudio.MODID);
 		packet.registerPacket(0x01, PacketNoteParticle.class);
 
-		packet.registerPacket(0x10, PacketDriveState.class);
-		packet.registerPacket(0x13, PacketDriveRecord.class);
-		packet.registerPacket(0x14, PacketDriveCounter.class);
+		// packet.registerPacket(0x10, PacketDriveState.class);
+		// packet.registerPacket(0x13, PacketDriveRecord.class);
+		// packet.registerPacket(0x14, PacketDriveCounter.class);
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(tapeReelItem), " i ", "ipi", " i ", 'i', "ingotIron", 'p', Items.PAPER));
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(magneticTapeItem, 32), "ddd", "rir", "ddd", 'd', "dyeBlack", 'r', Items.REDSTONE, 'i', "ingotIron"));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(partTapeDriveItem), "igi", "rRr", "ipi", 'g', "blockGlass", 'p', Blocks.PISTON, 'R', new ItemStack(tapeReelItem, 1, 0), 'r', Items.REDSTONE, 'i', "ingotIron"));
+		// GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(partTapeDriveItem), "igi", "rRr", "ipi", 'g', "blockGlass", 'p', Blocks.PISTON, 'R', new ItemStack(tapeReelItem, 1, 0), 'r', Items.REDSTONE, 'i', "ingotIron"));
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerAudio());
 
