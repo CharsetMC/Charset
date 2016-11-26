@@ -1,11 +1,12 @@
-* [All] Removed the following content:
+* [All] Removed the following content. Please don't cry. (Okay, you can cry a little bit.)
   * Wires - they were broken anyway
   * Gates - use amadornes's Super Circuit Maker instead
   * Backpacks (Storage) - use copygirl's WearableBackpacks instead
-* [All] Fix various NPEs throughout the mod
+* [All] Fix various NPEs throughout the mod (asie, palaster)
 * [Audio] Update DFPWM to "1a"
 * [Audio] [#85] Fix SoundEvent crash in NoteBlockManager on server side
 * [Audio] [#77] Fix the Tape Drive file dialog freezing Minecraft
 * [Pipes] Reduce amount of Shifter models
 * [Storage] Fix Hopping Barrels inventory insertion (Tahg)
+* [Storage] Fix Locks not rendering on server (asie, palaster)
 * [Tweaks] Add support for some modded doors to DoubleDoorTweak
