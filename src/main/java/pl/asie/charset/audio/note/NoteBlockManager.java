@@ -64,7 +64,7 @@ public class NoteBlockManager {
         if (!worldIn.isRemote) {
             TileEntity note = worldIn.getTileEntity(pos);
             if (note != null && note.hasCapability(Capabilities.AUDIO_SOURCE, null)) {
-                AudioDataSound dataSound = new AudioDataSound(sound.getSoundName().toString(), pitch);
+                AudioDataSound dataSound = new AudioDataSound(SoundEvent.REGISTRY.getNameForObject(sound).toString(), pitch);
                 AudioPacket packet = new AudioPacket(dataSound, 1.0f);
 
                 for (EnumFacing facing : EnumFacing.VALUES) {
