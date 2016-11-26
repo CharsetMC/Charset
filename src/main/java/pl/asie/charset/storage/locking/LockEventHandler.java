@@ -36,6 +36,10 @@ public class LockEventHandler {
             if (tile instanceof ILockableContainer && ((ILockableContainer) tile).isLocked()) {
                 LockCode code = ((ILockableContainer) tile).getLockCode();
                 if (code.getLock().startsWith("charset:")) {
+                    /* if (event.getWorld().getEntitiesWithinAABB(EntityLock.class,
+                            new AxisAlignedBB(event.getPos()).expandXyz(0.25f)).size() > 0) {
+                        event.setCanceled(true);
+                    } */
                     event.setCanceled(true);
                 }
             }

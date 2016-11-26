@@ -39,6 +39,7 @@ package pl.asie.charset.storage.barrel;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -69,7 +70,6 @@ public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBar
         Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
                 ProxyClient.barrelModel, state, minecart.getBrightness(partialTicks), true);
         GlStateManager.disableBlend();
-        GlStateManager.disableAlpha();
         tesr.renderTileEntityAt(minecart.barrel, 0, 0, 0, partialTicks, 0);
         GlStateManager.popMatrix();
     }

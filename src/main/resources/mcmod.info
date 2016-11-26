@@ -35,33 +35,11 @@
             "url": "http://charset.asie.pl"
         },
         {
-            "modid": "CharsetWires",
-            "name": "+",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Redstone cabling with analog support",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl"
-        },
-        {
-            "modid": "CharsetGates",
-            "name": "&",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Simple redstone gates",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl"
-        },
-        {
             "modid": "CharsetAudio",
             "name": "♫",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "Tape Drives, Iron Note Block, etc.",
+            "description": "Tape Drives and various audio transport methods",
             "authorList": [
                 "asiekierka"
             ],
@@ -72,7 +50,7 @@
             "name": "#",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "Things useful for storage (Backpacks, Locks, etc.)",
+            "description": "Things useful for storage (Barrels, Locks, etc.)",
             "authorList": [
                 "asiekierka"
             ],
@@ -83,7 +61,7 @@
             "name": "⚐",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "Various decorative objects.",
+            "description": "Various decorative objects",
             "authorList": [
                 "asiekierka"
             ],
@@ -94,7 +72,7 @@
             "name": "!",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "Drama Generator in Minecraft. Joke module.",
+            "description": "Drama Generator in Minecraft. Joke module",
             "authorList": [
                 "asiekierka"
             ],
@@ -105,7 +83,7 @@
             "name": "/",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "A wrench which happens to rotate multiparts.",
+            "description": "A wrench which happens to rotate multiparts",
             "authorList": [
                 "asiekierka"
             ],

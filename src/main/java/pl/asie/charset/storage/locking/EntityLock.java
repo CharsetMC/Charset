@@ -17,6 +17,7 @@
 package pl.asie.charset.storage.locking;
 
 import com.google.common.base.Predicate;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityHanging;
@@ -38,10 +39,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.LockCode;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.storage.ModCharsetStorage;
 
-public class EntityLock extends EntityHanging {
+public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnData {
     static final DataParameter<Integer> COLOR_0 = EntityDataManager.createKey(EntityLock.class, DataSerializers.VARINT);
     static final DataParameter<Integer> COLOR_1 = EntityDataManager.createKey(EntityLock.class, DataSerializers.VARINT);
 
@@ -54,18 +56,18 @@ public class EntityLock extends EntityHanging {
 
     private String lockKey = null;
     private String prefixedLockKey = null;
-    private int[] colors = new int[] { -1, -1 };
+    protected int[] colors = new int[] { -1, -1 };
     private TileEntity tileCached;
 
     public EntityLock(World worldIn) {
         super(worldIn);
     }
 
-    public EntityLock(World worldIn, ItemStack stack, BlockPos p_i45852_2_, EnumFacing p_i45852_3_) {
-        super(worldIn, p_i45852_2_);
+    public EntityLock(World worldIn, ItemStack stack, BlockPos pos, EnumFacing facing) {
+        super(worldIn, pos);
         this.setColors(stack.getTagCompound());
         this.setLockKey(((ItemLock) stack.getItem()).getRawKey(stack));
-        this.updateFacingWithBoundingBox(p_i45852_3_);
+        this.updateFacingWithBoundingBox(facing);
     }
 
     private void setColors(NBTTagCompound compound) {
@@ -76,10 +78,6 @@ public class EntityLock extends EntityHanging {
             colors[0] = -1;
             colors[1] = -1;
         }
-        getDataManager().set(COLOR_0, colors[0]);
-        getDataManager().set(COLOR_1, colors[1]);
-        getDataManager().setDirty(COLOR_0);
-        getDataManager().setDirty(COLOR_1);
     }
 
     private void setLockKey(String s) {
@@ -119,9 +117,7 @@ public class EntityLock extends EntityHanging {
 
     @Override
     protected void entityInit() {
-        this.getDataManager().register(HANGING_ROTATION, null);
-        this.getDataManager().register(COLOR_0, null);
-        this.getDataManager().register(COLOR_1, null);
+        super.entityInit();
         this.setEntityInvulnerable(true);
     }
 
@@ -155,7 +151,7 @@ public class EntityLock extends EntityHanging {
     public void onUpdate() {
         super.onUpdate();
 
-        if (lockKey != null && lockKey.length() > 0) {
+        if (!worldObj.isRemote && lockKey != null && lockKey.length() > 0) {
             if (getAttachedTile() instanceof ILockableContainer) {
                 ILockableContainer container = (ILockableContainer) tileCached;
                 if (!container.isLocked() || !prefixedLockKey.equals(container.getLockCode().getLock())) {
@@ -166,25 +162,8 @@ public class EntityLock extends EntityHanging {
     }
 
     @Override
-    protected void updateFacingWithBoundingBox(EnumFacing facingDirectionIn) {
-        super.updateFacingWithBoundingBox(facingDirectionIn);
-        this.getDataManager().set(HANGING_ROTATION, facingDirectionIn);
-        this.getDataManager().setDirty(HANGING_ROTATION);
-    }
-
-    @Override
-    public void notifyDataManagerChange(DataParameter<?> key) {
-        if (key == HANGING_ROTATION) {
-            EnumFacing facing = getDataManager().get(HANGING_ROTATION);
-            if (facing != null) {
-                this.updateFacingWithBoundingBox(facing);
-            }
-        }
-    }
-
-    @Override
     public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, ItemStack stack, EnumHand hand) {
-        if (hand == EnumHand.MAIN_HAND && lockKey != null) {
+        if (!worldObj.isRemote && hand == EnumHand.MAIN_HAND && lockKey != null) {
             boolean canUnlock = false;
             if (stack != null && stack.getItem() instanceof IKeyItem) {
                 IKeyItem key = (IKeyItem) stack.getItem();
@@ -234,6 +213,13 @@ public class EntityLock extends EntityHanging {
 
     @Override
     public boolean onValidSurface() {
+        if (getAttachedTile() instanceof ILockableContainer) {
+            ILockableContainer container = (ILockableContainer) tileCached;
+            if (container.isLocked() && prefixedLockKey.equals(container.getLockCode().getLock())) {
+                return true;
+            }
+        }
+
         if (!this.worldObj.getCollisionBoxes(this, this.getEntityBoundingBox()).isEmpty()) {
             return false;
         } else {
@@ -324,6 +310,20 @@ public class EntityLock extends EntityHanging {
 
     @Override
     public void playPlaceSound() {
+        // TODO
+    }
 
+    @Override
+    public void writeSpawnData(ByteBuf buffer) {
+        buffer.writeByte(facingDirection.ordinal());
+        buffer.writeInt(colors[0]);
+        buffer.writeInt(colors[1]);
+    }
+
+    @Override
+    public void readSpawnData(ByteBuf buffer) {
+        this.updateFacingWithBoundingBox(EnumFacing.getFront(buffer.readUnsignedByte()));
+        colors[0] = buffer.readInt();
+        colors[1] = buffer.readInt();
     }
 }

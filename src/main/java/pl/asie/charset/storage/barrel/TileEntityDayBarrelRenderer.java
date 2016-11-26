@@ -277,9 +277,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             GlStateManager.enableRescaleNormal();
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            GlStateManager.pushMatrix();
             RenderHelper.enableStandardItemLighting();
-            GlStateManager.popMatrix();
 
             GlStateManager.scale(0.5F, 0.5F, 0.02F);
 

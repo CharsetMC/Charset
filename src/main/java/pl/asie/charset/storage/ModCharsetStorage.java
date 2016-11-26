@@ -180,7 +180,7 @@ public class ModCharsetStorage {
 			GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
 		}
 
-		EntityRegistry.registerModEntity(EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, true);
+		EntityRegistry.registerModEntity(EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, false);
 		EntityRegistry.registerModEntity(EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
 
 		proxy.init();

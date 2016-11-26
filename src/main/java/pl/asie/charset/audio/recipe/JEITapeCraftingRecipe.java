@@ -35,6 +35,7 @@ import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.audio.tape.ItemTape;
+import pl.asie.charset.lib.recipe.JEIPluginCharsetLib;
 
 public class JEITapeCraftingRecipe extends BlankRecipeWrapper implements IShapedCraftingRecipeWrapper {
 	public static class Handler implements IRecipeHandler<RecipeTape> {
@@ -71,12 +72,6 @@ public class JEITapeCraftingRecipe extends BlankRecipeWrapper implements IShaped
 
 	@Override
 	public void getIngredients(IIngredients ingredients) {
-		// TODO
-	}
-
-	@Nonnull
-	@Override
-	public List getInputs() {
 		Object[] inputs = new Object[9];
 
 		List<String> mats = new ArrayList<String>();
@@ -86,20 +81,14 @@ public class JEITapeCraftingRecipe extends BlankRecipeWrapper implements IShaped
 			}
 		}
 
-		inputs[0] = mats;
-		inputs[1] = mats;
-		inputs[2] = mats;
-		inputs[3] = new ItemStack(ModCharsetAudio.tapeReelItem, 1, OreDictionary.WILDCARD_VALUE);
-		inputs[5] = inputs[3];
+		inputs[0] = inputs[1] = inputs[2] = mats;
+		inputs[3] = inputs[5] = new ItemStack(ModCharsetAudio.tapeReelItem, 1, OreDictionary.WILDCARD_VALUE);
 		inputs[6] = inputs[7] = inputs[8] = new ItemStack(Blocks.STONE_SLAB);
 
-		return Arrays.asList(inputs);
-	}
+		ItemStack output = new ItemStack(ModCharsetAudio.tapeItem, 1, OreDictionary.WILDCARD_VALUE);
 
-	@Nonnull
-	@Override
-	public List<ItemStack> getOutputs() {
-		return Collections.singletonList(new ItemStack(ModCharsetAudio.tapeItem, 1, OreDictionary.WILDCARD_VALUE));
+		ingredients.setInputLists(ItemStack.class, JEIPluginCharsetLib.STACKS.expandRecipeItemStackInputs(Arrays.asList(inputs)));
+		ingredients.setOutputs(ItemStack.class, JEIPluginCharsetLib.STACKS.getSubtypes(output));
 	}
 
 	@Override

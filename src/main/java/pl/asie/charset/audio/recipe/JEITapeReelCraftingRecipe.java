@@ -33,6 +33,7 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.recipe.JEIPluginCharsetLib;
 
 public class JEITapeReelCraftingRecipe extends BlankRecipeWrapper implements IShapedCraftingRecipeWrapper {
 	public static class Handler implements IRecipeHandler<RecipeTapeReel> {
@@ -69,13 +70,8 @@ public class JEITapeReelCraftingRecipe extends BlankRecipeWrapper implements ISh
 
 	@Override
 	public void getIngredients(IIngredients ingredients) {
-		// TODO
-	}
-
-	@Nonnull
-	@Override
-	public List getInputs() {
 		Object[] inputs = new Object[9];
+		ItemStack output = new ItemStack(ModCharsetAudio.tapeReelItem, 1, OreDictionary.WILDCARD_VALUE);
 
 		List<Object> mats = new ArrayList<Object>();
 		mats.add(new ItemStack(ModCharsetAudio.magneticTapeItem));
@@ -89,13 +85,8 @@ public class JEITapeReelCraftingRecipe extends BlankRecipeWrapper implements ISh
 			}
 		}
 
-		return Arrays.asList(inputs);
-	}
-
-	@Nonnull
-	@Override
-	public List<ItemStack> getOutputs() {
-		return Collections.singletonList(new ItemStack(ModCharsetAudio.tapeReelItem, 1, OreDictionary.WILDCARD_VALUE));
+		ingredients.setInputLists(ItemStack.class, JEIPluginCharsetLib.STACKS.expandRecipeItemStackInputs(Arrays.asList(inputs)));
+		ingredients.setOutputs(ItemStack.class, JEIPluginCharsetLib.STACKS.getSubtypes(output));
 	}
 
 	@Override

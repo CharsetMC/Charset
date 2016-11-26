@@ -46,7 +46,6 @@ import pl.asie.charset.storage.ModCharsetStorage;
 @SideOnly(Side.CLIENT)
 public class RenderLock extends Render<EntityLock> {
     private final Minecraft mc = Minecraft.getMinecraft();
-    private final ModelResourceLocation model = new ModelResourceLocation("charsetstorage:lock", "inventory");
 
     public RenderLock(RenderManager renderManagerIn) {
         super(renderManagerIn);
@@ -64,7 +63,6 @@ public class RenderLock extends Render<EntityLock> {
         GlStateManager.rotate(180.0F - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
         this.renderManager.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-        GlStateManager.pushMatrix();
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
 
         if (this.renderOutlines) {
@@ -74,15 +72,13 @@ public class RenderLock extends Render<EntityLock> {
 
         ItemStack stack = new ItemStack(ModCharsetStorage.lockItem);
         stack.setTagCompound(new NBTTagCompound());
-        int color0 = entity.getDataManager().get(EntityLock.COLOR_0);
-        int color1 = entity.getDataManager().get(EntityLock.COLOR_1);
 
-        if (color0 != -1) {
-            stack.getTagCompound().setInteger("color0", color0);
+        if (entity.colors[0] != -1) {
+            stack.getTagCompound().setInteger("color0", entity.colors[0]);
         }
 
-        if (color1 != -1) {
-            stack.getTagCompound().setInteger("color1", color1);
+        if (entity.colors[1] != -1) {
+            stack.getTagCompound().setInteger("color1", entity.colors[1]);
         }
 
         mc.getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.FIXED);
@@ -92,7 +88,6 @@ public class RenderLock extends Render<EntityLock> {
             GlStateManager.disableColorMaterial();
         }
 
-        GlStateManager.popMatrix();
         GlStateManager.popMatrix();
     }
 

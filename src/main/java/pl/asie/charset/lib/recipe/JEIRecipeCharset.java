@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,22 +81,18 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements ICraftingRec
 
     @Override
     public void getIngredients(IIngredients ingredients) {
-        // TODO
-    }
+        List<Object> inputs = new ArrayList<Object>();
+        Object output = recipe.output.preview();
 
-    @Override
-    public List getInputs() {
-        List<Object> mats = new ArrayList<Object>();
         for (IRecipeObject o : recipe.input) {
-            mats.add(o != null ? o.preview() : null);
+            inputs.add(o != null ? o.preview() : null);
         }
 
-        return mats;
-    }
-
-    @Override
-    public List<ItemStack> getOutputs() {
-        Object o = recipe.output.preview();
-        return o instanceof List ? (List<ItemStack>) o : (o instanceof ItemStack ? Collections.singletonList((ItemStack) o) : null);
+        ingredients.setInputLists(ItemStack.class, JEIPluginCharsetLib.STACKS.expandRecipeItemStackInputs(Arrays.asList(inputs)));
+        if (output instanceof ItemStack) {
+            ingredients.setOutputs(ItemStack.class, JEIPluginCharsetLib.STACKS.getSubtypes((ItemStack) output));
+        } else if (output instanceof List) {
+            ingredients.setOutputs(ItemStack.class, (List<ItemStack>) output);
+        }
     }
 }
