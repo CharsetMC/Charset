@@ -237,7 +237,7 @@ public class EntityPoster extends Entity {
                 if (inv.getItem() == ModCharsetDecoration.posterItem) return true;
                 if (player.isSneaking()) return true;
                 ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
-                return isItemTilting(held) || isItemRotating(held) || isItemScaling(held);
+                return held != null && (isItemTilting(held) || isItemRotating(held) || isItemScaling(held));
             }
         }
 

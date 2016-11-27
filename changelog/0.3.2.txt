@@ -1,1 +1,4 @@
+* [All] [#86] Fixed a crash on startup in some cases.
 * [Decoration] Wrenches can now be used to tilt Posters.
+* [Tweaks] [#87] Fixed double door tweak loading crash (UnableToFindMethodException).
+

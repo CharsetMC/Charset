@@ -1086,7 +1086,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
     public ItemStack getDroppedBlock() {
         ItemStack is = makeBarrel(type, woodLog, woodSlab);
-        if (type == Type.SILKY && item != null && getItemCount() > 0) {
+        if (type == Type.SILKY && item != null && getItemCount() > 0 && broken_with_silk_touch) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag == null) {
                 tag = new NBTTagCompound();

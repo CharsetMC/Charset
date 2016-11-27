@@ -64,7 +64,7 @@ public class ModCharsetLib {
 	public static final String MODID = "CharsetLib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart@[1.3.0,2.0.0)";
+	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart@[1.3.0,)";
 	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
 
 	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
