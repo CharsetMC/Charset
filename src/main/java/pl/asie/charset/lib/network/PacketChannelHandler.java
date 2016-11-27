@@ -28,6 +28,7 @@ import net.minecraft.network.PacketBuffer;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import pl.asie.charset.lib.ModCharsetLib;
 
 @Sharable
 public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, Packet> {
@@ -54,6 +55,11 @@ public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, 
 		Packet newMsg = registry.instantiatePacket(msg.payload().readUnsignedByte());
 		if (newMsg != null) {
 			newMsg.readData(iNetHandler, msg.payload());
+			if (newMsg.isAsynchronous() || ModCharsetLib.proxy.isMainThread()) {
+				newMsg.apply();
+			} else {
+				ModCharsetLib.proxy.addScheduledMainTask(newMsg::apply);
+			}
 		}
 	}
 }

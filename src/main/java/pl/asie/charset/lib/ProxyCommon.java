@@ -23,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -68,12 +69,12 @@ public class ProxyCommon {
 		return DimensionManager.getWorld(dim);
 	}
 
-	public boolean isClientThread() {
-		return false;
+	public boolean isMainThread() {
+		return FMLCommonHandler.instance().getMinecraftServerInstance().isCallingFromMinecraftThread();
 	}
 
-	public void addScheduledClientTask(Runnable runnable) {
-
+	public void addScheduledMainTask(Runnable runnable) {
+		FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
 	}
 
 	public boolean isClient() {

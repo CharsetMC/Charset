@@ -2,7 +2,6 @@ package pl.asie.charset.api.audio;
 
 import io.netty.buffer.ByteBuf;
 
-
 public abstract class AudioData {
     public abstract int getTime();
     public abstract void readData(ByteBuf buf);

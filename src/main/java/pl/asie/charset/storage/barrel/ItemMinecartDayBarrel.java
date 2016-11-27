@@ -66,7 +66,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
 
     @Override
     protected EntityMinecart createCart(GameProfile owner, ItemStack cart, World world, double x, double y, double z) {
-        EntityMinecartDayBarrel minecart = new EntityMinecartDayBarrel(world, x + 0.5F, y + 0.5F, z + 0.5F);
+        EntityMinecartDayBarrel minecart = new EntityMinecartDayBarrel(world, x, y, z);
         minecart.initFromStack(cart);
         return minecart;
     }

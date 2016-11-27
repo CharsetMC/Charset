@@ -112,12 +112,12 @@ public class ProxyClient extends ProxyCommon {
 	}
 
 	@Override
-	public boolean isClientThread() {
+	public boolean isMainThread() {
 		return Minecraft.getMinecraft().isCallingFromMinecraftThread();
 	}
 
 	@Override
-	public void addScheduledClientTask(Runnable runnable) {
+	public void addScheduledMainTask(Runnable runnable) {
 		Minecraft.getMinecraft().addScheduledTask(runnable);
 	}
 

@@ -30,5 +30,9 @@ public abstract class Packet {
 
 	public abstract void readData(INetHandler handler, ByteBuf buf);
 
+	public abstract void apply();
+
 	public abstract void writeData(ByteBuf buf);
+
+	public abstract boolean isAsynchronous();
 }

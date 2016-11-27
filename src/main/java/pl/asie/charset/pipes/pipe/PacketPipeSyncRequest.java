@@ -35,11 +35,19 @@ public class PacketPipeSyncRequest extends PacketTile {
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
+	}
 
+	@Override
+	public void apply() {
 		if (tile == null || !(tile instanceof TilePipe)) {
 			return;
 		}
 
 		((TilePipe) tile).onSyncRequest();
+	}
+
+	@Override
+	public boolean isAsynchronous() {
+		return false;
 	}
 }

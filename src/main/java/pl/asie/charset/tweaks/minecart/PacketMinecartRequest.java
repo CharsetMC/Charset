@@ -39,11 +39,14 @@ public class PacketMinecartRequest extends PacketEntity {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
-		super.readData(handler, buf);
-
+	public void apply() {
 		if (entity instanceof EntityMinecart) {
 			PacketMinecartUpdate.send((EntityMinecart) entity);
 		}
+	}
+
+	@Override
+	public boolean isAsynchronous() {
+		return true;
 	}
 }

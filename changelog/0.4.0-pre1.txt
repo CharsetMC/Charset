@@ -1,4 +1,5 @@
-* [Decoration, Drama, Lib Pipes, Storage, Tweaks, Wrench] Ported to 1.11
+* [Decoration, Drama, Lib, Pipes, Storage, Tweaks, Wrench] Ported to 1.11
+* [All] Various small bugfixes
 * [Pipes] Turned pipes into regular TEs in preparation for MCMP2
 * [Storage] Improvements to barrel logic
-* [All] Various small bugfixes
+* [Storage] Fixed barrelcart placement and dyeing

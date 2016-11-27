@@ -2,6 +2,7 @@ package pl.asie.charset.lib.items;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemMinecart;
@@ -46,7 +47,17 @@ public abstract class ItemMinecartCharset extends ItemMinecart {
     protected abstract EntityMinecart createCart(GameProfile owner, ItemStack cart, World world, double x, double y, double z);
 
     public EntityMinecart placeCart(GameProfile owner, ItemStack cart, World world, BlockPos pos) {
-        EntityMinecart minecart = createCart(owner, cart, world, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F);
+        float yOffset = 0.0625f;
+        IBlockState railState = world.getBlockState(pos);
+        BlockRailBase.EnumRailDirection railDirection = BlockRailBase.isRailBlock(railState)
+                ? railState.getValue(((BlockRailBase) railState.getBlock()).getShapeProperty())
+                : null;
+
+        if (railDirection != null && railDirection.isAscending()) {
+            yOffset += 0.5f;
+        }
+
+        EntityMinecart minecart = createCart(owner, cart, world, pos.getX() + 0.5F, pos.getY() + yOffset, pos.getZ() + 0.5F);
         cart.shrink(1);
         world.spawnEntity(minecart);
         return minecart;

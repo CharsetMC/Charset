@@ -67,10 +67,13 @@ public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBar
         GlStateManager.enableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.rotate(90, 0, 1, 0);
+        GlStateManager.translate(0, 0, 1);
         Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
                 ProxyClient.barrelModel, state, minecart.getBrightness(partialTicks), true);
         GlStateManager.disableBlend();
         tesr.renderTileEntityAt(minecart.barrel, 0, 0, 0, partialTicks, 0);
+        RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
     }
 }

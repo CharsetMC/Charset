@@ -256,18 +256,23 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             return true;
         }
 
-        boolean result = barrel.activate(player, null, hand);
-        updateDataWatcher(false);
-        return result;
+        if (!player.isSneaking()) {
+            boolean result = barrel.activate(player, null, hand);
+            updateDataWatcher(false);
+            return result;
+        } else {
+            return false;
+        }
     }
 
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+                || super.hasCapability(capability, facing);
     }
 
     public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing) {
         return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
                 ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(itemHandler)
-                : null;
+                : super.getCapability(capability, facing);
     }
 }

@@ -58,6 +58,11 @@ public class PacketAudioData extends Packet {
 		packet.writeData(buf);
 	}
 
+	@Override
+	public boolean isAsynchronous() {
+		return false;
+	}
+
 	@SideOnly(Side.CLIENT)
 	private void playSoundNote(AudioPacket packet, IDataSound sound) {
 		for (AudioSink sink : packet.getSinks()) {
@@ -74,7 +79,10 @@ public class PacketAudioData extends Packet {
 		int id = buf.readInt();
 		AudioPacket packet = new AudioPacket();
 		packet.readData(buf);
+	}
 
+	@Override
+	public void apply() {
 		AudioData audioData = packet.getData();
 		if (audioData instanceof IDataSound) {
 			IDataSound sound = (IDataSound) audioData;

@@ -22,6 +22,7 @@ import io.netty.buffer.ByteBuf;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -34,6 +35,11 @@ public class PacketItemUpdate extends PacketTile {
 	protected PipeItem item;
 	private static final TIntObjectMap<WeakReference<PipeItem>> itemIdCache = new TIntObjectHashMap<WeakReference<PipeItem>>();
 	private boolean syncStack;
+
+	private ItemStack stack;
+	private short id;
+	private int dirs, flags, progress;
+	private boolean addWhenDone;
 
 	public PacketItemUpdate() {
 		super();
@@ -50,15 +56,39 @@ public class PacketItemUpdate extends PacketTile {
 			return;
 		}
 
-		short id = buf.readShort();
-		int dirs = buf.readUnsignedByte();
-		int flags = buf.readUnsignedByte();
-		int progress = buf.readUnsignedByte();
-		boolean addWhenDone = false;
+		id = buf.readShort();
+		dirs = buf.readUnsignedByte();
+		flags = buf.readUnsignedByte();
+		progress = buf.readUnsignedByte();
+		addWhenDone = false;
+		syncStack = (flags & 0x04) != 0;
 
+		if (syncStack) {
+			stack = ByteBufUtils.readItemStack(buf);
+		}
+	}
+
+	public void writeItemData(ByteBuf buf) {
+		buf.writeShort(item.id);
+		buf.writeByte(DirectionUtils.ordinal(item.input) | (DirectionUtils.ordinal(item.output) << 3));
+		buf.writeByte((item.reachedCenter ? 0x01 : 0) | (item.isStuck() ? 0x02 : 0) | (syncStack ? 0x04 : 0));
+		buf.writeByte(item.progress);
+
+		if (syncStack) {
+			ByteBufUtils.writeItemStack(buf, item.getStack());
+		}
+	}
+
+	@Override
+	public void readData(INetHandler handler, ByteBuf buf) {
+		super.readData(handler, buf);
+		readItemData(buf);
+	}
+
+	@Override
+	public void apply() {
 		WeakReference<PipeItem> ref = itemIdCache.get(id);
 		item = ref != null ? ref.get() : null;
-		syncStack = (flags & 0x04) != 0;
 
 		if (item != null && (item.getOwner() != tile || !item.getOwner().getPipeItems().contains(item))) {
 			item.getOwner().removeItemClientSide(item);
@@ -68,6 +98,9 @@ public class PacketItemUpdate extends PacketTile {
 
 		if (item == null) {
 			TilePipe pipe = (TilePipe) tile;
+			if (pipe == null) {
+				return;
+			}
 			item = pipe.getItemByID(id);
 		}
 
@@ -93,7 +126,7 @@ public class PacketItemUpdate extends PacketTile {
 		item.setStuckFlagClient(stuck);
 
 		if (syncStack) {
-			item.stack = ByteBufUtils.readItemStack(buf);
+			item.stack = stack;
 		}
 
 		itemIdCache.put(id, new WeakReference<PipeItem>(item));
@@ -103,26 +136,14 @@ public class PacketItemUpdate extends PacketTile {
 		}
 	}
 
-	public void writeItemData(ByteBuf buf) {
-		buf.writeShort(item.id);
-		buf.writeByte(DirectionUtils.ordinal(item.input) | (DirectionUtils.ordinal(item.output) << 3));
-		buf.writeByte((item.reachedCenter ? 0x01 : 0) | (item.isStuck() ? 0x02 : 0) | (syncStack ? 0x04 : 0));
-		buf.writeByte(item.progress);
-
-		if (syncStack) {
-			ByteBufUtils.writeItemStack(buf, item.getStack());
-		}
-	}
-
-	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
-		super.readData(handler, buf);
-		readItemData(buf);
-	}
-
 	@Override
 	public void writeData(ByteBuf buf) {
 		super.writeData(buf);
 		writeItemData(buf);
+	}
+
+	@Override
+	public boolean isAsynchronous() {
+		return false;
 	}
 }

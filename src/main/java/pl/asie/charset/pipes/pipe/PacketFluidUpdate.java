@@ -27,6 +27,9 @@ import pl.asie.charset.lib.network.PacketTile;
 
 public class PacketFluidUpdate extends PacketTile {
 	protected PipeFluidContainer container;
+	private String fluidID;
+	private int fluidColor;
+	private int[] fluidAmounts = new int[7];
 	private boolean ignoreDirty;
 
 	public PacketFluidUpdate() {
@@ -48,20 +51,17 @@ public class PacketFluidUpdate extends PacketTile {
 		int sides = buf.readUnsignedByte();
 
 		if ((sides & 128) != 0) {
-			String fluidString = ByteBufUtils.readUTF8String(buf);
-			if (fluidString.length() > 0) {
-				container.fluidColor = buf.readInt();
-				container.fluidStack = new FluidStack(FluidRegistry.getFluid(fluidString), 1000);
-			} else {
-				container.fluidColor = 0;
-				container.fluidStack = null;
+			fluidID = ByteBufUtils.readUTF8String(buf);
+			if (fluidID.length() > 0) {
+				fluidColor = buf.readInt();
 			}
 		}
 
 		for (int i = 0; i <= 6; i++) {
 			if ((sides & (1 << i)) != 0) {
-				PipeFluidContainer.Tank tank = container.tanks[i];
-				tank.amount = buf.readUnsignedShort();
+				fluidAmounts[i] = buf.readUnsignedShort();
+			} else {
+				fluidAmounts[i] = -1;
 			}
 		}
 	}
@@ -109,8 +109,32 @@ public class PacketFluidUpdate extends PacketTile {
 	}
 
 	@Override
+	public void apply() {
+		if (fluidID != null) {
+			if (fluidID.length() > 0) {
+				container.fluidColor = fluidColor;
+				container.fluidStack = new FluidStack(FluidRegistry.getFluid(fluidID), 1000);
+			} else {
+				container.fluidColor = 0;
+				container.fluidStack = null;
+			}
+		}
+
+		for (int i = 0; i <= 6; i++) {
+			if (fluidAmounts[i] >= 0) {
+				container.tanks[i].amount = fluidAmounts[i];
+			}
+		}
+	}
+
+	@Override
 	public void writeData(ByteBuf buf) {
 		super.writeData(buf);
 		writeFluidData(buf);
+	}
+
+	@Override
+	public boolean isAsynchronous() {
+		return false;
 	}
 }

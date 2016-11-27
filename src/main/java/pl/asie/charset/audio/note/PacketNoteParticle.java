@@ -41,6 +41,10 @@ public class PacketNoteParticle extends PacketTile {
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
 		note = buf.readByte();
+	}
+
+	@Override
+	public void apply() {
 		if (tile != null) {
 			BlockPos pos = tile.getPos();
 			tile.getWorld().spawnParticle(EnumParticleTypes.NOTE, (double) pos.getX() + 0.5D, (double) pos.getY() + 1.2D, (double) pos.getZ() + 0.5D,
@@ -52,5 +56,10 @@ public class PacketNoteParticle extends PacketTile {
 	public void writeData(ByteBuf buf) {
 		super.writeData(buf);
 		buf.writeByte(note);
+	}
+
+	@Override
+	public boolean isAsynchronous() {
+		return false;
 	}
 }

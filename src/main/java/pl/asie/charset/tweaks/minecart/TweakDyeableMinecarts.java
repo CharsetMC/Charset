@@ -122,8 +122,9 @@ public class TweakDyeableMinecarts extends Tweak {
 	@SubscribeEvent
 	public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
 		 if (!event.getTarget().world.isRemote
-				&& event.getTarget() instanceof EntityMinecart
-				&& ColorUtils.isDye(event.getEntityPlayer().getHeldItem(event.getHand()))) {
+				 && event.getTarget() instanceof EntityMinecart
+				 && event.getEntityPlayer().isSneaking()
+				 && ColorUtils.isDye(event.getEntityPlayer().getHeldItem(event.getHand()))) {
 			MinecartDyeable properties = MinecartDyeable.get((EntityMinecart) event.getTarget());
 			if (properties != null) {
 				properties.setColor(ColorUtils.getRGBColor(ColorUtils.getColorIDFromDye(event.getEntityPlayer().getHeldItem(event.getHand()))));

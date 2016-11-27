@@ -35,11 +35,21 @@ public class PacketAudioStop extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		AudioStreamManager.INSTANCE.remove(buf.readInt());
+		this.id = buf.readInt();
+	}
+
+	@Override
+	public void apply() {
+		AudioStreamManager.INSTANCE.remove(id);
 	}
 
 	@Override
 	public void writeData(ByteBuf buf) {
 		buf.writeInt(id);
+	}
+
+	@Override
+	public boolean isAsynchronous() {
+		return false;
 	}
 }

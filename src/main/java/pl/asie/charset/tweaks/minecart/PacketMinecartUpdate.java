@@ -27,6 +27,8 @@ import pl.asie.charset.lib.network.PacketEntity;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 
 public class PacketMinecartUpdate extends PacketEntity {
+	private int color;
+
 	public PacketMinecartUpdate() {
 		super();
 	}
@@ -49,20 +51,14 @@ public class PacketMinecartUpdate extends PacketEntity {
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
-		final int color = buf.readInt();
+		color = buf.readInt();
+	}
 
+	@Override
+	public void apply() {
 		if (entity instanceof EntityMinecart) {
 			final EntityMinecart minecart = (EntityMinecart) entity;
-			if (!Minecraft.getMinecraft().isCallingFromMinecraftThread()) {
-				Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-					@Override
-					public void run() {
-						update(minecart, color);
-					}
-				});
-			} else {
-				update(minecart, color);
-			}
+			update(minecart, color);
 		}
 	}
 
@@ -73,5 +69,10 @@ public class PacketMinecartUpdate extends PacketEntity {
 		EntityMinecart minecart = (EntityMinecart) entity;
 		MinecartDyeable properties = MinecartDyeable.get(minecart);
 		buf.writeInt(properties != null ? properties.getColor() : -1);
+	}
+
+	@Override
+	public boolean isAsynchronous() {
+		return false;
 	}
 }
