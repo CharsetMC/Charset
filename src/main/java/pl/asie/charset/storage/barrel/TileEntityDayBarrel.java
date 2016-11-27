@@ -223,7 +223,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         item.setCount(compound.getInteger("count"));
         orientation = Orientation.getOrientation(compound.getByte("dir"));
         type = Type.VALUES[compound.getByte("type")];
-        if (!compound.hasKey("log")) {
+        if (compound.hasKey("log")) {
             woodLog = new ItemStack(compound.getCompoundTag("log"));
             if (woodLog.isEmpty()) {
                 woodLog = DEFAULT_LOG;

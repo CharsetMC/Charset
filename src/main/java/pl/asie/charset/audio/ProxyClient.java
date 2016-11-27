@@ -17,6 +17,7 @@
 package pl.asie.charset.audio;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import pl.asie.charset.audio.tape.ItemTape;
 
 public class ProxyClient extends ProxyCommon {

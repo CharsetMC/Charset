@@ -151,7 +151,7 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		if (Loader.isModLoaded("NotEnoughCodecs")) {
+		if (Loader.isModLoaded("notenoughcodecs")) {
 			logger.info("NotEnoughCodecs present, MP3 and MP4 support available");
 		}
 	}

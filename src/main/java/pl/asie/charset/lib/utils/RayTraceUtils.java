@@ -98,93 +98,93 @@ public final class RayTraceUtils {
 		start = start.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
 		end = end.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
 
-		Vec3d vec0 = start.getIntermediateWithXValue(end, aabb.minX);
-		Vec3d vec1 = start.getIntermediateWithXValue(end, aabb.maxX);
-		Vec3d vec2 = start.getIntermediateWithYValue(end, aabb.minY);
-		Vec3d vec3 = start.getIntermediateWithYValue(end, aabb.maxY);
-		Vec3d vec4 = start.getIntermediateWithZValue(end, aabb.minZ);
-		Vec3d vec5 = start.getIntermediateWithZValue(end, aabb.maxZ);
+		Vec3d vecWest = start.getIntermediateWithXValue(end, aabb.minX);
+		Vec3d vecEast = start.getIntermediateWithXValue(end, aabb.maxX);
+		Vec3d vecDown = start.getIntermediateWithYValue(end, aabb.minY);
+		Vec3d vecUp = start.getIntermediateWithYValue(end, aabb.maxY);
+		Vec3d vecNorth = start.getIntermediateWithZValue(end, aabb.minZ);
+		Vec3d vecSouth = start.getIntermediateWithZValue(end, aabb.maxZ);
 
-		if (!isVecInsideYZBounds(aabb, vec0)) {
-			vec0 = null;
+		if (!isVecInsideYZBounds(aabb, vecWest)) {
+			vecWest = null;
 		}
 
-		if (!isVecInsideYZBounds(aabb, vec1)) {
-			vec1 = null;
+		if (!isVecInsideYZBounds(aabb, vecEast)) {
+			vecEast = null;
 		}
 
-		if (!isVecInsideXZBounds(aabb, vec2)) {
-			vec2 = null;
+		if (!isVecInsideXZBounds(aabb, vecDown)) {
+			vecDown = null;
 		}
 
-		if (!isVecInsideXZBounds(aabb, vec3)) {
-			vec3 = null;
+		if (!isVecInsideXZBounds(aabb, vecUp)) {
+			vecUp = null;
 		}
 
-		if (!isVecInsideXYBounds(aabb, vec4)) {
-			vec4 = null;
+		if (!isVecInsideXYBounds(aabb, vecNorth)) {
+			vecNorth = null;
 		}
 
-		if (!isVecInsideXYBounds(aabb, vec5)) {
-			vec5 = null;
+		if (!isVecInsideXYBounds(aabb, vecSouth)) {
+			vecSouth = null;
 		}
 
-		Vec3d vec6 = null;
+		Vec3d vecHit = null;
 
-		if (vec0 != null && (vec6 == null || start.squareDistanceTo(vec0) < start.squareDistanceTo(vec6))) {
-			vec6 = vec0;
+		if (vecWest != null && (vecHit == null || start.squareDistanceTo(vecWest) < start.squareDistanceTo(vecHit))) {
+			vecHit = vecWest;
 		}
 
-		if (vec1 != null && (vec6 == null || start.squareDistanceTo(vec1) < start.squareDistanceTo(vec6))) {
-			vec6 = vec1;
+		if (vecEast != null && (vecHit == null || start.squareDistanceTo(vecEast) < start.squareDistanceTo(vecHit))) {
+			vecHit = vecEast;
 		}
 
-		if (vec2 != null && (vec6 == null || start.squareDistanceTo(vec2) < start.squareDistanceTo(vec6))) {
-			vec6 = vec2;
+		if (vecDown != null && (vecHit == null || start.squareDistanceTo(vecDown) < start.squareDistanceTo(vecHit))) {
+			vecHit = vecDown;
 		}
 
-		if (vec3 != null && (vec6 == null || start.squareDistanceTo(vec3) < start.squareDistanceTo(vec6))) {
-			vec6 = vec3;
+		if (vecUp != null && (vecHit == null || start.squareDistanceTo(vecUp) < start.squareDistanceTo(vecHit))) {
+			vecHit = vecUp;
 		}
 
-		if (vec4 != null && (vec6 == null || start.squareDistanceTo(vec4) < start.squareDistanceTo(vec6))) {
-			vec6 = vec4;
+		if (vecNorth != null && (vecHit == null || start.squareDistanceTo(vecNorth) < start.squareDistanceTo(vecHit))) {
+			vecHit = vecNorth;
 		}
 
-		if (vec5 != null && (vec6 == null || start.squareDistanceTo(vec5) < start.squareDistanceTo(vec6))) {
-			vec6 = vec5;
+		if (vecSouth != null && (vecHit == null || start.squareDistanceTo(vecSouth) < start.squareDistanceTo(vecHit))) {
+			vecHit = vecSouth;
 		}
 
-		if (vec6 == null) {
+		if (vecHit == null) {
 			return null;
 		} else {
-			EnumFacing enumfacing = null;
+			EnumFacing sideHit = null;
 
-			if (vec6 == vec0) {
-				enumfacing = EnumFacing.WEST;
+			if (vecHit == vecWest) {
+				sideHit = EnumFacing.WEST;
 			}
 
-			if (vec6 == vec1) {
-				enumfacing = EnumFacing.EAST;
+			if (vecHit == vecEast) {
+				sideHit = EnumFacing.EAST;
 			}
 
-			if (vec6 == vec2) {
-				enumfacing = EnumFacing.DOWN;
+			if (vecHit == vecDown) {
+				sideHit = EnumFacing.DOWN;
 			}
 
-			if (vec6 == vec3) {
-				enumfacing = EnumFacing.UP;
+			if (vecHit == vecUp) {
+				sideHit = EnumFacing.UP;
 			}
 
-			if (vec6 == vec4) {
-				enumfacing = EnumFacing.NORTH;
+			if (vecHit == vecNorth) {
+				sideHit = EnumFacing.NORTH;
 			}
 
-			if (vec6 == vec5) {
-				enumfacing = EnumFacing.SOUTH;
+			if (vecHit == vecSouth) {
+				sideHit = EnumFacing.SOUTH;
 			}
 
-			RayTraceResult mop = new RayTraceResult(vec6.addVector((double) pos.getX(), (double) pos.getY(), (double) pos.getZ()), enumfacing, pos);
+			RayTraceResult mop = new RayTraceResult(vecHit.addVector((double) pos.getX(), (double) pos.getY(), (double) pos.getZ()), sideHit, pos);
 			mop.subHit = subHit;
 			return mop;
 		}
