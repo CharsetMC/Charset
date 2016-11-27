@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.Optional;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
+import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -34,6 +35,7 @@ import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
+import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.redstone.*;
 
 public class Capabilities {
@@ -44,6 +46,8 @@ public class Capabilities {
 
 	@CapabilityInject(IItemInsertionHandler.class)
 	public static Capability<IItemInsertionHandler> ITEM_INSERTION_HANDLER;
+	@CapabilityInject(IPipeView.class)
+	public static Capability<IPipeView> PIPE_VIEW;
 
 	@CapabilityInject(IBundledEmitter.class)
 	public static Capability<IBundledEmitter> BUNDLED_EMITTER;
@@ -59,6 +63,7 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<IAudioReceiver>(), DefaultAudioReceiver.class);
 
 		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<IItemInsertionHandler>(), DefaultItemInsertionHandler.class);
+		CapabilityManager.INSTANCE.register(IPipeView.class, new NullCapabilityStorage<IPipeView>(), DefaultPipeView.class);
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter.class);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter.class);
@@ -78,5 +83,7 @@ public class Capabilities {
 //		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneEmitterWrapper());
 //		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledReceiverWrapper());
 //		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneReceiverWrapper());
+//		CapabilityWrapperRegistry.registerCapabilityWrapper(new ItemInsertionHandlerWrapper());
+//		CapabilityWrapperRegistry.registerCapabilityWrapper(new PipeViewWrapper());
 	}
 }

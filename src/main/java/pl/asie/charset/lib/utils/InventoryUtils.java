@@ -37,13 +37,17 @@ public final class InventoryUtils {
 	}
 
 	public static IItemInsertionHandler getItemInsertionHandler(ICapabilityProvider tile, EnumFacing facing) {
+		return getItemInsertionHandler(tile, facing, false);
+	}
+
+	public static IItemInsertionHandler getItemInsertionHandler(ICapabilityProvider tile, EnumFacing facing, boolean ignoreRealHandlers) {
 		if (tile == null) {
 			return null;
 		}
 
 		if (tile.hasCapability(Capabilities.ITEM_INSERTION_HANDLER, facing)) {
 			return tile.getCapability(Capabilities.ITEM_INSERTION_HANDLER, facing);
-		} else {
+		} else if (!ignoreRealHandlers) {
 			IItemHandler handler = getItemHandler(tile, facing);
 			if (handler != null) {
 				return new IItemInsertionHandler() {

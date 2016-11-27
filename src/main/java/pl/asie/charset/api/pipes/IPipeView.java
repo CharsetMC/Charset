@@ -20,19 +20,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
- * This interface is implemented by Charset's pipes.
- * Please do not implement it yourself.
+ * This interface is used for viewing items travelling through a pipe.
+ * Note that the pipe can decide the contents at its own discretion and
+ * that it is not necessarily exhaustive - the idea is to let other mods
+ * react - and only react - to the act of items travelling inside a pipe.
  */
-public interface IPipe {
+public interface IPipeView {
 	/**
-	 * Get the stack closest to the middle of a given side of the pipe.
-	 * WARNING: This is not a free function and should be used primarily
-	 * by item detectors.
-	 *
-	 * @param side The side (null - center)
-	 * @return The closest stack found.
+	 * Get a list of visible stacks travelling in a pipe.
 	 */
-	@Nullable ItemStack getTravellingStack(@Nullable EnumFacing side);
+	Collection<ItemStack> getTravellingStacks();
 }

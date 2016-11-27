@@ -1,5 +1,6 @@
 package pl.asie.charset.pipes.pipe;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -9,30 +10,49 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
-import pl.asie.charset.api.pipes.IPipe;
+import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.misc.IConnectable;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
-import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable {
+public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable {
+    public class InsertionHandler implements IItemInsertionHandler {
+        private final EnumFacing facing;
+
+        private InsertionHandler(EnumFacing facing) {
+            this.facing = facing;
+        }
+
+        @Override
+        public ItemStack insertItem(ItemStack stack, boolean simulate) {
+            if (getWorld() == null || getWorld().isRemote || !connects(facing)) {
+                return stack;
+            }
+
+            PipeItem item = new PipeItem(TilePipe.this, stack, facing);
+
+            if (injectItemInternal(item, facing, simulate)) {
+                return ItemStack.EMPTY;
+            } else {
+                return stack;
+            }
+        }
+    }
+
     public static final GenericExtendedProperty<TilePipe> PROPERTY = new GenericExtendedProperty<TilePipe>("part", TilePipe.class);
 
     final PipeFluidContainer fluid = new PipeFluidContainer(this);
@@ -48,22 +68,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 
     public TilePipe() {
         for (EnumFacing facing : EnumFacing.VALUES)
-            insertionHandlers[facing.ordinal()] = new IItemInsertionHandler() {
-                @Override
-                public ItemStack insertItem(ItemStack stack, boolean simulate) {
-                    if (getWorld() == null || getWorld().isRemote || !connects(facing)) {
-                        return stack;
-                    }
-
-                    PipeItem item = new PipeItem(TilePipe.this, stack, facing);
-
-                    if (injectItemInternal(item, facing, simulate)) {
-                        return ItemStack.EMPTY;
-                    } else {
-                        return stack;
-                    }
-                }
-            };
+            insertionHandlers[facing.ordinal()] = new InsertionHandler(facing);
     }
 
     public TileEntity getNeighbourTile(EnumFacing side) {
@@ -449,46 +454,18 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
     }
 
     @Override
-    public ItemStack getTravellingStack(EnumFacing side) {
-        float targetError = 1000f;
-        PipeItem targetItem = null;
+    public Collection<ItemStack> getTravellingStacks() {
+        ImmutableList.Builder<ItemStack> builder = new ImmutableList.Builder<>();
 
         synchronized (itemSet) {
             for (PipeItem p : itemSet) {
-                float error;
-
-                if (side == null) {
-                    error = Math.abs(p.getProgress() - 0.5f);
-
-                    if (error > 0.25f) {
-                        continue;
-                    }
-                } else {
-                    if (p.getDirection() == null) {
-                        continue;
-                    }
-
-                    if (p.getProgress() <= 0.25f && side == p.getDirection().getOpposite()) {
-                        error = Math.abs(p.getProgress() - 0.125f);
-                    } else if (p.getProgress() >= 0.75f && side == p.getDirection()) {
-                        error = Math.abs(p.getProgress() - 0.875f);
-                    } else {
-                        continue;
-                    }
-
-                    if (error > 0.125f) {
-                        continue;
-                    }
-                }
-
-                if (error < targetError) {
-                    targetError = error;
-                    targetItem = p;
+                if (p.isValid()) {
+                    builder.add(p.getStack());
                 }
             }
         }
 
-        return targetItem != null ? targetItem.getStack() : null;
+        return builder.build();
     }
 
     @Override
@@ -498,28 +475,27 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (facing != null) {
-            if (connects(facing)) {
-                return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
-                        || capability == Capabilities.ITEM_INSERTION_HANDLER;
-            }
+        if (facing != null && connects(facing)) {
+            return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
+                    || capability == Capabilities.ITEM_INSERTION_HANDLER;
+        } else {
+            return capability == Capabilities.PIPE_VIEW;
         }
-
-        return false;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (facing != null) {
-            if (connects(facing)) {
-                if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-                    return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluid.tanks[facing.ordinal()]);
-                } else if (capability == Capabilities.ITEM_INSERTION_HANDLER) {
-                    return Capabilities.ITEM_INSERTION_HANDLER.cast(insertionHandlers[facing.ordinal()]);
-                }
+        if (facing != null && connects(facing)) {
+            if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+                return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluid.tanks[facing.ordinal()]);
+            } else if (capability == Capabilities.ITEM_INSERTION_HANDLER) {
+                return Capabilities.ITEM_INSERTION_HANDLER.cast(insertionHandlers[facing.ordinal()]);
+            }
+        } else {
+            if (capability == Capabilities.PIPE_VIEW) {
+                return Capabilities.PIPE_VIEW.cast(this);
             }
         }
-
         return null;
     }
 }
