@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
+import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -32,6 +33,7 @@ import pl.asie.charset.lib.capability.*;
 import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
+import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.redstone.*;
 
 public class Capabilities {
@@ -39,6 +41,9 @@ public class Capabilities {
 	public static Capability<IAudioSource> AUDIO_SOURCE;
 	@CapabilityInject(IAudioReceiver.class)
 	public static Capability<IAudioReceiver> AUDIO_RECEIVER;
+
+	@CapabilityInject(IItemInsertionHandler.class)
+	public static Capability<IItemInsertionHandler> ITEM_INSERTION_HANDLER;
 
 	@CapabilityInject(IBundledEmitter.class)
 	public static Capability<IBundledEmitter> BUNDLED_EMITTER;
@@ -53,11 +58,11 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource.class);
 		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<IAudioReceiver>(), DefaultAudioReceiver.class);
 
+		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<IItemInsertionHandler>(), DefaultItemInsertionHandler.class);
+
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter.class);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter.class);
-
 		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver.class);
-
 		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver.class);
 
 		if (Loader.isModLoaded("mcmultipart")) {

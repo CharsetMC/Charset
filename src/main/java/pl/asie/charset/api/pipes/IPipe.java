@@ -19,15 +19,13 @@ package pl.asie.charset.api.pipes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
-import pl.asie.charset.api.lib.IItemInjectable;
-
 import javax.annotation.Nullable;
 
 /**
  * This interface is implemented by Charset's pipes.
  * Please do not implement it yourself.
  */
-public interface IPipe extends IItemInjectable {
+public interface IPipe {
 	/**
 	 * Get the stack closest to the middle of a given side of the pipe.
 	 * WARNING: This is not a free function and should be used primarily

@@ -29,7 +29,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.items.IItemHandler;
 
-import pl.asie.charset.api.lib.IItemInjectable;
+import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.InventoryUtils;
@@ -270,10 +270,7 @@ public class PipeItem {
 					return;
 				} else {
 					TileEntity tile = owner.getNeighbourTile(output);
-
-					if (!passToInjectable(tile, output, false)) {
-						addToItemHandler(tile, output, false);
-					}
+					passToInjectable(tile, output, false);
 				}
 			}
 
@@ -288,23 +285,10 @@ public class PipeItem {
 			return false;
 		}
 
-		TilePipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(dir), dir.getOpposite());
-
-		if (pipe != null) {
-			return pipe.canInjectItems(dir.getOpposite());
-		}
-
 		TileEntity tile = owner.getNeighbourTile(dir);
 
 		if (tile != null) {
-			if (tile instanceof IItemInjectable) {
-				return ((IItemInjectable) tile).canInjectItems(dir.getOpposite());
-			} else {
-				IItemHandler handler = InventoryUtils.getItemHandler(tile, dir.getOpposite());
-				if (handler != null && handler.getSlots() > 0) {
-					return true;
-				}
-			}
+			return InventoryUtils.getItemInsertionHandler(tile, dir.getOpposite()) != null;
 		}
 
 		return false;
@@ -335,10 +319,6 @@ public class PipeItem {
 		TileEntity tile = owner.getNeighbourTile(dir);
 
 		if (passToInjectable(tile, dir, true)) {
-			return true;
-		}
-
-		if (addToItemHandler(tile, dir, true)) {
 			return true;
 		}
 
@@ -474,23 +454,20 @@ public class PipeItem {
 	}
 
 	private boolean passToInjectable(TileEntity tile, EnumFacing dir, boolean simulate) {
-		/* if (tile instanceof IMultipartContainer) {
-			IMultipart part = ((IMultipartContainer) tile).getPartInSlot(PartSlot.CENTER);
-			if (part instanceof TilePipe) {
-				return false;
-			}
-		} */
 		if (tile instanceof TilePipe) {
 			return false;
 		}
 
-		if (tile instanceof IItemInjectable) {
-			int added = ((IItemInjectable) tile).injectItem(stack, dir.getOpposite(), simulate);
-			if (added > 0) {
-				if (!simulate) {
-					stack.shrink(added);
-				}
+		IItemInsertionHandler handler = InventoryUtils.getItemInsertionHandler(tile, dir);
+		if (handler != null) {
+			if (owner.getWorld().isRemote) {
 				return true;
+			} else {
+				ItemStack newStack = handler.insertItem(stack, simulate);
+				if (!simulate) {
+					stack = newStack;
+				}
+				return newStack.isEmpty();
 			}
 		}
 
@@ -501,44 +478,6 @@ public class PipeItem {
 		if (pipe != null) {
 			if (pipe.injectItemInternal(this, dir.getOpposite(), simulate)) {
 				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private boolean addToItemHandler(TileEntity tile, EnumFacing dir, boolean simulate) {
-		if (tile != null) {
-			int stackSize = stack.getCount();
-			IItemHandler handler = InventoryUtils.getItemHandler(tile, dir.getOpposite());
-			if (handler != null) {
-				if (owner.getWorld().isRemote) {
-					return true;
-				}
-
-				for (int i = 0; i < handler.getSlots(); i++) {
-					ItemStack remain = handler.insertItem(i, stack, simulate);
-					int added = stack.getCount();
-					if (!remain.isEmpty()) {
-						added -= remain.getCount();
-					}
-					stackSize -= added;
-					if (stackSize == 0) {
-						if (!simulate) {
-							stack = ItemStack.EMPTY;
-						}
-						return true;
-					} else if (!simulate) {
-						stack = stack.copy();
-						stack.setCount(stackSize);
-					}
-				}
-
-				if (stackSize > 0 && !simulate) {
-					stack = stack.copy();
-					stack.setCount(stackSize);
-					return true;
-				}
 			}
 		}
 

@@ -31,6 +31,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.utils.InventoryUtils;
@@ -187,28 +188,31 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
-			if (input != null && output != null && output.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite())) {
-				IFluidHandler inTank = FluidUtils.getFluidHandler(input, direction);
-				if (inTank != null) {
-					FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
-					if (stack != null && matches(stack)) {
-						FluidUtils.push(inTank, output.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()), stack);
+			if (input != null && output != null) {
+				if (output.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite())) {
+					IFluidHandler inTank = FluidUtils.getFluidHandler(input, direction);
+					if (inTank != null) {
+						FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
+						if (stack != null && matches(stack)) {
+							FluidUtils.push(inTank, output.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()), stack);
+						}
 					}
 				}
 
 				if (ticker % 16 == 0) {
 					IItemHandler handler = InventoryUtils.getItemHandler(input, direction);
-					if (handler != null) {
+					IItemInsertionHandler outHandler = InventoryUtils.getItemInsertionHandler(output, direction.getOpposite());
+					if (handler != null && outHandler != null) {
 						for (int i = 0; i < handler.getSlots(); i++) {
 							ItemStack source = handler.getStackInSlot(i);
 							if (!source.isEmpty() && matches(source)) {
 								int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
 								ItemStack stack = handler.extractItem(i, maxSize, true);
 								if (!stack.isEmpty()) {
-									if (output.injectItem(stack, direction.getOpposite(), true) == stack.getCount()) {
+									if (outHandler.insertItem(stack, true).isEmpty()) {
 										stack = handler.extractItem(i, maxSize, false);
 										if (!stack.isEmpty()) {
-											output.injectItem(stack, direction.getOpposite(), false);
+											outHandler.insertItem(stack, false);
 										}
 
 										return;

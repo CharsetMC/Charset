@@ -18,18 +18,44 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import pl.asie.charset.api.lib.IItemInsertionHandler;
+import pl.asie.charset.lib.Capabilities;
 
 public final class InventoryUtils {
 	private InventoryUtils() {
 
+	}
+
+	public static IItemInsertionHandler getItemInsertionHandler(ICapabilityProvider tile, EnumFacing facing) {
+		if (tile == null) {
+			return null;
+		}
+
+		if (tile.hasCapability(Capabilities.ITEM_INSERTION_HANDLER, facing)) {
+			return tile.getCapability(Capabilities.ITEM_INSERTION_HANDLER, facing);
+		} else {
+			IItemHandler handler = getItemHandler(tile, facing);
+			if (handler != null) {
+				return new IItemInsertionHandler() {
+					@Override
+					public ItemStack insertItem(ItemStack stack, boolean simulate) {
+						return ItemHandlerHelper.insertItem(handler, stack, simulate);
+					}
+				};
+			}
+		}
+
+		return null;
 	}
 
 	public static IItemHandler getItemHandler(ICapabilityProvider tile, EnumFacing facing) {

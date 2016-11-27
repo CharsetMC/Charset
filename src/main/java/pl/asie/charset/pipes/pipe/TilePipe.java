@@ -15,8 +15,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
+import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IPipe;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.misc.IConnectable;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
@@ -38,10 +40,31 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 
     protected int[] shifterDistance = new int[6];
 
+    private final IItemInsertionHandler[] insertionHandlers = new IItemInsertionHandler[6];
     private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
     private byte connectionCache = 0;
     private boolean neighborBlockChanged;
     private boolean requestUpdate;
+
+    public TilePipe() {
+        for (EnumFacing facing : EnumFacing.VALUES)
+            insertionHandlers[facing.ordinal()] = new IItemInsertionHandler() {
+                @Override
+                public ItemStack insertItem(ItemStack stack, boolean simulate) {
+                    if (getWorld() == null || getWorld().isRemote || !connects(facing)) {
+                        return stack;
+                    }
+
+                    PipeItem item = new PipeItem(TilePipe.this, stack, facing);
+
+                    if (injectItemInternal(item, facing, simulate)) {
+                        return ItemStack.EMPTY;
+                    } else {
+                        return stack;
+                    }
+                }
+            };
+    }
 
     public TileEntity getNeighbourTile(EnumFacing side) {
         return side != null ? getWorld().getTileEntity(getPos().offset(side)) : null;
@@ -268,17 +291,17 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
     }
 
     private void updateNeighborInfo(boolean sendPacket) {
-        if (!getWorld().isRemote) {
-            byte oc = connectionCache;
+        byte oc = connectionCache;
 
-            for (EnumFacing dir : EnumFacing.VALUES) {
-                updateConnections(dir);
+        for (EnumFacing dir : EnumFacing.VALUES) {
+            updateConnections(dir);
+            if (!getWorld().isRemote) {
                 updateShifterSide(dir);
             }
+        }
 
-            if (sendPacket && connectionCache != oc) {
-                markBlockForUpdate();
-            }
+        if (sendPacket && connectionCache != oc) {
+            markBlockForUpdate();
         }
     }
 
@@ -388,26 +411,6 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
         }
     }
 
-    @Override
-    public boolean canInjectItems(EnumFacing side) {
-        return connects(side);
-    }
-
-    @Override
-    public int injectItem(ItemStack stack, EnumFacing direction, boolean simulate) {
-        if (getWorld() == null || getWorld().isRemote || !connects(direction)) {
-            return 0;
-        }
-
-        PipeItem item = new PipeItem(this, stack, direction);
-
-        if (injectItemInternal(item, direction, simulate)) {
-            return stack.getCount();
-        } else {
-            return 0;
-        }
-    }
-
     protected void scheduleRenderUpdate() {
         if (getWorld() != null) {
             getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
@@ -495,13 +498,26 @@ public class TilePipe extends TileBase implements IConnectable, IPipe, ITickable
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && facing != null;
+        if (facing != null) {
+            if (connects(facing)) {
+                return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
+                        || capability == Capabilities.ITEM_INSERTION_HANDLER;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && facing != null) {
-            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluid.tanks[facing.ordinal()]);
+        if (facing != null) {
+            if (connects(facing)) {
+                if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+                    return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluid.tanks[facing.ordinal()]);
+                } else if (capability == Capabilities.ITEM_INSERTION_HANDLER) {
+                    return Capabilities.ITEM_INSERTION_HANDLER.cast(insertionHandlers[facing.ordinal()]);
+                }
+            }
         }
 
         return null;

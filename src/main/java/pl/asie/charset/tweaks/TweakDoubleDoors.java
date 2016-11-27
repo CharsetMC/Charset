@@ -68,16 +68,20 @@ public class TweakDoubleDoors extends Tweak {
 	@Override
 	public boolean init() {
 		for (Block block : Block.REGISTRY) {
-			if (block != null && block instanceof BlockDoor) {
-				Class c = block.getClass();
-				Method m = ReflectionHelper.findMethod(c, block, new String[]{"onBlockActivated", "func_180639_a"},
-						World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
-						EnumHand.class, EnumFacing.class,
-						float.class, float.class, float.class);
-				if (m != null && m.getDeclaringClass() == BlockDoor.class) {
-					allowedDoors.add((BlockDoor) block);
-					System.out.println("Allowing " + block.getRegistryName().toString());
+			try {
+				if (block != null && block instanceof BlockDoor) {
+					Class c = block.getClass();
+					Method m = ReflectionHelper.findMethod(c, block, new String[]{"onBlockActivated", "func_180639_a"},
+							World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
+							EnumHand.class, EnumFacing.class,
+							float.class, float.class, float.class);
+					if (m != null && m.getDeclaringClass() == BlockDoor.class) {
+						allowedDoors.add((BlockDoor) block);
+						System.out.println("Allowing " + block.getRegistryName().toString());
+					}
 				}
+			} catch (ReflectionHelper.UnableToFindMethodException e) {
+				// This is fine.
 			}
 		}
 
