@@ -72,7 +72,7 @@ public class ModCharsetDecoration {
 				"0",
 				"-",
 				"0",
-				'-', Items.PAPER, '0', "slimeball"
+				'-', "paper", '0', "slimeball"
 		));
 	}
 }

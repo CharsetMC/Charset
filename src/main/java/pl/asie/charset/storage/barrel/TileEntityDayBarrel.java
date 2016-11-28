@@ -36,9 +36,6 @@
 
 package pl.asie.charset.storage.barrel;
 
-import gnu.trove.map.TLongLongMap;
-import gnu.trove.map.hash.TLongLongHashMap;
-import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.factorization.Orientation;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.NoticeUpdater;
@@ -261,7 +258,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
     @Override
     public void update() {
-        if (getWorld() == null || getWorld().isRemote) {
+        if (getWorld().isRemote) {
             return;
         }
 
@@ -365,7 +362,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
     public int getMaxSize() {
         int size = 64*64;
-        if (item != null) {
+        if (!item.isEmpty()) {
             size = item.getMaxStackSize()*64;
         }
         if (type == Type.LARGER) {
@@ -375,7 +372,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     public boolean itemMatch(ItemStack is) {
-        if (is == null || item == null) {
+        if (is.isEmpty() || item.isEmpty()) {
             return false;
         }
         return ItemUtils.canMerge(item, is);
@@ -432,7 +429,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             int loadCount = tag.getInteger("SilkCount");
             if (loadCount > 0) {
                 ItemStack loadItem = getSilkedItem(is);
-                if (loadItem != null) {
+                if (!loadItem.isEmpty()) {
                     item = loadItem;
                     item.setCount(loadCount);
                 }
@@ -441,18 +438,18 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     public static ItemStack getSilkedItem(ItemStack is) {
-        if (is == null || !is.hasTagCompound()) {
-            return null;
+        if (is .isEmpty() || !is.hasTagCompound()) {
+            return ItemStack.EMPTY;
         }
         NBTTagCompound tag = is.getTagCompound();
         if (tag.hasKey("SilkItem")) {
             return new ItemStack(is.getTagCompound().getCompoundTag("SilkItem"));
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
     public static boolean isNested(ItemStack is) {
-        return getSilkedItem(is) != null;
+        return !getSilkedItem(is).isEmpty();
     }
 
 
@@ -747,10 +744,10 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         getWorld().setTileEntity(next, this);
         player.addExhaustion(0.5F);
         ItemStack is = player.getHeldItem(hand);
-        if (is != null && is.isItemStackDamageable() && world.rand.nextInt(4) == 0) {
+        if (!is.isEmpty() && is.isItemStackDamageable() && world.rand.nextInt(4) == 0) {
             is.damageItem(distance, player);
             if (is.getCount() <= 0) {
-                player.setHeldItem(hand, null);
+                player.setHeldItem(hand, ItemStack.EMPTY);
             }
         }
         //spillItems(spillage); // Meh!
@@ -856,7 +853,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (type == Type.CREATIVE || (type == Type.SILKY && broken_with_silk_touch)) {
             return;
         }
-        if (item == null || getItemCount() <= 0 ) {
+        if (item.isEmpty() || getItemCount() <= 0 ) {
             return;
         }
         int count = getItemCount();

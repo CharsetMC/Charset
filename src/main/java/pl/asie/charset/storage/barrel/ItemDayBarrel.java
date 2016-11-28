@@ -79,7 +79,7 @@ public class ItemDayBarrel extends ItemBlock {
             TileEntityDayBarrel db = new TileEntityDayBarrel();
             db.loadFromStack(is);
             int count = db.getItemCount();
-            if (count > 0 && db.item != null) {
+            if (count > 0 && !db.item.isEmpty()) {
                 if (db.item.getItem() == this) {
                     list.add("?");
                     return;

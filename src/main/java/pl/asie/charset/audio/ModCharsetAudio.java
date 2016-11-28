@@ -134,8 +134,8 @@ public class ModCharsetAudio {
 		// packet.registerPacket(0x13, PacketDriveRecord.class);
 		// packet.registerPacket(0x14, PacketDriveCounter.class);
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(tapeReelItem), " i ", "ipi", " i ", 'i', "ingotIron", 'p', Items.PAPER));
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(magneticTapeItem, 32), "ddd", "rir", "ddd", 'd', "dyeBlack", 'r', Items.REDSTONE, 'i', "ingotIron"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(tapeReelItem), " i ", "ipi", " i ", 'i', "ingotIron", 'p', "paper"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(magneticTapeItem, 32), "ddd", "rir", "ddd", 'd', "dyeBlack", 'r', "dustRedstone", 'i', "ingotIron"));
 		// GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(partTapeDriveItem), "igi", "rRr", "ipi", 'g', "blockGlass", 'p', Blocks.PISTON, 'R', new ItemStack(tapeReelItem, 1, 0), 'r', Items.REDSTONE, 'i', "ingotIron"));
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerAudio());
