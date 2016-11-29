@@ -22,7 +22,7 @@ import net.minecraftforge.common.capabilities.Capability;
 
 import mcmultipart.capabilities.ICapabilityWrapper;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
-import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.capability.Capabilities;
 
 public class RedstoneEmitterWrapper implements ICapabilityWrapper<IRedstoneEmitter> {
 	@Override

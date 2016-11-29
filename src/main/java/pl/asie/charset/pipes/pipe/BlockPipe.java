@@ -22,8 +22,6 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.Properties;
-import pl.asie.charset.lib.blocks.IMultipleSelectionBoxBlock;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.pipes.PipeUtils;

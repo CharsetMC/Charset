@@ -21,7 +21,7 @@ import java.util.Collection;
 import net.minecraftforge.common.capabilities.Capability;
 import mcmultipart.capabilities.ICapabilityWrapper;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
-import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.capability.Capabilities;
 
 public class RedstoneReceiverWrapper implements ICapabilityWrapper<IRedstoneReceiver> {
 	private class WrappedReceiver implements IRedstoneReceiver {

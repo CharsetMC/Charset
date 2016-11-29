@@ -21,7 +21,7 @@ public final class RecipeUtils {
         }, width, height);
     }
 
-    public static IRecipe getMatchingRecipe(InventoryCrafting crafting, World world) {
+    public static IRecipe findMatchingRecipe(InventoryCrafting crafting, World world) {
         for (IRecipe recipe : CraftingManager.getInstance().getRecipeList()) {
             if (recipe.matches(crafting, world)) {
                 return recipe;

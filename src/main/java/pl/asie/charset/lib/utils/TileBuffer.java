@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.misc;
+package pl.asie.charset.lib.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

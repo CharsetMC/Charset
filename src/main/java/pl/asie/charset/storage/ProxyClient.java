@@ -46,11 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.storage.barrel.BarrelModel;
-import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
-import pl.asie.charset.storage.barrel.RenderMinecartDayBarrel;
-import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
-import pl.asie.charset.storage.barrel.TileEntityDayBarrelRenderer;
+import pl.asie.charset.storage.barrel.*;
 import pl.asie.charset.storage.crate.CrateModel;
 import pl.asie.charset.storage.locking.EntityLock;
 import pl.asie.charset.storage.locking.ItemLock;
@@ -88,6 +84,7 @@ public class ProxyClient extends ProxyCommon {
 
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelBlock);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelItem);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemMinecartDayBarrel.Color(), ModCharsetStorage.barrelCartItem);
 
 		if (ModCharsetLib.INDEV) {
 			Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(crateModel.colorizer, ModCharsetStorage.crateBlock);

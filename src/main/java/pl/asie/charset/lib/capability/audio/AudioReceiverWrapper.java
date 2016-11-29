@@ -20,7 +20,7 @@ import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IAudioReceiver;
-import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
 

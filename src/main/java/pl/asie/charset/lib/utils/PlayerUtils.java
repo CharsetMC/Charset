@@ -54,33 +54,4 @@ public class PlayerUtils {
 	public static boolean isCreative(EntityPlayer player) {
 		return player.capabilities.isCreativeMode;
 	}
-
-	// Weird Factorization stuff
-	public static int getPuntStrengthOrWeakness(EntityPlayer player) {
-		if (player == null) return 1;
-		//strength * knocback
-		int strength = 0;
-		PotionEffect p_str = player.getActivePotionEffect(MobEffects.STRENGTH);
-		PotionEffect p_wea = player.getActivePotionEffect(MobEffects.WEAKNESS);
-		if (p_str != null) {
-			strength += p_str.getAmplifier() + 1;
-		}
-		if (p_wea != null) {
-			strength -= p_wea.getAmplifier() + 1;
-		}
-		int knockback = EnchantmentHelper.getKnockbackModifier(player);
-		return strength * knockback;
-	}
-
-	public static int getPuntStrengthInt(EntityPlayer player) {
-		int str = getPuntStrengthOrWeakness(player);
-		return Math.min(1, str);
-	}
-
-	public static double getPuntStrengthMultiplier(EntityPlayer player) {
-		int str = getPuntStrengthOrWeakness(player);
-		if (str == 0) return 1;
-		if (str < 1) return 1.0 / -str;
-		return str;
-	}
 }

@@ -38,6 +38,7 @@ package pl.asie.charset.storage.barrel;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,11 +55,26 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.items.ItemMinecartCharset;
+import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemMinecartDayBarrel extends ItemMinecartCharset {
+    public static class Color implements IItemColor {
+        @Override
+        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+            if (tintIndex == 1) {
+                BarrelCacheInfo info = BarrelCacheInfo.from(stack);
+                return ColorLookupHandler.INSTANCE.getColor(info.logStack, RenderUtils.AveragingMode.V_EDGES_ONLY);
+            }
+
+            return -1;
+        }
+    }
+
     public ItemMinecartDayBarrel() {
         super();
         setUnlocalizedName("charset.barrelCart");
@@ -86,25 +102,25 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
         return super.getItemStackDisplayName(is);
     }
 
-    ItemStack creative_cart = null;
+    List<ItemStack> todaysCarts = null;
 
     @Override
     public void getSubItems(Item item, CreativeTabs tab, NonNullList<ItemStack> list) {
-        if (creative_cart == null) {
-            ItemStack creative = null;
-            for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels()) {
+        if (todaysCarts == null) {
+            todaysCarts = new ArrayList<>();
+            NonNullList<ItemStack> stacks = NonNullList.create();
+            ModCharsetStorage.barrelBlock.getSubBlocks(ModCharsetStorage.barrelItem,
+                    ModCharsetLib.CREATIVE_TAB, stacks);
+            for (ItemStack barrel : stacks) {
                 TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
-                if (type == TileEntityDayBarrel.Type.CREATIVE) {
-                    creative = barrel;
-                    break;
+                if (type == TileEntityDayBarrel.Type.NORMAL || type == TileEntityDayBarrel.Type.CREATIVE) {
+                    ItemStack barrelCart = makeBarrel(barrel);
+                    todaysCarts.add(barrelCart);
                 }
             }
-            if (creative == null) return;
-            creative_cart = makeBarrel(creative);
         }
-        if (creative_cart != null) {
-            list.add(creative_cart);
-        }
+
+        list.addAll(todaysCarts);
     }
 
     public ItemStack makeBarrel(ItemStack barrelItem) {

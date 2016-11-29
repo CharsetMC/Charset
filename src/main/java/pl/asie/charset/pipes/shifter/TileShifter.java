@@ -29,13 +29,15 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
-import pl.asie.charset.lib.utils.InventoryUtils;
 import pl.asie.charset.lib.Properties;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
@@ -70,11 +72,11 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	private boolean isInput(TileEntity input, EnumFacing direction) {
 		if (input != null) {
-			if (InventoryUtils.getItemHandler(input, direction) != null) {
+			if (CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, input, direction) != null) {
 				return true;
 			}
 
-			IFluidHandler fluidHandler = FluidUtils.getFluidHandler(input, direction);
+			IFluidHandler fluidHandler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, input, direction);
 			if (fluidHandler != null) {
 				return !(fluidHandler instanceof PipeFluidContainer.Tank);
 			}
@@ -163,7 +165,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 		for (ItemStack s : filters) {
 			if (!s.isEmpty()) {
-				IFluidHandler handler = FluidUtils.getFluidHandler(s, null);
+				IFluidHandler handler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, s, null);
 				if (handler != null && FluidUtils.matches(handler, stack)) {
 					return true;
 				}
@@ -189,19 +191,17 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
 			if (input != null && output != null) {
-				if (output.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite())) {
-					IFluidHandler inTank = FluidUtils.getFluidHandler(input, direction);
-					if (inTank != null) {
-						FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
-						if (stack != null && matches(stack)) {
-							FluidUtils.push(inTank, output.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()), stack);
-						}
+				IFluidHandler inTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, input, direction);
+				if (inTank != null) {
+					FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
+					if (stack != null && matches(stack)) {
+						FluidUtils.push(inTank, output.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()), stack);
 					}
 				}
 
 				if (ticker % 16 == 0) {
-					IItemHandler handler = InventoryUtils.getItemHandler(input, direction);
-					IItemInsertionHandler outHandler = InventoryUtils.getItemInsertionHandler(output, direction.getOpposite());
+					IItemHandler handler = CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, input, direction);
+					IItemInsertionHandler outHandler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, output, direction.getOpposite());
 					if (handler != null && outHandler != null) {
 						for (int i = 0; i < handler.getSlots(); i++) {
 							ItemStack source = handler.getStackInSlot(i);

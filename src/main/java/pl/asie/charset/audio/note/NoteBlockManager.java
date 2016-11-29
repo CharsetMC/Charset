@@ -20,8 +20,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.audio.ModCharsetAudio;
-import pl.asie.charset.lib.Capabilities;
-import pl.asie.charset.lib.audio.AudioDataSound;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.audio.AudioDataGameSound;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 
 import javax.annotation.Nullable;
@@ -64,7 +64,7 @@ public class NoteBlockManager {
         if (!worldIn.isRemote) {
             TileEntity note = worldIn.getTileEntity(pos);
             if (note != null && note.hasCapability(Capabilities.AUDIO_SOURCE, null)) {
-                AudioDataSound dataSound = new AudioDataSound(SoundEvent.REGISTRY.getNameForObject(sound).toString(), pitch);
+                AudioDataGameSound dataSound = new AudioDataGameSound(SoundEvent.REGISTRY.getNameForObject(sound).toString(), pitch);
                 AudioPacket packet = new AudioPacket(dataSound, 1.0f);
 
                 for (EnumFacing facing : EnumFacing.VALUES) {

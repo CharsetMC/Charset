@@ -23,8 +23,6 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -69,7 +67,7 @@ import java.util.Random;
 import java.util.UUID;
 
 @Mod(modid = ModCharsetStorage.MODID, name = ModCharsetStorage.NAME, version = ModCharsetStorage.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetStorage {
 	public static final String MODID = "charsetstorage";
 	public static final String NAME = "#";
@@ -235,7 +233,7 @@ public class ModCharsetStorage {
 	private void checkPlankForWoods(ItemStack log) {
 		InventoryCrafting plankCrafting = RecipeUtils.getCraftingInventory(3, 3);
 		plankCrafting.setInventorySlotContents(0, log);
-		IRecipe plankRecipe = RecipeUtils.getMatchingRecipe(plankCrafting, null);
+		IRecipe plankRecipe = RecipeUtils.findMatchingRecipe(plankCrafting, null);
 
 		if (plankRecipe != null) {
 			ItemStack plank = plankRecipe.getCraftingResult(plankCrafting);
@@ -249,7 +247,7 @@ public class ModCharsetStorage {
 				slabCrafting.setInventorySlotContents(6, plank.copy());
 				slabCrafting.setInventorySlotContents(7, plank.copy());
 				slabCrafting.setInventorySlotContents(8, plank.copy());
-				IRecipe slabRecipe = RecipeUtils.getMatchingRecipe(slabCrafting, null);
+				IRecipe slabRecipe = RecipeUtils.findMatchingRecipe(slabCrafting, null);
 
 				if (slabRecipe != null) {
 					ItemStack potentialSlab = slabRecipe.getCraftingResult(slabCrafting);
@@ -266,7 +264,7 @@ public class ModCharsetStorage {
 				InventoryCrafting stickCrafting = RecipeUtils.getCraftingInventory(3, 3);
 				slabCrafting.setInventorySlotContents(0, plank.copy());
 				slabCrafting.setInventorySlotContents(3, plank.copy());
-				IRecipe stickRecipe = RecipeUtils.getMatchingRecipe(slabCrafting, null);
+				IRecipe stickRecipe = RecipeUtils.findMatchingRecipe(slabCrafting, null);
 
 				if (stickRecipe != null) {
 					ItemStack potentialStick = stickRecipe.getCraftingResult(stickCrafting);

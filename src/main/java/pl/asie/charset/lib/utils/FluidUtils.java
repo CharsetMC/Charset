@@ -14,18 +14,6 @@ public final class FluidUtils {
 
     }
 
-    public static IFluidHandler getFluidHandler(ICapabilityProvider tile, EnumFacing dir) {
-        if (tile != null) {
-            if (tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir)) {
-                return tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, dir);
-            } else if (tile instanceof ItemStack && tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, dir)) {
-                return tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, dir);
-            }
-        }
-
-        return null;
-    }
-
     public static boolean matches(IFluidHandler handler, FluidStack stack) {
         IFluidTankProperties[] properties = handler.getTankProperties();
         if (properties != null) for (IFluidTankProperties property : properties) {

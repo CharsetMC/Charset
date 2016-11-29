@@ -24,15 +24,15 @@ import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IDataPCM;
 import pl.asie.charset.lib.audio.codec.DFPWM;
 
-public class AudioDataSound extends AudioData implements IDataSound {
+public class AudioDataGameSound extends AudioData implements IDataSound {
     private String name;
     private float pitch;
 
-    public AudioDataSound() {
+    public AudioDataGameSound() {
 
     }
 
-    public AudioDataSound(String name, float pitch) {
+    public AudioDataGameSound(String name, float pitch) {
         this.name = name;
         this.pitch = pitch;
     }

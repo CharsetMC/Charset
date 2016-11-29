@@ -23,8 +23,10 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,11 +43,15 @@ import net.minecraftforge.oredict.RecipeSorter;
 
 import pl.asie.charset.api.audio.AudioAPI;
 import pl.asie.charset.lib.audio.AudioDataDFPWM;
-import pl.asie.charset.lib.audio.AudioDataSound;
+import pl.asie.charset.lib.audio.AudioDataGameSound;
 import pl.asie.charset.lib.audio.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
-import pl.asie.charset.lib.misc.IconCharset;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.capability.providers.CapabilityProviderFluidHandler;
+import pl.asie.charset.lib.capability.providers.CapabilityProviderItemHandler;
+import pl.asie.charset.lib.capability.providers.CapabilityProviderItemInsertionHandler;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.recipe.RecipeCharset;
@@ -54,14 +60,13 @@ import pl.asie.charset.lib.utils.ColorUtils;
 
 @Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart;after:jei@[3.13.3.373,)")
 public class ModCharsetLib {
-	public static final boolean INDEV = false;
+	public static final boolean INDEV = true;
 
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "charsetlib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_MCMP = "required-after:forge@[13.19.0.2160,);required-after:charsetlib@" + VERSION + ";required-after:mcmultipart@[1.3.0,2.0.0)";
-	public static final String DEP_NO_MCMP = "required-after:forge@[13.19.0.2160,);required-after:charsetlib@" + VERSION + ";after:mcmultipart";
+	public static final String DEP_DEFAULT = "required-after:forge@[13.19.0.2160,);required-after:charsetlib@" + VERSION + ";after:mcmultipart";
 
 	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
 		@Override
@@ -72,7 +77,6 @@ public class ModCharsetLib {
 
 	@Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;
-
 	public static PacketRegistry packet;
 
 	@SidedProxy(clientSide = "pl.asie.charset.lib.ProxyClient", serverSide = "pl.asie.charset.lib.ProxyCommon")
@@ -148,12 +152,16 @@ public class ModCharsetLib {
 //		}
 
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
-		AudioAPI.DATA_REGISTRY.register(AudioDataSound.class);
+		AudioAPI.DATA_REGISTRY.register(AudioDataGameSound.class);
 		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class);
 	}
 
 	@Mod.EventHandler
 	public void postInit(FMLInitializationEvent event) {
+		CapabilityHelper.registerProvider(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new CapabilityProviderItemHandler());
+		CapabilityHelper.registerProvider(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, new CapabilityProviderFluidHandler());
+		CapabilityHelper.registerProvider(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityProviderItemInsertionHandler());
+
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);
 		}

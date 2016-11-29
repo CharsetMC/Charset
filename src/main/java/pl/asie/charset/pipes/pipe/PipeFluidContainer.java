@@ -23,9 +23,11 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
 
@@ -393,6 +395,6 @@ public class PipeFluidContainer implements ITickable {
     public IFluidHandler getTankBlockNeighbor(BlockPos pos, EnumFacing direction) {
         BlockPos p = pos.offset(direction);
         TileEntity tile = owner.getWorld().getTileEntity(p);
-        return FluidUtils.getFluidHandler(tile, direction.getOpposite());
+        return CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, tile, direction.getOpposite());
     }
 }

@@ -28,8 +28,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import pl.asie.charset.storage.ModCharsetStorage;
+import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class BlockBase extends Block {
@@ -99,5 +103,20 @@ public abstract class BlockBase extends Block {
 				((TileBase) tile).onPlacedBy(placer, stack);
 			}
 		}
+	}
+
+	@Override
+	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+		if (isTileProvider) {
+			List<ItemStack> stacks = new ArrayList<ItemStack>();
+
+			TileEntity tile = getTileAfterBreak(world, pos);
+			if (tile instanceof TileBase) {
+				stacks.add(((TileBase) tile).getDroppedBlock());
+				return stacks;
+			}
+		}
+
+		return super.getDrops(world, pos, state, fortune);
 	}
 }

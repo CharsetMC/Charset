@@ -153,7 +153,7 @@ public enum Orientation {
         }
         return null;
     }
-    
+
     
     public Orientation rotateOnFace(int count) {
         count = count % 4;

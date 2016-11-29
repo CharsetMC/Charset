@@ -20,7 +20,7 @@ import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
-import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
 

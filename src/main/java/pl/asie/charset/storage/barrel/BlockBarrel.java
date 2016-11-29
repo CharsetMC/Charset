@@ -83,20 +83,6 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        List<ItemStack> stacks = new ArrayList<ItemStack>();
-
-        TileEntity tile = getTileAfterBreak(world, pos);
-        if (tile instanceof TileEntityDayBarrel) {
-            stacks.add(((TileEntityDayBarrel) tile).getDroppedBlock());
-        } else {
-            stacks.add(new ItemStack(ModCharsetStorage.barrelItem));
-        }
-
-        return stacks;
-    }
-
-    @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos fromPos) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {

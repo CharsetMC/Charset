@@ -25,7 +25,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.lib.misc.IConnectable;
+import pl.asie.charset.lib.utils.IConnectable;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
             {EnumFacing.UP, EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH}
     };
 
-    private final ModelRotation[] ROTATIONS = new ModelRotation[]{
+    private static final ModelRotation[] ROTATIONS = new ModelRotation[]{
             ModelRotation.X0_Y0,
             ModelRotation.X180_Y0,
             ModelRotation.X270_Y0,

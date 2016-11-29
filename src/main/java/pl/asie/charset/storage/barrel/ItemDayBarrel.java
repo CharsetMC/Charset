@@ -37,6 +37,7 @@
 package pl.asie.charset.storage.barrel;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -44,6 +45,9 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.storage.ModCharsetStorage;
 
 import java.util.List;
 

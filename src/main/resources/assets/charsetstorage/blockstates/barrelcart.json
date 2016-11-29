@@ -5,7 +5,8 @@
       "model": "forge:item-layer",
       "transform": "forge:default-item",
       "textures": {
-        "layer0": "charsetstorage:items/barrel_cart"
+        "layer0": "charsetstorage:items/barrel_cart",
+        "layer1": "charsetstorage:items/barrel_cart_layer1"
       }
     }
   }

@@ -22,7 +22,7 @@ import net.minecraftforge.common.capabilities.Capability;
 
 import mcmultipart.capabilities.ICapabilityWrapper;
 import pl.asie.charset.api.wires.IBundledReceiver;
-import pl.asie.charset.lib.Capabilities;
+import pl.asie.charset.lib.capability.Capabilities;
 
 public class BundledReceiverWrapper implements ICapabilityWrapper<IBundledReceiver> {
 	private class WrappedReceiver implements IBundledReceiver {

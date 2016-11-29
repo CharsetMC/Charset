@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.misc;
+package pl.asie.charset.lib;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.item.Item;
 
-public interface IConnectable {
-	boolean connects(EnumFacing side);
+public class IconCharset extends Item {
+	public IconCharset() {
+		super();
+		setUnlocalizedName("icon");
+	}
 }

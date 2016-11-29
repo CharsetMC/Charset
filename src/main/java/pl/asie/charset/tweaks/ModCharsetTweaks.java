@@ -34,13 +34,12 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
 import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
-import pl.asie.charset.tweaks.neptune.TweakMobEqualizer;
 import pl.asie.charset.tweaks.neptune.TweakZorro;
 import pl.asie.charset.tweaks.shard.TweakGlassShards;
 import pl.asie.charset.tweaks.tnt.TweakImprovedTNT;
 
 @Mod(modid = ModCharsetTweaks.MODID, name = ModCharsetTweaks.NAME, version = ModCharsetTweaks.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetTweaks {
 	public static final String MODID = "charsettweaks";
 	public static final String NAME = "*";

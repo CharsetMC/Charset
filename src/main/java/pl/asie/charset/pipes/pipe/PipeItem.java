@@ -27,12 +27,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.items.IItemHandler;
 
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.DirectionUtils;
-import pl.asie.charset.lib.utils.InventoryUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
@@ -288,7 +288,7 @@ public class PipeItem {
 		TileEntity tile = owner.getNeighbourTile(dir);
 
 		if (tile != null) {
-			return InventoryUtils.getItemInsertionHandler(tile, dir.getOpposite()) != null;
+			return CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, tile, dir.getOpposite()) != null;
 		}
 
 		return false;
@@ -458,7 +458,7 @@ public class PipeItem {
 			return false;
 		}
 
-		IItemInsertionHandler handler = InventoryUtils.getItemInsertionHandler(tile, dir);
+		IItemInsertionHandler handler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, tile, dir);
 		if (handler != null) {
 			if (owner.getWorld().isRemote) {
 				return true;

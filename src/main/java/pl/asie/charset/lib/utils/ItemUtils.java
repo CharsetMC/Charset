@@ -26,6 +26,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -36,6 +37,25 @@ import net.minecraftforge.oredict.OreDictionary;
 public final class ItemUtils {
 	private ItemUtils() {
 
+	}
+
+	public static ItemStack firstNonEmpty(ItemStack... stacks) {
+		for (ItemStack stack : stacks) {
+			if (!stack.isEmpty())
+				return stack;
+		}
+
+		return ItemStack.EMPTY;
+	}
+
+	public static int hashCode(ItemStack stack) {
+		if (stack.isEmpty())
+			return 0;
+
+		int hash = stack.getCount();
+		hash = 31 * hash + Item.getIdFromItem(stack.getItem());
+		hash = 7 * hash + stack.getItemDamage();
+		return hash;
 	}
 
 	public static boolean isOreType(ItemStack stack, String ore) {

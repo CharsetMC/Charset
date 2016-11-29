@@ -39,6 +39,10 @@ public class TileBase extends TileEntity {
 	}
 
 	public ItemStack getPickedBlock() {
+		return getDroppedBlock();
+	}
+
+	public ItemStack getDroppedBlock() {
 		return new ItemStack(getBlockType());
 	}
 

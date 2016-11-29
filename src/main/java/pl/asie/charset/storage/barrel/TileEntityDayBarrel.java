@@ -65,7 +65,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.lib.blocks.TileBase;
-import pl.asie.charset.lib.utils.CapabilityUtils;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.factorization.SpaceUtil;
 import pl.asie.charset.lib.utils.PlayerUtils;
@@ -221,17 +221,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         orientation = Orientation.getOrientation(compound.getByte("dir"));
         type = Type.VALUES[compound.getByte("type")];
         if (compound.hasKey("log")) {
-            woodLog = new ItemStack(compound.getCompoundTag("log"));
-            if (woodLog.isEmpty()) {
-                woodLog = DEFAULT_LOG;
-            }
+            woodLog = ItemUtils.firstNonEmpty(new ItemStack(compound.getCompoundTag("log")), DEFAULT_LOG);
         }
         if (compound.hasKey("slab")) {
-            woodSlab = new ItemStack(compound.getCompoundTag("slab"));
-            if (woodSlab.isEmpty()) {
-                woodSlab = DEFAULT_SLAB;
-            }
+            woodSlab = ItemUtils.firstNonEmpty(new ItemStack(compound.getCompoundTag("slab")), DEFAULT_SLAB);
         }
+
         last_mentioned_count = getItemCount();
     }
 
@@ -286,7 +281,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
         if (getItemCount() < getMaxSize()) {
             BlockPos upPos = getPos().offset(orientation.top);
-            IItemHandler handler = CapabilityUtils.getCapability(getWorld(), upPos,
+            IItemHandler handler = CapabilityHelper.get(getWorld(), upPos,
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top.getOpposite(),
                     true, true);
 
@@ -304,7 +299,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
         if (getExtractableItemCount() > 0) {
             BlockPos downPos = getPos().offset(orientation.top.getOpposite());
-            IItemHandler handler = CapabilityUtils.getCapability(getWorld(), downPos,
+            IItemHandler handler = CapabilityHelper.get(getWorld(), downPos,
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top,
                     true, true);
 
@@ -660,7 +655,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     boolean punt(EntityPlayer player, EnumHand hand) {
-        int distance = PlayerUtils.getPuntStrengthInt(player);
+        int distance = 0; // TODO: Restore punt
         if (distance <= 0) {
             return false;
         }
@@ -953,10 +948,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     @Override
-    public ItemStack getPickedBlock() {
-        return getDroppedBlock();
-    }
-
     public ItemStack getDroppedBlock() {
         ItemStack is = makeBarrel(type, woodLog, woodSlab);
         if (type == Type.SILKY && !item.isEmpty() && broken_with_silk_touch) {
