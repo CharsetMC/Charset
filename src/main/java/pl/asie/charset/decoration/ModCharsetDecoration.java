@@ -41,6 +41,7 @@ import org.apache.logging.log4j.Logger;
 import pl.asie.charset.decoration.poster.EntityPoster;
 import pl.asie.charset.decoration.poster.ItemPoster;
 import pl.asie.charset.decoration.scaffold.BlockScaffold;
+import pl.asie.charset.decoration.scaffold.ItemScaffold;
 import pl.asie.charset.decoration.scaffold.TileScaffold;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.ItemUtils;
@@ -71,7 +72,7 @@ public class ModCharsetDecoration {
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("decoration.cfg"));
 
 		scaffoldBlock = new BlockScaffold();
-		ModCharsetLib.proxy.registerBlock(scaffoldBlock, "scaffold");
+		ModCharsetLib.proxy.registerBlock(scaffoldBlock, new ItemScaffold(scaffoldBlock), "scaffold");
 		ModCharsetLib.proxy.registerItemModel(scaffoldBlock, 0, "charsetdecoration:scaffold");
 
 		posterItem = new ItemPoster();
@@ -104,9 +105,9 @@ public class ModCharsetDecoration {
 
 		if (plankRecipe != null) {
 			ItemStack plank = plankRecipe.getCraftingResult(plankCrafting);
-			ItemStack scaffold = new ItemStack(scaffoldBlock);
-			scaffold.setTagCompound(new NBTTagCompound());
-			ItemUtils.writeToNBT(plank, scaffold.getTagCompound(), "plank");
+			ItemStack scaffold = BlockScaffold.createStack(plank, 4);
+
+			BlockScaffold.PLANKS.add(plank);
 
 			GameRegistry.addRecipe(new ShapedOreRecipe(scaffold,
 					"ppp",

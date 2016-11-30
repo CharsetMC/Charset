@@ -44,8 +44,12 @@ public class ProxyCommon {
 	}
 
 	public void registerBlock(Block block, String name) {
+		registerBlock(block, new ItemBlock(block), name);
+	}
+
+	public void registerBlock(Block block, Item item, String name) {
 		GameRegistry.register(block.setRegistryName(name));
-		GameRegistry.register(new ItemBlock(block).setRegistryName(name));
+		GameRegistry.register(item.setRegistryName(name));
 		block.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 	}
 

@@ -36,6 +36,7 @@
 
 package pl.asie.charset.storage.barrel;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -63,15 +64,9 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.storage.ModCharsetStorage;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class BlockBarrel extends BlockBase implements ITileEntityProvider {
-    private static final boolean SHOW_ALL_BARRELS = ModCharsetLib.INDEV;
-
     public BlockBarrel() {
         // TODO: Adventure mode support (the Material trick doesn't work)
         super(Material.WOOD);
@@ -80,6 +75,42 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         setHarvestLevel("axe", 0);
         setSoundType(SoundType.WOOD);
         setUnlocalizedName("charset.barrel");
+    }
+
+    @Override
+    protected Collection<ItemStack> getCreativeItems() {
+        ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
+
+        for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels()) {
+            TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
+            if (type == TileEntityDayBarrel.Type.CREATIVE) {
+                builder.add(barrel);
+            }
+        }
+
+        return builder.build();
+    }
+
+    @Override
+    protected List<Collection<ItemStack>> getCreativeItemSets() {
+        List<Collection<ItemStack>> list = new ArrayList<>();
+        TileEntityDayBarrel rep = new TileEntityDayBarrel();
+
+        for (ItemStack barrel : BarrelRegistry.INSTANCE.getRegularBarrels()) {
+            rep.loadFromStack(barrel);
+            ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
+
+            for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
+                if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
+                if (type == TileEntityDayBarrel.Type.LARGER) continue;
+                rep.type = type;
+                builder.add(rep.getPickedBlock());
+            }
+
+            list.add(builder.build());
+        }
+
+        return list;
     }
 
     @Override
@@ -201,50 +232,6 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
             return extendedBS;
         }
     }
-
-    @Override
-    public void getSubBlocks(Item me, CreativeTabs tab, NonNullList<ItemStack> itemList) {
-        if (todaysBarrels == null) {
-            todaysBarrels = new ArrayList<ItemStack>();
-
-            ArrayList<ItemStack> weeklyBarrels = new ArrayList<>();
-            Calendar cal = ModCharsetLib.calendar.get();
-            int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
-
-            for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels()) {
-                TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
-                if (type == TileEntityDayBarrel.Type.NORMAL) {
-                    weeklyBarrels.add(barrel);
-                } else if (type == TileEntityDayBarrel.Type.CREATIVE) {
-                    todaysBarrels.add(barrel);
-                }
-            }
-
-            if (!SHOW_ALL_BARRELS) {
-                Collections.shuffle(weeklyBarrels, new Random(doy));
-            }
-            int barrelsToAdd = 1;
-
-            TileEntityDayBarrel rep = new TileEntityDayBarrel();
-            for (ItemStack barrel : weeklyBarrels) {
-                rep.loadFromStack(barrel);
-                for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
-                    if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
-                    if (type == TileEntityDayBarrel.Type.LARGER) continue;
-                    rep.type = type;
-                    todaysBarrels.add(rep.getPickedBlock());
-                }
-                barrelsToAdd--;
-                if (!SHOW_ALL_BARRELS && barrelsToAdd <= 0) {
-                    break;
-                }
-            }
-        }
-
-        itemList.addAll(todaysBarrels);
-    }
-
-    ArrayList<ItemStack> todaysBarrels = null;
 
     @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {

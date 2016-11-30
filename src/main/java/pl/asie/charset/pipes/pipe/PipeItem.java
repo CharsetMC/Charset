@@ -458,7 +458,7 @@ public class PipeItem {
 			return false;
 		}
 
-		IItemInsertionHandler handler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, tile, dir);
+		IItemInsertionHandler handler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, tile, dir.getOpposite());
 		if (handler != null) {
 			if (owner.getWorld().isRemote) {
 				return true;

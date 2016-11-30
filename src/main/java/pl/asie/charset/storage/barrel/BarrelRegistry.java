@@ -31,6 +31,7 @@ import java.util.List;
 public class BarrelRegistry {
     public static final BarrelRegistry INSTANCE = new BarrelRegistry();
     private final ArrayList<ItemStack> BARRELS = new ArrayList<>();
+    private final ArrayList<ItemStack> BARRELS_NORMAL = new ArrayList<>();
 
     private static boolean verifyRecipePart(Object o) {
         return o instanceof ItemStack || (o instanceof String && OreDictionary.doesOreNameExist((String) o));
@@ -66,10 +67,16 @@ public class BarrelRegistry {
     public ItemStack register(TileEntityDayBarrel.Type type, ItemStack log, ItemStack slab) {
         ItemStack ret = TileEntityDayBarrel.makeBarrel(type, log, slab);
         BARRELS.add(ret);
+        if (type == TileEntityDayBarrel.Type.NORMAL)
+            BARRELS_NORMAL.add(ret);
         return ret;
     }
 
     public Collection<ItemStack> getBarrels() {
         return Collections.unmodifiableList(BARRELS);
+    }
+
+    public Collection<ItemStack> getRegularBarrels() {
+        return Collections.unmodifiableList(BARRELS_NORMAL);
     }
 }

@@ -111,9 +111,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     public class InsertionHandler extends BaseItemHandler {
         @Override
         public ItemStack getStackInSlot(int slot) {
-            ItemStack stack = item.copy();
-            if (stack.getCount() > 64)
+            ItemStack stack = item;
+            if (stack.getCount() > 64) {
+                stack = stack.copy();
                 stack.setCount(64);
+            }
             return stack;
         }
 
@@ -213,6 +215,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
     @Override
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
+        Orientation oldOrientation = orientation;
+
         woodLog = DEFAULT_LOG;
         woodSlab = DEFAULT_SLAB;
 
@@ -228,6 +232,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
 
         last_mentioned_count = getItemCount();
+
+        if (orientation != oldOrientation)
+            markBlockForRenderUpdate();
     }
 
     @Override

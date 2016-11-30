@@ -118,8 +118,7 @@ public class ModCharsetStorage {
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
 		barrelCartItem = new ItemMinecartDayBarrel();
-		GameRegistry.register(barrelBlock.setRegistryName("barrel"));
-		GameRegistry.register(barrelItem.setRegistryName("barrel"));
+		ModCharsetLib.proxy.registerBlock(barrelBlock, barrelItem, "barrel");
 		GameRegistry.register(barrelCartItem.setRegistryName("barrelCart"));
 
 		MinecraftForge.EVENT_BUS.register(new BarrelEventListener());

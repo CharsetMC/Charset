@@ -27,6 +27,8 @@ tooltip.charset.tape.unnamed=Unnamed Tape
 
 # CharsetDecoration
 item.charset.poster.name=Poster
+tile.charset.scaffold.name=Scaffold
+tile.charset.scaffold.format=%s Scaffold
 
 # CharsetDrama
 item.charset.dramaInABottle.name=Drama in a Bottle

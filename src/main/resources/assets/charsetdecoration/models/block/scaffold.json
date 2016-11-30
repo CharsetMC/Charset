@@ -11,15 +11,20 @@
         "east":  { "texture": "#cross" }
       }
     },
-    {   "from": [ 16, 15.98, 16 ],
-      "to": [ 0, 0, 0 ],
+    {   "from": [ 15.99, 15.99, 15.99 ],
+      "to": [ 0.01, 0.01, 0.01 ],
       "faces": {
         "up":  { "texture": "#cross" },
-        "down":    { "texture": "#top", "cullface": "up" },
         "north": { "texture": "#cross" },
         "south": { "texture": "#cross" },
         "west":  { "texture": "#cross" },
         "east":  { "texture": "#cross" }
+      }
+    },
+    {   "from": [ 16, 15.98, 16 ],
+      "to": [ 0, 0, 0 ],
+      "faces": {
+        "down":    { "texture": "#top", "cullface": "up" }
       }
     },
     {   "from": [ 0, 15.99, 0 ],

@@ -16,29 +16,32 @@
 
 package pl.asie.charset.lib.blocks;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.storage.ModCharsetStorage;
 import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class BlockBase extends Block {
 	protected final Map<IBlockAccess, TileEntity> lastBrokenMap = new HashMap<>();
 	private boolean isTileProvider = this instanceof ITileEntityProvider;
+	private ImmutableList<ItemStack> items;
 
 	public BlockBase(Material materialIn) {
 		super(materialIn);
@@ -79,6 +82,44 @@ public abstract class BlockBase extends Block {
 		}
 
 		return new ItemStack(this);
+	}
+
+	protected Collection<ItemStack> getCreativeItems() {
+		return ImmutableList.of(new ItemStack(this));
+	}
+
+	protected List<Collection<ItemStack>> getCreativeItemSets() {
+		return Collections.EMPTY_LIST;
+	}
+
+	protected int getCreativeItemSetAmount() {
+		return 1;
+	}
+
+	@Override
+	public void getSubBlocks(Item me, CreativeTabs tab, NonNullList<ItemStack> itemList) {
+		if (items == null) {
+			ImmutableList.Builder<ItemStack> builder = ImmutableList.builder();
+			builder.addAll(getCreativeItems());
+			List<Collection<ItemStack>> sets = getCreativeItemSets();
+
+			if (sets.size() > 0) {
+				if (ModCharsetLib.INDEV) {
+					for (Collection<ItemStack> set : sets)
+						builder.addAll(set);
+				} else {
+					Calendar cal = ModCharsetLib.calendar.get();
+					int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
+					Collections.shuffle(sets, new Random(doy));
+					for (int i = 0; i < Math.min(getCreativeItemSetAmount(), sets.size()); i++)
+						builder.addAll(sets.get(i));
+				}
+			}
+
+			items = builder.build();
+		}
+
+		itemList.addAll(items);
 	}
 
 	@Override
