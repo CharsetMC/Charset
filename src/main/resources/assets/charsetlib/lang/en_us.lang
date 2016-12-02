@@ -37,19 +37,6 @@ item.charset.dramaInABottle.name=Drama in a Bottle
 item.charset.clayBucket.filled.name=%s Clay Bucket
 item.charset.clayBucket.empty.name=Clay Bucket
 
-# CharsetGates
-part.charset.gate.nand=NAND Gate
-part.charset.gate.nand.i=AND Gate
-part.charset.gate.nor=NOR Gate
-part.charset.gate.nor.i=OR Gate
-part.charset.gate.xor=XOR Gate
-part.charset.gate.xor.i=XNOR Gate
-part.charset.gate.buffer=Inverted Buffer Gate
-part.charset.gate.buffer.i=Buffer Gate
-part.charset.gate.pulse_former=Pulse Former
-part.charset.gate.multiplexer=Multiplexer
-part.charset.gate.rs_latch=RS Latch
-
 # CharsetLib
 charset.color.black=Black
 charset.color.red=Red
@@ -99,19 +86,11 @@ tile.charset.barrel.HOPPING.name=Hopping
 tile.charset.barrel.LARGER.name=Larger
 tile.charset.barrel.STICKY.name=Sticky
 tile.charset.barrel.CREATIVE.name=Creative
-tile.charset.crate.name=Crate
-tile.charset.crate.format=%s Crate
 
 # CharsetTweaks
 item.charset.graphite.name=Graphite
 item.charset.shard.colored.name=%s Glass Shard
 item.charset.shard.name=Glass Shard
-
-# CharsetWires
-tile.charset.wire.name=Redstone Cable
-tile.charset.wire.insulated.name=%s Insulated Cable
-tile.charset.wire.bundled.name=Bundled Cable
-tile.charset.wire.freestanding.name=Freestanding %s
 
 # CharsetWrench
 item.charset.wrench.name=Wrench

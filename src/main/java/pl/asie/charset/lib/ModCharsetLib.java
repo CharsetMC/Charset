@@ -52,6 +52,7 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.capability.providers.CapabilityProviderFluidHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityProviderItemHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityProviderItemInsertionHandler;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.recipe.RecipeCharset;
@@ -60,7 +61,7 @@ import pl.asie.charset.lib.utils.ColorUtils;
 
 @Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart;after:jei@[3.13.3.373,)")
 public class ModCharsetLib {
-	public static final boolean INDEV = true;
+	public static final boolean INDEV = false;
 
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "charsetlib";
@@ -165,6 +166,8 @@ public class ModCharsetLib {
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);
 		}
+
+		ItemMaterialRegistry.INSTANCE.init();
 	}
 
 	@Mod.EventHandler

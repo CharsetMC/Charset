@@ -45,6 +45,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.storage.barrel.BarrelCartRecipe;
@@ -56,10 +58,6 @@ import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
 import pl.asie.charset.storage.barrel.ItemDayBarrel;
 import pl.asie.charset.storage.barrel.ItemMinecartDayBarrel;
 import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
-import pl.asie.charset.storage.crate.BlockCrate;
-import pl.asie.charset.storage.crate.CrateRegistry;
-import pl.asie.charset.storage.crate.ItemCrate;
-import pl.asie.charset.storage.crate.TileEntityCrate;
 import pl.asie.charset.storage.locking.*;
 
 import javax.annotation.Nullable;
@@ -95,9 +93,6 @@ public class ModCharsetStorage {
 	public static ItemDayBarrel barrelItem;
 	public static ItemMinecartDayBarrel barrelCartItem;
 
-	public static BlockCrate crateBlock;
-	public static ItemBlock crateItem;
-
 	public static boolean renderBarrelText, renderBarrelItem, renderBarrelItem3D;
 
 	private Configuration config;
@@ -106,14 +101,6 @@ public class ModCharsetStorage {
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(ModCharsetStorage.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("storage.cfg"));
-
-		if (ModCharsetLib.INDEV) {
-			crateBlock = new BlockCrate();
-			crateItem = new ItemCrate(crateBlock);
-			GameRegistry.register(crateBlock.setRegistryName("crate"));
-			GameRegistry.register(crateItem.setRegistryName("crate"));
-			ModCharsetLib.proxy.registerItemModel(crateBlock, 0, "charsetstorage:crate");
-		}
 
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
@@ -155,9 +142,6 @@ public class ModCharsetStorage {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
-		if (ModCharsetLib.INDEV) {
-			GameRegistry.registerTileEntity(TileEntityCrate.class, "charset:crate");
-		}
 
 		EntityRegistry.registerModEntity(new ResourceLocation("charsetstorage:lock"), EntityLock.class, "charsetstorage:lock", 1, this, 64, 3, false);
 		EntityRegistry.registerModEntity(new ResourceLocation("charsetstorage:barrelCart"), EntityMinecartDayBarrel.class, "charsetstorage:barrelCart", 2, this, 64, 1, true);
@@ -229,91 +213,20 @@ public class ModCharsetStorage {
 		RecipeSorter.register("charsetstorage:lockDye", RecipeDyeLock.class, RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
 	}
 
-	private void checkPlankForWoods(ItemStack log) {
-		InventoryCrafting plankCrafting = RecipeUtils.getCraftingInventory(3, 3);
-		plankCrafting.setInventorySlotContents(0, log);
-		IRecipe plankRecipe = RecipeUtils.findMatchingRecipe(plankCrafting, null);
-
-		if (plankRecipe != null) {
-			ItemStack plank = plankRecipe.getCraftingResult(plankCrafting);
-			if (!plank.isEmpty()) {
-				plank.setCount(1);
-
-				// The great slab search
-				ItemStack slab = plank;
-
-				InventoryCrafting slabCrafting = RecipeUtils.getCraftingInventory(3, 3);
-				slabCrafting.setInventorySlotContents(6, plank.copy());
-				slabCrafting.setInventorySlotContents(7, plank.copy());
-				slabCrafting.setInventorySlotContents(8, plank.copy());
-				IRecipe slabRecipe = RecipeUtils.findMatchingRecipe(slabCrafting, null);
-
-				if (slabRecipe != null) {
-					ItemStack potentialSlab = slabRecipe.getCraftingResult(slabCrafting);
-					if (!potentialSlab.isEmpty() && potentialSlab.getItem() != Item.getItemFromBlock(Blocks.WOODEN_SLAB)) {
-						slab = potentialSlab;
-					}
-				}
-
-				BarrelRegistry.INSTANCE.registerCraftable(log, slab);
-
-				// The slightly greater stick search
-				ItemStack stick = new ItemStack(Items.STICK);
-
-				InventoryCrafting stickCrafting = RecipeUtils.getCraftingInventory(3, 3);
-				slabCrafting.setInventorySlotContents(0, plank.copy());
-				slabCrafting.setInventorySlotContents(3, plank.copy());
-				IRecipe stickRecipe = RecipeUtils.findMatchingRecipe(slabCrafting, null);
-
-				if (stickRecipe != null) {
-					ItemStack potentialStick = stickRecipe.getCraftingResult(stickCrafting);
-					if (!potentialStick.isEmpty()) {
-						stick = potentialStick;
-					}
-				}
-
-				if (ModCharsetLib.INDEV) {
-					CrateRegistry.INSTANCE.registerCraftable(plank, stick);
-				}
-			}
-		}
-	}
-
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE, new ItemStack(Blocks.BEDROCK), new ItemStack(Blocks.DIAMOND_BLOCK));
 		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
 
 		// If you stop this from happening in postInit, please adjust TextureStitchEvent in ProxyClient
-		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
-		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 1));
-		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 2), new ItemStack(Blocks.WOODEN_SLAB, 1, 2));
-		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG, 1, 3), new ItemStack(Blocks.WOODEN_SLAB, 1, 3));
-		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 0), new ItemStack(Blocks.WOODEN_SLAB, 1, 4));
-		BarrelRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.LOG2, 1, 1), new ItemStack(Blocks.WOODEN_SLAB, 1, 5));
-
-		if (ModCharsetLib.INDEV) {
-			for (int i = 0; i < 6; i++) {
-				CrateRegistry.INSTANCE.registerCraftable(new ItemStack(Blocks.PLANKS, 1, i), new ItemStack(Items.STICK));
-			}
-		}
-
-		for (ItemStack log : OreDictionary.getOres("logWood", false)) {
-			if (log.getItem() == Item.getItemFromBlock(Blocks.LOG) || log.getItem() == Item.getItemFromBlock(Blocks.LOG2)) {
-				continue;
-			}
-
-			try {
-				if (log.getMetadata() == OreDictionary.WILDCARD_VALUE) {
-					for (int i = 0; i < (log.getItem() instanceof ItemBlock ? 16 : 128); i++) {
-						ItemStack stack = new ItemStack(log.getItem(), 1, i);
-						checkPlankForWoods(stack);
-					}
-				} else {
-					checkPlankForWoods(log.copy());
+		for (ItemMaterial log : ItemMaterialRegistry.INSTANCE.getMaterialsByType("log")) {
+			ItemMaterial plank = log.getRelatedByType("plank");
+			if (plank != null) {
+				ItemMaterial slab = plank.getRelatedByType("slab");
+				if (slab == null) {
+					slab = plank;
 				}
-			} catch (Exception e) {
-
+				BarrelRegistry.INSTANCE.registerCraftable(log.getStack(), slab.getStack());
 			}
 		}
 

@@ -1,6 +1,6 @@
 * [Decoration, Drama, Lib, Pipes, Storage, Tweaks, Wrench] Ported to 1.11
 * [All] Various small bugfixes
-* [Decoration] Added scaffolds! Climb, climb, climb!
+* [Decoration] Added scaffolds! Climb, climb, climb! They're still slightly wonky, however.
 * [Pipes] Turned pipes into regular TEs in preparation for MCMP2
 * [Storage] Improvements to barrel logic
 * [Storage] Fixed barrelcart placement and dyeing

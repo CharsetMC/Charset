@@ -39,7 +39,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	public static final Collection<ItemStack> PLANKS = new HashSet<>();
 	private static final int MAX_OVERHANG = 8;
 	private static final AxisAlignedBB COLLISION_BOX_SIDES = new AxisAlignedBB(0, 0, 0, 1, 1, 1).expand(-0.3125, 0, -0.3125);
-	private static final AxisAlignedBB COLLISION_BOX_TOP = new AxisAlignedBB(0, 1 - 0.0625, 0, 1, 1, 1);
+	private static final AxisAlignedBB COLLISION_BOX_TOP = new AxisAlignedBB(-0.0625, 1 - 0.0625, -0.0625, 1 + 0.0625, 1, 1 + 0.0625);
 
 	public BlockScaffold() {
 		super(Material.WOOD);

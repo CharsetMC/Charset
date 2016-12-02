@@ -44,6 +44,8 @@ import pl.asie.charset.decoration.scaffold.BlockScaffold;
 import pl.asie.charset.decoration.scaffold.ItemScaffold;
 import pl.asie.charset.decoration.scaffold.TileScaffold;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
@@ -96,43 +98,24 @@ public class ModCharsetDecoration {
 		));
 	}
 
-	private void registerScaffoldRecipe(ItemStack log) {
-		// todo: unify into some kind of wood registry
-		// we do it this way to not register recipes for invalid logs
-		InventoryCrafting plankCrafting = RecipeUtils.getCraftingInventory(3, 3);
-		plankCrafting.setInventorySlotContents(0, log);
-		IRecipe plankRecipe = RecipeUtils.findMatchingRecipe(plankCrafting, null);
+	private void registerScaffoldRecipe(ItemMaterial plankMaterial) {
+		ItemStack plank = plankMaterial.getStack();
+		ItemStack scaffold = BlockScaffold.createStack(plank, 4);
 
-		if (plankRecipe != null) {
-			ItemStack plank = plankRecipe.getCraftingResult(plankCrafting);
-			ItemStack scaffold = BlockScaffold.createStack(plank, 4);
+		BlockScaffold.PLANKS.add(plank);
 
-			BlockScaffold.PLANKS.add(plank);
-
-			GameRegistry.addRecipe(new ShapedOreRecipe(scaffold,
-					"ppp",
-					" s ",
-					"s s",
-					's', "stickWood", 'p', plank
-			));
-		}
+		GameRegistry.addRecipe(new ShapedOreRecipe(scaffold,
+				"ppp",
+				" s ",
+				"s s",
+				's', "stickWood", 'p', plank
+		));
 	}
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		for (ItemStack log : OreDictionary.getOres("logWood", false)) {
-			try {
-				if (log.getMetadata() == OreDictionary.WILDCARD_VALUE) {
-					for (int i = 0; i < (log.getItem() instanceof ItemBlock ? 16 : 128); i++) {
-						ItemStack stack = new ItemStack(log.getItem(), 1, i);
-						registerScaffoldRecipe(stack);
-					}
-				} else {
-					registerScaffoldRecipe(log.copy());
-				}
-			} catch (Exception e) {
-
-			}
+		for (ItemMaterial plankMaterial : ItemMaterialRegistry.INSTANCE.getMaterialsByType("plank")) {
+			registerScaffoldRecipe(plankMaterial);
 		}
 	}
 }

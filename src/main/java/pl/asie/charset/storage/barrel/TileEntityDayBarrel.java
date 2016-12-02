@@ -233,7 +233,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
         last_mentioned_count = getItemCount();
 
-        if (orientation != oldOrientation)
+        if (isClient && orientation != oldOrientation)
             markBlockForRenderUpdate();
     }
 

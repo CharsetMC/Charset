@@ -47,7 +47,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.storage.barrel.*;
-import pl.asie.charset.storage.crate.CrateModel;
 import pl.asie.charset.storage.locking.EntityLock;
 import pl.asie.charset.storage.locking.ItemLock;
 import pl.asie.charset.storage.locking.RenderLock;
@@ -55,7 +54,6 @@ import pl.asie.charset.storage.locking.RenderLock;
 public class ProxyClient extends ProxyCommon {
 	public static final KeyBinding backpackOpenKey = new KeyBinding("key.charset.backpackOpen", Keyboard.KEY_C, "key.categories.gameplay");
 	public static final BarrelModel barrelModel = new BarrelModel();
-	public static final CrateModel crateModel = new CrateModel();
 
 	@Override
 	public void preInit() {
@@ -85,11 +83,6 @@ public class ProxyClient extends ProxyCommon {
 		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelBlock);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(barrelModel.colorizer, ModCharsetStorage.barrelItem);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemMinecartDayBarrel.Color(), ModCharsetStorage.barrelCartItem);
-
-		if (ModCharsetLib.INDEV) {
-			Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(crateModel.colorizer, ModCharsetStorage.crateBlock);
-			Minecraft.getMinecraft().getItemColors().registerItemColorHandler(crateModel.colorizer, ModCharsetStorage.crateItem);
-		}
 	}
 
 	@SubscribeEvent
@@ -106,7 +99,6 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onTextureMap(TextureStitchEvent.Pre event) {
 		BarrelModel.onTextureLoad(event.getMap());
-		CrateModel.onTextureLoad(event.getMap());
 	}
 
 	@SubscribeEvent
@@ -114,8 +106,6 @@ public class ProxyClient extends ProxyCommon {
 	public void onPostBake(ModelBakeEvent event) {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:barrel", "normal"), barrelModel);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:barrel", "inventory"), barrelModel);
-		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:crate", "normal"), crateModel);
-		event.getModelRegistry().putObject(new ModelResourceLocation("charsetstorage:crate", "inventory"), crateModel);
 
 		BarrelModel.template = (IRetexturableModel) RenderUtils.getModel(new ResourceLocation("charsetstorage:block/barrel"));
 	}
