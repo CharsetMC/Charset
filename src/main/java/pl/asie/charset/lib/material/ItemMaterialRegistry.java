@@ -10,6 +10,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.storage.barrel.BarrelRegistry;
 
@@ -44,68 +45,47 @@ public class ItemMaterialRegistry {
 
 	private void initLogMaterial(ItemStack log) {
 		ItemMaterial logMaterial = new ItemMaterial("log", log);
-		InventoryCrafting plankCrafting = RecipeUtils.getCraftingInventory(3, 3);
-		plankCrafting.setInventorySlotContents(0, log);
-		IRecipe plankRecipe = RecipeUtils.findMatchingRecipe(plankCrafting, null);
 
-		if (plankRecipe != null) {
-			ItemStack plank = plankRecipe.getCraftingResult(plankCrafting);
-			if (!plank.isEmpty()) {
-				// We look for the plank first to ensure only valid logs
-				// get registered.
-				if (register(logMaterial)) {
-					plank.setCount(1);
-					ItemMaterial plankMaterial = new ItemMaterial("plank", plank);
-					if (register(plankMaterial)) {
-						logMaterial.registerRelation(plankMaterial, "plank");
-						plankMaterial.registerRelation(logMaterial, "log");
+		// We look for the plank first to ensure only valid logs
+		// get registered.
+		ItemStack plank = RecipeUtils.getCraftingResult(null, 3, 3, log);
+		if (!plank.isEmpty() && ItemUtils.isOreType(plank, "plankWood")) {
+			if (register(logMaterial)) {
+				plank.setCount(1);
+				ItemMaterial plankMaterial = new ItemMaterial("plank", plank);
+				if (register(plankMaterial)) {
+					logMaterial.registerRelation(plankMaterial, "plank");
+					plankMaterial.registerRelation(logMaterial, "log");
 
-						// The great slab search
-						ItemStack slab = plank;
+					ItemStack slab = RecipeUtils.getCraftingResult(null, 3, 3,
+							null, null, null,
+							null, null, null,
+							plank, plank, plank);
 
-						InventoryCrafting slabCrafting = RecipeUtils.getCraftingInventory(3, 3);
-						slabCrafting.setInventorySlotContents(6, plank.copy());
-						slabCrafting.setInventorySlotContents(7, plank.copy());
-						slabCrafting.setInventorySlotContents(8, plank.copy());
-						IRecipe slabRecipe = RecipeUtils.findMatchingRecipe(slabCrafting, null);
-
-						if (slabRecipe != null) {
-							ItemStack potentialSlab = slabRecipe.getCraftingResult(slabCrafting);
-							if (!potentialSlab.isEmpty()) {
-								slab = potentialSlab;
-							}
+					if (!slab.isEmpty()) {
+						slab.setCount(1);
+						ItemMaterial slabMaterial = new ItemMaterial("slab", slab);
+						if (register(slabMaterial)) {
+							plankMaterial.registerRelation(slabMaterial, "slab");
+							slabMaterial.registerRelation(plankMaterial, "block");
 						}
+					}
 
-						// The slightly greater stick search
-						ItemStack stick = new ItemStack(Items.STICK);
+					ItemStack stick = RecipeUtils.getCraftingResult(null, 3, 3,
+							plank, null, null,
+							plank, null, null,
+							null, null, null);
+					if (stick.isEmpty()) {
+						stick = new ItemStack(Items.STICK);
+					} else {
+						stick.setCount(1);
+					}
 
-						InventoryCrafting stickCrafting = RecipeUtils.getCraftingInventory(3, 3);
-						slabCrafting.setInventorySlotContents(0, plank.copy());
-						slabCrafting.setInventorySlotContents(3, plank.copy());
-						IRecipe stickRecipe = RecipeUtils.findMatchingRecipe(slabCrafting, null);
-
-						if (stickRecipe != null) {
-							ItemStack potentialStick = stickRecipe.getCraftingResult(stickCrafting);
-							if (!potentialStick.isEmpty()) {
-								stick = potentialStick;
-							}
-						}
-
-						if (slab != plank) {
-							slab.setCount(1);
-							ItemMaterial slabMaterial = new ItemMaterial("slab", slab);
-							if (register(slabMaterial)) {
-								plankMaterial.registerRelation(slabMaterial, "slab");
-								slabMaterial.registerRelation(plankMaterial, "block");
-							}
-						}
-
-						ItemMaterial stickMaterial = new ItemMaterial("stick", stick);
-						if (register(stickMaterial)) {
-							plankMaterial.registerRelation(stickMaterial, "stick");
-							stickMaterial.registerRelation(plankMaterial, "plank");
-							stickMaterial.registerRelation(logMaterial, "log");
-						}
+					ItemMaterial stickMaterial = new ItemMaterial("stick", stick);
+					if (register(stickMaterial)) {
+						plankMaterial.registerRelation(stickMaterial, "stick");
+						stickMaterial.registerRelation(plankMaterial, "plank");
+						stickMaterial.registerRelation(logMaterial, "log");
 					}
 				}
 			}
