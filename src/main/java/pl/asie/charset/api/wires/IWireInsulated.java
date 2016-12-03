@@ -20,6 +20,7 @@ package pl.asie.charset.api.wires;
  * This interface is implemented by Charset's insulated wire parts.
  * Please do not implement it yourself.
  */
+@Deprecated
 public interface IWireInsulated extends IWire {
 	/**
 	 * Get the color of the insulated wire.

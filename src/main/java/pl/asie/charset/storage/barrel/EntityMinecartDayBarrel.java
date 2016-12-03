@@ -79,6 +79,11 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         }
 
         @Override
+        public int getSlotLimit(int slot) {
+            return barrel.readOnlyView.getSlotLimit(slot);
+        }
+
+        @Override
         public ItemStack getStackInSlot(int slot) {
             return barrel.readOnlyView.getStackInSlot(slot);
         }

@@ -98,6 +98,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         }
 
         @Override
+        public int getSlotLimit(int slot) {
+            return Math.min(64, getMaxSize());
+        }
+
+        @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             return stack;
         }

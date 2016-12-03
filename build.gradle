@@ -23,12 +23,12 @@ group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.11-13.19.0.2165"
+	version = "1.11-13.19.0.2178"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20161128"
+	mappings = "snapshot_20161203"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -53,7 +53,7 @@ configurations {
 
 dependencies {
 //	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.3.0_87:universal"
-	deobfCompile "mezz.jei:jei_1.11:4.0.4.198"
+	deobfCompile "mezz.jei:jei_1.11:4.0.4.199"
 	shadow name: "libresample4j", version: "bc0a030"
 //	shadow name: "JTraits", version: "18c8227"
 }

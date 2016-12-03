@@ -98,7 +98,7 @@ public class SpritesheetFactory {
             sprites[i] = map.getTextureExtry(s);
             if (sprites[i] == null) {
                 sprites[i] = new SliceSprite(new ResourceLocation(s), location, i, width, height);
-                map.setTextureEntry(s, sprites[i]);
+                map.setTextureEntry(sprites[i]);
             }
         }
         return sprites;

@@ -68,7 +68,7 @@ import java.util.Set;
 
 public class TweakMobEqualizer extends Tweak {
 	public TweakMobEqualizer() {
-		super("tweaks", "equalOpportunitiesForMobs", "Causes some mobs to rarely spawn wearing your armor on higher difficulty levels.", true);
+		super("tweaks", "equalOpportunitiesForMobs", "Causes some mobs to rarely! spawn wearing your armor on higher difficulty levels.", true);
 	}
 
 	@Override
@@ -91,6 +91,9 @@ public class TweakMobEqualizer extends Tweak {
 			return;
 		}
 		EntityMob ent = (EntityMob) event.getEntityLiving();
+		// TODO: Evaluate this system.
+		// 1) Is canPickUpLoot() a valid check?
+		// 2) Should we add more granular setups (like only some elements of armor, but at a higher frequency)?
 		if (event.getWorld().rand.nextInt(400) > difficulty.getDifficultyId()) {
 			return;
 		}
@@ -99,7 +102,7 @@ public class TweakMobEqualizer extends Tweak {
 		if (template == null) {
 			return;
 		}
-		int equipmentCount = 0;
+			int equipmentCount = 0;
 		ItemStack[] equipmentCopies = new ItemStack[6];
 		boolean copyArmor = event.getEntity() instanceof IRangedAttackMob || event.getWorld().rand.nextBoolean();
 		boolean copyWeapon = !(event.getEntity() instanceof IRangedAttackMob) || event.getWorld().rand.nextBoolean();

@@ -16,6 +16,7 @@
 
 package pl.asie.charset.api.wires;
 
+@Deprecated
 public enum WireType {
 	NORMAL,
 	INSULATED,

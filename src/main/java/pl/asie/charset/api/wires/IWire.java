@@ -22,6 +22,7 @@ import javax.annotation.Nonnull;
  * This interface is implemented by Charset's wire parts.
  * Please do not implement it yourself.
  */
+@Deprecated
 public interface IWire {
 	/**
 	 * Get the type of this wire.
