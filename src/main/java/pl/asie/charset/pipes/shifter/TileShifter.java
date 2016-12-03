@@ -175,6 +175,44 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		return false;
 	}
 
+	private void updateFluids(TileEntity input, TilePipe output, EnumFacing direction) {
+		if (input != null && output != null) {
+			IFluidHandler inTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, input, direction);
+			if (inTank != null) {
+				FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
+				if (stack != null && matches(stack)) {
+					FluidUtils.push(inTank, output.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()), stack);
+				}
+			}
+		}
+	}
+
+	private void updateItems(TileEntity input, TilePipe output, EnumFacing direction) {
+		if (ticker % 16 == 0 && input != null && output != null) {
+			IItemHandler handler = CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, input, direction);
+			IItemInsertionHandler outHandler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, output, direction.getOpposite());
+			if (handler != null && outHandler != null) {
+				for (int i = 0; i < handler.getSlots(); i++) {
+					ItemStack source = handler.getStackInSlot(i);
+					if (!source.isEmpty() && matches(source)) {
+						int maxSize = 1;
+						ItemStack stack = handler.extractItem(i, maxSize, true);
+						if (!stack.isEmpty()) {
+							if (outHandler.insertItem(stack, true).isEmpty()) {
+								stack = handler.extractItem(i, maxSize, false);
+								if (!stack.isEmpty()) {
+									outHandler.insertItem(stack, false);
+								}
+
+								return;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public void update() {
 		super.update();
@@ -187,42 +225,11 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 		if (redstoneLevel > 0) {
 			EnumFacing direction = getDirection();
-
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
-			if (input != null && output != null) {
-				IFluidHandler inTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, input, direction);
-				if (inTank != null) {
-					FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
-					if (stack != null && matches(stack)) {
-						FluidUtils.push(inTank, output.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()), stack);
-					}
-				}
 
-				if (ticker % 16 == 0) {
-					IItemHandler handler = CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, input, direction);
-					IItemInsertionHandler outHandler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, output, direction.getOpposite());
-					if (handler != null && outHandler != null) {
-						for (int i = 0; i < handler.getSlots(); i++) {
-							ItemStack source = handler.getStackInSlot(i);
-							if (!source.isEmpty() && matches(source)) {
-								int maxSize = /* getRedstoneLevel() >= 8 ? source.stackSize : */ 1;
-								ItemStack stack = handler.extractItem(i, maxSize, true);
-								if (!stack.isEmpty()) {
-									if (outHandler.insertItem(stack, true).isEmpty()) {
-										stack = handler.extractItem(i, maxSize, false);
-										if (!stack.isEmpty()) {
-											outHandler.insertItem(stack, false);
-										}
-
-										return;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+			updateItems(input, output, direction);
+			updateFluids(input, output, direction);
 		}
 	}
 

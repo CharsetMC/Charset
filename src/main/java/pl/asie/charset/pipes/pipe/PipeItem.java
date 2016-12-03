@@ -53,6 +53,9 @@ public class PipeItem {
 	protected ItemStack stack = ItemStack.EMPTY;
 	protected int progress;
 
+	protected EnumFacing transformedFacing;
+	protected Object transformedModel;
+
 	private int activeShifterDistance;
 	private TilePipe owner;
 	private boolean stuck;

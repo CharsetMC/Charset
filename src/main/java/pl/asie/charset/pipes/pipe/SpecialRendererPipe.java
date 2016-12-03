@@ -102,7 +102,6 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 
 	private final class ItemModelTransformer implements ModelTransformer.IVertexTransformer {
 		private ItemStack stack;
-		private float[] offset;
 		private float scale;
 		private EnumFacing direction;
 
@@ -127,7 +126,7 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 					}
 				}
 				for (int i = 0; i < 3; i++) {
-					data[i] = ((data[i] - 0.5f) * scale) + offset[i];
+					data[i] = ((data[i] - 0.5f) * scale);
 				}
 			} else if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR && quad.hasTintIndex()) {
 				int k = itemColors.getColorFromItemstack(stack, quad.getTintIndex());
@@ -291,12 +290,19 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 					continue;
 				}
 
-				ITEM_MODEL_TRANSFORMER.stack = stack;
-				ITEM_MODEL_TRANSFORMER.scale = getItemScale(item);
-				ITEM_MODEL_TRANSFORMER.direction = id;
-				ITEM_MODEL_TRANSFORMER.offset = calculateItemOffset(item, partialTicks);
+				if (item.transformedModel == null || item.transformedFacing != id) {
+					ITEM_MODEL_TRANSFORMER.stack = stack;
+					ITEM_MODEL_TRANSFORMER.scale = getItemScale(item);
+					ITEM_MODEL_TRANSFORMER.direction = id;
 
-				renderer.renderModel(getWorld(), ModelTransformer.transform(model, DEFAULT_STATE, 0L, ITEM_MODEL_TRANSFORMER), DEFAULT_STATE, pos, buffer, false);
+					item.transformedFacing = id;
+					item.transformedModel = ModelTransformer.transform(model, DEFAULT_STATE, 0L, ITEM_MODEL_TRANSFORMER);
+				}
+
+				float[] offset = calculateItemOffset(item, partialTicks);
+				buffer.setTranslation(x - pos.getX() + offset[0], y - pos.getY() + offset[1], z - pos.getZ() + offset[2]);
+
+				renderer.renderModel(getWorld(), (IBakedModel) item.transformedModel, DEFAULT_STATE, pos, buffer, false);
 			}
 		}
 
@@ -323,6 +329,7 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 				IBakedModel model = itemModelCache.getIfPresent(stack);
 				if (model == null) {
 					model = renderItem.getItemModelWithOverrides(stack, part.getWorld(), null);
+					itemModelCache.put(stack, model);
 				}
 
 				GlStateManager.translate(x + offset[0], y + offset[1], z + offset[2]);

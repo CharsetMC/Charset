@@ -19,6 +19,7 @@ import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.IConnectable;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.pipes.ModCharsetPipes;
@@ -63,7 +64,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     private final IItemInsertionHandler[] insertionHandlers = new IItemInsertionHandler[6];
     private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
     private byte connectionCache = 0;
-    private boolean neighborBlockChanged;
+    private int neighborsUpdate = 0;
     private boolean requestUpdate;
 
     public TilePipe() {
@@ -220,7 +221,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     @Override
     public void validate() {
         super.validate();
-        neighborBlockChanged = true;
+        neighborsUpdate = 0x3F;
         scheduleRenderUpdate();
     }
 
@@ -233,9 +234,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
         }
 
-        if (neighborBlockChanged) {
+        if (neighborsUpdate != 0) {
             updateNeighborInfo(true);
-            neighborBlockChanged = false;
+            neighborsUpdate = 0;
         }
 
         fluid.update();
@@ -255,53 +256,55 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         return direction == null ? 0 : shifterDistance[direction.ordinal()];
     }
 
-    private void updateShifterSide(EnumFacing dir) {
+    private void propagateShifterChange(EnumFacing dir, IShifter shifter, int shifterDist) {
         int i = dir.ordinal();
         int oldDistance = shifterDistance[i];
 
-        if (shifterDistance[i] == 1 && getNearestShifterInternal(dir) != null) {
-            return;
-        }
-
-        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(getPos());
-        EnumFacing dirO = dir.getOpposite();
-        int dist = 0;
-        TilePipe pipe;
-        TileEntity tile;
-
-        while ((pipe = PipeUtils.getPipe(getWorld(), p, dirO)) != null) {
-            p.move(dirO);
-            dist++;
-
-            if (!pipe.connects(dirO)) {
-                break;
-            }
-        }
-
-        tile = getWorld().getTileEntity(p);
-
-        if (tile != null && tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, dir)
-                && isMatchingShifter(tile.getCapability(ModCharsetPipes.CAP_SHIFTER, dir), dir, dist)) {
-            shifterDistance[i] = dist;
+        if (shifter != null && isMatchingShifter(shifter, dir, shifterDist)) {
+            shifterDistance[i] = shifterDist;
         } else {
             shifterDistance[i] = 0;
         }
 
+        System.out.println("update " + getPos() + " " + dir + " " + oldDistance + " -> " + shifterDistance[i]);
+
         if (oldDistance != shifterDistance[i]) {
-            pipe = PipeUtils.getPipe(getWorld(), getPos().offset(dir), null);
+            TilePipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(dir), null);
             if (pipe != null) {
-                pipe.updateShifterSide(dir);
+                pipe.propagateShifterChange(dir, shifter, shifterDist + 1);
             }
         }
+    }
+
+    private void updateShifterSide(EnumFacing dirBack) {
+        BlockPos.MutableBlockPos shifterPos = new BlockPos.MutableBlockPos(getPos());
+        EnumFacing dir = dirBack.getOpposite();
+        int dist = 0;
+        TilePipe pipe;
+
+        while ((pipe = PipeUtils.getPipe(getWorld(), shifterPos, dirBack)) != null) {
+            shifterPos.move(dirBack);
+            dist++;
+
+            if (!pipe.connects(dirBack)) {
+                break;
+            }
+        }
+
+        TileEntity shifterTile = getWorld().getTileEntity(shifterPos);
+        IShifter shifter = CapabilityHelper.get(ModCharsetPipes.CAP_SHIFTER, shifterTile, dir);
+        propagateShifterChange(dir, shifter, dist);
     }
 
     private void updateNeighborInfo(boolean sendPacket) {
         byte oc = connectionCache;
 
         for (EnumFacing dir : EnumFacing.VALUES) {
-            updateConnections(dir);
-            if (!getWorld().isRemote) {
-                updateShifterSide(dir);
+            if ((neighborsUpdate & (1 << dir.ordinal())) != 0) {
+                updateConnections(dir);
+                if (!getWorld().isRemote) {
+                    updateShifterSide(dir);
+                }
             }
         }
 
@@ -422,8 +425,16 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
     }
 
-    public void onNeighborBlockChange(Block block , BlockPos neighborPos) {
-        neighborBlockChanged = true;
+    public void onNeighborBlockChange(Block block, BlockPos neighborPos) {
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if (this.getPos().offset(facing).equals(neighborPos)) {
+                neighborsUpdate |= 1 << facing.ordinal();
+                return;
+            }
+        }
+
+        // fallback
+        neighborsUpdate |= 0x3F;
     }
 
     public Collection<PipeItem> getPipeItems() {
