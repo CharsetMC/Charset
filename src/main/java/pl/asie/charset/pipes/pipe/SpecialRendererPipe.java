@@ -37,17 +37,22 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.render.DualTESR;
 import pl.asie.charset.lib.render.ModelTransformer;
 import pl.asie.charset.lib.render.SimpleBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
+
+import javax.annotation.Nullable;
 
 public class SpecialRendererPipe extends DualTESR<TilePipe> {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
@@ -79,6 +84,58 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 	private final ItemColors itemColors = mc.getItemColors();
 	private final IBlockState DEFAULT_STATE = Blocks.AIR.getDefaultState();
 	private final ItemModelTransformer ITEM_MODEL_TRANSFORMER = new ItemModelTransformer();
+	private final ModelRenderBlockAccess modelRenderBlockAccess = new ModelRenderBlockAccess();
+
+	private final class ModelRenderBlockAccess implements IBlockAccess {
+		private IBlockAccess base;
+		private BlockPos pos;
+
+		public void set(IBlockAccess base, BlockPos pos) {
+			this.base = base;
+			this.pos = pos;
+		}
+
+		@Nullable
+		@Override
+		public TileEntity getTileEntity(BlockPos pos) {
+			return null;
+		}
+
+		@Override
+		public int getCombinedLight(BlockPos pos, int lightValue) {
+			return base.getCombinedLight(this.pos, lightValue);
+		}
+
+		@Override
+		public IBlockState getBlockState(BlockPos pos) {
+			return Blocks.AIR.getDefaultState();
+		}
+
+		@Override
+		public boolean isAirBlock(BlockPos pos) {
+			return true;
+		}
+
+		@Override
+		public Biome getBiome(BlockPos pos) {
+			return base.getBiome(this.pos);
+		}
+
+		@Override
+		public int getStrongPower(BlockPos pos, EnumFacing direction) {
+			return 0;
+		}
+
+		@Override
+		public WorldType getWorldType() {
+			return base.getWorldType();
+		}
+
+		@Override
+		public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+			return false;
+		}
+	}
 
 	private final class FluidColorTransformer implements ModelTransformer.IVertexTransformer {
 		private final int color;
@@ -251,6 +308,8 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 			}
 		}
 
+		modelRenderBlockAccess.set(getWorld(), pos);
+
 		synchronized (part.getPipeItems()) {
 			for (PipeItem item : part.getPipeItems()) {
 				EnumFacing id = item.getDirection();
@@ -302,7 +361,7 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 				float[] offset = calculateItemOffset(item, partialTicks);
 				buffer.setTranslation(x - pos.getX() + offset[0], y - pos.getY() + offset[1], z - pos.getZ() + offset[2]);
 
-				renderer.renderModel(getWorld(), (IBakedModel) item.transformedModel, DEFAULT_STATE, pos, buffer, false);
+				renderer.renderModelFlat(modelRenderBlockAccess, (IBakedModel) item.transformedModel, DEFAULT_STATE, pos, buffer, false, item.id);
 			}
 		}
 

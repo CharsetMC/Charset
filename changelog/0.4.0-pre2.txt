@@ -1,6 +1,8 @@
-* [All] Update to Forge 2178
-* [Pipes] Add Observer support
-* [Pipes] Disable most fluid routing logic - needs a rewrite!
-* [Pipes] Optimizations to pipe code, especially rendering
-* [Storage] Fixed rotated barrels not updating neighbors
-* [Tweaks] Add a "mob equalizer" tweak, letting mobs very rarely spawn with some of your armor and weapons!
+* [All] Updated to Forge 2178.
+* [Pipes] Added Observer support.
+* [Pipes] Disabled most fluid routing logic - needs a rewrite!
+* [Pipes] Fixed light rendering glitches for traveling items.
+* [Pipes] Optimizations to pipe code, especially rendering.
+* [Storage] Fixed rendering glitches for barrel information popups.
+* [Storage] Fixed rotated barrels not updating neighbors.
+* [Tweaks] Added a "mob equalizer" tweak, letting mobs very rarely spawn with some of your armor and weapons!

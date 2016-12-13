@@ -158,11 +158,11 @@ public class RenderMessages extends RenderMessagesProxy {
         double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.getPartialTicks();
         double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.getPartialTicks();
         GlStateManager.pushMatrix();
-        GL11.glPushAttrib(GL11.GL_BLEND);
         GlStateManager.translate(-cx, -cy, -cz);
 
         GlStateManager.depthMask(false);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.disableDepth();
+        GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.color(1, 1, 1, 1);
@@ -185,7 +185,6 @@ public class RenderMessages extends RenderMessagesProxy {
                     continue;
                 }
             }
-            GlStateManager.disableLighting();
             float lifeLeft = (m.lifeTime - timeExisted)/1000F;
             float opacity = 1F;
             if (lifeLeft < 1) {
@@ -196,11 +195,14 @@ public class RenderMessages extends RenderMessagesProxy {
                 renderMessage(m, event.getPartialTicks(), opacity, cx, cy, cz);
             }
         }
+
+        GlStateManager.disableBlend();
+        GlStateManager.enableDepth();
         GlStateManager.enableLighting();
+        GlStateManager.depthMask(true);
         GlStateManager.color(1, 1, 1, 1);
 
         GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
         //RenderUtil.checkGLError("Notification render error!"); TODO
     }
 
