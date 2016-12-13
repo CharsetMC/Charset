@@ -26,7 +26,7 @@ public final class FluidUtils {
         return false;
     }
 
-    public static void push(IFluidHandler from, IFluidHandler to, int amt) {
+    public static int push(IFluidHandler from, IFluidHandler to, int amt) {
         if (amt > 0) {
             FluidStack drained = from.drain(amt, false);
             if (drained != null && drained.amount > 0) {
@@ -34,13 +34,16 @@ public final class FluidUtils {
                 if (amt > 0) {
                     FluidStack toDrain = drained.copy();
                     toDrain.amount = amt;
-                    from.drain(toDrain, true);
+                    FluidStack drainedReal = from.drain(toDrain, true);
+                    return drainedReal.amount;
                 }
             }
         }
+
+        return 0;
     }
 
-    public static void push(IFluidHandler from, IFluidHandler to, FluidStack out) {
+    public static int push(IFluidHandler from, IFluidHandler to, FluidStack out) {
         if (out != null && out.amount > 0) {
             FluidStack drained = from.drain(out, false);
             if (drained != null && drained.amount > 0) {
@@ -48,9 +51,12 @@ public final class FluidUtils {
                 if (amt > 0) {
                     FluidStack toDrain = drained;
                     toDrain.amount = amt;
-                    from.drain(toDrain, true);
+                    FluidStack drainedReal = from.drain(toDrain, true);
+                    return drainedReal.amount;
                 }
             }
         }
+
+        return 0;
     }
 }

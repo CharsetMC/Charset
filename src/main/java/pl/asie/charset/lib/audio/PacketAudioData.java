@@ -20,7 +20,6 @@ import io.netty.buffer.ByteBuf;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -31,8 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.audio.AudioData;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.AudioSink;
-import pl.asie.charset.api.audio.IDataPCM;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.api.audio.IAudioDataPCM;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.audio.manager.AudioStreamOpenAL;
 import pl.asie.charset.lib.audio.manager.IAudioStream;
@@ -90,12 +88,12 @@ public class PacketAudioData extends Packet {
 			return;
 		}
 
-		if (!(audioData instanceof IDataPCM) || ((IDataPCM) audioData).getSampleSize() != 1) {
+		if (!(audioData instanceof IAudioDataPCM) || ((IAudioDataPCM) audioData).getSampleSize() != 1) {
 			// Nope!
 			return;
 		}
 
-		IDataPCM pcmPacket = (IDataPCM) audioData;
+		IAudioDataPCM pcmPacket = (IAudioDataPCM) audioData;
 		byte[] data = pcmPacket.getSamplePCMData();
 		if (pcmPacket.isSampleSigned()) {
 			byte[] data2 = new byte[data.length];

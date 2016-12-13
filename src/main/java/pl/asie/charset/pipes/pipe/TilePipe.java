@@ -13,24 +13,24 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.CapabilityItemHandler;
+import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.IConnectable;
 import pl.asie.charset.lib.utils.GenericExtendedProperty;
 import pl.asie.charset.pipes.ModCharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
-public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable {
+public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable, IDebuggable {
     public class InsertionHandler implements IItemInsertionHandler {
         private final EnumFacing facing;
 
@@ -256,7 +256,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         return direction == null ? 0 : shifterDistance[direction.ordinal()];
     }
 
-    private void propagateShifterChange(EnumFacing dir, IShifter shifter, int shifterDist) {
+    private boolean markShifterChange(EnumFacing dir, IShifter shifter, int shifterDist) {
         int i = dir.ordinal();
         int oldDistance = shifterDistance[i];
 
@@ -266,13 +266,14 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             shifterDistance[i] = 0;
         }
 
-        System.out.println("update " + getPos() + " " + dir + " " + oldDistance + " -> " + shifterDistance[i]);
+        return oldDistance != shifterDistance[i];
+    }
 
-        if (oldDistance != shifterDistance[i]) {
-            TilePipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(dir), null);
-            if (pipe != null) {
-                pipe.propagateShifterChange(dir, shifter, shifterDist + 1);
-            }
+    private void propagateShifterChange(EnumFacing dir, IShifter shifter, int shifterDist) {
+        TilePipe pipe = this;
+        while (pipe != null && pipe.markShifterChange(dir, shifter, shifterDist)) {
+            pipe = PipeUtils.getPipe(getWorld(), pipe.getPos().offset(dir), null);
+            shifterDist++;
         }
     }
 
@@ -307,6 +308,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
                 }
             }
         }
+
+        // TODO
+        // fluid.markFlowPath(null, false);
 
         if (sendPacket && connectionCache != oc) {
             markBlockForUpdate();
@@ -385,6 +389,10 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
     }
 
+    protected void updateObservers() {
+        getWorld().updateObservingBlocksAt(getPos(), getBlockType());
+    }
+
     protected boolean injectItemInternal(PipeItem item, EnumFacing dir, boolean simulate) {
         if (item.isValid()) {
             int stuckItems = 0;
@@ -413,6 +421,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
                 item.reset(this, dir);
                 item.sendPacket(true);
             }
+
             return true;
         } else {
             return false;
@@ -486,6 +495,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        if (capability == Capabilities.DEBUGGABLE)
+            return true;
+
         if (facing != null && connects(facing)) {
             return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
                     || capability == Capabilities.ITEM_INSERTION_HANDLER;
@@ -496,6 +508,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        if (capability == Capabilities.DEBUGGABLE)
+            return Capabilities.DEBUGGABLE.cast(this);
+
         if (facing != null && connects(facing)) {
             if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
                 return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluid.tanks[facing.ordinal()]);
@@ -508,5 +523,31 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             }
         }
         return null;
+    }
+
+    @Override
+    public void addDebugInformation(List<String> stringList, Side side) {
+        if (side != Side.SERVER)
+            return;
+
+        StringBuilder info = new StringBuilder();
+        info.append("i" + getPipeItems().size());
+
+        stringList.add(info.toString());
+
+        for (int i = 0; i <= 6; i++) {
+            EnumFacing facing = DirectionUtils.get(i);
+            StringBuilder sideInfo = new StringBuilder();
+
+            sideInfo.append(facing != null ? facing.name().charAt(0) : 'C');
+            sideInfo.append(": ");
+            sideInfo.append(i < 6 && connects(facing) ? '+' : '-');
+            sideInfo.append(" f" + fluid.tanks[i].type.name().charAt(0) + "(" + fluid.tanks[i].amount + ")");
+            if (i < 6) {
+                sideInfo.append(" s" + shifterDistance[i]);
+            }
+
+            stringList.add(sideInfo.toString());
+        }
     }
 }

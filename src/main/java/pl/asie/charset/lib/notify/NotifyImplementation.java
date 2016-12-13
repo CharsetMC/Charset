@@ -56,19 +56,29 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
+import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.ProxyClient;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 
 public class NotifyImplementation {
-    @SidedProxy(clientSide = "pl.asie.charset.lib.notify.RenderMessages", serverSide = "pl.asie.charset.lib.notify.RenderMessagesProxy")
+//    @SidedProxy(modId = "charsetlib", clientSide = "pl.asie.charset.lib.notify.RenderMessages", serverSide = "pl.asie.charset.lib.notify.RenderMessagesProxy")
     public static RenderMessagesProxy proxy;
     public static NotifyNetwork net = new NotifyNetwork();
     
     public static NotifyImplementation instance;
     
     public static void init() {
+        // TODO: HACK! Wait on Forge fix
+        try {
+            if (ModCharsetLib.proxy instanceof ProxyClient) {
+                proxy = (RenderMessagesProxy) Class.forName("pl.asie.charset.lib.notify.RenderMessages").newInstance();
+            } else {
+                proxy = (RenderMessagesProxy) Class.forName("pl.asie.charset.lib.notify.RenderMessagesProxy").newInstance();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
         NotifyImplementation.instance = new NotifyImplementation();
         MinecraftForge.EVENT_BUS.register(NotifyImplementation.instance);
         PointNetworkHandler.INSTANCE.initialize();

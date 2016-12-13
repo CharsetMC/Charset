@@ -33,7 +33,6 @@ import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
@@ -43,7 +42,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.animation.FastTESR;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.render.DualTESR;
@@ -53,7 +51,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 public class SpecialRendererPipe extends DualTESR<TilePipe> {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
-	private static final float ITEM_RANDOM_OFFSET = 0.01F;
+	private static final float ITEM_OFFSET_MULTIPLIER = 0.02F;
 
 	private static final float TANK_MIN = 4.01f;
 	private static final float TANK_MAX = 11.99f;
@@ -103,6 +101,7 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 	private final class ItemModelTransformer implements ModelTransformer.IVertexTransformer {
 		private ItemStack stack;
 		private float scale;
+		private float[] offset = new float[3];
 		private EnumFacing direction;
 
 		@Override
@@ -126,7 +125,7 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 					}
 				}
 				for (int i = 0; i < 3; i++) {
-					data[i] = ((data[i] - 0.5f) * scale);
+					data[i] = ((data[i] - 0.5f) * scale) + offset[i];
 				}
 			} else if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR && quad.hasTintIndex()) {
 				int k = itemColors.getColorFromItemstack(stack, quad.getTintIndex());
@@ -204,34 +203,19 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 
 	private float[] calculateItemOffset(PipeItem item, float partialTicks) {
 		EnumFacing id = item.getDirection();
-		float[] offset;
 
 		if (id == null) {
 			return new float[] { 0.5f, 0.5f, 0.5f };
 		} else if (partialTicks == 0 || item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
-			offset = new float[] { item.getX(), item.getY(), item.getZ() };
+			return new float[] { item.getX(), item.getY(), item.getZ() };
 		} else {
 			float partialMul = partialTicks * PipeItem.SPEED / PipeItem.MAX_PROGRESS;
-			offset = new float[]{
+			return new float[]{
 				item.getX() + (partialMul * id.getFrontOffsetX()),
 				item.getY() + (partialMul * id.getFrontOffsetY()),
 				item.getZ() + (partialMul * id.getFrontOffsetZ())
 			};
 		}
-
-		PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
-
-		switch (id.getAxis()) {
-			case Y:
-			case X:
-				offset[0] += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-				break;
-			case Z:
-				offset[2] += PREDICTIVE_ITEM_RANDOM.nextFloat() * ITEM_RANDOM_OFFSET;
-				break;
-		}
-
-		return offset;
 	}
 
 	@Override
@@ -294,6 +278,22 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 					ITEM_MODEL_TRANSFORMER.stack = stack;
 					ITEM_MODEL_TRANSFORMER.scale = getItemScale(item);
 					ITEM_MODEL_TRANSFORMER.direction = id;
+
+					if (id != null) {
+						PREDICTIVE_ITEM_RANDOM.setSeed(item.id);
+
+						switch (id.getAxis()) {
+							case Y:
+							case X:
+								ITEM_MODEL_TRANSFORMER.offset[0] = (PREDICTIVE_ITEM_RANDOM.nextFloat() - 0.5F) * ITEM_OFFSET_MULTIPLIER;
+								ITEM_MODEL_TRANSFORMER.offset[2] = 0;
+								break;
+							case Z:
+								ITEM_MODEL_TRANSFORMER.offset[0] = 0;
+								ITEM_MODEL_TRANSFORMER.offset[2] = (PREDICTIVE_ITEM_RANDOM.nextFloat() - 0.5F) * ITEM_OFFSET_MULTIPLIER;
+								break;
+						}
+					}
 
 					item.transformedFacing = id;
 					item.transformedModel = ModelTransformer.transform(model, DEFAULT_STATE, 0L, ITEM_MODEL_TRANSFORMER);

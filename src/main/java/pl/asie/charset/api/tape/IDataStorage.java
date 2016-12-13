@@ -18,6 +18,9 @@ package pl.asie.charset.api.tape;
 
 import java.io.IOException;
 
+/**
+ * The data storage class used, for example, by CharsetAudio.
+ */
 public interface IDataStorage {
 	void initialize(String id, int position, int size);
 	boolean isInitialized();

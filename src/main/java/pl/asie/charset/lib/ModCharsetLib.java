@@ -59,15 +59,16 @@ import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 
-@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart;after:jei@[3.13.3.373,)")
+@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = ModCharsetLib.DEP_LIB)
 public class ModCharsetLib {
-	public static final boolean INDEV = false;
-
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "charsetlib";
 	public static final String NAME = "‽";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_DEFAULT = "required-after:forge@[13.19.0.2160,);required-after:charsetlib@" + VERSION + ";after:mcmultipart";
+	public static final String DEP_LIB = "required-after:forge@[13.19.1.2188,);after:mcmultipart;after:jei@[4.0.5.201,)";
+	public static final String DEP_DEFAULT = DEP_LIB + ";required-after:charsetlib@" + VERSION;
+
+	public static final boolean INDEV = ("@version@".equals(VERSION.toLowerCase()));
 
 	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
 		@Override
@@ -140,6 +141,9 @@ public class ModCharsetLib {
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(proxy);
 		ColorUtils.initialize();
+
+		if (INDEV)
+			MinecraftForge.EVENT_BUS.register(new InDevEventHandler());
 
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");

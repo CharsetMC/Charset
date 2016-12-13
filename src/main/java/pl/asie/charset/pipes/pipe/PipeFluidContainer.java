@@ -30,8 +30,10 @@ import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
+import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
 
 public class PipeFluidContainer implements ITickable {
     private static boolean CAN_BE_DRAINED = false;
@@ -82,8 +84,21 @@ public class PipeFluidContainer implements ITickable {
         }
     }
 
+    public enum TankType {
+	    NONE,
+	    INPUT,
+	    OUTPUT;
+
+	    private static final TankType[] INVERTED = {NONE, OUTPUT, INPUT};
+
+	    public TankType invert() {
+		    return INVERTED[ordinal()];
+	    }
+    }
+
     public class Tank implements IFluidHandler {
         public final EnumFacing location;
+	    public TankType type = TankType.NONE;
         public int amount;
         private boolean dirty;
 
@@ -198,6 +213,10 @@ public class PipeFluidContainer implements ITickable {
                 return null;
             }
         }
+
+	    public int getFreeSpace() {
+		    return TANK_SIZE - amount;
+	    }
     }
 
     public static final int TANK_RATE = 80;
@@ -231,10 +250,13 @@ public class PipeFluidContainer implements ITickable {
         if (fluidStack != null) {
             fluidStack.writeToNBT(nbt);
             int[] amt = new int[7];
+            byte[] flags = new byte[7];
             for (int i = 0; i <= 6; i++) {
                 amt[i] = tanks[i].amount;
+                flags[i] = (byte) tanks[i].type.ordinal();
             }
             nbt.setIntArray("TankAmts", amt);
+            nbt.setByteArray("TankFlags", flags);
         }
     }
 
@@ -253,6 +275,62 @@ public class PipeFluidContainer implements ITickable {
                     tanks[i].amount = Math.min(TANK_SIZE, amt[i]);
                 }
             }
+
+            byte[] flags = nbt.getByteArray("TankFlags");
+            if (flags != null && flags.length == 7) {
+                for (int i = 0; i <= 6; i++) {
+                    tanks[i].type = TankType.values()[flags[i] % 3];
+                }
+            }
+        }
+    }
+
+    public void markFlowPath(EnumFacing inputDir, boolean isFlowing) {
+        // get strongest shifter
+        EnumSet<EnumFacing> shiftedSides = isFlowing && inputDir != null ? EnumSet.of(inputDir) : EnumSet.noneOf(EnumFacing.class);
+        EnumSet<EnumFacing> updateSides = EnumSet.noneOf(EnumFacing.class);
+
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            int dist = owner.getShifterStrength(facing);
+            if (dist > 0) {
+                IShifter shifter = owner.getNearestShifter(facing);
+                if (shifter != null && shifter.isShifting()) {
+                    System.out.println("i am be shifting");
+                    shiftedSides.add(facing.getOpposite());
+                }
+            }
+        }
+
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            TankType oldType = tanks[facing.ordinal()].type;
+            if (shiftedSides.size() > 0) {
+                if (owner.connects(facing)) {
+                    if (shiftedSides.contains(facing)) {
+                        tanks[facing.ordinal()].type = TankType.INPUT;
+                    } else {
+                        tanks[facing.ordinal()].type = TankType.OUTPUT;
+                    }
+                } else {
+                    tanks[facing.ordinal()].type = TankType.NONE;
+                }
+            } else {
+                tanks[facing.ordinal()].type = TankType.NONE;
+            }
+
+            if (facing == EnumFacing.DOWN && owner.connects(facing) && tanks[0].type == TankType.NONE)
+                tanks[0].type = TankType.OUTPUT;
+
+            if (oldType != tanks[facing.ordinal()].type) {
+                updateSides.add(facing);
+            }
+        }
+
+        for (EnumFacing facing : updateSides) {
+            TilePipe pipe = PipeUtils.getPipe(owner.getWorld(), owner.getPos().offset(facing), facing.getOpposite());
+            if (pipe != null) {
+                System.out.println(owner.getPos() + " " + facing + " " + tanks[facing.ordinal()].type);
+                pipe.fluid.markFlowPath(facing.getOpposite(), tanks[facing.ordinal()].type == TankType.OUTPUT);
+            }
         }
     }
 
@@ -266,92 +344,48 @@ public class PipeFluidContainer implements ITickable {
             return;
         }
 
-        EnumFacing pushDir = null;
-        int shifterDist = Integer.MAX_VALUE;
-
-        for (EnumFacing facing : EnumFacing.VALUES) {
-            if (owner.connects(facing)) {
-                int sStr = owner.getShifterStrength(facing);
-                if (sStr > 0 && sStr < shifterDist) {
-                    IShifter s = owner.getNearestShifter(facing);
-                    if (s != null && s.isShifting() && s.matches(fluidStack)) {
-                        pushDir = facing;
-                        shifterDist = sStr;
-                    }
-                }
-            } else {
-                tanks[facing.ordinal()].amount = 0;
-            }
-        }
-
         CAN_BE_DRAINED = true;
 
-        if (pushDir != null) {
-            pushAll(pushDir);
-        } else if (owner.connects(EnumFacing.DOWN)) {
-            pushAll(EnumFacing.DOWN);
-        } else {
-            /* FluidStack baseStack = tanks[6].get();
-            if (baseStack == null) {
-                List<EnumFacing> dirs = new ArrayList<EnumFacing>(6);
-                for (EnumFacing facing : EnumFacing.VALUES) {
-                    dirs.add(facing);
-                }
-                Collections.shuffle(dirs);
-                for (EnumFacing facing : dirs) {
-                    if (tanks[facing.ordinal()].get() != null) {
-                        baseStack = tanks[facing.ordinal()].get();
-                        break;
-                    }
-                }
-            }
+	    int inputAmount = 0;
+	    int inputCount = 0;
+	    int outputFreeAmount = 0;
+	    int outputCount = 0;
 
-            if (baseStack != null) {
-                float amount = baseStack.amount;
-                Set<Tank> tankSet = new HashSet<Tank>();
-
-                for (int i = 0; i <= 6; i++) {
-                    if (i == 6 || owner.connects(EnumFacing.getFront(i))) {
-                        Tank tank = tanks[i];
-                        if (tank.get() != null && tank.get().isFluidEqual(baseStack)) {
-                            tankSet.add(tank);
-                            amount += tank.get().amount;
-                        } else if (tank.get() == null) {
-                            tankSet.add(tank);
-                        }
-                    }
+	    // count fluids, [O]->Neighbour
+	    for (int i = 0; i < 6; i++)
+	    	if (tanks[i].type == TankType.INPUT) {
+			    inputAmount += tanks[i].amount;
+			    inputCount++;
+		    } else if (tanks[i].type == TankType.OUTPUT && i < 6) {
+                IFluidHandler handler = getTankBlockNeighbor(owner.getPos(), EnumFacing.getFront(i));
+                if (handler != null) {
+                    FluidUtils.push(tanks[i], handler, TANK_RATE);
                 }
+			    outputFreeAmount += tanks[i].getFreeSpace();
+			    outputCount++;
+		    }
 
-                int tankCount = tankSet.size();
+	    if (outputCount > 0 && outputFreeAmount > 0) {
+		    // [N]->[O]
+		    int pushAmount = tanks[6].amount;
+		    for (int i = 0; i < 6; i++) {
+			    if (tanks[i].type == TankType.OUTPUT) {
+				    int toPush = Math.min(pushAmount * tanks[i].getFreeSpace() / outputFreeAmount, tanks[6].amount);
+				    FluidUtils.push(tanks[6], tanks[i], Math.min(toPush, TANK_RATE));
+			    }
+		    }
+	    }
 
-                if (amount > 0) {
-                    for (Tank tank : tankSet) {
-                        int amt = Math.round(amount / tankCount);
-                        if (amt > 0) {
-                            if (tank.stack != null && tank.stack.amount != amt) {
-                                tank.stack.amount = amt;
-                                tank.dirty = true;
-                            } else if (tank.stack == null) {
-                                tank.stack = baseStack.copy();
-                                tank.stack.amount = amt;
-                                tank.dirty = true;
-                            }
-                        } else {
-                            if (tank.stack != null) {
-                                tank.stack = null;
-                                tank.dirty = true;
-                            }
-                        }
-                        amount -= amt;
-                        tankCount--;
-                    }
-                }
-
-                if (amount > 0) {
-                    ModCharsetLib.logger.warn(String.format("[PipeFluidContainer->equalize] Accidentally voided %.3f mB at %s!", amount, owner.getPos().toString()));
-                }
-            } */
-        }
+	    if (inputCount > 0 && inputAmount > 0) {
+		    // [I]->[N]
+		    int pushFreeSpace = tanks[6].getFreeSpace();
+		    for (int i = 0; i < 6; i++) {
+			    if (tanks[i].type == TankType.INPUT) {
+					int toPush = Math.min(pushFreeSpace * tanks[i].amount / inputAmount, tanks[i].amount);
+					FluidUtils.push(tanks[i], tanks[6], Math.min(toPush, TANK_RATE));
+			    }
+		    }
+	    }
 
         CAN_BE_DRAINED = false;
 

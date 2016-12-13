@@ -178,10 +178,11 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	private void updateFluids(TileEntity input, TilePipe output, EnumFacing direction) {
 		if (input != null && output != null) {
 			IFluidHandler inTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, input, direction);
-			if (inTank != null) {
+			IFluidHandler outTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, output, direction.getOpposite());
+			if (inTank != null && outTank != null) {
 				FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
 				if (stack != null && matches(stack)) {
-					FluidUtils.push(inTank, output.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite()), stack);
+					FluidUtils.push(inTank, outTank, stack);
 				}
 			}
 		}
@@ -273,7 +274,6 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 		if (oldRedstoneLevel != redstoneLevel) {
 			markBlockForUpdate();
-			// Necessary? world.neighborChanged(pos, getBlockType(), pos);
 		}
 
 		EnumFacing direction = getDirection();

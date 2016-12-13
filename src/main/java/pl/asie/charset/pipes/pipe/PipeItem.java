@@ -442,6 +442,7 @@ public class PipeItem {
 			return;
 		}
 
+		owner.updateObservers();
 		calculateOutputDirection();
 		updateStuckFlag();
 		sendPacket(false);
