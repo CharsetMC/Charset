@@ -24,15 +24,16 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.lib.ModCharsetLib;
 
 public final class ItemUtils {
 	private ItemUtils() {
@@ -140,6 +141,14 @@ public final class ItemUtils {
 			}
 
 			return true;
+		}
+	}
+
+	public static EntityItem giveOrSpawnItemEntity(EntityPlayer player, World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
+		if (!ModCharsetLib.alwaysDropDroppablesGivenToPlayer && player.inventory != null && !PlayerUtils.isFakePlayer(player) && player.inventory.addItemStackToInventory(stack)) {
+			return null;
+		} else {
+			return spawnItemEntity(world, loc, stack, mXm, mYm, mZm, randomness);
 		}
 	}
 

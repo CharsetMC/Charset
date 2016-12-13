@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
@@ -96,6 +97,8 @@ public class ModCharsetLib {
 		}
 	};
 	public static Logger logger;
+	public static Configuration config;
+	public static boolean alwaysDropDroppablesGivenToPlayer;
 
 	private File configurationDirectory;
 
@@ -111,6 +114,9 @@ public class ModCharsetLib {
 		if (!configurationDirectory.exists()) {
 			configurationDirectory.mkdir();
 		}
+
+		config = new Configuration(getConfigFile("lib.cfg"));
+		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
 
 		charsetIconItem = new IconCharset();
 		GameRegistry.register(charsetIconItem.setRegistryName("icon"));
@@ -128,6 +134,8 @@ public class ModCharsetLib {
 
 		Capabilities.init();
 		NotifyImplementation.init();
+
+		config.save();
 	}
 
 	@Mod.EventHandler

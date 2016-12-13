@@ -459,55 +459,13 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return !getSilkedItem(is).isEmpty();
     }
 
-
-    //Network stuff TODO
-
-    void updateClients(BarrelMessage messageType) {
-        if (hasWorld()) {
-            markBlockForUpdate();
-        }
+    void updateCountClients() {
+        ModCharsetStorage.packet.sendToWatching(new PacketBarrelCountUpdate(this), this);
     }
 
-    /* FMLProxyPacket getPacket(BarrelMessage messageType) {
-        if (messageType == BarrelMessage.BarrelItem) {
-            return Core.network.TEmessagePacket(this, messageType, NetworkFactorization.nullItem(item), getItemCount());
-        } else if (messageType == BarrelMessage.BarrelCount) {
-            return Core.network.TEmessagePacket(this, messageType, getItemCount());
-        } else {
-            new IllegalArgumentException("bad MessageType: " + messageType).printStackTrace();
-            return null;
-        }
+    protected void onCountUpdate(PacketBarrelCountUpdate packet) {
+        item.setCount(packet.count);
     }
-
-    void updateClients(BarrelMessage messageType) {
-        if (world == null || world.isRemote) {
-            return;
-        }
-        broadcastMessage(null, getPacket(messageType));
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean handleMessageFromServer(Enum messageType, ByteBuf input) throws IOException {
-        if (super.handleMessageFromServer(messageType, input)) {
-            return true;
-        }
-        if (messageType == BarrelMessage.BarrelCount) {
-            setItemCount(input.readInt());
-            return true;
-        }
-        if (messageType == BarrelMessage.BarrelItem) {
-            item = DataUtil.readStack(input);
-            setItemCount(input.readInt());
-            return true;
-        }
-        if (messageType == BarrelMessage.BarrelDoubleClickHack) {
-            Minecraft mc = Minecraft.getMinecraft();
-            mc.playerController.currentItemHittingBlock = mc.player.getHeldItem();
-            return true;
-        }
-        return false;
-    } */
 
     //Inventory code
 
@@ -525,9 +483,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (c != last_mentioned_count) {
             if (last_mentioned_count*c <= 0) {
                 //One of them was 0
-                updateClients(BarrelMessage.BarrelItem);
+                markBlockForUpdate();
             } else {
-                updateClients(BarrelMessage.BarrelCount);
+                updateCountClients();
             }
             last_mentioned_count = c;
         }
@@ -614,7 +572,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         if (take > 0) {
             held.shrink(take);
             if (veryNew) {
-                updateClients(BarrelMessage.BarrelItem);
+                markBlockForUpdate();
             }
         } else {
             info(entityplayer);
@@ -761,48 +719,44 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return true;
     }
 
-    public void click(EntityPlayer entityplayer) {
+    public void click(EntityPlayer player) {
         EnumHand hand = EnumHand.MAIN_HAND;
         // left click: remove a stack, or punt if properly equipped
-        if (punt(entityplayer, hand)) {
+        if (punt(player, hand)) {
             return;
         }
 
         if (item.isEmpty()) {
-            info(entityplayer);
+            info(player);
             return;
         }
 
-        ItemStack origHeldItem = entityplayer.getHeldItem(hand);
+        ItemStack origHeldItem = player.getHeldItem(hand);
         if (ForgeHooks.canToolHarvestBlock(world, pos, origHeldItem)) {
             return;
         }
 
-        int to_remove = Math.min(item.getMaxStackSize(), getItemCount());
-        if (entityplayer.isSneaking() && to_remove >= 1) {
-            to_remove = 1;
+        int removeCount = Math.min(item.getMaxStackSize(), getItemCount());
+        if (removeCount <= 0)
+            return;
+
+        if (player.isSneaking()) {
+            removeCount = 1;
+        } else if (removeCount == getItemCount() && removeCount > 1) {
+            removeCount--;
         }
-        if (to_remove > 1 && to_remove == getItemCount()) {
-            to_remove--;
-        }
+
         BlockPos dropPos = getPos();
-        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), entityplayer, Block.FULL_BLOCK_AABB, 0);
+        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), player, Block.FULL_BLOCK_AABB, 0);
         if (result != null && result.sideHit != null) {
             dropPos = dropPos.offset(result.sideHit);
+        } else {
+            dropPos = dropPos.offset(orientation.facing);
         }
-        ItemUtils.spawnItemEntity(world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), makeStack(to_remove), 0.2f, 0.2f, 0.2f, 1);
-        item.shrink(to_remove);
+
+        ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), makeStack(removeCount), 0.2f, 0.2f, 0.2f, 1);
+        item.shrink(removeCount);
         onItemChange(false);
-        Entity ent = null;
-        // TODO
-        //Entity ent = ItemUtil.giveItem(entityplayer, new Coord(this), makeStack(to_remove), SpaceUtil.getOrientation(last_hit_side));
-        if (ent != null && ent.isDead && !(entityplayer instanceof FakePlayer)) {
-            ItemStack newHeld = entityplayer.getHeldItem(hand);
-            if (newHeld != origHeldItem) {
-                // TODO
-                // broadcastMessage(entityplayer, BarrelMessage.BarrelDoubleClickHack);
-            }
-        }
     }
 
     void info(final EntityPlayer entityplayer) {
@@ -869,8 +823,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             to_drop = Math.min(item.getMaxStackSize(), count);
             count -= to_drop;
             ItemUtils.spawnItemEntity(world, new Vec3d(getPos()).addVector(0.5, 0.5, 0.5), makeStack(to_drop), 0.2f, 0.2f, 0.2f, 1);
-            // TODO
-            //ItemUtil.giveItem(null, new Coord(this), makeStack(to_drop), null);
             if (count <= 0) {
                 break;
             }
@@ -1011,16 +963,5 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         } catch (Exception e) {
             return isWooden() ? 20 : 0;
         }
-    }
-
-    enum BarrelMessage {
-        BarrelItem, BarrelCount, BarrelDoubleClickHack;
-        static final BarrelMessage[] VALUES = values();
-    }
-
-    // TODO
-    // @Override
-    public Enum[] getMessages() {
-        return BarrelMessage.VALUES;
     }
 }

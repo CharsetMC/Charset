@@ -49,15 +49,7 @@ import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RecipeUtils;
-import pl.asie.charset.storage.barrel.BarrelCartRecipe;
-import pl.asie.charset.storage.barrel.BarrelEventListener;
-import pl.asie.charset.storage.barrel.BarrelRegistry;
-import pl.asie.charset.storage.barrel.BarrelUpgradeRecipes;
-import pl.asie.charset.storage.barrel.BlockBarrel;
-import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
-import pl.asie.charset.storage.barrel.ItemDayBarrel;
-import pl.asie.charset.storage.barrel.ItemMinecartDayBarrel;
-import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
+import pl.asie.charset.storage.barrel.*;
 import pl.asie.charset.storage.locking.*;
 
 import javax.annotation.Nullable;
@@ -150,6 +142,8 @@ public class ModCharsetStorage {
 
 		packet = new PacketRegistry(ModCharsetStorage.MODID);
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
+
+		packet.registerPacket(0x01, PacketBarrelCountUpdate.class);
 
 		MinecraftForge.EVENT_BUS.register(new LockEventHandler());
 

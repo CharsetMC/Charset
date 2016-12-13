@@ -47,6 +47,11 @@ public class PacketRegistry {
 	}
 
 	public void registerPacket(int id, Class<? extends Packet> packet) {
+		try {
+			packet.getConstructor();
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException("No empty constructor defined! This is a Charset bug!", e);
+		}
 		idPacketMap.put(id, packet);
 		packetIdMap.put(packet, id);
 	}
