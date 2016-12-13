@@ -85,7 +85,7 @@ public class ItemWrench extends Item {
 
             /* if (Loader.isModLoaded("mcmultipart")) {
                 EnumActionResult result = tryRotateMultipart(playerIn, worldIn, pos, targetFacing);
-                if (result != EnumActionResult.PASS) {
+                if (res2ult != EnumActionResult.PASS) {
                     return result;
                 }
             } */
