@@ -56,6 +56,9 @@ public class PipeItem {
 	protected ItemStack stack;
 	protected int progress;
 
+	protected EnumFacing transformedFacing;
+	protected Object transformedModel;
+
 	private int activeShifterDistance;
 	private PartPipe owner;
 	private boolean stuck;

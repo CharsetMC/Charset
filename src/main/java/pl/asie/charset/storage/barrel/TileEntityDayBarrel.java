@@ -1076,6 +1076,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
 
         if (orientation != oldOrientation) {
             markBlockForUpdate();
+            getWorld().notifyNeighborsRespectDebug(pos, getBlockType());
         }
     }
 
