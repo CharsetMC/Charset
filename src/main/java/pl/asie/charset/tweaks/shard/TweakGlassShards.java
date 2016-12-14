@@ -76,6 +76,17 @@ public class TweakGlassShards extends Tweak {
 
 	@SubscribeEvent
 	public void onBlockHarvest(BlockEvent.HarvestDropsEvent event) {
+		if (event.getState() == null) {
+			return;
+		}
+
+		// WORKAROUND: Some mods seem to like event.getDrops() being null.
+		// This is not what Forge does.
+		if (event.getDrops() == null) {
+			ModCharsetLib.logger.error("Block " + event.getState().getBlock().getRegistryName() + " provides a null getDrops() list, against Forge's original method behaviour! This is a bug in the mod providing it!");
+			return;
+		}
+
 		if (event.getDrops().size() > 0) {
 			return;
 		}
