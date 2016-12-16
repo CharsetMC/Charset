@@ -379,6 +379,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 	public void update() {
 		if (requestUpdate && getWorld() != null) {
 			ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
+			requestUpdate = false;
 		}
 
 		if (neighborBlockChanged && getWorld() != null) {

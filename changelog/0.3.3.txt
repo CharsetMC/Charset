@@ -1,1 +1,4 @@
+* [Pipes] Fix small lag issue
 * [Pipes, Storage] Backported a selection of 1.11 fixes/optimizations
+* [Storage] [#95] Fix Lock entity not having a localized name
+* [Tweaks] [#97] Add workaround for blocks returning null getDrops() in Glass Shards tweak
