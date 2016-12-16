@@ -23,12 +23,12 @@ group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.11-13.19.0.2178"
+	version = "1.11-13.19.1.2188"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20161203"
+	mappings = "snapshot_20161208"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -39,6 +39,10 @@ repositories {
 	maven {
 		name 'DVS1 Maven FS'
 		url 'http://dvs1.progwml6.com/files/maven'
+	}
+	maven {
+		name 'Sonatype OSSRH (Snapshots)'
+		url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
 	ivy {
 		name 'asie dependency mirror'
@@ -53,9 +57,11 @@ configurations {
 
 dependencies {
 //	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.3.0_87:universal"
-	deobfCompile "mezz.jei:jei_1.11:4.0.4.199"
+	deobfCompile "mezz.jei:jei_1.11:4.0.5.201"
 	shadow name: "libresample4j", version: "bc0a030"
-//	shadow name: "JTraits", version: "18c8227"
+	shadow "net.sandius.rembulan:rembulan-runtime:0.1-SNAPSHOT"
+	shadow "net.sandius.rembulan:rembulan-compiler:0.1-SNAPSHOT"
+	shadow "net.sandius.rembulan:rembulan-stdlib:0.1-SNAPSHOT"
 }
 
 sourceSets {
@@ -94,6 +100,7 @@ shadowJar {
 	configurations = [project.configurations.shadow]
 	relocate 'com.amadornes.jtraits', 'pl.asie.charset.lib.jtraits'
 	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.audio.libresample4j'
+	relocate 'net.sandius.rembulan', 'pl.asie.charset.scripting.rembulan'
 }
 
 reobfJar {

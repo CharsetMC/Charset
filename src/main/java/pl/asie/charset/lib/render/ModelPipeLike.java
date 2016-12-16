@@ -33,6 +33,10 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedModel {
+    private static final boolean DEBUG = false;
+    private static final boolean RENDER_INNER_FACES = true;
+    private static final boolean RENDER_OUTER_FACES = true;
+
     private static final EnumFacing[][] CONNECTION_DIRS = new EnumFacing[][]{
             {EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST},
             {EnumFacing.SOUTH, EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.EAST},
@@ -51,13 +55,19 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
             ModelRotation.X270_Y90
     };
 
-    private final List<BakedQuad>[] lists = new List[65];
+    private final List<BakedQuad>[] lists = new List[64];
     private final IUnlistedProperty<T> property;
 
     public ModelPipeLike(IUnlistedProperty<T> property) {
         this.property = property;
+        addDefaultBlockTransforms();
+    }
 
-        for (int i = 0; i < 64; i++) {
+    private List<BakedQuad> getPipeQuads(int i) {
+        if (i == 64)
+            i = 48;
+
+        if (DEBUG || lists[i] == null) {
             boolean[] connections = new boolean[6];
             for (int j = 0; j < 6; j++) {
                 if ((i & (1 << j)) != 0) {
@@ -68,8 +78,7 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
             lists[i] = ImmutableList.copyOf(generateQuads(connections));
         }
 
-        lists[64] = lists[48];
-        addDefaultBlockTransforms();
+        return lists[i];
     }
 
     public int getOutsideColor(EnumFacing facing) {
@@ -102,36 +111,36 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
                 if (connections[neighbors[2].ordinal()]) {
                     from = new Vector3f(0, min, min);
                     to = new Vector3f(min, min, max);
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
 
                 if (connections[neighbors[0].ordinal()]) {
                     from = new Vector3f(min, min, 0);
                     to = new Vector3f(max, min, min);
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
 
                 if (connections[neighbors[3].ordinal()]) {
                     from = new Vector3f(max, min, min);
                     to = new Vector3f(16, min, max);
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
 
                 if (connections[neighbors[1].ordinal()]) {
                     from = new Vector3f(min, min, max);
                     to = new Vector3f(max, min, 16);
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
             } else {
                 // Not connected; render one quad.
                 from = new Vector3f(connections[neighbors[2].ordinal()] ? 0 : min, min, connections[neighbors[0].ordinal()] ? 0 : min);
                 to = new Vector3f(connections[neighbors[3].ordinal()] ? 16 : max, min, connections[neighbors[1].ordinal()] ? 16 : max);
-                quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                if (!isOpaque()) {
+                if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                if (RENDER_INNER_FACES && !isOpaque()) {
                     quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
             }
@@ -141,7 +150,6 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
 
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
-
         if (side != null) {
             return Collections.emptyList();
         }
@@ -152,7 +160,7 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
         }
 
         if (target == null) {
-            return lists[64];
+            return getPipeQuads(64);
         }
 
         int pointer = 0;
@@ -160,6 +168,6 @@ public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedMod
             pointer = (pointer << 1) | (target.connects(f) ? 1 : 0);
         }
 
-        return lists[pointer];
+        return getPipeQuads(pointer);
     }
 }

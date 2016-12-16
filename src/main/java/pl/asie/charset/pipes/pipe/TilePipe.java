@@ -232,6 +232,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         if (requestUpdate) {
             markBlockForRenderUpdate();
             ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
+            requestUpdate = false;
         }
 
         if (neighborsUpdate != 0) {
