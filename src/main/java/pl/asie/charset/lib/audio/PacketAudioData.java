@@ -71,10 +71,18 @@ public class PacketAudioData extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		int id = buf.readInt();
-		AudioPacket packet = new AudioPacket();
+		id = buf.readInt();
+		packet = new AudioPacket();
 		packet.readData(buf);
 
+		if (ModCharsetLib.proxy.isClientThread()) {
+			apply();
+		} else {
+			ModCharsetLib.proxy.addScheduledClientTask(this::apply);
+		}
+	}
+
+	public void apply() {
 		AudioData audioData = packet.getData();
 		if (audioData instanceof IDataSound) {
 			IDataSound sound = (IDataSound) audioData;

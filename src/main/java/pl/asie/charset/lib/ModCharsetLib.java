@@ -56,7 +56,7 @@ import pl.asie.charset.lib.wires.RecipeResultWire;
 import pl.asie.charset.lib.wires.WireFactory;
 import pl.asie.charset.lib.wires.WireManager;
 
-@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart;after:JEI@[3.13.3.373,)")
+@Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = "after:mcmultipart;after:JEI@[3.13.3.373,)", acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetLib {
 	public static final boolean INDEV = false;
 
@@ -66,6 +66,7 @@ public class ModCharsetLib {
 	public static final String VERSION = "@VERSION@";
 	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart@[1.3.0,)";
 	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
+	public static final String ACCEPTABLE_REMOTE_VERSIONS = "@VERSION@";
 
 	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
 		@Override

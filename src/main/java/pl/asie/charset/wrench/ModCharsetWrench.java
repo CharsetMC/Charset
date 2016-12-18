@@ -27,7 +27,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.ModCharsetLib;
 
 @Mod(modid = ModCharsetWrench.MODID, name = ModCharsetWrench.NAME, version = ModCharsetWrench.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetWrench {
 	public static final String MODID = "CharsetWrench";
 	public static final String NAME = "/";

@@ -41,27 +41,20 @@ public class PacketDriveState extends PacketPart {
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
-		final State newState = State.values()[buf.readUnsignedByte()];
+		state = State.values()[buf.readUnsignedByte()];
 
 		if (part instanceof PartTapeDrive) {
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					((PartTapeDrive) part).setState(newState);
-				}
-			};
-
 			if (part.getWorld().isRemote) {
 				if (ModCharsetLib.proxy.isClientThread()) {
-					runnable.run();
+					apply();
 				} else {
-					ModCharsetLib.proxy.addScheduledClientTask(runnable);
+					ModCharsetLib.proxy.addScheduledClientTask(this::apply);
 				}
 			} else {
 				if (!getThreadListener(handler).isCallingFromMinecraftThread()) {
-					getThreadListener(handler).addScheduledTask(runnable);
+					getThreadListener(handler).addScheduledTask(this::apply);
 				} else {
-					runnable.run();
+					apply();
 				}
 			}
 		}
@@ -71,5 +64,9 @@ public class PacketDriveState extends PacketPart {
 	public void writeData(ByteBuf buf) {
 		super.writeData(buf);
 		buf.writeByte(state.ordinal());
+	}
+
+	public void apply() {
+		((PartTapeDrive) part).setState(state);
 	}
 }

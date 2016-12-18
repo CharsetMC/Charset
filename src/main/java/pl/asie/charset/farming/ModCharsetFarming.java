@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 import pl.asie.charset.lib.ModCharsetLib;
 
 @Mod(modid = ModCharsetFarming.MODID, name = ModCharsetFarming.NAME, version = ModCharsetFarming.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetFarming {
 	public static final String MODID = "CharsetFarming";
 	public static final String NAME = ";";

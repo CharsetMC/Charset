@@ -52,7 +52,7 @@ import pl.asie.charset.pipes.shifter.ShifterStorage;
 import pl.asie.charset.pipes.shifter.TileShifter;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
-		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetPipes {
 	public static final String MODID = "CharsetPipes";
 	public static final String NAME = "|";

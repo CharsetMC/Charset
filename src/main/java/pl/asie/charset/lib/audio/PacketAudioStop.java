@@ -19,6 +19,7 @@ package pl.asie.charset.lib.audio;
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.network.INetHandler;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.network.Packet;
 
@@ -35,7 +36,17 @@ public class PacketAudioStop extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		AudioStreamManager.INSTANCE.remove(buf.readInt());
+		id = buf.readInt();
+
+		if (ModCharsetLib.proxy.isClientThread()) {
+			apply();
+		} else {
+			ModCharsetLib.proxy.addScheduledClientTask(this::apply);
+		}
+	}
+
+	public void apply() {
+		AudioStreamManager.INSTANCE.remove(id);
 	}
 
 	@Override

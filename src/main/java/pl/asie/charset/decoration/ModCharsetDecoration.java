@@ -34,7 +34,7 @@ import pl.asie.charset.decoration.poster.ItemPoster;
 import pl.asie.charset.lib.ModCharsetLib;
 
 @Mod(modid = ModCharsetDecoration.MODID, name = ModCharsetDecoration.NAME, version = ModCharsetDecoration.VERSION,
-		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
+		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetDecoration {
 	public static final String MODID = "CharsetDecoration";
 	public static final String NAME = "^";
