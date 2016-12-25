@@ -47,6 +47,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -62,19 +63,11 @@ import java.util.EnumSet;
 import java.util.Iterator;
 
 public class NotifyImplementation {
-//    @SidedProxy(modId = "charsetlib", clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
+    @SidedProxy(modId = "charsetlib", clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
     public static NotifyProxy proxy;
     public static NotifyImplementation instance;
     
     public static void init() {
-        // TODO: HACK! Wait on Forge fix
-        try {
-            if (ModCharsetLib.proxy instanceof ProxyClient) {
-                proxy = (NotifyProxy) Class.forName("pl.asie.charset.lib.notify.NotifyProxyClient").newInstance();
-            } else {
-                proxy = (NotifyProxy) Class.forName("pl.asie.charset.lib.notify.NotifyProxy").newInstance();
-            }
-        } catch (Exception e) { e.printStackTrace(); }
         NotifyImplementation.instance = new NotifyImplementation();
         MinecraftForge.EVENT_BUS.register(NotifyImplementation.instance);
     }
