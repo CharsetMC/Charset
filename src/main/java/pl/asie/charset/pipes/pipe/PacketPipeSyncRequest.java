@@ -18,12 +18,16 @@ package pl.asie.charset.pipes.pipe;
 
 import io.netty.buffer.ByteBuf;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
 import pl.asie.charset.lib.network.PacketPart;
 import pl.asie.charset.lib.network.PacketTile;
 
 public class PacketPipeSyncRequest extends PacketTile {
+	private EntityPlayer requester;
+
 	public PacketPipeSyncRequest() {
 		super();
 	}
@@ -35,15 +39,16 @@ public class PacketPipeSyncRequest extends PacketTile {
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
+		requester = handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).playerEntity : null;
 	}
 
 	@Override
 	public void apply() {
-		if (tile == null || !(tile instanceof TilePipe)) {
+		if (requester == null || tile == null || !(tile instanceof TilePipe)) {
 			return;
 		}
 
-		((TilePipe) tile).onSyncRequest();
+		((TilePipe) tile).onSyncRequest(requester);
 	}
 
 	@Override

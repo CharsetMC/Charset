@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.render;
 
-import gnu.trove.function.TIntFunction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResourceManager;
@@ -26,7 +25,7 @@ public abstract class PixelOperationSprite extends TextureAtlasSprite {
 
     @Override
     public boolean load(IResourceManager manager, ResourceLocation loc) {
-        BufferedImage image = RenderUtils.getBufferedImage(location);
+        BufferedImage image = RenderUtils.getTextureImage(location);
         if (image == null) {
             return false;
         }

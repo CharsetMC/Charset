@@ -34,15 +34,19 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.factorization;
+package pl.asie.charset.lib.utils;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.factorization.Quaternion;
+import pl.asie.charset.lib.factorization.SpaceUtil;
 
 import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
 
 public enum Orientation {
     FACE_DOWN_POINT_SOUTH(EnumFacing.DOWN, EnumFacing.SOUTH),
@@ -211,25 +215,25 @@ public enum Orientation {
     }
 
     @SideOnly(Side.CLIENT)
-    private static javax.vecmath.Matrix4f newMat() {
-        javax.vecmath.Matrix4f ret = new javax.vecmath.Matrix4f();
+    private static Matrix4f newMat() {
+        Matrix4f ret = new Matrix4f();
         ret.setIdentity();
         return ret;
     }
 
     @SideOnly(Side.CLIENT)
     public TRSRTransformation toTransformation() {
-        Quaternion fzq = Quaternion.fromOrientation(this.getSwapped());
-        javax.vecmath.Matrix4f trans = newMat();
-        javax.vecmath.Matrix4f rot = newMat();
-        javax.vecmath.Matrix4f r90 = newMat();
+        Quaternion quat = Quaternion.fromOrientation(this.getSwapped());
+        Matrix4f trans = newMat();
+        Matrix4f rot = newMat();
+        Matrix4f r90 = newMat();
 
         r90.setRotation(new AxisAngle4f(0, 1, 0, (float) Math.PI / 2));
 
-        trans.setTranslation(new javax.vecmath.Vector3f(0.5F, 0.5F, 0.5F));
-        javax.vecmath.Matrix4f iTrans = new javax.vecmath.Matrix4f(trans);
+        trans.setTranslation(new Vector3f(0.5F, 0.5F, 0.5F));
+        Matrix4f iTrans = new Matrix4f(trans);
         iTrans.invert();
-        rot.setRotation(fzq.toJavax());
+        rot.setRotation(quat.toJavax());
         rot.mul(r90);
 
         trans.mul(rot);

@@ -73,9 +73,9 @@ public class EntityPoster extends Entity {
     private static final DataParameter<NBTTagCompound> PARAMETER_TAG = EntityDataManager.createKey(EntityPoster.class, DataSerializersCharset.NBT_TAG_COMPOUND);
 
     /* private static final DataParameter<Optional<ItemStack>> PARAMETER_INV = EntityDataManager.createKey(EntityPoster.class, DataSerializers.OPTIONAL_ITEM_STACK);
-    private static final DataParameter<Quaternion> PARAMETER_ROT = EntityDataManager.createKey(EntityPoster.class, DataSerializersCharset.FZ_OUATERNION);
+    private static final DataParameter<Quaternion> PARAMETER_ROT = EntityDataManager.createKey(EntityPoster.class, DataSerializersCharset.OUATERNION);
     private static final DataParameter<Float> PARAMETER_SCALE = EntityDataManager.createKey(EntityPoster.class, DataSerializers.FLOAT);
-    private static final DataParameter<Quaternion> PARAMETER_BASE_ROT = EntityDataManager.createKey(EntityPoster.class, DataSerializersCharset.FZ_OUATERNION);
+    private static final DataParameter<Quaternion> PARAMETER_BASE_ROT = EntityDataManager.createKey(EntityPoster.class, DataSerializersCharset.OUATERNION);
     private static final DataParameter<Float> PARAMETER_BASE_SCALE = EntityDataManager.createKey(EntityPoster.class, DataSerializers.FLOAT);
     private static final DataParameter<Integer> PARAMETER_SPIN_NORMAL = EntityDataManager.createKey(EntityPoster.class, DataSerializers.VARINT);
     private static final DataParameter<Integer> PARAMETER_SPIN_VERTICAL = EntityDataManager.createKey(EntityPoster.class, DataSerializers.VARINT);
@@ -237,7 +237,7 @@ public class EntityPoster extends Entity {
 
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player != null) {
-            if (!locked || PlayerUtils.isCreative(player)) {
+            if (!locked || player.isCreative()) {
                 if (inv.getItem() == ModCharsetDecoration.posterItem) return true;
                 if (player.isSneaking()) return true;
                 ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
@@ -251,7 +251,7 @@ public class EntityPoster extends Entity {
     public boolean hitByEntity(Entity ent) {
         if (!world.isRemote && ent instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) ent;
-            if (!locked || PlayerUtils.isCreative(player)) {
+            if (!locked || player.isCreative()) {
                 ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
                 if (!held.isEmpty() && (isItemTilting(held) || isItemRotating(held) || isItemScaling(held))) {
                     return false;

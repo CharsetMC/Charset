@@ -44,15 +44,12 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -61,8 +58,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.blocks.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.utils.GenericExtendedProperty;
-import pl.asie.charset.storage.ModCharsetStorage;
+import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import java.util.*;
 
@@ -171,7 +167,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         return new TileEntityDayBarrel();
     }
 
-    public static final IUnlistedProperty<BarrelCacheInfo> BARREL_INFO = new GenericExtendedProperty<>("info", BarrelCacheInfo.class);
+    public static final IUnlistedProperty<BarrelCacheInfo> BARREL_INFO = new UnlistedPropertyGeneric<>("info", BarrelCacheInfo.class);
 
     @Override
     protected BlockStateContainer createBlockState() {

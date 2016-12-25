@@ -18,6 +18,7 @@ package pl.asie.charset.lib.render;
 
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -40,9 +41,19 @@ public class CharsetFaceBakery extends FaceBakery {
         );
 
         if (hasColor) {
-            RenderUtils.recolorQuad(quad, tintIndex);
+           recolorQuad(quad, tintIndex);
         }
 
+        return quad;
+    }
+
+    private BakedQuad recolorQuad(BakedQuad quad, int color) {
+        int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
+        int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
+        int[] vertexData = quad.getVertexData();
+        for (int i = 0; i < 4; i++) {
+            vertexData[v * i + c] = RenderUtils.multiplyColor(vertexData[v * i + c], color);
+        }
         return quad;
     }
 }

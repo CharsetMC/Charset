@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.utils;
+package pl.asie.charset.lib;
 
 import net.minecraft.util.EnumFacing;
 

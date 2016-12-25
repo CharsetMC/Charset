@@ -145,7 +145,7 @@ public final class ItemUtils {
 	}
 
 	public static EntityItem giveOrSpawnItemEntity(EntityPlayer player, World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
-		if (!ModCharsetLib.alwaysDropDroppablesGivenToPlayer && player.inventory != null && !PlayerUtils.isFakePlayer(player) && player.inventory.addItemStackToInventory(stack)) {
+		if (!ModCharsetLib.alwaysDropDroppablesGivenToPlayer && player.inventory != null && !PlayerUtils.isFake(player) && player.inventory.addItemStackToInventory(stack)) {
 			return null;
 		} else {
 			return spawnItemEntity(world, loc, stack, mXm, mYm, mZm, randomness);

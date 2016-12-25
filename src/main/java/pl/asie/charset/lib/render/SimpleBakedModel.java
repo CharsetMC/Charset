@@ -62,13 +62,6 @@ public class SimpleBakedModel implements IPerspectiveAwareModel {
         }
     }
 
-    public void addModel(IBakedModel model, int tint) {
-        for (int i = 0; i < 7; i++) {
-            EnumFacing side = i == 6 ? null : EnumFacing.getFront(i);
-            RenderUtils.addRecoloredQuads(model.getQuads(null, side, 0), tint, quads[i], side);
-        }
-    }
-
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
         return quads[side == null ? 6 : side.ordinal()];

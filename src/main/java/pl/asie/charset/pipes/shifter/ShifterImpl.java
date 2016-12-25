@@ -23,7 +23,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.utils.FluidUtils;
+import pl.asie.charset.lib.utils.FluidHandlerHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 /**
@@ -89,7 +89,7 @@ public class ShifterImpl implements IShifter {
                 return true;
             } else {
                 IFluidHandler handler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, filter, null);
-                return handler != null ? FluidUtils.matches(handler, source) : true;
+                return handler != null ? FluidHandlerHelper.matches(handler, source) : true;
             }
         } else {
             return false;

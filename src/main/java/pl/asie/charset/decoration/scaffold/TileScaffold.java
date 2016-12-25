@@ -1,18 +1,16 @@
 package pl.asie.charset.decoration.scaffold;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockRenderLayer;
 import pl.asie.charset.decoration.ModCharsetDecoration;
 import pl.asie.charset.lib.blocks.TileBase;
-import pl.asie.charset.lib.utils.GenericExtendedProperty;
+import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 public class TileScaffold extends TileBase {
-	public static final GenericExtendedProperty<ScaffoldCacheInfo> PROPERTY = new GenericExtendedProperty<>("tile", ScaffoldCacheInfo.class);
+	public static final UnlistedPropertyGeneric<ScaffoldCacheInfo> PROPERTY = new UnlistedPropertyGeneric<>("tile", ScaffoldCacheInfo.class);
 	private ItemStack plank = ItemStack.EMPTY;
 
 	public ItemStack getPlank() {

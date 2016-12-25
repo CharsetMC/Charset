@@ -17,6 +17,7 @@
 package pl.asie.charset.lib.blocks;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -74,7 +75,7 @@ public class TileBase extends TileEntity {
 	@Override
 	public final NBTTagCompound getUpdateTag() {
 		NBTTagCompound compound = super.writeToNBT(new NBTTagCompound());
-		writeNBTData(compound, true);
+		compound = writeNBTData(compound, true);
 		return compound;
 	}
 
@@ -88,7 +89,7 @@ public class TileBase extends TileEntity {
 	@Override
 	public final void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		readNBTData(compound, false);
+		readNBTData(compound, (world instanceof WorldClient));
 	}
 
 	@Override

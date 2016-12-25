@@ -2,6 +2,7 @@ package pl.asie.charset.pipes.pipe;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -15,11 +16,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.IConnectable;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
@@ -53,7 +55,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
     }
 
-    public static final GenericExtendedProperty<TilePipe> PROPERTY = new GenericExtendedProperty<TilePipe>("part", TilePipe.class);
+    public static final UnlistedPropertyGeneric<TilePipe> PROPERTY = new UnlistedPropertyGeneric<TilePipe>("part", TilePipe.class);
 
     final PipeFluidContainer fluid = new PipeFluidContainer(this);
     boolean renderFast = false;
@@ -488,15 +490,14 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         return null;
     }
 
-    protected void onSyncRequest() {
-        // TODO: HACK! HACK! HACK! HACK! HACK! HACK! HACK! HACK!
+    protected void onSyncRequest(EntityPlayer player) {
         synchronized (itemSet) {
             for (PipeItem p : itemSet) {
-                p.sendPacket(true);
+                ModCharsetPipes.packet.sendTo(p.getSyncPacket(true), player);
             }
         }
 
-        fluid.sendPacket(true);
+        ModCharsetPipes.packet.sendTo(fluid.getSyncPacket(true), player);
     }
 
     @Override

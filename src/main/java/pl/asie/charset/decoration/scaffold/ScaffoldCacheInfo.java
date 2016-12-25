@@ -1,7 +1,6 @@
 package pl.asie.charset.decoration.scaffold;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -14,7 +13,7 @@ public class ScaffoldCacheInfo implements IRenderComparable<ScaffoldCacheInfo> {
 	}
 
 	public static ScaffoldCacheInfo from(TileScaffold tile) {
-		return new ScaffoldCacheInfo(RenderUtils.getSprite(tile.getPlank()));
+		return new ScaffoldCacheInfo(RenderUtils.getItemSprite(tile.getPlank()));
 	}
 
 	public static ScaffoldCacheInfo from(ItemStack stack) {

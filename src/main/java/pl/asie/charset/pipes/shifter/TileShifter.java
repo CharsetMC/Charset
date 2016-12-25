@@ -38,7 +38,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.utils.FluidUtils;
+import pl.asie.charset.lib.utils.FluidHandlerHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
@@ -166,7 +166,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		for (ItemStack s : filters) {
 			if (!s.isEmpty()) {
 				IFluidHandler handler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, s, null);
-				if (handler != null && FluidUtils.matches(handler, stack)) {
+				if (handler != null && FluidHandlerHelper.matches(handler, stack)) {
 					return true;
 				}
 			}
@@ -182,7 +182,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			if (inTank != null && outTank != null) {
 				FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
 				if (stack != null && matches(stack)) {
-					FluidUtils.push(inTank, outTank, stack);
+					FluidHandlerHelper.push(inTank, outTank, stack);
 				}
 			}
 		}
@@ -269,7 +269,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 		redstoneLevel = 0;
 		for (EnumFacing d : EnumFacing.VALUES) {
-			redstoneLevel = Math.max(redstoneLevel, RedstoneUtils.getRedstonePowerWithWire(world, pos.offset(d), d));
+			redstoneLevel = Math.max(redstoneLevel, RedstoneUtils.getRedstonePower(world, pos.offset(d), d));
 		}
 
 		if (oldRedstoneLevel != redstoneLevel) {

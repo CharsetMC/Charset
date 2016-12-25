@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.common.base.Function;
-import gnu.trove.function.TIntFunction;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -49,7 +48,6 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.render.CharsetFaceBakery;
-import pl.asie.charset.lib.render.SimpleBakedModel;
 
 import javax.annotation.Nonnull;
 
@@ -69,8 +67,8 @@ public final class RenderUtils {
 
 	}
 
-	public static BakedQuad bakeFace(Vector3f from, Vector3f to, @Nonnull EnumFacing facing,
-							   TextureAtlasSprite sprite, int tintIndex) {
+	public static BakedQuad createQuad(Vector3f from, Vector3f to, @Nonnull EnumFacing facing,
+									   TextureAtlasSprite sprite, int tintIndex) {
 		Vector3f fFrom = new Vector3f(from);
 		Vector3f fTo = new Vector3f(to);
 		EnumFacing.AxisDirection facingDir = facing.getAxisDirection();
@@ -134,7 +132,7 @@ public final class RenderUtils {
 		return 0xFF000000 | avgColor[0] | (avgColor[1] << 8) | (avgColor[2] << 16);
 	}
 
-	public static BufferedImage getBufferedImage(ResourceLocation location) {
+	public static BufferedImage getTextureImage(ResourceLocation location) {
 		try {
 			ResourceLocation pngLocation = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {"textures", location.getResourcePath(), ".png"}));
 			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(pngLocation);
@@ -145,7 +143,7 @@ public final class RenderUtils {
 		}
 	}
 
-	public static TextureAtlasSprite getSprite(ItemStack stack) {
+	public static TextureAtlasSprite getItemSprite(ItemStack stack) {
 		if (renderItem == null) {
 			renderItem = Minecraft.getMinecraft().getRenderItem();
 		}
@@ -153,7 +151,7 @@ public final class RenderUtils {
 		return renderItem.getItemModelWithOverrides(stack, null, null).getParticleTexture();
 	}
 
-	public static boolean isDynamicItemRenderer(World world, ItemStack stack) {
+	public static boolean isBuiltInRenderer(World world, ItemStack stack) {
 		if (renderItem == null) {
 			renderItem = Minecraft.getMinecraft().getRenderItem();
 		}
@@ -198,41 +196,6 @@ public final class RenderUtils {
 		return null;
 	}
 
-	public static BakedQuad clone(BakedQuad quad) {
-		return new BakedQuad(quad.getVertexData(), quad.getTintIndex(), quad.getFace(), quad.getSprite(), quad.shouldApplyDiffuseLighting(), quad.getFormat());
-	}
-
-	public static BakedQuad recolorQuad(BakedQuad quad, int color) {
-		int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
-		int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-		int[] vertexData = quad.getVertexData();
-		for (int i = 0; i < 4; i++) {
-			vertexData[v * i + c] = multiplyColor(vertexData[v * i + c], color);
-		}
-		return quad;
-	}
-
-	public static int multiplyColor(int src, int dst) {
-		int out = 0;
-		for (int i = 0; i < 32; i += 8) {
-			out |= ((((src >> i) & 0xFF) * ((dst >> i) & 0xFF) / 0xFF) & 0xFF) << i;
-		}
-		return out;
-	}
-
-	public static void addRecoloredQuads(List<BakedQuad> src, int color, List<BakedQuad> target, EnumFacing facing) {
-		for (BakedQuad quad : src) {
-			BakedQuad quad1 = clone(quad);
-			int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
-			int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
-			int[] vertexData = quad1.getVertexData();
-			for (int i = 0; i < 4; i++) {
-				vertexData[v * i + c] = multiplyColor(vertexData[v * i + c], color);
-			}
-			target.add(quad1);
-		}
-	}
-
 	public static IModel getModel(ResourceLocation location) {
 		try {
 			IModel model = ModelLoaderRegistry.getModel(location);
@@ -246,18 +209,16 @@ public final class RenderUtils {
 		}
 	}
 
-	private static int getLineMask(int y, int x, int z) {
+	private static int getSelectionMask(int y, int x, int z) {
 		return 1 << (y * 4 + x * 2 + z);
 	}
 
 	private static void drawLine(VertexBuffer worldrenderer, Tessellator tessellator, double x1, double y1, double z1, double x2, double y2, double z2) {
-		worldrenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
 		worldrenderer.pos(x1, y1, z1).endVertex();
 		worldrenderer.pos(x2, y2, z2).endVertex();
-		tessellator.draw();
 	}
 
-	public static int getLineMask(EnumFacing face) {
+	public static int getSelectionMask(EnumFacing face) {
 		int lineMask = 0;
 		switch (face) {
 			case DOWN:
@@ -265,28 +226,28 @@ public final class RenderUtils {
 			case UP:
 				return 0xF00;
 			case NORTH:
-				lineMask |= getLineMask(1, 0, 0);
-				lineMask |= getLineMask(1, 1, 0);
-				lineMask |= getLineMask(0, 0, 0);
-				lineMask |= getLineMask(2, 0, 0);
+				lineMask |= getSelectionMask(1, 0, 0);
+				lineMask |= getSelectionMask(1, 1, 0);
+				lineMask |= getSelectionMask(0, 0, 0);
+				lineMask |= getSelectionMask(2, 0, 0);
 				return lineMask;
 			case SOUTH:
-				lineMask |= getLineMask(1, 0, 1);
-				lineMask |= getLineMask(1, 1, 1);
-				lineMask |= getLineMask(0, 0, 1);
-				lineMask |= getLineMask(2, 0, 1);
+				lineMask |= getSelectionMask(1, 0, 1);
+				lineMask |= getSelectionMask(1, 1, 1);
+				lineMask |= getSelectionMask(0, 0, 1);
+				lineMask |= getSelectionMask(2, 0, 1);
 				return lineMask;
 			case WEST:
-				lineMask |= getLineMask(1, 0, 0);
-				lineMask |= getLineMask(1, 0, 1);
-				lineMask |= getLineMask(0, 1, 0);
-				lineMask |= getLineMask(2, 1, 0);
+				lineMask |= getSelectionMask(1, 0, 0);
+				lineMask |= getSelectionMask(1, 0, 1);
+				lineMask |= getSelectionMask(0, 1, 0);
+				lineMask |= getSelectionMask(2, 1, 0);
 				return lineMask;
 			case EAST:
-				lineMask |= getLineMask(1, 1, 0);
-				lineMask |= getLineMask(1, 1, 1);
-				lineMask |= getLineMask(0, 1, 1);
-				lineMask |= getLineMask(2, 1, 1);
+				lineMask |= getSelectionMask(1, 1, 0);
+				lineMask |= getSelectionMask(1, 1, 1);
+				lineMask |= getSelectionMask(0, 1, 1);
+				lineMask |= getSelectionMask(2, 1, 1);
 				return lineMask;
 		}
 		return lineMask;
@@ -303,69 +264,79 @@ public final class RenderUtils {
 
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer worldrenderer = tessellator.getBuffer();
-		if ((lineMask & getLineMask(0, 0, 0)) != 0) {
+		worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+		if ((lineMask & getSelectionMask(0, 0, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.minY, boundingBox.minZ);
 		}
-		if ((lineMask & getLineMask(0, 0, 1)) != 0) {
+		if ((lineMask & getSelectionMask(0, 0, 1)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.maxZ,
 					boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
 		}
-		if ((lineMask & getLineMask(0, 1, 0)) != 0) {
+		if ((lineMask & getSelectionMask(0, 1, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.minX, boundingBox.minY, boundingBox.maxZ);
 		}
-		if ((lineMask & getLineMask(0, 1, 1)) != 0) {
+		if ((lineMask & getSelectionMask(0, 1, 1)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
 		}
-		if ((lineMask & getLineMask(1, 0, 0)) != 0) {
+		if ((lineMask & getSelectionMask(1, 0, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.minX, boundingBox.maxY, boundingBox.minZ);
 		}
-		if ((lineMask & getLineMask(1, 0, 1)) != 0) {
+		if ((lineMask & getSelectionMask(1, 0, 1)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.maxZ,
 					boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getLineMask(1, 1, 0)) != 0) {
+		if ((lineMask & getSelectionMask(1, 1, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
 		}
-		if ((lineMask & getLineMask(1, 1, 1)) != 0) {
+		if ((lineMask & getSelectionMask(1, 1, 1)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.minY, boundingBox.maxZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getLineMask(2, 0, 0)) != 0) {
+		if ((lineMask & getSelectionMask(2, 0, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.maxY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
 		}
-		if ((lineMask & getLineMask(2, 0, 1)) != 0) {
+		if ((lineMask & getSelectionMask(2, 0, 1)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.maxY, boundingBox.maxZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getLineMask(2, 1, 0)) != 0) {
+		if ((lineMask & getSelectionMask(2, 1, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.maxY, boundingBox.minZ,
 					boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getLineMask(2, 1, 1)) != 0) {
+		if ((lineMask & getSelectionMask(2, 1, 1)) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
 		}
+		tessellator.draw();
 
 		GlStateManager.depthMask(true);
 		GlStateManager.enableTexture2D();
 		GlStateManager.disableBlend();
+	}
+
+	public static int multiplyColor(int src, int dst) {
+		int out = 0;
+		for (int i = 0; i < 32; i += 8) {
+			out |= ((((src >> i) & 0xFF) * ((dst >> i) & 0xFF) / 0xFF) & 0xFF) << i;
+		}
+		return out;
 	}
 }

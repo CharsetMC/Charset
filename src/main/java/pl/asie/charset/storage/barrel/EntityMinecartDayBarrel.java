@@ -36,7 +36,6 @@
 
 package pl.asie.charset.storage.barrel;
 
-import com.google.common.base.Optional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -55,10 +54,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import pl.asie.charset.lib.factorization.Orientation;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.storage.ModCharsetStorage;
-
-import javax.annotation.Nullable;
 
 public class EntityMinecartDayBarrel extends EntityMinecart {
     private static final DataParameter<ItemStack> BARREL_ITEM = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);

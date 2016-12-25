@@ -99,8 +99,8 @@ public class TweakAutoReplace extends Tweak {
 	/**
 	 * Returns if the destroyed item can be replaced with this item.
 	 */
-	private static boolean canReplace(@Nullable ItemStack replacement, @Nonnull ItemStack destroyed) {
-		if (replacement == null) {
+	private static boolean canReplace(@Nonnull ItemStack replacement, @Nonnull ItemStack destroyed) {
+		if (replacement.isEmpty()) {
 			return false;
 		}
 

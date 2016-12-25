@@ -2,7 +2,7 @@ package pl.asie.charset.lib.recipe;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
-import pl.asie.charset.lib.utils.MiscUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class RecipeObjectOreDict implements IRecipeObject {
     private final int id;
@@ -13,7 +13,7 @@ public class RecipeObjectOreDict implements IRecipeObject {
 
     @Override
     public boolean matches(ItemStack stack) {
-        return stack != null && MiscUtils.contains(OreDictionary.getOreIDs(stack), id);
+        return stack != null && ArrayUtils.contains(OreDictionary.getOreIDs(stack), id);
     }
 
     @Override

@@ -60,7 +60,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.factorization.Orientation;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.factorization.Quaternion;
 import pl.asie.charset.lib.factorization.SpaceUtil;
 import pl.asie.charset.lib.render.ModelTransformer;

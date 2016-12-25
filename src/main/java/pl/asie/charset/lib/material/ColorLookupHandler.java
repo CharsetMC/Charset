@@ -7,8 +7,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+import org.apache.commons.lang3.ArrayUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.utils.MiscUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 public class ColorLookupHandler {
@@ -62,7 +62,7 @@ public class ColorLookupHandler {
 
     public int getDefaultColor(ItemStack stack) {
         int[] oreIDs = OreDictionary.getOreIDs(stack);
-        if (MiscUtils.contains(oreIDs, OreDictionary.getOreID("logWood"))) {
+        if (ArrayUtils.contains(oreIDs, OreDictionary.getOreID("logWood"))) {
             return 0xff735e39;
         } else {
             IBlockState state = ItemUtils.getBlockState(stack);
@@ -73,7 +73,7 @@ public class ColorLookupHandler {
     public int getColor(ItemStack stack, RenderUtils.AveragingMode mode) {
         Key key = new Key(stack, mode);
         if (!COLOR_MAP.containsKey(key)) {
-            TextureAtlasSprite sprite = RenderUtils.getSprite(stack);
+            TextureAtlasSprite sprite = RenderUtils.getItemSprite(stack);
             if (sprite.getIconName().endsWith("missingno")) {
                 COLOR_MAP.put(key, getDefaultColor(stack));
             } else {

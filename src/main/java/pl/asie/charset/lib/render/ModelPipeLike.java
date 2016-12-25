@@ -25,7 +25,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.lib.utils.IConnectable;
+import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.ArrayList;

@@ -51,7 +51,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
-import pl.asie.charset.lib.factorization.Orientation;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.factorization.SpaceUtil;
 import pl.asie.charset.storage.ModCharsetStorage;
 

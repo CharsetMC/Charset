@@ -9,8 +9,8 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
-public final class FluidUtils {
-    private FluidUtils() {
+public final class FluidHandlerHelper {
+    private FluidHandlerHelper() {
 
     }
 
@@ -43,9 +43,9 @@ public final class FluidUtils {
         return 0;
     }
 
-    public static int push(IFluidHandler from, IFluidHandler to, FluidStack out) {
-        if (out != null && out.amount > 0) {
-            FluidStack drained = from.drain(out, false);
+    public static int push(IFluidHandler from, IFluidHandler to, FluidStack pushed) {
+        if (pushed != null && pushed.amount > 0) {
+            FluidStack drained = from.drain(pushed, false);
             if (drained != null && drained.amount > 0) {
                 int amt = to.fill(drained, true);
                 if (amt > 0) {

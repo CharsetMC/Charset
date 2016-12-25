@@ -35,17 +35,6 @@
             "url": "http://charset.asie.pl"
         },
         {
-            "modid": "CharsetAudio",
-            "name": "♫",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Tape Drives and various audio transport methods",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl"
-        },
-        {
             "modid": "CharsetStorage",
             "name": "#",
             "version": "${version}",

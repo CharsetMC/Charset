@@ -28,7 +28,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.utils.FluidUtils;
+import pl.asie.charset.lib.utils.FluidHandlerHelper;
 import pl.asie.charset.pipes.ModCharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
@@ -359,7 +359,7 @@ public class PipeFluidContainer implements ITickable {
 		    } else if (tanks[i].type == TankType.OUTPUT && i < 6) {
                 IFluidHandler handler = getTankBlockNeighbor(owner.getPos(), EnumFacing.getFront(i));
                 if (handler != null) {
-                    FluidUtils.push(tanks[i], handler, TANK_RATE);
+                    FluidHandlerHelper.push(tanks[i], handler, TANK_RATE);
                 }
 			    outputFreeAmount += tanks[i].getFreeSpace();
 			    outputCount++;
@@ -371,7 +371,7 @@ public class PipeFluidContainer implements ITickable {
 		    for (int i = 0; i < 6; i++) {
 			    if (tanks[i].type == TankType.OUTPUT) {
 				    int toPush = Math.min(pushAmount * tanks[i].getFreeSpace() / outputFreeAmount, tanks[6].amount);
-				    FluidUtils.push(tanks[6], tanks[i], Math.min(toPush, TANK_RATE));
+				    FluidHandlerHelper.push(tanks[6], tanks[i], Math.min(toPush, TANK_RATE));
 			    }
 		    }
 	    }
@@ -382,7 +382,7 @@ public class PipeFluidContainer implements ITickable {
 		    for (int i = 0; i < 6; i++) {
 			    if (tanks[i].type == TankType.INPUT) {
 					int toPush = Math.min(pushFreeSpace * tanks[i].amount / inputAmount, tanks[i].amount);
-					FluidUtils.push(tanks[i], tanks[6], Math.min(toPush, TANK_RATE));
+					FluidHandlerHelper.push(tanks[i], tanks[6], Math.min(toPush, TANK_RATE));
 			    }
 		    }
 	    }
@@ -392,9 +392,13 @@ public class PipeFluidContainer implements ITickable {
         checkPacketUpdate();
     }
 
+    PacketFluidUpdate getSyncPacket(boolean ignoreDirty) {
+        return new PacketFluidUpdate(owner, this, ignoreDirty);
+    }
+
     void sendPacket(boolean ignoreDirty) {
         if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-            ModCharsetPipes.packet.sendToAllAround(new PacketFluidUpdate(owner, this, ignoreDirty), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+            ModCharsetPipes.packet.sendToAllAround(getSyncPacket(ignoreDirty), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
         }
     }
 
@@ -417,11 +421,11 @@ public class PipeFluidContainer implements ITickable {
     }
 
     private void pushAll(EnumFacing pushDir) {
-        FluidUtils.push(tanks[pushDir.ordinal()], getTankBlockNeighbor(owner.getPos(), pushDir), TANK_RATE);
-        FluidUtils.push(tanks[6], tanks[pushDir.ordinal()], TANK_RATE);
+        FluidHandlerHelper.push(tanks[pushDir.ordinal()], getTankBlockNeighbor(owner.getPos(), pushDir), TANK_RATE);
+        FluidHandlerHelper.push(tanks[6], tanks[pushDir.ordinal()], TANK_RATE);
         for (EnumFacing facing : EnumFacing.VALUES) {
             if (facing != pushDir && owner.connects(facing)) {
-                FluidUtils.push(tanks[facing.ordinal()], tanks[6], TANK_RATE);
+                FluidHandlerHelper.push(tanks[facing.ordinal()], tanks[6], TANK_RATE);
             }
         }
     }

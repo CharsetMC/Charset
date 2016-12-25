@@ -19,15 +19,12 @@ package pl.asie.charset.lib.render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class SpritesheetFactory {
     private final ResourceLocation location;
@@ -55,7 +52,7 @@ public class SpritesheetFactory {
         @Override
         public boolean load(IResourceManager manager, ResourceLocation loc) {
             if (sheet == null) {
-                sheet = RenderUtils.getBufferedImage(location);
+                sheet = RenderUtils.getTextureImage(location);
                 if (sheet == null) {
                     ModCharsetLib.logger.warn("Could not find texture sheet " + location + "!");
                     return false;

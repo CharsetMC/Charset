@@ -18,11 +18,11 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class GenericExtendedProperty<T> implements IUnlistedProperty<T> {
+public class UnlistedPropertyGeneric<T> implements IUnlistedProperty<T> {
     private final String name;
     private final Class<T> klazz;
 
-    public GenericExtendedProperty(String name, Class<T> klazz) {
+    public UnlistedPropertyGeneric(String name, Class<T> klazz) {
         this.name = name;
         this.klazz = klazz;
     }

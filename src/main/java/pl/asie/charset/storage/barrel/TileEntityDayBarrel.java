@@ -36,7 +36,7 @@
 
 package pl.asie.charset.storage.barrel;
 
-import pl.asie.charset.lib.factorization.Orientation;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.INoticeUpdater;
 import net.minecraft.block.Block;

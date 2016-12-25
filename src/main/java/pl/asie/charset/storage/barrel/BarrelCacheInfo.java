@@ -39,7 +39,7 @@ package pl.asie.charset.storage.barrel;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
-import pl.asie.charset.lib.factorization.Orientation;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.render.IRenderComparable;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -88,8 +88,8 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     }
 
     public static BarrelCacheInfo from(TileEntityDayBarrel barrel) {
-        TextureAtlasSprite log = RenderUtils.getSprite(barrel.woodLog);
-        TextureAtlasSprite slab = RenderUtils.getSprite(barrel.woodSlab);
+        TextureAtlasSprite log = RenderUtils.getItemSprite(barrel.woodLog);
+        TextureAtlasSprite slab = RenderUtils.getItemSprite(barrel.woodSlab);
         Orientation fzo = barrel.orientation;
         TileEntityDayBarrel.Type type = barrel.type;
         return new BarrelCacheInfo(log, barrel.woodLog, slab, type, fzo, isMetal(barrel.woodLog));

@@ -11,7 +11,7 @@ import pl.asie.charset.lib.factorization.Quaternion;
 import java.io.IOException;
 
 public class DataSerializersCharset {
-    public static final DataSerializer<Quaternion> FZ_OUATERNION = new DataSerializer<Quaternion>() {
+    public static final DataSerializer<Quaternion> OUATERNION = new DataSerializer<Quaternion>() {
         public void write(PacketBuffer buf, Quaternion value) {
             buf.writeFloat((float) value.w);
             buf.writeFloat((float) value.x);
@@ -49,7 +49,7 @@ public class DataSerializersCharset {
     };
 
     static {
-        DataSerializers.registerSerializer(FZ_OUATERNION);
+        DataSerializers.registerSerializer(OUATERNION);
         DataSerializers.registerSerializer(NBT_TAG_COMPOUND);
     }
 }

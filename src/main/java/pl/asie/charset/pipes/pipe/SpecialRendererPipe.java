@@ -242,7 +242,7 @@ public class SpecialRendererPipe extends DualTESR<TilePipe> {
 
 		SimpleBakedModel smodel = new SimpleBakedModel();
 		for (EnumFacing facing : EnumFacing.VALUES) {
-			smodel.addQuad(null, RenderUtils.bakeFace(from, to, facing, sprite, -1));
+			smodel.addQuad(null, RenderUtils.createQuad(from, to, facing, sprite, -1));
 		}
 
 		if (entry.color == -1) {

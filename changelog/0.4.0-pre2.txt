@@ -1,9 +1,10 @@
-* [All] Updated to Forge 2178.
+* [All] Updated to Forge 2199.
 * [Lib] Cleaned up notification system a bit.
 * [Lib] Fixed /mutter not applying notice styles.
 * [Pipes] Added Observer support.
 * [Pipes] Disabled most fluid routing logic - needs a rewrite!
 * [Pipes] Fixed light rendering glitches for traveling items.
+* [Pipes] Fixed pipes not syncing in 0.4.0-pre1.
 * [Pipes] Optimizations to pipe code, especially rendering.
 * [Storage] Fixed rendering glitches for barrel information popups.
 * [Storage] Fixed rotated barrels not updating neighbors.

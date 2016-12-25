@@ -53,9 +53,9 @@ public class ProxyClient extends ProxyCommon {
 			EnumFacing face = faces[i];
 			if (wire.connectsAny(face)) {
 				int lineMask = 0xfff;
-				lineMask &= ~RenderUtils.getLineMask(face.getOpposite());
+				lineMask &= ~RenderUtils.getSelectionMask(face.getOpposite());
 				RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(i + 1), lineMask);
-				lineMaskCenter &= ~RenderUtils.getLineMask(face);
+				lineMaskCenter &= ~RenderUtils.getSelectionMask(face);
 			}
 		}
 		if (lineMaskCenter != 0) {

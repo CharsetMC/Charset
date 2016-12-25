@@ -46,6 +46,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.chunk.Chunk;
+import pl.asie.charset.lib.utils.Orientation;
 
 import javax.vecmath.Vector3d;
 import java.util.*;

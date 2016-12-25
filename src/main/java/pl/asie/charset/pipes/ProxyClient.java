@@ -63,6 +63,6 @@ public class ProxyClient extends ProxyCommon {
 
 	@Override
 	public boolean stopsRenderFast(World world, ItemStack stack) {
-		return RenderUtils.isDynamicItemRenderer(world, stack);
+		return RenderUtils.isBuiltInRenderer(world, stack);
 	}
 }

@@ -198,7 +198,7 @@ public class PipeItem {
 		}
 	}
 
-	PacketItemUpdate getSyncPacket(boolean syncStack) {
+	protected PacketItemUpdate getSyncPacket(boolean syncStack) {
 		return new PacketItemUpdate(owner, this, syncStack);
 	}
 

@@ -30,15 +30,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public class PlayerUtils {
-	public static boolean isFakePlayer(EntityPlayer player) {
+	public static boolean isFake(EntityPlayer player) {
 		return player instanceof FakePlayer || !player.addedToChunk;
 	}
 
 	public static EntityPlayer find(MinecraftServer server, String name) {
 		return ModCharsetLib.proxy.findPlayer(server, name);
-	}
-
-	public static boolean isCreative(EntityPlayer player) {
-		return player.capabilities.isCreativeMode;
 	}
 }

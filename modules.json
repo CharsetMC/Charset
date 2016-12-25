@@ -1,5 +1,5 @@
 {
-	"mcversion": "1.10.2",
+	"mcversion": "1.11",
 	"modules": {
 		"lib": {
 			"char": "‽",
@@ -23,16 +23,6 @@
 			"description": "Gameplay/aesthetic tweaks to vanilla",
 			"dependencies": ["lib"],
 			"stability": "stable"
-		},
-		"audio": {
-			"char": "♫",
-			"default": true,
-			"description": "Tape Drives and various audio transport methods",
-			"dependencies": ["lib", "mod:MCMultiPart"],
-			"recommendations": {
-				"mod:NotEnoughCodecs": "MP3/MP4/AAC/FLAC support in Tape Drives"
-			},
-			"stability": "staging"
 		},
 		"storage": {
 			"char": "#",
