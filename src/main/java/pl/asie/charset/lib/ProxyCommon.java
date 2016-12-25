@@ -17,9 +17,12 @@
 package pl.asie.charset.lib;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.DimensionManager;
@@ -34,6 +37,15 @@ public class ProxyCommon {
 	// TODO 1.11
 //	public void drawWireHighlight(PartWire wire) {
 //	}
+
+	public EntityPlayer findPlayer(MinecraftServer server, String name) {
+		for (EntityPlayerMP target : server.getPlayerList().getPlayers()) {
+			if (target.getName().equals(name)) {
+				return target;
+			}
+		}
+		return null;
+	}
 
 	public void registerItemModel(Item item, int meta, String name) {
 

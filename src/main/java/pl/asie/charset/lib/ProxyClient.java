@@ -18,7 +18,9 @@ package pl.asie.charset.lib;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -26,6 +28,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,6 +36,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.misc.SplashTextHandler;
 import pl.asie.charset.lib.render.ModelFactory;
 import pl.asie.charset.lib.utils.RenderUtils;
 
@@ -60,6 +64,18 @@ public class ProxyClient extends ProxyCommon {
 	}
 	*/
 
+	@Override
+	public EntityPlayer findPlayer(MinecraftServer server, String name) {
+		if (server == null) {
+			if (Minecraft.getMinecraft().world != null) {
+				return Minecraft.getMinecraft().world.getPlayerEntityByName(name);
+			}
+			return null;
+		} else {
+			return super.findPlayer(server, name);
+		}
+	}
+
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
@@ -80,7 +96,10 @@ public class ProxyClient extends ProxyCommon {
 
 	@Override
 	public void init() {
+		super.init();
+
 		AudioStreamManager.INSTANCE = new AudioStreamManagerClient();
+		MinecraftForge.EVENT_BUS.register(new SplashTextHandler());
 	}
 
 	@Override
@@ -108,6 +127,8 @@ public class ProxyClient extends ProxyCommon {
 
 	@Override
 	public void onServerStop() {
+		super.onServerStop();
+
 		AudioStreamManagerClient.INSTANCE.removeAll();
 	}
 

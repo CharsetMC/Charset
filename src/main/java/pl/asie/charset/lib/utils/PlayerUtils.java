@@ -27,6 +27,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import pl.asie.charset.lib.ModCharsetLib;
 
 public class PlayerUtils {
 	public static boolean isFakePlayer(EntityPlayer player) {
@@ -34,21 +35,7 @@ public class PlayerUtils {
 	}
 
 	public static EntityPlayer find(MinecraftServer server, String name) {
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-			if (server == null) {
-				if (Minecraft.getMinecraft().world != null) {
-					return Minecraft.getMinecraft().world.getPlayerEntityByName(name);
-				}
-				return null;
-			}
-		}
-
-		for (EntityPlayerMP target : server.getPlayerList().getPlayers()) {
-			if (target.getName().equals(name)) {
-				return target;
-			}
-		}
-		return null;
+		return ModCharsetLib.proxy.findPlayer(server, name);
 	}
 
 	public static boolean isCreative(EntityPlayer player) {

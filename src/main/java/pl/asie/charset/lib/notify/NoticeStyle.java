@@ -38,7 +38,7 @@ package pl.asie.charset.lib.notify;
 
 import net.minecraft.tileentity.TileEntity;
 
-public enum Style {
+public enum NoticeStyle {
     /**
      * This message will not cause other nearby messages to be removed
      */

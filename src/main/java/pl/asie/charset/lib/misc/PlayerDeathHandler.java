@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib;
+package pl.asie.charset.lib.misc;
 
 import java.util.Iterator;
 

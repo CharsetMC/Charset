@@ -1,4 +1,4 @@
-package pl.asie.charset.lib;
+package pl.asie.charset.lib.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiOverlayDebug;

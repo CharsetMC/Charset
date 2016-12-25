@@ -38,12 +38,11 @@ package pl.asie.charset.storage.barrel;
 
 import pl.asie.charset.lib.factorization.Orientation;
 import pl.asie.charset.lib.notify.Notice;
-import pl.asie.charset.lib.notify.NoticeUpdater;
+import pl.asie.charset.lib.notify.INoticeUpdater;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -61,14 +60,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.factorization.SpaceUtil;
-import pl.asie.charset.lib.utils.PlayerUtils;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
@@ -760,7 +757,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     void info(final EntityPlayer entityplayer) {
-        new Notice(notice_target, new NoticeUpdater() {
+        new Notice(notice_target, new INoticeUpdater() {
             @Override
             public void update(Notice msg) {
                 if (item.isEmpty()) {

@@ -15,6 +15,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IPipeView;
@@ -22,9 +23,7 @@ import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.utils.DirectionUtils;
-import pl.asie.charset.lib.utils.IConnectable;
-import pl.asie.charset.lib.utils.GenericExtendedProperty;
+import pl.asie.charset.lib.utils.*;
 import pl.asie.charset.pipes.ModCharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
@@ -390,8 +389,34 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
     }
 
-    protected void updateObservers() {
-        getWorld().updateObservingBlocksAt(getPos(), getBlockType());
+    protected void updateObservers(ItemStack source) {
+        if (!world.isRemote && !source.isEmpty()) {
+            ObserverHelper.updateObservingBlocksAt(world, pos, getBlockType());
+
+            // TODO: Think of a better design for Shifters so we can bring this back
+            /* ObserverHelper.updateObservingBlocksAt(world, pos, getBlockType(), (observerPos, facing) -> {
+                TileEntity tile = world.getTileEntity(observerPos.offset(facing));
+                if (tile != null) {
+                    IItemHandler handler = CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, tile, facing.getOpposite());
+                    if (handler != null) {
+                        boolean hasFilter = false;
+                        for (int i = 0; i < handler.getSlots(); i++) {
+                            ItemStack stack = handler.getStackInSlot(i);
+                            if (!stack.isEmpty()) {
+                                hasFilter = true;
+                                if (ItemUtils.equals(source, stack, false, stack.getHasSubtypes(), false)) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return !hasFilter;
+                    }
+                }
+
+                return true;
+            }); */
+        }
     }
 
     protected boolean injectItemInternal(PipeItem item, EnumFacing dir, boolean simulate) {

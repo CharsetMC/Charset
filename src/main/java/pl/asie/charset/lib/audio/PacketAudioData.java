@@ -34,6 +34,7 @@ import pl.asie.charset.api.audio.IAudioDataPCM;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.audio.manager.AudioStreamOpenAL;
 import pl.asie.charset.lib.audio.manager.IAudioStream;
+import pl.asie.charset.lib.audio.types.IDataGameSound;
 import pl.asie.charset.lib.network.Packet;
 
 public class PacketAudioData extends Packet {
@@ -62,7 +63,7 @@ public class PacketAudioData extends Packet {
 	}
 
 	@SideOnly(Side.CLIENT)
-	private void playSoundNote(AudioPacket packet, IDataSound sound) {
+	private void playSoundNote(AudioPacket packet, IDataGameSound sound) {
 		for (AudioSink sink : packet.getSinks()) {
 			Minecraft.getMinecraft().getSoundHandler().playSound(
 					new PositionedSoundRecord(new SoundEvent(new ResourceLocation(sound.getSoundName())),
@@ -82,8 +83,8 @@ public class PacketAudioData extends Packet {
 	@Override
 	public void apply() {
 		AudioData audioData = packet.getData();
-		if (audioData instanceof IDataSound) {
-			IDataSound sound = (IDataSound) audioData;
+		if (audioData instanceof IDataGameSound) {
+			IDataGameSound sound = (IDataGameSound) audioData;
 			playSoundNote(packet, sound);
 			return;
 		}

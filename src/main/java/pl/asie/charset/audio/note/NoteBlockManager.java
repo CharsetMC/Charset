@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.audio.AudioDataGameSound;
+import pl.asie.charset.lib.audio.types.AudioDataGameSound;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 
 import javax.annotation.Nullable;

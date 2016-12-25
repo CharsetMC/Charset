@@ -1,6 +1,7 @@
 package pl.asie.charset.lib.items;
 
 import com.mojang.authlib.GameProfile;
+import mods.railcraft.api.core.items.IMinecartItem;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.material.Material;
@@ -17,12 +18,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 import pl.asie.charset.lib.ModCharsetLib;
 
 import java.util.List;
 
-// @Optional.Interface(iface = "mods.railcraft.api.core.items.IMinecartItem", modid = "Railcraft")
-public abstract class ItemMinecartCharset extends ItemMinecart {
+@Optional.Interface(iface = "mods.railcraft.api.core.items.IMinecartItem", modid = "Railcraft")
+public abstract class ItemMinecartCharset extends ItemMinecart implements IMinecartItem {
     private static final IBehaviorDispenseItem MINECART_DISPENSER_BEHAVIOR = new BehaviorDefaultDispenseItem()
     {
         private final BehaviorDefaultDispenseItem behaviourDefaultDispenseItem = new BehaviorDefaultDispenseItem();
@@ -67,15 +69,14 @@ public abstract class ItemMinecartCharset extends ItemMinecart {
         }
     }
 
-    /* NORELEASE: Railcraft?
     @Override
     public boolean canBePlacedByNonPlayer(ItemStack cart) {
         return true;
     }
-    */
 
     protected abstract EntityMinecart createCart(GameProfile owner, ItemStack cart, World world, double x, double y, double z);
 
+    // NOTE: IMinecartItem *and* Charset rely on this
     public EntityMinecart placeCart(GameProfile owner, ItemStack cart, World world, BlockPos pos) {
         float yOffset = 0.0625f;
         IBlockState railState = world.getBlockState(pos);

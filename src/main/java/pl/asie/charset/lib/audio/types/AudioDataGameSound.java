@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.audio;
+package pl.asie.charset.lib.audio.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.api.audio.AudioData;
 import pl.asie.charset.api.audio.AudioPacket;
+import pl.asie.charset.lib.audio.AudioUtils;
 
-public class AudioDataGameSound extends AudioData implements IDataSound {
+public class AudioDataGameSound extends AudioData implements IDataGameSound {
     private String name;
     private float pitch;
 

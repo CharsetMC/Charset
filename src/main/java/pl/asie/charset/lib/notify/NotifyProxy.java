@@ -39,10 +39,16 @@ package pl.asie.charset.lib.notify;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 
-public class RenderMessagesProxy {
+public class NotifyProxy {
+    public void addMessage(Object locus, ItemStack item, String format, String... args) {
 
-    public void addMessage(Object locus, ItemStack item, String format, String... args) { }
-    public void onscreen(String message, String[] formatArgs) { }
-    public void replaceable(ITextComponent msg, int msgKey) { }
+    }
 
+    public void onscreen(String message, String[] formatArgs) {
+
+    }
+
+    public void replaceable(ITextComponent msg, int msgKey) {
+
+    }
 }

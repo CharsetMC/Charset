@@ -61,7 +61,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class RenderMessages extends RenderMessagesProxy {
+public class NotifyProxyClient extends NotifyProxy {
     static final List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<ClientMessage>());
     
     {
@@ -82,16 +82,16 @@ public class RenderMessages extends RenderMessagesProxy {
             return;
         }
         ClientMessage msg = new ClientMessage(player.world, locus, item, format, args);
-        if (msg.style.contains(Style.CLEAR)) {
+        if (msg.style.contains(NoticeStyle.CLEAR)) {
             messages.clear();
             if (msg.msg == null || msg.msg.equals("")) return;
         }
-        if (msg.style.contains(Style.UPDATE) || msg.style.contains(Style.UPDATE_SAME_ITEM)) {
+        if (msg.style.contains(NoticeStyle.UPDATE) || msg.style.contains(NoticeStyle.UPDATE_SAME_ITEM)) {
             updateMessage(msg);
             return;
         }
         
-        boolean force_position = msg.style.contains(Style.FORCE);
+        boolean force_position = msg.style.contains(NoticeStyle.FORCE);
         
         if (messages.size() > 4 && !force_position) {
             messages.remove(0);
@@ -124,7 +124,7 @@ public class RenderMessages extends RenderMessagesProxy {
             if (!msg.locus.equals(update.locus)) {
                 continue;
             }
-            if (!update.style.contains(Style.UPDATE_SAME_ITEM)) {
+            if (!update.style.contains(NoticeStyle.UPDATE_SAME_ITEM)) {
                 msg.item = update.item;
             }
             msg.msg = update.msg;
@@ -178,7 +178,7 @@ public class RenderMessages extends RenderMessagesProxy {
                 it.remove();
                 continue;
             }
-            if (!m.style.contains(Style.DRAWFAR)) {
+            if (!m.style.contains(NoticeStyle.DRAWFAR)) {
                 Vec3d pos = m.getPosition(event.getPartialTicks());
                 double dist = camera.getDistance(pos.xCoord, pos.yCoord, pos.zCoord);
                 if (dist > 8) {
@@ -236,7 +236,7 @@ public class RenderMessages extends RenderMessagesProxy {
         float x = (float) vec.xCoord;
         float y = (float) vec.yCoord;
         float z = (float) vec.zCoord;
-        if (m.style.contains(Style.SCALE_SIZE)) {
+        if (m.style.contains(NoticeStyle.SCALE_SIZE)) {
             double dx = x - cx;
             double dy = y - cy;
             double dz = z - cz;
@@ -301,8 +301,7 @@ public class RenderMessages extends RenderMessagesProxy {
         }
         {
             if (m.show_item) {
-                //GL11.glColor4f(opacity, opacity, opacity, opacity);
-                // :| Friggin' resets the transparency don't it...
+                // TODO: Add transparency support
                 GlStateManager.translate(0, -centeringOffset, 0);
 
                 GlStateManager.translate((float) (halfWidth + 4), -lineCount/2, 0);

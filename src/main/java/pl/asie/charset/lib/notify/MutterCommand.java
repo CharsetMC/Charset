@@ -56,18 +56,18 @@ public class MutterCommand extends CommandBase {
         if (!(sender instanceof TileEntity || sender instanceof Entity)) {
             return;
         }
-        EnumSet theStyle = EnumSet.noneOf(Style.class);
-        ItemStack heldItem = null;
+        EnumSet theStyle = EnumSet.noneOf(NoticeStyle.class);
+        ItemStack heldItem = ItemStack.EMPTY;
         if (sender instanceof EntityLivingBase) {
             heldItem = ((EntityLivingBase) sender).getHeldItem(EnumHand.MAIN_HAND);
         }
-        ItemStack sendItem = null;
+        ItemStack sendItem = ItemStack.EMPTY;
         for (int i = 0; i < args.length; i++) {
             String s = args[i];
             if (s.equalsIgnoreCase("--long")) {
-                theStyle.add(Style.LONG);
-            } else if (s.equalsIgnoreCase("--show-item") && heldItem != null) {
-                theStyle.add(Style.DRAWITEM);
+                theStyle.add(NoticeStyle.LONG);
+            } else if (s.equalsIgnoreCase("--show-item") && !heldItem.isEmpty()) {
+                theStyle.add(NoticeStyle.DRAWITEM);
                 sendItem = heldItem;
             } else {
                 break;
@@ -76,7 +76,7 @@ public class MutterCommand extends CommandBase {
         }
         String msg = Joiner.on(" ").skipNulls().join(args);
         msg = msg.replace("\\n", "\n");
-        new Notice(sender, "%s", msg).withItem(sendItem).sendToAll();
+        new Notice(sender, "%s", msg).withStyle(theStyle).withItem(sendItem).sendToAll();
     }
     
     @Override

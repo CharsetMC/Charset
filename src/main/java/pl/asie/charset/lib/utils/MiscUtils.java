@@ -1,5 +1,7 @@
 package pl.asie.charset.lib.utils;
 
+import it.unimi.dsi.fastutil.ints.IntArrays;
+
 public final class MiscUtils {
     private MiscUtils() {
 

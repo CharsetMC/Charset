@@ -1,4 +1,4 @@
-package pl.asie.charset.lib.audio;
+package pl.asie.charset.lib.audio.types;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.math.BlockPos;

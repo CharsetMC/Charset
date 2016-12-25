@@ -47,6 +47,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
+import pl.asie.charset.lib.ModCharsetLib;
 
 import java.io.IOException;
 import java.util.List;
@@ -82,19 +83,16 @@ public class PointCommand extends CommandBase {
         if (mop == null || mop.typeOfHit == RayTraceResult.Type.MISS) {
             sender.sendMessage(new TextComponentTranslation("charset.point.toofar"));
             return;
-        }
-        try {
-            switch (mop.typeOfHit) {
-            default: return;
+      }
+        switch (mop.typeOfHit) {
             case BLOCK:
-                PointNetworkHandler.INSTANCE.pointAtCoord(NotificationCoord.fromMop(player.world, mop), msg);
+                ModCharsetLib.packet.sendToServer(PacketPoint.atCoord(mop.getBlockPos(), msg));
                 break;
             case ENTITY:
-                PointNetworkHandler.INSTANCE.pointAtEntity(mop.entityHit, msg);
+                ModCharsetLib.packet.sendToServer(PacketPoint.atEntity(mop.entityHit, msg));
                 break;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            default:
+                return;
         }
     }
 

@@ -1,4 +1,6 @@
 * [All] Updated to Forge 2178.
+* [Lib] Cleaned up notification system a bit.
+* [Lib] Fixed /mutter not applying notice styles.
 * [Pipes] Added Observer support.
 * [Pipes] Disabled most fluid routing logic - needs a rewrite!
 * [Pipes] Fixed light rendering glitches for traveling items.

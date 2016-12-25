@@ -36,6 +36,6 @@
 
 package pl.asie.charset.lib.notify;
 
-public interface NoticeUpdater {
+public interface INoticeUpdater {
     void update(Notice msg);
 }

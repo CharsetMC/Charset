@@ -47,6 +47,7 @@ import net.minecraft.world.World;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.CheckReturnValue;
+import java.util.Collection;
 import java.util.EnumSet;
 
 public class Notice {
@@ -54,8 +55,8 @@ public class Notice {
     private String message;
     private String[] messageParameters;
     private ItemStack item = ItemStack.EMPTY;
-    private EnumSet<Style> style = EnumSet.noneOf(Style.class);
-    private NoticeUpdater updater;
+    private EnumSet<NoticeStyle> style = EnumSet.noneOf(NoticeStyle.class);
+    private INoticeUpdater updater;
 
     private boolean isUpdating = false;
     private int age = 0;
@@ -71,8 +72,8 @@ public class Notice {
     /**
      * Creates an in-world notification message, which is sent using
      * {@link #sendTo(EntityPlayer)} or {@link #sendToAll()}. Additional options can be
-     * provided using {@link #withItem(ItemStack)} m}, {@link #withStyle(Style...)}, {@link #withWorld(World)},
-     * and {@link #withUpdater(NoticeUpdater)}. <br>
+     * provided using {@link #withItem(ItemStack)} m}, {@link #withStyle(NoticeStyle...)}, {@link #withWorld(World)},
+     * and {@link #withUpdater(INoticeUpdater)}. <br>
      * <b>Remember to send the Notice!</b><br>
      * <code><pre>
      * Notice msg = new Notice(oldManEntity, "%s", "It's dangerous to go alone!\nTake this!");
@@ -113,13 +114,13 @@ public class Notice {
     }
     
     /**
-     * Creates a new Notice. The {@link NoticeUpdater} will be used to populate the initial message,
+     * Creates a new Notice. The {@link INoticeUpdater} will be used to populate the initial message,
      * and will be called repeatedly until some amount of time passes. If the message changes,
      * then the clients will be updated.
      * 
      * <pre>
      * <code>
-     * new Notice(somewhere, new NoticeUpdater() {
+     * new Notice(somewhere, new INoticeUpdater() {
      *     void update(Notice msg) {
      *         msg.setMessage("%s", System.currentTimeMillis()/1000);
      *     }
@@ -131,11 +132,11 @@ public class Notice {
      *            An {@link Entity}, {@link TileEntity}, {@link Vec3d},
      *            {@link IMultipart} or {@link NotificationCoord}
      * @param updater
-     *             The {@link NoticeUpdater} object.
+     *             The {@link INoticeUpdater} object.
      * 
      */
     @CheckReturnValue
-    public Notice(Object where, NoticeUpdater updater) {
+    public Notice(Object where, INoticeUpdater updater) {
         this.where = where;
         withUpdater(updater);
         updater.update(this);
@@ -148,7 +149,7 @@ public class Notice {
      * </p>
      * 
      * <p>
-     * If {@link #withStyle(Style...)} is used, then the item will
+     * If {@link #withStyle(NoticeStyle...)} is used, then the item will
      * be drawn in the notification.
      * </p>
      * 
@@ -177,12 +178,12 @@ public class Notice {
     }
 
     /**
-     * Sets the {@link Style}s for the message. See {@link Style} for details.
+     * Sets the {@link NoticeStyle}s for the message. See {@link NoticeStyle} for details.
      */
     @CheckReturnValue
-    public Notice withStyle(Style... styles) {
+    public Notice withStyle(NoticeStyle... styles) {
         boolean addedStyle = false;
-        for (Style s : styles) {
+        for (NoticeStyle s : styles) {
             addedStyle |= style.add(s);
         }
         if (addedStyle && isUpdating) {
@@ -190,6 +191,18 @@ public class Notice {
         }
         return this;
     }
+
+    public Notice withStyle(Collection<NoticeStyle> styles) {
+        boolean addedStyle = false;
+        for (NoticeStyle s : styles) {
+            addedStyle |= style.add(s);
+        }
+        if (addedStyle && isUpdating) {
+            this.changed = true;
+        }
+        return this;
+    }
+
 
     /**
      * Sets the world of the Notice. (This is only needed for sending a
@@ -203,17 +216,17 @@ public class Notice {
 
     /**
      * Schedules a recurring notification.
-     * <code>{@link NoticeUpdater#update}(this)</code> will be called until no
+     * <code>{@link INoticeUpdater#update}(this)</code> will be called until no
      * longer necessary.
      */
     @CheckReturnValue
-    public Notice withUpdater(NoticeUpdater updater) {
+    public Notice withUpdater(INoticeUpdater updater) {
         this.updater = updater;
         return this;
     }
     
     /**
-     * Changes the message. This goes with the {@link NoticeUpdater} constructor.
+     * Changes the message. This goes with the {@link INoticeUpdater} constructor.
      */
     public void setMessage(String newMessage, String... newMessageParameters) {
         cmp(this.message, newMessage);
@@ -247,8 +260,8 @@ public class Notice {
     }
 
     int getLifetime() {
-        if (style.contains(Style.VERY_LONG)) return ClientMessage.VERY_LONG_TIME;
-        if (style.contains(Style.LONG)) return ClientMessage.LONG_TIME;
+        if (style.contains(NoticeStyle.VERY_LONG)) return ClientMessage.VERY_LONG_TIME;
+        if (style.contains(NoticeStyle.LONG)) return ClientMessage.LONG_TIME;
         return ClientMessage.SHORT_TIME;
     }
     
@@ -320,7 +333,7 @@ public class Notice {
      */
     public static void clear(EntityPlayer player) {
         NotificationCoord at = new NotificationCoord(player.world, new BlockPos(player));
-        NotifyImplementation.instance.doSend(player, at, player.world, EnumSet.of(Style.CLEAR), null, "", emptyStringArray);
+        NotifyImplementation.instance.doSend(player, at, player.world, EnumSet.of(NoticeStyle.CLEAR), null, "", emptyStringArray);
     }
 
     /**
@@ -380,13 +393,13 @@ public class Notice {
         isUpdating = false;
         if (changed) {
             if (changedItem) {
-                style.add(Style.UPDATE);
+                style.add(NoticeStyle.UPDATE);
                 sendTo(targetPlayer);
-                style.remove(Style.UPDATE);
+                style.remove(NoticeStyle.UPDATE);
             } else {
-                style.add(Style.UPDATE_SAME_ITEM);
+                style.add(NoticeStyle.UPDATE_SAME_ITEM);
                 sendTo(targetPlayer);
-                style.remove(Style.UPDATE_SAME_ITEM);
+                style.remove(NoticeStyle.UPDATE_SAME_ITEM);
             }
             changed = changedItem = false;
         }

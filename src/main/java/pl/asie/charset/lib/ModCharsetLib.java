@@ -43,9 +43,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 
 import pl.asie.charset.api.audio.AudioAPI;
-import pl.asie.charset.lib.audio.AudioDataDFPWM;
-import pl.asie.charset.lib.audio.AudioDataGameSound;
-import pl.asie.charset.lib.audio.AudioSinkBlock;
+import pl.asie.charset.lib.audio.types.AudioDataDFPWM;
+import pl.asie.charset.lib.audio.types.AudioDataGameSound;
+import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.capability.Capabilities;
@@ -54,8 +54,13 @@ import pl.asie.charset.lib.capability.providers.CapabilityProviderFluidHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityProviderItemHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityProviderItemInsertionHandler;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.misc.IconCharset;
+import pl.asie.charset.lib.misc.InDevEventHandler;
+import pl.asie.charset.lib.misc.PlayerDeathHandler;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
+import pl.asie.charset.lib.notify.PacketNotification;
+import pl.asie.charset.lib.notify.PacketPoint;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
@@ -145,6 +150,9 @@ public class ModCharsetLib {
 		packet = new PacketRegistry(ModCharsetLib.MODID);
 		packet.registerPacket(0x01, PacketAudioData.class);
 		packet.registerPacket(0x02, PacketAudioStop.class);
+
+		packet.registerPacket(0x10, PacketNotification.class);
+		packet.registerPacket(0x11, PacketPoint.class);
 
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(proxy);

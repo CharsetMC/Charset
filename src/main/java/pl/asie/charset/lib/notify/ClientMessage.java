@@ -57,7 +57,7 @@ class ClientMessage {
     Object locus;
     ItemStack item;
     String msg;
-    EnumSet<Style> style;
+    EnumSet<NoticeStyle> style;
     
     long creationTime;
     long lifeTime;
@@ -77,13 +77,13 @@ class ClientMessage {
         msg = parts[1];
         
         creationTime = System.currentTimeMillis();
-        if (style.contains(Style.LONG)) {
+        if (style.contains(NoticeStyle.LONG)) {
             lifeTime = 1000 * LONG_TIME;
         } else {
             lifeTime = 1000 * SHORT_TIME;
         }
-        position_important = style.contains(Style.EXACTPOSITION);
-        show_item = style.contains(Style.DRAWITEM) && item != null;
+        position_important = style.contains(NoticeStyle.EXACTPOSITION);
+        show_item = style.contains(NoticeStyle.DRAWITEM) && !item.isEmpty();
         translate(args);
     }
     

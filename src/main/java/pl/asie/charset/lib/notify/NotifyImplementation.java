@@ -47,8 +47,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -64,31 +62,28 @@ import java.util.EnumSet;
 import java.util.Iterator;
 
 public class NotifyImplementation {
-//    @SidedProxy(modId = "charsetlib", clientSide = "pl.asie.charset.lib.notify.RenderMessages", serverSide = "pl.asie.charset.lib.notify.RenderMessagesProxy")
-    public static RenderMessagesProxy proxy;
-    public static NotifyNetwork net = new NotifyNetwork();
-    
+//    @SidedProxy(modId = "charsetlib", clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
+    public static NotifyProxy proxy;
     public static NotifyImplementation instance;
     
     public static void init() {
         // TODO: HACK! Wait on Forge fix
         try {
             if (ModCharsetLib.proxy instanceof ProxyClient) {
-                proxy = (RenderMessagesProxy) Class.forName("pl.asie.charset.lib.notify.RenderMessages").newInstance();
+                proxy = (NotifyProxy) Class.forName("pl.asie.charset.lib.notify.NotifyProxyClient").newInstance();
             } else {
-                proxy = (RenderMessagesProxy) Class.forName("pl.asie.charset.lib.notify.RenderMessagesProxy").newInstance();
+                proxy = (NotifyProxy) Class.forName("pl.asie.charset.lib.notify.NotifyProxy").newInstance();
             }
         } catch (Exception e) { e.printStackTrace(); }
         NotifyImplementation.instance = new NotifyImplementation();
         MinecraftForge.EVENT_BUS.register(NotifyImplementation.instance);
-        PointNetworkHandler.INSTANCE.initialize();
     }
 
     public void registerServerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new MutterCommand());
     }
     
-    void doSend(EntityPlayer player, Object where, World world, EnumSet<Style> style, ItemStack item, String format, String[] args) {
+    void doSend(EntityPlayer player, Object where, World world, EnumSet<NoticeStyle> style, ItemStack item, String format, String[] args) {
         if (where == null) {
             return;
         }
@@ -101,7 +96,7 @@ public class NotifyImplementation {
         } else {
             TargetPoint target = null;
             if (player == null) {
-                final int range = style.contains(Style.DRAWFAR) ? 128 : 32;
+                final int range = style.contains(NoticeStyle.DRAWFAR) ? 128 : 32;
                 int x = 0, y = 0, z = 0;
                 boolean failed = false;
                 BlockPos pos = null;
@@ -140,8 +135,7 @@ public class NotifyImplementation {
                 }
             }
             if (args == null) args = new String[0];
-            FMLProxyPacket packet = NotifyNetwork.notifyPacket(where, item, format, args);
-            NotifyNetwork.broadcast(packet, player, target);
+            ModCharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, format, args), target);
         }
     }
     
@@ -152,24 +146,24 @@ public class NotifyImplementation {
         proxy.addMessage(where, item, styledFormat, args);
     }
     
-    String styleMessage(EnumSet<Style> style, String format) {
+    String styleMessage(EnumSet<NoticeStyle> style, String format) {
         if (style == null) {
             return "\n" + format;
         }
         String prefix = "";
         String sep = "";
-        for (Style s : style) {
+        for (NoticeStyle s : style) {
             prefix += sep + s.toString();
             sep = " ";
         }
         return prefix + "\n" + format;
     }
     
-    static EnumSet<Style> loadStyle(String firstLine) {
-        EnumSet<Style> ret = EnumSet.noneOf(Style.class);
+    static EnumSet<NoticeStyle> loadStyle(String firstLine) {
+        EnumSet<NoticeStyle> ret = EnumSet.noneOf(NoticeStyle.class);
         for (String s : firstLine.split(" ")) {
             try {
-                ret.add(Style.valueOf(s));
+                ret.add(NoticeStyle.valueOf(s));
             } catch (IllegalArgumentException e) {}
         }
         return ret;
@@ -208,8 +202,7 @@ public class NotifyImplementation {
         if (player.world.isRemote) {
             proxy.onscreen(message, formatArgs);
         } else {
-            FMLProxyPacket packet = NotifyNetwork.onscreenPacket(message, formatArgs);
-            NotifyNetwork.broadcast(packet, player, null);
+            ModCharsetLib.packet.sendTo(PacketNotification.createOnscreen(message, formatArgs), player);
         }
     }
     
@@ -217,8 +210,7 @@ public class NotifyImplementation {
         if (player.world.isRemote) {
             proxy.replaceable(msg, msgKey);
         } else {
-            FMLProxyPacket packet = NotifyNetwork.replaceableChatPacket(msg, msgKey);
-            NotifyNetwork.broadcast(packet, player, null);
+            ModCharsetLib.packet.sendTo(PacketNotification.createReplaceable(msg, msgKey), player);
         }
     }
 }
