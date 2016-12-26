@@ -9,8 +9,8 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.model.TRSRTransformation;
-import pl.asie.charset.lib.render.ModelFactory;
-import pl.asie.charset.lib.render.WrappedBakedModel;
+import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.render.model.WrappedBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 public class ModelScaffold extends ModelFactory<ScaffoldCacheInfo> {

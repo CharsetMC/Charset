@@ -21,13 +21,15 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class SlotTyped extends Slot {
+public class SlotTyped extends SlotItemHandler {
 	private Object[] allowedTypes;
 	
-	public SlotTyped(IInventory par1iInventory, int par2, int par3, int par4, Object[] allowedTypes) {
-		super(par1iInventory, par2, par3, par4);
+	public SlotTyped(IItemHandler handler, int par2, int par3, int par4, Object[] allowedTypes) {
+		super(handler, par2, par3, par4);
 		this.allowedTypes = allowedTypes;
 	}
 

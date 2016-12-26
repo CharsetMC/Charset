@@ -24,6 +24,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.lib.network.PacketPart;
 import pl.asie.charset.lib.network.PacketTile;
+import pl.asie.charset.pipes.PipeUtils;
 
 public class PacketFluidUpdate extends PacketTile {
 	protected PipeFluidContainer container;
@@ -47,7 +48,7 @@ public class PacketFluidUpdate extends PacketTile {
 			return;
 		}
 
-		container = ((TilePipe) tile).fluid;
+		container = PipeUtils.getPipe(tile).fluid;
 		int sides = buf.readUnsignedByte();
 
 		if ((sides & 128) != 0) {

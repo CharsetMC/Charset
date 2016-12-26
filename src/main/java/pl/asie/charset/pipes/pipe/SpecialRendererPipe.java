@@ -47,14 +47,14 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.lib.render.DualTESR;
-import pl.asie.charset.lib.render.ModelTransformer;
-import pl.asie.charset.lib.render.SimpleBakedModel;
+import pl.asie.charset.lib.render.DualTileEntitySpecialRenderer;
+import pl.asie.charset.lib.render.model.ModelTransformer;
+import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 
-public class SpecialRendererPipe extends DualTESR<TilePipe> {
+public class SpecialRendererPipe extends DualTileEntitySpecialRenderer<TilePipe> {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();
 	private static final float ITEM_OFFSET_MULTIPLIER = 0.02F;
 

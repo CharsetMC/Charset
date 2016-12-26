@@ -37,36 +37,27 @@
 package pl.asie.charset.storage.barrel;
 
 import com.google.common.collect.ImmutableMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.model.IModelState;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import pl.asie.charset.lib.material.ColorLookupHandler;
-import pl.asie.charset.lib.render.ModelColorizer;
-import pl.asie.charset.lib.render.ModelFactory;
-import pl.asie.charset.lib.render.WrappedBakedModel;
+import pl.asie.charset.lib.render.model.ModelColorHandler;
+import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.render.model.WrappedBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
-    public final ModelColorizer<BarrelCacheInfo> colorizer = new ModelColorizer<BarrelCacheInfo>(this) {
+    public final ModelColorHandler<BarrelCacheInfo> colorizer = new ModelColorHandler<BarrelCacheInfo>(this) {
         @Override
         public int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
             if (!info.isMetal && !info.type.isHopping()) {

@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -37,8 +36,7 @@ import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerClient;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.misc.SplashTextHandler;
-import pl.asie.charset.lib.render.ModelFactory;
-import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.lib.render.model.ModelFactory;
 
 public class ProxyClient extends ProxyCommon {
 	// TODO 1.11

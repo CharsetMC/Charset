@@ -24,6 +24,7 @@ import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
 import pl.asie.charset.lib.network.PacketPart;
 import pl.asie.charset.lib.network.PacketTile;
+import pl.asie.charset.pipes.PipeUtils;
 
 public class PacketPipeSyncRequest extends PacketTile {
 	private EntityPlayer requester;
@@ -48,7 +49,7 @@ public class PacketPipeSyncRequest extends PacketTile {
 			return;
 		}
 
-		((TilePipe) tile).onSyncRequest(requester);
+		PipeUtils.getPipe(tile).onSyncRequest(requester);
 	}
 
 	@Override

@@ -78,18 +78,18 @@ public class EntityTNTImproved extends EntityTNTPrimed {
     }
 
     // see EntityLivingBase
-    public void knockBack(Entity entityIn, float strenght, double xRatio, double zRatio) {
+    public void knockBack(Entity entityIn, float strength, double xRatio, double zRatio) {
         this.isAirBorne = true;
         float f = MathHelper.sqrt(xRatio * xRatio + zRatio * zRatio);
         this.motionX /= 2.0D;
         this.motionZ /= 2.0D;
-        this.motionX -= xRatio / (double)f * (double)strenght;
-        this.motionZ -= zRatio / (double)f * (double)strenght;
+        this.motionX -= xRatio / (double)f * (double)strength;
+        this.motionZ -= zRatio / (double)f * (double)strength;
 
         if (this.onGround)
         {
             this.motionY /= 2.0D;
-            this.motionY += (double)strenght;
+            this.motionY += (double)strength;
 
             if (this.motionY > 0.4000000059604645D)
             {

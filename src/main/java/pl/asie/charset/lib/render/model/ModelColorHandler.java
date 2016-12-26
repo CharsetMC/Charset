@@ -1,4 +1,4 @@
-package pl.asie.charset.lib.render;
+package pl.asie.charset.lib.render.model;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IBlockColor;
@@ -10,10 +10,10 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 
 import javax.annotation.Nullable;
 
-public abstract class ModelColorizer<T extends IRenderComparable<T>> implements IBlockColor, IItemColor {
+public abstract class ModelColorHandler<T extends IRenderComparable<T>> implements IBlockColor, IItemColor {
     private final ModelFactory<T> parent;
 
-    public ModelColorizer(ModelFactory<T> parent) {
+    public ModelColorHandler(ModelFactory<T> parent) {
         this.parent = parent;
     }
 

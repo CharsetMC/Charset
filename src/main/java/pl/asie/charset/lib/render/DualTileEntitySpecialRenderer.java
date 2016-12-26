@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 /**
  * Created by asie on 11/26/16.
  */
-public class DualTESR<T extends TileEntity> extends TileEntitySpecialRenderer<T> {
+public class DualTileEntitySpecialRenderer<T extends TileEntity> extends TileEntitySpecialRenderer<T> {
 	protected final Minecraft mc = Minecraft.getMinecraft();
 
 	protected void renderTileEntityFastFromSlow(T part, double x, double y, double z, float partialTicks, int destroyStage) {

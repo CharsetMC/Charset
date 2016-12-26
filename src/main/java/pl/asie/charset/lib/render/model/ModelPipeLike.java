@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.render;
+package pl.asie.charset.lib.render.model;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;

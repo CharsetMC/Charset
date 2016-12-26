@@ -27,8 +27,10 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.network.PacketTile;
 import pl.asie.charset.lib.utils.SpaceUtils;
+import pl.asie.charset.pipes.PipeUtils;
 
 public class PacketItemUpdate extends PacketTile {
 	protected PipeItem item;
@@ -96,7 +98,7 @@ public class PacketItemUpdate extends PacketTile {
 		}
 
 		if (item == null) {
-			TilePipe pipe = (TilePipe) tile;
+			TilePipe pipe = PipeUtils.getPipe(tile);
 			if (pipe == null) {
 				return;
 			}
@@ -105,7 +107,7 @@ public class PacketItemUpdate extends PacketTile {
 
 		if (item == null) {
 			if (syncStack) {
-				item = new PipeItem((TilePipe) tile, id);
+				item = new PipeItem(PipeUtils.getPipe(tile), id);
 				addWhenDone = true;
 			} else {
 				return;
@@ -131,7 +133,7 @@ public class PacketItemUpdate extends PacketTile {
 		itemIdCache.put(id, new WeakReference<PipeItem>(item));
 
 		if (addWhenDone) {
-			((TilePipe) tile).addItemClientSide(item);
+			PipeUtils.getPipe(tile).addItemClientSide(item);
 		}
 	}
 

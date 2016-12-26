@@ -63,7 +63,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.Quaternion;
 import pl.asie.charset.lib.utils.SpaceUtils;
-import pl.asie.charset.lib.render.ModelTransformer;
+import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 

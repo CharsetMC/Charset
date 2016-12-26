@@ -21,9 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
 

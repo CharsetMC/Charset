@@ -22,6 +22,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.pipes.pipe.TilePipe;
 
 public final class PipeUtils {
@@ -29,9 +30,13 @@ public final class PipeUtils {
 
 	}
 
+	public static TilePipe getPipe(TileEntity tile) {
+		return tile instanceof TilePipe ? (TilePipe) tile : (TilePipe) tile.getCapability(Capabilities.PIPE_VIEW, null);
+	}
+
 	public static TilePipe getPipe(IBlockAccess world, BlockPos blockPos, EnumFacing side) {
 		TileEntity tile = world.getTileEntity(blockPos);
-		return tile instanceof TilePipe ? (TilePipe) tile : null;
+		return getPipe(tile);
 		/* IMultipartContainer container = MultipartHelper.getPartContainer(world, blockPos);
 		if (container == null) {
 			return null;

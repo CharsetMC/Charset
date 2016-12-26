@@ -18,7 +18,6 @@ package pl.asie.charset.lib.utils;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.List;
 
 import com.google.common.base.Function;
 import net.minecraft.client.renderer.RenderItem;

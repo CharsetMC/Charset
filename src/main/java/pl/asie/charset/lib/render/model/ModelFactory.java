@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.render;
+package pl.asie.charset.lib.render.model;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -30,12 +30,10 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
