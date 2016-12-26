@@ -50,6 +50,7 @@ import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.utils.DataSerializersCharset;
 import pl.asie.charset.lib.wires.ItemWire;
 import pl.asie.charset.lib.wires.RecipeObjectWire;
 import pl.asie.charset.lib.wires.RecipeResultWire;
@@ -136,7 +137,9 @@ public class ModCharsetLib {
 
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(proxy);
-		ColorUtils.initialize();
+
+		ColorUtils.init();
+		DataSerializersCharset.init();
 
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
