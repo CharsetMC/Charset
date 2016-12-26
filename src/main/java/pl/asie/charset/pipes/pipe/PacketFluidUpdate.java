@@ -44,11 +44,12 @@ public class PacketFluidUpdate extends PacketTile {
 	}
 
 	public void readFluidData(ByteBuf buf) {
-		if (tile == null || !(tile instanceof TilePipe)) {
+		TilePipe pipe = PipeUtils.getPipe(tile);
+		if (pipe == null) {
 			return;
 		}
 
-		container = PipeUtils.getPipe(tile).fluid;
+		container = pipe.fluid;
 		int sides = buf.readUnsignedByte();
 
 		if ((sides & 128) != 0) {

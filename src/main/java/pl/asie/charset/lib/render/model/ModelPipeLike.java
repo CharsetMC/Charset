@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class ModelPipeLike<T extends IConnectable> extends BaseBakedModel {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final boolean RENDER_INNER_FACES = true;
     private static final boolean RENDER_OUTER_FACES = true;
 

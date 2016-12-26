@@ -19,24 +19,24 @@ package pl.asie.charset.lib.container;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public abstract class ContainerBase extends Container {
 	private final int containerSize;
-	private final IInventory inventory;
+	private final IItemHandler handler;
+	private final IContainerHandler containerHandler;
 
-	public ContainerBase(IInventory inventory, InventoryPlayer inventoryPlayer) {
-		this.inventory = inventory;
-
-		if (inventory != null) {
-			this.containerSize = inventory.getSizeInventory();
-			this.inventory.openInventory(inventoryPlayer.player);
-		} else {
-			this.containerSize = 0;
+	public ContainerBase(IItemHandler handler, IContainerHandler listener, InventoryPlayer inventoryPlayer) {
+		this.handler = handler;
+		this.containerHandler = listener;
+		this.containerSize = handler != null ? handler.getSlots() : 0;
+		if (listener != null) {
+			listener.onOpenedBy(inventoryPlayer.player);
 		}
 	}
 
@@ -44,24 +44,24 @@ public abstract class ContainerBase extends Container {
 		return containerSize;
 	}
 
-	public IInventory getInventoryObject() {
-		return inventory;
+	public IItemHandler getItemHandler() {
+		return handler;
 	}
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		return this.inventory.isUsableByPlayer(player);
+		return containerHandler != null ? containerHandler.isUsableByPlayer(player) : true;
 	}
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
-		if (inventory == null) {
+		if (handler == null) {
 			return null;
 		}
 
 		Slot slotObject = inventorySlots.get(slot);
 		if (slotObject != null && slotObject.getHasStack()) {
-			tryTransferStackInSlot(slotObject, slotObject.inventory == this.inventory);
+			tryTransferStackInSlot(slotObject, slotObject instanceof SlotItemHandler && ((SlotItemHandler) slotObject).getItemHandler() == this.handler);
 			if (!ModCharsetLib.proxy.isClient()) {
 				detectAndSendChanges();
 			}
@@ -132,6 +132,8 @@ public abstract class ContainerBase extends Container {
 	@Override
 	public void onContainerClosed(EntityPlayer player) {
 		super.onContainerClosed(player);
-		this.inventory.closeInventory(player);
+		if (containerHandler != null) {
+			this.containerHandler.onClosedBy(player);
+		}
 	}
 }

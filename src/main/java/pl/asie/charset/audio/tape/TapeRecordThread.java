@@ -40,6 +40,7 @@ public class TapeRecordThread implements Runnable {
 		List<String> exts = new ArrayList<String>();
 		exts.add("ogg");
 		exts.add("wav");
+
 		if (Loader.isModLoaded("notenoughcodecs")) {
 			exts.add("aac");
 			exts.add("mp3");
@@ -47,6 +48,7 @@ public class TapeRecordThread implements Runnable {
 			exts.add("mp4");
 			exts.add("flac");
 		}
+
 		return exts.toArray(new String[exts.size()]);
 	}
 

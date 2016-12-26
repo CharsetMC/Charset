@@ -31,6 +31,9 @@ public final class PipeUtils {
 	}
 
 	public static TilePipe getPipe(TileEntity tile) {
+		if (tile == null)
+			return null;
+
 		return tile instanceof TilePipe ? (TilePipe) tile : (TilePipe) tile.getCapability(Capabilities.PIPE_VIEW, null);
 	}
 

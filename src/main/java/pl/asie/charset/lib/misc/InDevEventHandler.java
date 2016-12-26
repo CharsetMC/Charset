@@ -25,14 +25,10 @@ public class InDevEventHandler {
 		ICapabilityProvider provider = null;
 		switch (mouseOver.typeOfHit) {
 			case BLOCK:
-				TileEntity tile = world.getTileEntity(mouseOver.getBlockPos());
-				if (tile != null)
-					provider = tile;
+				provider = world.getTileEntity(mouseOver.getBlockPos());
 				break;
 			case ENTITY:
-				Entity entity = world.getEntityByID(mouseOver.entityHit.getEntityId());
-				if (entity != null)
-					provider = entity;
+				provider = world.getEntityByID(mouseOver.entityHit.getEntityId());
 				break;
 		}
 

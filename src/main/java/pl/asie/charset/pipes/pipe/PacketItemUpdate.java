@@ -53,10 +53,6 @@ public class PacketItemUpdate extends PacketTile {
 	}
 
 	public void readItemData(ByteBuf buf) {
-		if (tile == null || !(tile instanceof TilePipe)) {
-			return;
-		}
-
 		id = buf.readShort();
 		dirs = buf.readUnsignedByte();
 		flags = buf.readUnsignedByte();
@@ -97,17 +93,18 @@ public class PacketItemUpdate extends PacketTile {
 			item = null;
 		}
 
+		TilePipe pipe = PipeUtils.getPipe(tile);
+		if (pipe == null) {
+			return;
+		}
+
 		if (item == null) {
-			TilePipe pipe = PipeUtils.getPipe(tile);
-			if (pipe == null) {
-				return;
-			}
 			item = pipe.getItemByID(id);
 		}
 
 		if (item == null) {
 			if (syncStack) {
-				item = new PipeItem(PipeUtils.getPipe(tile), id);
+				item = new PipeItem(pipe, id);
 				addWhenDone = true;
 			} else {
 				return;
@@ -133,7 +130,7 @@ public class PacketItemUpdate extends PacketTile {
 		itemIdCache.put(id, new WeakReference<PipeItem>(item));
 
 		if (addWhenDone) {
-			PipeUtils.getPipe(tile).addItemClientSide(item);
+			pipe.addItemClientSide(item);
 		}
 	}
 
