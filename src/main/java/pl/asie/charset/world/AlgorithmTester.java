@@ -20,7 +20,45 @@ public class AlgorithmTester {
 	private static final int COLOR_GRASS = 0xFF00aa00;
 
 	public int calc(int x, int y, int z) {
-		return COLOR_GRASS;
+		double v = (y - 80);
+		double heightBase = noise.eval(x * 0.005f, 394384848, z * 0.005f) * 64;
+		double roughness = ((noise.eval(x * 0.002f, 203984, z * 0.002f) + 1) / 100) + 0.0001f;
+		v += heightBase;
+		v += noise.eval(x * roughness, y * 0.002f, z * roughness) * 32;
+		return v < 0 ? 1 : 0;
+	}
+
+	public void update() {
+		init();
+
+		BufferedImage img = canvas.img;
+		for (int x = 0; x < img.getWidth(); x++) {
+			int ctr = 0;
+			boolean hasWater = false;
+			for (int y = 0; y < img.getHeight(); y++) {
+				int ry = img.getHeight() - 1 - y;
+				int out = calc(x, ry, COORD_Z);
+				int color = COLOR_AIR;
+				if (out == 0) {
+					ctr = 0;
+					if (ry < 64) {
+						color = 0xFF0000aa;
+						hasWater = true;
+					}
+				} else {
+					ctr++;
+					if (hasWater && ctr <= 4)
+						color = 0xFFffff55;
+					else if (ctr == 1)
+						color = COLOR_GRASS;
+					else if (ctr >= 2 && ctr <= 4)
+						color = COLOR_DIRT;
+					else
+						color = COLOR_STONE;
+				}
+				img.setRGB(x, y, color);
+			}
+		}
 	}
 
 	private static final Random RANDOM = new Random();
@@ -96,18 +134,6 @@ public class AlgorithmTester {
 		});
 
 		update();
-	}
-
-	public void update() {
-		init();
-
-		BufferedImage img = canvas.img;
-		for (int y = 0; y < img.getHeight(); y++) {
-			int ry = img.getHeight() - 1 - y;
-			for (int x = 0; x < img.getWidth(); x++) {
-				img.setRGB(x, y, calc(x, ry, COORD_Z));
-			}
-		}
 	}
 
 	public static void main(String[] args) {

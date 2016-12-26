@@ -25,6 +25,8 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
+import java.util.function.Predicate;
+
 public class SlotTyped extends SlotItemHandler {
 	private Object[] allowedTypes;
 	
@@ -42,13 +44,15 @@ public class SlotTyped extends SlotItemHandler {
         		for(ItemStack target: OreDictionary.getOres(s)) {
         			if(OreDictionary.itemMatches(target, stack, false)) return true;
         		}
-        	} else if(o instanceof Block) {
+        	} else if (o instanceof Block) {
         		return (Block.getBlockFromItem(stack.getItem()).equals((Block)o));
-        	} else if(o instanceof Item) {
+        	} else if (o instanceof Item) {
         		return (stack.getItem().equals((Item)o));
-        	} else if(o instanceof ItemStack) {
+        	} else if (o instanceof ItemStack) {
         		return OreDictionary.itemMatches(((ItemStack)o), stack, true);
-        	}
+        	} else if (o instanceof Predicate) {
+		        return ((Predicate<ItemStack>) o).test(stack);
+	        }
         }
         return false;
     }

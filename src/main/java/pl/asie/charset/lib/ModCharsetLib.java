@@ -64,6 +64,7 @@ import pl.asie.charset.lib.notify.PacketPoint;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.utils.DataSerializersCharset;
 
 @Mod(modid = ModCharsetLib.MODID, name = ModCharsetLib.NAME, version = ModCharsetLib.VERSION, updateJSON = ModCharsetLib.UPDATE_URL, dependencies = ModCharsetLib.DEP_LIB)
 public class ModCharsetLib {
@@ -156,7 +157,9 @@ public class ModCharsetLib {
 
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(proxy);
-		ColorUtils.initialize();
+
+		ColorUtils.init();
+		DataSerializersCharset.init();
 
 		if (INDEV)
 			MinecraftForge.EVENT_BUS.register(new InDevEventHandler());

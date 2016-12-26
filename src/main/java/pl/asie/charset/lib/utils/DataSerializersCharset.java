@@ -9,7 +9,11 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import java.io.IOException;
 
-public class DataSerializersCharset {
+public final class DataSerializersCharset {
+    private DataSerializersCharset() {
+
+    }
+
     public static final DataSerializer<Quaternion> OUATERNION = new DataSerializer<Quaternion>() {
         public void write(PacketBuffer buf, Quaternion value) {
             buf.writeFloat((float) value.w);
@@ -47,8 +51,13 @@ public class DataSerializersCharset {
         }
     };
 
-    static {
-        DataSerializers.registerSerializer(OUATERNION);
-        DataSerializers.registerSerializer(NBT_TAG_COMPOUND);
+    private static boolean initialized = false;
+
+    public static void init() {
+        if (!initialized) {
+            DataSerializers.registerSerializer(OUATERNION);
+            DataSerializers.registerSerializer(NBT_TAG_COMPOUND);
+            initialized = true;
+        }
     }
 }

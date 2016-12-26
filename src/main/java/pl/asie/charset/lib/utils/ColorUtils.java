@@ -54,7 +54,7 @@ public final class ColorUtils {
 
 	}
 
-	public static void initialize() {
+	public static void init() {
 		for (int i = 0; i < 16; i++) {
 			OREDICT_DYE_IDS[i] = OreDictionary.getOreID("dye" + UPPERCASE_DYE_SUFFIXES[i]);
 		}
