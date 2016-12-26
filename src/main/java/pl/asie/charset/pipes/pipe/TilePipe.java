@@ -563,7 +563,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         stringList.add(info.toString());
 
         for (int i = 0; i <= 6; i++) {
-            EnumFacing facing = DirectionUtils.get(i);
+            EnumFacing facing = SpaceUtils.getFacing(i);
             StringBuilder sideInfo = new StringBuilder();
 
             sideInfo.append(facing != null ? facing.name().charAt(0) : 'C');

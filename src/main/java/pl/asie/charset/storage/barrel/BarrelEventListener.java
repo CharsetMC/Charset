@@ -52,7 +52,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.utils.Orientation;
-import pl.asie.charset.lib.factorization.SpaceUtil;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 public class BarrelEventListener {
@@ -66,7 +66,7 @@ public class BarrelEventListener {
     }
 
     private void drawArrowHighlight(EntityPlayer player, RayTraceResult trace, Vec3d cameraPos) {
-        Orientation orientation = SpaceUtil.getOrientation(player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
+        Orientation orientation = SpaceUtils.getOrientation(player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
         if (orientation.top.getDirectionVec().getY() == 1) {
             /*
              * The purpose of this is two-fold:
@@ -89,7 +89,7 @@ public class BarrelEventListener {
 
         {
             EnumFacing face = orientation.facing;
-            if (SpaceUtil.sign(face) == 1) {
+            if (SpaceUtils.sign(face) == 1) {
                 GlStateManager.translate(
                         face.getDirectionVec().getX(),
                         face.getDirectionVec().getY(),
@@ -121,7 +121,7 @@ public class BarrelEventListener {
             float bot_y = mid_y - orientation.top.getDirectionVec().getY() / 2F;
             float bot_z = mid_z - orientation.top.getDirectionVec().getZ() / 2F;
 
-            EnumFacing r = SpaceUtil.rotate(orientation.facing, orientation.top);
+            EnumFacing r = SpaceUtils.rotateCounterclockwise(orientation.facing, orientation.top);
             float right_x = r.getDirectionVec().getX() / 2F;
             float right_y = r.getDirectionVec().getY() / 2F;
             float right_z = r.getDirectionVec().getZ() / 2F;

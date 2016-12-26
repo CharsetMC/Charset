@@ -41,8 +41,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.factorization.Quaternion;
-import pl.asie.charset.lib.factorization.SpaceUtil;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
@@ -125,8 +123,8 @@ public enum Orientation {
     }
 
     private void setup() {
-        nextFaceRotation = find(facing, SpaceUtil.rotate(top, facing));
-        prevFaceRotation = find(facing, SpaceUtil.rotateBack(top, facing));
+        nextFaceRotation = find(facing, SpaceUtils.rotateCounterclockwise(top, facing));
+        prevFaceRotation = find(facing, SpaceUtils.rotateClockwise(top, facing));
     }
     
     private void setupRotation() {
@@ -143,9 +141,9 @@ public enum Orientation {
 
     private void setupDirectionRotation() {
         for (EnumFacing dir : EnumFacing.values()) {
-            Vec3d v = SpaceUtil.fromDirection(dir);
+            Vec3d v = SpaceUtils.fromDirection(dir);
             Quaternion.fromOrientation(this).applyRotation(v);
-            dirRotations[dir.ordinal()] = SpaceUtil.round(v, null);
+            dirRotations[dir.ordinal()] = SpaceUtils.getClosestDirection(v, null);
         }
     }
     

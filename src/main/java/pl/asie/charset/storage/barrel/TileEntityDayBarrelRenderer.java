@@ -61,8 +61,8 @@ import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.Orientation;
-import pl.asie.charset.lib.factorization.Quaternion;
-import pl.asie.charset.lib.factorization.SpaceUtil;
+import pl.asie.charset.lib.utils.Quaternion;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.render.ModelTransformer;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
@@ -73,7 +73,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
     void doDraw(TileEntityDayBarrel barrel, ItemStack is, float partialTicks) {
         Orientation bo = barrel.orientation;
         EnumFacing face = bo.facing;
-        if (SpaceUtil.sign(face) == 1) {
+        if (SpaceUtils.sign(face) == 1) {
             GlStateManager.translate(face.getDirectionVec().getX(), face.getDirectionVec().getY(), face.getDirectionVec().getZ());
         }
         GlStateManager.translate(

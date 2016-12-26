@@ -32,8 +32,8 @@ import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.pipes.ModCharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
@@ -533,8 +533,8 @@ public class PipeItem {
 	public void readFromNBT(NBTTagCompound nbt) {
 		stack = new ItemStack(nbt);
 		progress = nbt.getShort("p");
-		input = DirectionUtils.get(nbt.getByte("in"));
-		output = DirectionUtils.get(nbt.getByte("out"));
+		input = SpaceUtils.getFacing(nbt.getByte("in"));
+		output = SpaceUtils.getFacing(nbt.getByte("out"));
 		reachedCenter = nbt.getBoolean("reachedCenter");
 		if (nbt.hasKey("stuck")) {
 			stuck = nbt.getBoolean("stuck");
@@ -547,8 +547,8 @@ public class PipeItem {
 	public void writeToNBT(NBTTagCompound nbt) {
 		stack.writeToNBT(nbt);
 		nbt.setShort("p", (short) progress);
-		nbt.setByte("in", (byte) DirectionUtils.ordinal(input));
-		nbt.setByte("out", (byte) DirectionUtils.ordinal(output));
+		nbt.setByte("in", (byte) SpaceUtils.ordinal(input));
+		nbt.setByte("out", (byte) SpaceUtils.ordinal(output));
 		nbt.setBoolean("reachedCenter", reachedCenter);
 		if (stuck) {
 			nbt.setBoolean("stuck", stuck);

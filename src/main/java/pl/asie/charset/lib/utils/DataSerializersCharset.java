@@ -6,7 +6,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializer;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import pl.asie.charset.lib.factorization.Quaternion;
 
 import java.io.IOException;
 

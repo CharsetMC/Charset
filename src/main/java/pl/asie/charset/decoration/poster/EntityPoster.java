@@ -36,17 +36,13 @@
 
 package pl.asie.charset.decoration.poster;
 
-import com.google.common.base.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -58,16 +54,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.decoration.ModCharsetDecoration;
-import pl.asie.charset.lib.factorization.Quaternion;
-import pl.asie.charset.lib.factorization.SpaceUtil;
+import pl.asie.charset.lib.utils.Quaternion;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.utils.DataSerializersCharset;
-import pl.asie.charset.lib.utils.DirectionUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.utils.PlayerUtils;
-import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
-
-import javax.annotation.Nullable;
-import java.io.IOException;
 
 public class EntityPoster extends Entity {
     private static final DataParameter<NBTTagCompound> PARAMETER_TAG = EntityDataManager.createKey(EntityPoster.class, DataSerializersCharset.NBT_TAG_COMPOUND);
@@ -121,9 +111,9 @@ public class EntityPoster extends Entity {
         spin_tilt = compound.getShort("spin_tilt");
         delta_scale = compound.getByte("delta_scale");
         locked = compound.getBoolean("locked");
-        norm = DirectionUtils.get(compound.getByte("norm"));
-        top = DirectionUtils.get(compound.getByte("top"));
-        tilt = DirectionUtils.get(compound.getByte("tilt"));
+        norm = SpaceUtils.getFacing(compound.getByte("norm"));
+        top = SpaceUtils.getFacing(compound.getByte("top"));
+        tilt = SpaceUtils.getFacing(compound.getByte("tilt"));
 
         updateSize();
         if (!world.isRemote) {
@@ -143,9 +133,9 @@ public class EntityPoster extends Entity {
         compound.setShort("spin_vertical", spin_vertical);
         compound.setByte("delta_scale", delta_scale);
         compound.setBoolean("locked", locked);
-        compound.setByte("norm", (byte) DirectionUtils.ordinal(norm));
-        compound.setByte("top", (byte) DirectionUtils.ordinal(top));
-        compound.setByte("tilt", (byte) DirectionUtils.ordinal(tilt));
+        compound.setByte("norm", (byte) SpaceUtils.ordinal(norm));
+        compound.setByte("top", (byte) SpaceUtils.ordinal(top));
+        compound.setByte("tilt", (byte) SpaceUtils.ordinal(tilt));
     }
 
     @Override
@@ -160,7 +150,7 @@ public class EntityPoster extends Entity {
     }
 
     void updateSize() {
-        Vec3d here = SpaceUtil.fromEntPos(this);
+        Vec3d here = getPositionVector();
         Vec3d[] parts = new Vec3d[6];
         EnumFacing[] values = EnumFacing.VALUES;
         for (int i = 0; i < values.length; i++) {
@@ -174,9 +164,9 @@ public class EntityPoster extends Entity {
             } else {
                 s /= 2;
             }
-            parts[i] = SpaceUtil.scale(SpaceUtil.fromDirection(dir), s).add(here);
+            parts[i] = SpaceUtils.scale(SpaceUtils.fromDirection(dir), s).add(here);
         }
-        setEntityBoundingBox(SpaceUtil.newBox(parts));
+        setEntityBoundingBox(SpaceUtils.withPoints(parts));
     }
 
     public void setItem(ItemStack item) {
@@ -214,8 +204,8 @@ public class EntityPoster extends Entity {
         this.norm = norm;
         this.top = top;
 
-        Vec3d tiltV = SpaceUtil.fromDirection(norm).crossProduct(SpaceUtil.fromDirection(top));
-        this.tilt = SpaceUtil.round(tiltV, norm);
+        Vec3d tiltV = SpaceUtils.fromDirection(norm).crossProduct(SpaceUtils.fromDirection(top));
+        this.tilt = SpaceUtils.getClosestDirection(tiltV, norm);
 
         updateSize();
         setEntityBoundingBox(bounds);
@@ -335,7 +325,7 @@ public class EntityPoster extends Entity {
         final boolean shouldTilt = isItemTilting(held);
         final boolean shouldRotate = isItemRotating(held);
         if (shouldRotate || shouldTilt) {
-            EnumFacing clickDir = SpaceUtil.determineOrientation(player);
+            EnumFacing clickDir = SpaceUtils.determineOrientation(player);
             if (shouldRotate) {
                 if (clickDir == norm || clickDir == norm.getOpposite()) {
                     spin_normal -= d;

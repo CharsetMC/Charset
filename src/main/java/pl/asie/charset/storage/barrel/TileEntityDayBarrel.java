@@ -65,7 +65,7 @@ import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.factorization.SpaceUtil;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
@@ -415,7 +415,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         RayTraceResult hit = RayTraceUtils.getCollision(getWorld(), getPos(), placer, Block.FULL_BLOCK_AABB, 0);
         if (hit != null) {
             if (hit.hitVec != null) {
-                orientation = SpaceUtil.getOrientation(placer, hit.sideHit, hit.hitVec.subtract(new Vec3d(getPos())));
+                orientation = SpaceUtils.getOrientation(placer, hit.sideHit, hit.hitVec.subtract(new Vec3d(getPos())));
             } else if (hit.sideHit != null) {
                 orientation = Orientation.fromDirection(hit.sideHit);
             }
@@ -637,7 +637,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         boolean doRotation = dir.getDirectionVec().getY() == 0;
         EnumFacing rotationAxis = null;
         if (doRotation) {
-            rotationAxis = SpaceUtil.rotate(dir, EnumFacing.UP);
+            rotationAxis = SpaceUtils.rotateCounterclockwise(dir, EnumFacing.UP);
         }
         if (player.isSneaking() && distance > 1) {
             distance = 1;
@@ -679,8 +679,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             }
             //When we roll a barrel, the side we punch should face up
             for (int r = rotateCount; r > 0; r--) {
-                EnumFacing nTop = SpaceUtil.rotate(newOrientation.top, rotationAxis);
-                EnumFacing nFace = SpaceUtil.rotate(newOrientation.facing, rotationAxis);
+                EnumFacing nTop = SpaceUtils.rotateCounterclockwise(newOrientation.top, rotationAxis);
+                EnumFacing nFace = SpaceUtils.rotateCounterclockwise(newOrientation.facing, rotationAxis);
                 newOrientation = Orientation.fromDirection(nFace).pointTopTo(nTop);
             }
         }

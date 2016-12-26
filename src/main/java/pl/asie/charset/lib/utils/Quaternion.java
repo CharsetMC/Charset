@@ -34,7 +34,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.factorization;
+package pl.asie.charset.lib.utils;
 
 import com.google.common.io.ByteArrayDataOutput;
 import io.netty.buffer.ByteBuf;
@@ -44,7 +44,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.utils.Orientation;
 
 import javax.vecmath.Quat4d;
 import javax.vecmath.Quat4f;
@@ -54,7 +53,7 @@ import java.io.IOException;
 
 public class Quaternion {
     public double w, x, y, z;
-    
+
     //Data functions
     public Quaternion() {
         this(1, 0, 0, 0);
@@ -183,14 +182,14 @@ public class Quaternion {
     public boolean isZero() {
         return x == 0 && y == 0 && z == 0;
     }
-    
+
     public void update(double nw, double nx, double ny, double nz) {
         w = nw;
         x = nx;
         y = ny;
         z = nz;
     }
-    
+
     public void update(Quaternion other) {
         update(other.w, other.x, other.y, other.z);
     }
@@ -212,7 +211,7 @@ public class Quaternion {
      */
     public Vec3d toRotationVector() {
         Vec3d rotVec = toVector().normalize();
-        return SpaceUtil.scale(rotVec, getAngleRadians());
+        return SpaceUtils.scale(rotVec, getAngleRadians());
     }
     
     public double getAngleRadians() {

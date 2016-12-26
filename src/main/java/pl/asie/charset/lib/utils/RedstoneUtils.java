@@ -37,15 +37,12 @@ public final class RedstoneUtils {
 
 	}
 
+	// TODO: Evaluate me
 	public static int getRedstonePower(World world, BlockPos pos, EnumFacing facing) {
-		return getRedstonePower(world, pos, facing, false);
-	}
-
-	public static int getRedstonePower(World world, BlockPos pos, EnumFacing facing, boolean forceWires) {
 		IBlockState iblockstate = world.getBlockState(pos);
 		Block block = iblockstate.getBlock();
 
-		if (forceWires && block instanceof BlockRedstoneWire) {
+		if (block instanceof BlockRedstoneWire) {
 			return iblockstate.getValue(BlockRedstoneWire.POWER);
 		}
 

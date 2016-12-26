@@ -48,8 +48,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import pl.asie.charset.decoration.ModCharsetDecoration;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.factorization.Quaternion;
-import pl.asie.charset.lib.factorization.SpaceUtil;
+import pl.asie.charset.lib.utils.Quaternion;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.items.ItemBase;
 
 import java.util.ArrayList;
@@ -87,11 +87,11 @@ public class ItemPoster extends ItemBase {
             // Create the thing
             EntityPoster poster = new EntityPoster(w);
             poster.setBase(bestWidth, rot, dir, top, bounds);
-            final Vec3d spot = SpaceUtil.getMiddle(plane);
-            if (SpaceUtil.sign(dir) == -1) {
-                spot.add(SpaceUtil.scale(SpaceUtil.fromDirection(dir), 1.0 / 2560.0));
+            final Vec3d spot = SpaceUtils.getMiddle(plane);
+            if (SpaceUtils.sign(dir) == -1) {
+                spot.add(SpaceUtils.scale(SpaceUtils.fromDirection(dir), 1.0 / 2560.0));
             }
-            SpaceUtil.toEntPos(poster, spot);
+            SpaceUtils.setEntityPosition(poster, spot);
             result = poster;
             return false;
         }
@@ -113,10 +113,10 @@ public class ItemPoster extends ItemBase {
 
         private boolean determineSize() {
             // Setup box areas
-            plane = SpaceUtil.flatten(blockBox, dir);
+            plane = SpaceUtils.flatten(blockBox, dir);
 
             final double pix = 1.0 / 16.0;
-            bounds = SpaceUtil.addCoord(plane, SpaceUtil.scale(new Vec3d(dir.getDirectionVec()), pix));
+            bounds = SpaceUtils.withPoint(plane, SpaceUtils.scale(new Vec3d(dir.getDirectionVec()), pix));
 
             for (Object ent : w.getEntitiesWithinAABB(EntityPoster.class, bounds)) {
                 if (ent instanceof EntityPoster) {
@@ -135,7 +135,7 @@ public class ItemPoster extends ItemBase {
             final double xwidth = plane.maxX - plane.minX;
             final double ywidth = plane.maxY - plane.minY;
             final double zwidth = plane.maxZ - plane.minZ;
-            bestWidth = SpaceUtil.getDiagonalLength(plane);
+            bestWidth = SpaceUtils.getDiagonalLength(plane);
 
             if (xwidth != 0) bestWidth = xwidth;
             if (ywidth != 0 && ywidth < bestWidth) bestWidth = ywidth;
@@ -152,9 +152,9 @@ public class ItemPoster extends ItemBase {
             final IBlockState state = w.getBlockState(at);
             state.addCollisionBoxToList(w, at, query, boxes, player);
 
-            final Vec3d playerEye = SpaceUtil.fromPlayerEyePos(player);
+            final Vec3d playerEye = SpaceUtils.fromPlayerEyePos(player);
             Vec3d look = player.getLookVec();
-            look = SpaceUtil.scale(look, 8);
+            look = SpaceUtils.scale(look, 8);
             final Vec3d reachEnd = look.add(playerEye);
 
             double minDist = Double.POSITIVE_INFINITY;

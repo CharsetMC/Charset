@@ -34,7 +34,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.lib.factorization;
+package pl.asie.charset.lib.utils;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -46,15 +46,16 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.chunk.Chunk;
-import pl.asie.charset.lib.utils.Orientation;
+import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import javax.vecmath.Vector3d;
 import java.util.*;
 
 /**
  * Operations on AxisAlignedBB (aka 'Box'), Vec3d, EnumFacing, Entities, and conversions between them.
  */
-public final class SpaceUtil {
+public final class SpaceUtils {
 
     public static final byte GET_POINT_MIN = 0x0;
     public static final byte GET_POINT_MAX = 0x7;
@@ -62,23 +63,19 @@ public final class SpaceUtil {
     public static EnumFacing determineOrientation(EntityLivingBase player) {
         if (player.rotationPitch > 75) {
             return EnumFacing.DOWN;
-        }
-        if (player.rotationPitch <= -75) {
+        } else if (player.rotationPitch <= -75) {
             return EnumFacing.UP;
+        } else {
+            return determineFlatOrientation(player);
         }
-        return determineFlatOrientation(player);
     }
 
+    // TODO: Rename?
     public static EnumFacing determineFlatOrientation(EntityLivingBase player) {
         //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
         int var7 = MathHelper.floor((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
         int r = var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
         return EnumFacing.VALUES[r];
-    }
-
-    @Deprecated // newVec!
-    public static Vec3d newvec() {
-        return new Vec3d(0, 0, 0);
     }
 
     public static Vec3d copy(Vec3d a) {
@@ -89,18 +86,23 @@ public final class SpaceUtil {
         return new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
     }
 
-    public static Vec3d fromEntPos(Entity ent) {
-        return new Vec3d(ent.posX, ent.posY, ent.posZ);
-    }
-
-    public static Vec3d fromEntVel(Entity ent) {
+    public static Vec3d getEntityVelocity(Entity ent) {
         return new Vec3d(ent.motionX, ent.motionY, ent.motionZ);
     }
 
-    public static void toEntVel(Entity ent, Vec3d vec) {
+    public static void setEntityVelocity(Entity ent, Vec3d vec) {
         ent.motionX = vec.xCoord;
         ent.motionY = vec.yCoord;
         ent.motionZ = vec.zCoord;
+    }
+
+    public static int ordinal(@Nullable EnumFacing side) {
+        return side == null ? 6 : side.ordinal();
+    }
+
+    @Nullable
+    public static EnumFacing getFacing(int ordinal) {
+        return ordinal == 6 ? null : EnumFacing.getFront(ordinal);
     }
 
     public static Vec3d fromPlayerEyePos(EntityPlayer ent) {
@@ -114,7 +116,7 @@ public final class SpaceUtil {
     }
 
     /** Sets the entity's position directly. Does *NOT* update the bounding box! */
-    public static void toEntPos(Entity ent, Vec3d pos) {
+    public static void setEntityPosition(Entity ent, Vec3d pos) {
         ent.posX = pos.xCoord;
         ent.posY = pos.yCoord;
         ent.posZ = pos.zCoord;
@@ -152,25 +154,23 @@ public final class SpaceUtil {
                 (ab.minZ + ab.maxZ) / 2);
     }
 
-    public static AxisAlignedBB incrContract(AxisAlignedBB box, double dx, double dy, double dz) {
+    public static AxisAlignedBB contractBox(AxisAlignedBB box, double dx, double dy, double dz) {
         return box.expand(-dx, -dy, -dz);
     }
 
     public static Vec3d fromDirection(EnumFacing dir) {
-        //return new Vec3d(pos.getX(), pos.getY(), pos.getZ());
-        // TODO: NORELEASE.fixme("There may be more bad conversions like this; there is a direct coord query from EnumFacing.");
         return new Vec3d(dir.getDirectionVec());
     }
 
-    /* public static SortedPair<Vec3d> sort(Vec3d left, Vec3d right) {
+    public static Pair<Vec3d, Vec3d> sort(Vec3d left, Vec3d right) {
         double minX = Math.min(left.xCoord, right.xCoord);
         double maxX = Math.max(left.xCoord, right.xCoord);
         double minY = Math.min(left.yCoord, right.yCoord);
         double maxY = Math.max(left.yCoord, right.yCoord);
         double minZ = Math.min(left.zCoord, right.zCoord);
         double maxZ = Math.max(left.zCoord, right.zCoord);
-        return new SortedPair<Vec3d>(new Vec3d(minX, minY, minZ), new Vec3d(maxX, maxY, maxZ));
-    } */
+        return Pair.of(new Vec3d(minX, minY, minZ), new Vec3d(maxX, maxY, maxZ));
+    }
 
     /**
      * Copies a point on box into target.
@@ -201,7 +201,7 @@ public final class SpaceUtil {
         byte high = hghs[face.ordinal()];
         assert low != high;
         assert (~low & 0x7) != high;
-        return newBox(getVertex(box, low), getVertex(box, high));
+        return new AxisAlignedBB(getVertex(box, low), getVertex(box, high));
     }
 
     public static double getDiagonalLength(AxisAlignedBB ab) {
@@ -211,10 +211,9 @@ public final class SpaceUtil {
         return Math.sqrt(x * x + y * y + z * z);
     }
 
-    public static Vec3d averageVec(Vec3d a, Vec3d b) {
+    public static Vec3d average(Vec3d a, Vec3d b) {
         return new Vec3d((a.xCoord + b.xCoord) / 2, (a.yCoord + b.yCoord) / 2, (a.zCoord + b.zCoord) / 2);
     }
-
 
     public static double getAngle(Vec3d a, Vec3d b) {
         double dot = a.dotProduct(b);
@@ -225,14 +224,8 @@ public final class SpaceUtil {
         return Math.acos(div);
     }
 
-    public static AxisAlignedBB newBox(Vec3d min, Vec3d max) {
-        return new AxisAlignedBB(
-                min.xCoord, min.yCoord, min.zCoord,
-                max.xCoord, max.yCoord, max.zCoord);
-    }
-
-    public static AxisAlignedBB newBox(Vec3d[] parts) {
-        return newBox(getLowest(parts), getHighest(parts));
+    public static AxisAlignedBB withPoints(Vec3d[] parts) {
+        return new AxisAlignedBB(getLowest(parts), getHighest(parts));
     }
 
     public static Vec3d scale(Vec3d base, double s) {
@@ -240,14 +233,14 @@ public final class SpaceUtil {
     }
 
     public static Vec3d componentMultiply(Vec3d a, Vec3d b) {
-        return new Vec3d(a.xCoord + b.yCoord, a.yCoord + b.yCoord, a.zCoord + b.yCoord);
+        return new Vec3d(a.xCoord + b.xCoord, a.yCoord + b.yCoord, a.zCoord + b.zCoord);
     }
 
     public static Vec3d componentMultiply(Vec3d a, double x, double y, double z) {
         return new Vec3d(a.xCoord + x, a.yCoord + y, a.zCoord + z);
     }
 
-    public static AxisAlignedBB newBoxSort(Vec3d min, Vec3d max) {
+    public static AxisAlignedBB sortedBox(Vec3d min, Vec3d max) {
         double minX = Math.min(min.xCoord, max.xCoord);
         double minY = Math.min(min.yCoord, max.yCoord);
         double minZ = Math.min(min.zCoord, max.zCoord);
@@ -257,21 +250,15 @@ public final class SpaceUtil {
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public static AxisAlignedBB newBoxUnsort(Vec3d min, Vec3d max) {
+    public static AxisAlignedBB withPoint(AxisAlignedBB box, Vec3d vec) {
         return new AxisAlignedBB(
-                min.xCoord, min.yCoord, min.zCoord,
-                max.xCoord, max.yCoord, max.zCoord);
-    }
-
-    public static AxisAlignedBB addCoord(AxisAlignedBB box, Vec3d vec) {
-        return box.addCoord(vec.xCoord, vec.yCoord, vec.zCoord);
-        // NORELEASE: Is the above right? Should be equivalent to this:
-        /*if (vec.xCoord < box.minX) box.minX = vec.xCoord;
-        if (box.maxX < vec.xCoord) box.maxX = vec.xCoord;
-        if (vec.yCoord < box.minY) box.minY = vec.yCoord;
-        if (box.maxY < vec.yCoord) box.maxY = vec.yCoord;
-        if (vec.zCoord < box.minZ) box.minZ = vec.zCoord;
-        if (box.maxZ < vec.zCoord) box.maxZ = vec.zCoord;*/
+                vec.xCoord < box.minX ? vec.xCoord : box.minX,
+                vec.yCoord < box.minY ? vec.yCoord : box.minY,
+                vec.zCoord < box.minZ ? vec.zCoord : box.minZ,
+                box.maxX < vec.xCoord ? vec.xCoord : box.maxX,
+                box.maxY < vec.yCoord ? vec.yCoord : box.maxY,
+                box.maxZ < vec.zCoord ? vec.zCoord : box.maxZ
+        );
     }
 
     public static Vec3d[] getCorners(AxisAlignedBB box) {
@@ -330,32 +317,9 @@ public final class SpaceUtil {
         return new Vec3d(x, y, z);
     }
 
-    public static ArrayList<EnumFacing> getRandomDirections(Random rand) {
-        ArrayList<EnumFacing> ret = new ArrayList<EnumFacing>(6);
-        for (int i = 0; i < 6; i++) {
-            ret.add(SpaceUtil.getOrientation(i));
-        }
-        Collections.shuffle(ret, rand);
-        return ret;
-    }
-
-    public static int getAxis(EnumFacing fd) {
-        if (fd.getDirectionVec().getX() != 0) {
-            return 1;
-        }
-        if (fd.getDirectionVec().getY() != 0) {
-            return 2;
-        }
-        if (fd.getDirectionVec().getZ() != 0) {
-            return 3;
-        }
-        return 0;
-    }
-
     public static boolean isZero(Vec3d vec) {
         return vec.xCoord == 0 && vec.yCoord == 0 && vec.zCoord == 0;
     }
-
 
     /**
      * Return the distance between point and the line defined as passing through the origin and lineVec
@@ -368,6 +332,10 @@ public final class SpaceUtil {
         double mag = lineVec.lengthVector();
         Vec3d nPoint = scale(point, -1);
         return lineVec.crossProduct(nPoint).lengthVector() / mag;
+    }
+
+    public static double lineDistance(Vec3d origin, Vec3d lineVec, Vec3d point) {
+        return lineDistance(lineVec.subtract(origin), point.subtract(origin));
     }
 
     public static EnumFacing getOrientation(int ordinal) {
@@ -418,7 +386,7 @@ public final class SpaceUtil {
         for (int X = 0; X < pointy; X++) {
             fo = fo.getNextRotationOnFace();
         }
-        EnumFacing orient = SpaceUtil.determineOrientation(player);
+        EnumFacing orient = SpaceUtils.determineOrientation(player);
         if (orient.getAxis() != EnumFacing.Axis.Y
                 && facing.getAxis() == EnumFacing.Axis.Y) {
             facing = orient;
@@ -441,15 +409,18 @@ public final class SpaceUtil {
     }
 
     public static int sign(EnumFacing dir) {
-        if (dir == null) return 0;
-        return dir.getAxisDirection().getOffset();
+        return dir != null ? dir.getAxisDirection().getOffset() : 0;
     }
 
-    public static double sum(Vec3d vec) {
+    public static double componentSum(Vec3d vec) {
         return vec.xCoord + vec.yCoord + vec.zCoord;
     }
 
-    public static EnumFacing round(Vec3d vec, EnumFacing not) {
+    public static EnumFacing getClosestDirection(Vec3d vec) {
+        return getClosestDirection(vec, null);
+    }
+
+    public static EnumFacing getClosestDirection(Vec3d vec, EnumFacing not) {
         if (isZero(vec)) return null;
         Vec3i work;
         double bestAngle = Double.POSITIVE_INFINITY;
@@ -476,9 +447,9 @@ public final class SpaceUtil {
     public static Vec3d normalize(Vec3d v) {
         // Vanilla's threshold is too low for my purposes.
         double length = v.lengthVector();
-        if (length == 0) return newvec();
+        if (length == 0) return Vec3d.ZERO;
         double inv = 1.0 / length;
-        if (Double.isNaN(inv) || Double.isInfinite(inv)) return newvec();
+        if (Double.isNaN(inv) || Double.isInfinite(inv)) return Vec3d.ZERO;
         return scale(v, inv);
     }
 
@@ -522,22 +493,6 @@ public final class SpaceUtil {
                 maxX, maxY, maxZ);
     }
 
-    // TODO
-    /*
-    public static boolean contains(AxisAlignedBB box, BlockPos at) {
-        return NumUtil.intersect(box.minX, box.maxX, at.getX(), at.getX() + 1)
-                && NumUtil.intersect(box.minY, box.maxY, at.getY(), at.getY() + 1)
-                && NumUtil.intersect(box.minZ, box.maxZ, at.getZ(), at.getZ() + 1);
-
-    }
-
-    public static boolean contains(AxisAlignedBB box, Coord at) {
-        return NumUtil.intersect(box.minX, box.maxX, at.x, at.x + 1)
-                && NumUtil.intersect(box.minY, box.maxY, at.y, at.y + 1)
-                && NumUtil.intersect(box.minZ, box.maxZ, at.z, at.z + 1);
-    }
-    */
-
     public static double getVolume(AxisAlignedBB box) {
         if (box == null) return 0;
         double x = box.maxX - box.minX;
@@ -549,12 +504,8 @@ public final class SpaceUtil {
         return volume;
     }
 
-    public static AxisAlignedBB getBox(BlockPos at, int R) {
-        return new AxisAlignedBB(at.add(-R, -R, -R), at.add(+R, +R, +R));
-    }
-
-    public static Vec3d dup(double d) {
-        return new Vec3d(d, d, d);
+    public static AxisAlignedBB createBox(BlockPos at, int radius) {
+        return new AxisAlignedBB(at.add(-radius, -radius, -radius), at.add(+radius+1, +radius+1, +radius+1));
     }
 
     /**
@@ -588,43 +539,6 @@ public final class SpaceUtil {
         return ret;
     }
 
-    public static Vec3d subtract(Vec3d you, Vec3d me) {
-        return you.subtract(me);
-    }
-
-    public static Vec3d setX(Vec3d v, double x) {
-        return new Vec3d(x, v.yCoord, v.zCoord);
-    }
-
-    public static Vec3d setY(Vec3d v, double y) {
-        return new Vec3d(v.xCoord, y, v.zCoord);
-    }
-
-    public static Vec3d setZ(Vec3d v, double z) {
-        return new Vec3d(v.xCoord, v.yCoord, z);
-    }
-
-    public static EnumFacing fromAxis(EnumFacing.Axis a) {
-        if (a == EnumFacing.Axis.Y) return EnumFacing.DOWN;
-        if (a == EnumFacing.Axis.X) return EnumFacing.WEST;
-        if (a == EnumFacing.Axis.Z) return EnumFacing.NORTH;
-        return null;
-    }
-
-    public static AxisAlignedBB newBox() {
-        return new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-    }
-
-    public static Vec3d newVec() {
-        return new Vec3d(0, 0, 0);
-    }
-
-    public static AxisAlignedBB newBoxAround(BlockPos pos) {
-        return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(),
-                pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
-    }
-
-
     private static final int[][] ROTATION_MATRIX = {
             {0, 1, 4, 5, 3, 2},
             {0, 1, 5, 4, 2, 3},
@@ -634,48 +548,39 @@ public final class SpaceUtil {
             {3, 2, 0, 1, 4, 5},
             {0, 1, 2, 3, 4, 5}
     };
-    // Rescued from Forge. (This is a table of simple mathematical facts and involves
-    // no creativity or arrangement, therefore copyright doesn't apply. So there.)
 
-    public static EnumFacing rotate(EnumFacing dir, EnumFacing axis) {
-        // EnumFacing admittedly does have rotate methods.
-        // However, I don't feel like trusting them to work the same as ForgeDirection did.
-        // If this is in fact unnecessarily it'll be easy enough to inline the appropriate code.
+    private static final int[][] ROTATION_MATRIX_INV = new int[6][6];
+
+    static {
+        for (int axis = 0; axis < 6; axis++)
+            for (int dir = 0; dir < 6; dir++) {
+                int out = dir;
+                out = ROTATION_MATRIX[axis][out];
+                out = ROTATION_MATRIX[axis][out];
+                out = ROTATION_MATRIX[axis][out];
+                ROTATION_MATRIX_INV[axis][dir] = out;
+            }
+    }
+
+    public static EnumFacing rotateCounterclockwise(EnumFacing dir, EnumFacing axis) {
         return EnumFacing.VALUES[ROTATION_MATRIX[axis.ordinal()][dir.ordinal()]];
     }
 
-    public static EnumFacing rotateBack(EnumFacing dir, EnumFacing axis) {
-        return rotate(rotate(rotate(dir, axis), axis), axis);
+    public static EnumFacing rotateClockwise(EnumFacing dir, EnumFacing axis) {
+        return EnumFacing.VALUES[ROTATION_MATRIX_INV[axis.ordinal()][dir.ordinal()]];
     }
 
-    public static Iterable<BlockPos.MutableBlockPos> iteratePos(BlockPos src, int r) {
-        return BlockPos.getAllInBoxMutable(src.add(-r, -r, -r), src.add(+r, +r, +r));
+    public static Iterable<BlockPos.MutableBlockPos> iterateAround(BlockPos src, int radius) {
+        return BlockPos.getAllInBoxMutable(src.add(-radius, -radius, -radius), src.add(+radius, +radius, +radius));
     }
 
-    public static Vector3d toJavax(Vec3d val) {
+    public static Vector3d toJavaVector(Vec3d val) {
         return new Vector3d(val.xCoord, val.yCoord, val.zCoord);
     }
 
-    public static AxisAlignedBB getBox(Chunk chunk) {
+    public static AxisAlignedBB getChunkBoundingBox(Chunk chunk) {
         int minX = chunk.xPosition << 4;
         int minZ = chunk.zPosition << 4;
         return new AxisAlignedBB(minX, 0, minZ, minX + 16, 0xFF, minZ + 16);
-    }
-
-    public static boolean equals(AxisAlignedBB a, AxisAlignedBB b) {
-        if (a == b) return true;
-        if (a == null || b == null) return false;
-        return a.minX == b.minX && a.minY == b.minY && a.minZ == b.minZ
-                && a.maxX == b.maxX && a.maxY == b.maxY && a.maxZ == b.maxZ;
-    }
-
-    public static boolean equals(Vec3d a, Vec3d b) {
-        return a.xCoord == b.xCoord && a.yCoord == b.yCoord && a.zCoord == b.zCoord;
-    }
-
-    public static double lengthSquare(Vec3d vec) {
-        return vec.xCoord * vec.xCoord
-                + vec.yCoord * vec.yCoord
-                + vec.zCoord * vec.zCoord;
     }
 }
