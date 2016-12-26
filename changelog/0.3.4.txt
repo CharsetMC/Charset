@@ -1,1 +1,2 @@
 * [Audio] [#98] Fix rare race condition on audio packet receive.
+* [Decoration] [#101] Fix Poster "Unknown serializer type" crash.
