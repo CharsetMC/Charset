@@ -150,7 +150,7 @@ public class ItemPoster extends ItemBase {
             final ArrayList<AxisAlignedBB> boxes = new ArrayList<AxisAlignedBB>();
             final AxisAlignedBB query = new AxisAlignedBB(at.add(-9, -9, -9), at.add(+9, +9, +9));
             final IBlockState state = w.getBlockState(at);
-            state.addCollisionBoxToList(w, at, query, boxes, player);
+            state.addCollisionBoxToList(w, at, query, boxes, player, false);
 
             final Vec3d playerEye = SpaceUtils.fromPlayerEyePos(player);
             Vec3d look = player.getLookVec();

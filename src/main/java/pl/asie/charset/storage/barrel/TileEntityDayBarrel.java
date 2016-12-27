@@ -612,7 +612,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         } */
         AxisAlignedBB ab = b.getCollisionBoundingBox(w, pos);
         ArrayList<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
-        b.addCollisionBoxToList(w, pos, ab, list, null);
+        b.addCollisionBoxToList(w, pos, ab, list, null, false);
         for (AxisAlignedBB bb : list) {
             if (bb.maxY - pos.getY() <= 0.51) {
                 return true;

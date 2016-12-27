@@ -92,7 +92,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	}
 
 	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn) {
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_184something) {
    	    if (entityBox.intersectsWith(COLLISION_BOX_SIDES.offset(pos)))
    	    	collidingBoxes.add(COLLISION_BOX_SIDES.offset(pos));
 
