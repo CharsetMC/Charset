@@ -34,7 +34,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetCrafting {
 	public static final String MODID = "charsetcrafting";
-	public static final String NAME = "?";
+	public static final String NAME = "#";
 	public static final String VERSION = "@VERSION@";
 
 	@Mod.Instance(MODID)

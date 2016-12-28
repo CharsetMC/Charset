@@ -65,7 +65,6 @@ public class ContainerPocketTable extends ContainerBase {
     private ArrayList<Slot> craftingSlots = new ArrayList<Slot>();
     private ArrayList<Slot> mainInvSlots = new ArrayList<Slot>();
     private ArrayList<Slot> hotbarSlots = new ArrayList<Slot>();
-    private ArrayList<Slot> mainInvThenHotbarSlots = new ArrayList<Slot>();
     private RedirectedSlotCrafting craftResultSlot;
 
     private boolean isCrafting = false;
@@ -209,12 +208,14 @@ public class ContainerPocketTable extends ContainerBase {
         if (slot == craftResultSlot) {
             updateCraft();
             ItemStack res = craftResultSlot.getStack();
+            ItemStack held;
+
             if (res.isEmpty()) {
                 return slot.getStack();
             } else {
                 res = res.copy();
             }
-            ItemStack held = ItemStack.EMPTY;
+
             for (int count = getCraftCount(res); count > 0; count--) {
                 ItemStack craftedStack = craftResultSlot.getStack().copy();
                 held = tryTransferStackInSlot(player, craftResultSlot, nonCraftingInventorySlots);
@@ -228,15 +229,13 @@ public class ContainerPocketTable extends ContainerBase {
                     break;
                 }
             }
-            detectAndSendChanges();
         } else if (nonCraftingInventorySlots.contains(slot)) {
             tryTransferStackInSlot(player, slot, craftingSlots);
         } else if (craftingSlots.contains(slot)) {
             tryTransferStackInSlot(player, slot, nonCraftingInventorySlots);
-        } else {
-            slot.getStack();
         }
 
+        detectAndSendChanges();
         return ItemStack.EMPTY;
     }
     
@@ -303,7 +302,7 @@ public class ContainerPocketTable extends ContainerBase {
                 }
                 for (int probidex = slotIndexIndex; probidex < slotsTwice.length && probidex < slotIndexIndex + slots.length; probidex++) {
                     ItemStack empty = playerInv.getStackInSlot(slotsTwice[probidex]);
-                    if (empty != null) {
+                    if (!empty.isEmpty()) {
                         continue;
                     }
                     playerInv.setInventorySlotContents(slotsTwice[probidex], is.splitStack(1));

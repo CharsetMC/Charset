@@ -1,5 +1,6 @@
 * [All] Update to Minecraft 1.11.2, minor bugfixes
 * [Crafting] New module, now with (noticeably rewritten) Pocket Crafting Tables
 * [Decoration] [#101] Fix Poster "Unknown serializer type" crash.
+* [Decoration] Scaffolds now use a better collision box implementation if fullBoundingBoxLadders is enabled.
 * [Lib] [#102] Fix server-side packet registration crash.
 * [Pipes, Tweaks] Texture tweaks

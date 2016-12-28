@@ -54,9 +54,7 @@ public abstract class ContainerBase extends Container {
 		Slot slotObject = inventorySlots.get(slot);
 		if (slotObject != null && slotObject.getHasStack()) {
 			ItemStack stack = tryTransferStackInSlot(player, slotObject, slotObject.inventory == player.inventory ? SLOTS_INVENTORY : SLOTS_PLAYER);
-			if (!ModCharsetLib.proxy.isClient()) {
-				detectAndSendChanges();
-			}
+			detectAndSendChanges();
 			return stack;
 		} else {
 			return slotObject.getStack();

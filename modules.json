@@ -25,16 +25,23 @@
 			"stability": "stable"
 		},
 		"storage": {
-			"char": "#",
+			"char": "■",
 			"default": true,
 			"description": "Things useful for storage (Barrels, Locks, etc.)",
+			"dependencies": ["lib"],
+			"stability": "staging"
+		},
+		"crafting": {
+			"char": "#",
+			"default": true,
+			"description": "Pocket Crafting Table",
 			"dependencies": ["lib"],
 			"stability": "staging"
 		},
 		"decoration": {
 			"char": "⚐",
 			"default": true,
-			"description": "Various decorative objects",
+			"description": "Decoration/building-related objects (posters, scaffolds)",
 			"dependencies": ["lib"],
 			"stability": "staging"
 		},

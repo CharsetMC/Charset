@@ -60,7 +60,7 @@ import java.util.UUID;
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetStorage {
 	public static final String MODID = "charsetstorage";
-	public static final String NAME = "#";
+	public static final String NAME = "■";
 	public static final String VERSION = "@VERSION@";
 	public static final int DEFAULT_LOCKING_COLOR = 0xFBDB6A;
 	private static final Random rand = new Random();

@@ -25,8 +25,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -73,6 +75,10 @@ public class ModCharsetDecoration {
 		logger = LogManager.getLogger(ModCharsetDecoration.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("decoration.cfg"));
 
+		if (!ForgeModContainer.fullBoundingBoxLadders) {
+			logger.warn("To make Charset scaffolds work better, we recommend enabling fullBoundingBoxLadders in forge.cfg.");
+		}
+
 		scaffoldBlock = new BlockScaffold();
 		ModCharsetLib.proxy.registerBlock(scaffoldBlock, new ItemScaffold(scaffoldBlock), "scaffold");
 		ModCharsetLib.proxy.registerItemModel(scaffoldBlock, 0, "charsetdecoration:scaffold");
@@ -88,7 +94,10 @@ public class ModCharsetDecoration {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		EntityRegistry.registerModEntity(new ResourceLocation("charsetdecoration:poster"), EntityPoster.class, "charsetdecoration:poster", 1, this, 64, 3, true);
-		GameRegistry.registerTileEntity(TileScaffold.class, "charsetdecoration:scaffold");
+
+		if (scaffoldBlock != null) {
+			GameRegistry.registerTileEntity(TileScaffold.class, "charsetdecoration:scaffold");
+		}
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(posterItem),
 				"0",
@@ -114,8 +123,10 @@ public class ModCharsetDecoration {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		for (ItemMaterial plankMaterial : ItemMaterialRegistry.INSTANCE.getMaterialsByType("plank")) {
-			registerScaffoldRecipe(plankMaterial);
+		if (scaffoldBlock != null) {
+			for (ItemMaterial plankMaterial : ItemMaterialRegistry.INSTANCE.getMaterialsByType("plank")) {
+				registerScaffoldRecipe(plankMaterial);
+			}
 		}
 	}
 }

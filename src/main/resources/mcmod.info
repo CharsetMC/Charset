@@ -36,10 +36,21 @@
         },
         {
             "modid": "CharsetStorage",
-            "name": "#",
+            "name": "■",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Things useful for storage (Barrels, Locks, etc.)",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetCrafting",
+            "name": "#",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Pocket Crafting Table",
             "authorList": [
                 "asiekierka"
             ],
@@ -50,7 +61,7 @@
             "name": "⚐",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "Various decorative objects",
+            "description": "Decoration/building-related objects (posters, scaffolds)",
             "authorList": [
                 "asiekierka"
             ],

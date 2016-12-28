@@ -10,7 +10,6 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -21,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -38,8 +38,9 @@ import java.util.List;
 public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	public static final Collection<ItemStack> PLANKS = new HashSet<>();
 	private static final int MAX_OVERHANG = 8;
-	private static final AxisAlignedBB COLLISION_BOX_SIDES = new AxisAlignedBB(0, 0, 0, 1, 1, 1).expand(-0.3125, 0, -0.3125);
-	private static final AxisAlignedBB COLLISION_BOX_TOP = new AxisAlignedBB(-0.0625, 1 - 0.0625, -0.0625, 1 + 0.0625, 1, 1 + 0.0625);
+	private static final AxisAlignedBB COLLISION_BOX = new AxisAlignedBB(0.01, 0, 0.01, 0.99, 1, 0.99);
+	private static final AxisAlignedBB COLLISION_BOX_HACKY_SIDES = new AxisAlignedBB(0, 0, 0, 1, 1, 1).expand(-0.3125, 0, -0.3125);
+	private static final AxisAlignedBB COLLISION_BOX_HACKY_TOP = new AxisAlignedBB(-0.0625, 1 - 0.0625, -0.0625, 1 + 0.0625, 1, 1 + 0.0625);
 
 	public BlockScaffold() {
 		super(Material.WOOD);
@@ -93,13 +94,19 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_184something) {
-   	    if (entityBox.intersectsWith(COLLISION_BOX_SIDES.offset(pos)))
-   	    	collidingBoxes.add(COLLISION_BOX_SIDES.offset(pos));
+		if (ForgeModContainer.fullBoundingBoxLadders) {
+			if (entityBox.intersectsWith(COLLISION_BOX.offset(pos)))
+				collidingBoxes.add(COLLISION_BOX.offset(pos));
+		} else {
+			// Hack!
+			if (entityBox.intersectsWith(COLLISION_BOX_HACKY_SIDES.offset(pos)))
+				collidingBoxes.add(COLLISION_BOX_HACKY_SIDES.offset(pos));
 
-		if (!(entityIn instanceof EntityLivingBase) || !((EntityLivingBase) entityIn).isOnLadder()) {
-			if (pos.getY() + 0.9 <= entityBox.minY) {
-				if (entityBox.intersectsWith(COLLISION_BOX_TOP.offset(pos)))
-					collidingBoxes.add(COLLISION_BOX_TOP.offset(pos));
+			if (!(entityIn instanceof EntityLivingBase) || !((EntityLivingBase) entityIn).isOnLadder()) {
+				if (pos.getY() + 0.9 <= entityBox.minY) {
+					if (entityBox.intersectsWith(COLLISION_BOX_HACKY_TOP.offset(pos)))
+						collidingBoxes.add(COLLISION_BOX_HACKY_TOP.offset(pos));
+				}
 			}
 		}
 	}
