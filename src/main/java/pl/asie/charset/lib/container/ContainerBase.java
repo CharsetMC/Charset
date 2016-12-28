@@ -22,30 +22,26 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.ItemUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public abstract class ContainerBase extends Container {
-	private final int containerSize;
-	private final IItemHandler handler;
+	protected final Collection<Slot> SLOTS_PLAYER = new ArrayList<>(36);
+	protected final Collection<Slot> SLOTS_INVENTORY = new ArrayList<>();
 	private final IContainerHandler containerHandler;
 
-	public ContainerBase(IItemHandler handler, IContainerHandler listener, InventoryPlayer inventoryPlayer) {
-		this.handler = handler;
+	public ContainerBase(InventoryPlayer inventoryPlayer) {
+		this(inventoryPlayer, null);
+	}
+
+	public ContainerBase(InventoryPlayer inventoryPlayer, IContainerHandler listener) {
 		this.containerHandler = listener;
-		this.containerSize = handler != null ? handler.getSlots() : 0;
 		if (listener != null) {
 			listener.onOpenedBy(inventoryPlayer.player);
 		}
-	}
-
-	public int getSize() {
-		return containerSize;
-	}
-
-	public IItemHandler getItemHandler() {
-		return handler;
 	}
 
 	@Override
@@ -55,78 +51,112 @@ public abstract class ContainerBase extends Container {
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
-		if (handler == null) {
-			return null;
-		}
-
 		Slot slotObject = inventorySlots.get(slot);
 		if (slotObject != null && slotObject.getHasStack()) {
-			tryTransferStackInSlot(slotObject, slotObject instanceof SlotItemHandler && ((SlotItemHandler) slotObject).getItemHandler() == this.handler);
+			ItemStack stack = tryTransferStackInSlot(player, slotObject, slotObject.inventory == player.inventory ? SLOTS_INVENTORY : SLOTS_PLAYER);
 			if (!ModCharsetLib.proxy.isClient()) {
 				detectAndSendChanges();
 			}
+			return stack;
+		} else {
+			return slotObject.getStack();
 		}
-		return null;
 	}
 
-	// From OpenComputers, looks like a good implementation
-	protected void tryTransferStackInSlot(Slot from, boolean intoPlayerInventory) {
+	private boolean tryInsertStackToSlot(EntityPlayer player, Slot from, Slot to) {
+		if (!to.getHasStack() || ItemUtils.canMerge(from.getStack(), to.getStack())) {
+			ItemStack fromStack = from.getStack();
+			ItemStack toStack = to.getStack();
+
+			int maxSize = Math.min(toStack.getMaxStackSize(), to.getSlotStackLimit());
+			if (toStack.isEmpty()) {
+				int amount = Math.min(fromStack.getCount(), maxSize);
+
+				if (amount > 0) {
+					to.putStack(fromStack.splitStack(amount));
+					to.onSlotChanged();
+
+					return true;
+				}
+			} else {
+				int amount = Math.min(maxSize - toStack.getCount(), fromStack.getCount());
+
+				if (amount > 0) {
+					fromStack.shrink(amount);
+					toStack.grow(amount);
+					to.onSlotChanged();
+
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	// TODO: BUGTEST ME
+	protected ItemStack tryTransferStackInSlot(EntityPlayer player, Slot from, Collection<Slot> targets) {
 		ItemStack fromStack = from.getStack();
-		boolean somethingChanged = false;
+		Collection<Slot> targetsValidEmpty = new ArrayList<>(targets.size());
+		boolean dirty = false;
 
-		int step = intoPlayerInventory ? -1 : 1;
-		int begin = intoPlayerInventory ? (inventorySlots.size() - 1) : 0;
-		int end = intoPlayerInventory ? 0 : inventorySlots.size() - 1;
+		if (!from.getHasStack())
+			return from.getStack();
 
-		if (fromStack.getMaxStackSize() > 1) {
-			for (int i = begin; i * step <= end; i += step) {
-				if (i >= 0 && i < inventorySlots.size() && from.getHasStack() && from.getStack().getCount() > 0) {
-					Slot intoSlot = inventorySlots.get(i);
-					if (intoSlot.inventory != from.inventory && intoSlot.getHasStack()) {
-						ItemStack intoStack = intoSlot.getStack();
-						boolean itemsAreEqual = fromStack.isItemEqual(intoStack) && ItemStack.areItemStackTagsEqual(fromStack, intoStack);
-						int maxStackSize = Math.min(fromStack.getMaxStackSize(), intoSlot.getSlotStackLimit());
-						boolean slotHasCapacity = intoStack.getCount() < maxStackSize;
-						if (itemsAreEqual && slotHasCapacity) {
-							int itemsMoved = Math.min(maxStackSize - intoStack.getCount(), fromStack.getCount());
-							if (itemsMoved > 0) {
-								intoStack.grow(from.decrStackSize(itemsMoved).getCount());
-								intoSlot.onSlotChanged();
-								somethingChanged = true;
-							}
-						}
-					}
+		// Pass 1: Merge
+		for (Slot to : targets) {
+			if (to.isItemValid(fromStack)) {
+				if (to.getHasStack()) {
+					dirty |= tryInsertStackToSlot(player, from, to);
+
+					if (!from.getHasStack())
+						break;
+				} else {
+					targetsValidEmpty.add(to);
 				}
 			}
 		}
 
-		for (int i = begin; i * step <= end; i += step) {
-			if (i >= 0 && i < inventorySlots.size() && from.getHasStack() && from.getStack().getCount() > 0) {
-				Slot intoSlot = inventorySlots.get(i);
-				if (intoSlot.inventory != from.inventory && !intoSlot.getHasStack() && intoSlot.isItemValid(fromStack)) {
-					int maxStackSize = Math.min(fromStack.getMaxStackSize(), intoSlot.getSlotStackLimit());
-					int itemsMoved = Math.min(maxStackSize, fromStack.getCount());
-					intoSlot.putStack(from.decrStackSize(itemsMoved));
-					somethingChanged = true;
-				}
+		// Pass 2: Place
+		if (from.getHasStack()) {
+			for (Slot to : targetsValidEmpty) {
+				dirty |= tryInsertStackToSlot(player, from, to);
+
+				if (!from.getHasStack())
+					break;
 			}
 		}
 
-		if (somethingChanged) {
+		if (dirty) {
 			from.onSlotChanged();
 		}
+
+		return fromStack;
 	}
 
 	public void bindPlayerInventory(InventoryPlayer inventoryPlayer, int startX, int startY) {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
+				addPlayerSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
 						startX + j * 18, startY + i * 18));
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			addSlotToContainer(new Slot(inventoryPlayer, i, startX + i * 18, startY + 58));
+			addPlayerSlotToContainer(new Slot(inventoryPlayer, i, startX + i * 18, startY + 58));
 		}
+	}
+
+	@Override
+	protected Slot addSlotToContainer(Slot slotIn) {
+		slotIn = super.addSlotToContainer(slotIn);
+		SLOTS_INVENTORY.add(slotIn);
+		return slotIn;
+	}
+
+	protected Slot addPlayerSlotToContainer(Slot slot) {
+		slot = super.addSlotToContainer(slot);
+		SLOTS_PLAYER.add(slot);
+		return slot;
 	}
 
 	@Override

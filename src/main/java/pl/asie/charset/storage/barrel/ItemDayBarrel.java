@@ -59,6 +59,15 @@ public class ItemDayBarrel extends ItemBlock {
     }
 
     @Override
+    public int getItemStackLimit(ItemStack stack) {
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("SilkItem")) {
+            return 1;
+        } else {
+            return super.getItemStackLimit(stack);
+        }
+    }
+
+    @Override
     public String getItemStackDisplayName(ItemStack is) {
         TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getUpgrade(is);
         String lookup = "tile.charset.barrel.format";

@@ -442,7 +442,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     }
 
     public static ItemStack getSilkedItem(ItemStack is) {
-        if (is .isEmpty() || !is.hasTagCompound()) {
+        if (is.isEmpty() || !is.hasTagCompound()) {
             return ItemStack.EMPTY;
         }
         NBTTagCompound tag = is.getTagCompound();
@@ -922,7 +922,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             NBTTagCompound si = new NBTTagCompound();
             item.writeToNBT(si);
             tag.setTag("SilkItem", si);
-            tag.setLong("rnd", hashCode() + world.getTotalWorldTime());
         }
         return is;
     }

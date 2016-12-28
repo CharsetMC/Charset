@@ -49,7 +49,7 @@ public class PacketPoint extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		player = handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).playerEntity : null;
+		player = getPlayer(handler);
 		type = Type.VALUES[buf.readByte()];
 		message = buildMessage(player, buf);
 

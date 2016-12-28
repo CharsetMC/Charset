@@ -27,7 +27,7 @@ import pl.asie.charset.lib.container.SlotTyped;
 
 public class ContainerTapeDrive extends ContainerBase {
 	public ContainerTapeDrive(IItemHandler handler, IContainerHandler containerHandler, InventoryPlayer inventoryPlayer) {
-		super(handler, containerHandler, inventoryPlayer);
+		super(inventoryPlayer, containerHandler);
 		this.addSlotToContainer(new SlotTyped(handler, 0, 80, 34, new Object[]{ModCharsetAudio.tapeItem}));
 		this.bindPlayerInventory(inventoryPlayer, 8, 84);
 	}

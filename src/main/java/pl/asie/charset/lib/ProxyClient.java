@@ -16,10 +16,15 @@
 
 package pl.asie.charset.lib;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.login.INetHandlerLoginClient;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
@@ -61,6 +66,12 @@ public class ProxyClient extends ProxyCommon {
 		}
 	}
 	*/
+
+	@Override
+	public EntityPlayer getPlayer(INetHandler handler) {
+		return (handler instanceof INetHandlerPlayClient || handler instanceof INetHandlerLoginClient)
+				? Minecraft.getMinecraft().player : super.getPlayer(handler);
+	}
 
 	@Override
 	public EntityPlayer findPlayer(MinecraftServer server, String name) {
@@ -131,13 +142,13 @@ public class ProxyClient extends ProxyCommon {
 	}
 
 	@Override
-	public boolean isMainThread() {
+	public boolean isCallingFromMinecraftThread() {
 		return Minecraft.getMinecraft().isCallingFromMinecraftThread();
 	}
 
 	@Override
-	public void addScheduledMainTask(Runnable runnable) {
-		Minecraft.getMinecraft().addScheduledTask(runnable);
+	public ListenableFuture<Object> addScheduledTask(Runnable runnable) {
+		return Minecraft.getMinecraft().addScheduledTask(runnable);
 	}
 
 	@Override

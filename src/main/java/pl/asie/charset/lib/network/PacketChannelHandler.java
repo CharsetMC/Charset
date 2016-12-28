@@ -26,6 +26,7 @@ import io.netty.handler.codec.MessageToMessageCodec;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
+import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import pl.asie.charset.lib.ModCharsetLib;
@@ -55,10 +56,19 @@ public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, 
 		Packet newMsg = registry.instantiatePacket(msg.payload().readUnsignedByte());
 		if (newMsg != null) {
 			newMsg.readData(iNetHandler, msg.payload());
-			if (newMsg.isAsynchronous() || ModCharsetLib.proxy.isMainThread()) {
+			if (newMsg.isAsynchronous()) {
 				newMsg.apply();
 			} else {
-				ModCharsetLib.proxy.addScheduledMainTask(newMsg::apply);
+				IThreadListener listener = Packet.getThreadListener(iNetHandler);
+				if (listener == null) {
+					listener = ModCharsetLib.proxy;
+				}
+
+				if (listener.isCallingFromMinecraftThread()) {
+					newMsg.apply();
+				} else {
+					listener.addScheduledTask(newMsg::apply);
+				}
 			}
 		}
 	}

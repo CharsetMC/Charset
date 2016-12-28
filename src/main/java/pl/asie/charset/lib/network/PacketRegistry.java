@@ -79,18 +79,7 @@ public class PacketRegistry {
 			}
 		}
 	}
-	// TODO 1.11
-/*
-	public void sendToWatching(Packet message, IMultipart tile) {
-		sendToWatching(message, tile.getWorld(), tile.getPos());
-	}
 
-	public void sendToAllAround(Packet packet, IMultipart entity,
-								double d) {
-		this.sendToAllAround(packet, new TargetPoint(entity.getWorld().provider.getDimension(),
-				entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(), d));
-	}
-*/
 	public void sendToWatching(Packet message, TileEntity tile) {
 		sendToWatching(message, tile.getWorld(), tile.getPos());
 	}

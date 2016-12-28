@@ -85,7 +85,7 @@ public class PacketNotification extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf input) {
-		me = Minecraft.getMinecraft().player;
+		me = getPlayer(handler);
 		type = Type.VALUES[input.readByte()];
 
 		switch (type) {

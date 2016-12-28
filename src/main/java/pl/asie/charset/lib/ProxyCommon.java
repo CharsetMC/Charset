@@ -16,6 +16,8 @@
 
 package pl.asie.charset.lib;
 
+import akka.routing.Listen;
+import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -26,6 +28,7 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.NetHandlerLoginServer;
+import net.minecraft.util.IThreadListener;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.DimensionManager;
@@ -36,10 +39,14 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerServer;
 
-public class ProxyCommon {
+public class ProxyCommon implements IThreadListener {
 	// TODO 1.11
 //	public void drawWireHighlight(PartWire wire) {
 //	}
+
+	public EntityPlayer getPlayer(INetHandler handler) {
+		return handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).playerEntity : null;
+	}
 
 	public EntityPlayer findPlayer(MinecraftServer server, String name) {
 		for (EntityPlayerMP target : server.getPlayerList().getPlayers()) {
@@ -88,12 +95,14 @@ public class ProxyCommon {
 		return DimensionManager.getWorld(dim);
 	}
 
-	public boolean isMainThread() {
+	@Override
+	public boolean isCallingFromMinecraftThread() {
 		return FMLCommonHandler.instance().getMinecraftServerInstance().isCallingFromMinecraftThread();
 	}
 
-	public void addScheduledMainTask(Runnable runnable) {
-		FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
+	@Override
+	public ListenableFuture<Object> addScheduledTask(Runnable runnable) {
+		return FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
 	}
 
 	public boolean isClient() {

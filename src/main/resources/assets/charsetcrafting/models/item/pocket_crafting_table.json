@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "charsetcrafting:items/pocket_crafting_table"
+  }
+}
