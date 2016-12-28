@@ -25,8 +25,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import pl.asie.charset.audio.GuiHandlerAudio;
-import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.crafting.pocket.ItemPocketTable;
+import pl.asie.charset.crafting.pocket.PacketPTAction;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 

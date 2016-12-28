@@ -1,11 +1,45 @@
-package pl.asie.charset.crafting;
+/*
+ * Copyright (c) 2016 neptunepink
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Copyright (c) 2015-2016 Adrian Siekierka
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.lang.reflect.Field;
+package pl.asie.charset.crafting.pocket;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
@@ -14,14 +48,14 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.crafting.ModCharsetCrafting;
 import pl.asie.charset.lib.container.ContainerBase;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
-public class ContainerPocket extends ContainerBase {
+public class ContainerPocketTable extends ContainerBase {
     private final EntityPlayer player;
     private final InventoryPlayer playerInv;
     private InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
@@ -37,7 +71,7 @@ public class ContainerPocket extends ContainerBase {
     private boolean isCrafting = false;
     private boolean dirty = false;
 
-    public ContainerPocket(EntityPlayer player) {
+    public ContainerPocketTable(EntityPlayer player) {
         super(player.inventory);
         this.player = player;
         this.playerInv = player.inventory;
@@ -377,65 +411,4 @@ public class ContainerPocket extends ContainerBase {
         playerInv.setInventorySlotContents(slot, toMove.isEmpty() ? ItemStack.EMPTY : toMove);
         updateMatrix();
     }
-    
-   /* @Override
-    public ItemStack slotClick(int slotId, int clickedButton, int mode, EntityPlayer player) {
-        // In a pocket crafting table, use 2 stacks of iron & 1 stick to make a sword.
-        // Put an iron sword in your 3rd hotbar slot.
-        // Fill the rest of your inventory up with cobble.
-        // Put your mouse over the crafting result, and press 3 to lose your sword.
-        // Since it gets put in the crafting area and then gets wiped out.
-        
-        // So this is code to dance around that issue. There may be similar
-        boolean bad_news = false;
-        if (mode == 2 && clickedButton >= 0 && clickedButton < 9) {
-            Slot slot2 = (Slot)this.inventorySlots.get(slotId);
-            if (slot2.canTakeStack(player)) {
-                bad_news = true;
-            }
-        }
-        if (!bad_news) {
-            ItemStack ret = super.slotClick(slotId, clickedButton, mode, player);
-            if (dirty) {
-                updateCraft();
-            }
-            return ret;
-        }
-        final InventoryPlayer realInventory = player.inventory;
-        
-        try {
-            player.inventory = new InventoryPlayer(player) {
-                {
-                    for (Field field : InventoryPlayer.class.getFields()) {
-                        field.set(this, field.get(realInventory));
-                    }
-                }
-                
-                @Override
-                public int getFirstEmptyStack() {
-                    foundCraftingSlot: for (int i = 0; i < mainInventory.length; ++i) {
-                        if (mainInventory[i] != null) continue;
-                        for (Slot slot : craftingSlots) {
-                            if (i == slot.getSlotIndex()) {
-                                continue foundCraftingSlot;
-                            }
-                        }
-                        return i;
-                    }
-                    return -1;
-                }
-            };
-            return super.slotClick(slotId, clickedButton, mode, player);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            player.inventory = realInventory;
-            if (dirty) {
-                updateCraft();
-            }
-        }
-        // (Could we just verify the crafting recipe instead of this nosense? Might not actually be possible. But if it is, it'd be less terrible.)
-        
-    } */
 }
