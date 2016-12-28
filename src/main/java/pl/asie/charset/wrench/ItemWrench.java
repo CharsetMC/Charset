@@ -37,6 +37,7 @@ public class ItemWrench extends Item {
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
         setUnlocalizedName("charset.wrench");
         setHarvestLevel("wrench", 2);
+        setMaxStackSize(1);
     }
 
     @Override
