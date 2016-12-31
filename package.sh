@@ -18,12 +18,12 @@ for i in `jq -r '.modules | keys[]' "$OUTDIR"/modules.json`; do
 		jar cvf "$OUTDIR"/releases/"$1"/charset-"$1"-"$i".jar \
 			assets/charset"$i" \
 			pl/asie/charset/"$i" pl/asie/charset/api \
-			mcmod.info LICENSE* NOTICE
+			pack.mcmeta mcmod.info LICENSE* NOTICE
 	else
 		jar cvf "$OUTDIR"/releases/"$1"/charset-"$1"-"$i".jar \
 			assets/charset"$i" \
 			pl/asie/charset/"$i" \
-			mcmod.info LICENSE* NOTICE
+			pack.mcmeta mcmod.info LICENSE* NOTICE
 	fi
 	rm mcmod.info
 done
