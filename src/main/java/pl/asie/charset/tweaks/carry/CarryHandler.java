@@ -16,6 +16,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,6 +62,7 @@ public class CarryHandler {
     public boolean grab(World world, BlockPos pos) {
         if (block == null) {
             block = world.getBlockState(pos);
+
             if (block.getBlock().isAir(block, world, pos)) {
                 block = null;
                 return false;
@@ -152,7 +154,7 @@ public class CarryHandler {
         }
     }
 
-    public static class Provider implements ICapabilityProvider {
+    public static class Provider implements ICapabilitySerializable<NBTTagCompound> {
         final CarryHandler handler;
 
         public Provider(EntityPlayer entity) {
@@ -168,6 +170,16 @@ public class CarryHandler {
         @Override
         public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
             return capability == TweakCarry.CAPABILITY ? TweakCarry.CAPABILITY.cast(handler) : null;
+        }
+
+        @Override
+        public NBTTagCompound serializeNBT() {
+            return (NBTTagCompound) STORAGE.writeNBT(TweakCarry.CAPABILITY, handler, null);
+        }
+
+        @Override
+        public void deserializeNBT(NBTTagCompound nbt) {
+            STORAGE.readNBT(TweakCarry.CAPABILITY, handler, null, nbt);
         }
     }
 

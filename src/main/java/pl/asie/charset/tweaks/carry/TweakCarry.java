@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -24,17 +25,20 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
+import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 
 import java.util.Random;
 
@@ -71,6 +75,21 @@ public class TweakCarry extends Tweak {
         CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
+        }
+    }
+
+    /* @SubscribeEvent
+    public void onEntitySpawn(EntityJoinWorldEvent event) {
+        if (event.getEntity().world.isRemote && event.getEntity().hasCapability(CAPABILITY, null)) {
+            ModCharsetTweaks.packet.sendToServer(new PacketCarrySyncRequest());
+        }
+    } */
+
+    // local sync
+    @SubscribeEvent
+    public void onPlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!event.player.world.isRemote && event.player.hasCapability(CAPABILITY, null)) {
+            ModCharsetTweaks.packet.sendTo(new PacketCarrySync(event.player.getCapability(CAPABILITY, null)), event.player);
         }
     }
 
@@ -162,22 +181,12 @@ public class TweakCarry extends Tweak {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
-        cancelIfCarrying(event, event.getEntityPlayer());
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
     public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         cancelIfCarrying(event, event.getEntityPlayer());
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        cancelIfCarrying(event, event.getEntityPlayer());
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
         cancelIfCarrying(event, event.getEntityPlayer());
     }
 
@@ -202,9 +211,6 @@ public class TweakCarry extends Tweak {
             RenderHelper.enableStandardItemLighting();
             GlStateManager.popMatrix();
 
-            //OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 15, 15);
-            Random random = new Random(System.currentTimeMillis());
-            //GlStateManager.translate(random.nextFloat()*10-5,random.nextFloat()*10-5,random.nextFloat()*10-5);
             GlStateManager.translate(-0.5, -1.25, -1.5);
             GlStateManager.enableRescaleNormal();
 
@@ -234,6 +240,13 @@ public class TweakCarry extends Tweak {
 
                 TileEntity tile = carryHandler.getBlockAccess().getTileEntity(CarryHandler.ACCESS_POS);
                 if (tile != null) {
+                    RenderHelper.enableStandardItemLighting();
+                    int i = carryHandler.getBlockAccess().getCombinedLight(CarryHandler.ACCESS_POS, 0);
+                    int j = i % 65536;
+                    int k = i / 65536;
+                    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j, (float)k);
+                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
                     try {
                         TileEntityRendererDispatcher.instance.renderTileEntityAt(tile, 0, 0, 0, partialTicks);
                     } catch (Exception e) {
