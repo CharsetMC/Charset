@@ -33,7 +33,6 @@ import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.carry.PacketCarryGrab;
 import pl.asie.charset.tweaks.carry.PacketCarrySync;
-import pl.asie.charset.tweaks.carry.PacketCarrySyncRequest;
 import pl.asie.charset.tweaks.carry.TweakCarry;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
@@ -110,7 +109,6 @@ public class ModCharsetTweaks {
 
 		packet.registerPacket(0x11, PacketCarryGrab.class);
 		packet.registerPacket(0x12, PacketCarrySync.class);
-		packet.registerPacket(0x13, PacketCarrySyncRequest.class);
 
 		for (Tweak t : tweakSet) {
 			if (t.isEnabled()) {

@@ -25,7 +25,7 @@ public class CarryHandler {
     public static final Storage STORAGE = new Storage();
     public static final BlockPos ACCESS_POS = new BlockPos(0, 64, 0);
 
-    private EntityPlayer player;
+    private Entity player;
     private Access access;
     private IBlockState block;
     private NBTTagCompound tile;
@@ -34,7 +34,7 @@ public class CarryHandler {
         this.access = new Access();
     }
 
-    public CarryHandler setPlayer(EntityPlayer player) {
+    public CarryHandler setPlayer(Entity player) {
         this.player = player;
         return this;
     }
@@ -185,7 +185,7 @@ public class CarryHandler {
 
     private class Access implements IBlockAccess {
         private BlockPos getPlayerPos() {
-            return player != null ? player.getPosition().up() : ACCESS_POS;
+            return player != null ? player.getPosition() : ACCESS_POS;
         }
 
         @Nullable

@@ -36,6 +36,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
@@ -60,6 +61,9 @@ public class TweakCarry extends Tweak {
         }
 
         MinecraftForge.EVENT_BUS.register(this);
+        if (ModCharsetLib.proxy.isClient()) {
+            MinecraftForge.EVENT_BUS.register(new TweakCarryRender());
+        }
         CapabilityManager.INSTANCE.register(CarryHandler.class, CarryHandler.STORAGE, CarryHandler.class);
         return true;
     }
@@ -78,18 +82,39 @@ public class TweakCarry extends Tweak {
         }
     }
 
-    /* @SubscribeEvent
-    public void onEntitySpawn(EntityJoinWorldEvent event) {
-        if (event.getEntity().world.isRemote && event.getEntity().hasCapability(CAPABILITY, null)) {
-            ModCharsetTweaks.packet.sendToServer(new PacketCarrySyncRequest());
+    private void syncCarryData(Entity who, EntityPlayer target) {
+        if (who instanceof EntityPlayer && who.hasCapability(CAPABILITY, null)) {
+            ModCharsetTweaks.packet.sendTo(new PacketCarrySync(who), target);
         }
-    } */
+    }
 
-    // local sync
     @SubscribeEvent
     public void onPlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!event.player.world.isRemote && event.player.hasCapability(CAPABILITY, null)) {
-            ModCharsetTweaks.packet.sendTo(new PacketCarrySync(event.player.getCapability(CAPABILITY, null)), event.player);
+        syncCarryData(event.player, event.player);
+    }
+
+    @SubscribeEvent
+    public void onPlayerRespawnEvent(PlayerEvent.PlayerRespawnEvent event) {
+        syncCarryData(event.player, event.player);
+    }
+
+    @SubscribeEvent
+    public void onPlayerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
+        syncCarryData(event.player, event.player);
+    }
+
+    @SubscribeEvent
+    public void onPlayerStartTracking(net.minecraftforge.event.entity.player.PlayerEvent.StartTracking event) {
+        syncCarryData(event.getTarget(), event.getEntityPlayer());
+    }
+
+    @SubscribeEvent
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        CarryHandler carryHandler = event.player.getCapability(CAPABILITY, null);
+        if (carryHandler != null && carryHandler.isCarrying()) {
+            if (event.player.isSprinting()) {
+                event.player.setSprinting(false);
+            }
         }
     }
 
@@ -167,14 +192,6 @@ public class TweakCarry extends Tweak {
         }
     }
 
-    @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        CarryHandler carryHandler = event.player.getCapability(CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying() && event.player.isSprinting()) {
-            event.player.setSprinting(false);
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         cancelIfCarrying(event, event.getEntityPlayer());
@@ -188,78 +205,5 @@ public class TweakCarry extends Tweak {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         cancelIfCarrying(event, event.getEntityPlayer());
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    @SideOnly(Side.CLIENT)
-    public void onRenderHand(RenderHandEvent event) {
-        EntityPlayer player = Minecraft.getMinecraft().player;
-        float partialTicks = event.getPartialTicks();
-
-        CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying()) {
-            event.setCanceled(true);
-            Minecraft.getMinecraft().entityRenderer.enableLightmap();
-
-            GlStateManager.pushMatrix();
-            float rotX = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTicks;
-            float rotY = player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTicks;
-
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(rotX, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(rotY, 0.0F, 1.0F, 0.0F);
-            RenderHelper.enableStandardItemLighting();
-            GlStateManager.popMatrix();
-
-            GlStateManager.translate(-0.5, -1.25, -1.5);
-            GlStateManager.enableRescaleNormal();
-
-            try {
-                Tessellator tessellator = Tessellator.getInstance();
-                VertexBuffer buffer = tessellator.getBuffer();
-                //Minecraft.getMinecraft().getRenderItem().renderItem(
-                  //      new ItemStack(Blocks.STONE), player, ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND, false);
-
-                buffer.setTranslation(0, -64, 0);
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
-
-                IBlockState renderState = carryHandler.getBlockState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
-                IBlockState renderStateExt = carryHandler.getBlockState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
-
-                BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
-                IBakedModel model = brd.getModelForState(renderState);
-                if (carryHandler.getBlockState().getRenderType() == EnumBlockRenderType.MODEL) {
-                    brd.getBlockModelRenderer().renderModelFlat(carryHandler.getBlockAccess(),
-                            model, renderStateExt,
-                            CarryHandler.ACCESS_POS, buffer, false, 0L
-                    );
-                }
-
-                tessellator.draw();
-                buffer.setTranslation(0, 0, 0);
-
-                TileEntity tile = carryHandler.getBlockAccess().getTileEntity(CarryHandler.ACCESS_POS);
-                if (tile != null) {
-                    RenderHelper.enableStandardItemLighting();
-                    int i = carryHandler.getBlockAccess().getCombinedLight(CarryHandler.ACCESS_POS, 0);
-                    int j = i % 65536;
-                    int k = i / 65536;
-                    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j, (float)k);
-                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-                    try {
-                        TileEntityRendererDispatcher.instance.renderTileEntityAt(tile, 0, 0, 0, partialTicks);
-                    } catch (Exception e) {
-
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            GlStateManager.disableRescaleNormal();
-            GlStateManager.popMatrix();
-            Minecraft.getMinecraft().entityRenderer.disableLightmap();
-        }
     }
 }
