@@ -25,7 +25,11 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.entity.Entity;
 
-import pl.asie.charset.lib.ModCharsetLib;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import pl.asie.charset.tweaks.carry.PacketCarryGrab;
 import pl.asie.charset.tweaks.minecart.ModelMinecartWrapped;
 import pl.asie.charset.tweaks.shard.ItemShard;
 import pl.asie.charset.tweaks.shard.TweakGlassShards;
@@ -64,5 +68,21 @@ public class ProxyClient extends ProxyCommon {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void carryGrabBlock(EntityPlayer player, World world, BlockPos pos) {
+		if (!(player instanceof EntityPlayerMP)) {
+			ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, pos));
+		}
+		super.carryGrabBlock(player, world, pos);
+	}
+
+	@Override
+	public void carryGrabEntity(EntityPlayer player, World world, Entity entity) {
+		if (!(player instanceof EntityPlayerMP)) {
+			ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, entity));
+		}
+		super.carryGrabEntity(player, world, entity);
 	}
 }

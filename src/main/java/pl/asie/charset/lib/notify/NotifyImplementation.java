@@ -57,6 +57,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.ProxyClient;
+import pl.asie.charset.tweaks.ModCharsetTweaks;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -128,7 +129,11 @@ public class NotifyImplementation {
                 }
             }
             if (args == null) args = new String[0];
-            ModCharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, format, args), target);
+            if (player != null) {
+                ModCharsetLib.packet.sendTo(PacketNotification.createNotify(where, item, format, args), player);
+            } else {
+                ModCharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, format, args), target);
+            }
         }
     }
     

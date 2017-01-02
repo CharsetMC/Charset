@@ -31,6 +31,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.tweaks.carry.PacketCarryGrab;
+import pl.asie.charset.tweaks.carry.TweakCarry;
 import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
 import pl.asie.charset.tweaks.minecart.PacketMinecartUpdate;
 import pl.asie.charset.tweaks.minecart.TweakDyeableMinecarts;
@@ -70,6 +72,7 @@ public class ModCharsetTweaks {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		// addTweak(new TweakAutoReplace());
+		addTweak(new TweakCarry());
 		addTweak(new TweakDisableVanillaTools());
 		addTweak(new TweakDoubleDoors());
 		addTweak(new TweakDyeableMinecarts());
@@ -102,6 +105,8 @@ public class ModCharsetTweaks {
 		packet = new PacketRegistry(ModCharsetTweaks.MODID);
 		packet.registerPacket(0x01, PacketMinecartUpdate.class);
 		packet.registerPacket(0x02, PacketMinecartRequest.class);
+
+		packet.registerPacket(0x11, PacketCarryGrab.class);
 
 		for (Tweak t : tweakSet) {
 			if (t.isEnabled()) {

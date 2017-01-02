@@ -138,9 +138,25 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         return EntityMinecart.Type.CHEST;
     }
 
-    public void initFromStack(ItemStack is) {
+    public EntityMinecartDayBarrel initFromStack(ItemStack is) {
         barrel.loadFromStack(is);
         updateDataWatcher(true);
+        return this;
+    }
+
+    public EntityMinecartDayBarrel initFromTile(TileEntityDayBarrel barrel) {
+        this.barrel = barrel;
+        barrel.setWorld(world);
+        barrel.setPos(BlockPos.ORIGIN);
+        barrel.validate();
+        barrel.orientation = Orientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
+        barrel.notice_target = this;
+        updateDataWatcher(true);
+        return this;
+    }
+
+    public TileEntityDayBarrel getTileInternal() {
+        return barrel;
     }
 
     private void createBarrel() {

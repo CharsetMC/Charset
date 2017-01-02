@@ -40,7 +40,7 @@ public abstract class PacketTile extends Packet {
 	public void readData(INetHandler handler, ByteBuf buf) {
 		int dim = buf.readInt();
 		int x = buf.readInt();
-		int y = buf.readUnsignedShort();
+		int y = buf.readInt();
 		int z = buf.readInt();
 
 		World w = ModCharsetLib.proxy.getLocalWorld(dim);
@@ -54,7 +54,7 @@ public abstract class PacketTile extends Packet {
 	public void writeData(ByteBuf buf) {
 		buf.writeInt(tile.getWorld().provider.getDimension());
 		buf.writeInt(tile.getPos().getX());
-		buf.writeShort(tile.getPos().getY());
+		buf.writeInt(tile.getPos().getY());
 		buf.writeInt(tile.getPos().getZ());
 	}
 }

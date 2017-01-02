@@ -19,13 +19,14 @@ package pl.asie.charset.lib.render.model;
 import net.minecraft.util.BlockRenderLayer;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ModelKey<T extends IRenderComparable<T>> {
     T object;
     BlockRenderLayer layer;
     Class objectClass;
 
-    public ModelKey(@Nonnull T object, @Nonnull BlockRenderLayer layer) {
+    public ModelKey(@Nonnull T object, @Nullable BlockRenderLayer layer) {
         this.object = object;
         this.layer = layer;
         this.objectClass = object.getClass();
