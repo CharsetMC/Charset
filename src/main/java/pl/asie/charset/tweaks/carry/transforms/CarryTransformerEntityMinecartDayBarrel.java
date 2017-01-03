@@ -1,12 +1,8 @@
-package pl.asie.charset.tweaks.carry;
+package pl.asie.charset.tweaks.carry.transforms;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.*;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.*;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.storage.ModCharsetStorage;
 import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;

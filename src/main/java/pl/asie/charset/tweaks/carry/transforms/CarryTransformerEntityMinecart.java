@@ -1,4 +1,4 @@
-package pl.asie.charset.tweaks.carry;
+package pl.asie.charset.tweaks.carry.transforms;
 
 import net.minecraft.block.BlockHopper;
 import net.minecraft.block.state.IBlockState;
@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
+import pl.asie.charset.tweaks.carry.ICarryTransformer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,8 +28,8 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 			World world = object.world;
 			NBTTagCompound compound = new NBTTagCompound();
 			compound = object.writeToNBT(compound);
-			compound.removeTag("UUIDLeast");
-			compound.removeTag("UUIDMost");
+			//compound.removeTag("UUIDLeast");
+			//compound.removeTag("UUIDMost");
 			if (patchTag != null) {
 				for (String tag : patchTag.getKeySet()) {
 					compound.setTag(tag, patchTag.getTag(tag));
@@ -85,7 +86,6 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 			TileEntityCommandBlock tile = new TileEntityCommandBlock();
 			NBTTagCompound compound = ((EntityMinecartCommandBlock) object).getCommandBlockLogic().writeToNBT(new NBTTagCompound());
 			tile.readFromNBT(compound);
-
 			return Pair.of(Blocks.COMMAND_BLOCK.getDefaultState(), tile);
 		} else if (object instanceof EntityMinecartChest) {
 			TileEntityChest tile = new TileEntityChest();
@@ -95,11 +95,11 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 			TileEntityHopper tile = new TileEntityHopper();
 			copyEntityToTile(tile, object, "Items");
 			return Pair.of(Blocks.HOPPER.getDefaultState(), tile);
-		} else if (object instanceof EntityMinecartFurnace) {
+		}/* else if (object instanceof EntityMinecartFurnace) {
 			TileEntityFurnace tile = new TileEntityFurnace();
 			copyEntityToTile(tile, object, "Fuel");
 			return Pair.of(Blocks.FURNACE.getDefaultState(), tile);
-		} else {
+		}*/ else {
 			return null;
 		}
 	}
@@ -132,11 +132,11 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 			return transform(object, EntityMinecartHopper.class,
 					filter(tile.writeToNBT(new NBTTagCompound()), "Items"),
 					simulate) != null;
-		} else if (state.getBlock() == Blocks.FURNACE) {
+		}/* else if (state.getBlock() == Blocks.FURNACE) {
 			return transform(object, EntityMinecartFurnace.class,
 					filter(tile.writeToNBT(new NBTTagCompound()), "Fuel"),
 					simulate) != null;
-		}
+		} */
 
 		return false;
 	}

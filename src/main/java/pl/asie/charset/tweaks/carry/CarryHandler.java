@@ -1,6 +1,8 @@
 package pl.asie.charset.tweaks.carry;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -29,6 +32,7 @@ public class CarryHandler {
     private Access access;
     private IBlockState block;
     private NBTTagCompound tile;
+    private float grabbedYaw;
 
     public CarryHandler() {
         this.access = new Access();
@@ -43,12 +47,16 @@ public class CarryHandler {
         return access;
     }
 
+    public float getGrabbedYaw() { return grabbedYaw; }
+
     public boolean isCarrying() {
         return block != null;
     }
 
     public void put(IBlockState state, TileEntity tile) {
+        grabbedYaw = player != null ? player.rotationYaw : 0.0F;
         this.block = state;
+
         if (tile != null) {
             this.tile = tile.writeToNBT(new NBTTagCompound());
             this.tile.setInteger("x", 0);
@@ -61,6 +69,8 @@ public class CarryHandler {
 
     public boolean grab(World world, BlockPos pos) {
         if (block == null) {
+            grabbedYaw = player != null ? player.rotationYaw : 0.0F;
+
             block = world.getBlockState(pos);
 
             if (block.getBlock().isAir(block, world, pos)) {
@@ -84,10 +94,33 @@ public class CarryHandler {
         }
     }
 
+    private IBlockState rotateState(IBlockState original) {
+        IBlockState newState = original;
+        float yawDiff = player != null ? player.rotationYaw - grabbedYaw : 0.0F;
+
+        int rotCycles = MathHelper.floor((double)(yawDiff * 4.0F / 360.0F) + 0.5D) & 3;
+        if (rotCycles > 0) {
+            for (IProperty<?> prop : original.getProperties().keySet()) {
+                if (prop.getName().equals("facing") || prop.getName().equals("rotation")) {
+                    EnumFacing facing = (EnumFacing) newState.getValue(prop);
+                    for (int i = 0; i < rotCycles; i++) {
+                        facing = facing.rotateAround(EnumFacing.Axis.Y);
+                    }
+                    if (prop.getAllowedValues().contains(facing)) {
+                        newState = newState.withProperty((IProperty<EnumFacing>) prop, facing);
+                    }
+                }
+            }
+        }
+
+        return newState;
+    }
+
+
     public boolean place(World world, BlockPos pos, EnumFacing facing) {
         if (block != null) {
             if (world.mayPlace(block.getBlock(), pos, false, facing, (Entity)null)) {
-                world.setBlockState(pos, block);
+                world.setBlockState(pos, rotateState(block));
                 block = null;
 
                 if (tile != null) {

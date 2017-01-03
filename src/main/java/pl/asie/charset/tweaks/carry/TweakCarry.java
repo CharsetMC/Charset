@@ -3,15 +3,9 @@ package pl.asie.charset.tweaks.carry;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
@@ -19,13 +13,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
-import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -35,13 +27,11 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
-import pl.asie.charset.tweaks.minecart.PacketMinecartRequest;
-
-import java.util.Random;
+import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecart;
+import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecartDayBarrel;
 
 public class TweakCarry extends Tweak {
     public static final ResourceLocation CAP_IDENTIFIER = new ResourceLocation("charsettweaks:carry");
@@ -122,7 +112,7 @@ public class TweakCarry extends Tweak {
     @SideOnly(Side.CLIENT)
     public void onMouse(MouseEvent event) {
         if (event.isButtonstate() && event.getButton() == 2
-                && GuiScreen.isShiftKeyDown()) {
+                && Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown()) {
 
             EntityPlayer player = Minecraft.getMinecraft().player;
             CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
