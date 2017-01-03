@@ -45,14 +45,12 @@ public class TweakCarryRender {
 			Minecraft.getMinecraft().entityRenderer.enableLightmap();
 
 			GlStateManager.pushMatrix();
-			float rotX = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTicks;
-			float rotY = player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTicks;
 
-			GlStateManager.pushMatrix();
+			/* GlStateManager.pushMatrix();
 			GlStateManager.rotate(rotX, 1.0F, 0.0F, 0.0F);
 			GlStateManager.rotate(rotY, 0.0F, 1.0F, 0.0F);
 			RenderHelper.enableStandardItemLighting();
-			GlStateManager.popMatrix();
+			GlStateManager.popMatrix(); */
 
 			GlStateManager.translate(0, player.isSneaking() ? -0.65 : -0.75, -1);
 			GlStateManager.enableRescaleNormal();
@@ -70,21 +68,26 @@ public class TweakCarryRender {
 				VertexBuffer buffer = tessellator.getBuffer();
 
 				buffer.setTranslation(0, -64, 0);
-				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
-				IBlockState renderState = carryHandler.getBlockState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
-				IBlockState renderStateExt = carryHandler.getBlockState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+				try {
+					IBlockState renderState = carryHandler.getBlockState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+					IBlockState renderStateExt = carryHandler.getBlockState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
 
-				BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
-				IBakedModel model = brd.getModelForState(renderState);
-				if (carryHandler.getBlockState().getRenderType() == EnumBlockRenderType.MODEL) {
-					brd.getBlockModelRenderer().renderModelFlat(carryHandler.getBlockAccess(),
-							model, renderStateExt,
-							CarryHandler.ACCESS_POS, buffer, false, 0L
-					);
+					BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
+					IBakedModel model = brd.getModelForState(renderState);
+					if (carryHandler.getBlockState().getRenderType() == EnumBlockRenderType.MODEL) {
+						brd.getBlockModelRenderer().renderModelFlat(carryHandler.getBlockAccess(),
+								model, renderStateExt,
+								CarryHandler.ACCESS_POS, buffer, false, 0L
+						);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					tessellator.draw();
 				}
 
-				tessellator.draw();
 				buffer.setTranslation(0, 0, 0);
 
 				TileEntity tile = carryHandler.getBlockAccess().getTileEntity(CarryHandler.ACCESS_POS);

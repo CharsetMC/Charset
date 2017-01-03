@@ -77,7 +77,7 @@ public class CarryHandler {
 
             block = world.getBlockState(pos);
 
-            if (block.getBlock().isAir(block, world, pos)) {
+            if (block.getBlock().isAir(block, world, pos) || !canPickUp(world, pos, block)) {
                 block = null;
                 return false;
             }
@@ -93,6 +93,22 @@ public class CarryHandler {
         } else {
             return false;
         }
+    }
+
+    private boolean canPickUp(World world, BlockPos pos, IBlockState block) {
+        if (player instanceof EntityPlayer && ((EntityPlayer) player).isCreative()) {
+            return true;
+        }
+
+        float hardness = player instanceof EntityPlayer
+                ? block.getPlayerRelativeBlockHardness((EntityPlayer) player, world, pos)
+                : block.getBlockHardness(world, pos);
+
+        if (hardness <= 0) {
+            return false;
+        }
+
+        return true;
     }
 
     private IBlockState rotateState(IBlockState original) {
@@ -218,7 +234,7 @@ public class CarryHandler {
 
     private class Access implements IBlockAccess {
         private BlockPos getPlayerPos() {
-            return player != null ? player.getPosition() : ACCESS_POS;
+            return player != null ? player.getPosition().up() : ACCESS_POS;
         }
 
         @Nullable
