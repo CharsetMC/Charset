@@ -9,10 +9,15 @@
   "variants": {
     "normal": [{}],
     "direction": {
-      "north_south": {}
+      "north_south": {},
+      "east_west": {},
+      "north_west": {},
+      "north_east": {},
+      "south_west": {},
+      "south_east": {}
     },
     "inventory": [{
-	  "transform": "forge:default-block"
+	  "transform": "forge:default-item"
 	}]
   }
 }

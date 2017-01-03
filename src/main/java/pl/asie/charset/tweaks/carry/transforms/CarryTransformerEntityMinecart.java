@@ -28,8 +28,8 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 			World world = object.world;
 			NBTTagCompound compound = new NBTTagCompound();
 			compound = object.writeToNBT(compound);
-			//compound.removeTag("UUIDLeast");
-			//compound.removeTag("UUIDMost");
+			compound.removeTag("UUIDLeast");
+			compound.removeTag("UUIDMost");
 			if (patchTag != null) {
 				for (String tag : patchTag.getKeySet()) {
 					compound.setTag(tag, patchTag.getTag(tag));

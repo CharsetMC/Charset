@@ -7,17 +7,21 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import pl.asie.charset.lib.ModCharsetLib;
 
-public class BlockRailCross extends BlockRailBase {
+public class BlockRailCharset extends BlockRailBase {
+	// hacks! <3
 	public static final IProperty<EnumRailDirection> DIRECTION = PropertyEnum.create(
 			"direction", EnumRailDirection.class,
-			EnumRailDirection.NORTH_SOUTH);
+			EnumRailDirection.NORTH_SOUTH, EnumRailDirection.EAST_WEST,
+			EnumRailDirection.NORTH_EAST, EnumRailDirection.NORTH_WEST,
+			EnumRailDirection.SOUTH_EAST, EnumRailDirection.SOUTH_WEST);
 
-	protected BlockRailCross() {
+	protected BlockRailCharset() {
 		super(false);
 		setCreativeTab(ModCharsetLib.CREATIVE_TAB);
-		setUnlocalizedName("charset.rail_cross");
+		setUnlocalizedName("charset.rail_charset");
 	}
 
 	@Override
@@ -35,13 +39,18 @@ public class BlockRailCross extends BlockRailBase {
 		if (cart != null) {
 			float cartYaw = cart.rotationYaw % 180;
 			while (cartYaw < 0) cartYaw += 180;
-			System.out.println(cartYaw);
+			EnumRailDirection value;
+
 			if (cartYaw < 45 || cartYaw > 135)
-				return EnumRailDirection.EAST_WEST;
+				value = EnumRailDirection.EAST_WEST;
 			else
-				return EnumRailDirection.NORTH_SOUTH;
+				value = EnumRailDirection.NORTH_SOUTH;
+
+			if (value != state.getValue(DIRECTION) && world instanceof World)
+				((World) world).setBlockState(pos, state.withProperty(DIRECTION, value), 6);
+			return value;
 		} else {
-			return EnumRailDirection.EAST_WEST;
+			return state.getValue(DIRECTION);
 		}
 	}
 

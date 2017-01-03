@@ -122,6 +122,8 @@ public class TweakCarry extends Tweak {
 
             if (player.getHeldItem(EnumHand.MAIN_HAND).isEmpty()
                     && player.getHeldItem(EnumHand.OFF_HAND).isEmpty()
+                    && !player.isPlayerSleeping()
+                    && !player.isRiding()
                     && Minecraft.getMinecraft().currentScreen == null
                     && carryHandler != null) {
 

@@ -30,7 +30,7 @@ public class TrackCombiner {
 		World world = event.getWorld();
 		BlockPos pos = event.getPos();
 
-		if (event.getEntityPlayer().isSneaking() && !event.getItemStack().isEmpty()) {
+		if (/* event.getEntityPlayer().isSneaking() && */ !event.getItemStack().isEmpty()) {
 			IBlockState state = world.getBlockState(pos);
 			if (transform.containsKey(state)) {
 				for (Map.Entry<ItemStack, IBlockState> entry : transform.get(state).entrySet()) {
@@ -54,10 +54,11 @@ public class TrackCombiner {
 			IBlockState state = world.getBlockState(pos);
 			if (transformInv.containsKey(state)) {
 				Pair<ItemStack, IBlockState> pair = transformInv.get(state);
-				ItemUtils.giveOrSpawnItemEntity(
-						event.getEntityPlayer(), world, new Vec3d(pos).addVector(0.5, 0.125, 0.5),
-						pair.getLeft().copy(), 0.02f, 0.02f, 0.02f, 1.0f
-				);
+				if (!world.isRemote) {
+					ItemUtils.spawnItemEntity(world, new Vec3d(pos).addVector(0.5, 0.125, 0.5),
+							pair.getLeft().copy(), 0.02f, 0.05f, 0.02f, 1.0f
+					);
+				}
 				world.setBlockState(pos, pair.getRight());
 				event.setCanceled(true);
 			}

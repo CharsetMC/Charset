@@ -21,7 +21,6 @@ import net.minecraft.block.BlockRail;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.BlockRailDetector;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.init.Blocks;
@@ -38,7 +37,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.lib.ModCharsetLib;
@@ -62,7 +60,7 @@ public class ModCharsetCarts {
 	public static TrackCombiner combiner;
 	public static Logger logger;
 
-	public static BlockRailCross blockRailCross;
+	public static BlockRailCharset blockRailCross;
 
 	private Configuration config;
 
@@ -80,8 +78,8 @@ public class ModCharsetCarts {
 		logger = LogManager.getLogger(ModCharsetCarts.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("carts.cfg"));
 
-		ModCharsetLib.proxy.registerBlock(blockRailCross = new BlockRailCross(), "rail_cross");
-		ModCharsetLib.proxy.registerItemModel(blockRailCross, 0, "charsetcarts:rail_cross");
+		ModCharsetLib.proxy.registerBlock(blockRailCross = new BlockRailCharset(), "rail_charset");
+		ModCharsetLib.proxy.registerItemModel(blockRailCross, 0, "charsetcarts:rail_charset");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 
@@ -104,7 +102,9 @@ public class ModCharsetCarts {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		register(EntityMinecartImproved.class, "rminecart", EntityMinecart.class);
+		if (ModCharsetLib.INDEV) {
+			register(EntityMinecartImproved.class, "rminecart", EntityMinecart.class);
+		}
 		MinecraftForge.EVENT_BUS.register(this);
 
 		if (combiner != null) {
