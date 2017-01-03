@@ -116,20 +116,25 @@ public class TweakCarry extends Tweak {
 
             EntityPlayer player = Minecraft.getMinecraft().player;
             CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
+            if (!player.isCreative()) {
+                event.setCanceled(true);
+            }
 
             if (player.getHeldItem(EnumHand.MAIN_HAND).isEmpty()
                     && player.getHeldItem(EnumHand.OFF_HAND).isEmpty()
                     && Minecraft.getMinecraft().currentScreen == null
                     && carryHandler != null) {
 
+                if (player.isCreative()) {
+                    event.setCanceled(true);
+                }
+
                 RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
                 if (mouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
                     ModCharsetTweaks.proxy.carryGrabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
-                    event.setCanceled(true);
                 } else if (mouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
                     Entity entity = mouseOver.entityHit;
                     ModCharsetTweaks.proxy.carryGrabEntity(player, player.getEntityWorld(), entity);
-                    event.setCanceled(true);
                 }
             }
         }
@@ -152,11 +157,7 @@ public class TweakCarry extends Tweak {
                 pos = pos.offset(facing);
             }
 
-            if (!world.isRemote) {
-                carryHandler.place(world, pos, facing);
-            } else {
-                carryHandler.empty();
-            }
+            carryHandler.place(world, pos, facing);
         }
     }
 

@@ -18,7 +18,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 
 import javax.annotation.Nonnull;
@@ -32,6 +31,7 @@ public class CarryHandler {
     private Access access;
     private IBlockState block;
     private NBTTagCompound tile;
+    private TileEntity tileInstance;
     private float grabbedYaw;
 
     public CarryHandler() {
@@ -41,6 +41,18 @@ public class CarryHandler {
     public CarryHandler setPlayer(Entity player) {
         this.player = player;
         return this;
+    }
+
+    private void setTile(TileEntity tile) {
+        if (tile != null) {
+            this.tile = tile.writeToNBT(new NBTTagCompound());
+            this.tile.setInteger("x", 0);
+            this.tile.setInteger("y", 64);
+            this.tile.setInteger("z", 0);
+        } else {
+            this.tile = null;
+        }
+        this.tileInstance = null;
     }
 
     public IBlockAccess getBlockAccess() {
@@ -56,15 +68,7 @@ public class CarryHandler {
     public void put(IBlockState state, TileEntity tile) {
         grabbedYaw = player != null ? player.rotationYaw : 0.0F;
         this.block = state;
-
-        if (tile != null) {
-            this.tile = tile.writeToNBT(new NBTTagCompound());
-            this.tile.setInteger("x", 0);
-            this.tile.setInteger("y", 64);
-            this.tile.setInteger("z", 0);
-        } else {
-            this.tile = null;
-        }
+        setTile(tile);
     }
 
     public boolean grab(World world, BlockPos pos) {
@@ -79,10 +83,7 @@ public class CarryHandler {
             }
 
             if (block.getBlock().hasTileEntity(block)) {
-                tile = world.getTileEntity(pos).writeToNBT(new NBTTagCompound());
-                tile.setInteger("x", 0);
-                tile.setInteger("y", 64);
-                tile.setInteger("z", 0);
+                setTile(world.getTileEntity(pos));
                 world.removeTileEntity(pos);
             }
 
@@ -119,7 +120,7 @@ public class CarryHandler {
 
     public boolean place(World world, BlockPos pos, EnumFacing facing) {
         if (block != null) {
-            if (world.mayPlace(block.getBlock(), pos, false, facing, (Entity)null)) {
+            if (world.mayPlace(block.getBlock(), pos, false, facing, null)) {
                 world.setBlockState(pos, rotateState(block));
                 block = null;
 
@@ -150,8 +151,7 @@ public class CarryHandler {
     }
 
     public TileEntity getTileEntity() {
-        // TODO: optimize
-        return tile != null ? TileEntity.create(player.world, tile) : null;
+        return tileInstance != null ? tileInstance : (tile != null ? (tileInstance = TileEntity.create(player.world, tile)) : null);
     }
 
     public static class Storage implements Capability.IStorage<CarryHandler> {

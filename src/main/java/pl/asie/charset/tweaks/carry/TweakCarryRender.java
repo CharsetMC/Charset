@@ -4,8 +4,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -20,15 +23,25 @@ import org.lwjgl.opengl.GL11;
  * Created by asie on 1/2/17.
  */
 public class TweakCarryRender {
+	private static final Minecraft mc = Minecraft.getMinecraft();
+
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	@SideOnly(Side.CLIENT)
 	public void onRenderHand(RenderHandEvent event) {
-		EntityPlayer player = Minecraft.getMinecraft().player;
+		Entity rve = Minecraft.getMinecraft().getRenderViewEntity();
+		if (!(rve instanceof EntityPlayer)) {
+			return;
+		}
+		EntityPlayer player = (EntityPlayer) rve;
 		float partialTicks = event.getPartialTicks();
 
 		CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
 		if (carryHandler != null && carryHandler.isCarrying()) {
 			event.setCanceled(true);
+			if (this.mc.gameSettings.thirdPersonView != 0 || this.mc.gameSettings.hideGUI) {
+				return;
+			}
+
 			Minecraft.getMinecraft().entityRenderer.enableLightmap();
 
 			GlStateManager.pushMatrix();
@@ -41,8 +54,16 @@ public class TweakCarryRender {
 			RenderHelper.enableStandardItemLighting();
 			GlStateManager.popMatrix();
 
-			GlStateManager.translate(-0.5, -1.25, -1.5);
+			GlStateManager.translate(0, player.isSneaking() ? -0.65 : -0.75, -1);
 			GlStateManager.enableRescaleNormal();
+			GlStateManager.enableBlend();
+			GlStateManager.rotate(180, 0, 1, 0);
+			GlStateManager.translate(-0.5, -0.5, -0.5);
+
+			TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
+
+			textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
 
 			try {
 				Tessellator tessellator = Tessellator.getInstance();
@@ -85,6 +106,10 @@ public class TweakCarryRender {
 				e.printStackTrace();
 			}
 
+			textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+			textureManager.getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+
+			GlStateManager.disableBlend();
 			GlStateManager.disableRescaleNormal();
 			GlStateManager.popMatrix();
 			Minecraft.getMinecraft().entityRenderer.disableLightmap();
