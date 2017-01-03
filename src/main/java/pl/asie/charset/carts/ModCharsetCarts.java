@@ -16,8 +16,16 @@
 
 package pl.asie.charset.carts;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRail;
+import net.minecraft.block.BlockRailBase;
+import net.minecraft.block.BlockRailDetector;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,6 +37,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.lib.ModCharsetLib;
@@ -49,7 +59,10 @@ public class ModCharsetCarts {
 
 	@Mod.Instance(MODID)
 	public static ModCharsetCarts instance;
+	public static TrackCombiner combiner;
 	public static Logger logger;
+
+	public static BlockRailCross blockRailCross;
 
 	private Configuration config;
 
@@ -67,14 +80,41 @@ public class ModCharsetCarts {
 		logger = LogManager.getLogger(ModCharsetCarts.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("carts.cfg"));
 
+		ModCharsetLib.proxy.registerBlock(blockRailCross = new BlockRailCross(), "rail_cross");
+		ModCharsetLib.proxy.registerItemModel(blockRailCross, 0, "charsetcarts:rail_cross");
+
 		MinecraftForge.EVENT_BUS.register(proxy);
+
+		if (config.getBoolean("trackCombiner", "features", true, "Enables the Track Combiner, replacing the usual way of crafting expansion rails with an in-world mechanism.")) {
+			combiner = new TrackCombiner();
+		}
+
+		config.save();
+	}
+
+	private void registerFancy(Block railSrc, IProperty<BlockRailBase.EnumRailDirection> propSrc, Block railDst, IProperty<BlockRailBase.EnumRailDirection> propDst, ItemStack with) {
+		for (BlockRailBase.EnumRailDirection direction : propSrc.getAllowedValues()) {
+			if (propDst.getAllowedValues().contains(direction)) {
+				combiner.register(railSrc.getDefaultState().withProperty(propSrc, direction),
+						railDst.getDefaultState().withProperty(propDst, direction),
+						with);
+			}
+		}
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		register(EntityMinecartImproved.class, "rminecart", EntityMinecart.class);
-
 		MinecraftForge.EVENT_BUS.register(this);
+
+		if (combiner != null) {
+			MinecraftForge.EVENT_BUS.register(combiner);
+
+			combiner.register(Blocks.RAIL, blockRailCross.getDefaultState(), new ItemStack(Blocks.RAIL));
+			registerFancy(Blocks.RAIL, BlockRail.SHAPE, Blocks.DETECTOR_RAIL, BlockRailDetector.SHAPE, new ItemStack(Blocks.STONE_PRESSURE_PLATE));
+		} else {
+			GameRegistry.addShapedRecipe(new ItemStack(blockRailCross, 2), " r ", "r r", " r ", 'r', new ItemStack(Blocks.RAIL));
+		}
 	}
 
 	@SubscribeEvent

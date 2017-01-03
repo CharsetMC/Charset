@@ -19,6 +19,7 @@ package pl.asie.charset.lib;
 import akka.routing.Listen;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -70,9 +71,13 @@ public class ProxyCommon implements IThreadListener {
 	}
 
 	public void registerBlock(Block block, Item item, String name) {
+		registerBlock(block, item, name, ModCharsetLib.CREATIVE_TAB);
+	}
+
+	public void registerBlock(Block block, Item item, String name, CreativeTabs tab) {
 		GameRegistry.register(block.setRegistryName(name));
 		GameRegistry.register(item.setRegistryName(name));
-		block.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+		block.setCreativeTab(tab);
 	}
 
 	public void registerRecipeShaped(ItemStack output, Object... recipe) {
