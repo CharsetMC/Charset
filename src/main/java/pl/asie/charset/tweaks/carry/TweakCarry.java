@@ -4,6 +4,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -11,6 +12,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +20,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -56,6 +59,51 @@ public class TweakCarry extends Tweak {
         }
         CapabilityManager.INSTANCE.register(CarryHandler.class, CarryHandler.STORAGE, CarryHandler.class);
         return true;
+    }
+
+    private boolean dropCarriedBlock(EntityLivingBase entity, boolean must) {
+        CarryHandler carryHandler = entity.getCapability(CAPABILITY, null);
+        if (carryHandler != null && carryHandler.isCarrying()) {
+            World world = entity.getEntityWorld();
+            if (world.isRemote) {
+                carryHandler.empty();
+                return true;
+            }
+
+            BlockPos base = entity.getPosition();
+            for (int method = 0; method <= (must ? 2 : 1); method++) {
+                for (int radius = 0; radius <= (must ? 4 : 2); radius++) {
+                    Vec3i radiusVec = new Vec3i(radius, radius, radius);
+                    for (BlockPos pos : BlockPos.getAllInBoxMutable(base.subtract(radiusVec), base.add(radiusVec))) {
+                        if (world.getBlockState(pos).getBlock().isReplaceable(world, pos)
+                                && (method > 1 || !world.isAirBlock(pos))
+                                && (method > 0 || world.isSideSolid(pos.down(), EnumFacing.UP))
+                                ) {
+                            carryHandler.place(world, pos.toImmutable(), EnumFacing.UP);
+                        }
+                        if (!carryHandler.isCarrying()) break;
+                    }
+                    if (!carryHandler.isCarrying()) break;
+                }
+                if (!carryHandler.isCarrying()) break;
+            }
+
+            if (carryHandler.isCarrying()) {
+                if (must) {
+                    ModCharsetLib.logger.error("Could not drop carried block from player " + entity.getName() + "! This is a bug!");
+                }
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    @SubscribeEvent
+    public void onLivingDeath(LivingDeathEvent event) {
+        dropCarriedBlock(event.getEntityLiving(), true);
     }
 
     @SubscribeEvent
