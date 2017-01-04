@@ -141,10 +141,10 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
     @Override
     public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
-        TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof TileEntityDayBarrel) {
-            if (((TileEntityDayBarrel) tile).canRotate(axis)) {
-                ((TileEntityDayBarrel) tile).rotate(axis);
+        if (axis != null) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof TileEntityDayBarrel) {
+                ((TileEntityDayBarrel) tile).rotateWrench(axis);
                 return true;
             }
         }

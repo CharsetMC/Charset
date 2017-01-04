@@ -36,10 +36,12 @@
 
 package pl.asie.charset.storage.barrel;
 
+import net.minecraft.block.Block;
+import pl.asie.charset.api.lib.IAxisRotatable;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.INoticeUpdater;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -72,7 +74,7 @@ import pl.asie.charset.storage.ModCharsetStorage;
 import java.util.ArrayList;
 import java.util.WeakHashMap;
 
-public class TileEntityDayBarrel extends TileBase implements ITickable {
+public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRotatable {
     public ItemStack item = ItemStack.EMPTY;
     private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.LOG);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.PLANKS);
@@ -492,6 +494,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return isTop(facing) || isBottom(facing) || facing == null;
+        } else if (capability == Capabilities.AXIS_ROTATABLE) {
+            return facing != null;
         } else {
             return false;
         }
@@ -507,6 +511,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
             } else if (facing == null) {
                 return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(readOnlyView);
             }
+        } else if (capability == Capabilities.AXIS_ROTATABLE) {
+            return Capabilities.AXIS_ROTATABLE.cast(this);
         }
 
         return null;
@@ -621,107 +627,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return false;
     }
 
-    boolean punt(EntityPlayer player, EnumHand hand) {
-        int distance = 0; // TODO: Restore punt
-        if (distance <= 0) {
-            return false;
-        }
-        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), player, Block.FULL_BLOCK_AABB, 0);
-        if (result == null || result.sideHit == null) {
-            return false;
-        }
-        EnumFacing dir = result.sideHit.getOpposite();
-        BlockPos src = getPos();
-        BlockPos next = src;
-        Orientation newOrientation = orientation;
-        boolean doRotation = dir.getDirectionVec().getY() == 0;
-        EnumFacing rotationAxis = null;
-        if (doRotation) {
-            rotationAxis = SpaceUtils.rotateCounterclockwise(dir, EnumFacing.UP);
-        }
-        if (player.isSneaking() && distance > 1) {
-            distance = 1;
-        }
-        int spillage = distance;
-        int doubleRolls = 0;
-        for (int i = 0; i < distance; i++) {
-            if (i > 6) {
-                break;
-            }
-            boolean must_rise_or_fail = false;
-            BlockPos peek = next.offset(dir);
-            if (!getWorld().isBlockLoaded(peek)) {
-                break;
-            }
-            IBlockState peekState = getWorld().getBlockState(peek);
-            BlockPos below = peek.offset(EnumFacing.DOWN);
-            int rotateCount = 1;
-            if (!peekState.getBlock().isReplaceable(getWorld(), peek)) {
-                if (!isStairish(getWorld(), peek)) {
-                    break;
-                }
-                BlockPos above = peek.offset(EnumFacing.UP);
-                if (!getWorld().isAirBlock(above) /* Not going to replace snow in this case */) {
-                    break;
-                }
-                next = above;
-                spillage += 3;
-                rotateCount++;
-                doubleRolls++;
-            } else if (getWorld().getBlockState(below).getBlock().isReplaceable(getWorld(), below) && i != distance - 1) {
-                next = below;
-                spillage++;
-            } else {
-                next = peek;
-            }
-            if (!doRotation) {
-                rotateCount = 0;
-            }
-            //When we roll a barrel, the side we punch should face up
-            for (int r = rotateCount; r > 0; r--) {
-                EnumFacing nTop = SpaceUtils.rotateCounterclockwise(newOrientation.top, rotationAxis);
-                EnumFacing nFace = SpaceUtils.rotateCounterclockwise(newOrientation.facing, rotationAxis);
-                newOrientation = Orientation.fromDirection(nFace).pointTopTo(nTop);
-            }
-        }
-        if (src.equals(next)) {
-            return false;
-        }
-        if (!doRotation && orientation.top == EnumFacing.UP && dir == EnumFacing.UP) {
-            spillage = 0;
-        }
-        // TODO
-        /* if (doubleRolls % 2 == 1) {
-            Sound.barrelPunt2.playAt(src);
-        } else {
-            Sound.barrelPunt.playAt(src);
-        } */
-        getWorld().removeTileEntity(src);
-        getWorld().setBlockToAir(src);
-        if (newOrientation != null) {
-            this.orientation = newOrientation;
-        }
-        this.validate();
-        getWorld().setBlockState(next, ModCharsetStorage.barrelBlock.getDefaultState());
-        getWorld().setTileEntity(next, this);
-        player.addExhaustion(0.5F);
-        ItemStack is = player.getHeldItem(hand);
-        if (!is.isEmpty() && is.isItemStackDamageable() && world.rand.nextInt(4) == 0) {
-            is.damageItem(distance, player);
-            if (is.getCount() <= 0) {
-                player.setHeldItem(hand, ItemStack.EMPTY);
-            }
-        }
-        //spillItems(spillage); // Meh!
-        return true;
-    }
-
     public void click(EntityPlayer player) {
         EnumHand hand = EnumHand.MAIN_HAND;
-        // left click: remove a stack, or punt if properly equipped
-        if (punt(player, hand)) {
-            return;
-        }
 
         if (item.isEmpty()) {
             info(player);
@@ -890,11 +797,21 @@ public class TileEntityDayBarrel extends TileBase implements ITickable {
         return barrel;
     }
 
-    public boolean canRotate(EnumFacing axis) {
-        return axis != null;
+    @Override
+    public boolean rotateAround(EnumFacing axis) {
+        Orientation newOrientation = orientation.rotateAround(axis);
+
+        if (orientation != newOrientation) {
+            orientation = newOrientation;
+            markBlockForUpdate();
+            getWorld().notifyNeighborsRespectDebug(pos, getBlockType(), true);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void rotate(EnumFacing axis) {
+    public void rotateWrench(EnumFacing axis) {
         Orientation oldOrientation = orientation;
 
         if (axis == orientation.facing.getOpposite()) {

@@ -42,6 +42,7 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -87,10 +88,10 @@ public enum Orientation {
      */
     public final EnumFacing top;
     
-    private Orientation nextFaceRotation, prevFaceRotation;
+    private Orientation[] rotations = new Orientation[EnumFacing.VALUES.length];
     private int rotation;
     private Orientation swapped;
-    private EnumFacing[] dirRotations = new EnumFacing[EnumFacing.values().length]; // Admitedly we could just use values() here. But that's ugly.
+    private EnumFacing[] dirRotations = new EnumFacing[EnumFacing.VALUES.length]; // Admitedly we could just use values() here. But that's ugly.
     
     private static Orientation[] valuesCache = values();
     
@@ -101,12 +102,6 @@ public enum Orientation {
     
     static {
         for (Orientation o : values()) {
-            o.setup();
-        }
-        for (Orientation o : values()) {
-            o.setupRotation();
-        }
-        for (Orientation o : values()) {
             for (Orientation t : values()) {
                 if (o.facing == t.top && o.top == t.facing) {
                     o.swapped = t;
@@ -114,20 +109,46 @@ public enum Orientation {
                 }
             }
         }
+
+        for (Orientation o : values()) {
+            o.setupRotationFacing();
+        }
+        for (Orientation o : values()) {
+            o.setupRotationTop();
+        }
+        for (Orientation o : values()) {
+            o.setupRotationAll();
+        }
         for (Orientation o : values()) {
             o.setupDirectionRotation();
         }
+
         if (valuesCache.length == 0) {
             throw new RuntimeException("lolwut");
         }
     }
 
-    private void setup() {
-        nextFaceRotation = find(facing, SpaceUtils.rotateCounterclockwise(top, facing));
-        prevFaceRotation = find(facing, SpaceUtils.rotateClockwise(top, facing));
+    private void setupRotationFacing() {
+        rotations[facing.getOpposite().ordinal()] = find(facing, SpaceUtils.rotateCounterclockwise(top, facing));
+        rotations[facing.ordinal()] = find(facing, SpaceUtils.rotateClockwise(top, facing));
     }
-    
-    private void setupRotation() {
+
+    private void setupRotationTop() {
+        rotations[top.getOpposite().ordinal()] = getSwapped().getNextRotationOnFace().getSwapped();
+        rotations[top.ordinal()] = getSwapped().getPrevRotationOnFace().getSwapped();
+    }
+
+    private void setupRotationAll() {
+        for (EnumFacing dir : EnumFacing.VALUES) {
+            if (dir.getAxis() != facing.getAxis() && dir.getAxis() != top.getAxis()) {
+                if (dir.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE) {
+                    rotations[dir.ordinal()] = find(facing.rotateAround(dir.getAxis()), top.rotateAround(dir.getAxis()));
+                } else {
+                    rotations[dir.ordinal()] = find(facing.rotateAround(dir.getAxis()).rotateAround(dir.getAxis()).rotateAround(dir.getAxis()), top.rotateAround(dir.getAxis()).rotateAround(dir.getAxis()).rotateAround(dir.getAxis()));
+                }
+            }
+        }
+
         int rcount = 0;
         Orientation head = fromDirection(facing);
         for (int i = 0; i < 5; i++) {
@@ -135,7 +156,7 @@ public enum Orientation {
                 rotation = rcount;
             }
             rcount++;
-            head = head.nextFaceRotation;
+            head = head.getNextRotationOnFace();
         }
     }
 
@@ -163,14 +184,14 @@ public enum Orientation {
             Orientation here = this;
             while (count > 0) {
                 count--;
-                here = here.nextFaceRotation;
+                here = here.getNextRotationOnFace();
             }
             return here;
         } else if (count < 0) {
             Orientation here = this;
             while (count < 0) {
                 count++;
-                here = here.prevFaceRotation;
+                here = here.getPrevRotationOnFace();
             }
             return here;
         } else {
@@ -179,19 +200,19 @@ public enum Orientation {
     }
     
     public Orientation getNextRotationOnFace() {
-        return nextFaceRotation;
+        return rotations[facing.getOpposite().ordinal()];
     }
     
     public Orientation getPrevRotationOnFace() {
-        return prevFaceRotation;
+        return rotations[facing.ordinal()];
     }
     
     public Orientation getNextRotationOnTop() {
-        return getSwapped().getNextRotationOnFace().getSwapped();
+        return rotations[top.getOpposite().ordinal()];
     }
     
     public Orientation getPrevRotationOnTop() {
-        return getSwapped().getPrevRotationOnFace().getSwapped();
+        return rotations[top.ordinal()];
     }
     
     public Orientation rotateOnTop(int count) {
@@ -250,9 +271,13 @@ public enum Orientation {
             if (fzo.top == newTop) {
                 return fzo;
             }
-            fzo = fzo.nextFaceRotation;
+            fzo = fzo.getNextRotationOnFace();
         }
         return null;
+    }
+    
+    public Orientation rotateAround(@Nonnull EnumFacing axis) {
+        return rotations[axis.ordinal()];
     }
     
     public int getRotation() {

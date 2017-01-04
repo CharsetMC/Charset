@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
+import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IPipeView;
@@ -36,6 +37,7 @@ import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
+import pl.asie.charset.lib.capability.lib.DefaultAxisRotatable;
 import pl.asie.charset.lib.capability.lib.DefaultDebuggable;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.redstone.*;
@@ -46,6 +48,8 @@ public class Capabilities {
 	@CapabilityInject(IAudioReceiver.class)
 	public static Capability<IAudioReceiver> AUDIO_RECEIVER;
 
+	@CapabilityInject(IAxisRotatable.class)
+	public static Capability<IAxisRotatable> AXIS_ROTATABLE;
 	@CapabilityInject(IDebuggable.class)
 	public static Capability<IDebuggable> DEBUGGABLE;
 
@@ -67,6 +71,7 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource.class);
 		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<IAudioReceiver>(), DefaultAudioReceiver.class);
 
+		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new NullCapabilityStorage<IAxisRotatable>(), DefaultAxisRotatable.class);
 		CapabilityManager.INSTANCE.register(IDebuggable.class, new NullCapabilityStorage<IDebuggable>(), DefaultDebuggable.class);
 
 		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<IItemInsertionHandler>(), DefaultItemInsertionHandler.class);

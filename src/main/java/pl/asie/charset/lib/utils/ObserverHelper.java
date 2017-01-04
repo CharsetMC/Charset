@@ -47,7 +47,7 @@ public final class ObserverHelper {
 				((BlockObserver) state.getBlock()).observedNeighborChanged(state, world, origPos, type, pos);
 			} catch (Throwable throwable) {
 				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while updating neighbours");
-				CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being updated");
+				CrashReportCategory crashreportcategory = crashreport.makeCategory("IAxisRotatableBlock being updated");
 				crashreportcategory.setDetail("Source block type", new ICrashReportDetail<String>() {
 					public String call() throws Exception {
 						try {

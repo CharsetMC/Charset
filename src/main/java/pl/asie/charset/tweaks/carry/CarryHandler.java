@@ -19,6 +19,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import pl.asie.charset.lib.utils.RotationUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -111,33 +112,11 @@ public class CarryHandler {
         return true;
     }
 
-    private IBlockState rotateState(IBlockState original) {
-        IBlockState newState = original;
-        float yawDiff = player != null ? player.rotationYaw - grabbedYaw : 0.0F;
-
-        int rotCycles = MathHelper.floor((double)(yawDiff * 4.0F / 360.0F) + 0.5D) & 3;
-        if (rotCycles > 0) {
-            for (IProperty<?> prop : original.getProperties().keySet()) {
-                if (prop.getName().equals("facing") || prop.getName().equals("rotation")) {
-                    EnumFacing facing = (EnumFacing) newState.getValue(prop);
-                    for (int i = 0; i < rotCycles; i++) {
-                        facing = facing.rotateAround(EnumFacing.Axis.Y);
-                    }
-                    if (prop.getAllowedValues().contains(facing)) {
-                        newState = newState.withProperty((IProperty<EnumFacing>) prop, facing);
-                    }
-                }
-            }
-        }
-
-        return newState;
-    }
-
 
     public boolean place(World world, BlockPos pos, EnumFacing facing) {
         if (block != null) {
             if (world.mayPlace(block.getBlock(), pos, false, facing, null)) {
-                world.setBlockState(pos, rotateState(block));
+                world.setBlockState(pos, block);
                 block = null;
 
                 if (tile != null) {
@@ -146,6 +125,15 @@ public class CarryHandler {
                     tile.setInteger("z", pos.getZ());
                     world.setTileEntity(pos, TileEntity.create(world, tile));
                     tile = null;
+                }
+
+                float yawDiff = player != null ? grabbedYaw - player.rotationYaw : 0.0F;
+                while (yawDiff < 0)
+                    yawDiff += 360.0F;
+                int rotCycles = MathHelper.floor((double)(yawDiff * 4.0F / 360.0F) + 0.5D) & 3;
+
+                if (rotCycles > 0) {
+                    RotationUtils.rotateAround(world, pos, EnumFacing.UP, rotCycles);
                 }
 
                 return true;
