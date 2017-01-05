@@ -46,11 +46,22 @@
             "url": "http://charset.asie.pl"
         },
         {
+            "modid": "CharsetCarts",
+            "name": "∐",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Improved rails and carts",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
             "modid": "CharsetCrafting",
             "name": "#",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "Pocket Crafting Table",
+            "description": "Pocket Crafting Table (for now)",
             "authorList": [
                 "asiekierka"
             ],

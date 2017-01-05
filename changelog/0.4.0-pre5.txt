@@ -3,5 +3,7 @@
 * [Carts] Add alternate ways of crafting certain tracks (all reversible and disableable, of course):
     * Right-click on a track with a Stone Pressure Plate to create a Detector Track
     * Right-click on a track with another track to create a Crossing Track
+* [Decoration] [#106] Fix posters catching fire
+* [Decoration, Storage] [#108, #105] Fix various issues with item drops
 * [Tweaks] New tweak: Block Carrying! Sneak-middleclick a block to pick it up.
     * Note that Block Carrying does not currently render on other players. This will be added eventually.

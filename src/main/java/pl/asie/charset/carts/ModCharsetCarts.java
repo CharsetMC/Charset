@@ -49,7 +49,7 @@ import java.util.Map;
 public class ModCharsetCarts {
 	public static final Map<Class<? extends Entity>, Class<? extends EntityMinecart>> REPLACEMENT_MAP = new HashMap<>();
 	public static final String MODID = "charsetcarts";
-	public static final String NAME = "U";
+	public static final String NAME = "∐";
 	public static final String VERSION = "@VERSION@";
 
 	@SidedProxy(clientSide = "pl.asie.charset.carts.ProxyClient", serverSide = "pl.asie.charset.carts.ProxyCommon")
