@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -52,10 +53,15 @@ public class TweakCarryRender {
 			RenderHelper.enableStandardItemLighting();
 			GlStateManager.popMatrix(); */
 
+			float yaw = carryHandler.getGrabbedYaw() + 45.0f;
+			while (yaw < 0)
+				yaw += 360.0f;
+			yaw = yaw - (yaw % 90);
+
 			GlStateManager.translate(0, player.isSneaking() ? -0.65 : -0.75, -1);
 			GlStateManager.enableRescaleNormal();
 			GlStateManager.enableBlend();
-			GlStateManager.rotate(180, 0, 1, 0);
+			GlStateManager.rotate(yaw - 180, 0, 1, 0);
 			GlStateManager.translate(-0.5, -0.5, -0.5);
 
 			TextureManager textureManager = Minecraft.getMinecraft().getTextureManager();
@@ -93,10 +99,10 @@ public class TweakCarryRender {
 				TileEntity tile = carryHandler.getBlockAccess().getTileEntity(CarryHandler.ACCESS_POS);
 				if (tile != null) {
 					//RenderHelper.enableStandardItemLighting();
-					int i = carryHandler.getBlockAccess().getCombinedLight(CarryHandler.ACCESS_POS, 0);
+					/* int i = carryHandler.getBlockAccess().getCombinedLight(CarryHandler.ACCESS_POS, 0);
 					int j = i % 65536;
 					int k = i / 65536;
-					OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j, (float)k);
+					OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j, (float)k); */
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
 					try {

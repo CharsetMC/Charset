@@ -165,6 +165,7 @@ public class CarryHandler {
             if (instance.block != null) {
                 compound.setString("b:name", instance.block.getBlock().getRegistryName().toString());
                 compound.setByte("b:meta", (byte) instance.block.getBlock().getMetaFromState(instance.block));
+                compound.setFloat("p:yaw", instance.grabbedYaw);
 
                 if (instance.tile != null) {
                     compound.setTag("b:tile", instance.tile);
@@ -182,6 +183,7 @@ public class CarryHandler {
                 if (compound.hasKey("b:name") && compound.hasKey("b:meta")) {
                     Block block = Block.getBlockFromName(compound.getString("b:name"));
                     instance.block = block.getStateFromMeta(compound.getByte("b:meta"));
+                    instance.grabbedYaw = compound.getFloat("p:yaw");
 
                     if (compound.hasKey("b:tile")) {
                         instance.tile = compound.getCompoundTag("b:tile");
@@ -222,7 +224,7 @@ public class CarryHandler {
 
     private class Access implements IBlockAccess {
         private BlockPos getPlayerPos() {
-            return player != null ? player.getPosition().up() : ACCESS_POS;
+            return player != null ? new BlockPos(player.posX, player.posY + player.getEyeHeight(), player.posZ) : ACCESS_POS;
         }
 
         @Nullable
