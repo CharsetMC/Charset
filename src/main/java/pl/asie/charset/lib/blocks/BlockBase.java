@@ -39,6 +39,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.MiscUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
 
@@ -48,18 +49,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.*;
 
 public abstract class BlockBase extends Block {
-	// TODO: Move me!
-	private static final MethodHandle EXPLOSION_SIZE_GETTER;
 	private boolean isTileProvider = this instanceof ITileEntityProvider;
 	private ImmutableList<ItemStack> items;
-
-	static {
-		try {
-			EXPLOSION_SIZE_GETTER = MethodHandles.lookup().unreflectGetter(ReflectionHelper.findField(Explosion.class, "explosionSize", "field_77280_f"));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	public BlockBase(Material materialIn) {
 		super(materialIn);
@@ -175,10 +166,7 @@ public abstract class BlockBase extends Block {
 		world.setBlockToAir(pos);
 
 		List<ItemStack> items = getDrops(world, pos, state, tile, 0, false);
-		float chance = 1.0f;
-		try {
-			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / (float) EXPLOSION_SIZE_GETTER.invokeExact(explosion), true, null);
-		} catch (Throwable t) { t.printStackTrace(); }
+		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / MiscUtils.getExplosionSize(explosion), true, null);
 
 		for (ItemStack item : items)
 			if (world.rand.nextFloat() <= chance)

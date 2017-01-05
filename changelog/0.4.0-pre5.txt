@@ -7,3 +7,4 @@
 * [Decoration, Storage] [#108, #105] Fix various issues with item drops
 * [Tweaks] New tweak: Block Carrying! Sneak-middleclick a block to pick it up.
     * Note that Block Carrying does not currently render on other players. This will be added eventually.
+    * Also note that Block Carrying, being a fresh and new mechanic, might be rebalanced with time.

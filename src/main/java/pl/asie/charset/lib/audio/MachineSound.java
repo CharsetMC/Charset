@@ -34,7 +34,7 @@
  * SOFTWARE.
  */
 
-package pl.asie.charset.lib.utils;
+package pl.asie.charset.lib.audio;
 
 import net.minecraft.client.audio.ITickableSound;
 import net.minecraft.client.audio.PositionedSound;

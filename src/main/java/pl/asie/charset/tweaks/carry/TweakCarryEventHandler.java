@@ -10,14 +10,18 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -38,6 +42,23 @@ public class TweakCarryEventHandler {
         CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onLivingFall(LivingFallEvent event) {
+        CarryHandler carryHandler = event.getEntityLiving().getCapability(TweakCarry.CAPABILITY, null);
+        if (carryHandler != null && carryHandler.isCarrying() && event.getDistance() >= 4.0f) {
+            // TODO: add distance-based scaling
+            TweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void onLivingHurt(LivingHurtEvent event) {
+        CarryHandler carryHandler = event.getEntityLiving().getCapability(TweakCarry.CAPABILITY, null);
+        if (carryHandler != null && carryHandler.isCarrying() && event.getSource() != DamageSource.FALL) {
+            TweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
         }
     }
 

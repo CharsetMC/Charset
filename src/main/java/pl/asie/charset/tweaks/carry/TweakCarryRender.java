@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,6 +23,22 @@ import org.lwjgl.opengl.GL11;
 
 public class TweakCarryRender {
 	private static final Minecraft mc = Minecraft.getMinecraft();
+
+	/* @SubscribeEvent(priority = EventPriority.HIGH)
+	@SideOnly(Side.CLIENT)
+	public void onRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
+		if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) {
+			Entity rve = Minecraft.getMinecraft().getRenderViewEntity();
+			if (!(rve instanceof EntityPlayer)) {
+				return;
+			}
+			EntityPlayer player = (EntityPlayer) rve;
+			CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+			if (carryHandler != null && carryHandler.isCarrying()) {
+				event.setCanceled(true);
+			}
+		}
+	} */
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	@SideOnly(Side.CLIENT)

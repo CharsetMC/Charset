@@ -156,6 +156,10 @@ public class TweakCarry extends Tweak {
     }
 
     protected static boolean dropCarriedBlock(EntityLivingBase entity, boolean must) {
+        return dropCarriedBlock(entity, must, (must ? 4 : 2));
+    }
+
+    protected static boolean dropCarriedBlock(EntityLivingBase entity, boolean must, int maxRadius) {
         CarryHandler carryHandler = entity.getCapability(CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             World world = entity.getEntityWorld();
@@ -166,11 +170,11 @@ public class TweakCarry extends Tweak {
 
             BlockPos base = entity.getPosition();
             for (int method = 0; method <= (must ? 2 : 1); method++) {
-                for (int radius = 0; radius <= (must ? 4 : 2); radius++) {
+                for (int radius = 0; radius <= maxRadius; radius++) {
                     Vec3i radiusVec = new Vec3i(radius, radius, radius);
                     for (BlockPos pos : BlockPos.getAllInBoxMutable(base.subtract(radiusVec), base.add(radiusVec))) {
                         if (world.getBlockState(pos).getBlock().isReplaceable(world, pos)
-                                && (method > 1 || !world.isAirBlock(pos))
+                                && (method > 1 || !world.isAirBlock(pos.down()))
                                 && (method > 0 || world.isSideSolid(pos.down(), EnumFacing.UP))
                                 ) {
                             carryHandler.place(world, pos.toImmutable(), EnumFacing.UP);
@@ -188,6 +192,9 @@ public class TweakCarry extends Tweak {
                 }
                 return false;
             } else {
+                if (entity instanceof EntityPlayer) {
+                    TweakCarry.syncCarryWithClient(entity, (EntityPlayer) entity);
+                }
                 return true;
             }
         } else {
