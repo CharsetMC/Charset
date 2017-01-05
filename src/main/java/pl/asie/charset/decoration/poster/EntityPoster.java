@@ -89,9 +89,10 @@ public class EntityPoster extends Entity {
 
     private boolean initialized = false;
 
-    public EntityPoster(World w) {
-        super(w);
+    public EntityPoster(World world) {
+        super(world);
         setSize(0.5F, 0.5F);
+        isImmuneToFire = true;
     }
 
     @Override
