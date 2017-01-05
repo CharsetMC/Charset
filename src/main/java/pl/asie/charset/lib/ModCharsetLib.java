@@ -178,7 +178,7 @@ public class ModCharsetLib {
 	}
 
 	@Mod.EventHandler
-	public void postInit(FMLInitializationEvent event) {
+	public void postInit(FMLPostInitializationEvent event) {
 		CapabilityHelper.registerProvider(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new CapabilityProviderItemHandler());
 		CapabilityHelper.registerProvider(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, new CapabilityProviderFluidHandler());
 		CapabilityHelper.registerProvider(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityProviderItemInsertionHandler());
