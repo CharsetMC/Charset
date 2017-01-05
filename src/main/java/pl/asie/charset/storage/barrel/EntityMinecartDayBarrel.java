@@ -113,9 +113,6 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     @Override
     public void killMinecart(DamageSource damage) {
         this.setDead();
-        if (barrel != null) {
-            barrel.dropContents();
-        }
 
         ItemStack itemstack = getCartItem();
         if (this.getCustomNameTag() != null) {
@@ -123,6 +120,9 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         }
 
         this.entityDropItem(itemstack, 0.0F);
+        for (ItemStack stack : barrel.getContentDrops(false)) {
+            this.entityDropItem(stack, 0.0F);
+        }
     }
 
     @Override

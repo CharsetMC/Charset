@@ -3,7 +3,12 @@ package pl.asie.charset.tweaks.carry;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -13,6 +18,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -21,8 +27,13 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.utils.AttributeUtils;
+
+import java.util.UUID;
 
 public class TweakCarryEventHandler {
+    private static final AttributeModifier MODIFIER_CARRY = AttributeUtils.newModifierSingleton("charsettweaks:carry", -0.25D, AttributeUtils.Operation.ADD_MULTIPLIED);
+
     private void cancelIfCarrying(Event event, EntityPlayer player) {
         CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
@@ -65,9 +76,18 @@ public class TweakCarryEventHandler {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         CarryHandler carryHandler = event.player.getCapability(TweakCarry.CAPABILITY, null);
+        IAttributeInstance movementSpeed = event.player.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
         if (carryHandler != null && carryHandler.isCarrying()) {
             if (event.player.isSprinting()) {
                 event.player.setSprinting(false);
+            }
+
+            if (!event.player.isPotionActive(MobEffects.STRENGTH) && !movementSpeed.hasModifier(MODIFIER_CARRY)) {
+               movementSpeed.applyModifier(MODIFIER_CARRY);
+            }
+        } else {
+            if (movementSpeed.hasModifier(MODIFIER_CARRY)) {
+                movementSpeed.removeModifier(MODIFIER_CARRY);
             }
         }
     }

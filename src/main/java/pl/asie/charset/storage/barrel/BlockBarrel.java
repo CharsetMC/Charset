@@ -36,6 +36,7 @@
 
 package pl.asie.charset.storage.barrel;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -51,6 +52,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -58,8 +60,10 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.blocks.BlockBase;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class BlockBarrel extends BlockBase implements ITileEntityProvider {
@@ -175,10 +179,19 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
+        if (te instanceof TileEntityDayBarrel) {
+            return ((TileEntityDayBarrel) te).getDrops(silkTouch);
+        } else {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {
-            if (!((TileEntityDayBarrel) tile).removedByPlayer(player, willHarvest)) {
+            if (!((TileEntityDayBarrel) tile).canHarvest(player)) {
                 return false;
             }
         }

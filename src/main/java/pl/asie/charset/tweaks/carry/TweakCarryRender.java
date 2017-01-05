@@ -20,9 +20,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
-/**
- * Created by asie on 1/2/17.
- */
 public class TweakCarryRender {
 	private static final Minecraft mc = Minecraft.getMinecraft();
 

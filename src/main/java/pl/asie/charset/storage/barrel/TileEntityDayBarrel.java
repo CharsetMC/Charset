@@ -71,7 +71,9 @@ import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.WeakHashMap;
 
 public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRotatable {
@@ -713,24 +715,34 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         return (int) Math.max(1, v*14);
     }
 
-    @Override
-    public void dropContents() {
-        if (type == Type.CREATIVE || (type == Type.SILKY && broken_with_silk_touch)) {
-            return;
+    public List<ItemStack> getContentDrops(boolean silkTouch) {
+        List<ItemStack> stacks = new ArrayList<>();
+
+        if (type == Type.CREATIVE || (type == Type.SILKY && silkTouch)) {
+            return stacks;
         }
-        if (item.isEmpty() || getItemCount() <= 0 ) {
-            return;
+        if (item.isEmpty() || getItemCount() <= 0) {
+            return stacks;
         }
         int count = getItemCount();
         for (int i = 0; i < maxStackDrop; i++) {
             int to_drop;
             to_drop = Math.min(item.getMaxStackSize(), count);
             count -= to_drop;
-            ItemUtils.spawnItemEntity(world, new Vec3d(getPos()).addVector(0.5, 0.5, 0.5), makeStack(to_drop), 0.2f, 0.2f, 0.2f, 1);
+            stacks.add(makeStack(to_drop));
             if (count <= 0) {
                 break;
             }
         }
+
+        return stacks;
+    }
+
+    public List<ItemStack> getDrops(boolean silkTouch) {
+        List<ItemStack> stacks = new ArrayList<>();
+        stacks.add(getDroppedBlock(silkTouch));
+        stacks.addAll(getContentDrops(silkTouch));
+        return stacks;
     }
 
     public boolean canLose() {
@@ -828,8 +840,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
 
     @Override
     public ItemStack getDroppedBlock() {
+        return getDroppedBlock(false);
+    }
+
+    public ItemStack getDroppedBlock(boolean silkTouch) {
         ItemStack is = makeBarrel(type, woodLog, woodSlab);
-        if (type == Type.SILKY && !item.isEmpty() && broken_with_silk_touch) {
+        if (type == Type.SILKY && !item.isEmpty() && silkTouch) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag == null) {
                 tag = new NBTTagCompound();
@@ -843,27 +859,22 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         return is;
     }
 
-    boolean broken_with_silk_touch = false;
-
-    public boolean removedByPlayer(EntityPlayer player, boolean willHarvest) {
-        if (cancelRemovedByPlayer(player)) return false;
-        broken_with_silk_touch = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getHeldItem(EnumHand.MAIN_HAND)) > 0;
-        return true;
-    }
-
-    private boolean cancelRemovedByPlayer(EntityPlayer player) {
-        if (item == null) {
-            return false;
+    public boolean canHarvest(EntityPlayer player) {
+        if (item.isEmpty()) {
+            return true;
         }
         if (player == null || !player.capabilities.isCreativeMode || player.isSneaking()) {
-            return false;
+            return true;
         }
+
+        // Propagate left click
         if (player.world.isRemote) {
-            player.swingArm(EnumHand.MAIN_HAND); // TODO
+            player.swingArm(EnumHand.MAIN_HAND);
         } else {
             click(player);
         }
-        return true;
+
+        return false;
     }
 
     public boolean isWooden() {
