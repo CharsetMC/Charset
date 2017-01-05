@@ -1,40 +1,34 @@
 package pl.asie.charset.tweaks.carry;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import org.apache.commons.lang3.tuple.Pair;
+import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
 import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecart;
 import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecartDayBarrel;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TweakCarry extends Tweak {
     public static final ResourceLocation CAP_IDENTIFIER = new ResourceLocation("charsettweaks:carry");
@@ -42,8 +36,23 @@ public class TweakCarry extends Tweak {
     @CapabilityInject(CarryHandler.class)
     public static Capability<CarryHandler> CAPABILITY;
 
+    private static Set<String> whitelist = new HashSet<>();
+    private static Set<String> blacklist = new HashSet<>();
+
     public TweakCarry() {
         super("tweaks", "blockCarrying", "Allow players to carry blocks by shift-pickblock.", true);
+    }
+
+    @Override
+    protected void initConfig(Configuration config) {
+        super.initConfig(config);
+
+        whitelist.clear();
+        blacklist.clear();
+        for (String s : config.get("blockCarry", "whitelist", new String[]{}, "Accepts block/tile entity registry names and classes.").getStringList())
+            whitelist.add(s);
+        for (String s : config.get("blockCarry", "blacklist", new String[]{}, "Accepts block/tile entity registry names and classes.").getStringList())
+            blacklist.add(s);
     }
 
     @Override
@@ -53,15 +62,100 @@ public class TweakCarry extends Tweak {
             CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecartDayBarrel());
         }
 
-        MinecraftForge.EVENT_BUS.register(this);
+        CapabilityManager.INSTANCE.register(CarryHandler.class, CarryHandler.STORAGE, CarryHandler.class);
+
+        MinecraftForge.EVENT_BUS.register(new TweakCarryEventHandler());
         if (ModCharsetLib.proxy.isClient()) {
             MinecraftForge.EVENT_BUS.register(new TweakCarryRender());
         }
-        CapabilityManager.INSTANCE.register(CarryHandler.class, CarryHandler.STORAGE, CarryHandler.class);
+
         return true;
     }
 
-    private boolean dropCarriedBlock(EntityLivingBase entity, boolean must) {
+    protected static boolean canCarry(World world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        if ("minecraft".equals(state.getBlock().getRegistryName().getResourceDomain())) {
+            return true;
+        }
+
+        boolean hasTileEntity = state.getBlock().hasTileEntity(state);
+
+        Set<String> names = new HashSet<>();
+        Set<ResourceLocation> locs = new HashSet<>();
+
+        locs.add(state.getBlock().getRegistryName());
+        names.add(state.getBlock().getClass().getName());
+
+        if (hasTileEntity) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile != null) {
+                Class<? extends TileEntity> tileClass = tile.getClass();
+                locs.add(TileEntity.getKey(tileClass));
+                names.add(tileClass.getName());
+            }
+        }
+
+        for (ResourceLocation r : locs)
+            names.add(r.toString());
+
+        CharsetIMC.Result allowedIMC = CharsetIMC.INSTANCE.allows("carry", locs);
+
+        if (!Collections.disjoint(blacklist, names) || allowedIMC == CharsetIMC.Result.NO) {
+            return false;
+        } else if (!hasTileEntity) {
+            return true;
+        } else {
+            return !Collections.disjoint(whitelist, names) || allowedIMC == CharsetIMC.Result.YES;
+        }
+    }
+
+    protected static boolean canCarry(Entity entity) {
+        Class<? extends Entity> entityClass = entity.getClass();
+        String name = EntityRegistry.getEntry(entityClass).getName();
+        String clsName = entityClass.getName();
+
+        return !blacklist.contains(name) && !blacklist.contains(clsName);
+    }
+
+    public static void grabBlock(EntityPlayer player, World world, BlockPos pos) {
+        if (!(player instanceof EntityPlayerMP)) {
+            ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, pos));
+        }
+
+        CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+        if (carryHandler != null && !carryHandler.isCarrying()) {
+            if (canCarry(world, pos)) {
+                carryHandler.grab(world, pos);
+            } else {
+                // Sync in case the client said "yes".
+                syncCarryWithClient(player, player);
+            }
+        }
+    }
+
+    public static void grabEntity(EntityPlayer player, World world, Entity entity) {
+        if (!(player instanceof EntityPlayerMP)) {
+            ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, entity));
+        }
+
+        CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+        if (carryHandler != null && !carryHandler.isCarrying()) {
+            if (canCarry(entity)) {
+                for (ICarryTransformer<Entity> transformer : CarryTransformerRegistry.INSTANCE.getEntityTransformers()) {
+                    if (transformer.extract(entity, true) != null) {
+                        Pair<IBlockState, TileEntity> pair = transformer.extract(entity, false);
+                        carryHandler.put(pair.getLeft(), pair.getRight());
+                        return;
+                    }
+                }
+            } else {
+                // Sync in case the client said "yes".
+                syncCarryWithClient(player, player);
+            }
+        }
+    }
+
+    protected static boolean dropCarriedBlock(EntityLivingBase entity, boolean must) {
         CarryHandler carryHandler = entity.getCapability(CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             World world = entity.getEntityWorld();
@@ -101,150 +195,9 @@ public class TweakCarry extends Tweak {
         }
     }
 
-    @SubscribeEvent
-    public void onLivingDeath(LivingDeathEvent event) {
-        dropCarriedBlock(event.getEntityLiving(), true);
-    }
-
-    @SubscribeEvent
-    public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof EntityPlayer) {
-            event.addCapability(CAP_IDENTIFIER, new CarryHandler.Provider((EntityPlayer) event.getObject()));
-        }
-    }
-
-    private void cancelIfCarrying(Event event, EntityPlayer player) {
-        CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying()) {
-            event.setCanceled(true);
-        }
-    }
-
-    private void syncCarryData(Entity who, EntityPlayer target) {
-        if (who instanceof EntityPlayer && who.hasCapability(CAPABILITY, null)) {
+    protected static void syncCarryWithClient(Entity who, EntityPlayer target) {
+        if (who instanceof EntityPlayerMP && who.hasCapability(CAPABILITY, null)) {
             ModCharsetTweaks.packet.sendTo(new PacketCarrySync(who), target);
         }
-    }
-
-    @SubscribeEvent
-    public void onPlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
-        syncCarryData(event.player, event.player);
-    }
-
-    @SubscribeEvent
-    public void onPlayerRespawnEvent(PlayerEvent.PlayerRespawnEvent event) {
-        syncCarryData(event.player, event.player);
-    }
-
-    @SubscribeEvent
-    public void onPlayerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
-        syncCarryData(event.player, event.player);
-    }
-
-    @SubscribeEvent
-    public void onPlayerStartTracking(net.minecraftforge.event.entity.player.PlayerEvent.StartTracking event) {
-        syncCarryData(event.getTarget(), event.getEntityPlayer());
-    }
-
-    @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        CarryHandler carryHandler = event.player.getCapability(CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying()) {
-            if (event.player.isSprinting()) {
-                event.player.setSprinting(false);
-            }
-        }
-    }
-
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void onMouse(MouseEvent event) {
-        if (event.isButtonstate() && event.getButton() == 2
-                && Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown()) {
-
-            EntityPlayer player = Minecraft.getMinecraft().player;
-            CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
-            if (!player.isCreative()) {
-                event.setCanceled(true);
-            }
-
-            if (player.getHeldItem(EnumHand.MAIN_HAND).isEmpty()
-                    && player.getHeldItem(EnumHand.OFF_HAND).isEmpty()
-                    && !player.isPlayerSleeping()
-                    && !player.isRiding()
-                    && Minecraft.getMinecraft().currentScreen == null
-                    && carryHandler != null) {
-
-                if (player.isCreative()) {
-                    event.setCanceled(true);
-                }
-
-                RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
-                if (mouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    ModCharsetTweaks.proxy.carryGrabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
-                } else if (mouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
-                    Entity entity = mouseOver.entityHit;
-                    ModCharsetTweaks.proxy.carryGrabEntity(player, player.getEntityWorld(), entity);
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        EntityPlayer player = event.getEntityPlayer();
-
-        CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying()) {
-            event.setCanceled(true);
-
-            World world = event.getWorld();
-            BlockPos pos = event.getPos();
-            EnumFacing facing = event.getFace();
-            IBlockState state = world.getBlockState(pos);
-
-            if (!state.getBlock().isReplaceable(world, pos)) {
-                pos = pos.offset(facing);
-            }
-
-            carryHandler.place(world, pos, facing);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
-        EntityPlayer player = event.getEntityPlayer();
-
-        CarryHandler carryHandler = player.getCapability(CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying()) {
-            event.setCanceled(true);
-            Entity entity = event.getTarget();
-
-            for (ICarryTransformer<Entity> transformer : CarryTransformerRegistry.INSTANCE.getEntityTransformers()) {
-                IBlockState state = carryHandler.getBlockState();
-                TileEntity tile = carryHandler.getTileEntity();
-
-                if (transformer.insert(entity, state, tile, true)) {
-                    carryHandler.empty();
-                    transformer.insert(entity, state, tile, false);
-                    return;
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-        cancelIfCarrying(event, event.getEntityPlayer());
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        cancelIfCarrying(event, event.getEntityPlayer());
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        cancelIfCarrying(event, event.getEntityPlayer());
     }
 }

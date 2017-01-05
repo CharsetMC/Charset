@@ -118,6 +118,10 @@ public class ModCharsetTweaks {
 				}
 			}
 		}
+
+		if (configuration.hasChanged()) {
+			configuration.save();
+		}
 	}
 
 	@EventHandler

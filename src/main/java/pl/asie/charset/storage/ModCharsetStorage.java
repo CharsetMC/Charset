@@ -23,6 +23,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -129,6 +130,8 @@ public class ModCharsetStorage {
 		config.save();
 
 		proxy.preInit();
+
+		FMLInterModComms.sendMessage("charsetlib", "addCarry", barrelBlock.getRegistryName());
 	}
 
 	@Mod.EventHandler

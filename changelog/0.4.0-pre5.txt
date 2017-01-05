@@ -4,3 +4,4 @@
     * Right-click on a track with a Stone Pressure Plate to create a Detector Track
     * Right-click on a track with another track to create a Crossing Track
 * [Tweaks] New tweak: Block Carrying! Sneak-middleclick a block to pick it up.
+    * Note that Block Carrying does not currently render on other players. This will be added eventually.

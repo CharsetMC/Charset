@@ -25,8 +25,7 @@ import com.google.common.base.Suppliers;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,8 +36,6 @@ import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.RecipeSorter;
 
@@ -201,5 +198,12 @@ public class ModCharsetLib {
 	@Mod.EventHandler
 	public void serverStop(FMLServerStoppedEvent event) {
 		proxy.onServerStop();
+	}
+
+	@Mod.EventHandler
+	public void onIMC(FMLInterModComms.IMCEvent event) {
+		for (FMLInterModComms.IMCMessage message : event.getMessages()) {
+			CharsetIMC.INSTANCE.receiveMessage(message);
+		}
 	}
 }

@@ -68,10 +68,10 @@ public class PacketCarryGrab extends Packet {
 		if (player != null) {
 			switch (type) {
 				case BLOCK:
-					ModCharsetTweaks.proxy.carryGrabBlock(player, world, pos);
+					TweakCarry.grabBlock(player, world, pos);
 					break;
 				case ENTITY:
-					ModCharsetTweaks.proxy.carryGrabEntity(player, world, entity);
+					TweakCarry.grabEntity(player, world, entity);
 					break;
 			}
 		}

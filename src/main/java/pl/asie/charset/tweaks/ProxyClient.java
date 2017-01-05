@@ -69,20 +69,4 @@ public class ProxyClient extends ProxyCommon {
 			}
 		}
 	}
-
-	@Override
-	public void carryGrabBlock(EntityPlayer player, World world, BlockPos pos) {
-		if (!(player instanceof EntityPlayerMP)) {
-			ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, pos));
-		}
-		super.carryGrabBlock(player, world, pos);
-	}
-
-	@Override
-	public void carryGrabEntity(EntityPlayer player, World world, Entity entity) {
-		if (!(player instanceof EntityPlayerMP)) {
-			ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, entity));
-		}
-		super.carryGrabEntity(player, world, entity);
-	}
 }

@@ -27,7 +27,15 @@ public class PacketCarrySync extends Packet {
 	public void readData(INetHandler handler, ByteBuf buf) {
 		int dimension = buf.readInt();
 		World world = ModCharsetLib.proxy.getLocalWorld(dimension);
-		player = world.getEntityByID(buf.readInt());
+		int playerId = buf.readInt();
+		if (world != null) {
+			player = world.getEntityByID(playerId);
+		} else {
+			player = getPlayer(handler);
+			if (player.getEntityId() == playerId) {
+				world = player.getEntityWorld();
+			}
+		}
 		tag = ByteBufUtils.readTag(buf);
 	}
 

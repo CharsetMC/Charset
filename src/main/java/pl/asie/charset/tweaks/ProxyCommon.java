@@ -37,24 +37,4 @@ public class ProxyCommon {
 	public void initShardsTweakClient() {
 
 	}
-
-	public void carryGrabBlock(EntityPlayer player, World world, BlockPos pos) {
-		CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
-		if (carryHandler != null && !carryHandler.isCarrying()) {
-			carryHandler.grab(world, pos);
-		}
-	}
-
-	public void carryGrabEntity(EntityPlayer player, World world, Entity entity) {
-		CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
-		if (carryHandler != null && !carryHandler.isCarrying()) {
-			for (ICarryTransformer<Entity> transformer : CarryTransformerRegistry.INSTANCE.getEntityTransformers()) {
-				if (transformer.extract(entity, true) != null) {
-					Pair<IBlockState, TileEntity> pair = transformer.extract(entity, false);
-					carryHandler.put(pair.getLeft(), pair.getRight());
-					return;
-				}
-			}
-		}
-	}
 }

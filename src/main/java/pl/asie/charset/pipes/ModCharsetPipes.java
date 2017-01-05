@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -82,6 +83,9 @@ public class ModCharsetPipes {
 		ModCharsetLib.proxy.registerItemModel(shifterBlock, 0, "charsetpipes:shifter");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
+
+		FMLInterModComms.sendMessage("charsetlib", "addCarry", blockPipe.getRegistryName());
+		FMLInterModComms.sendMessage("charsetlib", "addCarry", shifterBlock.getRegistryName());
 	}
 
 	@EventHandler
