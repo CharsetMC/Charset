@@ -90,7 +90,7 @@ public class ModCharsetCarts {
 		config.save();
 	}
 
-	private void registerFancy(Block railSrc, IProperty<BlockRailBase.EnumRailDirection> propSrc, Block railDst, IProperty<BlockRailBase.EnumRailDirection> propDst, ItemStack with) {
+	private void registerCombinerRecipeForDirs(Block railSrc, IProperty<BlockRailBase.EnumRailDirection> propSrc, Block railDst, IProperty<BlockRailBase.EnumRailDirection> propDst, ItemStack with) {
 		for (BlockRailBase.EnumRailDirection direction : propSrc.getAllowedValues()) {
 			if (propDst.getAllowedValues().contains(direction)) {
 				combiner.register(railSrc.getDefaultState().withProperty(propSrc, direction),
@@ -105,13 +105,14 @@ public class ModCharsetCarts {
 		if (ModCharsetLib.INDEV) {
 			register(EntityMinecartImproved.class, "rminecart", EntityMinecart.class);
 		}
+
 		MinecraftForge.EVENT_BUS.register(this);
 
 		if (combiner != null) {
 			MinecraftForge.EVENT_BUS.register(combiner);
 
 			combiner.register(Blocks.RAIL, blockRailCross.getDefaultState(), new ItemStack(Blocks.RAIL));
-			registerFancy(Blocks.RAIL, BlockRail.SHAPE, Blocks.DETECTOR_RAIL, BlockRailDetector.SHAPE, new ItemStack(Blocks.STONE_PRESSURE_PLATE));
+			registerCombinerRecipeForDirs(Blocks.RAIL, BlockRail.SHAPE, Blocks.DETECTOR_RAIL, BlockRailDetector.SHAPE, new ItemStack(Blocks.STONE_PRESSURE_PLATE));
 		} else {
 			GameRegistry.addShapedRecipe(new ItemStack(blockRailCross, 2), " r ", "r r", " r ", 'r', new ItemStack(Blocks.RAIL));
 		}

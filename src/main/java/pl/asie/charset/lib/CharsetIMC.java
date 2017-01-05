@@ -1,7 +1,9 @@
 package pl.asie.charset.lib;
 
+import com.google.common.collect.Lists;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.sandius.rembulan.compiler.ir.LoadConst;
 
 import java.util.*;
 
@@ -52,26 +54,46 @@ public final class CharsetIMC {
         return result;
     }
 
-    private void add(String entryKey, ResourceLocation entry) {
-        if (!registryLocs.containsKey(entryKey))
-            registryLocs.put(entryKey, new HashSet<>());
-        registryLocs.get(entryKey).add(entry);
+    private void add(Collection<String> entryKeys, ResourceLocation entry) {
+        for (String entryKey : entryKeys) {
+            if (!registryLocs.containsKey(entryKey))
+                registryLocs.put(entryKey, new HashSet<>());
+            registryLocs.get(entryKey).add(entry);
+        }
+    }
+
+    private String toEntryKey(String entryKey, String prefix) {
+        entryKey = entryKey.trim();
+        return prefix + entryKey.substring(0, 1).toLowerCase() + entryKey.substring(1);
+    }
+
+    private List<String> toList(String entryKey, String prefix) {
+        if (entryKey.startsWith("[") && entryKey.endsWith("]")) {
+            List<String> keys = new ArrayList<>();
+            for (String key : entryKey.substring(1, entryKey.length() - 1).split(",")) {
+                keys.add(toEntryKey(key, prefix));
+            }
+            return keys;
+        } else {
+            return Lists.newArrayList(toEntryKey(entryKey, prefix));
+        }
     }
 
     protected void receiveMessage(FMLInterModComms.IMCMessage msg) {
-        if (msg.key.startsWith("add")) {
-            String entryKey = msg.key.substring("add".length());
-            entryKey = "w:" + entryKey.substring(0, 1).toLowerCase() + entryKey.substring(1);
+        for (String key : msg.key.split(";")) {
+            key = key.trim();
+            if (key.startsWith("add")) {
+                List<String> entryKeys = toList(key.substring("add".length()), "w:");
 
-            if (msg.isResourceLocationMessage()) {
-                add(entryKey, msg.getResourceLocationValue());
-            }
-        } else if (msg.key.startsWith("remove")) {
-            String entryKey = msg.key.substring("remove".length());
-            entryKey = "b:" + entryKey.substring(0, 1).toLowerCase() + entryKey.substring(1);
+                if (msg.isResourceLocationMessage()) {
+                    add(entryKeys, msg.getResourceLocationValue());
+                }
+            } else if (key.startsWith("remove")) {
+                List<String> entryKeys = toList(key.substring("remove".length()), "b:");
 
-            if (msg.isResourceLocationMessage()) {
-                add(entryKey, msg.getResourceLocationValue());
+                if (msg.isResourceLocationMessage()) {
+                    add(entryKeys, msg.getResourceLocationValue());
+                }
             }
         }
     }
