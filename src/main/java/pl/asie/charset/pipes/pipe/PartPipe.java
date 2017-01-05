@@ -254,6 +254,10 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 			return true;
 		}
 
+		if (tile != null && tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) {
+			return true;
+		}
+
 		if (tile instanceof IFluidHandler) {
 			return true;
 		}

@@ -249,7 +249,7 @@ public class EntityPoster extends Entity {
             EntityPlayer player = (EntityPlayer) ent;
             if (!locked || PlayerUtils.isCreative(player)) {
                 ItemStack held = player.getHeldItem(EnumHand.MAIN_HAND);
-                if (isItemTilting(held) || isItemRotating(held) || isItemScaling(held)) {
+                if (held != null && (isItemTilting(held) || isItemRotating(held) || isItemScaling(held))) {
                     return false;
                 } else if (spin_normal != 0 || spin_vertical != 0 || spin_tilt != 0) {
                     spin_normal = spin_vertical = spin_tilt = 0;
