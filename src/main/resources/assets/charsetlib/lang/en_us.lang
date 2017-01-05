@@ -25,6 +25,9 @@ tile.charset.ironNoteBlock.name=Iron Note Block
 tooltip.charset.tape.none=No Tape
 tooltip.charset.tape.unnamed=Unnamed Tape
 
+# CharsetCarts
+tile.charset.rail_cross.name=Crossing Rail
+
 # CharsetCrafting
 item.charset.pocket_crafting_table.name=Pocket Crafting Table
 

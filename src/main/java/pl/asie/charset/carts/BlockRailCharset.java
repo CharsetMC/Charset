@@ -25,6 +25,11 @@ public class BlockRailCharset extends BlockRailBase {
 	}
 
 	@Override
+	public String getUnlocalizedName() {
+		return "tile.charset.rail_cross";
+	}
+
+	@Override
 	public boolean isFlexibleRail(IBlockAccess world, BlockPos pos) {
 		return false;
 	}

@@ -17,7 +17,11 @@
       "south_east": {}
     },
     "inventory": [{
-	  "transform": "forge:default-item"
-	}]
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charsetcarts:blocks/rail_cross"
+      }
+    }]
   }
 }
