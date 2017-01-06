@@ -9,8 +9,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.HashMap;
@@ -42,6 +44,38 @@ public class TrackCombiner {
 					}
 				}
 			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onBlockHarvest(BlockEvent.HarvestDropsEvent event) {
+		if (event.getState() == null) {
+			return;
+		}
+
+		World world = event.getWorld();
+		BlockPos pos = event.getPos();
+
+		// WORKAROUND: Some mods seem to like event.getDrops() being null.
+		// This is not what Forge does.
+		if (event.getDrops() == null) {
+			ModCharsetLib.logger.error("Block " + event.getState().getBlock().getRegistryName() + " provides a null getDrops() list, against Forge's original method behaviour! This is a bug in the mod providing it!");
+			return;
+		}
+
+		IBlockState state = event.getState();
+		if (transformInv.containsKey(state)) {
+			event.getDrops().clear();
+			IBlockState oldState = world.getBlockState(pos);
+			world.setBlockState(pos, state, 4); // This is just for internal use; no block updates or resend
+			while (transformInv.containsKey(state)) {
+				Pair<ItemStack, IBlockState> pair = transformInv.get(state);
+				event.getDrops().add(pair.getLeft().copy());
+				state = pair.getRight();
+				world.setBlockState(pos, state, 4);
+			}
+			event.getDrops().addAll(state.getBlock().getDrops(world, pos, state, event.getFortuneLevel()));
+			world.setBlockState(pos, oldState, 2);
 		}
 	}
 

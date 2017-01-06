@@ -24,6 +24,8 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -33,6 +35,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -59,6 +62,7 @@ public class ModCharsetCarts {
 	public static ModCharsetCarts instance;
 	public static TrackCombiner combiner;
 	public static Logger logger;
+	public static int minecartStackSize;
 
 	public static BlockRailCharset blockRailCross;
 
@@ -77,6 +81,7 @@ public class ModCharsetCarts {
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = LogManager.getLogger(ModCharsetCarts.MODID);
 		config = new Configuration(ModCharsetLib.instance.getConfigFile("carts.cfg"));
+		minecartStackSize = config.getInt("minecartStackSize", "tweaks", 4, 1, 64, "Sets the minimum stack size for all minecarts.");
 
 		ModCharsetLib.proxy.registerBlock(blockRailCross = new BlockRailCharset(), "rail_charset");
 		ModCharsetLib.proxy.registerItemModel(blockRailCross, 0, "charsetcarts:rail_charset");
@@ -111,10 +116,21 @@ public class ModCharsetCarts {
 		if (combiner != null) {
 			MinecraftForge.EVENT_BUS.register(combiner);
 
+			// TODO: This needs a redesign... Possibly move the Combiner to Lib.
 			combiner.register(Blocks.RAIL, blockRailCross.getDefaultState(), new ItemStack(Blocks.RAIL));
+			combiner.register(Blocks.RAIL, blockRailCross.getDefaultState().withProperty(BlockRailCharset.DIRECTION, BlockRailBase.EnumRailDirection.EAST_WEST), new ItemStack(Blocks.RAIL));
 			registerCombinerRecipeForDirs(Blocks.RAIL, BlockRail.SHAPE, Blocks.DETECTOR_RAIL, BlockRailDetector.SHAPE, new ItemStack(Blocks.STONE_PRESSURE_PLATE));
 		} else {
 			GameRegistry.addShapedRecipe(new ItemStack(blockRailCross, 2), " r ", "r r", " r ", 'r', new ItemStack(Blocks.RAIL));
+		}
+	}
+
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		for (Item item : Item.REGISTRY) {
+			if (item instanceof ItemMinecart && item.getItemStackLimit() < minecartStackSize) {
+				item.setMaxStackSize(minecartStackSize);
+			}
 		}
 	}
 

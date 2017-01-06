@@ -107,18 +107,7 @@ public class GuiPocketTable extends GuiContainer {
         char my_key = ("" + key).toLowerCase(Locale.ROOT).charAt(0);
         int action = -1;
         int arg = 0;
-        // 'x' clears items out of the way. Fill inv, then bag (and make slurp
-        // sound). [XXX TODO -- Doing this server-friendly'd require a packet or
-        // something]
-        // 'z' in crafting area, balance items out. Then fill in with rest of
-        // inventory.
-        // 'c' cycle layout, based on outer edge:
-        // - Full: rotate
-        // - In a '\' corner: spread left/right
-        // - In a '/' corner: spread up/down
-        // - A line along a side: spread to the other side, skipping the middle.
-        // - Two touching: fill the circumerfence, alternating.
-        // - middle of a side: spread across center
+
         if (my_key == ModCharsetCrafting.pocketActions.charAt(0) /* x */) {
             action = PacketPTAction.CLEAR;
         } else if (my_key == ModCharsetCrafting.pocketActions.charAt(1) /* c */) {

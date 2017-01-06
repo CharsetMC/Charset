@@ -1,0 +1,2 @@
+* [Carts] Add option to set the minimum minecart item stack size
+* [Carts] Fix TrackCombiner not working correctly in survival mode
