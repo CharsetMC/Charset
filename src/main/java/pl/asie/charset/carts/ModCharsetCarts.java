@@ -30,6 +30,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -42,6 +45,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.asie.charset.carts.link.Linkable;
 import pl.asie.charset.lib.ModCharsetLib;
 
 import java.util.HashMap;
@@ -57,6 +61,9 @@ public class ModCharsetCarts {
 
 	@SidedProxy(clientSide = "pl.asie.charset.carts.ProxyClient", serverSide = "pl.asie.charset.carts.ProxyCommon")
 	public static ProxyCommon proxy;
+
+	@CapabilityInject(Linkable.class)
+	public static Capability<Linkable> LINKABLE;
 
 	@Mod.Instance(MODID)
 	public static ModCharsetCarts instance;
@@ -87,6 +94,7 @@ public class ModCharsetCarts {
 		ModCharsetLib.proxy.registerItemModel(blockRailCross, 0, "charsetcarts:rail_charset");
 
 		MinecraftForge.EVENT_BUS.register(proxy);
+		CapabilityManager.INSTANCE.register(Linkable.class, Linkable.PROVIDER.getStorage(), Linkable.class);
 
 		if (config.getBoolean("trackCombiner", "features", true, "Enables the Track Combiner, replacing the usual way of crafting expansion rails with an in-world mechanism.")) {
 			combiner = new TrackCombiner();

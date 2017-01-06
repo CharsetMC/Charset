@@ -32,7 +32,7 @@ public class TrackCombiner {
 		World world = event.getWorld();
 		BlockPos pos = event.getPos();
 
-		if (/* event.getEntityPlayer().isSneaking() && */ !event.getItemStack().isEmpty()) {
+		if (event.getEntityPlayer().isSneaking() && !event.getItemStack().isEmpty()) {
 			IBlockState state = world.getBlockState(pos);
 			if (transform.containsKey(state)) {
 				for (Map.Entry<ItemStack, IBlockState> entry : transform.get(state).entrySet()) {

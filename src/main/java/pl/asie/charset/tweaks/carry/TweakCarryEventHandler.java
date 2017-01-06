@@ -70,7 +70,7 @@ public class TweakCarryEventHandler {
     @SubscribeEvent
     public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof EntityPlayer) {
-            event.addCapability(TweakCarry.CAP_IDENTIFIER, new CarryHandler.Provider((EntityPlayer) event.getObject()));
+            event.addCapability(TweakCarry.CAP_IDENTIFIER, CarryHandler.PROVIDER.create(new CarryHandler().setPlayer((EntityPlayer) event.getObject())));
         }
     }
 

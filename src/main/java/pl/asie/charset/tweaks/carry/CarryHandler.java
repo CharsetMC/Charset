@@ -18,14 +18,16 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CarryHandler {
-    public static final Storage STORAGE = new Storage();
+    public static CapabilityProviderFactory<CarryHandler> PROVIDER;
     public static final BlockPos ACCESS_POS = new BlockPos(0, 64, 0);
 
     private Entity player;
@@ -158,6 +160,12 @@ public class CarryHandler {
         return tileInstance != null ? tileInstance : (tile != null ? (tileInstance = TileEntity.create(player.world, tile)) : null);
     }
 
+    public static void register() {
+        Capability.IStorage<CarryHandler> storage = new CarryHandler.Storage();
+        CapabilityManager.INSTANCE.register(CarryHandler.class, storage, CarryHandler.class);
+        CarryHandler.PROVIDER = new CapabilityProviderFactory<>(TweakCarry.CAPABILITY, storage);
+    }
+
     public static class Storage implements Capability.IStorage<CarryHandler> {
         @Override
         public NBTBase writeNBT(Capability<CarryHandler> capability, CarryHandler instance, EnumFacing side) {
@@ -190,35 +198,6 @@ public class CarryHandler {
                     }
                 }
             }
-        }
-    }
-
-    public static class Provider implements ICapabilitySerializable<NBTTagCompound> {
-        final CarryHandler handler;
-
-        public Provider(EntityPlayer entity) {
-            handler = new CarryHandler().setPlayer(entity);
-        }
-
-        @Override
-        public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-            return capability == TweakCarry.CAPABILITY;
-        }
-
-        @Nullable
-        @Override
-        public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-            return capability == TweakCarry.CAPABILITY ? TweakCarry.CAPABILITY.cast(handler) : null;
-        }
-
-        @Override
-        public NBTTagCompound serializeNBT() {
-            return (NBTTagCompound) STORAGE.writeNBT(TweakCarry.CAPABILITY, handler, null);
-        }
-
-        @Override
-        public void deserializeNBT(NBTTagCompound nbt) {
-            STORAGE.readNBT(TweakCarry.CAPABILITY, handler, null, nbt);
         }
     }
 

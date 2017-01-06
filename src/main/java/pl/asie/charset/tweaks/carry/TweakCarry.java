@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.tweaks.ModCharsetTweaks;
 import pl.asie.charset.tweaks.Tweak;
 import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecart;
@@ -62,7 +63,7 @@ public class TweakCarry extends Tweak {
             CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecartDayBarrel());
         }
 
-        CapabilityManager.INSTANCE.register(CarryHandler.class, CarryHandler.STORAGE, CarryHandler.class);
+        CarryHandler.register();
 
         MinecraftForge.EVENT_BUS.register(new TweakCarryEventHandler());
         if (ModCharsetLib.proxy.isClient()) {
