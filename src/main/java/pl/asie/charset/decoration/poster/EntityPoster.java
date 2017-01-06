@@ -103,6 +103,7 @@ public class EntityPoster extends Entity {
             inv = new ItemStack(compound.getCompoundTag("inv"));
             if (inv.isEmpty()) inv = new ItemStack(ModCharsetDecoration.posterItem);
         }
+
         rot = Quaternion.loadFromTag(compound, "rot");
         scale = compound.getDouble("scale");
         base_rotation = Quaternion.loadFromTag(compound, "base_rot");
@@ -146,6 +147,7 @@ public class EntityPoster extends Entity {
         if (world.isRemote) {
             if (dataManager.isDirty()) {
                 readEntityFromNBT(dataManager.get(PARAMETER_TAG));
+                dataManager.setClean();
             }
         }
     }

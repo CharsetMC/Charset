@@ -1,1 +1,4 @@
+* [Carts] Add option to set the minimum minecart item stack size
+* [Carts] Fix TrackCombiner not working correctly in survival mode
+* [Decoration] Fix posters being a massive lagfest
 * [Lib] Fix broken modded wood detection

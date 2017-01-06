@@ -91,7 +91,7 @@ public class ItemPoster extends ItemBase {
             if (SpaceUtils.sign(dir) == -1) {
                 spot.add(SpaceUtils.scale(SpaceUtils.fromDirection(dir), 1.0 / 2560.0));
             }
-            SpaceUtils.setEntityPosition(poster, spot);
+            SpaceUtils.setEntityPosition(poster, spot.add(new Vec3d(at)));
             result = poster;
             return false;
         }
@@ -116,7 +116,7 @@ public class ItemPoster extends ItemBase {
             plane = SpaceUtils.flatten(blockBox, dir);
 
             final double pix = 1.0 / 16.0;
-            bounds = SpaceUtils.withPoint(plane, SpaceUtils.scale(new Vec3d(dir.getDirectionVec()), pix));
+            bounds = SpaceUtils.withPoint(plane, SpaceUtils.scale(new Vec3d(dir.getDirectionVec()), pix)).move(new Vec3d(at));
 
             for (Object ent : w.getEntitiesWithinAABB(EntityPoster.class, bounds)) {
                 if (ent instanceof EntityPoster) {
@@ -167,7 +167,7 @@ public class ItemPoster extends ItemBase {
                 if (vecLen > minDist) continue;
                 minDist = vecLen;
                 dir = mop.sideHit;
-                blockBox = box;
+                blockBox = box.move(Vec3d.ZERO.subtract(new Vec3d(at)));
             }
 
             if (blockBox == null) blockBox = state.getCollisionBoundingBox(w, at);
