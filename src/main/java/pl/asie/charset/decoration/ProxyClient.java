@@ -12,8 +12,6 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.decoration.poster.EntityPoster;
-import pl.asie.charset.decoration.poster.RenderPoster;
 import pl.asie.charset.decoration.scaffold.ModelScaffold;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.storage.barrel.BarrelModel;
@@ -23,12 +21,6 @@ public class ProxyClient extends ProxyCommon {
 
     @Override
     public void preInit() {
-        RenderingRegistry.registerEntityRenderingHandler(EntityPoster.class, new IRenderFactory<EntityPoster>() {
-            @Override
-            public Render<? super EntityPoster> createRenderFor(RenderManager manager) {
-                return new RenderPoster(manager);
-            }
-        });
     }
 
     @SubscribeEvent

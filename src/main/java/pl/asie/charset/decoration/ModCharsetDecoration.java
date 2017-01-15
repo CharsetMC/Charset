@@ -40,8 +40,6 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pl.asie.charset.decoration.poster.EntityPoster;
-import pl.asie.charset.decoration.poster.ItemPoster;
 import pl.asie.charset.decoration.scaffold.BlockScaffold;
 import pl.asie.charset.decoration.scaffold.ItemScaffold;
 import pl.asie.charset.decoration.scaffold.TileScaffold;
@@ -66,7 +64,6 @@ public class ModCharsetDecoration {
 	public static Logger logger;
 
 	public static Block scaffoldBlock;
-	public static Item posterItem;
 
 	private Configuration config;
 
@@ -83,28 +80,15 @@ public class ModCharsetDecoration {
 		ModCharsetLib.proxy.registerBlock(scaffoldBlock, new ItemScaffold(scaffoldBlock), "scaffold");
 		ModCharsetLib.proxy.registerItemModel(scaffoldBlock, 0, "charsetdecoration:scaffold");
 
-		posterItem = new ItemPoster();
-		GameRegistry.register(posterItem.setRegistryName("poster"));
-		ModCharsetLib.proxy.registerItemModel(posterItem, 0, "charsetdecoration:poster");
-
 		proxy.preInit();
 		MinecraftForge.EVENT_BUS.register(proxy);
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		EntityRegistry.registerModEntity(new ResourceLocation("charsetdecoration:poster"), EntityPoster.class, "charsetdecoration:poster", 1, this, 64, 3, true);
-
 		if (scaffoldBlock != null) {
 			GameRegistry.registerTileEntity(TileScaffold.class, "charsetdecoration:scaffold");
 		}
-
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(posterItem),
-				"0",
-				"-",
-				"0",
-				'-', "paper", '0', "slimeball"
-		));
 	}
 
 	private void registerScaffoldRecipe(ItemMaterial plankMaterial) {
