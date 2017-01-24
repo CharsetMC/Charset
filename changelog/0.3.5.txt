@@ -1,0 +1,3 @@
+* [Pipes] [#113] Fix pipes trying to push fluid into non-fluid-containers (and crashing, too!)
+* [Pipes] [#108] Fix pipes refusing to connect to capability-based IFluidHandlers
+* [Tweaks] Add support for modifying the enderman griefing list with mobControl

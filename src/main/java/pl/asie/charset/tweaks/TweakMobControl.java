@@ -24,12 +24,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 
-<<<<<<< HEAD
-=======
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
->>>>>>> 4bb8a90... replace last tweak w/ block list
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
