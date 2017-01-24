@@ -74,7 +74,6 @@ public class ModCharsetTweaks {
 	public void preInit(FMLPreInitializationEvent event) {
 		// addTweak(new TweakAutoReplace());
 		addTweak(new TweakCarry());
-		addTweak(new TweakDisableEndermanGriefing());
 		addTweak(new TweakDisableVanillaTools());
 		addTweak(new TweakDoubleDoors());
 		addTweak(new TweakDyeableMinecarts());
