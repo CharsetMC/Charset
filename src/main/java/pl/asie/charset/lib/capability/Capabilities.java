@@ -20,8 +20,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.lib.IAxisRotatable;
@@ -32,14 +34,16 @@ import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
-import pl.asie.charset.lib.capability.*;
-import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.lib.DefaultAxisRotatable;
 import pl.asie.charset.lib.capability.lib.DefaultDebuggable;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
+import pl.asie.charset.lib.capability.providers.CapabilityWrapperFluidStacks;
+import pl.asie.charset.lib.capability.providers.CapabilityWrapperInsertionToItemHandler;
+import pl.asie.charset.lib.capability.providers.CapabilityWrapperInventory;
+import pl.asie.charset.lib.capability.providers.commoncapabilities.CapabilityWrapperSlotlessInsertion;
 import pl.asie.charset.lib.capability.redstone.*;
 
 public class Capabilities {
@@ -98,5 +102,21 @@ public class Capabilities {
 //		CapabilityWrapperRegistry.registerCapabilityWrapper(new DebuggableWrapper());
 //		CapabilityWrapperRegistry.registerCapabilityWrapper(new ItemInsertionHandlerWrapper());
 //		CapabilityWrapperRegistry.registerCapabilityWrapper(new PipeViewWrapper());
+	}
+
+	@Optional.Method(modid = "commoncapabilities")
+	private static void registerCommonCapabilitiesWrappers() {
+		CapabilityHelper.registerWrapper(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityWrapperSlotlessInsertion());
+	}
+
+	// Order is important!
+	public static void registerDefaultWrappers() {
+		if (Loader.isModLoaded("commoncapabilities"))
+			registerCommonCapabilitiesWrappers();
+
+		// Vanilla wrappers
+		CapabilityHelper.registerWrapper(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new CapabilityWrapperInventory());
+		CapabilityHelper.registerWrapper(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, new CapabilityWrapperFluidStacks());
+		CapabilityHelper.registerWrapper(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityWrapperInsertionToItemHandler());
 	}
 }

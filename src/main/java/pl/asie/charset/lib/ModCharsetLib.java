@@ -24,9 +24,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,10 +44,6 @@ import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.capability.providers.CapabilityProviderFluidHandler;
-import pl.asie.charset.lib.capability.providers.CapabilityProviderItemHandler;
-import pl.asie.charset.lib.capability.providers.CapabilityProviderItemInsertionHandler;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.misc.InDevEventHandler;
@@ -179,9 +173,7 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		CapabilityHelper.registerProvider(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new CapabilityProviderItemHandler());
-		CapabilityHelper.registerProvider(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, new CapabilityProviderFluidHandler());
-		CapabilityHelper.registerProvider(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityProviderItemInsertionHandler());
+		Capabilities.registerDefaultWrappers();
 
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);

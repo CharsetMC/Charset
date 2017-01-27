@@ -1,5 +1,7 @@
 package pl.asie.charset.lib.capability;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -9,23 +11,21 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class CapabilityHelper {
-    public interface Provider<T> {
+    public interface Wrapper<T> {
         T get(ICapabilityProvider provider, EnumFacing side);
     }
 
-    private static final Map<Capability, Provider<?>> providers = new IdentityHashMap<>();
+    private static final Multimap<Capability, Wrapper<?>> wrappers = LinkedListMultimap.create();
 
     private CapabilityHelper() {
 
     }
 
-    public static <T> void registerProvider(Capability<T> capability, Provider<T> provider) {
-        providers.put(capability, provider);
+    public static <T> void registerWrapper(Capability<T> capability, Wrapper<T> provider) {
+        wrappers.put(capability, provider);
     }
 
     public static <T> T get(Capability<T> capability, ICapabilityProvider provider, EnumFacing facing) {
@@ -33,18 +33,22 @@ public final class CapabilityHelper {
     }
 
     public static <T> T get(Capability<T> capability, ICapabilityProvider provider, EnumFacing facing, boolean withWrappers) {
-        if (provider == null)
-            return null;
-
-        if (withWrappers && providers.containsKey(capability)) {
-            return (T) providers.get(capability).get(provider, facing);
-        } else {
+        if (provider != null) {
             if (provider.hasCapability(capability, facing)) {
                 return provider.getCapability(capability, facing);
-            } else {
-                return null;
+            }
+
+            if (withWrappers && wrappers.containsKey(capability)) {
+                for (Wrapper helper : wrappers.get(capability)) {
+                    T result = (T) helper.get(provider, facing);
+                    if (result != null) {
+                        return result;
+                    }
+                }
             }
         }
+
+        return null;
     }
 
     public static <T> T get(World world, BlockPos pos, Capability<T> capability, EnumFacing facing, boolean tiles, boolean entities) {

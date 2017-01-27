@@ -13,23 +13,19 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 /**
  * Created by asie on 11/29/16.
  */
-public class CapabilityProviderItemInsertionHandler implements CapabilityHelper.Provider<IItemInsertionHandler> {
+public class CapabilityWrapperInsertionToItemHandler implements CapabilityHelper.Wrapper<IItemInsertionHandler> {
 	@Override
 	public IItemInsertionHandler get(ICapabilityProvider provider, EnumFacing facing) {
-		if (provider.hasCapability(Capabilities.ITEM_INSERTION_HANDLER, facing)) {
-			return provider.getCapability(Capabilities.ITEM_INSERTION_HANDLER, facing);
+		IItemHandler handler = CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, provider, facing);
+		if (handler != null) {
+			return new IItemInsertionHandler() {
+				@Override
+				public ItemStack insertItem(ItemStack stack, boolean simulate) {
+					return ItemHandlerHelper.insertItem(handler, stack, simulate);
+				}
+			};
 		} else {
-			IItemHandler handler = CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, provider, facing);
-			if (handler != null) {
-				return new IItemInsertionHandler() {
-					@Override
-					public ItemStack insertItem(ItemStack stack, boolean simulate) {
-						return ItemHandlerHelper.insertItem(handler, stack, simulate);
-					}
-				};
-			} else {
-				return null;
-			}
+			return null;
 		}
 	}
 }

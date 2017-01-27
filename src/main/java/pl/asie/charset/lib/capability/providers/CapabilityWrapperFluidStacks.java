@@ -10,12 +10,10 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 /**
  * Created by asie on 11/29/16.
  */
-public class CapabilityProviderFluidHandler implements CapabilityHelper.Provider<IFluidHandler> {
+public class CapabilityWrapperFluidStacks implements CapabilityHelper.Wrapper<IFluidHandler> {
 	@Override
 	public IFluidHandler get(ICapabilityProvider provider, EnumFacing side) {
-		if (provider.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) {
-			return provider.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
-		} else if (provider instanceof ItemStack && provider.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, side)) {
+		if (provider instanceof ItemStack && provider.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, side)) {
 			return provider.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, side);
 		} else {
 			return null;

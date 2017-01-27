@@ -102,7 +102,6 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
             for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
                 if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
-                if (type == TileEntityDayBarrel.Type.LARGER) continue;
                 rep.type = type;
                 builder.add(rep.getPickedBlock());
             }

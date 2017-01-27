@@ -81,8 +81,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.LOG);
     private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.PLANKS);
     public ItemStack woodLog = DEFAULT_LOG, woodSlab = DEFAULT_SLAB;
-    // TODO: Dynamic barrel sizes!
-
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
     Object notice_target = this;
@@ -199,7 +197,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public enum Type {
-        NORMAL, SILKY, HOPPING, LARGER, STICKY, CREATIVE;
+        NORMAL, SILKY, HOPPING, @Deprecated LARGER, STICKY, CREATIVE;
 
         public static final Type[] VALUES = values();
         public static Type valueOf(int ordinal) {
@@ -372,9 +370,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         int size = 64*64;
         if (!item.isEmpty()) {
             size = item.getMaxStackSize()*64;
-        }
-        if (type == Type.LARGER) {
-            size *= 2;
         }
         return size;
     }

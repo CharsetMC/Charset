@@ -32,9 +32,6 @@ public class PacketCarrySync extends Packet {
 			player = world.getEntityByID(playerId);
 		} else {
 			player = getPlayer(handler);
-			if (player.getEntityId() == playerId) {
-				world = player.getEntityWorld();
-			}
 		}
 		tag = ByteBufUtils.readTag(buf);
 	}

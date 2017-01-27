@@ -13,12 +13,10 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 /**
  * Created by asie on 11/29/16.
  */
-public class CapabilityProviderItemHandler implements CapabilityHelper.Provider<IItemHandler> {
+public class CapabilityWrapperInventory implements CapabilityHelper.Wrapper<IItemHandler> {
 	@Override
 	public IItemHandler get(ICapabilityProvider provider, EnumFacing facing) {
-		if (provider.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)) {
-			return provider.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
-		} else if (provider instanceof ISidedInventory) {
+		if (provider instanceof ISidedInventory) {
 			IItemHandler handler = new SidedInvWrapper((ISidedInventory) provider, facing);
 			return handler.getSlots() > 0 ? handler : null;
 		} else if (provider instanceof IInventory) {

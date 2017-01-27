@@ -77,6 +77,7 @@ public class ModCharsetTweaks {
 		addTweak(new TweakDisableVanillaTools());
 		addTweak(new TweakDoubleDoors());
 		addTweak(new TweakDyeableMinecarts());
+		addTweak(new TweakFiniteWater());
 		addTweak(new TweakGlassShards());
 		addTweak(new TweakGraphite());
 		addTweak(new TweakImprovedTNT());
