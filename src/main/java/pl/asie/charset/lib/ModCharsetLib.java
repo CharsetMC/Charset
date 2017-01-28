@@ -44,6 +44,7 @@ import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.loader.LoaderHandler;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.misc.InDevEventHandler;
@@ -115,6 +116,8 @@ public class ModCharsetLib {
 		config = new Configuration(getConfigFile("lib.cfg"));
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
 
+		LoaderHandler.INSTANCE.readDataTable(event.getAsmData());
+
 		charsetIconItem = new IconCharset();
 		GameRegistry.register(charsetIconItem.setRegistryName("icon"));
 		charsetIconStack = new ItemStack(charsetIconItem);
@@ -173,7 +176,8 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		Capabilities.registerDefaultWrappers();
+		LoaderHandler.INSTANCE.postInit();
+		Capabilities.registerVanillaWrappers();
 
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);

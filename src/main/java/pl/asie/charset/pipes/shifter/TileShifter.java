@@ -16,6 +16,7 @@
 
 package pl.asie.charset.pipes.shifter;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -47,9 +48,22 @@ import pl.asie.charset.pipes.pipe.PipeFluidContainer;
 import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
-	private ItemStack[] filters = new ItemStack[6];
+	public interface ExtractionHandler<T> {
+		Capability<T> getCapability();
+		int getTickerSpeed();
+		boolean extract(T input, TilePipe output, TileShifter shifter, EnumFacing direction);
+	}
+
+	private static final Set<ExtractionHandler<?>> extractionHandlers;
+
+	static {
+		extractionHandlers = ImmutableSet.of(new ShifterExtractionHandlerFluids(), new ShifterExtractionHandlerItems());
+	}
+
+	private final ItemStack[] filters = new ItemStack[6];
 	private int redstoneLevel;
 	private int ticker = ModCharsetPipes.RANDOM.nextInt(256);
 
@@ -72,13 +86,14 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	private boolean isInput(TileEntity input, EnumFacing direction) {
 		if (input != null) {
-			if (CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, input, direction) != null) {
-				return true;
+			if (PipeUtils.getPipe(input) != null) {
+				return false;
 			}
 
-			IFluidHandler fluidHandler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, input, direction);
-			if (fluidHandler != null) {
-				return !(fluidHandler instanceof PipeFluidContainer.Tank);
+			for (ExtractionHandler handler : extractionHandlers) {
+				if (CapabilityHelper.get(handler.getCapability(), input, direction) != null) {
+					return true;
+				}
 			}
 		}
 
@@ -175,45 +190,6 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		return false;
 	}
 
-	private void updateFluids(TileEntity input, TilePipe output, EnumFacing direction) {
-		if (input != null && output != null) {
-			IFluidHandler inTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, input, direction);
-			IFluidHandler outTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, output, direction.getOpposite());
-			if (inTank != null && outTank != null) {
-				FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
-				if (stack != null && matches(stack)) {
-					FluidHandlerHelper.push(inTank, outTank, stack);
-				}
-			}
-		}
-	}
-
-	private void updateItems(TileEntity input, TilePipe output, EnumFacing direction) {
-		if (ticker % 16 == 0 && input != null && output != null) {
-			IItemHandler handler = CapabilityHelper.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, input, direction);
-			IItemInsertionHandler outHandler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, output, direction.getOpposite());
-			if (handler != null && outHandler != null) {
-				for (int i = 0; i < handler.getSlots(); i++) {
-					ItemStack source = handler.getStackInSlot(i);
-					if (!source.isEmpty() && matches(source)) {
-						int maxSize = 1;
-						ItemStack stack = handler.extractItem(i, maxSize, true);
-						if (!stack.isEmpty()) {
-							if (outHandler.insertItem(stack, true).isEmpty()) {
-								stack = handler.extractItem(i, maxSize, false);
-								if (!stack.isEmpty()) {
-									outHandler.insertItem(stack, false);
-								}
-
-								return;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	@Override
 	public void update() {
 		super.update();
@@ -229,8 +205,14 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
 
-			updateItems(input, output, direction);
-			updateFluids(input, output, direction);
+			for (ExtractionHandler handler : extractionHandlers) {
+				if (ticker % handler.getTickerSpeed() == 0) {
+					Object inputHandler = CapabilityHelper.get(handler.getCapability(), input, direction);
+					if (inputHandler != null) {
+						handler.extract(inputHandler, output, this, direction);
+					}
+				}
+			}
 		}
 	}
 

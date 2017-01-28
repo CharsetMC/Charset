@@ -3,8 +3,6 @@ package pl.asie.charset.pipes.pipe;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -41,7 +39,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
         @Override
         public ItemStack insertItem(ItemStack stack, boolean simulate) {
-            if (getWorld() == null || getWorld().isRemote || !connects(facing)) {
+            if (getWorld().isRemote || !connects(facing)) {
                 return stack;
             }
 
@@ -96,15 +94,11 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         TileEntity tile = getNeighbourTile(side);
 
         if (tile != null) {
-            if (tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.getOpposite())) {
+            if (CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, tile, side.getOpposite()) != null) {
                 return true;
             }
 
-            if (tile instanceof ISidedInventory || tile instanceof IInventory) {
-                return true;
-            }
-
-            if (tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) {
+            if (CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, tile, side.getOpposite()) != null) {
                 return true;
             }
 
@@ -421,18 +415,25 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
     }
 
+    // TODO: hack...
+    public boolean isLikelyToFailInsertingItem() {
+        synchronized (itemSet) {
+            for (PipeItem p : itemSet) {
+                if (p.isStuck()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     protected boolean injectItemInternal(PipeItem item, EnumFacing dir, boolean simulate) {
         if (item.isValid()) {
-            int stuckItems = 0;
-
             synchronized (itemSet) {
                 for (PipeItem p : itemSet) {
                     if (p.isStuck()) {
-                        stuckItems++;
-
-                        if (stuckItems >= 1) {
-                            return false;
-                        }
+                        return false;
                     }
                 }
 

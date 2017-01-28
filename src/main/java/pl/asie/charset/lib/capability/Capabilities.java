@@ -43,8 +43,9 @@ import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInventory;
-import pl.asie.charset.lib.capability.providers.commoncapabilities.CapabilityWrapperSlotlessInsertion;
+import pl.asie.charset.lib.modcompat.commoncapabilities.CapabilityWrapperSlotlessInsertion;
 import pl.asie.charset.lib.capability.redstone.*;
+import pl.asie.charset.lib.loader.ModCompatProvider;
 
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)
@@ -104,17 +105,7 @@ public class Capabilities {
 //		CapabilityWrapperRegistry.registerCapabilityWrapper(new PipeViewWrapper());
 	}
 
-	@Optional.Method(modid = "commoncapabilities")
-	private static void registerCommonCapabilitiesWrappers() {
-		CapabilityHelper.registerWrapper(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityWrapperSlotlessInsertion());
-	}
-
-	// Order is important!
-	public static void registerDefaultWrappers() {
-		if (Loader.isModLoaded("commoncapabilities"))
-			registerCommonCapabilitiesWrappers();
-
-		// Vanilla wrappers
+	public static void registerVanillaWrappers() {
 		CapabilityHelper.registerWrapper(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new CapabilityWrapperInventory());
 		CapabilityHelper.registerWrapper(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, new CapabilityWrapperFluidStacks());
 		CapabilityHelper.registerWrapper(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityWrapperInsertionToItemHandler());
