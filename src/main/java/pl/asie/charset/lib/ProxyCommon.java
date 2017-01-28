@@ -46,7 +46,7 @@ public class ProxyCommon implements IThreadListener {
 //	}
 
 	public EntityPlayer getPlayer(INetHandler handler) {
-		return handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).playerEntity : null;
+		return handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).player : null;
 	}
 
 	public EntityPlayer findPlayer(MinecraftServer server, String name) {

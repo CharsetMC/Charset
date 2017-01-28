@@ -4,17 +4,6 @@ package pl.asie.charset.scripting;
 import com.google.common.base.Charsets;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.sandius.rembulan.StateContext;
-import net.sandius.rembulan.Table;
-import net.sandius.rembulan.Variable;
-import net.sandius.rembulan.compiler.CompilerChunkLoader;
-import net.sandius.rembulan.env.RuntimeEnvironments;
-import net.sandius.rembulan.exec.DirectCallExecutor;
-import net.sandius.rembulan.impl.StateContexts;
-import net.sandius.rembulan.lib.*;
-import net.sandius.rembulan.load.ChunkLoader;
-import net.sandius.rembulan.load.LoaderException;
-import net.sandius.rembulan.runtime.LuaFunction;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.lib.ModCharsetLib;
@@ -28,9 +17,6 @@ public class ModCharsetScripting {
 	public static final String NAME = "$";
 	public static final String VERSION = "@VERSION@";
 
-	public static StateContext state;
-	public static Table env;
-	public static ChunkLoader loader;
 	public static Logger logger;
 
 	/* public void executeScripts() {

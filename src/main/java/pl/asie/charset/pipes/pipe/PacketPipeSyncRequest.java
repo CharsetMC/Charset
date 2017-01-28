@@ -23,12 +23,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketPart;
 import pl.asie.charset.lib.network.PacketTile;
 import pl.asie.charset.pipes.PipeUtils;
 
 public class PacketPipeSyncRequest extends PacketTile {
-	private EntityPlayerMP requester;
+	private EntityPlayer requester;
 
 	public PacketPipeSyncRequest() {
 		super();
@@ -41,7 +42,7 @@ public class PacketPipeSyncRequest extends PacketTile {
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
-		requester = handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).playerEntity : null;
+		requester = ModCharsetLib.proxy.getPlayer(handler);
 	}
 
 	@Override

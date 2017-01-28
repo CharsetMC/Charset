@@ -200,12 +200,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         NORMAL, SILKY, HOPPING, @Deprecated LARGER, STICKY, CREATIVE;
 
         public static final Type[] VALUES = values();
-        public static Type valueOf(int ordinal) {
-            if (ordinal < 0 || ordinal >= VALUES.length) {
-                return NORMAL;
-            }
-            return VALUES[ordinal];
-        }
 
         public boolean isHopping() {
             return this == HOPPING || this == CREATIVE;

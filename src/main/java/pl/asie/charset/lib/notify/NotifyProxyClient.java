@@ -211,7 +211,7 @@ public class NotifyProxyClient extends NotifyProxy {
     private void renderMessage(ClientMessage m, float partial, float opacity, double cx, double cy, double cz) {
         int width = 0;
         String[] lines = m.msg.split("\n");
-        FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
+        FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
         for (String line : lines) {
             width = Math.max(width, fr.getStringWidth(line));
         }

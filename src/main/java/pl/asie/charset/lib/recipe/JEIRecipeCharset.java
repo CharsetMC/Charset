@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class JEIRecipeCharset extends BlankRecipeWrapper implements ICraftingRecipeWrapper {
+public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapper {
     public static class Handler implements IRecipeHandler<RecipeCharset> {
         @Nonnull
         @Override

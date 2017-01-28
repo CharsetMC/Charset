@@ -18,17 +18,17 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.4.0-pre7"
+version = "0.4.0-pre8"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.11.2-13.20.0.2216"
+	version = "1.11.2-13.20.0.2226"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20170115"
+	mappings = "snapshot_20170128"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -45,6 +45,10 @@ repositories {
 		name 'Sonatype OSSRH (Snapshots)'
 		url 'https://oss.sonatype.org/content/repositories/snapshots/'
 	}
+    maven {
+        name "Cyclops Repo"
+        url "https://dl.bintray.com/cyclopsmc/dev/"
+    }
 	ivy {
 		name 'asie dependency mirror'
 		artifactPattern "http://asie.pl/javadeps/[module]-[revision](-[classifier]).[ext]"
@@ -58,13 +62,9 @@ configurations {
 
 dependencies {
 //	deobfCompile "MCMultiPart:MCMultiPart-experimental:1.3.0_87:universal"
-	deobfCompile "mezz.jei:jei_1.11.2:4.2.3.222"
+	deobfCompile "mezz.jei:jei_1.11.2:4.2.4.226"
+    deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.11.2-1.3.0-81"
 	shadow name: "libresample4j", version: "bc0a030"
-	shadow "net.sandius.rembulan:rembulan-runtime:0.1-SNAPSHOT"
-	shadow "net.sandius.rembulan:rembulan-compiler:0.1-SNAPSHOT"
-	shadow "net.sandius.rembulan:rembulan-stdlib:0.1-SNAPSHOT"
-//	shadow "org.nanohttpd:nanohttpd:2.3.1"
-//	shadow "org.nanohttpd:nanohttpd-websocket:2.3.1"
 }
 
 sourceSets {
@@ -103,8 +103,6 @@ shadowJar {
 	configurations = [project.configurations.shadow]
 //	relocate 'com.amadornes.jtraits', 'pl.asie.charset.lib.jtraits'
 	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.audio.libresample4j'
-	relocate 'net.sandius.rembulan', 'pl.asie.charset.scripting.rembulan'
-//	relocate 'fi.iki.elonen', 'pl.asie.charset.server.nanohttpd'
 }
 
 reobfJar {

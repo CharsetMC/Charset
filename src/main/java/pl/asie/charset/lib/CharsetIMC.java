@@ -3,7 +3,6 @@ package pl.asie.charset.lib;
 import com.google.common.collect.Lists;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.sandius.rembulan.compiler.ir.LoadConst;
 
 import java.util.*;
 
