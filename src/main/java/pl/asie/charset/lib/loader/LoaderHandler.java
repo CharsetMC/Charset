@@ -30,11 +30,7 @@ public class LoaderHandler {
 				try {
 					Class cls = getClass().getClassLoader().loadClass(data.getClassName());
 					postInitHandles.add(MethodHandles.lookup().findStatic(cls, methodName, MethodType.fromMethodDescriptorString("()V", classLoader)));
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
+				} catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
 					e.printStackTrace();
 				}
 			}

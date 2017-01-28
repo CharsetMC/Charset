@@ -1,22 +1,28 @@
 package pl.asie.charset.lib.material;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
-import org.apache.commons.lang3.ArrayUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import java.util.concurrent.TimeUnit;
+
 public class ColorLookupHandler {
     public static final ColorLookupHandler INSTANCE = new ColorLookupHandler();
-    private final TObjectIntMap<Key> COLOR_MAP = new TObjectIntHashMap<>();
+    private final Cache<Key, Integer> COLOR_MAP = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.MINUTES)
+            .build();
+    private final TIntIntMap DEFAULT_COLOR_MAP = new TIntIntHashMap();
 
     private ColorLookupHandler() {
-
+        DEFAULT_COLOR_MAP.put(OreDictionary.getOreID("logWood"), 0xff735e39);
     }
 
     public static class Key {
@@ -42,14 +48,8 @@ public class ColorLookupHandler {
             }
 
             Key k = (Key) o;
-            if (k.averagingMode != averagingMode || k.stack.getItem() != stack.getItem() || k.stack.getMetadata() != stack.getMetadata()) {
+            if (k.averagingMode != averagingMode || !ItemUtils.equals(stack, k.stack, false, k.stack.getHasSubtypes(), true)) {
                 return false;
-            }
-
-            if (stack.hasTagCompound() && k.stack.hasTagCompound()) {
-                if (!stack.getTagCompound().equals(k.stack.getTagCompound())) {
-                    return false;
-                }
             }
 
             return true;
@@ -57,29 +57,35 @@ public class ColorLookupHandler {
     }
 
     public void clear() {
-        COLOR_MAP.clear();
+        COLOR_MAP.invalidateAll();
     }
 
     public int getDefaultColor(ItemStack stack) {
         int[] oreIDs = OreDictionary.getOreIDs(stack);
-        if (ArrayUtils.contains(oreIDs, OreDictionary.getOreID("logWood"))) {
-            return 0xff735e39;
-        } else {
-            IBlockState state = ItemUtils.getBlockState(stack);
-            return state.getMaterial().getMaterialMapColor().colorValue | 0xFF000000;
+        for (int o : oreIDs) {
+            if (DEFAULT_COLOR_MAP.containsKey(o))
+                return DEFAULT_COLOR_MAP.get(o);
         }
+
+        IBlockState state = ItemUtils.getBlockState(stack);
+        return state.getMaterial().getMaterialMapColor().colorValue | 0xFF000000;
     }
 
     public int getColor(ItemStack stack, RenderUtils.AveragingMode mode) {
         Key key = new Key(stack, mode);
-        if (!COLOR_MAP.containsKey(key)) {
+        Integer result = COLOR_MAP.getIfPresent(key);
+        if (result == null) {
             TextureAtlasSprite sprite = RenderUtils.getItemSprite(stack);
+            int out;
             if (sprite.getIconName().endsWith("missingno")) {
-                COLOR_MAP.put(key, getDefaultColor(stack));
+                out = getDefaultColor(stack);
             } else {
-                COLOR_MAP.put(key, RenderUtils.getAverageColor(sprite, mode));
+                out = RenderUtils.getAverageColor(sprite, mode);
             }
+            COLOR_MAP.put(key, out);
+            return out;
+        } else {
+            return result;
         }
-        return COLOR_MAP.get(key);
     }
 }

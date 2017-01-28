@@ -17,12 +17,37 @@ import java.util.Map;
 import java.util.Set;
 
 public class RecipeCharset extends RecipeBase {
+    public enum Type {
+        SHAPED,
+        SHAPELESS
+    }
+
     protected IRecipeObject[] input = null;
     protected IRecipeResult output;
     protected int width = 0;
     protected int height = 0;
     protected boolean mirrored = false;
     protected boolean shapeless = false;
+
+    public IRecipeObject[] getInput() {
+        return input;
+    }
+
+    public IRecipeResult getOutput() {
+        return output;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public Type getType() {
+        return shapeless ? Type.SHAPELESS : Type.SHAPED;
+    }
 
     @Override
     public boolean matches(InventoryCrafting inv, @Nullable World worldIn) {

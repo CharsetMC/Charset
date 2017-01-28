@@ -53,17 +53,17 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapp
 
         @Override
         public int getWidth() {
-            return recipe.width;
+            return recipe.getWidth();
         }
 
         @Override
         public int getHeight() {
-            return recipe.height;
+            return recipe.getHeight();
         }
     }
 
     public static JEIRecipeCharset create(RecipeCharset recipe) {
-        return recipe.shapeless ? new Shapeless(recipe) : new Shaped(recipe);
+        return recipe.getType() == RecipeCharset.Type.SHAPELESS ? new Shapeless(recipe) : new Shaped(recipe);
     }
 
     protected final RecipeCharset recipe;
@@ -75,9 +75,9 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapp
     @Override
     public void getIngredients(IIngredients ingredients) {
         List<Object> inputs = new ArrayList<Object>();
-        Object output = recipe.output.preview();
+        Object output = recipe.getOutput().preview();
 
-        for (IRecipeObject o : recipe.input) {
+        for (IRecipeObject o : recipe.getInput()) {
             inputs.add(o != null ? o.preview() : null);
         }
 
