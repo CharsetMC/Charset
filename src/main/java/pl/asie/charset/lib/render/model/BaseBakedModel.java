@@ -34,15 +34,6 @@ import java.util.EnumMap;
 
 public abstract class BaseBakedModel implements IPerspectiveAwareModel {
     private final EnumMap<ItemCameraTransforms.TransformType, TRSRTransformation> transformMap = new EnumMap(ItemCameraTransforms.TransformType.class);
-    private final ResourceLocation particle;
-
-    public BaseBakedModel() {
-        this(null);
-    }
-
-    public BaseBakedModel(ResourceLocation particle) {
-        this.particle = particle != null ? particle : TextureMap.LOCATION_MISSING_TEXTURE;
-    }
 
     @Override
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
@@ -63,11 +54,6 @@ public abstract class BaseBakedModel implements IPerspectiveAwareModel {
     @Override
     public boolean isBuiltInRenderer() {
         return false;
-    }
-
-    @Override
-    public TextureAtlasSprite getParticleTexture() {
-        return RenderUtils.textureGetter.apply(particle);
     }
 
     @Override

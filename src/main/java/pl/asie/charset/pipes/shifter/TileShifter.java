@@ -17,11 +17,14 @@
 package pl.asie.charset.pipes.shifter;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
@@ -48,19 +51,38 @@ import pl.asie.charset.pipes.pipe.PipeFluidContainer;
 import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
-	public interface ExtractionHandler<T> {
-		Capability<T> getCapability();
-		int getTickerSpeed();
-		boolean extract(T input, TilePipe output, TileShifter shifter, EnumFacing direction);
+	public enum ExtractionType {
+		ITEMS(16),
+		FLUIDS(1);
+
+		public final int tickerSpeed;
+
+		ExtractionType(int tickerSpeed) {
+			this.tickerSpeed = tickerSpeed;
+		}
 	}
 
-	private static final Set<ExtractionHandler<?>> extractionHandlers;
+	public interface ExtractionHandler<T> {
+		Capability<T> getCapability();
+		ExtractionType getExtractionType();
+		EnumActionResult extract(T input, TilePipe output, TileShifter shifter, EnumFacing direction);
+	}
 
-	static {
-		extractionHandlers = ImmutableSet.of(new ShifterExtractionHandlerFluids(), new ShifterExtractionHandlerItems());
+	private static final Multimap<ExtractionType, ExtractionHandler<?>> extractionHandlers = LinkedListMultimap.create();
+
+	public static void registerExtractionHandler(ExtractionHandler<?> handler) {
+		extractionHandlers.put(handler.getExtractionType(), handler);
+	}
+
+	public static void registerVanillaExtractionHandlers() {
+		registerExtractionHandler(new ShifterExtractionHandlerItems());
+		registerExtractionHandler(new ShifterExtractionHandlerFluids());
 	}
 
 	private final ItemStack[] filters = new ItemStack[6];
@@ -90,7 +112,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 				return false;
 			}
 
-			for (ExtractionHandler handler : extractionHandlers) {
+			for (ExtractionHandler handler : extractionHandlers.values()) {
 				if (CapabilityHelper.get(handler.getCapability(), input, direction) != null) {
 					return true;
 				}
@@ -205,11 +227,16 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			TileEntity input = getNeighbourTile(direction.getOpposite());
 			TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
 
-			for (ExtractionHandler handler : extractionHandlers) {
-				if (ticker % handler.getTickerSpeed() == 0) {
-					Object inputHandler = CapabilityHelper.get(handler.getCapability(), input, direction);
-					if (inputHandler != null) {
-						handler.extract(inputHandler, output, this, direction);
+			for (ExtractionType type : extractionHandlers.keySet()) {
+				if (ticker % type.tickerSpeed == 0) {
+					EnumActionResult result = EnumActionResult.PASS;
+					for (ExtractionHandler handler : extractionHandlers.get(type)) {
+						Object inputHandler = CapabilityHelper.get(handler.getCapability(), input, direction);
+						if (inputHandler != null) {
+							result = handler.extract(inputHandler, output, this, direction);
+							if (result != EnumActionResult.PASS)
+								break;
+						}
 					}
 				}
 			}

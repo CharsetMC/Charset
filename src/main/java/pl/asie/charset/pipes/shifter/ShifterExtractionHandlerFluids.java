@@ -1,5 +1,6 @@
 package pl.asie.charset.pipes.shifter;
 
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
@@ -20,20 +21,22 @@ public class ShifterExtractionHandlerFluids implements TileShifter.ExtractionHan
 	}
 
 	@Override
-	public int getTickerSpeed() {
-		return 1;
+	public TileShifter.ExtractionType getExtractionType() {
+		return TileShifter.ExtractionType.FLUIDS;
 	}
 
 	@Override
-	public boolean extract(IFluidHandler inTank, TilePipe output, TileShifter shifter, EnumFacing direction) {
+	public EnumActionResult extract(IFluidHandler inTank, TilePipe output, TileShifter shifter, EnumFacing direction) {
 		IFluidHandler outTank = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, output, direction.getOpposite());
 		if (outTank != null) {
 			FluidStack stack = inTank.drain(PipeFluidContainer.TANK_RATE, false);
 			if (stack != null && shifter.matches(stack)) {
-				return FluidHandlerHelper.push(inTank, outTank, stack) > 0;
+				if (FluidHandlerHelper.push(inTank, outTank, stack) > 0) {
+					return EnumActionResult.SUCCESS;
+				}
 			}
 		}
 
-		return false;
+		return EnumActionResult.FAIL;
 	}
 }

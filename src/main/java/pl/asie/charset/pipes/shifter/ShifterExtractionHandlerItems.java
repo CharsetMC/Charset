@@ -1,6 +1,7 @@
 package pl.asie.charset.pipes.shifter;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -20,14 +21,14 @@ public class ShifterExtractionHandlerItems implements TileShifter.ExtractionHand
 	}
 
 	@Override
-	public int getTickerSpeed() {
-		return 16;
+	public TileShifter.ExtractionType getExtractionType() {
+		return TileShifter.ExtractionType.ITEMS;
 	}
 
 	@Override
-	public boolean extract(IItemHandler handler, TilePipe output, TileShifter shifter, EnumFacing direction) {
+	public EnumActionResult extract(IItemHandler handler, TilePipe output, TileShifter shifter, EnumFacing direction) {
 		if (output.isLikelyToFailInsertingItem())
-			return false;
+			return EnumActionResult.FAIL;
 
 		IItemInsertionHandler outHandler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, output, direction.getOpposite());
 		if (outHandler != null) {
@@ -43,13 +44,13 @@ public class ShifterExtractionHandlerItems implements TileShifter.ExtractionHand
 								outHandler.insertItem(stack, false);
 							}
 
-							return true;
+							return EnumActionResult.PASS;
 						}
 					}
 				}
 			}
 		}
 
-		return false;
+		return EnumActionResult.FAIL;
 	}
 }

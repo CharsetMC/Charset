@@ -19,25 +19,32 @@ package pl.asie.charset.lib.render.model;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-/**
- * Created by asie on 6/2/16.
- */
 public class WrappedBakedModel extends BaseBakedModel {
     private final IBakedModel parent;
+    private final TextureAtlasSprite particleSprite;
 
-    public WrappedBakedModel(IBakedModel parent) {
+    public WrappedBakedModel(IBakedModel parent, TextureAtlasSprite particleSprite) {
         super();
         this.parent = parent;
+        this.particleSprite = particleSprite;
     }
 
     @Override
     public boolean isGui3d() {
         return parent.isGui3d();
+    }
+
+    @Override
+    public TextureAtlasSprite getParticleTexture() {
+        return particleSprite;
     }
 
     @Override

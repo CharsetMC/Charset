@@ -72,9 +72,6 @@ public class BarrelCartRecipe extends RecipeBase {
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack is = inv.getStackInSlot(i);
             if (is.getItem() == ModCharsetStorage.barrelItem) {
-                if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
-                    return null;
-                }
                 return ModCharsetStorage.barrelCartItem.makeBarrel(is);
             }
         }

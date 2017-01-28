@@ -24,7 +24,7 @@ public class ModelScaffold extends ModelFactory<ScaffoldCacheInfo> {
 	public IBakedModel bake(ScaffoldCacheInfo info, boolean isItem, BlockRenderLayer layer) {
 		IModel retexturedModel = scaffoldModel.retexture(ImmutableMap.of("plank", info.plank.getIconName()));
 		return new WrappedBakedModel(retexturedModel.bake(TRSRTransformation.identity(),
-				DefaultVertexFormats.BLOCK, RenderUtils.textureGetter)).addDefaultBlockTransforms();
+				DefaultVertexFormats.BLOCK, RenderUtils.textureGetter), info.plank).addDefaultBlockTransforms();
 	}
 
 	@Override

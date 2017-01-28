@@ -46,6 +46,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.IRetexturableModel;
+import net.minecraftforge.client.model.ModelStateComposition;
 import net.minecraftforge.common.model.IModelState;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.model.ModelColorHandler;
@@ -119,7 +120,6 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         TextureAtlasSprite front = group.front;
         TextureAtlasSprite side = group.side;
         HashMap<String, String> textures = new HashMap<String, String>();
-        final HashMap<ResourceLocation, TextureAtlasSprite> map = new HashMap<ResourceLocation, TextureAtlasSprite>();
         if (isItem || layer == BlockRenderLayer.SOLID) {
             textures.put("log", log.getIconName());
             textures.put("plank", plank.getIconName());
@@ -130,21 +130,15 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
             textures.put("side", side.getIconName());
         }
         for (String s : new String[]{"log", "plank", "top", "front", "side"}) {
-            if (textures.get(s) == null) {
+            if (!textures.containsKey(s)) {
+                textures.put("#"+s, "");
                 textures.put(s, "");
-                textures.put("#" + s, "");
             }
         }
-        textures.put("particle", log.getIconName());
-        map.put(new ResourceLocation(log.getIconName()), log);
-        map.put(new ResourceLocation(plank.getIconName()), plank);
-        map.put(new ResourceLocation(top.getIconName()), top);
-        map.put(new ResourceLocation(front.getIconName()), front);
-        map.put(new ResourceLocation(side.getIconName()), side);
         IModelState state = info.orientation.toTransformation();
         ImmutableMap<String, String> textureMap = ImmutableMap.copyOf(textures);
         IModel retexture = template.retexture(textureMap);
-        return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter)).addDefaultBlockTransforms();
+        return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter), log).addDefaultBlockTransforms();
     }
 
     @Override

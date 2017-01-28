@@ -34,11 +34,12 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseBakedModel {
+public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseBakedModel implements IStateParticleBakedModel {
     private static final boolean DISABLE_CACHE = ModCharsetLib.INDEV;
     private static final Set<ModelFactory> FACTORIES = new HashSet<>();
 
@@ -63,11 +64,13 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     private final Cache<ModelKey<T>, IBakedModel> cache;
     private final IUnlistedProperty<T> property;
+    private final ResourceLocation particle;
 
     protected ModelFactory(IUnlistedProperty<T> property, ResourceLocation particle) {
-        super(particle);
+        super();
         this.FACTORIES.add(this);
 
+        this.particle = particle;
         this.cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
         this.property = property;
     }
@@ -105,10 +108,22 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         }
     }
 
+    public IBakedModel getModel(IBlockState state) {
+        return getModel(state, null);
+    }
+
+    public IBakedModel getModel(IBlockState state, BlockRenderLayer layer) {
+        if (state instanceof IExtendedBlockState) {
+            return getModel(((IExtendedBlockState) state).getValue(property), layer);
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
         if (state instanceof IExtendedBlockState) {
-            IBakedModel model = getModel(((IExtendedBlockState) state).getValue(property), MinecraftForgeClient.getRenderLayer());
+            IBakedModel model = getModel(state, MinecraftForgeClient.getRenderLayer());
             if (model != null) {
                 return model.getQuads(state, side, rand);
             }
@@ -119,9 +134,12 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        // TODO: If IBlockState-sensitive getParticleTexture ever hits,
-        // check for the barrel texture
-        return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.LOG.getDefaultState());
+        return RenderUtils.textureGetter.apply(particle);
+    }
+
+    @Override
+    public TextureAtlasSprite getParticleTexture(IBlockState state) {
+        return getModel(state).getParticleTexture();
     }
 
     @Override

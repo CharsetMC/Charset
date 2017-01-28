@@ -118,5 +118,6 @@ public class ModCharsetPipes {
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
+		TileShifter.registerVanillaExtractionHandlers();
 	}
 }
