@@ -2,7 +2,7 @@
     "modListVersion": 2,
     "modList": [
         {
-            "modid": "CharsetLib",
+            "modid": "charsetlib",
             "name": "‽",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -10,10 +10,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetPipes",
+            "modid": "charsetpipes",
             "name": "|",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -21,10 +23,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetTweaks",
+            "modid": "charsettweaks",
             "name": "*",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -32,10 +36,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetStorage",
+            "modid": "charsetstorage",
             "name": "■",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -43,10 +49,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetCarts",
+            "modid": "charsetcarts",
             "name": "∐",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -54,10 +62,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetCrafting",
+            "modid": "charsetcrafting",
             "name": "#",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -65,10 +75,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetDecoration",
+            "modid": "charsetdecoration",
             "name": "⚐",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -76,10 +88,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetDrama",
+            "modid": "charsetdrama",
             "name": "!",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -87,10 +101,12 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         },
         {
-            "modid": "CharsetWrench",
+            "modid": "charsetwrench",
             "name": "/",
             "version": "${version}",
             "mcversion": "${mcversion}",
@@ -98,7 +114,9 @@
             "authorList": [
                 "asiekierka"
             ],
-            "url": "http://charset.asie.pl"
+            "url": "http://charset.asie.pl",
+            "updateUrl": "http://charset.asie.pl/update.json",
+            "logoFile": "assets/charsetlib/textures/items/icon.png"
         }
     ]
 }

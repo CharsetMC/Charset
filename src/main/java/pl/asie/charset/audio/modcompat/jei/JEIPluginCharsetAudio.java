@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.audio.recipe;
+package pl.asie.charset.audio.modcompat.jei;
 
 import mezz.jei.api.*;
 import mezz.jei.api.ingredients.IModIngredientRegistration;

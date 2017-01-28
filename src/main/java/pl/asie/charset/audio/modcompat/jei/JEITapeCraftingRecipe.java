@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.audio.recipe;
+package pl.asie.charset.audio.modcompat.jei;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import mezz.jei.api.ingredients.IIngredients;
@@ -34,8 +33,9 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.audio.recipe.RecipeTape;
 import pl.asie.charset.audio.tape.ItemTape;
-import pl.asie.charset.lib.recipe.JEIPluginCharsetLib;
+import pl.asie.charset.lib.modcompat.jei.JEIPluginCharsetLib;
 
 public class JEITapeCraftingRecipe extends BlankRecipeWrapper implements IShapedCraftingRecipeWrapper {
 	public static class Handler implements IRecipeHandler<RecipeTape> {

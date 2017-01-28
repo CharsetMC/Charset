@@ -1,4 +1,4 @@
-package pl.asie.charset.lib.recipe;
+package pl.asie.charset.lib.modcompat.jei;
 
 import mezz.jei.api.*;
 import mezz.jei.api.ingredients.IModIngredientRegistration;

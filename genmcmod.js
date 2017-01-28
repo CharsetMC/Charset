@@ -6,13 +6,15 @@ var modules = JSON.parse(fs.readFileSync(inf, "UTF-8")).modules;
 var mcmod = Object.keys(modules).map(function(k) {
 	var v = modules[k];
 	var o = {
-		"modid": "Charset" + k.substring(0, 1).toUpperCase() + k.substring(1),
+		"modid": "charset" + k.toLowerCase(),
 		"name": v.char,
 		"version": "${version}",
 		"mcversion": "${mcversion}",
 		"description": v.description,
 		"authorList": [ "asiekierka" ],
-		"url": "http://charset.asie.pl"
+		"url": "http://charset.asie.pl",
+		"updateUrl": "http://charset.asie.pl/update.json",
+		"logoFile": "assets/charsetlib/textures/items/icon.png"
 	};
 	return o;
 });

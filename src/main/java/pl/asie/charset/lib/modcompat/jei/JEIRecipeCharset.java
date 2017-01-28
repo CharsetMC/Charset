@@ -1,18 +1,17 @@
-package pl.asie.charset.lib.recipe;
+package pl.asie.charset.lib.modcompat.jei;
 
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.BlankRecipeWrapper;
 import mezz.jei.api.recipe.IRecipeHandler;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
-import mezz.jei.api.recipe.wrapper.ICraftingRecipeWrapper;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.item.ItemStack;
+import pl.asie.charset.lib.recipe.IRecipeObject;
+import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapper {
