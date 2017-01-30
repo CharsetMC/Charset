@@ -206,7 +206,7 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 
 		if (id == null) {
 			return new float[] { 0.5f, 0.5f, 0.5f };
-		} else if (partialTicks == 0 || item.isStuck() || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
+		} else if (partialTicks == 0 || item.isStuck(null) || (!item.hasReachedCenter() && item.getProgress() == 0.5F)) {
 			offset = new float[] { item.getX(), item.getY(), item.getZ() };
 		} else {
 			float partialMul = partialTicks * PipeItem.SPEED / PipeItem.MAX_PROGRESS;
