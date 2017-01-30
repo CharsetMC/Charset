@@ -38,7 +38,7 @@ public class ShifterExtractionHandlerSlotlessItems implements TileShifter.Extrac
 
 	@Override
 	public EnumActionResult extract(ISlotlessItemHandler handler, TilePipe output, TileShifter shifter, EnumFacing direction) {
-		if (output.isLikelyToFailInsertingItem())
+		if (output.isLikelyToFailInsertingItem(direction))
 			return EnumActionResult.FAIL;
 
 		IItemInsertionHandler outHandler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, output, direction.getOpposite());

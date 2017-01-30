@@ -416,10 +416,10 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     }
 
     // TODO: hack...
-    public boolean isLikelyToFailInsertingItem() {
+    public boolean isLikelyToFailInsertingItem(EnumFacing dir) {
         synchronized (itemSet) {
             for (PipeItem p : itemSet) {
-                if (p.isStuck()) {
+                if (p.isStuck(dir)) {
                     return true;
                 }
             }
@@ -432,7 +432,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         if (item.isValid()) {
             synchronized (itemSet) {
                 for (PipeItem p : itemSet) {
-                    if (p.isStuck()) {
+                    if (p.isStuck(dir)) {
                         return false;
                     }
                 }

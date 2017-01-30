@@ -78,8 +78,20 @@ public class PipeItem {
 		this.id = id;
 	}
 
-	public boolean isStuck() {
-		return stuck;
+	public boolean isStuck(EnumFacing dirOther) {
+		if (!stuck)
+			return false;
+
+		if (dirOther == null)
+			return true;
+
+		if (progress <= CENTER_PROGRESS && input != null && dirOther.getAxis() == input.getAxis())
+			return true;
+
+		if (progress >= CENTER_PROGRESS && output != null && dirOther.getAxis() == output.getAxis())
+			return true;
+
+		return false;
 	}
 
 	public boolean isValid() {
