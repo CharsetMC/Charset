@@ -23,7 +23,7 @@ public class ModCharsetScripting {
 		for (File scriptFile : new File("./scripts").listFiles()) {
 			if (scriptFile.getName().endsWith(".lua")) {
 				try {
-					LuaFunction main = loader.loadTextChunk(new Variable(env),
+					LuaFunction main = annotation.loadTextChunk(new Variable(env),
 							"scripts:" + scriptFile.getName(), FileUtils.readFileToString(scriptFile, Charsets.UTF_8));
 					DirectCallExecutor.newExecutor().call(state, main);
 				} catch (Exception e) {
@@ -36,7 +36,7 @@ public class ModCharsetScripting {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		state = StateContexts.newDefaultInstance();
-		loader = CompilerChunkLoader.of("pl.asie.charset.scripting.compiled");
+		annotation = CompilerChunkLoader.of("pl.asie.charset.scripting.compiled");
 		env = state.newTable();
 
 		BasicLib.installInto(state, env, ScriptRuntimeEnvironment.INSTANCE, null);

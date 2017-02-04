@@ -25,7 +25,6 @@ import com.google.common.base.Suppliers;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.*;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -44,7 +43,7 @@ import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.loader.LoaderHandler;
+import pl.asie.charset.lib.annotation.AnnotationHandler;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.misc.InDevEventHandler;
@@ -94,7 +93,9 @@ public class ModCharsetLib {
 			return charsetIconStack;
 		}
 	};
+
 	public static Logger logger;
+
 	public static Configuration config;
 	public static boolean alwaysDropDroppablesGivenToPlayer;
 
@@ -106,7 +107,7 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		logger = LogManager.getLogger(MODID);
+		AnnotationHandler.INSTANCE.preInit(event.getAsmData());
 
 		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");
 		if (!configurationDirectory.exists()) {
@@ -115,8 +116,6 @@ public class ModCharsetLib {
 
 		config = new Configuration(getConfigFile("lib.cfg"));
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
-
-		LoaderHandler.INSTANCE.readDataTable(event.getAsmData());
 
 		charsetIconItem = new IconCharset();
 		GameRegistry.register(charsetIconItem.setRegistryName("icon"));
@@ -176,7 +175,7 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		LoaderHandler.INSTANCE.postInit();
+		AnnotationHandler.INSTANCE.postInit();
 		Capabilities.registerVanillaWrappers();
 
 		if (deathHandler.hasPredicate()) {

@@ -43,6 +43,7 @@ import org.apache.logging.log4j.Logger;
 import pl.asie.charset.decoration.scaffold.BlockScaffold;
 import pl.asie.charset.decoration.scaffold.ItemScaffold;
 import pl.asie.charset.decoration.scaffold.TileScaffold;
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -51,7 +52,7 @@ import pl.asie.charset.lib.utils.RecipeUtils;
 
 @Mod(modid = ModCharsetDecoration.MODID, name = ModCharsetDecoration.NAME, version = ModCharsetDecoration.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetDecoration {
+public class ModCharsetDecoration extends ModCharsetBase {
 	public static final String MODID = "charsetdecoration";
 	public static final String NAME = "^";
 	public static final String VERSION = "@VERSION@";
@@ -61,17 +62,11 @@ public class ModCharsetDecoration {
 
 	@Mod.Instance(MODID)
 	public static ModCharsetDecoration instance;
-	public static Logger logger;
 
 	public static Block scaffoldBlock;
 
-	private Configuration config;
-
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		logger = LogManager.getLogger(ModCharsetDecoration.MODID);
-		config = new Configuration(ModCharsetLib.instance.getConfigFile("decoration.cfg"));
-
 		if (!ForgeModContainer.fullBoundingBoxLadders) {
 			logger.warn("To make Charset scaffolds work better, we recommend enabling fullBoundingBoxLadders in forge.cfg.");
 		}

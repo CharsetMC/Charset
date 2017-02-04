@@ -123,7 +123,7 @@ public class GuiPocketTable extends GuiContainer {
         }
 
         if (action != -1) {
-            ModCharsetCrafting.packet.sendToServer(new PacketPTAction(action, arg));
+            ModCharsetCrafting.instance.packet().sendToServer(new PacketPTAction(action, arg));
         } else {
             super.keyTyped(key, par2);
         }

@@ -5,16 +5,12 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.loader.ModCompatProvider;
-import pl.asie.charset.lib.modcompat.commoncapabilities.CapabilityWrapperSlotlessInsertion;
-import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.annotation.ModCompatProvider;
 import pl.asie.charset.pipes.pipe.TilePipe;
 import pl.asie.charset.pipes.shifter.TileShifter;
 

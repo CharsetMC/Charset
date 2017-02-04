@@ -29,11 +29,12 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 
 @Mod(modid = ModCharsetDrama.MODID, name = ModCharsetDrama.NAME, version = ModCharsetDrama.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetDrama {
+public class ModCharsetDrama extends ModCharsetBase {
 	public static final String MODID = "charsetdrama";
 	public static final String NAME = "!";
 	public static final String VERSION = "@VERSION@";
@@ -41,14 +42,10 @@ public class ModCharsetDrama {
 	@Mod.Instance(MODID)
 	public static ModCharsetDrama instance;
 
-	public static Logger logger;
-
 	public static Item dramaInABottle;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		logger = LogManager.getLogger(ModCharsetDrama.MODID);
-
 		dramaInABottle = new ItemDramaInABottle();
 		dramaInABottle.setUnlocalizedName("charset.dramaInABottle");
 		dramaInABottle.setCreativeTab(ModCharsetLib.CREATIVE_TAB);

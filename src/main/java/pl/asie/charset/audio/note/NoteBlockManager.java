@@ -82,7 +82,7 @@ public class NoteBlockManager {
 
             // Did not send sound via speaker - use default implementation
             worldIn.playSound(null, pos, sound, SoundCategory.BLOCKS, 3.0F, pitch);
-            ModCharsetAudio.packet.sendToAllAround(new PacketNoteParticle(note, param), note, 32);
+            ModCharsetAudio.instance.packet().sendToAllAround(new PacketNoteParticle(note, param), note, 32);
         }
     }
 

@@ -35,7 +35,7 @@ public class ItemDramaInABottle extends Item {
 				player.sendMessage(new TextComponentString(stack.getTagCompound().getString("drama")));
 			} else {
 				stack.setTagCompound(new NBTTagCompound());
-				stack.getTagCompound().setString("drama", DramaGenerator.INSTANCE.createDrama());
+				stack.getTagCompound().setString("drama", DramaGenerator.INSTANCE.generateDrama());
 				player.sendMessage(new TextComponentString(stack.getTagCompound().getString("drama")));
 			}
 		}

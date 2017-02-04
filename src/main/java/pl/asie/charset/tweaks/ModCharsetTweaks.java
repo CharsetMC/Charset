@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.carry.PacketCarryGrab;
@@ -44,20 +45,16 @@ import pl.asie.charset.tweaks.tnt.TweakImprovedTNT;
 
 @Mod(modid = ModCharsetTweaks.MODID, name = ModCharsetTweaks.NAME, version = ModCharsetTweaks.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetTweaks {
+public class ModCharsetTweaks extends ModCharsetBase {
 	public static final String MODID = "charsettweaks";
 	public static final String NAME = "*";
 	public static final String VERSION = "@VERSION@";
-
-	public static PacketRegistry packet;
 
 	@Mod.Instance(MODID)
 	public static ModCharsetTweaks instance;
 
 	@SidedProxy(clientSide = "pl.asie.charset.tweaks.ProxyClient", serverSide = "pl.asie.charset.tweaks.ProxyCommon")
 	public static pl.asie.charset.tweaks.ProxyCommon proxy;
-
-	private Configuration configuration;
 
 	private final Set<Tweak> tweakSet = new HashSet<Tweak>();
 	private boolean canAddTweaks = true;
@@ -66,11 +63,11 @@ public class ModCharsetTweaks {
 		if (canAddTweaks) {
 			tweakSet.add(tweak);
 		} else {
-			ModCharsetLib.logger.error("Tried to add tweak too late, ignoring: " + tweak.getClass().getName());
+			logger.error("Tried to add tweak too late, ignoring: " + tweak.getClass().getName());
 		}
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		// addTweak(new TweakAutoReplace());
 		addTweak(new TweakCarry());
@@ -86,25 +83,21 @@ public class ModCharsetTweaks {
 		addTweak(new TweakNoSprinting());
 		addTweak(new TweakZorro());
 
-		configuration = new Configuration(ModCharsetLib.instance.getConfigFile("tweaks.cfg"));
 		canAddTweaks = false;
 
 		for (Tweak t : tweakSet) {
-			t.onConfigChanged(configuration, true);
+			t.onConfigChanged(config, true);
 			if (t.isEnabled()) {
 				if (!t.preInit()) {
-					ModCharsetLib.logger.error("Tweak " + t.getClass().getSimpleName() + " failed to load! Please disable it in the config.");
+					logger.error("Tweak " + t.getClass().getSimpleName() + " failed to load! Please disable it in the config.");
 					tweakSet.remove(t);
 				}
 			}
 		}
-
-		configuration.save();
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		packet = new PacketRegistry(ModCharsetTweaks.MODID);
 		packet.registerPacket(0x01, PacketMinecartUpdate.class);
 		packet.registerPacket(0x02, PacketMinecartRequest.class);
 
@@ -114,18 +107,14 @@ public class ModCharsetTweaks {
 		for (Tweak t : tweakSet) {
 			if (t.isEnabled()) {
 				if (!t.init()) {
-					ModCharsetLib.logger.error("Tweak " + t.getClass().getSimpleName() + " failed to load! Please disable it in the config.");
+					logger.error("Tweak " + t.getClass().getSimpleName() + " failed to load! Please disable it in the config.");
 					tweakSet.remove(t);
 				}
 			}
 		}
-
-		if (configuration.hasChanged()) {
-			configuration.save();
-		}
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		for (Tweak t : tweakSet) {
 			if (t.isEnabled()) {
@@ -138,7 +127,7 @@ public class ModCharsetTweaks {
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
 		if (ModCharsetTweaks.MODID.equals(event.getModID())) {
 			for (Tweak t : tweakSet) {
-				t.onConfigChanged(configuration, false);
+				t.onConfigChanged(config, false);
 			}
 		}
 	}

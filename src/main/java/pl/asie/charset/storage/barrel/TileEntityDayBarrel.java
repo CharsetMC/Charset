@@ -450,7 +450,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     void updateCountClients() {
-        ModCharsetStorage.packet.sendToWatching(new PacketBarrelCountUpdate(this), this);
+        ModCharsetStorage.instance.packet().sendToWatching(new PacketBarrelCountUpdate(this), this);
     }
 
     protected void onCountUpdate(PacketBarrelCountUpdate packet) {
@@ -762,7 +762,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         try {
             return Type.valueOf(name);
         } catch (IllegalArgumentException e) {
-            ModCharsetStorage.logger.warn("%s has invalid barrel Type %s. Resetting it.", is, name);
+            ModCharsetStorage.instance.logger().warn("%s has invalid barrel Type %s. Resetting it.", is, name);
             e.printStackTrace();
             tag.removeTag("type");
             return Type.NORMAL;

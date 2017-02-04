@@ -38,6 +38,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import pl.asie.charset.api.pipes.IShifter;
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.pipes.pipe.*;
@@ -48,15 +49,12 @@ import pl.asie.charset.pipes.shifter.TileShifter;
 
 @Mod(modid = ModCharsetPipes.MODID, name = ModCharsetPipes.NAME, version = ModCharsetPipes.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetPipes {
+public class ModCharsetPipes extends ModCharsetBase {
 	public static final String MODID = "charsetpipes";
 	public static final String NAME = "|";
 	public static final String VERSION = "@VERSION@";
-	public static final Random RANDOM = new Random();
 
 	public static final double PIPE_TESR_DISTANCE = 64.0D;
-
-	public static PacketRegistry packet;
 
 	@SidedProxy(clientSide = "pl.asie.charset.pipes.ProxyClient", serverSide = "pl.asie.charset.pipes.ProxyCommon")
 	public static ProxyCommon proxy;
@@ -64,10 +62,13 @@ public class ModCharsetPipes {
 	@CapabilityInject(IShifter.class)
 	public static Capability<IShifter> CAP_SHIFTER;
 
+	@Mod.Instance(MODID)
+	public static ModCharsetPipes instance;
+
 	public static Block shifterBlock;
 	public static Block blockPipe;
 
-	@EventHandler
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
 
@@ -88,11 +89,10 @@ public class ModCharsetPipes {
 		FMLInterModComms.sendMessage("charsetlib", "addCarry", shifterBlock.getRegistryName());
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		proxy.registerRenderers();
 
-		packet = new PacketRegistry(ModCharsetPipes.MODID);
 		packet.registerPacket(0x01, PacketItemUpdate.class);
 		packet.registerPacket(0x02, PacketPipeSyncRequest.class);
 		packet.registerPacket(0x03, PacketFluidUpdate.class);
@@ -116,7 +116,7 @@ public class ModCharsetPipes {
 				'g', "blockGlassColorless", 'm', "obsidian");
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		TileShifter.registerVanillaExtractionHandlers();
 	}

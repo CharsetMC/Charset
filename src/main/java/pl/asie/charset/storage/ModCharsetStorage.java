@@ -45,6 +45,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -59,21 +60,17 @@ import java.util.UUID;
 
 @Mod(modid = ModCharsetStorage.MODID, name = ModCharsetStorage.NAME, version = ModCharsetStorage.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetStorage {
+public class ModCharsetStorage extends ModCharsetBase {
 	public static final String MODID = "charsetstorage";
 	public static final String NAME = "■";
 	public static final String VERSION = "@VERSION@";
 	public static final int DEFAULT_LOCKING_COLOR = 0xFBDB6A;
-	private static final Random rand = new Random();
 
 	@Mod.Instance(MODID)
 	public static ModCharsetStorage instance;
 
 	@SidedProxy(clientSide = "pl.asie.charset.storage.ProxyClient", serverSide = "pl.asie.charset.storage.ProxyCommon")
 	public static ProxyCommon proxy;
-
-	public static PacketRegistry packet;
-	public static Logger logger;
 
 	public static ItemMasterKey masterKeyItem;
 	public static ItemKey keyItem;
@@ -88,13 +85,8 @@ public class ModCharsetStorage {
 
 	public static boolean renderBarrelText, renderBarrelItem, renderBarrelItem3D;
 
-	private Configuration config;
-
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		logger = LogManager.getLogger(ModCharsetStorage.MODID);
-		config = new Configuration(ModCharsetLib.instance.getConfigFile("storage.cfg"));
-
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
 		barrelCartItem = new ItemMinecartDayBarrel();
@@ -143,9 +135,7 @@ public class ModCharsetStorage {
 
 		proxy.init();
 
-		packet = new PacketRegistry(ModCharsetStorage.MODID);
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerStorage());
-
 		packet.registerPacket(0x01, PacketBarrelCountUpdate.class);
 
 		MinecraftForge.EVENT_BUS.register(new LockEventHandler());

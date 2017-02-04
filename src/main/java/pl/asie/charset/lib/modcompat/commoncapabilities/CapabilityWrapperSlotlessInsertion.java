@@ -9,7 +9,7 @@ import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHa
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.loader.ModCompatProvider;
+import pl.asie.charset.lib.annotation.ModCompatProvider;
 
 public class CapabilityWrapperSlotlessInsertion implements CapabilityHelper.Wrapper<IItemInsertionHandler> {
 	@CapabilityInject(ISlotlessItemHandler.class)

@@ -35,7 +35,7 @@ public class PacketMinecartRequest extends PacketEntity {
 	}
 
 	public static void send(EntityMinecart minecart) {
-		ModCharsetTweaks.packet.sendToServer(new PacketMinecartRequest(minecart));
+		ModCharsetTweaks.instance.packet().sendToServer(new PacketMinecartRequest(minecart));
 	}
 
 	@Override

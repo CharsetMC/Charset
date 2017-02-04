@@ -43,10 +43,10 @@ public class DataStorageManager {
 		if (saveDirParent.exists() || saveDirParent.mkdir()) {
 			saveDir = new File(saveDirParent, "tape");
 			if (!saveDir.exists() && !saveDir.mkdir()) {
-				ModCharsetAudio.logger.error("Could not create save directory! " + saveDirParent.getAbsolutePath());
+				ModCharsetAudio.instance.logger().error("Could not create save directory! " + saveDirParent.getAbsolutePath());
 			}
 		} else {
-			ModCharsetAudio.logger.error("Could not create save directory! " + saveDirParent.getAbsolutePath());
+			ModCharsetAudio.instance.logger().error("Could not create save directory! " + saveDirParent.getAbsolutePath());
 		}
 
 		lastSave = time();

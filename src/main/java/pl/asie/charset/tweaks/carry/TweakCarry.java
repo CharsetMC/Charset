@@ -120,7 +120,7 @@ public class TweakCarry extends Tweak {
 
     public static void grabBlock(EntityPlayer player, World world, BlockPos pos) {
         if (!(player instanceof EntityPlayerMP)) {
-            ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, pos));
+            ModCharsetTweaks.instance.packet().sendToServer(new PacketCarryGrab(world, pos));
         }
 
         CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
@@ -136,7 +136,7 @@ public class TweakCarry extends Tweak {
 
     public static void grabEntity(EntityPlayer player, World world, Entity entity) {
         if (!(player instanceof EntityPlayerMP)) {
-            ModCharsetTweaks.packet.sendToServer(new PacketCarryGrab(world, entity));
+            ModCharsetTweaks.instance.packet().sendToServer(new PacketCarryGrab(world, entity));
         }
 
         CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
@@ -205,7 +205,7 @@ public class TweakCarry extends Tweak {
 
     protected static void syncCarryWithClient(Entity who, EntityPlayer target) {
         if (who instanceof EntityPlayerMP && who.hasCapability(CAPABILITY, null)) {
-            ModCharsetTweaks.packet.sendTo(new PacketCarrySync(who), target);
+            ModCharsetTweaks.instance.packet().sendTo(new PacketCarrySync(who), target);
         }
     }
 }

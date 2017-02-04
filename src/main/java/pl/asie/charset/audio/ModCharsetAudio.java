@@ -49,6 +49,7 @@ import pl.asie.charset.audio.tape.ItemTape;
 import pl.asie.charset.audio.tape.ItemTapeReel;
 import pl.asie.charset.audio.recipe.RecipeTape;
 import pl.asie.charset.audio.recipe.RecipeTapeReel;
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
@@ -56,7 +57,7 @@ import java.io.IOException;
 
 @Mod(modid = ModCharsetAudio.MODID, name = ModCharsetAudio.NAME, version = ModCharsetAudio.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetAudio {
+public class ModCharsetAudio extends ModCharsetBase {
 	public static final String MODID = "charsetaudio";
 	public static final String NAME = "♫";
 	public static final String VERSION = "@VERSION@";
@@ -70,9 +71,6 @@ public class ModCharsetAudio {
 	@CapabilityInject(IDataStorage.class)
 	public static Capability<IDataStorage> CAP_STORAGE;
 
-	public static Logger logger;
-
-	public static PacketRegistry packet;
 	public static DataStorageManager storage;
 
 	// public static AudioCableFactory audioCableFactory;
@@ -82,8 +80,6 @@ public class ModCharsetAudio {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		logger = LogManager.getLogger(ModCharsetAudio.MODID);
-
 		// audioCableFactory = (AudioCableFactory) new AudioCableFactory().setRegistryName(new ResourceLocation("charsetaudio:cable"));
 		// WireManager.register(audioCableFactory);
 
@@ -124,7 +120,6 @@ public class ModCharsetAudio {
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new NoteBlockManager());
 
-		packet = new PacketRegistry(ModCharsetAudio.MODID);
 		packet.registerPacket(0x01, PacketNoteParticle.class);
 
 		// packet.registerPacket(0x10, PacketDriveState.class);

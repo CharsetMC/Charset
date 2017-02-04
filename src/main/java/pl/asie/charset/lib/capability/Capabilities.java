@@ -43,9 +43,7 @@ import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInventory;
-import pl.asie.charset.lib.modcompat.commoncapabilities.CapabilityWrapperSlotlessInsertion;
 import pl.asie.charset.lib.capability.redstone.*;
-import pl.asie.charset.lib.loader.ModCompatProvider;
 
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)

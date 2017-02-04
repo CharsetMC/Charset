@@ -182,19 +182,19 @@ public class DramaGenerator {
 
 	private final Random rand = new Random();
 
-	private String getDramaBase() {
+	public String generateDrama() {
+		return applyReplacements(getRandomDramaTemplate());
+	}
+
+	public String generatePersonalizedDrama(String user) {
+		return applyReplacements(getRandomDramaTemplate().replaceFirst("\\[people\\]", user));
+	}
+
+	private String getRandomDramaTemplate() {
 		return SENTENCES.get(rand.nextInt(SENTENCES.size()));
 	}
 
-	public String createDrama() {
-		return finishOverriding(getDramaBase());
-	}
-
-	public String createPersonalDrama(String user) {
-		return finishOverriding(getDramaBase().replaceFirst("\\[people\\]", user));
-	}
-
-	private String finishOverriding(String s) {
+	private String applyReplacements(String s) {
 		for (String c : COMBINATIONS.keySet()) {
 			String cc = "\\[" + c + "\\]";
 			for (int i = 0; i < 5; i++) {

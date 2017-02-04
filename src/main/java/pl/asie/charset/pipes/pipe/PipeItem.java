@@ -204,7 +204,7 @@ public class PipeItem {
 
 	protected void sendPacket(boolean syncStack) {
 		if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-			ModCharsetPipes.packet.sendToAllAround(getSyncPacket(syncStack), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+			ModCharsetPipes.instance.packet().sendToAllAround(getSyncPacket(syncStack), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
 		}
 	}
 

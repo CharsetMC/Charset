@@ -398,7 +398,7 @@ public class PipeFluidContainer implements ITickable {
 
     void sendPacket(boolean ignoreDirty) {
         if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-            ModCharsetPipes.packet.sendToAllAround(getSyncPacket(ignoreDirty), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+            ModCharsetPipes.instance.packet().sendToAllAround(getSyncPacket(ignoreDirty), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
         }
     }
 

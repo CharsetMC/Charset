@@ -27,12 +27,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.crafting.pocket.ItemPocketTable;
 import pl.asie.charset.crafting.pocket.PacketPTAction;
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 @Mod(modid = ModCharsetCrafting.MODID, name = ModCharsetCrafting.NAME, version = ModCharsetCrafting.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetCrafting {
+public class ModCharsetCrafting extends ModCharsetBase {
 	public static final String MODID = "charsetcrafting";
 	public static final String NAME = "#";
 	public static final String VERSION = "@VERSION@";
@@ -43,26 +44,23 @@ public class ModCharsetCrafting {
 	public static ItemPocketTable pocketTable;
 	public static String pocketActions = "xcbf";
 
-	public static PacketRegistry packet;
-
-	@EventHandler
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		pocketTable = new ItemPocketTable();
 		GameRegistry.register(pocketTable.setRegistryName("pocketTable"));
 		ModCharsetLib.proxy.registerItemModel(pocketTable, 0, "charsetcrafting:pocket_crafting_table");
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(pocketTable),
 				" c", "s ", 's', "stickWood", 'c', "workbench"));
 
-		packet = new PacketRegistry(ModCharsetCrafting.MODID);
 		packet.registerPacket(0x01, PacketPTAction.class);
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerCrafting());
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 	}
 }

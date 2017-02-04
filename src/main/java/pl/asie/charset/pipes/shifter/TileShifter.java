@@ -87,7 +87,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	private final ItemStack[] filters = new ItemStack[6];
 	private int redstoneLevel;
-	private int ticker = ModCharsetPipes.RANDOM.nextInt(256);
+	private int ticker = ModCharsetPipes.instance.rand().nextInt(256);
 
 	public TileShifter() {
 		for (int i = 0; i < filters.length; i++)

@@ -38,7 +38,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 	}
 
 	public static void send(EntityMinecart minecart) {
-		ModCharsetTweaks.packet.sendToAllAround(new PacketMinecartUpdate(minecart), minecart, 128);
+		ModCharsetTweaks.instance.packet().sendToAllAround(new PacketMinecartUpdate(minecart), minecart, 128);
 	}
 
 	private static void update(EntityMinecart minecart, int color) {

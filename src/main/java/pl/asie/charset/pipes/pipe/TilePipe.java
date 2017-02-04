@@ -226,7 +226,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
         if (requestUpdate) {
             markBlockForRenderUpdate();
-            ModCharsetPipes.packet.sendToServer(new PacketPipeSyncRequest(this));
+            ModCharsetPipes.instance.packet().sendToServer(new PacketPipeSyncRequest(this));
             requestUpdate = false;
         }
 
@@ -494,11 +494,11 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     protected void onSyncRequest(EntityPlayer player) {
         synchronized (itemSet) {
             for (PipeItem p : itemSet) {
-                ModCharsetPipes.packet.sendTo(p.getSyncPacket(true), player);
+                ModCharsetPipes.instance.packet().sendTo(p.getSyncPacket(true), player);
             }
         }
 
-        ModCharsetPipes.packet.sendTo(fluid.getSyncPacket(true), player);
+        ModCharsetPipes.instance.packet().sendTo(fluid.getSyncPacket(true), player);
     }
 
     @Override

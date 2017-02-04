@@ -46,6 +46,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.carts.link.Linkable;
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 
 import java.util.HashMap;
@@ -53,7 +54,7 @@ import java.util.Map;
 
 @Mod(modid = ModCharsetCarts.MODID, name = ModCharsetCarts.NAME, version = ModCharsetCarts.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetCarts {
+public class ModCharsetCarts extends ModCharsetBase {
 	public static final Map<Class<? extends Entity>, Class<? extends EntityMinecart>> REPLACEMENT_MAP = new HashMap<>();
 	public static final String MODID = "charsetcarts";
 	public static final String NAME = "∐";
@@ -68,12 +69,9 @@ public class ModCharsetCarts {
 	@Mod.Instance(MODID)
 	public static ModCharsetCarts instance;
 	public static TrackCombiner combiner;
-	public static Logger logger;
 	public static int minecartStackSize;
 
 	public static BlockRailCharset blockRailCross;
-
-	private Configuration config;
 
 	private void register(Class<? extends EntityMinecart> minecart, String name) {
 		EntityRegistry.registerModEntity(new ResourceLocation("charsetcarts:" + name), minecart, "charsetcarts:" + name, 2, this, 64, 1, true);
@@ -86,8 +84,6 @@ public class ModCharsetCarts {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		logger = LogManager.getLogger(ModCharsetCarts.MODID);
-		config = new Configuration(ModCharsetLib.instance.getConfigFile("carts.cfg"));
 		minecartStackSize = config.getInt("minecartStackSize", "tweaks", 4, 1, 64, "Sets the minimum stack size for all minecarts.");
 
 		ModCharsetLib.proxy.registerBlock(blockRailCross = new BlockRailCharset(), "rail_charset");
@@ -99,8 +95,6 @@ public class ModCharsetCarts {
 		if (config.getBoolean("trackCombiner", "features", true, "Enables the Track Combiner, replacing the usual way of crafting expansion rails with an in-world mechanism.")) {
 			combiner = new TrackCombiner();
 		}
-
-		config.save();
 	}
 
 	private void registerCombinerRecipeForDirs(Block railSrc, IProperty<BlockRailBase.EnumRailDirection> propSrc, Block railDst, IProperty<BlockRailBase.EnumRailDirection> propDst, ItemStack with) {

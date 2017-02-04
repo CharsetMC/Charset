@@ -24,31 +24,28 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
 
 @Mod(modid = ModCharsetWrench.MODID, name = ModCharsetWrench.NAME, version = ModCharsetWrench.VERSION,
 		dependencies = ModCharsetLib.DEP_DEFAULT, updateJSON = ModCharsetLib.UPDATE_URL)
-public class ModCharsetWrench {
+public class ModCharsetWrench extends ModCharsetBase {
 	public static final String MODID = "charsetwrench";
 	public static final String NAME = "/";
 	public static final String VERSION = "@VERSION@";
 
 	public static ItemWrench wrench;
 
-	@EventHandler
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		wrench = new ItemWrench();
 		GameRegistry.register(wrench.setRegistryName("wrench"));
 		ModCharsetLib.proxy.registerItemModel(wrench, 0, "charsetwrench:wrench");
 	}
 
-	@EventHandler
+	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wrench),
 				" i ", " si", "i  ", 's', "stickWood", 'i', "ingotIron"));
-	}
-
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
 	}
 }
