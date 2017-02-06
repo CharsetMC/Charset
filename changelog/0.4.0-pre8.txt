@@ -1,0 +1,8 @@
+* [Audio] [#115] Fix NoteBlockManager breaking modded note blocks
+* [Decoration] Remove posters
+* [Pipes] Add support for Common Capabilities slotless inserters (Colossal Chests)
+* [Pipes] Fix partially moved items clogging up pipes
+* [Tweaks] Add a "finite-water-outside-of-oceans" tweak
+* [Tweaks] Add support for modifying the enderman griefing list with mobControl
+* [Tweaks] [#111] Fix placing certain carried blocks crashing the game
+* [Tweaks] Improve rotation support for carried blocks
