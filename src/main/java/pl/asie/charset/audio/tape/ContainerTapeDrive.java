@@ -24,11 +24,12 @@ import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.container.ContainerBase;
 import pl.asie.charset.lib.container.IContainerHandler;
 import pl.asie.charset.lib.container.SlotTyped;
+import pl.asie.charset.lib.recipe.RecipeObjectItemStack;
 
 public class ContainerTapeDrive extends ContainerBase {
 	public ContainerTapeDrive(IItemHandler handler, IContainerHandler containerHandler, InventoryPlayer inventoryPlayer) {
 		super(inventoryPlayer, containerHandler);
-		this.addSlotToContainer(new SlotTyped(handler, 0, 80, 34, new Object[]{ModCharsetAudio.tapeItem}));
+		this.addSlotToContainer(new SlotTyped(handler, 0, 80, 34, new RecipeObjectItemStack(ModCharsetAudio.tapeItem)));
 		this.bindPlayerInventory(inventoryPlayer, 8, 84);
 	}
 }

@@ -16,21 +16,59 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLever;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 
+import java.lang.reflect.Method;
+import java.util.Objects;
+import java.util.WeakHashMap;
+
 public final class RotationUtils {
+	private static final WeakHashMap<Block, Boolean> withRotationCache = new WeakHashMap<>();
+
 	private RotationUtils() {
 
+	}
+
+	private static boolean overridesWithRotation(Block block) {
+		if (withRotationCache.containsKey(block)) {
+			return withRotationCache.get(block);
+		}
+
+		Class c = block.getClass();
+		Method m = null;
+
+		try {
+			m = c.getMethod("func_185499_a", IBlockState.class, Rotation.class);
+		} catch (Exception e) {
+			try {
+				m = c.getMethod("withRotation", IBlockState.class, Rotation.class);
+			} catch (Exception ee) {
+
+			}
+		}
+
+		if (m != null) {
+			boolean value = m.getDeclaringClass() != Block.class;
+			withRotationCache.put(block, value);
+			return value;
+		} else {
+			withRotationCache.put(block, false);
+			return false;
+		}
 	}
 
 	public static boolean rotateAround(World world, BlockPos pos, EnumFacing axis) {
@@ -66,16 +104,41 @@ public final class RotationUtils {
 		}
 
 		if (axis.getAxis() == EnumFacing.Axis.Y) {
+			int rotCount = (axis == EnumFacing.UP ? (4 - count) : count);
+			if (overridesWithRotation(state.getBlock())) {
+				switch (rotCount) {
+					case 1:
+						state = state.withRotation(Rotation.CLOCKWISE_90);
+						break;
+					case 2:
+						state = state.withRotation(Rotation.CLOCKWISE_180);
+						break;
+					case 3:
+						state = state.withRotation(Rotation.COUNTERCLOCKWISE_90);
+						break;
+					default:
+						// skip setBlockState
+						return true;
+				}
+
+				world.setBlockState(pos, state);
+				return true;
+			}
+
 			for (IProperty<?> prop : state.getProperties().keySet()) {
 				if (prop.getName().equals("facing") || prop.getName().equals("rotation")) {
-					EnumFacing facing = (EnumFacing) state.getValue(prop);
-					for (int i = 0; i < (axis == EnumFacing.UP ? (4 - count) : count); i++) {
-						facing = facing.rotateAround(EnumFacing.Axis.Y);
-					}
+					Object facing = state.getValue(prop);
+					if (facing instanceof EnumFacing) {
+						for (int i = 0; i < rotCount; i++) {
+							facing = ((EnumFacing) facing).rotateAround(EnumFacing.Axis.Y);
+						}
 
-					if (prop.getAllowedValues().contains(facing)) {
-						world.setBlockState(pos, state.withProperty((IProperty<EnumFacing>) prop, facing));
-						return true;
+						if (prop.getAllowedValues().contains(facing)) {
+							world.setBlockState(pos, state.withProperty((IProperty<EnumFacing>) prop, (EnumFacing) facing));
+							return true;
+						}
+					} else {
+						continue;
 					}
 				}
 			}

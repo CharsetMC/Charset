@@ -21,7 +21,7 @@ public class RecipeObjectItemStack implements IRecipeObject {
     }
 
     @Override
-    public boolean matches(ItemStack stack) {
+    public boolean test(ItemStack stack) {
         return OreDictionary.itemMatches(target, stack, false);
     }
 

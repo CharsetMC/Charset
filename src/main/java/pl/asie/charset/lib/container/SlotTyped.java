@@ -16,42 +16,25 @@
 
 package pl.asie.charset.lib.container;
 
-import net.minecraft.block.Block;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.function.Predicate;
 
 public class SlotTyped extends SlotItemHandler {
-	private Object[] allowedTypes;
+	private Predicate<ItemStack>[] allowedTypes;
 	
-	public SlotTyped(IItemHandler handler, int par2, int par3, int par4, Object[] allowedTypes) {
+	public SlotTyped(IItemHandler handler, int par2, int par3, int par4, Predicate<ItemStack>... allowedTypes) {
 		super(handler, par2, par3, par4);
 		this.allowedTypes = allowedTypes;
 	}
 
 	@Override
     public boolean isItemValid(ItemStack stack) {
-        for(Object o: allowedTypes) {
-        	if(o instanceof String) {
-        		// OreDict entry
-        		String s = (String)o;
-        		for(ItemStack target: OreDictionary.getOres(s)) {
-        			if(OreDictionary.itemMatches(target, stack, false)) return true;
-        		}
-        	} else if (o instanceof Block) {
-        		return (Block.getBlockFromItem(stack.getItem()).equals((Block)o));
-        	} else if (o instanceof Item) {
-        		return (stack.getItem().equals((Item)o));
-        	} else if (o instanceof ItemStack) {
-        		return OreDictionary.itemMatches(((ItemStack)o), stack, true);
-        	} else if (o instanceof Predicate) {
-		        return ((Predicate<ItemStack>) o).test(stack);
+		for (Predicate<ItemStack> o: allowedTypes) {
+        	if (o.test(stack)) {
+		        return true;
 	        }
         }
         return false;

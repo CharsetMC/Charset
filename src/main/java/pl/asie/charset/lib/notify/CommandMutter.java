@@ -50,7 +50,7 @@ import net.minecraft.util.EnumHand;
 
 import java.util.EnumSet;
 
-public class MutterCommand extends CommandBase {
+public class CommandMutter extends CommandBase {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if (!(sender instanceof TileEntity || sender instanceof Entity)) {

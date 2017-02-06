@@ -81,35 +81,37 @@ public class ContainerPocketTable extends ContainerBase {
     }
 
     @Override
-    protected Slot addPlayerSlotToContainer(Slot slot) {
-        if (slot.getSlotIndex() >= 9 && (slot.getSlotIndex() % 9) >= 6) {
-            slot = new Slot(slot.inventory, slot.getSlotIndex(), slot.xPos, slot.yPos) {
-                @Override
-                public void onSlotChanged() {
-                    super.onSlotChanged();
-                    updateCraft();
-                }
-            };
-            craftingSlots.add(slot);
-        } else {
-            nonCraftingInventorySlots.add(slot);
-            if (slot.getSlotIndex() < 9) {
-                hotbarSlots.add(slot);
-            } else {
-                mainInvSlots.add(slot);
-            }
-
-            if (slot.getSlotIndex() < 9 && slot.getHasStack() && slot.getStack().getItem() == ModCharsetCrafting.pocketTable) {
+    protected Slot addSlotToContainer(Slot slot) {
+        if (slot.inventory instanceof InventoryPlayer) {
+            if (slot.getSlotIndex() >= 9 && (slot.getSlotIndex() % 9) >= 6) {
                 slot = new Slot(slot.inventory, slot.getSlotIndex(), slot.xPos, slot.yPos) {
                     @Override
-                    public boolean canTakeStack(EntityPlayer playerIn) {
-                        return false;
+                    public void onSlotChanged() {
+                        super.onSlotChanged();
+                        updateCraft();
                     }
                 };
+                craftingSlots.add(slot);
+            } else {
+                nonCraftingInventorySlots.add(slot);
+                if (slot.getSlotIndex() < 9) {
+                    hotbarSlots.add(slot);
+                } else {
+                    mainInvSlots.add(slot);
+                }
+
+                if (slot.getSlotIndex() < 9 && slot.getHasStack() && slot.getStack().getItem() == ModCharsetCrafting.pocketTable) {
+                    slot = new Slot(slot.inventory, slot.getSlotIndex(), slot.xPos, slot.yPos) {
+                        @Override
+                        public boolean canTakeStack(EntityPlayer playerIn) {
+                            return false;
+                        }
+                    };
+                }
             }
         }
 
-        return super.addPlayerSlotToContainer(slot);
+        return super.addSlotToContainer(slot);
     }
 
     class RedirectedSlotCrafting extends SlotCrafting {

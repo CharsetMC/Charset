@@ -25,7 +25,7 @@ public class ColorLookupHandler {
         DEFAULT_COLOR_MAP.put(OreDictionary.getOreID("logWood"), 0xff735e39);
     }
 
-    public static class Key {
+    public static final class Key {
         public final RenderUtils.AveragingMode averagingMode;
         public final ItemStack stack;
         private final int hash;

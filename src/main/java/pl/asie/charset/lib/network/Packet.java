@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import pl.asie.charset.lib.ModCharsetLib;
 
 public abstract class Packet {
-	public static final IThreadListener getThreadListener(INetHandler handler) {
+	protected static IThreadListener getThreadListener(INetHandler handler) {
 		return FMLCommonHandler.instance().getWorldThread(handler);
 	}
 
@@ -38,7 +38,7 @@ public abstract class Packet {
 
 	public abstract boolean isAsynchronous();
 
-	public static final EntityPlayer getPlayer(INetHandler handler) {
+	protected static EntityPlayer getPlayer(INetHandler handler) {
 		return ModCharsetLib.proxy.getPlayer(handler);
 	}
 }

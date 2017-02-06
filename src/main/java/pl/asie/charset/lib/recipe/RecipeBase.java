@@ -20,6 +20,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.ForgeHooks;
 
 public abstract class RecipeBase implements IRecipe {
 	@Override
@@ -33,7 +34,7 @@ public abstract class RecipeBase implements IRecipe {
 
 		for (int i = 0; i < list.size(); ++i) {
 			ItemStack itemstack = inv.getStackInSlot(i);
-			list.set(i, net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack));
+			list.set(i, ForgeHooks.getContainerItem(itemstack));
 		}
 
 		return list;

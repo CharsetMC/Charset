@@ -61,7 +61,7 @@ public class RecipeCharset extends RecipeBase {
                         boolean matches = false;
 
                         for (IRecipeObject o : objectSet) {
-                            if (o.matches(stack)) {
+                            if (o.test(stack)) {
                                 matches = true;
                                 objectSet.remove(o);
                                 break;
@@ -91,7 +91,7 @@ public class RecipeCharset extends RecipeBase {
                                 noMatch = true;
                             }
                         } else {
-                            if (!ro.matches(inv.getStackInRowAndColumn(x, y))) {
+                            if (!ro.test(inv.getStackInRowAndColumn(x, y))) {
                                 noMatch = true;
                             }
                         }
@@ -203,7 +203,7 @@ public class RecipeCharset extends RecipeBase {
             map.put(' ', null);
 
             while (idx < o.length) {
-                Character c = new Character((char) o[idx++]);
+                char c = (char) o[idx++];
                 IRecipeObject ro = toRecipeObject(o[idx++]);
                 map.put(c, ro);
             }

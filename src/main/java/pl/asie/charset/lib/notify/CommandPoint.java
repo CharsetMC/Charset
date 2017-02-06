@@ -52,7 +52,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 import java.io.IOException;
 import java.util.List;
 
-public class PointCommand extends CommandBase {
+public class CommandPoint extends CommandBase {
 
     @Override
     public String getName() {

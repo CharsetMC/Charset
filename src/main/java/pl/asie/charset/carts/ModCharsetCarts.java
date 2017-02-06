@@ -23,11 +23,13 @@ import net.minecraft.block.BlockRailDetector;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -35,6 +37,7 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -46,8 +49,10 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.carts.link.Linkable;
+import pl.asie.charset.carts.link.TrainLinker;
 import pl.asie.charset.lib.ModCharsetBase;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,15 +68,18 @@ public class ModCharsetCarts extends ModCharsetBase {
 	@SidedProxy(clientSide = "pl.asie.charset.carts.ProxyClient", serverSide = "pl.asie.charset.carts.ProxyCommon")
 	public static ProxyCommon proxy;
 
+	public static final ResourceLocation LINKABLE_LOC = new ResourceLocation("charsetcarts:linkable");
 	@CapabilityInject(Linkable.class)
 	public static Capability<Linkable> LINKABLE;
 
 	@Mod.Instance(MODID)
 	public static ModCharsetCarts instance;
 	public static TrackCombiner combiner;
+	public static TrainLinker linker;
 	public static int minecartStackSize;
 
 	public static BlockRailCharset blockRailCross;
+	public static Item itemLinker;
 
 	private void register(Class<? extends EntityMinecart> minecart, String name) {
 		EntityRegistry.registerModEntity(new ResourceLocation("charsetcarts:" + name), minecart, "charsetcarts:" + name, 2, this, 64, 1, true);
@@ -91,6 +99,14 @@ public class ModCharsetCarts extends ModCharsetBase {
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 		CapabilityManager.INSTANCE.register(Linkable.class, Linkable.PROVIDER.getStorage(), Linkable.class);
+
+		if (ModCharsetLib.INDEV) {
+			linker = new TrainLinker();
+			MinecraftForge.EVENT_BUS.register(linker);
+
+			itemLinker = new Item().setCreativeTab(ModCharsetLib.CREATIVE_TAB).setUnlocalizedName("linker").setMaxStackSize(1);
+			GameRegistry.register(itemLinker.setRegistryName("linker"));
+		}
 
 		if (config.getBoolean("trackCombiner", "features", true, "Enables the Track Combiner, replacing the usual way of crafting expansion rails with an in-world mechanism.")) {
 			combiner = new TrackCombiner();
@@ -133,6 +149,55 @@ public class ModCharsetCarts extends ModCharsetBase {
 			if (item instanceof ItemMinecart && item.getItemStackLimit() < minecartStackSize) {
 				item.setMaxStackSize(minecartStackSize);
 			}
+		}
+	}
+
+	private final Map<EntityPlayer, EntityMinecart> linkMap = new HashMap<>();
+
+	@SubscribeEvent
+	public void onNothingInteract(PlayerInteractEvent.RightClickEmpty event) {
+		if (!event.getEntityPlayer().getEntityWorld().isRemote
+				&& event.getItemStack().getItem() == itemLinker) {
+			if (linkMap.containsKey(event.getEntityPlayer())) {
+				linkMap.remove(event.getEntityPlayer());
+				event.getEntityPlayer().sendMessage(new TextComponentString("dev_unlinked"));
+				event.setCanceled(true);
+			}
+		}
+	}
+	@SubscribeEvent
+	public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+		if (event.getTarget() instanceof EntityMinecart
+				&& !event.getTarget().getEntityWorld().isRemote
+				&& event.getItemStack().getItem() == itemLinker) {
+			EntityMinecart cart = (EntityMinecart) event.getTarget();
+
+			if (linkMap.containsKey(event.getEntityPlayer())) {
+				EntityMinecart cartOther = linkMap.remove(event.getEntityPlayer());
+				Linkable link = linker.get(cart);
+				Linkable linkOther = linker.get(cartOther);
+				if (event.getEntityPlayer().isSneaking()) {
+					if (linker.unlink(link, linkOther)) {
+						event.getEntityPlayer().sendMessage(new TextComponentString("dev_unlinked2"));
+					} else {
+						event.getEntityPlayer().sendMessage(new TextComponentString("dev_unlink2_failed"));
+					}
+				} else {
+					if (link.next == null && linkOther.previous == null) {
+						linker.link(link, linkOther);
+						event.getEntityPlayer().sendMessage(new TextComponentString("dev_linked2"));
+					} else if (link.previous == null && linkOther.next == null) {
+						linker.link(linkOther, link);
+						event.getEntityPlayer().sendMessage(new TextComponentString("dev_linked2"));
+					} else {
+						event.getEntityPlayer().sendMessage(new TextComponentString("dev_link2_failed"));
+					}
+				}
+			} else {
+				linkMap.put(event.getEntityPlayer(), cart);
+				event.getEntityPlayer().sendMessage(new TextComponentString("dev_linked1"));
+			}
+			event.setCanceled(true);
 		}
 	}
 

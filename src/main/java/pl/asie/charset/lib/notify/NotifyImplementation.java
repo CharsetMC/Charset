@@ -53,11 +53,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.ProxyClient;
-import pl.asie.charset.tweaks.ModCharsetTweaks;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -74,7 +71,7 @@ public class NotifyImplementation {
     }
 
     public void registerServerCommands(FMLServerStartingEvent event) {
-        event.registerServerCommand(new MutterCommand());
+        event.registerServerCommand(new CommandMutter());
     }
     
     void doSend(EntityPlayer player, Object where, World world, EnumSet<NoticeStyle> style, ItemStack item, String format, String[] args) {

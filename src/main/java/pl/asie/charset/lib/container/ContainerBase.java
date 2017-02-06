@@ -135,26 +135,24 @@ public abstract class ContainerBase extends Container {
 	public void bindPlayerInventory(InventoryPlayer inventoryPlayer, int startX, int startY) {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				addPlayerSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
+				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
 						startX + j * 18, startY + i * 18));
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			addPlayerSlotToContainer(new Slot(inventoryPlayer, i, startX + i * 18, startY + 58));
+			addSlotToContainer(new Slot(inventoryPlayer, i, startX + i * 18, startY + 58));
 		}
 	}
 
 	@Override
 	protected Slot addSlotToContainer(Slot slotIn) {
 		slotIn = super.addSlotToContainer(slotIn);
-		SLOTS_INVENTORY.add(slotIn);
+		if (slotIn.inventory instanceof InventoryPlayer) {
+			SLOTS_PLAYER.add(slotIn);
+		} else {
+			SLOTS_INVENTORY.add(slotIn);
+		}
 		return slotIn;
-	}
-
-	protected Slot addPlayerSlotToContainer(Slot slot) {
-		slot = super.addSlotToContainer(slot);
-		SLOTS_PLAYER.add(slot);
-		return slot;
 	}
 
 	@Override

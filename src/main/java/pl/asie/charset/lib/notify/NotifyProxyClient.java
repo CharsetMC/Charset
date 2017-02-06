@@ -66,7 +66,7 @@ public class NotifyProxyClient extends NotifyProxy {
     
     {
         MinecraftForge.EVENT_BUS.register(this);
-        ClientCommandHandler.instance.registerCommand(new PointCommand());
+        ClientCommandHandler.instance.registerCommand(new CommandPoint());
     }
 
     @Override

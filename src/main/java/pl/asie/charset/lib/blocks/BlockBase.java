@@ -63,7 +63,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.*;
 
 public abstract class BlockBase extends Block {
-	private boolean isTileProvider = this instanceof ITileEntityProvider;
+	private final boolean isTileProvider = this instanceof ITileEntityProvider;
 	private ImmutableList<ItemStack> items;
 
 	public BlockBase(Material materialIn) {
