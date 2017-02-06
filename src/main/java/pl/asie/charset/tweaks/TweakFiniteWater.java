@@ -36,11 +36,15 @@
 
 package pl.asie.charset.tweaks;
 
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeOcean;
 import net.minecraft.world.biome.BiomeRiver;
@@ -49,6 +53,7 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.utils.ItemUtils;
 
@@ -70,19 +75,49 @@ public class TweakFiniteWater extends Tweak {
 		MinecraftForge.EVENT_BUS.unregister(this);
 	}
 
+	private boolean isWater(IBlockState state) {
+		return state.getMaterial() == Material.WATER;
+	}
+
 	@SubscribeEvent
 	public void onFluidSource(BlockEvent.CreateFluidSourceEvent event) {
-		if (event.getState().getBlock() == Blocks.WATER
-				|| event.getState().getBlock() == Blocks.FLOWING_WATER) {
-			if (event.getPos().getY() <= event.getWorld().getSeaLevel()) {
+		System.out.println("a");
+		if (isWater(event.getState())) {
+			World world = event.getWorld();
+
+			if (event.getPos().getY() <= world.getSeaLevel()) {
 				Biome b = event.getWorld().getBiome(event.getPos());
 				if (b instanceof BiomeOcean || b instanceof BiomeRiver) {
+					boolean isAir = false;
+
+					for (int i = event.getPos().getY() + 1; i <= world.getSeaLevel(); i++) {
+						BlockPos pos = new BlockPos(event.getPos().getX(), i, event.getPos().getZ());
+						IBlockState state = world.getBlockState(pos);
+						if (isAir) {
+							if (!state.getBlock().isAir(state, world, pos)) {
+								// disconnection, cancel
+								event.setResult(Event.Result.DENY);
+								return;
+							}
+						} else {
+							if (state.getBlock().isAir(state, world, pos)) {
+								isAir = true;
+							} else if (!isWater(state)) {
+								// disconnection, cancel
+								event.setResult(Event.Result.DENY);
+								return;
+							}
+						}
+					}
+
+					// connection found, do not cancel
 					return;
 				}
 			}
 
 			// has not returned, cancel
-			event.setCanceled(true);
+			event.setResult(Event.Result.DENY);
+			return;
 		}
 	}
 }

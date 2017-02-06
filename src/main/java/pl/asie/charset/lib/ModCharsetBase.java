@@ -43,7 +43,7 @@ public class ModCharsetBase {
 	// Called by AnnotationHandler
 	public final void beforePreInit() {
 		logger = LogManager.getLogger(modid);
-		config = new Configuration(ModCharsetLib.instance.getConfigFile(modid + ".cfg"));
+		config = new Configuration(ModCharsetLib.instance.getConfigFile(modid.replaceFirst("charset", "") + ".cfg"));
 		packet = new PacketRegistry(modid);
 	}
 

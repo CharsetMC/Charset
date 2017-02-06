@@ -55,21 +55,18 @@ public abstract class Tweak {
 	}
 
 	public void onConfigChanged(Configuration config, boolean firstLaunch) {
+		int newMode = mode = maxMode > 0
+				? config.getInt(configKey, configCategory, isDefault ? 1 : 0, 0, maxMode, configComment)
+				: config.getBoolean(configKey, configCategory, isDefault, configComment) ? 1 : 0;
 		if (firstLaunch) {
 			initConfig(config);
-			mode = maxMode > 0
-					? config.getInt(configKey, configCategory, isDefault ? 1 : 0, 0, maxMode, configComment)
-					: config.getBoolean(configKey, configCategory, isDefault, configComment) ? 1 : 0;
+			mode = newMode;
 		} else if (canTogglePostLoad()) {
-			int newMode = maxMode > 0
-					? config.getInt(configKey, configCategory, isDefault ? 1 : 0, 0, maxMode, configComment)
-					: config.getBoolean(configKey, configCategory, isDefault, configComment) ? 1 : 0;
 			if (newMode != mode) {
 				if (mode > 0) {
 					mode = 0;
 					disable();
-				}
-				if (newMode > 0) {
+				} else if (newMode > 0) {
 					mode = newMode;
 					enable();
 				}

@@ -107,12 +107,12 @@ public class ModCharsetLib {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		AnnotationHandler.INSTANCE.preInit(event.getAsmData());
-
 		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");
 		if (!configurationDirectory.exists()) {
 			configurationDirectory.mkdir();
 		}
+
+		AnnotationHandler.INSTANCE.preInit(event.getAsmData());
 
 		config = new Configuration(getConfigFile("lib.cfg"));
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
