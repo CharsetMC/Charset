@@ -37,14 +37,18 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 
 public final class RotationUtils {
-	private static final WeakHashMap<Block, Boolean> withRotationCache = new WeakHashMap<>();
+	// private static final WeakHashMap<Block, Boolean> withRotationCache = new WeakHashMap<>();
 
 	private RotationUtils() {
 
 	}
 
-	private static boolean overridesWithRotation(Block block) {
-		if (withRotationCache.containsKey(block)) {
+	private static boolean overridesWithRotation(IBlockState state) {
+		// be it X->Z->X->Z or N->E->S->W, a 90-degree rotation will probably
+		// give a result
+		return state.withRotation(Rotation.CLOCKWISE_90) != state;
+
+		/* if (withRotationCache.containsKey(block)) {
 			return withRotationCache.get(block);
 		}
 
@@ -68,7 +72,7 @@ public final class RotationUtils {
 		} else {
 			withRotationCache.put(block, false);
 			return false;
-		}
+		} */
 	}
 
 	public static boolean rotateAround(World world, BlockPos pos, EnumFacing axis) {
@@ -105,7 +109,7 @@ public final class RotationUtils {
 
 		if (axis.getAxis() == EnumFacing.Axis.Y) {
 			int rotCount = (axis == EnumFacing.UP ? (4 - count) : count);
-			if (overridesWithRotation(state.getBlock())) {
+			if (overridesWithRotation(state)) {
 				switch (rotCount) {
 					case 1:
 						state = state.withRotation(Rotation.CLOCKWISE_90);
