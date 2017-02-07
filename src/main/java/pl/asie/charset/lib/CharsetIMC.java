@@ -45,7 +45,7 @@ public final class CharsetIMC {
         for (ResourceLocation loc : locations) {
             Result newResult = allows(key, loc);
             if (newResult == Result.NO)
-                break;
+                return Result.NO;
             else if (result != Result.YES)
                 result = newResult;
         }

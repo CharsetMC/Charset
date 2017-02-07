@@ -81,7 +81,6 @@ public class TweakFiniteWater extends Tweak {
 
 	@SubscribeEvent
 	public void onFluidSource(BlockEvent.CreateFluidSourceEvent event) {
-		System.out.println("a");
 		if (isWater(event.getState())) {
 			World world = event.getWorld();
 
