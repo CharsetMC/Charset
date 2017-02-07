@@ -1,5 +1,9 @@
 package pl.asie.charset.tweaks.carry;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEndPortal;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,11 +15,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.apache.commons.lang3.tuple.Pair;
@@ -75,11 +81,10 @@ public class TweakCarry extends Tweak {
 
     protected static boolean canCarry(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
-        if ("minecraft".equals(state.getBlock().getRegistryName().getResourceDomain())) {
-            return true;
-        }
+        Block block = state.getBlock();
 
         boolean hasTileEntity = state.getBlock().hasTileEntity(state);
+        boolean isVanilla = "minecraft".equals(block.getRegistryName().getResourceDomain());
 
         Set<String> names = new HashSet<>();
         Set<ResourceLocation> locs = new HashSet<>();
@@ -103,11 +108,19 @@ public class TweakCarry extends Tweak {
 
         if (!Collections.disjoint(blacklist, names) || allowedIMC == CharsetIMC.Result.NO) {
             return false;
-        } else if (!hasTileEntity) {
+        } else if (!Collections.disjoint(whitelist, names) || allowedIMC == CharsetIMC.Result.YES) {
             return true;
-        } else {
-            return !Collections.disjoint(whitelist, names) || allowedIMC == CharsetIMC.Result.YES;
         }
+
+        // We support all vanilla tile entities.
+        if (!isVanilla && hasTileEntity) return false;
+
+        // Class-based bans
+        if (block instanceof IPlantable) return false;
+        if (block instanceof IFluidBlock || block instanceof BlockLiquid) return false;
+        if (block instanceof BlockPortal || block instanceof BlockEndPortal) return false;
+
+        return true;
     }
 
     protected static boolean canCarry(Entity entity) {

@@ -7,6 +7,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -119,6 +120,7 @@ public class CarryHandler {
         if (block != null) {
             if (world.mayPlace(block.getBlock(), pos, false, facing, null)) {
                 world.setBlockState(pos, block);
+                IBlockState oldBlock = block;
                 block = null;
 
                 if (tile != null) {
@@ -132,11 +134,14 @@ public class CarryHandler {
                 float yawDiff = player != null ? grabbedYaw - player.rotationYaw : 0.0F;
                 while (yawDiff < 0)
                     yawDiff += 360.0F;
-                int rotCycles = MathHelper.floor((double)(yawDiff * 4.0F / 360.0F) + 0.5D) & 3;
+                int rotCycles = MathHelper.floor((double) (yawDiff * 4.0F / 360.0F) + 0.5D) & 3;
 
                 if (rotCycles > 0) {
                     RotationUtils.rotateAround(world, pos, EnumFacing.UP, rotCycles);
                 }
+
+                // TODO: Check if I break something
+                world.getBlockState(pos).neighborChanged(world, pos, oldBlock.getBlock(), pos);
 
                 return true;
             } else {
