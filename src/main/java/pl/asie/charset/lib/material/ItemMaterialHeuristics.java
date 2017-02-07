@@ -3,6 +3,7 @@ package pl.asie.charset.lib.material;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.ArrayUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
@@ -175,11 +176,15 @@ public final class ItemMaterialHeuristics {
         if (initialized)
             return;
 
+        ProgressManager.ProgressBar bar = ProgressManager.push("Material scanning", 3);
+
         reg = ItemMaterialRegistry.INSTANCE;
         initialized = true;
 
+        bar.step("Wood");
         supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
 
+        bar.step("Metals/Dusts");
         for (String oreName : OreDictionary.getOreNames()) {
             if (oreName.startsWith("ore")) {
                 initOreMaterial(oreName);
@@ -192,11 +197,12 @@ public final class ItemMaterialHeuristics {
             }
         }
 
+        bar.step("Slabs/Stairs");
         for (ItemMaterial material : reg.getMaterialsByType("block")) {
             findSlab(material);
             findStair(material);
         }
 
-        System.out.println("DBG: " + Arrays.toString(reg.getAllTypes().toArray(new String[reg.getAllTypes().size()])));
+        ProgressManager.pop(bar);
     }
 }

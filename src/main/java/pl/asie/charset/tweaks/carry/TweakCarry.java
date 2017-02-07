@@ -1,9 +1,6 @@
 package pl.asie.charset.tweaks.carry;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEndPortal;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockPortal;
+import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -116,7 +113,8 @@ public class TweakCarry extends Tweak {
         if (!isVanilla && hasTileEntity) return false;
 
         // Class-based bans
-        if (block instanceof IPlantable) return false;
+        // if (block instanceof IPlantable) return false;
+        if (block instanceof BlockBed) return false;
         if (block instanceof IFluidBlock || block instanceof BlockLiquid) return false;
         if (block instanceof BlockPortal || block instanceof BlockEndPortal) return false;
 
