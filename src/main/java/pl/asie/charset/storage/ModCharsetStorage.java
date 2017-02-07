@@ -149,11 +149,6 @@ public class ModCharsetStorage extends ModCharsetBase {
 			});
 		}
 
-		GameRegistry.addRecipe(new BarrelCartRecipe());
-		BarrelUpgradeRecipes.addUpgradeRecipes();
-
-		RecipeSorter.register("charsetstorage:barrelCart", BarrelCartRecipe.class, RecipeSorter.Category.SHAPELESS, "");
-
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(keyItem), "ng", "ng", " g", 'n', "nuggetGold", 'g', "ingotGold") {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
@@ -202,18 +197,27 @@ public class ModCharsetStorage extends ModCharsetBase {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE, new ItemStack(Blocks.BEDROCK), new ItemStack(Blocks.DIAMOND_BLOCK));
+		// TODO
+		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE,
+				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)),
+				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.DIAMOND_BLOCK))
+		);
 		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
+
+		GameRegistry.addRecipe(new BarrelCartRecipe());
+		BarrelUpgradeRecipes.addUpgradeRecipes();
+
+		RecipeSorter.register("charsetstorage:barrelCart", BarrelCartRecipe.class, RecipeSorter.Category.SHAPELESS, "");
 
 		// If you stop this from happening in postInit, please adjust TextureStitchEvent in ProxyClient
 		for (ItemMaterial log : ItemMaterialRegistry.INSTANCE.getMaterialsByType("log")) {
-			ItemMaterial plank = log.getRelatedByType("plank");
+			ItemMaterial plank = log.getRelated("plank");
 			if (plank != null) {
-				ItemMaterial slab = plank.getRelatedByType("slab");
+				ItemMaterial slab = plank.getRelated("slab");
 				if (slab == null) {
 					slab = plank;
 				}
-				BarrelRegistry.INSTANCE.registerCraftable(log.getStack(), slab.getStack());
+				BarrelRegistry.INSTANCE.registerCraftable(log, slab);
 			}
 		}
 

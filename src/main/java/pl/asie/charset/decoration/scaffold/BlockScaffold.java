@@ -27,6 +27,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.decoration.ModCharsetDecoration;
 import pl.asie.charset.lib.blocks.BlockBase;
 import pl.asie.charset.lib.blocks.TileBase;
+import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
@@ -36,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class BlockScaffold extends BlockBase implements ITileEntityProvider {
-	public static final Collection<ItemStack> PLANKS = new HashSet<>();
+	public static final Collection<ItemMaterial> PLANKS = new HashSet<>();
 	private static final int MAX_OVERHANG = 8;
 	private static final AxisAlignedBB COLLISION_BOX = new AxisAlignedBB(0.01, 0, 0.01, 0.99, 1, 0.99);
 	private static final AxisAlignedBB COLLISION_BOX_HACKY_SIDES = new AxisAlignedBB(0, 0, 0, 1, 1, 1).expand(-0.3125, 0, -0.3125);
@@ -50,10 +51,10 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 		setUnlocalizedName("charset.scaffold");
 	}
 
-	public static ItemStack createStack(ItemStack plank, int stackSize) {
+	public static ItemStack createStack(ItemMaterial plankMaterial, int stackSize) {
 		ItemStack scaffold = new ItemStack(ModCharsetDecoration.scaffoldBlock, stackSize);
 		scaffold.setTagCompound(new NBTTagCompound());
-		ItemUtils.writeToNBT(plank, scaffold.getTagCompound(), "plank");
+		scaffold.getTagCompound().setString("plank", plankMaterial.getId());
 		return scaffold;
 	}
 
@@ -65,7 +66,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	@Override
 	protected List<Collection<ItemStack>> getCreativeItemSets() {
 		List<Collection<ItemStack>> list = new ArrayList<>();
-		for (ItemStack s : PLANKS) {
+		for (ItemMaterial s : PLANKS) {
 			list.add(ImmutableList.of(createStack(s, 1)));
 		}
 		return list;

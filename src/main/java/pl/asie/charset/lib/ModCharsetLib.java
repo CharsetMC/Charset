@@ -25,6 +25,7 @@ import com.google.common.base.Suppliers;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -44,6 +45,7 @@ import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.annotation.AnnotationHandler;
+import pl.asie.charset.lib.material.ItemMaterialHeuristics;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.misc.InDevEventHandler;
@@ -111,6 +113,7 @@ public class ModCharsetLib {
 		if (!configurationDirectory.exists()) {
 			configurationDirectory.mkdir();
 		}
+		logger = LogManager.getLogger();
 
 		AnnotationHandler.INSTANCE.preInit(event.getAsmData());
 
@@ -182,7 +185,7 @@ public class ModCharsetLib {
 			MinecraftForge.EVENT_BUS.register(deathHandler);
 		}
 
-		ItemMaterialRegistry.INSTANCE.init();
+		ItemMaterialHeuristics.init();
 	}
 
 	@Mod.EventHandler

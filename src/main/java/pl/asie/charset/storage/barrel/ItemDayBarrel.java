@@ -75,7 +75,7 @@ public class ItemDayBarrel extends ItemBlock {
             lookup = "tile.charset.barrel.format2";
         }
         String type = I18n.translateToLocal("tile.charset.barrel." + upgrade + ".name");
-        return I18n.translateToLocalFormatted(lookup, type, TileEntityDayBarrel.getLog(is).getDisplayName());
+        return I18n.translateToLocalFormatted(lookup, type, TileEntityDayBarrel.getLog(is.getTagCompound()).getStack().getDisplayName());
     }
 
     @Override

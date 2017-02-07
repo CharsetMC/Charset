@@ -55,7 +55,7 @@ public class BarrelUpgradeRecipes {
     private static final ItemStack web = new ItemStack(Blocks.WEB);
 
     public static void addUpgradeRecipes() {
-        ItemStack oakBarrel = TileEntityDayBarrel.makeBarrel(TileEntityDayBarrel.Type.NORMAL, oakLog, oakPlank);
+        ItemStack oakBarrel = TileEntityDayBarrel.makeDefaultBarrel(TileEntityDayBarrel.Type.NORMAL);
         oakBarrel.setItemDamage(OreDictionary.WILDCARD_VALUE);
 
         RecipeSorter.register("factorization:barrel_upgrade", BarrelUpgrade.class, RecipeSorter.Category.SHAPED, "");
@@ -83,7 +83,7 @@ public class BarrelUpgradeRecipes {
         final TileEntityDayBarrel.Type upgradeType;
 
         public BarrelUpgrade(TileEntityDayBarrel.Type upgrade, int width, int height, ItemStack[] inputs) {
-            super(width, height, inputs, TileEntityDayBarrel.makeBarrel(upgrade, oakLog, oakPlank));
+            super(width, height, inputs, TileEntityDayBarrel.makeDefaultBarrel(upgrade));
             this.upgradeType = upgrade;
         }
 

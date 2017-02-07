@@ -13,7 +13,7 @@ public class ScaffoldCacheInfo implements IRenderComparable<ScaffoldCacheInfo> {
 	}
 
 	public static ScaffoldCacheInfo from(TileScaffold tile) {
-		return new ScaffoldCacheInfo(RenderUtils.getItemSprite(tile.getPlank()));
+		return new ScaffoldCacheInfo(RenderUtils.getItemSprite(tile.getPlank().getStack()));
 	}
 
 	public static ScaffoldCacheInfo from(ItemStack stack) {

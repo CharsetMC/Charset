@@ -37,19 +37,20 @@
 package pl.asie.charset.storage.barrel;
 
 import net.minecraft.block.Block;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagString;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.INoticeUpdater;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -71,16 +72,13 @@ import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.storage.ModCharsetStorage;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
 public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRotatable {
     public ItemStack item = ItemStack.EMPTY;
-    private static final ItemStack DEFAULT_LOG = new ItemStack(Blocks.LOG);
-    private static final ItemStack DEFAULT_SLAB = new ItemStack(Blocks.PLANKS);
-    public ItemStack woodLog = DEFAULT_LOG, woodSlab = DEFAULT_SLAB;
+    public ItemMaterial woodLog, woodSlab;
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
     Object notice_target = this;
@@ -215,20 +213,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
         Orientation oldOrientation = orientation;
 
-        woodLog = DEFAULT_LOG;
-        woodSlab = DEFAULT_SLAB;
-
         item = new ItemStack(compound.getCompoundTag("item"));
         item.setCount(compound.getInteger("count"));
         orientation = Orientation.getOrientation(compound.getByte("dir"));
         type = Type.VALUES[compound.getByte("type")];
-        if (compound.hasKey("log")) {
-            woodLog = ItemUtils.firstNonEmpty(new ItemStack(compound.getCompoundTag("log")), DEFAULT_LOG);
-        }
-        if (compound.hasKey("slab")) {
-            woodSlab = ItemUtils.firstNonEmpty(new ItemStack(compound.getCompoundTag("slab")), DEFAULT_SLAB);
-        }
-
+        woodLog = getLog(compound);
+        woodSlab = getSlab(compound);
         last_mentioned_count = getItemCount();
 
         if (isClient && orientation != oldOrientation)
@@ -238,12 +228,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     @Override
     public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
         ItemUtils.writeToNBT(item, compound, "item");
-        if (!woodLog.isEmpty()) {
-            ItemUtils.writeToNBT(woodLog, compound, "log");
-        }
-        if (!woodSlab.isEmpty()) {
-            ItemUtils.writeToNBT(woodSlab, compound, "slab");
-        }
+        compound.setString("log", woodLog.getId());
+        compound.setString("slab", woodSlab.getId());
         compound.setByte("dir", (byte) orientation.ordinal());
         compound.setByte("type", (byte) type.ordinal());
         compound.setInteger("count", item.getCount());
@@ -418,8 +404,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public void loadFromStack(ItemStack is) {
-        woodLog = getLog(is);
-        woodSlab = getSlab(is);
+        woodLog = getLog(is.getTagCompound());
+        woodSlab = getSlab(is.getTagCompound());
         type = getUpgrade(is);
         if (type == Type.SILKY && is.hasTagCompound()) {
             NBTTagCompound tag = is.getTagCompound();
@@ -738,12 +724,16 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         return item != null && getItemCount() > maxStackDrop * item.getMaxStackSize();
     }
 
-    public static ItemStack makeBarrel(Type type, ItemStack log, ItemStack slab) {
+    public static ItemStack makeDefaultBarrel(Type type) {
+        return makeBarrel(type, ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("log"), ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("slab"));
+    }
+
+    public static ItemStack makeBarrel(Type type, ItemMaterial log, ItemMaterial slab) {
         ItemStack barrel_item = new ItemStack(ModCharsetStorage.barrelItem);
         barrel_item = addUpgrade(barrel_item, type);
         NBTTagCompound compound = ItemUtils.getTagCompound(barrel_item, true);
-        ItemUtils.writeToNBT(log, compound, "log");
-        ItemUtils.writeToNBT(slab, compound, "slab");
+        compound.setString("log", log.getId());
+        compound.setString("slab", slab.getId());
         return barrel_item;
     }
 
@@ -769,23 +759,31 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         }
     }
 
-    public static ItemStack getLog(ItemStack is) {
-        return get(is, "log", DEFAULT_LOG);
+    public static ItemMaterial getLog(NBTTagCompound tag) {
+        return getMaterial(tag, "log");
     }
 
-    public static ItemStack getSlab(ItemStack is) {
-        return get(is, "slab", DEFAULT_SLAB);
+    public static ItemMaterial getSlab(NBTTagCompound tag) {
+        return getMaterial(tag, "slab");
     }
 
-    private static ItemStack get(ItemStack is, String name, ItemStack default_) {
-        ItemStack stack = default_;
-        if (is != null && is.hasTagCompound() && is.getTagCompound().hasKey(name)) {
-            ItemStack stack1 = new ItemStack(is.getTagCompound().getCompoundTag(name));
-            if (stack1 != null) {
-                stack = stack1;
+    private static ItemMaterial getMaterial(NBTTagCompound tag, String name) {
+        ItemMaterial result = null;
+
+        if (tag != null && tag.hasKey(name)) {
+            NBTBase nameTag = tag.getTag(name);
+            if (nameTag instanceof NBTTagString) {
+                result = ItemMaterialRegistry.INSTANCE.getMaterial(((NBTTagString) nameTag).getString());
+            } else if (nameTag instanceof NBTTagCompound) {
+                // TODO: Compatibility code! Remove in 1.12+
+                ItemStack stack = new ItemStack((NBTTagCompound) nameTag);
+                if (!stack.isEmpty()) {
+                    result = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stack);
+                }
             }
         }
-        return stack;
+
+        return result == null ? ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType(name) : result;
     }
 
     static ItemStack addUpgrade(ItemStack barrel, Type upgrade) {
@@ -866,13 +864,14 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         return false;
     }
 
+    // TODO: Use the ItemMaterial system better!
     public boolean isWooden() {
-        return ItemUtils.getBlockState(woodLog).getMaterial() == Material.WOOD;
+        return ItemUtils.getBlockState(woodLog.getStack()).getMaterial() == Material.WOOD;
     }
 
     public int getFlamability() {
         try {
-            return ItemUtils.getBlockState(woodLog).getBlock().getFlammability(getWorld(), getPos(), null);
+            return ItemUtils.getBlockState(woodLog.getStack()).getBlock().getFlammability(getWorld(), getPos(), null);
         } catch (Exception e) {
             return isWooden() ? 20 : 0;
         }

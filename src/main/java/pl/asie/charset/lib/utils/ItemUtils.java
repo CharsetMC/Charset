@@ -49,13 +49,16 @@ public final class ItemUtils {
 		return ItemStack.EMPTY;
 	}
 
-	public static int hashCode(ItemStack stack) {
+	public static int hashCode(ItemStack stack, boolean includeNBT) {
 		if (stack.isEmpty())
 			return 0;
 
 		int hash = stack.getCount();
 		hash = 31 * hash + Item.getIdFromItem(stack.getItem());
 		hash = 7 * hash + stack.getItemDamage();
+		if (includeNBT) {
+			hash = 7 * hash + (stack.hasTagCompound() ? stack.getTagCompound().hashCode() : 0);
+		}
 		return hash;
 	}
 

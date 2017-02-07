@@ -22,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import pl.asie.charset.lib.material.ItemMaterial;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,38 +34,16 @@ public class BarrelRegistry {
     private final ArrayList<ItemStack> BARRELS = new ArrayList<>();
     private final ArrayList<ItemStack> BARRELS_NORMAL = new ArrayList<>();
 
-    private static boolean verifyRecipePart(Object o) {
-        return o instanceof ItemStack || (o instanceof String && OreDictionary.doesOreNameExist((String) o));
-    }
-
-    private static ItemStack getRecipeStack(Object o) {
-        if (o instanceof ItemStack) {
-            return (ItemStack) o;
-        } else if (o instanceof String) {
-            List<ItemStack> stacks = OreDictionary.getOres((String) o, false);
-            return stacks.size() > 0 ? stacks.get(0) : null;
-        } else {
-            return null;
-        }
-    }
-
-    public void registerCraftable(Object log, Object slab) {
-        if (!verifyRecipePart(log) || !verifyRecipePart(slab)) {
-            return;
-        }
-
-        ItemStack logStack = getRecipeStack(log);
-        ItemStack slabStack = getRecipeStack(slab);
-
-        ItemStack barrel = register(TileEntityDayBarrel.Type.NORMAL, logStack, slabStack);
+    public void registerCraftable(ItemMaterial log, ItemMaterial slab) {
+        ItemStack barrel = register(TileEntityDayBarrel.Type.NORMAL, log, slab);
         GameRegistry.addRecipe(new ShapedOreRecipe(barrel,
                 "W-W",
                 "W W",
                 "WWW",
-                'W', log, '-', slab));
+                'W', log.getStack(), '-', slab.getStack()));
     }
 
-    public ItemStack register(TileEntityDayBarrel.Type type, ItemStack log, ItemStack slab) {
+    public ItemStack register(TileEntityDayBarrel.Type type, ItemMaterial log, ItemMaterial slab) {
         ItemStack ret = TileEntityDayBarrel.makeBarrel(type, log, slab);
         BARRELS.add(ret);
         if (type == TileEntityDayBarrel.Type.NORMAL)

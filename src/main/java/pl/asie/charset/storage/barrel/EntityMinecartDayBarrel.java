@@ -54,13 +54,15 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 public class EntityMinecartDayBarrel extends EntityMinecart {
     private static final DataParameter<ItemStack> BARREL_ITEM = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
-    private static final DataParameter<ItemStack> BARREL_LOG = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
-    private static final DataParameter<ItemStack> BARREL_SLAB = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    private static final DataParameter<String> BARREL_LOG = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
+    private static final DataParameter<String> BARREL_SLAB = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
     private static final DataParameter<Byte> BARREL_ORIENTATION = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
     private static final DataParameter<Byte> BARREL_TYPE = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
     private static final DataParameter<Integer> BARREL_ITEM_COUNT = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.VARINT);
@@ -189,8 +191,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
         dataManager.register(BARREL_ITEM, barrel.item);
         dataManager.register(BARREL_ITEM_COUNT, barrel.getItemCount());
-        dataManager.register(BARREL_LOG, barrel.woodLog);
-        dataManager.register(BARREL_SLAB, barrel.woodSlab);
+        dataManager.register(BARREL_LOG, barrel.woodLog.getId());
+        dataManager.register(BARREL_SLAB, barrel.woodSlab.getId());
         dataManager.register(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
         dataManager.register(BARREL_TYPE, (byte) barrel.type.ordinal());
     }
@@ -200,8 +202,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             dataManager.set(BARREL_ITEM, barrel.item);
             dataManager.set(BARREL_ITEM_COUNT, barrel.getItemCount());
             if (full) {
-                dataManager.set(BARREL_LOG, barrel.woodLog);
-                dataManager.set(BARREL_SLAB, barrel.woodSlab);
+                dataManager.set(BARREL_LOG, barrel.woodLog.getId());
+                dataManager.set(BARREL_SLAB, barrel.woodSlab.getId());
                 dataManager.set(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
                 dataManager.set(BARREL_TYPE, (byte) barrel.type.ordinal());
             }
@@ -222,8 +224,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         if (world.isRemote && dataManager.isDirty()) {
             barrel.item = dataManager.get(BARREL_ITEM);
             barrel.item.setCount(dataManager.get(BARREL_ITEM_COUNT));
-            barrel.woodLog = dataManager.get(BARREL_LOG);
-            barrel.woodSlab = dataManager.get(BARREL_SLAB);
+            barrel.woodLog = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_LOG));
+            barrel.woodSlab = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_SLAB));
             barrel.orientation = Orientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
             barrel.type = TileEntityDayBarrel.Type.values()[dataManager.get(BARREL_TYPE)];
         }

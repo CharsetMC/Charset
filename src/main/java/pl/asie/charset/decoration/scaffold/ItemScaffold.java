@@ -19,6 +19,6 @@ public class ItemScaffold extends ItemBlock {
 		String lookup = "tile.charset.scaffold.format";
 		TileScaffold tile = new TileScaffold();
 		tile.loadFromStack(is);
-		return I18n.translateToLocalFormatted(lookup, tile.getPlank().getDisplayName());
+		return I18n.translateToLocalFormatted(lookup, tile.getPlank().getStack().getDisplayName());
 	}
 }

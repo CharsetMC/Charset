@@ -1,32 +1,32 @@
 package pl.asie.charset.lib.material;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.*;
 
-public class ItemMaterial {
-	private final String type;
+public final class ItemMaterial {
+	private final String id;
 	private final ItemStack stack;
-	private final Map<String, ItemMaterial> typeRelations = new HashMap<>();
 
-	public ItemMaterial(String type, ItemStack stack) {
-		this.type = type;
+	protected ItemMaterial(ItemStack stack) {
+		this.id = ItemMaterialRegistry.createId(stack);
 		this.stack = stack;
 	}
 
-	public void registerRelation(ItemMaterial material, String type) {
-		if (!typeRelations.containsKey(type)) {
-			typeRelations.put(type, material);
-		}
+	public Collection<String> getTypes() {
+		return ItemMaterialRegistry.INSTANCE.getMaterialTypes(this);
 	}
 
-	public ItemMaterial getRelatedByType(String type) {
-		return typeRelations.get(type);
+	public ItemMaterial getRelated(String relation) {
+		return ItemMaterialRegistry.INSTANCE.materialRelations.get(this, relation);
 	}
 
-	public String getType() {
-		return type;
+	public String getId() {
+		return id;
 	}
 
 	public ItemStack getStack() {
@@ -35,6 +35,6 @@ public class ItemMaterial {
 
 	@Override
 	public String toString() {
-		return "ItemMaterial[" + type + ":" + stack.toString() + "]";
+		return "ItemMaterial[" + id + "]";
 	}
 }

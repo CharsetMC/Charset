@@ -88,11 +88,11 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     }
 
     public static BarrelCacheInfo from(TileEntityDayBarrel barrel) {
-        TextureAtlasSprite log = RenderUtils.getItemSprite(barrel.woodLog);
-        TextureAtlasSprite slab = RenderUtils.getItemSprite(barrel.woodSlab);
+        TextureAtlasSprite log = RenderUtils.getItemSprite(barrel.woodLog.getStack());
+        TextureAtlasSprite slab = RenderUtils.getItemSprite(barrel.woodSlab.getStack());
         Orientation fzo = barrel.orientation;
         TileEntityDayBarrel.Type type = barrel.type;
-        return new BarrelCacheInfo(log, barrel.woodLog, slab, type, fzo, isMetal(barrel.woodLog));
+        return new BarrelCacheInfo(log, barrel.woodLog.getStack(), slab, type, fzo, isMetal(barrel.woodLog.getStack()));
     }
 
     public static BarrelCacheInfo from(ItemStack is) {

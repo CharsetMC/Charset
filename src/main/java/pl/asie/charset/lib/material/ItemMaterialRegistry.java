@@ -1,119 +1,122 @@
 package pl.asie.charset.lib.material;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import net.minecraft.init.Blocks;
+import com.google.common.collect.*;
+import net.minecraft.block.Block;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
-import pl.asie.charset.storage.barrel.BarrelRegistry;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ItemMaterialRegistry {
-	public static ItemMaterialRegistry INSTANCE = new ItemMaterialRegistry();
-	private final Set<ItemMaterial> materialSet = new HashSet<>();
-	private final Multimap<String, ItemMaterial> materialsByType = HashMultimap.create();
-	private boolean initialized = false;
+	public static final ItemMaterialRegistry INSTANCE = new ItemMaterialRegistry();
+	private final Map<String, ItemMaterial> materialsById = new HashMap<>();
+	private final LinkedListMultimap<String, ItemMaterial> materialsByType = LinkedListMultimap.create();
+	private final Multimap<ItemMaterial, String> materialTypes = HashMultimap.create();
+	protected final Table<ItemMaterial, String, ItemMaterial> materialRelations = HashBasedTable.create();
 
 	protected ItemMaterialRegistry() {
 
+	}
+
+	public static final String createId(ItemStack stack) {
+		StringBuilder idBuilder = new StringBuilder();
+		idBuilder.append(stack.getItem().getRegistryName());
+		idBuilder.append(';');
+		idBuilder.append(stack.getMetadata());
+		if (stack.hasTagCompound()) {
+			idBuilder.append(';');
+			idBuilder.append(stack.getTagCompound().toString());
+		}
+		return idBuilder.toString();
+	}
+
+	public ItemMaterial getDefaultMaterialByType(String type) {
+		List<ItemMaterial> materials = materialsByType.get(type);
+		return materials != null && materials.size() > 0 ? materials.get(0) : null;
 	}
 
 	public Collection<ItemMaterial> getMaterialsByType(String type) {
 		return materialsByType.get(type);
 	}
 
-	public boolean register(ItemMaterial material) {
-		if (materialSet.add(material)) {
-			System.out.println("Registering " + material.toString());
-			materialsByType.put(material.getType(), material);
+	// TODO: slow - optimize
+	public Collection<ItemMaterial> getMaterialsByTypes(String... types) {
+		ImmutableSet.Builder<ItemMaterial> set = new ImmutableSet.Builder<>();
+		for (ItemMaterial material : materialsById.values()) {
+			Collection<String> srcTypes = material.getTypes();
+			boolean valid = true;
+			for (String type : types) {
+				if (type.charAt(0) == '!') {
+					if (srcTypes.contains(type)) {
+						valid = false;
+						break;
+					}
+				} else {
+					if (!srcTypes.contains(type)) {
+						valid = false;
+						break;
+					}
+				}
+			}
+			if (valid) {
+				set.add(material);
+			}
+		}
+		return set.build();
+	}
+
+	public ItemMaterial getMaterial(String id) {
+		return materialsById.get(id);
+	}
+
+	public Collection<String> getMaterialTypes(ItemMaterial material) {
+		return materialTypes.get(material);
+	}
+
+	public ItemMaterial getOrCreateMaterial(ItemStack stack) {
+		ItemMaterial material = materialsById.get(createId(stack));
+		if (material == null) {
+			material = new ItemMaterial(stack);
+			materialsById.put(material.getId(), material);
+			ModCharsetLib.logger.info("Registered new " + material.toString());
+		}
+		return material;
+	}
+
+	public boolean registerTypes(ItemMaterial material, String... types) {
+		boolean result = false;
+		for (String type : types) {
+			result |= registerType(material, type);
+		}
+		return result;
+	}
+
+	public boolean registerType(ItemMaterial material, String type) {
+		if (!materialTypes.containsEntry(material, type)) {
+			materialTypes.put(material, type);
+			materialsByType.put(type, material);
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	private void initLogMaterial(ItemStack log) {
-		ItemMaterial logMaterial = new ItemMaterial("log", log);
-
-		// We look for the plank first to ensure only valid logs
-		// get registered.
-		ItemStack plank = RecipeUtils.getCraftingResult(null, 3, 3, log);
-		if (!plank.isEmpty() && ItemUtils.isOreType(plank, "plankWood")) {
-			if (register(logMaterial)) {
-				plank.setCount(1);
-				ItemMaterial plankMaterial = new ItemMaterial("plank", plank);
-				if (register(plankMaterial)) {
-					logMaterial.registerRelation(plankMaterial, "plank");
-					plankMaterial.registerRelation(logMaterial, "log");
-
-					ItemStack slab = RecipeUtils.getCraftingResult(null, 3, 3,
-							null, null, null,
-							null, null, null,
-							plank, plank, plank);
-
-					if (!slab.isEmpty()) {
-						slab.setCount(1);
-						ItemMaterial slabMaterial = new ItemMaterial("slab", slab);
-						if (register(slabMaterial)) {
-							plankMaterial.registerRelation(slabMaterial, "slab");
-							slabMaterial.registerRelation(plankMaterial, "block");
-						}
-					}
-
-					ItemStack stick = RecipeUtils.getCraftingResult(null, 3, 3,
-							plank, null, null,
-							plank, null, null,
-							null, null, null);
-					if (stick.isEmpty()) {
-						stick = new ItemStack(Items.STICK);
-					} else {
-						stick.setCount(1);
-					}
-
-					ItemMaterial stickMaterial = new ItemMaterial("stick", stick);
-					if (register(stickMaterial)) {
-						plankMaterial.registerRelation(stickMaterial, "stick");
-						stickMaterial.registerRelation(plankMaterial, "plank");
-						stickMaterial.registerRelation(logMaterial, "log");
-					}
-				}
-			}
-		}
+	public boolean registerRelation(ItemMaterial source, ItemMaterial target, String relation, String invRelation) {
+		return registerRelation(source, target, relation) && registerRelation(target, source, invRelation);
 	}
 
-	private void supplyExpandedStacks(Collection<ItemStack> stacks, Consumer<ItemStack> stackConsumer) {
-		for (ItemStack log : stacks) {
-			try {
-				if (log.getMetadata() == OreDictionary.WILDCARD_VALUE) {
-					for (int i = 0; i < (log.getItem() instanceof ItemBlock ? 16 : 128); i++) {
-						ItemStack stack = new ItemStack(log.getItem(), 1, i);
-						stackConsumer.accept(stack);
-					}
-				} else {
-					stackConsumer.accept(log.copy());
-				}
-			} catch (Exception e) {
-
-			}
-		}
+	public boolean registerRelation(ItemMaterial source, ItemMaterial target, String relation) {
+		materialRelations.put(source, relation, target);
+		return true;
 	}
 
-	public void init() {
-		if (initialized)
-			return;
-
-		initialized = true;
-		supplyExpandedStacks(OreDictionary.getOres("logWood", false), this::initLogMaterial);
+	public Collection<String> getAllTypes() {
+		return materialsByType.keySet();
 	}
 }

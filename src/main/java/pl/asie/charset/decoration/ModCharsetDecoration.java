@@ -88,9 +88,9 @@ public class ModCharsetDecoration extends ModCharsetBase {
 
 	private void registerScaffoldRecipe(ItemMaterial plankMaterial) {
 		ItemStack plank = plankMaterial.getStack();
-		ItemStack scaffold = BlockScaffold.createStack(plank, 4);
+		ItemStack scaffold = BlockScaffold.createStack(plankMaterial, 4);
 
-		BlockScaffold.PLANKS.add(plank);
+		BlockScaffold.PLANKS.add(plankMaterial);
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(scaffold,
 				"ppp",

@@ -4,29 +4,47 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.decoration.ModCharsetDecoration;
 import pl.asie.charset.lib.blocks.TileBase;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 public class TileScaffold extends TileBase {
 	public static final UnlistedPropertyGeneric<ScaffoldCacheInfo> PROPERTY = new UnlistedPropertyGeneric<>("tile", ScaffoldCacheInfo.class);
-	private ItemStack plank = ItemStack.EMPTY;
+	private ItemMaterial plank;
 
-	public ItemStack getPlank() {
+	public ItemMaterial getPlank() {
 		return plank;
+	}
+
+	private void readPlankFromNBT(NBTTagCompound compound) {
+		// TODO: Compatibility code - remove in 1.12
+		plank = null;
+		if (compound != null) {
+			if (compound.hasKey("plank", Constants.NBT.TAG_STRING)) {
+				plank = ItemMaterialRegistry.INSTANCE.getMaterial(compound.getString("plank"));
+			} else if (compound.hasKey("plank", Constants.NBT.TAG_COMPOUND)) {
+				plank = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(compound.getCompoundTag("plank")));
+			}
+		}
+
+		if (plank == null) {
+			plank = ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank");
+		}
 	}
 
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
-		this.plank = ItemUtils.firstNonEmpty(
-				compound.hasKey("plank") ? new ItemStack(compound.getCompoundTag("plank")) : ItemStack.EMPTY,
-				new ItemStack(Blocks.PLANKS));
+		readPlankFromNBT(compound);
 	}
 
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
-		ItemUtils.writeToNBT(this.plank, compound, "plank");
+		compound.setString("plank", plank.getId());
 		return compound;
 	}
 
@@ -36,13 +54,7 @@ public class TileScaffold extends TileBase {
 	}
 
 	public void loadFromStack(ItemStack stack) {
-		ItemStack plank = ItemStack.EMPTY;
-
-		if (stack.hasTagCompound() && stack.getTagCompound().hasKey("plank")) {
-			plank = new ItemStack(stack.getSubCompound("plank"));
-		}
-
-		this.plank = ItemUtils.firstNonEmpty(plank, new ItemStack(Blocks.PLANKS));
+		readPlankFromNBT(stack.getTagCompound());
 	}
 
 	@Override
