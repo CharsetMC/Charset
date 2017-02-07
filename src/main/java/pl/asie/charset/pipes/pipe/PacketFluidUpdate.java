@@ -111,7 +111,7 @@ public class PacketFluidUpdate extends PacketTile {
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		if (fluidID != null) {
 			if (fluidID.length() > 0) {
 				container.fluidColor = fluidColor;

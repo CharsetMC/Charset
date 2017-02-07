@@ -28,7 +28,6 @@ public class PacketPTAction extends Packet {
 	public static final int CLEAR = 2;
 	public static final int FILL = 3;
 
-	private EntityPlayer player;
 	private int action;
 	private int arg;
 
@@ -47,13 +46,13 @@ public class PacketPTAction extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		player = getPlayer(handler);
 		action = buf.readUnsignedByte();
 		arg = buf.readInt();
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
+		EntityPlayer player = getPlayer(handler);
 		Container c = player.openContainer;
 		if (c instanceof ContainerPocketTable) {
 			((ContainerPocketTable) c).onAction(action, arg);

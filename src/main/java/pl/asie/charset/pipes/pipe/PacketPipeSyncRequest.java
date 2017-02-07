@@ -29,8 +29,6 @@ import pl.asie.charset.lib.network.PacketTile;
 import pl.asie.charset.pipes.PipeUtils;
 
 public class PacketPipeSyncRequest extends PacketTile {
-	private EntityPlayer requester;
-
 	public PacketPipeSyncRequest() {
 		super();
 	}
@@ -42,12 +40,12 @@ public class PacketPipeSyncRequest extends PacketTile {
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
-		requester = ModCharsetLib.proxy.getPlayer(handler);
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		TilePipe pipe = PipeUtils.getPipe(tile);
+		EntityPlayer requester = ModCharsetLib.proxy.getPlayer(handler);
 
 		if (requester != null && pipe != null) {
 			pipe.onSyncRequest(requester);

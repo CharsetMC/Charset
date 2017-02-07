@@ -81,7 +81,7 @@ public class PacketAudioData extends Packet {
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		AudioData audioData = packet.getData();
 		if (audioData instanceof IDataGameSound) {
 			IDataGameSound sound = (IDataGameSound) audioData;

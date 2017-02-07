@@ -30,14 +30,15 @@ public class PacketCarrySync extends Packet {
 		int playerId = buf.readInt();
 		if (world != null) {
 			player = world.getEntityByID(playerId);
-		} else {
-			player = getPlayer(handler);
 		}
 		tag = ByteBufUtils.readTag(buf);
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
+		if (player == null) {
+			player = getPlayer(handler);
+		}
 		if (player != null && player.hasCapability(TweakCarry.CAPABILITY, null)) {
 			CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
 			carryHandler.setPlayer(player);

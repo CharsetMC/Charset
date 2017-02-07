@@ -39,7 +39,7 @@ public class PacketAudioStop extends Packet {
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		AudioStreamManager.INSTANCE.remove(id);
 	}
 

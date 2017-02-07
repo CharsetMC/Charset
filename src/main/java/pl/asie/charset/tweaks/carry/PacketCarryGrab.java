@@ -64,7 +64,7 @@ public class PacketCarryGrab extends Packet {
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		if (player != null) {
 			switch (type) {
 				case BLOCK:

@@ -45,6 +45,16 @@ public class TweakCarryEventHandler {
         }
     }
 
+    @SubscribeEvent
+    public void onPlayerUpdate(TickEvent.PlayerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            CarryHandler carryHandler = event.player.getCapability(TweakCarry.CAPABILITY, null);
+            if (carryHandler != null && carryHandler.isCarrying()) {
+                carryHandler.update();
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingFall(LivingFallEvent event) {
         CarryHandler carryHandler = event.getEntityLiving().getCapability(TweakCarry.CAPABILITY, null);

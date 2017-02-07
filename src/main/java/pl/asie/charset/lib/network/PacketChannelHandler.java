@@ -57,7 +57,7 @@ public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, 
 		if (newMsg != null) {
 			newMsg.readData(iNetHandler, msg.payload());
 			if (newMsg.isAsynchronous()) {
-				newMsg.apply();
+				newMsg.apply(iNetHandler);
 			} else {
 				IThreadListener listener = Packet.getThreadListener(iNetHandler);
 				if (listener == null) {
@@ -65,9 +65,9 @@ public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, 
 				}
 
 				if (listener.isCallingFromMinecraftThread()) {
-					newMsg.apply();
+					newMsg.apply(iNetHandler);
 				} else {
-					listener.addScheduledTask(newMsg::apply);
+					listener.addScheduledTask(() -> newMsg.apply(iNetHandler));
 				}
 			}
 		}

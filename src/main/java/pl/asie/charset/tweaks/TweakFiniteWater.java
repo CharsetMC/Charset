@@ -79,6 +79,7 @@ public class TweakFiniteWater extends Tweak {
 		return state.getMaterial() == Material.WATER;
 	}
 
+	// TODO: override worldgen to give ocean water special support
 	@SubscribeEvent
 	public void onFluidSource(BlockEvent.CreateFluidSourceEvent event) {
 		if (isWater(event.getState())) {

@@ -6,11 +6,13 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.tileentity.TileEntityMobSpawnerRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -119,10 +121,20 @@ public class TweakCarryRender {
 					OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j, (float)k); */
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-					try {
-						TileEntityRendererDispatcher.instance.renderTileEntityAt(tile, 0, 0, 0, partialTicks);
-					} catch (Exception e) {
+					if (tile instanceof TileEntityMobSpawner) {
+						// TODO: Refactor into ICustomCarryHandler
+						if (carryHandler.spawnerLogic != null) {
+							GlStateManager.pushMatrix();
+							GlStateManager.translate(0.5F, 0, 0.5F);
+							TileEntityMobSpawnerRenderer.renderMob(carryHandler.spawnerLogic, 0, 0, 0, partialTicks);
+							GlStateManager.popMatrix();
+						}
+					} else {
+						try {
+							TileEntityRendererDispatcher.instance.renderTileEntityAt(tile, 0, 0, 0, partialTicks);
+						} catch (Exception e) {
 
+						}
 					}
 				}
 			} catch (Exception e) {

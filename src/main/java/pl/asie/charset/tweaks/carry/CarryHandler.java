@@ -1,6 +1,7 @@
 package pl.asie.charset.tweaks.carry;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
@@ -10,7 +11,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -38,6 +41,9 @@ public class CarryHandler {
     private TileEntity tileInstance;
     private float grabbedYaw;
 
+    // TODO: Refactor into ICustomCarryHandler
+    protected MobSpawnerBaseLogic spawnerLogic;
+
     public CarryHandler() {
         this.access = new Access();
     }
@@ -45,6 +51,12 @@ public class CarryHandler {
     public CarryHandler setPlayer(Entity player) {
         this.player = player;
         return this;
+    }
+
+    public void update() {
+        if (spawnerLogic != null) {
+            spawnerLogic.updateSpawner();
+        }
     }
 
     private void setTile(TileEntity tile) {
@@ -56,7 +68,32 @@ public class CarryHandler {
         } else {
             this.tile = null;
         }
+        onSetTile(tile == null);
         this.tileInstance = null;
+    }
+
+    private void onSetTile(boolean emptied) {
+        if (!emptied && block != null && block.getBlock() instanceof BlockMobSpawner) {
+            spawnerLogic = new MobSpawnerBaseLogic() {
+                @Override
+                public void broadcastEvent(int id) {
+
+                }
+
+                @Override
+                public World getSpawnerWorld() {
+                    return player.getEntityWorld();
+                }
+
+                @Override
+                public BlockPos getSpawnerPosition() {
+                    return player.getPosition();
+                }
+            };
+            spawnerLogic.readFromNBT(tile);
+        } else {
+            spawnerLogic = null;
+        }
     }
 
     public IBlockAccess getBlockAccess() {
@@ -128,7 +165,7 @@ public class CarryHandler {
                     tile.setInteger("y", pos.getY());
                     tile.setInteger("z", pos.getZ());
                     world.setTileEntity(pos, TileEntity.create(world, tile));
-                    tile = null;
+                    setTile(null);
                 }
 
                 float yawDiff = player != null ? grabbedYaw - player.rotationYaw : 0.0F;
@@ -154,7 +191,7 @@ public class CarryHandler {
 
     public void empty() {
         block = null;
-        tile = null;
+        setTile(null);
     }
 
     public IBlockState getBlockState() {
@@ -200,6 +237,7 @@ public class CarryHandler {
 
                     if (compound.hasKey("b:tile")) {
                         instance.tile = compound.getCompoundTag("b:tile");
+                        instance.onSetTile(false);
                     }
                 }
             }

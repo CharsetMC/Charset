@@ -39,7 +39,7 @@ public class PacketMinecartRequest extends PacketEntity {
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		if (entity instanceof EntityMinecart) {
 			PacketMinecartUpdate.send((EntityMinecart) entity);
 		}

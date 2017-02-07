@@ -133,7 +133,7 @@ public class PacketNotification extends Packet {
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		switch (type) {
 			case ONSCREEN:
 				NotifyImplementation.proxy.onscreen(msg, args);

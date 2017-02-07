@@ -83,7 +83,7 @@ public class PacketItemUpdate extends PacketTile {
 	}
 
 	@Override
-	public void apply() {
+	public void apply(INetHandler handler) {
 		WeakReference<PipeItem> ref = itemIdCache.get(id);
 		item = ref != null ? ref.get() : null;
 
