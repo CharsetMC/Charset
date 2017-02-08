@@ -210,7 +210,7 @@ public class ModCharsetStorage extends ModCharsetBase {
 		RecipeSorter.register("charsetstorage:barrelCart", BarrelCartRecipe.class, RecipeSorter.Category.SHAPELESS, "");
 
 		// If you stop this from happening in postInit, please adjust TextureStitchEvent in ProxyClient
-		for (ItemMaterial log : ItemMaterialRegistry.INSTANCE.getMaterialsByType("log")) {
+		for (ItemMaterial log : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("log", "block")) {
 			ItemMaterial plank = log.getRelated("plank");
 			if (plank != null) {
 				ItemMaterial slab = plank.getRelated("slab");

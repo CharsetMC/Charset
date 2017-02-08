@@ -103,7 +103,7 @@ public class ModCharsetDecoration extends ModCharsetBase {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		if (scaffoldBlock != null) {
-			for (ItemMaterial plankMaterial : ItemMaterialRegistry.INSTANCE.getMaterialsByType("plank")) {
+			for (ItemMaterial plankMaterial : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("plank", "block")) {
 				registerScaffoldRecipe(plankMaterial);
 			}
 		}

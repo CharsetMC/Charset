@@ -115,6 +115,15 @@ public class TweakCarry extends Tweak {
         // Class-based bans
         // if (block instanceof IPlantable) return false;
         if (block instanceof BlockBed) return false;
+        if (block instanceof BlockPistonExtension || block instanceof BlockPistonMoving) return false;
+        if (block instanceof BlockPistonBase) {
+            // If we don't have the BlockPistonBase.EXTENDED key, this piston
+            // uses foreign states - do not trust it!
+            if (!state.getPropertyKeys().contains(BlockPistonBase.EXTENDED)
+                    || state.getValue(BlockPistonBase.EXTENDED)) {
+                return false;
+            }
+        }
         if (block instanceof IFluidBlock || block instanceof BlockLiquid) return false;
         if (block instanceof BlockPortal || block instanceof BlockEndPortal) return false;
 
