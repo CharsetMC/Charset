@@ -1,0 +1,4 @@
+* Fix a few packet race conditions on the client side
+* [Lib] Fix "remove" IMC messages not working
+* [Tweaks] Blacklist vanilla blocks which should not have been carryable
+* [Tweaks] Fix carrying not forcing the block to update (for handling attachments)
