@@ -30,6 +30,10 @@ import pl.asie.charset.tweaks.carry.ICarryTransformer;
 import pl.asie.charset.tweaks.carry.TweakCarry;
 
 public class ProxyCommon {
+	public void preInitClient() {
+
+	}
+
 	public void initMinecartTweakClient() {
 
 	}

@@ -36,6 +36,11 @@ import pl.asie.charset.tweaks.shard.TweakGlassShards;
 
 public class ProxyClient extends ProxyCommon {
 	@Override
+	public void preInitClient() {
+		ModCharsetTweaks.instance.addTweak(new TweakWoolColors());
+	}
+
+	@Override
 	public void initShardsTweakClient() {
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemShard.Color(), TweakGlassShards.shardItem);
 	}

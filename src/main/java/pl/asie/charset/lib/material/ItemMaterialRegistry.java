@@ -88,7 +88,6 @@ public class ItemMaterialRegistry {
 		if (material == null) {
 			material = new ItemMaterial(stack);
 			materialsById.put(material.getId(), material);
-			ModCharsetLib.logger.info("Registered new " + material.toString());
 		}
 		return material;
 	}

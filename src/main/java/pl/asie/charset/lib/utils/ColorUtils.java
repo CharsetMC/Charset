@@ -21,7 +21,15 @@ import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.oredict.OreDictionary;
 
+// TODO: Refactor me
 public final class ColorUtils {
+	public static final String[] UNDERSCORE_DYE_SUFFIXES = new String[]{
+			"white", "orange", "magenta", "light_blue",
+			"yellow", "lime", "pink", "gray",
+			"silver", "cyan", "purple", "blue",
+			"brown", "green", "red", "black"
+	};
+
 	private static final int[] WOOL_TO_RGB = new int[]{
 			0xFAFAFA, 0xD87F33, 0xB24CD8, 0x6699D8,
 			0xE5E533, 0x7FCC19, 0xF27FA5, 0x4C4C4C,

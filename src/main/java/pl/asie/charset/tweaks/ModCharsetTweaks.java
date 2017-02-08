@@ -82,6 +82,7 @@ public class ModCharsetTweaks extends ModCharsetBase {
 		addTweak(new TweakMobEqualizer());
 		addTweak(new TweakNoSprinting());
 		addTweak(new TweakZorro());
+		proxy.preInitClient();
 
 		canAddTweaks = false;
 

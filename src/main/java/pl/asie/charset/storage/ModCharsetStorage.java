@@ -149,7 +149,7 @@ public class ModCharsetStorage extends ModCharsetBase {
 			});
 		}
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(keyItem), "ng", "ng", " g", 'n', "nuggetGold", 'g', "ingotGold") {
+		IRecipe recipeNewKey = new ShapedOreRecipe(new ItemStack(keyItem), "ng", "ng", " g", 'n', "nuggetGold", 'g', "ingotGold") {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
 				ItemStack result = output.copy();
@@ -157,9 +157,9 @@ public class ModCharsetStorage extends ModCharsetBase {
 				result.getTagCompound().setString("key", new UUID(rand.nextLong(), rand.nextLong()).toString());
 				return result;
 			}
-		});
+		};
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(keyItem), "ng", "ng", "kg", 'n', "nuggetGold", 'g', "ingotGold", 'k', keyItem) {
+		IRecipe recipeDuplicateKey = new ShapedOreRecipe(new ItemStack(keyItem), "ng", "ng", "kg", 'n', "nuggetGold", 'g', "ingotGold", 'k', keyItem) {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
 				ItemStack key = inv.getStackInRowAndColumn(0, 2);
@@ -175,9 +175,9 @@ public class ModCharsetStorage extends ModCharsetBase {
 				}
 				return null;
 			}
-		});
+		};
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(lockItem), " g ", "gkg", "gig", 'i', "ingotIron", 'g', "ingotGold", 'k', keyItem) {
+		IRecipe recipeLock = new ShapedOreRecipe(new ItemStack(lockItem), " g ", "gkg", "gig", 'i', "ingotIron", 'g', "ingotGold", 'k', keyItem) {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
 				ItemStack key = inv.getStackInRowAndColumn(1, 1);
@@ -189,7 +189,14 @@ public class ModCharsetStorage extends ModCharsetBase {
 				}
 				return null;
 			}
-		});
+		};
+
+		GameRegistry.addRecipe(recipeNewKey);
+		GameRegistry.addRecipe(recipeDuplicateKey);
+		GameRegistry.addRecipe(recipeLock);
+		RecipeSorter.register("charsetstorage:keyNew", recipeNewKey.getClass(), RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
+		RecipeSorter.register("charsetstorage:keyDuplicate", recipeDuplicateKey.getClass(), RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
+		RecipeSorter.register("charsetstorage:lockNew", recipeLock.getClass(), RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
 
 		GameRegistry.addRecipe(new RecipeDyeLock());
 		RecipeSorter.register("charsetstorage:lockDye", RecipeDyeLock.class, RecipeSorter.Category.SHAPED, "after:minecraft:shaped");
