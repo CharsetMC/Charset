@@ -1,15 +1,17 @@
 package pl.asie.charset.lib.material;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.ArrayUtils;
+import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -105,27 +107,7 @@ public final class ItemMaterialHeuristics {
     }
 
     // TODO: Tie ores to ingots
-    private static void initIngotMaterial(String oreName, ItemStack stack) {
-        String prefix = "ingot";
-        String suffixU = oreName.substring(prefix.length());
-        String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
-        ItemMaterial ingotMat = reg.getOrCreateMaterial(stack);
-
-        reg.registerTypes(ingotMat, prefix, suffix, "item");
-
-        // Try crafting a nugget
-        ItemStack nugget = RecipeUtils.getCraftingResult(null, 1, 1,
-                stack);
-        if (!nugget.isEmpty() && containsOreDict(nugget, "nugget" + suffixU)) {
-            ItemMaterial nuggetMat = reg.getOrCreateMaterial(nugget);
-            reg.registerTypes(nuggetMat, "nugget", suffix, "item");
-            reg.registerRelation(ingotMat, nuggetMat, "nugget", prefix);
-        }
-
-        initCompressableMaterial(oreName, stack);
-    }
-
-    private static void initCompressableMaterial(String oreName, ItemStack stack) {
+    private static void initIngotLikeMaterial(String oreName, ItemStack stack) {
         int splitPoint = indexOfUpper(oreName, 0);
         if (splitPoint < 0) return;
 
@@ -133,6 +115,19 @@ public final class ItemMaterialHeuristics {
         String suffixU = oreName.substring(splitPoint);
         String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
         ItemMaterial ingotMat = reg.getOrCreateMaterial(stack);
+
+        reg.registerTypes(ingotMat, prefix, suffix, "item");
+
+        // Try crafting a nugget
+        if (prefix.equals("ingot")) {
+            ItemStack nugget = RecipeUtils.getCraftingResult(null, 1, 1,
+                    stack);
+            if (!nugget.isEmpty() && containsOreDict(nugget, "nugget" + suffixU)) {
+                ItemMaterial nuggetMat = reg.getOrCreateMaterial(nugget);
+                reg.registerTypes(nuggetMat, "nugget", suffix, "item");
+                reg.registerRelation(ingotMat, nuggetMat, "nugget", prefix);
+            }
+        }
 
         // Try crafting a block
         ItemStack block = RecipeUtils.getCraftingResult(null, 3, 3,
@@ -153,6 +148,39 @@ public final class ItemMaterialHeuristics {
 
         // Create ore materials for each ore
         supplyExpandedStacks(OreDictionary.getOres(oreName), (stack -> reg.registerTypes(reg.getOrCreateMaterial(stack), prefix, suffix, "block")));
+    }
+
+    private static void initStoneMaterial(String oreName, ItemStack stack) {
+        if (oreName.endsWith("Polished")) return;
+        String prefix = "stone";
+        String suffixU = oreName.substring(prefix.length());
+        String suffix = suffixU.length() > 0 ? suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1) : "";
+
+        ItemMaterial stoneMat = reg.getOrCreateMaterial(stack);
+        reg.registerTypes(stoneMat, "stone", suffix, "block");
+
+        // Try crafting a brick
+        ItemStack block = RecipeUtils.getCraftingResult(null, 2, 2,
+                stack, stack,
+                stack, stack);
+        if (!block.isEmpty()) {
+            ItemMaterial brickMat = reg.getOrCreateMaterial(block);
+            reg.registerTypes(brickMat, "stone", "brick", suffix, "block");
+            reg.registerRelation(stoneMat, brickMat, "brick", "parent");
+        }
+    }
+
+    private static void initCobblestoneMaterial(String oreName, ItemStack stack) {
+        ItemMaterial cobbleMat = reg.getOrCreateMaterial(stack);
+        reg.registerTypes(cobbleMat, "cobblestone", "block");
+
+        ItemStack stoneStack = FurnaceRecipes.instance().getSmeltingResult(stack);
+        ItemMaterial stoneMaterial = reg.getMaterialIfPresent(stoneStack);
+        if (stoneMaterial == null) {
+            ModCharsetLib.logger.warn("Found OreDict cobblestone which does not give OreDict stone -> " + cobbleMat.toString());
+        } else {
+            reg.registerRelation(cobbleMat, stoneMaterial, "stone", "cobblestone");
+        }
     }
 
     private static void supplyExpandedStacks(Collection<ItemStack> stacks, Consumer<ItemStack> stackConsumer) {
@@ -176,7 +204,7 @@ public final class ItemMaterialHeuristics {
         if (initialized)
             return;
 
-        ProgressManager.ProgressBar bar = ProgressManager.push("Material scanning", 3);
+        ProgressManager.ProgressBar bar = ProgressManager.push("Material scanning", 6);
 
         reg = ItemMaterialRegistry.INSTANCE;
         initialized = true;
@@ -184,18 +212,35 @@ public final class ItemMaterialHeuristics {
         bar.step("Wood");
         supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
 
-        bar.step("Metals/Dusts");
+        bar.step("Ores");
         for (String oreName : OreDictionary.getOreNames()) {
             if (oreName.startsWith("ore")) {
                 initOreMaterial(oreName);
             }
+        }
 
-            if (oreName.startsWith("ingot")) {
-                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initIngotMaterial(oreName, s)));
-            } else if (oreName.startsWith("dust") || oreName.startsWith("gem")) {
-                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initCompressableMaterial(oreName, s)));
+        bar.step("Ingots/Dusts/Gems");
+        for (String oreName : OreDictionary.getOreNames()) {
+            if (oreName.startsWith("ingot") || oreName.startsWith("dust") || oreName.startsWith("gem")) {
+                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initIngotLikeMaterial(oreName, s)));
             }
         }
+
+        bar.step("Stones");
+        for (String oreName : OreDictionary.getOreNames()) {
+            if (oreName.startsWith("stone")) {
+                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initStoneMaterial(oreName, s)));
+            }
+        }
+
+        for (String oreName : OreDictionary.getOreNames()) {
+            if (oreName.startsWith("cobblestone")) {
+                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initCobblestoneMaterial(oreName, s)));
+            }
+        }
+
+        bar.step("Misc");
+        reg.registerTypes(reg.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)), "block", "bedrock");
 
         bar.step("Slabs/Stairs");
         for (ItemMaterial material : reg.getMaterialsByType("block")) {

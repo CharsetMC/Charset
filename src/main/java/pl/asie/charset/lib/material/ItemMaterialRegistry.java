@@ -79,8 +79,12 @@ public class ItemMaterialRegistry {
 		return materialTypes.get(material);
 	}
 
+	protected ItemMaterial getMaterialIfPresent(ItemStack stack) {
+		return materialsById.get(createId(stack));
+	}
+
 	public ItemMaterial getOrCreateMaterial(ItemStack stack) {
-		ItemMaterial material = materialsById.get(createId(stack));
+		ItemMaterial material = getMaterialIfPresent(stack);
 		if (material == null) {
 			material = new ItemMaterial(stack);
 			materialsById.put(material.getId(), material);
@@ -98,7 +102,7 @@ public class ItemMaterialRegistry {
 	}
 
 	public boolean registerType(ItemMaterial material, String type) {
-		if (!materialTypes.containsEntry(material, type)) {
+		if (type.length() > 0 && !materialTypes.containsEntry(material, type)) {
 			materialTypes.put(material, type);
 			materialsByType.put(type, material);
 			return true;
