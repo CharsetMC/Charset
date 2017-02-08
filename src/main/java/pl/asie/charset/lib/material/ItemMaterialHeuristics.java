@@ -61,12 +61,11 @@ public final class ItemMaterialHeuristics {
     }
 
     private static void initLogMaterial(ItemStack log) {
-        ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
-
         // We look for the plank first to ensure only valid logs
         // get registered.
         ItemStack plank = RecipeUtils.getCraftingResult(null, 3, 3, log);
         if (!plank.isEmpty() && ItemUtils.isOreType(plank, "plankWood")) {
+            ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
             if (reg.registerTypes(logMaterial, "log", "wood", "block")) {
                 plank.setCount(1);
                 ItemMaterial plankMaterial = reg.getOrCreateMaterial(plank);

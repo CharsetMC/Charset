@@ -50,20 +50,28 @@ public class TweakWoolColors extends Tweak {
 				d[0] *= 1.075F;
 				d[1] *= 1.075F;
 			} else if (color == EnumDyeColor.YELLOW) {
+				d[0] *= 1.10F;
 				d[2] *= 0.95F;
 			} else if (color == EnumDyeColor.MAGENTA) {
-				d[0] *= 1.05F;
-				d[2] *= 1.05F;
+				d[0] *= 1.1F;
+				d[1] *= 1.05F;
+				d[2] *= 1.1F;
 			} else if (color == EnumDyeColor.LIGHT_BLUE) {
-				d[2] *= 1.125F;
+				d[0] *= 1.05F;
+				d[1] *= 1.05F;
+				d[2] *= 1.05F;
+			} else if (color == EnumDyeColor.PINK) {
+				d[0] *= 1.025F;
+				d[1] *= 1.075F;
+				d[2] *= 1.025F;
 			} else if (color == EnumDyeColor.CYAN) {
-				d[0] *= 0.85F;
-				d[1] *= 0.9F;
-				d[2] *= 1.0F;
-			} else if (color == EnumDyeColor.PURPLE) {
 				d[0] *= 0.9F;
 				d[1] *= 0.95F;
-				d[2] *= 0.9F;
+				d[2] *= 1.05F;
+			} else if (color == EnumDyeColor.PURPLE) {
+				d[0] *= 1F;
+				d[1] *= 1.075F;
+				d[2] *= 1F;
 			} else if (color == EnumDyeColor.BROWN) {
 				d[0] *= 1.0F;
 				d[1] *= 0.925F;
@@ -78,9 +86,9 @@ public class TweakWoolColors extends Tweak {
 				d[2] *= 1.125F;
 			}
 
-			int c = (Math.round(d[0] * 255.0F) << 16)
-					| (Math.round(d[1] * 255.0F) << 8)
-					| (Math.round(d[2] * 255.0F) << 0);
+			int c = (Math.min(Math.round(d[0] * 255.0F), 255) << 16)
+					| (Math.min(Math.round(d[1] * 255.0F), 255) << 8)
+					| (Math.min(Math.round(d[2] * 255.0F), 255));
 			return c;
 		}
 
