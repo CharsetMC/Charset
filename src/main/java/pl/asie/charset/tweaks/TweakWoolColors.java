@@ -69,7 +69,7 @@ public class TweakWoolColors extends Tweak {
 
 		if (prefix.contains("hardened_clay")) {
 			float lum = d[0] * 0.3F + d[1] * 0.59F + d[2] * 0.11F;
-			float mul = (color == EnumDyeColor.ORANGE || color == EnumDyeColor.RED) ? 0.6f : 0.7f;
+			float mul = (color == EnumDyeColor.YELLOW || color == EnumDyeColor.ORANGE || color == EnumDyeColor.RED) ? 0.6f : 0.7f;
 			d[0] += (lum - d[0]) * mul;
 			d[1] += (lum - d[1]) * mul;
 			d[2] += (lum - d[2]) * mul;
@@ -141,7 +141,7 @@ public class TweakWoolColors extends Tweak {
 				int[] imageData = computeMinMaxData(image);
 				int[] imageGrayData = computeMinMaxData(imageGrayscale);
 				int delta = imageGrayData[3] - imageGrayData[7];
-				final float divisor = delta > 4 ? (float) delta / 4.0f : 1.0f;
+				final float divisor = delta > 5 ? (float) delta / 5.0f : 1.0f;
 				final int value2 = colorMultiplier(prefix, EnumDyeColor.byMetadata(i));
 
 				map.setTextureEntry(new PixelOperationSprite(target.toString(), source) {
