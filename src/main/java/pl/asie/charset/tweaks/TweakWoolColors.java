@@ -1,5 +1,6 @@
 package pl.asie.charset.tweaks;
 
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.EnumDyeColor;
@@ -11,7 +12,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 public class TweakWoolColors extends Tweak {
@@ -66,9 +69,13 @@ public class TweakWoolColors extends Tweak {
 
 		if (prefix.contains("hardened_clay")) {
 			float lum = d[0] * 0.3F + d[1] * 0.59F + d[2] * 0.11F;
-			d[0] += (lum - d[0]) * 0.35F;
-			d[1] += (lum - d[1]) * 0.35F;
-			d[2] += (lum - d[2]) * 0.35F;
+			float mul = (color == EnumDyeColor.ORANGE || color == EnumDyeColor.RED) ? 0.6f : 0.7f;
+			d[0] += (lum - d[0]) * mul;
+			d[1] += (lum - d[1]) * mul;
+			d[2] += (lum - d[2]) * mul;
+			d[0] *= 0.9F;
+			d[1] *= 0.9F;
+			d[2] *= 0.9F;
 		}
 
 		return    (Math.min(Math.round(d[0] * 255.0F), 255) << 16)
@@ -92,12 +99,71 @@ public class TweakWoolColors extends Tweak {
 		return false;
 	}
 
+	private BufferedImage toGrayscale(BufferedImage image) {
+		BufferedImage imageGrayscale = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		for (int iy = 0; iy < image.getHeight(); iy++) {
+			for (int ix = 0; ix < image.getWidth(); ix++) {
+				int c = image.getRGB(ix, iy);
+				int g = Math.round((c & 0xFF) * 0.11F + ((c >> 8) & 0xFF) * 0.59F + ((c >> 16) & 0xFF) * 0.3F);
+				int o = (c & 0xFF000000) | (g * 0x10101);
+				imageGrayscale.setRGB(ix, iy, o);
+			}
+		}
+		return imageGrayscale;
+	}
+
+	private int[] computeMinMaxData(BufferedImage image) {
+		int[] out = new int[] {1,1,1,0,255,255,255,0};
+		for (int iy = 0; iy < image.getHeight(); iy++) {
+			for (int ix = 0; ix < image.getWidth(); ix++) {
+				int c = image.getRGB(ix, iy);
+				if ((c & 0xFF) > out[0]) out[0] = (c & 0xFF);
+				if (((c>>8) & 0xFF) > out[1]) out[1] = ((c >> 8) & 0xFF);
+				if (((c>>16) & 0xFF) > out[2]) out[2] = ((c >> 16) & 0xFF);
+				if ((c & 0xFF) < out[4]) out[4] = (c & 0xFF);
+				if (((c>>8) & 0xFF) < out[5]) out[5] = ((c >> 8) & 0xFF);
+				if (((c>>16) & 0xFF) < out[6]) out[6] = ((c >> 16) & 0xFF);
+			}
+		}
+		out[3] = Math.max(out[0], Math.max(out[1], out[2]));
+		out[7] = Math.min(out[4], Math.min(out[5], out[6]));
+		return out;
+	}
+
 	private void recolorTextures(TextureMap map, String prefix) {
 		ResourceLocation source = new ResourceLocation(prefix + "white");
-		for (int i = 1; i < 16; i++) { // skip white
+		for (int i = 0; i < 16; i++) { // skip white
 			String s = ColorUtils.UNDERSCORE_DYE_SUFFIXES[i];
 			ResourceLocation target = new ResourceLocation(prefix + s);
-			map.setTextureEntry(new PixelOperationSprite.Multiply(target.toString(), source, colorMultiplier(prefix, EnumDyeColor.byMetadata(i))));
+			if (prefix.contains("hardened_clay")) {
+				BufferedImage image = RenderUtils.getTextureImage(new ResourceLocation("minecraft:blocks/hardened_clay"));
+				BufferedImage imageGrayscale = toGrayscale(image);
+				int[] imageData = computeMinMaxData(image);
+				int[] imageGrayData = computeMinMaxData(imageGrayscale);
+				int delta = imageGrayData[3] - imageGrayData[7];
+				final float divisor = delta > 4 ? (float) delta / 4.0f : 1.0f;
+				final int value2 = colorMultiplier(prefix, EnumDyeColor.byMetadata(i));
+
+				map.setTextureEntry(new PixelOperationSprite(target.toString(), source) {
+					@Override
+					public int apply(int x, int y, int value) {
+						int out = 0xFF000000;
+						for (int i = 0; i < 24; i += 8) {
+							int v1 = (((imageGrayscale.getRGB(x, y) >> i) & 0xFF) * 255 / imageGrayData[i >> 3]) - 0xFF;
+							v1 /= divisor;
+							int v2 = ((value2 >> i) & 0xFF) + v1;
+							if (v2 < 0) v2 = 0;
+							if (v2 > 255) v2 = 255;
+							int nonTintedOut = (v2 & 0xFF);
+							int tintedOut = nonTintedOut * imageData[i >> 3] / imageData[3];
+							out |= Math.round((nonTintedOut + tintedOut + (tintedOut / 2)) / 2.5f) << i;
+						}
+						return out;
+					}
+				});
+			} else if (i > 0) {
+				map.setTextureEntry(new PixelOperationSprite.Multiply(target.toString(), source, colorMultiplier(prefix, EnumDyeColor.byMetadata(i))));
+			}
 		}
 	}
 
@@ -107,6 +173,6 @@ public class TweakWoolColors extends Tweak {
 		recolorTextures(event.getMap(), "minecraft:blocks/wool_colored_");
 		recolorTextures(event.getMap(), "minecraft:blocks/glass_");
 		recolorTextures(event.getMap(), "minecraft:blocks/glass_pane_top_");
-		// recolorTextures(event.getMap(), "minecraft:blocks/hardened_clay_stained_");
+		recolorTextures(event.getMap(), "minecraft:blocks/hardened_clay_stained_");
 	}
 }
