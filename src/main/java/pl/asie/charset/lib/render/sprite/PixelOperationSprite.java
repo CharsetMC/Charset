@@ -9,6 +9,20 @@ import pl.asie.charset.lib.utils.RenderUtils;
 import java.awt.image.BufferedImage;
 
 public abstract class PixelOperationSprite extends TextureAtlasSprite {
+    public static class Multiply extends PixelOperationSprite {
+        private final int color;
+
+        public Multiply(String entry, ResourceLocation location, int color) {
+            super(entry, location);
+            this.color = color;
+        }
+
+        @Override
+        public int apply(int x, int y, int value) {
+            return RenderUtils.multiplyColor(value, color);
+        }
+    }
+
     private final ResourceLocation location;
 
     protected PixelOperationSprite(String entry, ResourceLocation location) {
