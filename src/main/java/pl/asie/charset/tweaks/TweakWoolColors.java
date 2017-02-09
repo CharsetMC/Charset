@@ -70,12 +70,12 @@ public class TweakWoolColors extends Tweak {
 		if (prefix.contains("hardened_clay")) {
 			float lum = d[0] * 0.3F + d[1] * 0.59F + d[2] * 0.11F;
 			float mul = (color == EnumDyeColor.YELLOW || color == EnumDyeColor.ORANGE || color == EnumDyeColor.RED) ? 0.6f : 0.7f;
-			d[0] += (lum - d[0]) * mul;
-			d[1] += (lum - d[1]) * mul;
-			d[2] += (lum - d[2]) * mul;
 			d[0] *= 0.9F;
 			d[1] *= 0.9F;
 			d[2] *= 0.9F;
+			d[0] += (lum - d[0]) * mul;
+			d[1] += (lum - d[1]) * mul;
+			d[2] += (lum - d[2]) * mul;
 		}
 
 		return    (Math.min(Math.round(d[0] * 255.0F), 255) << 16)
@@ -113,20 +113,27 @@ public class TweakWoolColors extends Tweak {
 	}
 
 	private int[] computeMinMaxData(BufferedImage image) {
-		int[] out = new int[] {1,1,1,0,255,255,255,0};
+		int[] out = new int[] {1,1,1,0,255,255,255,0,0,0,0,0};
 		for (int iy = 0; iy < image.getHeight(); iy++) {
 			for (int ix = 0; ix < image.getWidth(); ix++) {
 				int c = image.getRGB(ix, iy);
+				int g = Math.round((c & 0xFF) * 0.11F + ((c >> 8) & 0xFF) * 0.59F + ((c >> 16) & 0xFF) * 0.3F);
 				if ((c & 0xFF) > out[0]) out[0] = (c & 0xFF);
 				if (((c>>8) & 0xFF) > out[1]) out[1] = ((c >> 8) & 0xFF);
 				if (((c>>16) & 0xFF) > out[2]) out[2] = ((c >> 16) & 0xFF);
 				if ((c & 0xFF) < out[4]) out[4] = (c & 0xFF);
 				if (((c>>8) & 0xFF) < out[5]) out[5] = ((c >> 8) & 0xFF);
 				if (((c>>16) & 0xFF) < out[6]) out[6] = ((c >> 16) & 0xFF);
+				out[8] += (c & 0xFF);
+				out[9] += ((c >> 8) & 0xFF);
+				out[10] += ((c >> 16) & 0xFF);
+				out[11] += g;
 			}
 		}
 		out[3] = Math.max(out[0], Math.max(out[1], out[2]));
 		out[7] = Math.min(out[4], Math.min(out[5], out[6]));
+		for (int i = 8; i < 12; i++)
+			out[i] /= image.getWidth()*image.getHeight();
 		return out;
 	}
 
@@ -155,7 +162,7 @@ public class TweakWoolColors extends Tweak {
 							if (v2 < 0) v2 = 0;
 							if (v2 > 255) v2 = 255;
 							int nonTintedOut = (v2 & 0xFF);
-							int tintedOut = nonTintedOut * imageData[i >> 3] / imageData[3];
+							int tintedOut = nonTintedOut * imageData[8 + (i >> 3)] / imageData[0 + 3];
 							out |= Math.round((nonTintedOut + tintedOut + (tintedOut / 2)) / 2.5f) << i;
 						}
 						return out;
