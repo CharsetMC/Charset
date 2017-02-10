@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import mods.railcraft.api.core.items.IMinecartItem;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockRailBase;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
@@ -19,9 +18,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
-import pl.asie.charset.lib.ModCharsetLib;
-
-import java.util.List;
+import pl.asie.charset.ModCharset;
 
 @Optional.Interface(iface = "mods.railcraft.api.core.items.IMinecartItem", modid = "Railcraft")
 public abstract class ItemMinecartCharset extends ItemMinecart implements IMinecartItem {
@@ -51,7 +48,7 @@ public abstract class ItemMinecartCharset extends ItemMinecart implements IMinec
 
     public ItemMinecartCharset() {
         super(EntityMinecart.Type.RIDEABLE); // yeah, right
-        setCreativeTab(ModCharsetLib.CREATIVE_TAB);
+        setCreativeTab(ModCharset.CREATIVE_TAB);
         setHasSubtypes(true);
         BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(this, MINECART_DISPENSER_BEHAVIOR);
     }

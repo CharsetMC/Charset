@@ -2,18 +2,14 @@ package pl.asie.charset.tweaks.carry;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockMobSpawner;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -23,11 +19,9 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.utils.RotationUtils;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CarryHandler {
@@ -205,7 +199,7 @@ public class CarryHandler {
     public static void register() {
         Capability.IStorage<CarryHandler> storage = new CarryHandler.Storage();
         CapabilityManager.INSTANCE.register(CarryHandler.class, storage, CarryHandler.class);
-        CarryHandler.PROVIDER = new CapabilityProviderFactory<>(TweakCarry.CAPABILITY, storage);
+        CarryHandler.PROVIDER = new CapabilityProviderFactory<>(CharsetTweakCarry.CAPABILITY, storage);
     }
 
     public static class Storage implements Capability.IStorage<CarryHandler> {

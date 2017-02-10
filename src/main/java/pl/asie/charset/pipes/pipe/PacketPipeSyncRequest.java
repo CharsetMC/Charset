@@ -17,14 +17,9 @@
 package pl.asie.charset.pipes.pipe;
 
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
-import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.network.PacketPart;
 import pl.asie.charset.lib.network.PacketTile;
 import pl.asie.charset.pipes.PipeUtils;
 
@@ -45,7 +40,7 @@ public class PacketPipeSyncRequest extends PacketTile {
 	@Override
 	public void apply(INetHandler handler) {
 		TilePipe pipe = PipeUtils.getPipe(tile);
-		EntityPlayer requester = ModCharsetLib.proxy.getPlayer(handler);
+		EntityPlayer requester = getPlayer(handler);
 
 		if (requester != null && pipe != null) {
 			pipe.onSyncRequest(requester);

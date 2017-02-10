@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
@@ -54,7 +54,7 @@ public class SpritesheetFactory {
             if (sheet == null) {
                 sheet = RenderUtils.getTextureImage(location);
                 if (sheet == null) {
-                    ModCharsetLib.logger.warn("Could not find texture sheet " + location + "!");
+                    ModCharset.logger.warn("Could not find texture sheet " + location + "!");
                     return false;
                 }
             }

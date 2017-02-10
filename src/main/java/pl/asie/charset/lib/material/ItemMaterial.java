@@ -1,12 +1,8 @@
 package pl.asie.charset.lib.material;
 
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
 
 public final class ItemMaterial {
 	private final String id;

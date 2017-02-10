@@ -17,10 +17,8 @@
 package pl.asie.charset.api.audio;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.INBTSerializable;
 
 public abstract class AudioSink implements IAudioReceiver {
     public abstract World getWorld();

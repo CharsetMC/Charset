@@ -16,18 +16,9 @@
 
 package pl.asie.charset.lib.utils;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import pl.asie.charset.lib.ModCharsetLib;
 
 public class PlayerUtils {
 	public static boolean isFake(EntityPlayer player) {
@@ -35,6 +26,6 @@ public class PlayerUtils {
 	}
 
 	public static EntityPlayer find(MinecraftServer server, String name) {
-		return ModCharsetLib.proxy.findPlayer(server, name);
+		return UtilProxyCommon.proxy.findPlayer(server, name);
 	}
 }

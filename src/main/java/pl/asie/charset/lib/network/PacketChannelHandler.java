@@ -16,20 +16,17 @@
 
 package pl.asie.charset.lib.network;
 
-import java.util.List;
-
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
-
 import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import pl.asie.charset.lib.ModCharsetLib;
+
+import java.util.List;
 
 @Sharable
 public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, Packet> {
@@ -60,9 +57,6 @@ public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, 
 				newMsg.apply(iNetHandler);
 			} else {
 				IThreadListener listener = Packet.getThreadListener(iNetHandler);
-				if (listener == null) {
-					listener = ModCharsetLib.proxy;
-				}
 
 				if (listener.isCallingFromMinecraftThread()) {
 					newMsg.apply(iNetHandler);

@@ -16,19 +16,18 @@
 
 package pl.asie.charset.lib.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-
 import pl.asie.charset.lib.items.IDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class RecipeDyeableItem extends RecipeBase {
 	protected boolean isTarget(ItemStack stack) {

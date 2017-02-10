@@ -47,9 +47,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.CharsetLib;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CommandPoint extends CommandBase {
@@ -86,10 +85,10 @@ public class CommandPoint extends CommandBase {
       }
         switch (mop.typeOfHit) {
             case BLOCK:
-                ModCharsetLib.packet.sendToServer(PacketPoint.atCoord(mop.getBlockPos(), msg));
+                CharsetLib.packet.sendToServer(PacketPoint.atCoord(mop.getBlockPos(), msg));
                 break;
             case ENTITY:
-                ModCharsetLib.packet.sendToServer(PacketPoint.atEntity(mop.entityHit, msg));
+                CharsetLib.packet.sendToServer(PacketPoint.atEntity(mop.entityHit, msg));
                 break;
             default:
                 return;

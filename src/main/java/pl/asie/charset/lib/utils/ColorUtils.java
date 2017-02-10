@@ -18,7 +18,6 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-
 import net.minecraftforge.oredict.OreDictionary;
 
 // TODO: Refactor me

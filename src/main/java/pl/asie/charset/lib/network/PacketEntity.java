@@ -17,12 +17,10 @@
 package pl.asie.charset.lib.network;
 
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.network.INetHandler;
 import net.minecraft.world.World;
-
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.Utils;
 
 public abstract class PacketEntity extends Packet {
 	protected Entity entity;
@@ -40,7 +38,7 @@ public abstract class PacketEntity extends Packet {
 		int dim = buf.readInt();
 		int id = buf.readInt();
 
-		World w = ModCharsetLib.proxy.getLocalWorld(dim);
+		World w = Utils.getLocalWorld(dim);
 
 		if (w != null) {
 			entity = w.getEntityByID(id);

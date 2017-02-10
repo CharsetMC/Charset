@@ -16,17 +16,15 @@
 
 package pl.asie.charset.lib.misc;
 
-import java.util.Iterator;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.Iterator;
 
 public class PlayerDeathHandler {
 	private Predicate<ItemStack> itemKeepPredicate;

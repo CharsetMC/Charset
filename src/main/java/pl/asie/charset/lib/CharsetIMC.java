@@ -4,7 +4,14 @@ import com.google.common.collect.Lists;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public final class CharsetIMC {
     public enum Result {
@@ -78,7 +85,7 @@ public final class CharsetIMC {
         }
     }
 
-    protected void receiveMessage(FMLInterModComms.IMCMessage msg) {
+    public void receiveMessage(FMLInterModComms.IMCMessage msg) {
         for (String key : msg.key.split(";")) {
             key = key.trim();
             if (key.startsWith("add")) {

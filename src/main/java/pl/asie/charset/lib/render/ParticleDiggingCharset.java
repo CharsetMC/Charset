@@ -2,7 +2,6 @@ package pl.asie.charset.lib.render;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.ParticleDigging;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

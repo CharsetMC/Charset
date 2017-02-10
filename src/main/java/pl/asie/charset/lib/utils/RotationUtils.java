@@ -16,25 +16,18 @@
 
 package pl.asie.charset.lib.utils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLever;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-
-import java.lang.reflect.Method;
-import java.util.Objects;
-import java.util.WeakHashMap;
 
 public final class RotationUtils {
 	// private static final WeakHashMap<Block, Boolean> withRotationCache = new WeakHashMap<>();

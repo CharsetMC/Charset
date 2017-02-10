@@ -1,17 +1,12 @@
 package pl.asie.charset.lib.notify;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.Packet;
-
-import java.io.IOException;
 
 public class PacketPoint extends Packet {
 	enum Type {

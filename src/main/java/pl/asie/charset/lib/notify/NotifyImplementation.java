@@ -54,14 +54,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.CharsetLib;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
 
 public class NotifyImplementation {
-    @SidedProxy(modId = "charsetlib", clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
+    @SidedProxy(modId = "charset", clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
     public static NotifyProxy proxy;
     public static NotifyImplementation instance;
     
@@ -127,9 +127,9 @@ public class NotifyImplementation {
             }
             if (args == null) args = new String[0];
             if (player != null) {
-                ModCharsetLib.packet.sendTo(PacketNotification.createNotify(where, item, format, args), player);
+                CharsetLib.packet.sendTo(PacketNotification.createNotify(where, item, format, args), player);
             } else {
-                ModCharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, format, args), target);
+                CharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, format, args), target);
             }
         }
     }
@@ -197,7 +197,7 @@ public class NotifyImplementation {
         if (player.world.isRemote) {
             proxy.onscreen(message, formatArgs);
         } else {
-            ModCharsetLib.packet.sendTo(PacketNotification.createOnscreen(message, formatArgs), player);
+            CharsetLib.packet.sendTo(PacketNotification.createOnscreen(message, formatArgs), player);
         }
     }
     
@@ -205,7 +205,7 @@ public class NotifyImplementation {
         if (player.world.isRemote) {
             proxy.replaceable(msg, msgKey);
         } else {
-            ModCharsetLib.packet.sendTo(PacketNotification.createReplaceable(msg, msgKey), player);
+            CharsetLib.packet.sendTo(PacketNotification.createReplaceable(msg, msgKey), player);
         }
     }
 }

@@ -16,7 +16,6 @@
 
 package pl.asie.charset.pipes.shifter;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.state.IBlockState;
@@ -27,34 +26,23 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-
-import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
-import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.Properties;
+import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.FluidHandlerHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
-import pl.asie.charset.pipes.ModCharsetPipes;
-import pl.asie.charset.pipes.pipe.TilePipe;
-import pl.asie.charset.pipes.pipe.PipeFluidContainer;
+import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
+import pl.asie.charset.pipes.pipe.TilePipe;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
 	public enum ExtractionType {
@@ -87,7 +75,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	private final ItemStack[] filters = new ItemStack[6];
 	private int redstoneLevel;
-	private int ticker = ModCharsetPipes.instance.rand().nextInt(256);
+	private int ticker = CharsetPipes.instance.rand.nextInt(256);
 
 	public TileShifter() {
 		for (int i = 0; i < filters.length; i++)
@@ -297,13 +285,13 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-		return ((facing == null || facing == getDirection()) && capability == ModCharsetPipes.CAP_SHIFTER)
+		return ((facing == null || facing == getDirection()) && capability == CharsetPipes.CAP_SHIFTER)
 				|| super.hasCapability(capability, facing);
 	}
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-		if ((facing == null || facing == getDirection()) && capability == ModCharsetPipes.CAP_SHIFTER) {
+		if ((facing == null || facing == getDirection()) && capability == CharsetPipes.CAP_SHIFTER) {
 			return (T) this;
 		}
 		return super.getCapability(capability, facing);

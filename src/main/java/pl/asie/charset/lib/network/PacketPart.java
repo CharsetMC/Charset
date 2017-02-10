@@ -16,17 +16,6 @@
 
 package pl.asie.charset.lib.network;
 
-import java.util.UUID;
-
-import io.netty.buffer.ByteBuf;
-
-import net.minecraft.network.INetHandler;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.network.Packet;
-
 // TODO 1.11
 public abstract class PacketPart extends Packet {
 /*	protected IMultipart part;
@@ -49,12 +38,12 @@ public abstract class PacketPart extends Packet {
 		long l2 = buf.readLong();
 		UUID id = new UUID(l1, l2);
 
-		World w = ModCharsetLib.proxy.getLocalWorld(dim);
+		World w = ModCharset.proxy.getLocalWorld(dim);
 
 		if (w != null) {
-			IMultipartContainer container = MultipartHelper.getPartContainer(w, new BlockPos(x, y, z));
-			if (container != null) {
-				part = container.getPartFromID(id);
+			IMultipartContainer ui = MultipartHelper.getPartContainer(w, new BlockPos(x, y, z));
+			if (ui != null) {
+				part = ui.getPartFromID(id);
 			}
 		}
 	}
@@ -68,7 +57,7 @@ public abstract class PacketPart extends Packet {
 		UUID id = part.getContainer().getPartID(part);
 		if (id == null) {
 			// TODO: Figure out if this still happens. HACK!
-			ModCharsetLib.logger.warn("Part ID was null @ " + part.getPos().toString() + "! Please report to mod author!", new Throwable());
+			ModCharset.logger.warn("Part ID was null @ " + part.getPos().toString() + "! Please report to mod author!", new Throwable());
 			new Throwable().printStackTrace();
 			id = UUID.randomUUID();
 		}

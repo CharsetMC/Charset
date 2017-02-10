@@ -21,7 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.AudioSink;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public final class AudioUtils {
                     for (AudioSink sink : worlds.get(world)) {
                         BlockPos pos = new BlockPos(sink.getPos());
                         if (world.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
-                            ModCharsetLib.packet.sendTo(packet, player);
+                            CharsetLib.packet.sendTo(packet, player);
                             break;
                         }
                     }
@@ -76,7 +76,7 @@ public final class AudioUtils {
     }
 
     public static void stop(int id) {
-        ModCharsetLib.packet.sendToAll(new PacketAudioStop(id));
+        CharsetLib.packet.sendToAll(new PacketAudioStop(id));
         AudioStreamManager.INSTANCE.remove(id);
     }
 }

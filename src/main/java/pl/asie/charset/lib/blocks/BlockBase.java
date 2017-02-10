@@ -23,7 +23,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleDigging;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -31,7 +30,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -46,21 +44,22 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 import pl.asie.charset.lib.render.model.ModelFactory;
-import pl.asie.charset.lib.utils.MiscUtils;
-import pl.asie.charset.storage.ModCharsetStorage;
-import pl.asie.charset.storage.barrel.TileEntityDayBarrel;
+import pl.asie.charset.lib.utils.Utils;
 
 import javax.annotation.Nullable;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider = this instanceof ITileEntityProvider;
@@ -102,11 +101,11 @@ public abstract class BlockBase extends Block {
 			List<Collection<ItemStack>> sets = getCreativeItemSets();
 
 			if (sets.size() > 0) {
-				if (ModCharsetLib.INDEV) {
+				if (ModCharset.INDEV) {
 					for (Collection<ItemStack> set : sets)
 						builder.addAll(set);
 				} else {
-					Calendar cal = ModCharsetLib.calendar.get();
+					Calendar cal = CharsetLib.calendar.get();
 					int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
 					Collections.shuffle(sets, new Random(doy));
 					for (int i = 0; i < Math.min(getCreativeItemSetAmount(), sets.size()); i++)
@@ -180,7 +179,7 @@ public abstract class BlockBase extends Block {
 		world.setBlockToAir(pos);
 
 		List<ItemStack> items = getDrops(world, pos, state, tile, 0, false);
-		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / MiscUtils.getExplosionSize(explosion), true, null);
+		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / Utils.getExplosionSize(explosion), true, null);
 
 		for (ItemStack item : items)
 			if (world.rand.nextFloat() <= chance)

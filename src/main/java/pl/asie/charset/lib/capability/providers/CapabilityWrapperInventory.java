@@ -4,7 +4,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;

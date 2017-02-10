@@ -17,21 +17,21 @@
 package pl.asie.charset.lib.network;
 
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.PacketUtils;
+import pl.asie.charset.lib.utils.Utils;
 
 public abstract class Packet {
 	protected static final IThreadListener getThreadListener(INetHandler handler) {
-		return FMLCommonHandler.instance().getWorldThread(handler);
+		IThreadListener listener = FMLCommonHandler.instance().getWorldThread(handler);
+		return listener == null ? Utils.getThreadListener() : listener;
 	}
 
 	protected static final EntityPlayer getPlayer(INetHandler handler) {
-		return ModCharsetLib.proxy.getPlayer(handler);
+		return PacketUtils.getPlayer(handler);
 	}
 
 	public abstract void readData(INetHandler handler, ByteBuf buf);

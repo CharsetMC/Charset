@@ -20,11 +20,11 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -33,14 +33,16 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseBakedModel implements IStateParticleBakedModel {
-    private static final boolean DISABLE_CACHE = ModCharsetLib.INDEV;
+    private static final boolean DISABLE_CACHE = ModCharset.INDEV;
     private static final Set<ModelFactory> FACTORIES = new HashSet<>();
 
     private static class MFItemOverride extends ItemOverrideList {

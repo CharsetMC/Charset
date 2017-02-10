@@ -8,7 +8,7 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.ArrayUtils;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
@@ -176,7 +176,7 @@ public final class ItemMaterialHeuristics {
         ItemStack stoneStack = FurnaceRecipes.instance().getSmeltingResult(stack);
         ItemMaterial stoneMaterial = reg.getMaterialIfPresent(stoneStack);
         if (stoneMaterial == null) {
-            ModCharsetLib.logger.warn("Found OreDict cobblestone which does not give OreDict stone -> " + cobbleMat.toString());
+            ModCharset.logger.warn("Found OreDict cobblestone which does not give OreDict stone -> " + cobbleMat.toString());
         } else {
             reg.registerRelation(cobbleMat, stoneMaterial, "stone", "cobblestone");
         }

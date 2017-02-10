@@ -17,7 +17,6 @@
 package pl.asie.charset.lib.audio;
 
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.network.INetHandler;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.network.Packet;

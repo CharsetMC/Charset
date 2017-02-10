@@ -1,0 +1,13 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "inventory": {
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charset:items/lock",
+        "layer1": "charset:items/lock_color"
+      }
+    }
+  }
+}

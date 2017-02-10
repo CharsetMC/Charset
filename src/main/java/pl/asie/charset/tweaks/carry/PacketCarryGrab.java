@@ -6,9 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import pl.asie.charset.lib.ModCharsetLib;
 import pl.asie.charset.lib.network.Packet;
-import pl.asie.charset.tweaks.ModCharsetTweaks;
+import pl.asie.charset.lib.utils.Utils;
 
 /**
  * Created by asie on 1/2/17.
@@ -47,7 +46,7 @@ public class PacketCarryGrab extends Packet {
 
 		player = getPlayer(handler);
 		type = Type.values()[buf.readByte()];
-		world = ModCharsetLib.proxy.getLocalWorld(dim);
+		world = Utils.getLocalWorld(dim);
 
 		switch (type) {
 			case BLOCK:
@@ -68,10 +67,10 @@ public class PacketCarryGrab extends Packet {
 		if (player != null) {
 			switch (type) {
 				case BLOCK:
-					TweakCarry.grabBlock(player, world, pos);
+					CharsetTweakCarry.grabBlock(player, world, pos);
 					break;
 				case ENTITY:
-					TweakCarry.grabEntity(player, world, entity);
+					CharsetTweakCarry.grabEntity(player, world, entity);
 					break;
 			}
 		}

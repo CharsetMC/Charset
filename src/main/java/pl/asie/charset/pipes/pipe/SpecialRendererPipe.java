@@ -16,17 +16,15 @@
 
 package pl.asie.charset.pipes.pipe;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockModelRenderer;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.color.ItemColors;
@@ -39,7 +37,6 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -53,6 +50,11 @@ import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class SpecialRendererPipe extends DualTileEntitySpecialRenderer<TilePipe> {
 	private static final Random PREDICTIVE_ITEM_RANDOM = new Random();

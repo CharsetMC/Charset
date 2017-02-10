@@ -5,25 +5,32 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
+import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.annotation.ModCompatProvider;
 import pl.asie.charset.pipes.pipe.TilePipe;
 import pl.asie.charset.pipes.shifter.TileShifter;
 
-/**
- * Created by asie on 1/28/17.
- */
+@CharsetModule(
+	name = "commoncapabilities:pipes.slotlessExtraction",
+	dependencies = {"pipes", "mod:commoncapabilities"},
+	isModCompat = true
+)
 public class ShifterExtractionHandlerSlotlessItems implements TileShifter.ExtractionHandler<ISlotlessItemHandler> {
 	@CapabilityInject(ISlotlessItemHandler.class)
 	public static Capability<ISlotlessItemHandler> CAP;
 
-	@ModCompatProvider("commoncapabilities")
-	public static void register() {
-		TileShifter.registerExtractionHandler(new ShifterExtractionHandlerSlotlessItems());
+	@CharsetModule.Instance
+	public static ShifterExtractionHandlerSlotlessItems instance;
+
+	@Mod.EventHandler
+	public void register(FMLPostInitializationEvent event) {
+		TileShifter.registerExtractionHandler(instance);
 	}
 
 	@Override

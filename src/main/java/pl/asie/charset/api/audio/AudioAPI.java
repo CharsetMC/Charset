@@ -2,8 +2,6 @@ package pl.asie.charset.api.audio;
 
 import pl.asie.charset.api.lib.CharsetSimpleRegistry;
 
-import javax.annotation.Nullable;
-
 /**
  * The primary class for the Charset Audio API.
  */

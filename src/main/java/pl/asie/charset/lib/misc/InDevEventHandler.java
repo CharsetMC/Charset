@@ -1,13 +1,8 @@
 package pl.asie.charset.lib.misc;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiOverlayDebug;
-import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;

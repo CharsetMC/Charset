@@ -7,7 +7,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
-import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 
 /**

@@ -3,7 +3,6 @@ package pl.asie.charset.tweaks.carry;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
@@ -14,12 +13,10 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -33,13 +30,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.utils.AttributeUtils;
 
-import java.util.UUID;
-
 public class TweakCarryEventHandler {
     private static final AttributeModifier MODIFIER_CARRY = AttributeUtils.newModifierSingleton("charsettweaks:carry", -0.25D, AttributeUtils.Operation.ADD_MULTIPLIED);
 
     private void cancelIfCarrying(Event event, EntityPlayer player) {
-        CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
         }
@@ -48,7 +43,7 @@ public class TweakCarryEventHandler {
     @SubscribeEvent
     public void onPlayerUpdate(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            CarryHandler carryHandler = event.player.getCapability(TweakCarry.CAPABILITY, null);
+            CarryHandler carryHandler = event.player.getCapability(CharsetTweakCarry.CAPABILITY, null);
             if (carryHandler != null && carryHandler.isCarrying()) {
                 carryHandler.update();
             }
@@ -57,56 +52,56 @@ public class TweakCarryEventHandler {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingFall(LivingFallEvent event) {
-        CarryHandler carryHandler = event.getEntityLiving().getCapability(TweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakCarry.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying() && event.getDistance() >= 4.0f) {
             // TODO: add distance-based scaling
-            TweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
+            CharsetTweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingHurt(LivingHurtEvent event) {
-        CarryHandler carryHandler = event.getEntityLiving().getCapability(TweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakCarry.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying() && event.getSource() != DamageSource.FALL) {
-            TweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
+            CharsetTweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
         }
     }
 
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
-        TweakCarry.dropCarriedBlock(event.getEntityLiving(), true);
+        CharsetTweakCarry.dropCarriedBlock(event.getEntityLiving(), true);
     }
 
     @SubscribeEvent
     public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof EntityPlayer) {
-            event.addCapability(TweakCarry.CAP_IDENTIFIER, CarryHandler.PROVIDER.create(new CarryHandler().setPlayer((EntityPlayer) event.getObject())));
+            event.addCapability(CharsetTweakCarry.CAP_IDENTIFIER, CarryHandler.PROVIDER.create(new CarryHandler().setPlayer((EntityPlayer) event.getObject())));
         }
     }
 
     @SubscribeEvent
     public void onPlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
-        TweakCarry.syncCarryWithClient(event.player, event.player);
+        CharsetTweakCarry.syncCarryWithClient(event.player, event.player);
     }
 
     @SubscribeEvent
     public void onPlayerRespawnEvent(PlayerEvent.PlayerRespawnEvent event) {
-        TweakCarry.syncCarryWithClient(event.player, event.player);
+        CharsetTweakCarry.syncCarryWithClient(event.player, event.player);
     }
 
     @SubscribeEvent
     public void onPlayerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
-        TweakCarry.syncCarryWithClient(event.player, event.player);
+        CharsetTweakCarry.syncCarryWithClient(event.player, event.player);
     }
 
     @SubscribeEvent
     public void onPlayerStartTracking(net.minecraftforge.event.entity.player.PlayerEvent.StartTracking event) {
-        TweakCarry.syncCarryWithClient(event.getTarget(), event.getEntityPlayer());
+        CharsetTweakCarry.syncCarryWithClient(event.getTarget(), event.getEntityPlayer());
     }
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        CarryHandler carryHandler = event.player.getCapability(TweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = event.player.getCapability(CharsetTweakCarry.CAPABILITY, null);
         IAttributeInstance movementSpeed = event.player.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
         if (carryHandler != null && carryHandler.isCarrying()) {
             if (event.player.isSprinting()) {
@@ -130,7 +125,7 @@ public class TweakCarryEventHandler {
                 && Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown()) {
 
             EntityPlayer player = Minecraft.getMinecraft().player;
-            CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+            CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
             if (!player.isCreative()) {
                 event.setCanceled(true);
             }
@@ -148,10 +143,10 @@ public class TweakCarryEventHandler {
 
                 RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
                 if (mouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    TweakCarry.grabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
+                    CharsetTweakCarry.grabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
                 } else if (mouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
                     Entity entity = mouseOver.entityHit;
-                    TweakCarry.grabEntity(player, player.getEntityWorld(), entity);
+                    CharsetTweakCarry.grabEntity(player, player.getEntityWorld(), entity);
                 }
             }
         }
@@ -161,7 +156,7 @@ public class TweakCarryEventHandler {
     public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         EntityPlayer player = event.getEntityPlayer();
 
-        CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
 
@@ -182,7 +177,7 @@ public class TweakCarryEventHandler {
     public void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         EntityPlayer player = event.getEntityPlayer();
 
-        CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
             Entity entity = event.getTarget();

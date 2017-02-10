@@ -1,6 +1,11 @@
 package pl.asie.charset.lib.modcompat.jei;
 
-import mezz.jei.api.*;
+import mezz.jei.api.IGuiHelper;
+import mezz.jei.api.IJeiRuntime;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.IModRegistry;
+import mezz.jei.api.ISubtypeRegistry;
+import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import mezz.jei.api.recipe.IStackHelper;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;

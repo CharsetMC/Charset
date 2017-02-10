@@ -17,9 +17,6 @@
 package pl.asie.charset.api.lib;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * This capability is present for objects (primarily tiles) which may want to

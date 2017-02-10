@@ -1,16 +1,20 @@
 package pl.asie.charset.tweaks.carry.transforms;
 
-import net.minecraft.block.BlockHopper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.*;
+import net.minecraft.entity.item.EntityMinecartChest;
+import net.minecraft.entity.item.EntityMinecartCommandBlock;
+import net.minecraft.entity.item.EntityMinecartEmpty;
+import net.minecraft.entity.item.EntityMinecartHopper;
+import net.minecraft.entity.item.EntityMinecartTNT;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.TileEntityCommandBlock;
+import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
-import pl.asie.charset.storage.barrel.EntityMinecartDayBarrel;
 import pl.asie.charset.tweaks.carry.ICarryTransformer;
 
 import javax.annotation.Nonnull;

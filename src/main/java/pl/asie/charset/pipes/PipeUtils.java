@@ -17,11 +17,9 @@
 package pl.asie.charset.pipes;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.pipes.pipe.TilePipe;
 
@@ -40,19 +38,19 @@ public final class PipeUtils {
 	public static TilePipe getPipe(IBlockAccess world, BlockPos blockPos, EnumFacing side) {
 		TileEntity tile = world.getTileEntity(blockPos);
 		return getPipe(tile);
-		/* IMultipartContainer container = MultipartHelper.getPartContainer(world, blockPos);
-		if (container == null) {
+		/* IMultipartContainer ui = MultipartHelper.getPartContainer(world, blockPos);
+		if (ui == null) {
 			return null;
 		}
 
 		if (side != null) {
-			ISlottedPart part = container.getPartInSlot(PartSlot.getFaceSlot(side));
+			ISlottedPart part = ui.getPartInSlot(PartSlot.getFaceSlot(side));
 			if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
 				return null;
 			}
 		}
 
-		ISlottedPart part = container.getPartInSlot(PartSlot.CENTER);
+		ISlottedPart part = ui.getPartInSlot(PartSlot.CENTER);
 		if (part instanceof TilePipe) {
 			return (TilePipe) part;
 		} else {

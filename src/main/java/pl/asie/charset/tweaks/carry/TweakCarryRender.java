@@ -2,7 +2,10 @@ package pl.asie.charset.tweaks.carry;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -14,8 +17,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -35,7 +36,7 @@ public class TweakCarryRender {
 				return;
 			}
 			EntityPlayer player = (EntityPlayer) rve;
-			CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+			CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
 			if (carryHandler != null && carryHandler.isCarrying()) {
 				event.setCanceled(true);
 			}
@@ -52,7 +53,7 @@ public class TweakCarryRender {
 		EntityPlayer player = (EntityPlayer) rve;
 		float partialTicks = event.getPartialTicks();
 
-		CarryHandler carryHandler = player.getCapability(TweakCarry.CAPABILITY, null);
+		CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
 		if (carryHandler != null && carryHandler.isCarrying()) {
 			event.setCanceled(true);
 			if (this.mc.gameSettings.thirdPersonView != 0 || this.mc.gameSettings.hideGUI) {

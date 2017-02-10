@@ -24,8 +24,8 @@ import net.minecraft.block.BlockLever;
 import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -64,9 +64,9 @@ public final class RedstoneUtils {
 		}
 
 		//TODO 1.11
-//		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
-//		if (container != null) {
-//			return MultipartRedstoneHelper.canConnectRedstone(container, side, face);
+//		IMultipartContainer ui = MultipartHelper.getPartContainer(world, pos);
+//		if (ui != null) {
+//			return MultipartRedstoneHelper.canConnectRedstone(ui, side, face);
 //		} else {
 			return block.canConnectRedstone(state, world, pos, side);
 //		}

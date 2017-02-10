@@ -16,13 +16,12 @@
 
 package pl.asie.charset.lib.capability.redstone;
 
-import java.util.Collection;
-
-import net.minecraftforge.common.capabilities.Capability;
-
 import mcmultipart.capabilities.ICapabilityWrapper;
+import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.lib.capability.Capabilities;
+
+import java.util.Collection;
 
 public class BundledReceiverWrapper implements ICapabilityWrapper<IBundledReceiver> {
 	private class WrappedReceiver implements IBundledReceiver {

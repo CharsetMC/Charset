@@ -2,121 +2,17 @@
     "modListVersion": 2,
     "modList": [
         {
-            "modid": "charsetlib",
-            "name": "‽",
+            "modid": "charset",
+            "name": "Charset",
             "version": "${version}",
             "mcversion": "${mcversion}",
-            "description": "Base library mod",
+            "description": "Arrange Your Experience",
             "authorList": [
                 "asiekierka"
             ],
             "url": "http://charset.asie.pl",
             "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsetpipes",
-            "name": "|",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Item transport system",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsettweaks",
-            "name": "*",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Gameplay/aesthetic tweaks to vanilla",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsetstorage",
-            "name": "■",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Things useful for storage (Barrels, Locks, etc.)",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsetcarts",
-            "name": "∐",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Improved rails and carts",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsetcrafting",
-            "name": "#",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Pocket Crafting Table (for now)",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsetdecoration",
-            "name": "⚐",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Decoration/building-related objects (posters, scaffolds)",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsetdrama",
-            "name": "!",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "Drama Generator in Minecraft. Joke module",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
-        },
-        {
-            "modid": "charsetwrench",
-            "name": "/",
-            "version": "${version}",
-            "mcversion": "${mcversion}",
-            "description": "A wrench which happens to rotate multiparts",
-            "authorList": [
-                "asiekierka"
-            ],
-            "url": "http://charset.asie.pl",
-            "updateUrl": "http://charset.asie.pl/update.json",
-            "logoFile": "assets/charsetlib/textures/items/icon.png"
+            "logoFile": "assets/charset/textures/items/icon.png"
         }
     ]
 }

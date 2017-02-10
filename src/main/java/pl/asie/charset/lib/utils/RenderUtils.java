@@ -16,39 +16,35 @@
 
 package pl.asie.charset.lib.utils;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-
 import com.google.common.base.Function;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelRotation;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.render.CharsetFaceBakery;
 
 import javax.annotation.Nonnull;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public final class RenderUtils {
 	public static final CharsetFaceBakery BAKERY = new CharsetFaceBakery();
@@ -199,7 +195,7 @@ public final class RenderUtils {
 		try {
 			IModel model = ModelLoaderRegistry.getModel(location);
 			if (model == null) {
-				ModCharsetLib.logger.error("Model " + location.toString() + " is missing! THIS WILL CAUSE A CRASH!");
+				ModCharset.logger.error("Model " + location.toString() + " is missing! THIS WILL CAUSE A CRASH!");
 			}
 			return model;
 		} catch (Exception e) {

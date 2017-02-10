@@ -16,24 +16,21 @@
 
 package pl.asie.charset.lib.audio.manager;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.openal.AL10;
+import pl.asie.charset.ModCharset;
+
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.Vec3d;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.openal.AL10;
-
-import net.minecraft.client.Minecraft;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import pl.asie.charset.lib.ModCharsetLib;
 
 public class AudioStreamOpenAL implements IAudioStream {
 	public class SourceEntry {
@@ -187,6 +184,6 @@ public class AudioStreamOpenAL implements IAudioStream {
 			}
 		}
 
-		ModCharsetLib.logger.debug("Cleaned " + bufferCount + " buffers and " + sourceCount + " sources.");
+		ModCharset.logger.debug("Cleaned " + bufferCount + " buffers and " + sourceCount + " sources.");
 	}
 }

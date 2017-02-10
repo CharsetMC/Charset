@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.misc;
 
-import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.resources.IResource;
@@ -12,7 +11,6 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;

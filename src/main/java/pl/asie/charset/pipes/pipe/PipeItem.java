@@ -16,28 +16,25 @@
 
 package pl.asie.charset.pipes.pipe;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-
 import net.minecraft.util.math.Vec3d;
-
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.SpaceUtils;
-import pl.asie.charset.pipes.ModCharsetPipes;
+import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class PipeItem {
 	public static final int MAX_PROGRESS = 128;
@@ -178,8 +175,8 @@ public class PipeItem {
 					TileEntity shifterTile = owner.getWorld().getTileEntity(owner.getPos().offset(output.getOpposite(), activeShifterDistance));
 
 					if (shifterTile == null
-							|| !shifterTile.hasCapability(ModCharsetPipes.CAP_SHIFTER, output)
-							|| !isShifterPushing(shifterTile.getCapability(ModCharsetPipes.CAP_SHIFTER, output), output)) {
+							|| !shifterTile.hasCapability(CharsetPipes.CAP_SHIFTER, output)
+							|| !isShifterPushing(shifterTile.getCapability(CharsetPipes.CAP_SHIFTER, output), output)) {
 						needsRecalculation = true;
 					}
 				}
@@ -216,7 +213,7 @@ public class PipeItem {
 
 	protected void sendPacket(boolean syncStack) {
 		if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-			ModCharsetPipes.instance.packet().sendToAllAround(getSyncPacket(syncStack), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+			CharsetPipes.instance.packet.sendToAllAround(getSyncPacket(syncStack), owner, CharsetPipes.PIPE_TESR_DISTANCE);
 		}
 	}
 

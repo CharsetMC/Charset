@@ -19,9 +19,7 @@ package pl.asie.charset.lib.capability.redstone;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-
 import net.minecraftforge.common.capabilities.Capability;
-
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 
 public class DefaultRedstoneEmitterStorage implements Capability.IStorage<IRedstoneEmitter> {

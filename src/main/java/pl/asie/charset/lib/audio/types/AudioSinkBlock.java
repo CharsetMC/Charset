@@ -5,7 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import pl.asie.charset.api.audio.AudioSink;
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.Utils;
 
 public class AudioSinkBlock extends AudioSink {
     private World world;
@@ -57,7 +57,7 @@ public class AudioSinkBlock extends AudioSink {
         double yPos = buf.readDouble();
         double zPos = buf.readDouble();
 
-        world = ModCharsetLib.proxy.getLocalWorld(dimId);
+        world = Utils.getLocalWorld(dimId);
         pos = new Vec3d(xPos, yPos, zPos);
     }
 }

@@ -1,17 +1,17 @@
 package pl.asie.charset.lib.material;
 
-import com.google.common.collect.*;
-import net.minecraft.block.Block;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
-import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.utils.RecipeUtils;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ItemMaterialRegistry {
 	public static final ItemMaterialRegistry INSTANCE = new ItemMaterialRegistry();

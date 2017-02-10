@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.recipe;
 
-import com.google.common.base.Function;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;

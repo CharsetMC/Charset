@@ -16,7 +16,10 @@
 
 package pl.asie.charset.lib.audio.manager;
 
+import net.minecraftforge.fml.common.SidedProxy;
+
 public abstract class AudioStreamManager {
+	@SidedProxy(clientSide = "pl.asie.charset.lib.audio.manager.AudioStreamManagerClient", serverSide = "pl.asie.charset.lib.audio.manager.AudioStreamManagerServer")
 	public static AudioStreamManager INSTANCE;
 
 	public abstract void put(int id, IAudioStream stream);

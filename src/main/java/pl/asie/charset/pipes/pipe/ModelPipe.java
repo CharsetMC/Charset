@@ -19,10 +19,10 @@ package pl.asie.charset.pipes.pipe;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.render.model.ModelPipeLike;
+import pl.asie.charset.lib.render.model.ModelPipeShaped;
 
-public class ModelPipe extends ModelPipeLike<TilePipe> {
-    public static final ResourceLocation PIPE_TEXTURE_LOC = new ResourceLocation("charsetpipes", "blocks/pipe");
+public class ModelPipe extends ModelPipeShaped<TilePipe> {
+    public static final ResourceLocation PIPE_TEXTURE_LOC = new ResourceLocation("charset", "blocks/pipe");
     public static TextureAtlasSprite[] sprites;
 
     public ModelPipe() {

@@ -17,9 +17,7 @@
 package pl.asie.charset.api.pipes;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**

@@ -21,8 +21,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;

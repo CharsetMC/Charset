@@ -5,19 +5,28 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
+import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.annotation.ModCompatProvider;
 
+@CharsetModule(
+	name = "commoncapabilities:lib.slotlessInsertion",
+	isModCompat = true,
+	dependencies = {"mod:commoncapabilities"}
+)
 public class CapabilityWrapperSlotlessInsertion implements CapabilityHelper.Wrapper<IItemInsertionHandler> {
 	@CapabilityInject(ISlotlessItemHandler.class)
 	public static Capability<ISlotlessItemHandler> CAP;
+	@CharsetModule.Instance
+	public static CapabilityWrapperSlotlessInsertion instance;
 
-	@ModCompatProvider("commoncapabilities")
-	public static void register() {
-		CapabilityHelper.registerWrapper(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityWrapperSlotlessInsertion());
+	@Mod.EventHandler
+	public void register(FMLPostInitializationEvent event) {
+		CapabilityHelper.registerWrapper(Capabilities.ITEM_INSERTION_HANDLER, instance);
 	}
 
 	@Override

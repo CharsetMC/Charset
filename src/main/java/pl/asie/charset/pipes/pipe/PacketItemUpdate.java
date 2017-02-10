@@ -16,21 +16,18 @@
 
 package pl.asie.charset.pipes.pipe;
 
-import java.lang.ref.WeakReference;
-
-import io.netty.buffer.ByteBuf;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-
+import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-
-import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.network.PacketTile;
 import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.pipes.PipeUtils;
+
+import java.lang.ref.WeakReference;
 
 public class PacketItemUpdate extends PacketTile {
 	protected PipeItem item;

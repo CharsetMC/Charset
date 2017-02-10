@@ -22,7 +22,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import pl.asie.charset.lib.network.PacketPart;
 import pl.asie.charset.lib.network.PacketTile;
 import pl.asie.charset.pipes.PipeUtils;
 

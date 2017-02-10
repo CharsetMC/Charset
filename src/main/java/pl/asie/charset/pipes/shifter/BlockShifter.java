@@ -28,16 +28,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.Properties;
-import pl.asie.charset.pipes.pipe.TilePipe;
 import pl.asie.charset.pipes.PipeUtils;
+import pl.asie.charset.pipes.pipe.TilePipe;
 
 public class BlockShifter extends BlockContainer {
 	public static final PropertyBool EXTRACT = PropertyBool.create("extract");

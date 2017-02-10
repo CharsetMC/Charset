@@ -19,7 +19,6 @@ package pl.asie.charset.lib.capability;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
@@ -43,7 +42,11 @@ import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInventory;
-import pl.asie.charset.lib.capability.redstone.*;
+import pl.asie.charset.lib.capability.redstone.DefaultBundledEmitter;
+import pl.asie.charset.lib.capability.redstone.DefaultBundledEmitterStorage;
+import pl.asie.charset.lib.capability.redstone.DefaultRedstoneEmitter;
+import pl.asie.charset.lib.capability.redstone.DefaultRedstoneEmitterStorage;
+import pl.asie.charset.lib.capability.redstone.DummyRedstoneReceiver;
 
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)

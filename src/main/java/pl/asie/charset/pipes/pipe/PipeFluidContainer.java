@@ -29,7 +29,7 @@ import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.FluidHandlerHelper;
-import pl.asie.charset.pipes.ModCharsetPipes;
+import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
@@ -398,7 +398,7 @@ public class PipeFluidContainer implements ITickable {
 
     void sendPacket(boolean ignoreDirty) {
         if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-            ModCharsetPipes.instance.packet().sendToAllAround(getSyncPacket(ignoreDirty), owner, ModCharsetPipes.PIPE_TESR_DISTANCE);
+            CharsetPipes.instance.packet.sendToAllAround(getSyncPacket(ignoreDirty), owner, CharsetPipes.PIPE_TESR_DISTANCE);
         }
     }
 

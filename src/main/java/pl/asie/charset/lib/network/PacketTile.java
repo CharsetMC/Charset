@@ -17,13 +17,11 @@
 package pl.asie.charset.lib.network;
 
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.network.INetHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.utils.Utils;
 
 public abstract class PacketTile extends Packet {
 	protected TileEntity tile;
@@ -43,7 +41,7 @@ public abstract class PacketTile extends Packet {
 		int y = buf.readInt();
 		int z = buf.readInt();
 
-		World w = ModCharsetLib.proxy.getLocalWorld(dim);
+		World w = Utils.getLocalWorld(dim);
 
 		if (w != null) {
 			tile = w.getTileEntity(new BlockPos(x, y, z));

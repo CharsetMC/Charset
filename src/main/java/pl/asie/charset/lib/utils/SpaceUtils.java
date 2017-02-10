@@ -39,7 +39,7 @@ package pl.asie.charset.lib.utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -50,7 +50,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import javax.vecmath.Vector3d;
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Operations on AxisAlignedBB (aka 'Box'), Vec3d, EnumFacing, Entities, and conversions between them.

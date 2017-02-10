@@ -16,28 +16,24 @@
 
 package pl.asie.charset.lib.network;
 
-import java.util.EnumMap;
-
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
 import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
+
+import java.util.EnumMap;
 
 public class PacketRegistry {
 	private EnumMap<Side, FMLEmbeddedChannel> channels;

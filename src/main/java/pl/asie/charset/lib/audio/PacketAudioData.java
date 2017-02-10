@@ -17,7 +17,6 @@
 package pl.asie.charset.lib.audio;
 
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.network.INetHandler;

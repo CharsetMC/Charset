@@ -13,21 +13,25 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.IConnectable;
-import pl.asie.charset.lib.ModCharsetLib;
-import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.blocks.TileBase;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
-import pl.asie.charset.lib.utils.*;
-import pl.asie.charset.pipes.ModCharsetPipes;
+import pl.asie.charset.lib.utils.ObserverHelper;
+import pl.asie.charset.lib.utils.SpaceUtils;
+import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
+import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable, IDebuggable {
     public class InsertionHandler implements IItemInsertionHandler {
@@ -102,8 +106,8 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
                 return true;
             }
 
-            if (tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, side.getOpposite())) {
-                return tile.getCapability(ModCharsetPipes.CAP_SHIFTER, side.getOpposite()).getMode() == IShifter.Mode.Extract;
+            if (tile.hasCapability(CharsetPipes.CAP_SHIFTER, side.getOpposite())) {
+                return tile.getCapability(CharsetPipes.CAP_SHIFTER, side.getOpposite()).getMode() == IShifter.Mode.Extract;
             }
         }
 
@@ -226,7 +230,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
         if (requestUpdate) {
             markBlockForRenderUpdate();
-            ModCharsetPipes.instance.packet().sendToServer(new PacketPipeSyncRequest(this));
+            CharsetPipes.instance.packet.sendToServer(new PacketPipeSyncRequest(this));
             requestUpdate = false;
         }
 
@@ -289,7 +293,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
 
         TileEntity shifterTile = getWorld().getTileEntity(shifterPos);
-        IShifter shifter = CapabilityHelper.get(ModCharsetPipes.CAP_SHIFTER, shifterTile, dir);
+        IShifter shifter = CapabilityHelper.get(CharsetPipes.CAP_SHIFTER, shifterTile, dir);
         propagateShifterChange(dir, shifter, dist);
     }
 
@@ -331,8 +335,8 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
 
         IShifter shifter;
-        if (tile != null && tile.hasCapability(ModCharsetPipes.CAP_SHIFTER, dir) && isMatchingShifter(
-                shifter = tile.getCapability(ModCharsetPipes.CAP_SHIFTER, dir), dir, Integer.MAX_VALUE)) {
+        if (tile != null && tile.hasCapability(CharsetPipes.CAP_SHIFTER, dir) && isMatchingShifter(
+                shifter = tile.getCapability(CharsetPipes.CAP_SHIFTER, dir), dir, Integer.MAX_VALUE)) {
             return shifter;
         } else {
             return null;
@@ -370,7 +374,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
                 }
             }
 
-            if (renderFast && ModCharsetPipes.proxy.stopsRenderFast(getWorld(), item.stack)) {
+            if (renderFast && CharsetPipes.proxy.stopsRenderFast(getWorld(), item.stack)) {
                 renderFast = false;
             }
             itemSet.add(item);
@@ -440,7 +444,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
                 if (!simulate) {
                     itemSet.add(item);
 
-                    if (renderFast && ModCharsetPipes.proxy.stopsRenderFast(getWorld(), item.stack)) {
+                    if (renderFast && CharsetPipes.proxy.stopsRenderFast(getWorld(), item.stack)) {
                         renderFast = false;
                     }
                 }
@@ -494,11 +498,11 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     protected void onSyncRequest(EntityPlayer player) {
         synchronized (itemSet) {
             for (PipeItem p : itemSet) {
-                ModCharsetPipes.instance.packet().sendTo(p.getSyncPacket(true), player);
+                CharsetPipes.instance.packet.sendTo(p.getSyncPacket(true), player);
             }
         }
 
-        ModCharsetPipes.instance.packet().sendTo(fluid.getSyncPacket(true), player);
+        CharsetPipes.instance.packet.sendTo(fluid.getSyncPacket(true), player);
     }
 
     @Override
