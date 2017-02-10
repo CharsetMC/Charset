@@ -1,6 +1,7 @@
 * Rewritten internal mod structure (the whole thing!)
     * One mod ID with modules (higher granularity than previously) configurable in config/charset/modules.cfg
 * [storage.barrels] Fixed many issues with barrel carts.
+* [tweak.disableItemTooltips] New tweak! Off by default.
 * [tweak.pushableTnt] Fix unlocalized TNT name.
 * [tweak.unifyColors] New tweak! Unifies wool/stained glass/stained clay colors.
     * Dynamic - works with resource packs!
