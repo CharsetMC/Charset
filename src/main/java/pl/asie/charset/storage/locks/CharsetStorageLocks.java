@@ -46,8 +46,7 @@ import java.util.UUID;
 
 @CharsetModule(
 		name = "storage.locks",
-		description = "Player interaction-preventing locks and keys",
-		isDefault = false
+		description = "Player interaction-preventing locks and keys"
 )
 public class CharsetStorageLocks {
 	@CharsetModule.Instance
@@ -87,7 +86,7 @@ public class CharsetStorageLocks {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		EntityRegistry.registerModEntity(new ResourceLocation("charset:lock"), EntityLock.class, "charset:lock", 1, this, 64, 3, false);
+		RegistryUtils.register(EntityLock.class, "lock", 1, 64, 3, false);
 
 		MinecraftForge.EVENT_BUS.register(new LockEventHandler());
 

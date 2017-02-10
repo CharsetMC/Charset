@@ -17,13 +17,23 @@
 package pl.asie.charset;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.datafix.DataFixesManager;
+import net.minecraft.util.datafix.FixTypes;
+import net.minecraft.util.datafix.IFixableData;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.CompoundDataFixer;
+import net.minecraftforge.common.util.ModFixs;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
@@ -39,6 +49,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.asie.charset.datafixes.CharsetUnifiedModIdFixer;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.annotation.AnnotationHandler;
 import pl.asie.charset.lib.misc.IconCharset;
@@ -46,7 +57,10 @@ import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Mod(modid = ModCharset.MODID, name = ModCharset.NAME, version = ModCharset.VERSION, updateJSON = ModCharset.UPDATE_URL, dependencies = ModCharset.DEP_LIB)
 public class ModCharset {
@@ -75,6 +89,7 @@ public class ModCharset {
 	public static Configuration configModules;
 
 	private static File configurationDirectory;
+	private static ModFixs dataFixes;
 
 	public static File getConfigFile(String filename) {
 		return new File(configurationDirectory, filename);
@@ -92,6 +107,8 @@ public class ModCharset {
 		}
 		configModules = new Configuration(getConfigFile("modules.cfg"));
 		logger = LogManager.getLogger();
+		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 1);
+		dataFixes.registerFix(FixTypes.ENTITY, new CharsetUnifiedModIdFixer.Entity(oldPrefixes));
 
 		AnnotationHandler.INSTANCE.preInit(event.getAsmData());
 
@@ -150,10 +167,11 @@ public class ModCharset {
 		}
 	}
 
-	private static final List<String> oldPrefixes = Lists.newArrayList(
+	private static final Set<String> oldPrefixes = Sets.newHashSet(
 			"charsetlib", "charsetpipes", "charsetstorage",
 			"charsetdecoration", "charsetdrama", "charsetcarts",
-			"charsettweaks", "charsetaudio"
+			"charsettweaks", "charsetaudio", "charsetcrafting",
+			"charsetwrench"
 	);
 
 	@Mod.EventHandler

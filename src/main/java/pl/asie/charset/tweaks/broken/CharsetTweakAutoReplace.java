@@ -34,21 +34,35 @@
  * SOFTWARE.
  */
 
-package pl.asie.charset.tweaks.old;
+package pl.asie.charset.tweaks.broken;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
 
-public class TweakAutoReplace {
+/* @CharsetModule(
+		name = "tweak.autoReplace",
+		description = "Automatically replace items in vertical columns upon them breaking"
+) */
+// TODO: Fix me, please!
+public class CharsetTweakAutoReplace {
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(this);
+	}
+
 	@SubscribeEvent
 	public void onPlayerDestroyItem(PlayerDestroyItemEvent event) {
 		if (!(event.getEntity() instanceof EntityPlayerMP) || event.getEntity().world.isRemote || event.getOriginal().isEmpty()) {
@@ -63,15 +77,24 @@ public class TweakAutoReplace {
 			return;
 		}
 
-		int row;
+		int row, lastEmptiedSlot = -1;
+		boolean changed = false;
 
 		for (row = 2; row >= 0; row--) {
 			int slot = inv.currentItem + row * 9 + 9;
 			ItemStack stackAbove = inv.getStackInSlot(slot);
 			if (!canReplace(stackAbove, event.getOriginal())) break;
 			int targetSlot = ((slot < 27) ? (slot + 9) : (slot - 27));
-			inv.setInventorySlotContents(targetSlot, stackAbove.copy());
+			ItemStack stackTarget = stackAbove.copy();
+			inv.setInventorySlotContents(targetSlot, stackTarget);
 			inv.setInventorySlotContents(slot, ItemStack.EMPTY);
+			player.connection.sendPacket(new SPacketSetSlot(-1, targetSlot, stackTarget));
+			changed = true;
+			lastEmptiedSlot = slot;
+		}
+
+		if (changed) {
+			player.connection.sendPacket(new SPacketSetSlot(-1, lastEmptiedSlot, ItemStack.EMPTY));
 		}
 
 		inv.markDirty();
@@ -88,8 +111,8 @@ public class TweakAutoReplace {
 		// Check if same tool classes
 		Set<String> classesSrc = destroyed.getItem().getToolClasses(destroyed);
 		Set<String> classesDst = replacement.getItem().getToolClasses(replacement);
-		if (classesSrc.size() > 0 && classesSrc.equals(classesDst)) {
-			return true;
+		if (classesSrc.size() > 0 || classesDst.size() > 0) {
+			return classesSrc.equals(classesDst);
 		}
 
 		if (destroyed.getItem() instanceof ItemSword && replacement.getItem() instanceof ItemSword) {
@@ -97,6 +120,7 @@ public class TweakAutoReplace {
 		}
 
 		// Generic fallback check
-		return ItemUtils.equals(replacement, destroyed, false, !destroyed.getItem().isDamageable(), true);
+		// TODO: Special NBT handling?
+		return ItemUtils.equals(replacement, destroyed, false, !destroyed.getItem().isDamageable(), false);
 	}
 }

@@ -1,5 +1,8 @@
 package pl.asie.charset.tweaks;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.EnumDyeColor;
@@ -16,64 +19,30 @@ import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Map;
 
 @CharsetModule(
 		name = "tweak.unifyColors",
 		description = "Unifies various colored blocks and items' colors. Works with resource packs!"
 )
 public class CharsetTweakUnifyColors {
-	private int colorMultiplier(String prefix, EnumDyeColor color) {
-		float[] dOrig = EntitySheep.getDyeRgb(color);
-		float[] d = Arrays.copyOf(dOrig, 3);
+	private final Gson gson = new Gson();
+	private final ResourceLocation COLOR_PALETTE_LOC = new ResourceLocation("charset", "color_palette.json");
+	private final Type COLOR_PALETTE_TYPE = new TypeToken<Map<String, float[]>>() {}.getType();
+	private Map<String, float[]> colorPalette;
 
-		if (color == EnumDyeColor.BLUE) {
-			d[0] *= 0.925F;
-			d[1] *= 0.925F;
-			d[2] *= 0.875F;
-		} else if (color == EnumDyeColor.ORANGE) {
-			d[0] *= 1.075F;
-			d[1] *= 1.075F;
-		} else if (color == EnumDyeColor.YELLOW) {
-			d[0] *= 1.10F;
-			d[1] *= 0.95F;
-			d[2] *= 0.95F;
-		} else if (color == EnumDyeColor.MAGENTA) {
-			d[0] *= 1.1F;
-			d[1] *= 1.05F;
-			d[2] *= 1.1F;
-		} else if (color == EnumDyeColor.LIGHT_BLUE) {
-			d[0] *= 1.05F;
-			d[1] *= 1.05F;
-			d[2] *= 1.05F;
-		} else if (color == EnumDyeColor.PINK) {
-			d[0] *= 1.025F;
-			d[1] *= 1.075F;
-			d[2] *= 1.025F;
-		} else if (color == EnumDyeColor.CYAN) {
-			d[0] *= 0.9F;
-			d[1] *= 0.95F;
-			d[2] *= 1.05F;
-		} else if (color == EnumDyeColor.PURPLE) {
-			d[0] *= 1F;
-			d[1] *= 1.075F;
-			d[2] *= 1F;
-		} else if (color == EnumDyeColor.BROWN) {
-			d[0] *= 1.0F;
-			d[1] *= 0.925F;
-			d[2] *= 1.0F;
-		} else if (color == EnumDyeColor.BLACK) {
-			d[0] *= 1.33F;
-			d[1] *= 1.33F;
-			d[2] *= 1.33F;
-		} else if (color == EnumDyeColor.GRAY) {
-			d[0] *= 1.125F;
-			d[1] *= 1.125F;
-			d[2] *= 1.125F;
-		}
+	private int colorMultiplier(String prefix, EnumDyeColor color) {
+		float[] d = EntitySheep.getDyeRgb(color);
 
 		if (prefix.contains("hardened_clay")) {
+			float[] dOrig = d;
+			d = Arrays.copyOf(dOrig, 3);
+
 			float lum = d[0] * 0.3F + d[1] * 0.59F + d[2] * 0.11F;
 			float mul = (color == EnumDyeColor.YELLOW || color == EnumDyeColor.ORANGE || color == EnumDyeColor.RED) ? 0.6f : 0.7f;
 			d[0] *= 0.9F;
@@ -173,6 +142,27 @@ public class CharsetTweakUnifyColors {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+		try {
+			colorPalette = gson.fromJson(
+					new InputStreamReader(
+							Minecraft.getMinecraft().getResourceManager().getResource(COLOR_PALETTE_LOC).getInputStream()
+					), COLOR_PALETTE_TYPE
+			);
+
+			for (int i = 0; i < 16; i++) {
+				String key = ColorUtils.UNDERSCORE_DYE_SUFFIXES[i];
+				if (colorPalette.containsKey(key)) {
+					float[] src = colorPalette.get(key);
+					float[] dst = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(i));
+					dst[0] = src[0];
+					dst[1] = src[1];
+					dst[2] = src[2];
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		recolorTextures(event.getMap(), "minecraft:blocks/wool_colored_");
 		recolorTextures(event.getMap(), "minecraft:blocks/glass_");
 		recolorTextures(event.getMap(), "minecraft:blocks/glass_pane_top_");
