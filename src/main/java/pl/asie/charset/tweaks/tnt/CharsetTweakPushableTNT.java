@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.tweaks.old.tnt;
+package pl.asie.charset.tweaks.tnt;
 
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import pl.asie.charset.lib.ModCharset;
+import pl.asie.charset.lib.annotation.CharsetModule;
+import pl.asie.charset.lib.utils.RegistryUtils;
 
-public class TweakImprovedTNT {
-	public void enable() {
-		EntityRegistry.registerModEntity(new ResourceLocation("charsettweaks:tnt"), EntityTNTImproved.class, "charsettweaks:tnt", 1, ModCharset.instance, 64, 1, true);
+@CharsetModule(
+		name = "tweak.pushableTnt",
+		description = "Allows players to push TNT around by hand or projectile"
+)
+public class CharsetTweakPushableTNT {
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event) {
+		RegistryUtils.register(EntityTNTImproved.class, "charset:tnt", 1, 64, 1, true);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 

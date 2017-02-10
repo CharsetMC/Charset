@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.tweaks.old.tnt;
+package pl.asie.charset.tweaks.tnt;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -34,6 +36,16 @@ public class EntityTNTImproved extends EntityTNTPrimed {
 
     public EntityTNTImproved(World worldIn, double x, double y, double z, EntityLivingBase igniter) {
         super(worldIn, x, y, z, igniter);
+
+    }
+
+    @Override
+    public String getName() {
+        if (this.hasCustomName()) {
+            return this.getCustomNameTag();
+        } else {
+            return I18n.translateToLocal("entity.PrimedTnt.name");
+        }
     }
 
     @Nullable
