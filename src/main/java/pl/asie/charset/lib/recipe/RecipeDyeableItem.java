@@ -69,9 +69,9 @@ public class RecipeDyeableItem extends RecipeBase {
 					return new int[] {(c >> 16) & 255, (c >> 8) & 255, c & 255};
 				}
 			} else {
-				int dyeId = ColorUtils.getColorIDFromDye(stack);
-				if (dyeId >= 0) {
-					float[] col = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(dyeId));
+				EnumDyeColor dyeId = ColorUtils.getColorFromDye(stack);
+				if (dyeId != null) {
+					float[] col = EntitySheep.getDyeRgb(dyeId);
 					return new int[] {
 							(int) (col[0] * 255.0F),
 							(int) (col[1] * 255.0F),

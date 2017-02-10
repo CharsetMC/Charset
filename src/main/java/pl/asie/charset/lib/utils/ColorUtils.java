@@ -16,9 +16,14 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
 
 // TODO: Refactor me
 public final class ColorUtils {
@@ -29,7 +34,8 @@ public final class ColorUtils {
 			"brown", "green", "red", "black"
 	};
 
-	private static final int[] WOOL_TO_RGB = new int[]{
+	// TODO: Remove in 1.12
+	public static final int[] LEGACY_COLORS = new int[]{
 			0xFAFAFA, 0xD87F33, 0xB24CD8, 0x6699D8,
 			0xE5E533, 0x7FCC19, 0xF27FA5, 0x4C4C4C,
 			0x999999, 0x4C7F99, 0x7F3FB2, 0x334CB2,
@@ -67,33 +73,37 @@ public final class ColorUtils {
 		}
 	}
 
-	public static int getColorIDFromDye(ItemStack stack) {
+	public static @Nullable EnumDyeColor getColorFromDye(ItemStack stack) {
 		if (stack.isEmpty()) {
-			return -1;
+			return null;
 		}
 
 		if (stack.getItem() == Items.DYE) {
-			return 15 - stack.getItemDamage();
+			return EnumDyeColor.byDyeDamage(stack.getItemDamage());
 		}
 
 		int[] itemOreIDs = OreDictionary.getOreIDs(stack);
 		for (int i = 0; i < 16; i++) {
 			for (int id : itemOreIDs) {
 				if (OREDICT_DYE_IDS[i] == id) {
-					return i;
+					return EnumDyeColor.byMetadata(i);
 				}
 			}
 		}
 
-		return -1;
+		return null;
 	}
 
 	public static boolean isDye(ItemStack stack) {
-		return getColorIDFromDye(stack) >= 0;
+		return getColorFromDye(stack) != null;
 	}
 
-	public static int getRGBColor(int wool) {
-		return WOOL_TO_RGB[wool & 15];
+	public static int getIntColor(EnumDyeColor color) {
+		float[] d = EntitySheep.getDyeRgb(color);
+		return    (Math.min(Math.round(d[0] * 255.0F), 255) << 16)
+				| (Math.min(Math.round(d[1] * 255.0F), 255) << 8)
+				| (Math.min(Math.round(d[2] * 255.0F), 255))
+				| 0xFF000000;
 	}
 
 	public static String getOreDictEntry(String prefix, int wool) {

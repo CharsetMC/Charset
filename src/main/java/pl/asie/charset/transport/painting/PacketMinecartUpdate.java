@@ -19,11 +19,12 @@ package pl.asie.charset.transport.painting;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.network.INetHandler;
 import pl.asie.charset.lib.network.PacketEntity;
 
 public class PacketMinecartUpdate extends PacketEntity {
-	private int color;
+	private EnumDyeColor color;
 
 	public PacketMinecartUpdate() {
 		super();
@@ -37,7 +38,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 		CharsetTransportDyeableMinecarts.packet.sendToAllAround(new PacketMinecartUpdate(minecart), minecart, 128);
 	}
 
-	private static void update(EntityMinecart minecart, int color) {
+	private static void update(EntityMinecart minecart, EnumDyeColor color) {
 		MinecartDyeable properties = MinecartDyeable.get(minecart);
 		if (properties != null) {
 			properties.setColor(color);
@@ -47,7 +48,9 @@ public class PacketMinecartUpdate extends PacketEntity {
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
-		color = buf.readInt();
+		int intCol = buf.readInt();
+		if (intCol < 0) color = null;
+		else color = EnumDyeColor.byMetadata(intCol);
 	}
 
 	@Override
@@ -64,7 +67,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 
 		EntityMinecart minecart = (EntityMinecart) entity;
 		MinecartDyeable properties = MinecartDyeable.get(minecart);
-		buf.writeInt(properties != null ? properties.getColor() : -1);
+		buf.writeInt(properties != null && properties.getColor() != null ? properties.getColor().getMetadata() : -1);
 	}
 
 	@Override

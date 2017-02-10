@@ -17,23 +17,64 @@
 package pl.asie.charset.transport.painting;
 
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
+import pl.asie.charset.lib.utils.ColorUtils;
+
+import javax.annotation.Nullable;
 
 public class MinecartDyeable {
-	private int color = -1;
+	private EnumDyeColor color;
 
-	public int getColor() {
+	public @Nullable EnumDyeColor getColor() {
 		return color;
 	}
 
-	public void setColor(int color) {
-		if (color >= 0 && color <= 0xFFFFFF) {
-			this.color = color;
-		} else {
-			this.color = -1;
-		}
+	public void setColor(EnumDyeColor color) {
+		this.color = color;
 	}
 
 	public static MinecartDyeable get(EntityMinecart entity) {
 		return entity.getCapability(CharsetTransportDyeableMinecarts.MINECART_DYEABLE, null);
+	}
+
+	public static class Storage implements Capability.IStorage<MinecartDyeable> {
+		@Override
+		public NBTBase writeNBT(Capability<MinecartDyeable> capability, MinecartDyeable instance, EnumFacing side) {
+			if (instance != null) {
+				NBTTagCompound compound = new NBTTagCompound();
+				if (instance.color != null) {
+					compound.setInteger("id", instance.color.getMetadata());
+				}
+				return compound;
+			} else {
+				return null;
+			}
+		}
+
+		@Override
+		public void readNBT(Capability<MinecartDyeable> capability, MinecartDyeable instance, EnumFacing side, NBTBase nbt) {
+			if (nbt instanceof NBTTagCompound && instance != null) {
+				NBTTagCompound compound = (NBTTagCompound) nbt;
+				instance.color = null;
+				if (compound.hasKey("id")) {
+					instance.setColor(EnumDyeColor.byMetadata(compound.getInteger("id")));
+				} else if (compound.hasKey("color")) {
+					// TODO: Remove in 1.12 - legacy handling
+					int color = compound.getInteger("color");
+					if (color != -1) {
+						color &= 0xFFFFFF;
+						for (int i = 0; i < 16; i++) {
+							if ((ColorUtils.LEGACY_COLORS[i] & 0xFFFFFF) == color) {
+								instance.color = EnumDyeColor.byMetadata(i);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

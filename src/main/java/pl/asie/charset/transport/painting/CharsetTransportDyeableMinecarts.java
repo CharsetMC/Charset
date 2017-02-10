@@ -87,28 +87,7 @@ public class CharsetTransportDyeableMinecarts {
 		packet.registerPacket(0x01, PacketMinecartUpdate.class);
 		packet.registerPacket(0x02, PacketMinecartRequest.class);
 
-		CapabilityManager.INSTANCE.register(MinecartDyeable.class, new Capability.IStorage<MinecartDyeable>() {
-			@Override
-			public NBTBase writeNBT(Capability<MinecartDyeable> capability, MinecartDyeable instance, EnumFacing side) {
-				if (instance != null) {
-					NBTTagCompound compound = new NBTTagCompound();
-					compound.setInteger("color", instance.getColor());
-					return compound;
-				} else {
-					return null;
-				}
-			}
-
-			@Override
-			public void readNBT(Capability<MinecartDyeable> capability, MinecartDyeable instance, EnumFacing side, NBTBase nbt) {
-				if (nbt instanceof NBTTagCompound && instance != null) {
-					NBTTagCompound compound = (NBTTagCompound) nbt;
-					if (compound.hasKey("color")) {
-						instance.setColor(compound.getInteger("color"));
-					}
-				}
-			}
-		}, MinecartDyeable.class);
+		CapabilityManager.INSTANCE.register(MinecartDyeable.class, new MinecartDyeable.Storage(), MinecartDyeable.class);
 
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -165,7 +144,7 @@ public class CharsetTransportDyeableMinecarts {
 				 && ColorUtils.isDye(event.getEntityPlayer().getHeldItem(event.getHand()))) {
 			MinecartDyeable properties = MinecartDyeable.get((EntityMinecart) event.getTarget());
 			if (properties != null) {
-				properties.setColor(ColorUtils.getRGBColor(ColorUtils.getColorIDFromDye(event.getEntityPlayer().getHeldItem(event.getHand()))));
+				properties.setColor(ColorUtils.getColorFromDye(event.getEntityPlayer().getHeldItem(event.getHand())));
 
 				event.setCanceled(true);
 				event.getEntityPlayer().swingArm(event.getHand());

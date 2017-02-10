@@ -21,7 +21,10 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.lib.utils.ColorUtils;
 
 public class ModelMinecartWrapped extends ModelBase {
 	private final ModelBase parent;
@@ -34,13 +37,11 @@ public class ModelMinecartWrapped extends ModelBase {
 		if (entityIn instanceof EntityMinecart) {
 			EntityMinecart minecart = (EntityMinecart) entityIn;
 			MinecartDyeable dyeable = MinecartDyeable.get(minecart);
-			if (dyeable != null && dyeable.getColor() >= 0) {
-				Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("charsettweaks:textures/entity/painting.png"));
+			if (dyeable != null && dyeable.getColor() != null) {
+				Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("charset:textures/entity/minecart.png"));
+				float[] color = EntitySheep.getDyeRgb(dyeable.getColor());
 
-				float r = (float) ((dyeable.getColor() >> 16) & 255) / 255.0f;
-				float g = (float) ((dyeable.getColor() >> 8) & 255) / 255.0f;
-				float b = (float) (dyeable.getColor() & 255) / 255.0f;
-				GlStateManager.color(r, g, b);
+				GlStateManager.color(color[0], color[1], color[2]);
 			}
 		}
 

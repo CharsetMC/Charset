@@ -1,0 +1,7 @@
+* Rewritten internal mod structure (the whole thing!)
+    * One mod ID with modules (higher granularity than previously) configurable in config/charset/modules.cfg
+* [storage.barrels] Fixed many issues with barrel carts.
+* [tweak.unifyColors] New tweak! Unifies wool/stained glass/stained clay colors.
+    * Dynamic - works with resource packs!
+    * To change the colors, create your own assets/charset/color_palette.json.
+    * Note that stained clay takes on some of the tint of the hardened clay.
