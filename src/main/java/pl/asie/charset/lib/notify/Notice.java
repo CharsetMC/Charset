@@ -338,7 +338,7 @@ public class Notice {
 
     /**
      * Sends an on-screen message, using Vanilla's mechanism for displaying the
-     * painting's "Press SHIFT to dismount" message.
+     * color's "Press SHIFT to dismount" message.
      * (Unfortunately it kind of looks like crap because the text isn't shadowed. Oh well.)
      * 
      * @param player

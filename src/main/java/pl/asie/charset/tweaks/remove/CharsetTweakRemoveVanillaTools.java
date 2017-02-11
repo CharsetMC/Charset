@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.tweaks.old;
+package pl.asie.charset.tweaks.remove;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemAxe;
@@ -25,18 +25,26 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.ModCharset;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.annotation.CharsetModule;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class TweakDisableVanillaTools {
+@CharsetModule(
+		name = "tweak.remove.vanillaStyleTools",
+		isDefault = false
+)
+public class CharsetTweakRemoveVanillaTools {
 	public int getMode() {
-		return -1;
+		return 2;
 	}
 
-	public void enable() {
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
 		Set<Item> itemSet = new HashSet<Item>();
 		for (ResourceLocation l : Item.REGISTRY.getKeys()) {
 			Item i = Item.REGISTRY.getObject(l);

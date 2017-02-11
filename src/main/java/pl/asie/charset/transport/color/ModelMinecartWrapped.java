@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.transport.painting;
+package pl.asie.charset.transport.color;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
@@ -22,9 +22,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.utils.ColorUtils;
 
 public class ModelMinecartWrapped extends ModelBase {
 	private final ModelBase parent;

@@ -1,4 +1,4 @@
-package pl.asie.charset.transport;
+package pl.asie.charset.transport.rails;
 
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.SoundType;

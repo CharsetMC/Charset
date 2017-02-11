@@ -1,4 +1,4 @@
-package pl.asie.charset.transport;
+package pl.asie.charset.transport.carts;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.transport.painting;
+package pl.asie.charset.transport.color;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;

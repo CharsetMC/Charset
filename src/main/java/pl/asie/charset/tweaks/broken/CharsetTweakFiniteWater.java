@@ -12,29 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Copyright (c) 2014 copygirl
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 
-package pl.asie.charset.tweaks.old;
+package pl.asie.charset.tweaks.broken;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -45,12 +25,25 @@ import net.minecraft.world.biome.BiomeOcean;
 import net.minecraft.world.biome.BiomeRiver;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import pl.asie.charset.lib.annotation.CharsetModule;
 
-public class TweakFiniteWater {
+/* @CharsetModule(
+		name = "tweak.finiteWater",
+		description = "Adds slightly novel finite water. WIP",
+		isDefault = false
+) */
+public class CharsetTweakFiniteWater {
 	private boolean isWater(IBlockState state) {
 		return state.getMaterial() == Material.WATER;
+	}
+
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	// TODO: override worldgen to give ocean water special support

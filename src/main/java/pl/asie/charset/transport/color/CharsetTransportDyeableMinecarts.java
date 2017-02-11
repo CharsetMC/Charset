@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.transport.painting;
+package pl.asie.charset.transport.color;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
