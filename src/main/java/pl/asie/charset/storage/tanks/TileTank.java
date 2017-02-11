@@ -5,6 +5,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.FluidStack;
@@ -13,14 +15,19 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerFluidMap;
+import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.lib.IDebuggable;
+import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.lib.blocks.TileBase;
+import pl.asie.charset.lib.capability.Capabilities;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
-public class TileTank extends TileBase implements IFluidHandler, IFluidTankProperties {
+public class TileTank extends TileBase implements IFluidHandler, IFluidTankProperties, IMovable, IDebuggable {
     public static class TankIterator implements Iterator<TileTank> {
         private TileTank currTank;
 
@@ -38,6 +45,16 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
             TileTank tank = currTank;
             currTank = currTank.getAboveTank();
             return tank;
+        }
+    }
+
+    public static boolean checkPlacementConflict(TileEntity a, TileEntity b) {
+        if (a instanceof TileTank && b instanceof TileTank
+                && ((TileTank) a).fluidStack != null
+                && ((TileTank) b).fluidStack != null) {
+            return !((TileTank) a).fluidStack.isFluidEqual(((TileTank) b).fluidStack);
+        } else {
+            return false;
         }
     }
 
@@ -226,12 +243,15 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     @Override
     public FluidStack getContents() {
         Iterator<TileTank> i = getAllTanks();
-        FluidStack contents = i.next().fluidStack.copy();
+        FluidStack contents = i.next().fluidStack;
         if (contents != null) {
+            contents = contents.copy();
             while (i.hasNext()) {
                 FluidStack c = i.next().fluidStack;
                 if (c != null) {
                     contents.amount += c.amount;
+                } else {
+                    break;
                 }
             }
         }
@@ -273,11 +293,44 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+            return true;
+        } else if (capability == Capabilities.DEBUGGABLE) {
+            return true;
+        } else if (capability == Capabilities.MOVABLE) {
+            return true;
+        } else {
+            return super.hasCapability(capability, facing);
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ? CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this) : super.getCapability(capability, facing);
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || capability == Capabilities.DEBUGGABLE || capability == Capabilities.MOVABLE) {
+            return (T) this;
+        } else {
+            return super.getCapability(capability, facing);
+        }
+    }
+
+    private String dbgFluidToString(FluidStack stack) {
+        return stack == null ? TextFormatting.ITALIC + "<empty>" : stack.getLocalizedName() + " x " + stack.amount;
+    }
+
+    @Override
+    public void addDebugInformation(List<String> stringList, Side side) {
+        stringList.add("Global: " + dbgFluidToString(getContents()) + TextFormatting.RESET + "/" + getCapacity());
+        stringList.add("Local: " + dbgFluidToString(fluidStack) + TextFormatting.RESET + "/" + CAPACITY);
+    }
+
+    @Override
+    public boolean canMoveFrom() {
+        return true;
+    }
+
+    @Override
+    public boolean canMoveTo(World world, BlockPos pos) {
+        return !(checkPlacementConflict(this, world.getTileEntity(pos.up())) || checkPlacementConflict(this, world.getTileEntity(pos.down())));
     }
 }

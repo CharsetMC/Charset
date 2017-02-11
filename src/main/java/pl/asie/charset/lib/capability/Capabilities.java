@@ -28,6 +28,7 @@ import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
+import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
@@ -38,6 +39,7 @@ import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.lib.DefaultAxisRotatable;
 import pl.asie.charset.lib.capability.lib.DefaultDebuggable;
+import pl.asie.charset.lib.capability.lib.DefaultMovable;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInsertionToItemHandler;
@@ -58,6 +60,8 @@ public class Capabilities {
 	public static Capability<IAxisRotatable> AXIS_ROTATABLE;
 	@CapabilityInject(IDebuggable.class)
 	public static Capability<IDebuggable> DEBUGGABLE;
+	@CapabilityInject(IMovable.class)
+	public static Capability<IMovable> MOVABLE;
 
 	@CapabilityInject(IItemInsertionHandler.class)
 	public static Capability<IItemInsertionHandler> ITEM_INSERTION_HANDLER;
@@ -74,19 +78,20 @@ public class Capabilities {
 	public static Capability<IRedstoneReceiver> REDSTONE_RECEIVER;
 
 	public static void init() {
-		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource.class);
-		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<IAudioReceiver>(), DefaultAudioReceiver.class);
+		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource::new);
+		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<IAudioReceiver>(), DefaultAudioReceiver::new);
 
-		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new NullCapabilityStorage<IAxisRotatable>(), DefaultAxisRotatable.class);
-		CapabilityManager.INSTANCE.register(IDebuggable.class, new NullCapabilityStorage<IDebuggable>(), DefaultDebuggable.class);
+		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new NullCapabilityStorage<IAxisRotatable>(), DefaultAxisRotatable::new);
+		CapabilityManager.INSTANCE.register(IDebuggable.class, new NullCapabilityStorage<IDebuggable>(), DefaultDebuggable::new);
+		CapabilityManager.INSTANCE.register(IMovable.class, new NullCapabilityStorage<IMovable>(), DefaultMovable::new);
 
-		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<IItemInsertionHandler>(), DefaultItemInsertionHandler.class);
-		CapabilityManager.INSTANCE.register(IPipeView.class, new NullCapabilityStorage<IPipeView>(), DefaultPipeView.class);
+		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<IItemInsertionHandler>(), DefaultItemInsertionHandler::new);
+		CapabilityManager.INSTANCE.register(IPipeView.class, new NullCapabilityStorage<IPipeView>(), DefaultPipeView::new);
 
-		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter.class);
-		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter.class);
-		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver.class);
-		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver.class);
+		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter::new);
+		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter::new);
+		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver::new);
+		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver::new);
 
 		if (Loader.isModLoaded("mcmultipart")) {
 			initMultiplePants();

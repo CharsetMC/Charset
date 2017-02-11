@@ -19,6 +19,9 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import pl.asie.charset.api.lib.IMovable;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.utils.RotationUtils;
 
@@ -149,6 +152,13 @@ public class CarryHandler {
 
     public boolean place(World world, BlockPos pos, EnumFacing facing) {
         if (block != null) {
+            if (hasTileEntity()) {
+                IMovable movable = CapabilityHelper.get(Capabilities.MOVABLE, getTileEntity(), null);
+                if (movable != null && !movable.canMoveTo(world, pos)) {
+                    return false;
+                }
+            }
+
             if (world.mayPlace(block.getBlock(), pos, false, facing, null)) {
                 world.setBlockState(pos, block);
                 IBlockState oldBlock = block;
@@ -181,6 +191,10 @@ public class CarryHandler {
         } else {
             return false;
         }
+    }
+
+    private boolean hasTileEntity() {
+        return tile != null;
     }
 
     public void empty() {

@@ -45,7 +45,7 @@ import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
-import pl.asie.charset.lib.misc.InDevEventHandler;
+import pl.asie.charset.lib.misc.DebugInfoProvider;
 import pl.asie.charset.lib.misc.PlayerDeathHandler;
 import pl.asie.charset.lib.misc.SplashTextHandler;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -86,6 +86,7 @@ public class CharsetLib {
 	public static PlayerDeathHandler deathHandler = new PlayerDeathHandler();
 
 	public static boolean alwaysDropDroppablesGivenToPlayer;
+	public static boolean enableDebugInfo;
 	// public static boolean showAllItemTypes;
 
 	@SubscribeEvent
@@ -109,6 +110,7 @@ public class CharsetLib {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
+		enableDebugInfo = config.getBoolean("enableDebugInfo", "expert", false, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.");
 		// showAllItemTypes = config.getBoolean("showAllItemTypes", "general", true, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
 
 		// TODO 1.11
@@ -144,8 +146,8 @@ public class CharsetLib {
 		ColorUtils.init();
 		DataSerializersCharset.init();
 
-		if (ModCharset.INDEV)
-			MinecraftForge.EVENT_BUS.register(new InDevEventHandler());
+		if (ModCharset.INDEV || enableDebugInfo)
+			MinecraftForge.EVENT_BUS.register(new DebugInfoProvider());
 
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");

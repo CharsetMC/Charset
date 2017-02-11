@@ -31,9 +31,11 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
+import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.annotation.CharsetModule;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecart;
 import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecartDayBarrel;
@@ -108,6 +110,12 @@ public class CharsetTweakBlockCarrying {
         if (hasTileEntity) {
             TileEntity tile = world.getTileEntity(pos);
             if (tile != null) {
+                // Check IMovable
+                IMovable movable = tile.getCapability(Capabilities.MOVABLE, null);
+                if (movable != null && !movable.canMoveFrom()) {
+                    return false;
+                }
+
                 Class<? extends TileEntity> tileClass = tile.getClass();
                 locs.add(TileEntity.getKey(tileClass));
                 names.add(tileClass.getName());

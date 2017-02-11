@@ -168,17 +168,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     @Override
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
         // People may not place an empty tank between two tanks which differ only in liquid
-        TileEntity aboveEntity = worldIn.getTileEntity(pos);
-        TileEntity belowEntity = worldIn.getTileEntity(pos);
-        if (aboveEntity instanceof TileTank) {
-            TileTank aboveTank = (TileTank) aboveEntity;
-            TileTank belowTank = (TileTank) belowEntity;
-            if (aboveTank.fluidStack != null && belowTank.fluidStack != null && aboveTank.fluidStack.isFluidEqual(belowTank.fluidStack)) {
-                return false;
-            }
-        }
-
-        return true;
+        return !TileTank.checkPlacementConflict(worldIn.getTileEntity(pos.down()), worldIn.getTileEntity(pos.up()));
     }
 
     @Override

@@ -2,6 +2,7 @@ package pl.asie.charset.lib.misc;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.DimensionManager;
@@ -13,9 +14,10 @@ import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class InDevEventHandler {
+public class DebugInfoProvider {
 	private void addDebugInformation(RayTraceResult mouseOver, World world, List<String> info, Side side) {
 		ICapabilityProvider provider = null;
 		switch (mouseOver.typeOfHit) {
@@ -30,7 +32,13 @@ public class InDevEventHandler {
 		if (provider != null) {
 			IDebuggable debug = CapabilityHelper.get(Capabilities.DEBUGGABLE, provider, mouseOver.sideHit);
 			if (debug != null) {
-				debug.addDebugInformation(info, side);
+				List<String> targetInfo = new ArrayList<>();
+				debug.addDebugInformation(targetInfo, side);
+				if (targetInfo.size() > 0) {
+					info.add("");
+					info.add(TextFormatting.AQUA + "" + TextFormatting.BOLD + "" + TextFormatting.UNDERLINE + "" + TextFormatting.ITALIC + side.name());
+					info.addAll(targetInfo);
+				}
 			}
 		}
 	}
@@ -38,19 +46,23 @@ public class InDevEventHandler {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onGameOverlayDebugRender(RenderGameOverlayEvent.Text event) {
-		if (!Minecraft.getMinecraft().gameSettings.showDebugInfo)
+		Minecraft mc = Minecraft.getMinecraft();
+
+		if (!mc.gameSettings.showDebugInfo)
 			return;
 
-		// This relies on some hacks - we're getting the
-		// *server* world from the *client*, so this should
-		// only work in SSP.
-		if (!Minecraft.getMinecraft().isSingleplayer())
-			return;
-
-		RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
+		RayTraceResult mouseOver = mc.objectMouseOver;
 
 		if (mouseOver != null) {
-			World world = DimensionManager.getWorld(Minecraft.getMinecraft().world.provider.getDimension());
+			addDebugInformation(mouseOver, mc.world, event.getRight(), Side.CLIENT);
+
+			// The following relies on some hacks - we're getting the
+			// *server* world from the *client*, so this should
+			// only work in SSP.
+			if (!mc.isSingleplayer())
+				return;
+
+			World world = DimensionManager.getWorld(mc.world.provider.getDimension());
 			addDebugInformation(mouseOver, world, event.getRight(), Side.SERVER);
 		}
 	}
