@@ -58,7 +58,10 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         if (tankEntity instanceof TileTank) {
             TileTank tank = (TileTank) tankEntity;
             if (tank.fluidStack != null && tank.fluidStack.amount >= 1000) {
-                worldIn.setBlockState(pos, tank.fluidStack.getFluid().getBlock().getDefaultState());
+                float chance = (float) (tank.fluidStack.amount) / 8000;
+                if (worldIn.rand.nextFloat() <= chance) {
+                    worldIn.setBlockState(pos, tank.fluidStack.getFluid().getBlock().getDefaultState());
+                }
             }
         }
     }

@@ -97,6 +97,7 @@ public class ModCharset {
 		}
 		configModules = new Configuration(getConfigFile("modules.cfg"));
 		configIds = new Configuration(getConfigFile("ids.cfg"));
+		RegistryUtils.loadConfigIds(configIds);
 
 		logger = LogManager.getLogger();
 		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 1);
