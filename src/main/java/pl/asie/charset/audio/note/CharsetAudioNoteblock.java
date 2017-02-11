@@ -13,26 +13,38 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.NoteBlockEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.api.audio.AudioPacket;
-import pl.asie.charset.audio.ModCharsetAudio;
+import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.audio.types.AudioDataGameSound;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
+import pl.asie.charset.lib.network.PacketRegistry;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NoteBlockManager {
+@CharsetModule(
+        name = "audio.noteblock",
+        description = "Noteblock rework. WIP"
+)
+public class CharsetAudioNoteblock {
     private static final Map<Predicate<IBlockState>, SoundEvent> INSTRUMENTS = new HashMap<>();
     private static final SoundEvent DEFAULT_INSTRUMENT;
     private static final ResourceLocation NOTE_SOURCE_KEY = new ResourceLocation("charsetaudio:noteSource");
+
+    @CharsetModule.PacketRegistry
+    public PacketRegistry packet;
+
 
     static {
         DEFAULT_INSTRUMENT = SoundEvents.BLOCK_NOTE_HARP;
@@ -51,6 +63,12 @@ public class NoteBlockManager {
         }
 
         return DEFAULT_INSTRUMENT;
+    }
+
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
+        packet.registerPacket(0x01, PacketNoteParticle.class);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -86,7 +104,7 @@ public class NoteBlockManager {
                 event.setCanceled(true);
 
                 worldIn.playSound(null, pos, sound, SoundCategory.BLOCKS, 3.0F, pitch);
-                ModCharsetAudio.instance.packet().sendToAllAround(new PacketNoteParticle(note, param), note, 32);
+                packet.sendToAllAround(new PacketNoteParticle(note, param), note, 32);
             }
         }
     }

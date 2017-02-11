@@ -20,6 +20,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.commons.codec.binary.Hex;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.audio.ModCharsetAudio;
 
 import java.io.File;
@@ -42,10 +43,10 @@ public class DataStorageManager {
 		if (saveDirParent.exists() || saveDirParent.mkdir()) {
 			saveDir = new File(saveDirParent, "tape");
 			if (!saveDir.exists() && !saveDir.mkdir()) {
-				ModCharsetAudio.instance.logger().error("Could not create save directory! " + saveDirParent.getAbsolutePath());
+				ModCharset.logger.error("Could not create save directory! " + saveDirParent.getAbsolutePath());
 			}
 		} else {
-			ModCharsetAudio.instance.logger().error("Could not create save directory! " + saveDirParent.getAbsolutePath());
+			ModCharset.logger.error("Could not create save directory! " + saveDirParent.getAbsolutePath());
 		}
 
 		lastSave = time();

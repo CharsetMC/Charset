@@ -20,8 +20,8 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.tape.IDataStorage;
-import pl.asie.charset.audio.ModCharsetAudio;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public class DataStorageStorage implements Capability.IStorage<IDataStorage> {
 			try {
 				instance.onUnload();
 			} catch (IOException e) {
-				ModCharsetAudio.instance.logger().error("Could not save a DataStorage! (ID: " + instance.getUniqueId() + ")");
+				ModCharset.logger.error("Could not save a DataStorage! (ID: " + instance.getUniqueId() + ")");
 				e.printStackTrace();
 			}
 
