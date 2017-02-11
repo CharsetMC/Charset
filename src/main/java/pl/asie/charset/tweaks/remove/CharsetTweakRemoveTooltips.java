@@ -1,4 +1,4 @@
-package pl.asie.charset.tweaks;
+package pl.asie.charset.tweaks.remove;
 
 import net.minecraft.item.ItemTool;
 import net.minecraftforge.common.MinecraftForge;
@@ -10,11 +10,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.annotation.CharsetModule;
 
 @CharsetModule(
-        name = "tweak.disableItemTooltips",
-        description = "Disables all item tooltips",
+        name = "tweak.remove.itemTooltips",
         isDefault = false
 )
-public class CharsetTweakDisableTooltips {
+public class CharsetTweakRemoveTooltips {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);

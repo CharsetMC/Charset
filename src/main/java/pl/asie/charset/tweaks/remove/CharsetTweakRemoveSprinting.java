@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.tweaks;
+package pl.asie.charset.tweaks.remove;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -24,11 +24,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import pl.asie.charset.lib.annotation.CharsetModule;
 
 @CharsetModule(
-		name = "tweak.disableSprint",
-		description = "Disable sprinting.",
+		name = "tweak.remove.sprinting",
 		isDefault = false
 )
-public class CharsetTweakDisableSprint {
+public class CharsetTweakRemoveSprinting {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
