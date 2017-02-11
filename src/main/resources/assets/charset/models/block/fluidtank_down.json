@@ -1,0 +1,17 @@
+{
+    "elements": [
+        {   "from": [ 1, 0, 1 ],
+            "to": [ 15, 16, 15 ],
+            "faces": {
+                "down": { "texture": "#top", "cullface": "down" }
+            }
+        },
+        {   "from": [ 14.99, 15.99, 14.99 ],
+            "to": [ 1.01, 0.01, 1.01 ],
+            "faces": {
+                "up":    { "texture": "#top" }
+            }
+        }
+    ]
+}
+

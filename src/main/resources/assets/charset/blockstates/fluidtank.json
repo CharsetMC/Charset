@@ -1,0 +1,28 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "top": "charset:blocks/fluidtank/tank_top",
+      "side": "charset:blocks/fluidtank/tank_side_3",
+      "particle": "charset:blocks/fluidtank/tank_side_3"
+    },
+    "model": "charset:fluidtank",
+    "uvlock": false
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {
+        "transform": "forge:default-block"
+      }
+    ],
+    "connections": {
+      "0": {"textures": {"side": "charset:blocks/fluidtank/tank_side_0"}},
+      "1": {"textures": {"side": "charset:blocks/fluidtank/tank_side_1"}, "submodel": {"down": {"model": "charset:fluidtank_down"}}},
+      "2": {"textures": {"side": "charset:blocks/fluidtank/tank_side_2"}, "submodel": {"up": {"model": "charset:fluidtank_up"}}},
+      "3": {"submodel": {"down": {"model": "charset:fluidtank_down"}, "up": {"model": "charset:fluidtank_up"}}}
+    }
+  }
+}

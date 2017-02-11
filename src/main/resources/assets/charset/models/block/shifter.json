@@ -1,7 +1,7 @@
 {
   "parent": "block/cube",
   "textures": {
-    "particle": "charset:blocks/shifter_none",
+    "particle": "charset:blocks/shifter/shifter_none",
     "down": "#in",
     "up": "#out",
     "north": "#arrow",

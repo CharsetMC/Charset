@@ -1,6 +1,7 @@
 package pl.asie.charset.transport.rails;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -18,7 +19,8 @@ public class CharsetTransportRails {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        RegistryUtils.register(blockRailCross = new BlockRailCharset(), "rail_charset");
+        blockRailCross = new BlockRailCharset();
+        RegistryUtils.register(blockRailCross, new ItemBlock(blockRailCross),"rail_charset");
         RegistryUtils.registerModel(blockRailCross, 0, "charset:rail_charset");
     }
 

@@ -20,7 +20,7 @@ import java.util.Random;
 
 public class SplashTextHandler {
 	private static final ResourceLocation SPLASH_TEXTS = new ResourceLocation("texts/splashes.txt");
-	private static final ResourceLocation EXTRA_SPLASH_TEXTS = new ResourceLocation("charsetlib:texts/extra_splashes.txt");
+	private static final ResourceLocation EXTRA_SPLASH_TEXTS = new ResourceLocation("charset:texts/extra_splashes.txt");
 
 	public void addTexts(List<String> splashes, ResourceLocation loc) {
 		IResource resource = null;

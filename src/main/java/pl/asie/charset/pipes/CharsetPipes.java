@@ -19,6 +19,7 @@ package pl.asie.charset.pipes;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -77,11 +78,11 @@ public class CharsetPipes {
 		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
 
 		blockPipe = new BlockPipe();
-		RegistryUtils.register(blockPipe, "pipe");
+		RegistryUtils.register(blockPipe, new ItemBlock(blockPipe),"pipe");
 		GameRegistry.registerTileEntityWithAlternatives(TilePipe.class, "charset:pipe", "charsetpipes:pipe");
 
 		shifterBlock = new BlockShifter();
-		RegistryUtils.register(shifterBlock, "shifter");
+		RegistryUtils.register(shifterBlock, new ItemBlock(shifterBlock),"shifter");
 		GameRegistry.registerTileEntityWithAlternatives(TileShifter.class, "charset:shifter", "charsetpipes:shifter");
 
 		RegistryUtils.registerModel(blockPipe, 0, "charset:pipe");
@@ -89,8 +90,8 @@ public class CharsetPipes {
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 
-		FMLInterModComms.sendMessage("charsetlib", "addCarry", blockPipe.getRegistryName());
-		FMLInterModComms.sendMessage("charsetlib", "addCarry", shifterBlock.getRegistryName());
+		FMLInterModComms.sendMessage("charset", "addCarry", blockPipe.getRegistryName());
+		FMLInterModComms.sendMessage("charset", "addCarry", shifterBlock.getRegistryName());
 	}
 
 	@Mod.EventHandler

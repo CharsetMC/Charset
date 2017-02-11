@@ -34,7 +34,7 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 public class CharsetTweakPushableTNT {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		RegistryUtils.register(EntityTNTImproved.class, "charset:tnt", 1, 64, 1, true);
+		RegistryUtils.register(EntityTNTImproved.class, "tnt", 1, 64, 1, true);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
