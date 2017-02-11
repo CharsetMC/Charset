@@ -2,6 +2,7 @@ package pl.asie.charset.lib.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -17,17 +18,30 @@ public class DualTileEntitySpecialRenderer<T extends TileEntity> extends TileEnt
 	protected final Minecraft mc = Minecraft.getMinecraft();
 
 	protected void renderTileEntityFastFromSlow(T part, double x, double y, double z, float partialTicks, int destroyStage) {
-		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		Tessellator tessellator = Tessellator.getInstance();
+		VertexBuffer VertexBuffer = tessellator.getBuffer();
+		this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		RenderHelper.disableStandardItemLighting();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.enableBlend();
+		GlStateManager.disableCull();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
+		if (Minecraft.isAmbientOcclusionEnabled())
+		{
+			GlStateManager.shadeModel(GL11.GL_SMOOTH);
+		}
+		else
+		{
+			GlStateManager.shadeModel(GL11.GL_FLAT);
+		}
 
-		VertexBuffer buffer = Tessellator.getInstance().getBuffer();
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-		renderTileEntityFast(part, x, y, z, partialTicks, destroyStage, buffer);
-		Tessellator.getInstance().draw();
+		VertexBuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
-		GlStateManager.enableLighting();
-		GlStateManager.popMatrix();
+		renderTileEntityFast(part, x, y, z, partialTicks, destroyStage, VertexBuffer);
+		VertexBuffer.setTranslation(0, 0, 0);
+
+		tessellator.draw();
+
+		RenderHelper.enableStandardItemLighting();
 	}
 }

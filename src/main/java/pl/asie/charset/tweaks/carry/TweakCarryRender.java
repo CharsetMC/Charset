@@ -90,28 +90,27 @@ public class TweakCarryRender {
 				Tessellator tessellator = Tessellator.getInstance();
 				VertexBuffer buffer = tessellator.getBuffer();
 
-				buffer.setTranslation(0, -64, 0);
-				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+				if (carryHandler.getBlockState().getRenderType() == EnumBlockRenderType.MODEL) {
+					buffer.setTranslation(0, -64, 0);
+					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
-				try {
-					IBlockState renderState = carryHandler.getBlockState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
-					IBlockState renderStateExt = carryHandler.getBlockState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+					try {
+						IBlockState renderState = carryHandler.getBlockState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+						IBlockState renderStateExt = carryHandler.getBlockState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
 
-					BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
-					IBakedModel model = brd.getModelForState(renderState);
-					if (carryHandler.getBlockState().getRenderType() == EnumBlockRenderType.MODEL) {
+						BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
+						IBakedModel model = brd.getModelForState(renderState);
 						brd.getBlockModelRenderer().renderModelFlat(carryHandler.getBlockAccess(),
 								model, renderStateExt,
 								CarryHandler.ACCESS_POS, buffer, false, 0L
 						);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					tessellator.draw();
-				}
 
-				buffer.setTranslation(0, 0, 0);
+					tessellator.draw();
+					buffer.setTranslation(0, 0, 0);
+				}
 
 				TileEntity tile = carryHandler.getBlockAccess().getTileEntity(CarryHandler.ACCESS_POS);
 				if (tile != null) {

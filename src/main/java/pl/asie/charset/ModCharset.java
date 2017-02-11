@@ -16,22 +16,15 @@
 
 package pl.asie.charset;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.util.datafix.FixTypes;
-import net.minecraft.util.datafix.IFixableData;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.CompoundDataFixer;
 import net.minecraftforge.common.util.ModFixs;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -57,9 +50,6 @@ import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Mod(modid = ModCharset.MODID, name = ModCharset.NAME, version = ModCharset.VERSION, updateJSON = ModCharset.UPDATE_URL, dependencies = ModCharset.DEP_LIB)
@@ -86,7 +76,7 @@ public class ModCharset {
 	};
 
 	public static Logger logger;
-	public static Configuration configModules;
+	public static Configuration configModules, configIds;
 
 	private static File configurationDirectory;
 	private static ModFixs dataFixes;
@@ -106,6 +96,8 @@ public class ModCharset {
 			configurationDirectory.mkdir();
 		}
 		configModules = new Configuration(getConfigFile("modules.cfg"));
+		configIds = new Configuration(getConfigFile("ids.cfg"));
+
 		logger = LogManager.getLogger();
 		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 1);
 		dataFixes.registerFix(FixTypes.ENTITY, new CharsetUnifiedModIdFixer.Entity(oldPrefixes));
@@ -127,6 +119,8 @@ public class ModCharset {
 
 		AnnotationHandler.INSTANCE.init();
 		AnnotationHandler.INSTANCE.passEvent(event);
+
+		if (configIds.hasChanged()) configIds.save();
 	}
 
 	@Mod.EventHandler

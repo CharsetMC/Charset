@@ -171,19 +171,26 @@ public abstract class BlockBase extends Block {
 
 	@Override
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
+		IBlockState stateOld = world.getBlockState(pos);
+
 		onBlockDestroyedByExplosion(world, pos, explosion);
 
 		IBlockState state = world.getBlockState(pos);
 		TileEntity tile = world.getTileEntity(pos);
 
-		world.setBlockToAir(pos);
+		if (stateOld == state) {
+			world.setBlockToAir(pos);
 
-		List<ItemStack> items = getDrops(world, pos, state, tile, 0, false);
-		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / Utils.getExplosionSize(explosion), true, null);
+			List<ItemStack> items = getDrops(world, pos, state, tile, 0, false);
+			float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / Utils.getExplosionSize(explosion), true, null);
 
-		for (ItemStack item : items)
-			if (world.rand.nextFloat() <= chance)
-				spawnAsEntity(world, pos, item);
+			for (ItemStack item : items)
+				if (world.rand.nextFloat() <= chance)
+					spawnAsEntity(world, pos, item);
+		} else {
+			// The block seems to have been replaced with something.
+			// Don't do anything.
+		}
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package pl.asie.charset.storage.tanks;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -11,14 +12,19 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.model.animation.FastTESR;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
+import pl.asie.charset.lib.utils.ProxiedBlockAccess;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.pipes.pipe.SpecialRendererPipe;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Created by asie on 2/11/17.
@@ -41,6 +47,20 @@ public class TileTankRenderer extends FastTESR<TileTank> {
                 }
             }
             return data;
+        }
+    }
+
+    private final class TankBlockAccess extends ProxiedBlockAccess {
+        private final int fluidLight;
+
+        public TankBlockAccess(IBlockAccess access, int fluidLight) {
+            super(access);
+            this.fluidLight = fluidLight;
+        }
+
+        @Override
+        public int getCombinedLight(BlockPos pos, int lightValue) {
+            return access.getCombinedLight(pos, Math.max(fluidLight, lightValue));
         }
     }
 
@@ -72,6 +92,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
 
         IBakedModel model;
         int color = te.fluidStack.getFluid().getColor(te.fluidStack);
+        int light = te.fluidStack.getFluid().getLuminosity();
 
         if (color == -1) {
             model = smodel;
@@ -79,7 +100,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
             model = ModelTransformer.transform(smodel, te.fluidStack.getFluid().getBlock().getDefaultState(), 0L, new FluidColorTransformer(color));
         }
 
-        renderer.renderModelSmooth(getWorld(), model, te.fluidStack.getFluid().getBlock().getDefaultState(), pos, vertexBuffer, false, 0L);
+        renderer.renderModel(new TankBlockAccess(getWorld(), light), model, te.fluidStack.getFluid().getBlock().getDefaultState(), pos, vertexBuffer, false, 0L);
         vertexBuffer.setTranslation(0, 0, 0);
     }
 }

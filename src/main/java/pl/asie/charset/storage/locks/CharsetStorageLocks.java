@@ -86,7 +86,7 @@ public class CharsetStorageLocks {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		RegistryUtils.register(EntityLock.class, "lock", 1, 64, 3, false);
+		RegistryUtils.register(EntityLock.class, "lock", 64, 3, false);
 
 		MinecraftForge.EVENT_BUS.register(new LockEventHandler());
 

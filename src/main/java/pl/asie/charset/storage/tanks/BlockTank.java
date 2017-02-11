@@ -18,6 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
@@ -48,6 +49,18 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
                 (((worldIn.getBlockState(pos.up()).getBlock() == this) ? 0 : 2)
                 | (((worldIn.getBlockState(pos.down()).getBlock() == this) ? 0 : 1)))
             );
+    }
+
+    @Override
+    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
+        BlockPos tankPos = pos;
+        TileEntity tankEntity = worldIn.getTileEntity(tankPos);
+        if (tankEntity instanceof TileTank) {
+            TileTank tank = (TileTank) tankEntity;
+            if (tank.fluidStack != null && tank.fluidStack.amount >= 1000) {
+                worldIn.setBlockState(pos, tank.fluidStack.getFluid().getBlock().getDefaultState());
+            }
+        }
     }
 
     @Override
