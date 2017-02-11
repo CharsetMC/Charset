@@ -16,6 +16,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.model.animation.FastTESR;
+import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
@@ -66,7 +67,8 @@ public class TileTankRenderer extends FastTESR<TileTank> {
 
     @Override
     public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, @Nonnull VertexBuffer vertexBuffer) {
-        if (te.fluidStack == null || te.getBottomTank() != te)
+        boolean isCarrying = te.getWorld() != null;
+        if (te.fluidStack == null || (!isCarrying && te.getBottomTank() != te))
             return;
 
         BlockPos pos = te.getPos();
@@ -79,8 +81,9 @@ public class TileTankRenderer extends FastTESR<TileTank> {
             if (sprite == null) return;
         }
 
-        int tankCount = te.getCapacity() / TileTank.CAPACITY;
-        float height = (float) (te.getContents().amount) / TileTank.CAPACITY;
+        FluidStack contents = !isCarrying ? te.getContents() : te.fluidStack;
+        int tankCount = !isCarrying ? (te.getCapacity() / TileTank.CAPACITY) : TileTank.CAPACITY;
+        float height = (float) (contents.amount) / TileTank.CAPACITY;
         SimpleBakedModel smodel = new SimpleBakedModel();
 
         Vector3f from = new Vector3f(1.025f, 0.025f, 1.025f);

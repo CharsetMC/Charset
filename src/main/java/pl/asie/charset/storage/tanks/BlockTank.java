@@ -8,6 +8,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -41,6 +42,8 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
     public BlockTank() {
         super(Material.GLASS);
+        setHardness(0.6F);
+        setUnlocalizedName("charset.tank");
     }
 
     @Override
@@ -67,6 +70,12 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+        worldIn.notifyNeighborsRespectDebug(pos, state.getBlock(), false);
+    }
+
+    @Override
     public int getMetaFromState(IBlockState state) {
         return 0;
     }
@@ -83,6 +92,11 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
     @Override
     public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 

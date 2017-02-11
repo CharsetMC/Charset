@@ -15,7 +15,8 @@
     ],
     "inventory": [
       {
-        "transform": "forge:default-block"
+        "transform": "forge:default-block",
+        "submodel": {"down": {"model": "charset:fluidtank_down"}, "up": {"model": "charset:fluidtank_up"}}
       }
     ],
     "connections": {

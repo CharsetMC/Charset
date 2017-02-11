@@ -133,7 +133,16 @@ public class TweakCarryRender {
 						try {
 							TileEntityRendererDispatcher.instance.renderTileEntityAt(tile, 0, 0, 0, partialTicks);
 						} catch (Exception e) {
-
+							// Hack of the Year award for the Least Graceful Recovery
+							buffer.setTranslation(0, 0, 0);
+							boolean caught = false;
+							while (!caught) {
+								try {
+									tessellator.draw();
+								} catch (IllegalStateException ee) {
+									caught = true;
+								}
+							}
 						}
 					}
 				}

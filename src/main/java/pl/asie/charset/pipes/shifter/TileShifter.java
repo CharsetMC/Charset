@@ -74,6 +74,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	}
 
 	private final ItemStack[] filters = new ItemStack[6];
+	private boolean updateRedstoneLevels;
 	private int redstoneLevel;
 	private int ticker = CharsetPipes.instance.rand.nextInt(256);
 
@@ -132,13 +133,9 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	}
 
 	@Override
-	public boolean initialize() {
-		if (getWorld() != null && !getWorld().isRemote) {
-			updateRedstoneLevel(null);
-			return true;
-		}
-
-		return false;
+	public void validate() {
+		super.validate();
+		updateRedstoneLevels = true;
 	}
 
 	public int getShiftDistance() {
@@ -206,6 +203,11 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 		if (world.isRemote) {
 			return;
+		}
+
+		if (updateRedstoneLevels) {
+			updateRedstoneLevel(null);
+			updateRedstoneLevels = false;
 		}
 
 		ticker++;

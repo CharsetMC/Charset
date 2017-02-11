@@ -27,12 +27,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 public class TileBase extends TileEntity {
-	private boolean initialized = false;
-
-	protected boolean initialize() {
-		return true;
-	}
-
 	public ItemStack getPickedBlock() {
 		return getDroppedBlock();
 	}
@@ -93,9 +87,6 @@ public class TileBase extends TileEntity {
 	}
 
 	public void update() {
-		if (!initialized) {
-			initialized = initialize();
-		}
 	}
 
 	public TileEntity getNeighbourTile(EnumFacing side) {

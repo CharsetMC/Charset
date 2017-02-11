@@ -100,3 +100,5 @@ item.charset.shard.name=Glass Shard
 
 # CharsetWrench
 item.charset.wrench.name=Wrench
+
+tile.charset.tank.name=Tank

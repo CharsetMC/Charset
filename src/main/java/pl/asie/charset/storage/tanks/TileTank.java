@@ -3,6 +3,7 @@ package pl.asie.charset.storage.tanks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
@@ -12,6 +13,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerFluidMap;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.blocks.TileBase;
 
 import javax.annotation.Nullable;
@@ -44,10 +46,21 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     protected FluidStack fluidStack;
 
     protected void onStackModified() {
-        if (fluidStack.amount == 0)
-            fluidStack = null;
+        if (fluidStack != null) {
+            if (fluidStack.amount < 0)
+                ModCharset.logger.warn("Tank at " + getPos() + " had negative FluidStack amount " + fluidStack.amount + "! This is a bug!");
+
+            if (fluidStack.amount <= 0)
+                fluidStack = null;
+        }
         // TODO: Maybe send less often than every *change*?
         markBlockForUpdate();
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        world.notifyNeighborsRespectDebug(getPos(), CharsetStorageTanks.tankBlock, false);
     }
 
     @Override
@@ -84,16 +97,39 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     protected void findBottomTank() {
         TileTank tank = this;
+        Stack<TileTank> drainTanks = new Stack<TileTank>();
         for (int y = pos.getY() - 1; y >= 0; y--) {
             BlockPos nPos = new BlockPos(pos.getX(), y, pos.getZ());
             TileEntity nTank = world.getTileEntity(nPos);
             if (nTank instanceof TileTank && connects((TileTank) nTank) && ((TileTank) nTank).connects(this)) {
                 tank = (TileTank) nTank;
+                drainTanks.add(tank);
             } else {
                 break;
             }
         }
         bottomTank = tank;
+
+        // Shift the liquid down in case there's new tanks below
+        boolean fluidStackChanged = false;
+        while (!drainTanks.empty() && fluidStack != null && fluidStack.amount > 0) {
+            tank = drainTanks.pop();
+
+            if (tank.fluidStack == null) {
+                tank.fluidStack = fluidStack;
+                fluidStack = null;
+                fluidStackChanged = true;
+            } else {
+                int toAdd = Math.min(TileTank.CAPACITY - tank.fluidStack.amount, fluidStack.amount);
+                tank.fluidStack.amount += toAdd;
+                fluidStack.amount -= toAdd;
+                if (fluidStack.amount == 0) fluidStack = null;
+                fluidStackChanged = true;
+            }
+
+            tank.onStackModified();
+        }
+        if (fluidStackChanged) onStackModified();
     }
 
     public Iterator<TileTank> getAllTanks() {
