@@ -19,7 +19,7 @@ public class PacketCarrySync extends Packet {
 
 	public PacketCarrySync(Entity player) {
 		this.player = player;
-		this.tag = (NBTTagCompound) CarryHandler.PROVIDER.getStorage().writeNBT(CharsetTweakCarry.CAPABILITY, player.getCapability(CharsetTweakCarry.CAPABILITY, null), null);
+		this.tag = (NBTTagCompound) CarryHandler.PROVIDER.getStorage().writeNBT(CharsetTweakBlockCarrying.CAPABILITY, player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null), null);
 	}
 
 	@Override
@@ -38,10 +38,10 @@ public class PacketCarrySync extends Packet {
 		if (player == null) {
 			player = getPlayer(handler);
 		}
-		if (player != null && player.hasCapability(CharsetTweakCarry.CAPABILITY, null)) {
-			CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+		if (player != null && player.hasCapability(CharsetTweakBlockCarrying.CAPABILITY, null)) {
+			CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
 			carryHandler.setPlayer(player);
-			CarryHandler.PROVIDER.getStorage().readNBT(CharsetTweakCarry.CAPABILITY, carryHandler, null, tag);
+			CarryHandler.PROVIDER.getStorage().readNBT(CharsetTweakBlockCarrying.CAPABILITY, carryHandler, null, tag);
 		}
 	}
 

@@ -133,26 +133,10 @@ public class RecipeCharset extends RecipeBase {
     public static class Builder {
         private RecipeCharset recipe;
 
-        private static IRecipeObject toRecipeObject(Object o) {
-            if (o instanceof IRecipeObject) {
-                return (IRecipeObject) o;
-            } else if (o instanceof Block) {
-                return new RecipeObjectItemStack((Block) o);
-            } else if (o instanceof Item) {
-                return new RecipeObjectItemStack((Item) o);
-            } else if (o instanceof ItemStack) {
-                return new RecipeObjectItemStack((ItemStack) o);
-            } else if (o instanceof String) {
-                return new RecipeObjectOreDict((String) o);
-            } else {
-                throw new RuntimeException("Invalid recipe object: " + o);
-            }
-        }
-
         private static IRecipeObject[] toRecipeObject(Object[] o) {
             IRecipeObject[] objects = new IRecipeObject[o.length];
             for (int i = 0; i < o.length; i++) {
-                objects[i] = toRecipeObject(o[i]);
+                objects[i] = IRecipeObject.of(o[i]);
             }
             return objects;
         }
@@ -203,7 +187,7 @@ public class RecipeCharset extends RecipeBase {
 
             while (idx < o.length) {
                 char c = (char) o[idx++];
-                IRecipeObject ro = toRecipeObject(o[idx++]);
+                IRecipeObject ro = IRecipeObject.of(o[idx++]);
                 map.put(c, ro);
             }
 

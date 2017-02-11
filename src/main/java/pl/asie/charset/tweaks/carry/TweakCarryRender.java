@@ -36,7 +36,7 @@ public class TweakCarryRender {
 				return;
 			}
 			EntityPlayer player = (EntityPlayer) rve;
-			CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+			CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
 			if (carryHandler != null && carryHandler.isCarrying()) {
 				event.setCanceled(true);
 			}
@@ -53,7 +53,7 @@ public class TweakCarryRender {
 		EntityPlayer player = (EntityPlayer) rve;
 		float partialTicks = event.getPartialTicks();
 
-		CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+		CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
 		if (carryHandler != null && carryHandler.isCarrying()) {
 			event.setCanceled(true);
 			if (this.mc.gameSettings.thirdPersonView != 0 || this.mc.gameSettings.hideGUI) {

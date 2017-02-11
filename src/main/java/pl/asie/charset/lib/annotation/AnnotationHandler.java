@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.event.FMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 import java.lang.invoke.MethodHandle;
@@ -30,6 +31,8 @@ import java.util.function.BiConsumer;
 
 public class AnnotationHandler {
 	public static final AnnotationHandler INSTANCE = new AnnotationHandler();
+	public static final Set<String> jeiPluginClassNames = new HashSet<>();
+
 	private static final Multimap<String, String> dependencies = HashMultimap.create();
 	private static final TreeMultimap<Class, Pair<String, MethodHandle>> loaderHandles = TreeMultimap.create(
 			Comparator.comparing(Class::getName),
@@ -239,6 +242,13 @@ public class AnnotationHandler {
 				throw new RuntimeException(e);
 			}
 		});
+
+		for (ASMDataTable.ASMData data : table.getAll(CharsetJEIPlugin.class.getName())) {
+			String id = (String) data.getAnnotationInfo().get("value");
+			if (loadedModules.containsKey(id)) {
+				jeiPluginClassNames.add(data.getClassName());
+			}
+		}
 	}
 
 	public void passEvent(FMLEvent o) {

@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.RecipeSorter;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -49,6 +50,19 @@ public class CharsetStorageBarrels {
 	public static ItemMinecartDayBarrel barrelCartItem;
 
 	public static boolean renderBarrelText, renderBarrelItem, renderBarrelItem3D;
+	public static boolean enableSilkyBarrels, enableHoppingBarrels;
+
+	public static boolean isEnabled(TileEntityDayBarrel.Type type) {
+		if (type == TileEntityDayBarrel.Type.SILKY) {
+			return enableSilkyBarrels;
+		} else if (type == TileEntityDayBarrel.Type.HOPPING) {
+			return enableHoppingBarrels;
+		} else if (type == TileEntityDayBarrel.Type.LARGER) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -64,9 +78,11 @@ public class CharsetStorageBarrels {
 		RegistryUtils.registerModel(barrelItem, 0, "charset:barrel");
 		RegistryUtils.registerModel(barrelCartItem, 0, "charset:barrelCart");
 
-		renderBarrelItem3D = config.getBoolean("renderItem3D", "barrels", false, "Should items use fancy 3D rendering?");
-		renderBarrelItem = config.getBoolean("renderItem", "barrels", true, "Should items be rendered on barrels?");
-		renderBarrelText = config.getBoolean("renderText", "barrels", true, "Should text be rendered on barrels?");
+		renderBarrelItem3D = config.getBoolean("renderItem3D", "render", false, "Should items use fancy 3D rendering?");
+		renderBarrelItem = config.getBoolean("renderItem", "render", true, "Should items be rendered on barrels?");
+		renderBarrelText = config.getBoolean("renderText", "render", true, "Should text be rendered on barrels?");
+		enableSilkyBarrels = config.getBoolean("enableSilkyBarrels", "features", !ModCharset.isModuleLoaded("tweak.blockCarrying"), "Enable silky barrels. On by default unless tweak.blockCarrying is also present.");
+		enableHoppingBarrels = config.getBoolean("enableHoppingBarrels", "features", true, "Enable hopping barrels. On by default.");
 
 		FMLInterModComms.sendMessage("charset", "addCarry", barrelBlock.getRegistryName());
 	}

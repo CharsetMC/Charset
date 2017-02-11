@@ -34,7 +34,7 @@ public class TweakCarryEventHandler {
     private static final AttributeModifier MODIFIER_CARRY = AttributeUtils.newModifierSingleton("charsettweaks:carry", -0.25D, AttributeUtils.Operation.ADD_MULTIPLIED);
 
     private void cancelIfCarrying(Event event, EntityPlayer player) {
-        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
         }
@@ -43,7 +43,7 @@ public class TweakCarryEventHandler {
     @SubscribeEvent
     public void onPlayerUpdate(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            CarryHandler carryHandler = event.player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+            CarryHandler carryHandler = event.player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
             if (carryHandler != null && carryHandler.isCarrying()) {
                 carryHandler.update();
             }
@@ -52,56 +52,56 @@ public class TweakCarryEventHandler {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingFall(LivingFallEvent event) {
-        CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying() && event.getDistance() >= 4.0f) {
             // TODO: add distance-based scaling
-            CharsetTweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
+            CharsetTweakBlockCarrying.dropCarriedBlock(event.getEntityLiving(), false);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingHurt(LivingHurtEvent event) {
-        CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying() && event.getSource() != DamageSource.FALL) {
-            CharsetTweakCarry.dropCarriedBlock(event.getEntityLiving(), false);
+            CharsetTweakBlockCarrying.dropCarriedBlock(event.getEntityLiving(), false);
         }
     }
 
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
-        CharsetTweakCarry.dropCarriedBlock(event.getEntityLiving(), true);
+        CharsetTweakBlockCarrying.dropCarriedBlock(event.getEntityLiving(), true);
     }
 
     @SubscribeEvent
     public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof EntityPlayer) {
-            event.addCapability(CharsetTweakCarry.CAP_IDENTIFIER, CarryHandler.PROVIDER.create(new CarryHandler().setPlayer((EntityPlayer) event.getObject())));
+            event.addCapability(CharsetTweakBlockCarrying.CAP_IDENTIFIER, CarryHandler.PROVIDER.create(new CarryHandler().setPlayer((EntityPlayer) event.getObject())));
         }
     }
 
     @SubscribeEvent
     public void onPlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
-        CharsetTweakCarry.syncCarryWithClient(event.player, event.player);
+        CharsetTweakBlockCarrying.syncCarryWithClient(event.player, event.player);
     }
 
     @SubscribeEvent
     public void onPlayerRespawnEvent(PlayerEvent.PlayerRespawnEvent event) {
-        CharsetTweakCarry.syncCarryWithClient(event.player, event.player);
+        CharsetTweakBlockCarrying.syncCarryWithClient(event.player, event.player);
     }
 
     @SubscribeEvent
     public void onPlayerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
-        CharsetTweakCarry.syncCarryWithClient(event.player, event.player);
+        CharsetTweakBlockCarrying.syncCarryWithClient(event.player, event.player);
     }
 
     @SubscribeEvent
     public void onPlayerStartTracking(net.minecraftforge.event.entity.player.PlayerEvent.StartTracking event) {
-        CharsetTweakCarry.syncCarryWithClient(event.getTarget(), event.getEntityPlayer());
+        CharsetTweakBlockCarrying.syncCarryWithClient(event.getTarget(), event.getEntityPlayer());
     }
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        CarryHandler carryHandler = event.player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = event.player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         IAttributeInstance movementSpeed = event.player.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED);
         if (carryHandler != null && carryHandler.isCarrying()) {
             if (event.player.isSprinting()) {
@@ -125,7 +125,7 @@ public class TweakCarryEventHandler {
                 && Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown()) {
 
             EntityPlayer player = Minecraft.getMinecraft().player;
-            CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+            CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
             if (!player.isCreative()) {
                 event.setCanceled(true);
             }
@@ -143,10 +143,10 @@ public class TweakCarryEventHandler {
 
                 RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
                 if (mouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    CharsetTweakCarry.grabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
+                    CharsetTweakBlockCarrying.grabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
                 } else if (mouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
                     Entity entity = mouseOver.entityHit;
-                    CharsetTweakCarry.grabEntity(player, player.getEntityWorld(), entity);
+                    CharsetTweakBlockCarrying.grabEntity(player, player.getEntityWorld(), entity);
                 }
             }
         }
@@ -156,7 +156,7 @@ public class TweakCarryEventHandler {
     public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         EntityPlayer player = event.getEntityPlayer();
 
-        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
 
@@ -177,7 +177,7 @@ public class TweakCarryEventHandler {
     public void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         EntityPlayer player = event.getEntityPlayer();
 
-        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             event.setCanceled(true);
             Entity entity = event.getTarget();

@@ -45,44 +45,72 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
+import pl.asie.charset.lib.recipe.IRecipeObject;
+import pl.asie.charset.lib.recipe.IRecipeResult;
+import pl.asie.charset.lib.recipe.RecipeCharset;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BarrelUpgradeRecipes {
-    private static final ItemStack oakLog = new ItemStack(Blocks.LOG);
-    private static final ItemStack oakPlank = new ItemStack(Blocks.WOODEN_SLAB);
-    private static final ItemStack hopper = new ItemStack(Blocks.HOPPER);
-    private static final ItemStack slime_ball = new ItemStack(Items.SLIME_BALL);
-    private static final ItemStack web = new ItemStack(Blocks.WEB);
+    private static final IRecipeObject hopper = IRecipeObject.of(Blocks.HOPPER);
+    private static final IRecipeObject slime_ball = IRecipeObject.of("slimeball");
+    private static final IRecipeObject web = IRecipeObject.of(Blocks.WEB);
+    private static final IRecipeObject barrel = new IRecipeObject() {
+        @Override
+        public Object preview() {
+            return BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.NORMAL);
+        }
+
+        @Override
+        public boolean test(ItemStack stack) {
+            if (stack.getItem() == CharsetStorageBarrels.barrelItem) {
+                TileEntityDayBarrel rep = new TileEntityDayBarrel();
+                rep.loadFromStack(stack);
+                return rep.type == TileEntityDayBarrel.Type.NORMAL;
+            } else {
+                return false;
+            }
+        }
+    };
 
     public static void addUpgradeRecipes() {
-        ItemStack oakBarrel = TileEntityDayBarrel.makeDefaultBarrel(TileEntityDayBarrel.Type.NORMAL);
-        oakBarrel.setItemDamage(OreDictionary.WILDCARD_VALUE);
-
         RecipeSorter.register("factorization:barrel_upgrade", BarrelUpgrade.class, RecipeSorter.Category.SHAPED, "");
 
-        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.SILKY, 3, 3, new ItemStack[] {
-                web, web, web,
-                web, oakBarrel, web,
-                web, web, web
-        }));
+        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Type.SILKY)) {
+            GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.SILKY, 3, 3, new IRecipeObject[]{
+                    web, web, web,
+                    web, barrel, web,
+                    web, web, web
+            }));
+        }
 
-        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.HOPPING, 1, 3, new ItemStack[] {
-                hopper,
-                oakBarrel,
-                hopper
-        }));
+        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Type.HOPPING)) {
+            GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.HOPPING, 1, 3, new IRecipeObject[]{
+                    hopper,
+                    barrel,
+                    hopper
+            }));
+        }
 
-        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.STICKY, 1, 3, new ItemStack[] {
-                slime_ball,
-                oakBarrel,
-                slime_ball
-        }));
+        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Type.STICKY)) {
+            GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.STICKY, 1, 3, new IRecipeObject[]{
+                    slime_ball,
+                    barrel,
+                    slime_ball
+            }));
+        }
     }
 
-    public static class BarrelUpgrade extends ShapedRecipes {
+    public static class BarrelUpgrade extends RecipeCharset implements IRecipeResult {
         final TileEntityDayBarrel.Type upgradeType;
 
-        public BarrelUpgrade(TileEntityDayBarrel.Type upgrade, int width, int height, ItemStack[] inputs) {
-            super(width, height, inputs, TileEntityDayBarrel.makeDefaultBarrel(upgrade));
+        public BarrelUpgrade(TileEntityDayBarrel.Type upgrade, int width, int height, IRecipeObject[] inputs) {
+            super.width = width;
+            super.height = height;
+            super.input = inputs;
+            super.output = this;
             this.upgradeType = upgrade;
         }
 
@@ -94,23 +122,19 @@ public class BarrelUpgradeRecipes {
                 }
                 return is;
             }
-            return null;
+            return ItemStack.EMPTY;
         }
 
         @Override
-        public boolean matches(InventoryCrafting container, World world) {
-            if (!super.matches(container, world)) return false;
-            ItemStack is = grabBarrel(container);
-            if (is == null) return false;
-            TileEntityDayBarrel rep = new TileEntityDayBarrel();
-            rep.loadFromStack(is);
-            return rep.type == TileEntityDayBarrel.Type.NORMAL;
+        public Object preview() {
+            return BarrelRegistry.INSTANCE.getBarrels(upgradeType);
         }
 
+        @Nullable
         @Override
-        public ItemStack getCraftingResult(InventoryCrafting container) {
-            ItemStack is = grabBarrel(container);
-            if (is == null) return super.getCraftingResult(container); // Shouldn't happen?
+        public ItemStack apply(@Nullable InventoryCrafting input) {
+            ItemStack is = grabBarrel(input);
+            if (is.isEmpty()) return ItemStack.EMPTY; // Shouldn't happen?
             TileEntityDayBarrel rep = new TileEntityDayBarrel();
             rep.loadFromStack(is);
             rep.type = upgradeType;

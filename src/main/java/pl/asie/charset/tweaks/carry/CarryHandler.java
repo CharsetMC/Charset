@@ -199,7 +199,7 @@ public class CarryHandler {
     public static void register() {
         Capability.IStorage<CarryHandler> storage = new CarryHandler.Storage();
         CapabilityManager.INSTANCE.register(CarryHandler.class, storage, CarryHandler.class);
-        CarryHandler.PROVIDER = new CapabilityProviderFactory<>(CharsetTweakCarry.CAPABILITY, storage);
+        CarryHandler.PROVIDER = new CapabilityProviderFactory<>(CharsetTweakBlockCarrying.CAPABILITY, storage);
     }
 
     public static class Storage implements Capability.IStorage<CarryHandler> {

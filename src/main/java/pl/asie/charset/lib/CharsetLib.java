@@ -22,6 +22,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -86,6 +87,7 @@ public class CharsetLib {
 	public static PlayerDeathHandler deathHandler = new PlayerDeathHandler();
 
 	public static boolean alwaysDropDroppablesGivenToPlayer;
+	// public static boolean showAllItemTypes;
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
@@ -108,6 +110,7 @@ public class CharsetLib {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
+		// showAllItemTypes = config.getBoolean("showAllItemTypes", "general", true, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
 
 		// TODO 1.11
 //		WireManager.ITEM = new ItemWire();

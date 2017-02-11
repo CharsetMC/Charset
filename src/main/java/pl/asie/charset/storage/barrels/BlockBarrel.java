@@ -96,12 +96,13 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         List<Collection<ItemStack>> list = new ArrayList<>();
         TileEntityDayBarrel rep = new TileEntityDayBarrel();
 
-        for (ItemStack barrel : BarrelRegistry.INSTANCE.getRegularBarrels()) {
+        for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.NORMAL)) {
             rep.loadFromStack(barrel);
             ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
 
             for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
                 if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
+                if (!CharsetStorageBarrels.isEnabled(type)) continue;
                 rep.type = type;
                 builder.add(rep.getPickedBlock());
             }

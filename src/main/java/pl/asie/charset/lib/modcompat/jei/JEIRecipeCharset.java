@@ -81,9 +81,9 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapp
             inputs.add(o != null ? o.preview() : null);
         }
 
-        ingredients.setInputLists(ItemStack.class, JEIPluginCharsetLib.STACKS.expandRecipeItemStackInputs(inputs));
+        ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(inputs));
         if (output instanceof ItemStack) {
-            ingredients.setOutputs(ItemStack.class, JEIPluginCharsetLib.STACKS.getSubtypes((ItemStack) output));
+            ingredients.setOutputs(ItemStack.class, JEIPluginCharset.STACKS.getSubtypes((ItemStack) output));
         } else if (output instanceof List) {
             ingredients.setOutputs(ItemStack.class, (List<ItemStack>) output);
         }

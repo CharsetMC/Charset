@@ -46,7 +46,7 @@ import java.util.Set;
     name = "tweak.blockCarrying",
     description = "Allow players to carry blocks via shift-pickblock"
 )
-public class CharsetTweakCarry {
+public class CharsetTweakBlockCarrying {
     public static final ResourceLocation CAP_IDENTIFIER = new ResourceLocation("charsettweaks:carry");
 
     @CapabilityInject(CarryHandler.class)
@@ -159,7 +159,7 @@ public class CharsetTweakCarry {
             packet.sendToServer(new PacketCarryGrab(world, pos));
         }
 
-        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && !carryHandler.isCarrying()) {
             if (canCarry(world, pos)) {
                 carryHandler.grab(world, pos);
@@ -175,7 +175,7 @@ public class CharsetTweakCarry {
             packet.sendToServer(new PacketCarryGrab(world, entity));
         }
 
-        CarryHandler carryHandler = player.getCapability(CharsetTweakCarry.CAPABILITY, null);
+        CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && !carryHandler.isCarrying()) {
             if (canCarry(entity)) {
                 for (ICarryTransformer<Entity> transformer : CarryTransformerRegistry.INSTANCE.getEntityTransformers()) {
@@ -230,7 +230,7 @@ public class CharsetTweakCarry {
                 return false;
             } else {
                 if (entity instanceof EntityPlayer) {
-                    CharsetTweakCarry.syncCarryWithClient(entity, (EntityPlayer) entity);
+                    CharsetTweakBlockCarrying.syncCarryWithClient(entity, (EntityPlayer) entity);
                 }
                 return true;
             }
