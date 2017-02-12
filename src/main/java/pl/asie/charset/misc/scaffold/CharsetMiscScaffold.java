@@ -18,6 +18,7 @@ package pl.asie.charset.misc.scaffold;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -49,6 +50,7 @@ public class CharsetMiscScaffold {
 	public static CharsetMiscScaffold instance;
 
 	public static Block scaffoldBlock;
+	public static Item scaffoldItem;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -57,7 +59,8 @@ public class CharsetMiscScaffold {
 		}
 
 		scaffoldBlock = new BlockScaffold();
-		RegistryUtils.register(scaffoldBlock, new ItemScaffold(scaffoldBlock), "scaffold");
+		scaffoldItem = new ItemScaffold(scaffoldBlock);
+		RegistryUtils.register(scaffoldBlock, scaffoldItem, "scaffold");
 		RegistryUtils.registerModel(scaffoldBlock, 0, "charset:scaffold");
 
 		MinecraftForge.EVENT_BUS.register(this);

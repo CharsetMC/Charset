@@ -17,25 +17,27 @@ public class TileScaffold extends TileBase {
 		return plank;
 	}
 
-	private void readPlankFromNBT(NBTTagCompound compound) {
+	public static ItemMaterial getPlankFromNBT(NBTTagCompound compound) {
 		// TODO: Compatibility code - remove in 1.12
-		plank = null;
+		ItemMaterial mat = null;
 		if (compound != null) {
 			if (compound.hasKey("plank", Constants.NBT.TAG_STRING)) {
-				plank = ItemMaterialRegistry.INSTANCE.getMaterial(compound.getString("plank"));
+				mat = ItemMaterialRegistry.INSTANCE.getMaterial(compound.getString("plank"));
 			} else if (compound.hasKey("plank", Constants.NBT.TAG_COMPOUND)) {
-				plank = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(compound.getCompoundTag("plank")));
+				mat = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(compound.getCompoundTag("plank")));
 			}
 		}
 
-		if (plank == null) {
-			plank = ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank");
+		if (mat == null) {
+			mat = ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank");
 		}
+
+		return mat;
 	}
 
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
-		readPlankFromNBT(compound);
+		plank = getPlankFromNBT(compound);
 	}
 
 	@Override
@@ -50,7 +52,7 @@ public class TileScaffold extends TileBase {
 	}
 
 	public void loadFromStack(ItemStack stack) {
-		readPlankFromNBT(stack.getTagCompound());
+		plank = getPlankFromNBT(stack.getTagCompound());
 	}
 
 	@Override

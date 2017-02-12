@@ -1,8 +1,11 @@
 * Rewritten internal mod structure (the whole thing!)
     * One mod ID with modules (higher granularity than previously) configurable in config/charset/modules.
+    * The above, of course, makes "@Charset" work in JEI.
 * [audio.tapes] Temporaily removed due to a potential incoming redesign. That's the only breaking part of this update - sorry!
+* [misc.scaffolds] Improved JEI support.
 * [pipes] Add support for CommonCapabilities' IInventoryState for further optimizations.
 * [storage.barrels] Fixed many issues with barrel carts.
+* [storage.barrels] Improved JEI support.
 * [storage.barrels] Sticky barrel upgrade can now use OreDict-ed slimeballs.
 * [storage.tanks] New module! Who doesn't like BuildCraft-styled tanks?
 * [tweak.disableItemTooltips] New tweak! Off by default.

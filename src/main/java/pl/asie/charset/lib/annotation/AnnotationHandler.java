@@ -5,6 +5,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.TreeMultimap;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -34,9 +35,12 @@ public class AnnotationHandler {
 	public static final Set<String> jeiPluginClassNames = new HashSet<>();
 
 	private static final Multimap<String, String> dependencies = HashMultimap.create();
-	private static final TreeMultimap<Class, Pair<String, MethodHandle>> loaderHandles = TreeMultimap.create(
-			Comparator.comparing(Class::getName),
-			(a, b) -> {
+	private static final Multimap<Class, Pair<String, MethodHandle>> loaderHandles =
+		MultimapBuilder.hashKeys().treeSetValues(
+			(aO, bO) -> {
+				Pair<String, MethodHandle> a = (Pair<String, MethodHandle>) aO;
+				Pair<String, MethodHandle> b = (Pair<String, MethodHandle>) bO;
+
 				if (!a.getKey().equals(b.getKey())) {
 					boolean forwardDep = dependencies.get(a.getKey()).contains(b.getKey());
 					boolean backwardDep = dependencies.get(b.getKey()).contains(a.getKey());
@@ -49,9 +53,10 @@ public class AnnotationHandler {
 					}
 				}
 
-				return (int) Math.signum(a.getValue().hashCode() - b.getValue().hashCode());
+				if (a.getValue() == b.getValue()) return 0;
+				else return a.getValue().hashCode() < b.getKey().hashCode() ? -1 : 1;
 			}
-	);
+		).build();
 
 	private static final BiMap<String, Object> loadedModules = HashBiMap.create();
 	private static final Map<String, Object> loadedModulesByClass = new HashMap<>();

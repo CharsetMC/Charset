@@ -1,4 +1,4 @@
-package pl.asie.charset.storage.barrels.modcompat.jei;
+package pl.asie.charset.misc.scaffold.modcompat.jei;
 
 import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;
@@ -7,22 +7,22 @@ import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
+import pl.asie.charset.misc.scaffold.CharsetMiscScaffold;
+import pl.asie.charset.misc.scaffold.TileScaffold;
 import pl.asie.charset.storage.barrels.CharsetStorageBarrels;
 import pl.asie.charset.storage.barrels.TileEntityDayBarrel;
 
 import javax.annotation.Nullable;
 
-@CharsetJEIPlugin("storage.barrels")
-public class JEIPluginBarrels implements IModPlugin {
+@CharsetJEIPlugin("misc.scaffold")
+public class JEIPluginScaffold implements IModPlugin {
     @Override
     public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
-        subtypeRegistry.registerSubtypeInterpreter(CharsetStorageBarrels.barrelItem, new ISubtypeRegistry.ISubtypeInterpreter() {
+        subtypeRegistry.registerSubtypeInterpreter(CharsetMiscScaffold.scaffoldItem, new ISubtypeRegistry.ISubtypeInterpreter() {
             @Nullable
             @Override
             public String getSubtypeInfo(ItemStack itemStack) {
-                TileEntityDayBarrel barrel = new TileEntityDayBarrel();
-                barrel.loadFromStack(itemStack);
-                return barrel.type.name() + ";" + barrel.woodLog.getId() + ";" + barrel.woodSlab.getId();
+                return TileScaffold.getPlankFromNBT(itemStack.getTagCompound()).getId();
             }
         });
     }
