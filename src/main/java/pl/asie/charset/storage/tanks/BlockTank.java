@@ -12,7 +12,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -26,6 +28,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.blocks.BlockBase;
@@ -113,15 +116,19 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (hand != EnumHand.MAIN_HAND)
+            return false;
+
         ItemStack stack = playerIn.getHeldItem(hand);
-        EntityEquipmentSlot slot = (hand == EnumHand.OFF_HAND) ? EntityEquipmentSlot.OFFHAND : EntityEquipmentSlot.MAINHAND;
-        IFluidHandler handler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, stack, null);
+        IFluidHandlerItem handler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, stack, null);
         if (handler != null) {
             TileEntity tile = worldIn.getTileEntity(pos);
 
             if (tile instanceof TileTank) {
                 TileTank tank = (TileTank) tile;
                 if (!worldIn.isRemote) {
+                    boolean changed = false;
+
                     FluidStack fluidContained = tank.getBottomTank().fluidStack;
                     FluidStack fluidExtracted;
                     if (fluidContained != null) {
@@ -142,6 +149,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
                                 fluidExtracted = tank.drain(fluidExtracted, true);
                                 if (fluidExtracted != null) {
                                     handler.fill(fluidExtracted, true);
+                                    changed = true;
                                 }
                             }
                         }
@@ -153,8 +161,13 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
                             fluidExtracted = handler.drain(fluidExtracted, true);
                             if (fluidExtracted != null) {
                                 tank.fill(fluidExtracted, true);
+                                changed = true;
                             }
                         }
+                    }
+
+                    if (changed) {
+                        playerIn.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, handler.getContainer());
                     }
                 }
             }

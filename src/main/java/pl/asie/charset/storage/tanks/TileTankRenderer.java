@@ -27,13 +27,10 @@ import pl.asie.charset.pipes.pipe.SpecialRendererPipe;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/**
- * Created by asie on 2/11/17.
- */
 public class TileTankRenderer extends FastTESR<TileTank> {
-    private final BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
+    private static final BlockModelRenderer renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 
-    private final class FluidColorTransformer implements ModelTransformer.IVertexTransformer {
+    private static final class FluidColorTransformer implements ModelTransformer.IVertexTransformer {
         private final int color;
 
         public FluidColorTransformer(int color) {
@@ -51,7 +48,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
         }
     }
 
-    private final class TankBlockAccess extends ProxiedBlockAccess {
+    private static final class TankBlockAccess extends ProxiedBlockAccess {
         private final int fluidLight;
 
         public TankBlockAccess(IBlockAccess access, int fluidLight) {
@@ -65,24 +62,14 @@ public class TileTankRenderer extends FastTESR<TileTank> {
         }
     }
 
-    @Override
-    public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, @Nonnull VertexBuffer vertexBuffer) {
-        boolean isCarrying = te.getWorld() != null;
-        if (te.fluidStack == null || (!isCarrying && te.getBottomTank() != te))
-            return;
-
-        BlockPos pos = te.getPos();
-        vertexBuffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
-
+    public static void renderModel(IBlockAccess access, BlockPos pos, VertexBuffer buffer, FluidStack contents, int tankCount) {
         TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
-        TextureAtlasSprite sprite = map.getTextureExtry(te.fluidStack.getFluid().getStill().toString());
+        TextureAtlasSprite sprite = map.getTextureExtry(contents.getFluid().getStill().toString());
         if (sprite == null) {
             sprite = map.getTextureExtry(TextureMap.LOCATION_MISSING_TEXTURE.toString());
             if (sprite == null) return;
         }
 
-        FluidStack contents = !isCarrying ? te.getContents() : te.fluidStack;
-        int tankCount = !isCarrying ? (te.getCapacity() / TileTank.CAPACITY) : TileTank.CAPACITY;
         float height = (float) (contents.amount) / TileTank.CAPACITY;
         SimpleBakedModel smodel = new SimpleBakedModel();
 
@@ -94,16 +81,31 @@ public class TileTankRenderer extends FastTESR<TileTank> {
         }
 
         IBakedModel model;
-        int color = te.fluidStack.getFluid().getColor(te.fluidStack);
-        int light = te.fluidStack.getFluid().getLuminosity();
+        int color = contents.getFluid().getColor(contents);
+        int light = contents.getFluid().getLuminosity();
 
         if (color == -1) {
             model = smodel;
         } else {
-            model = ModelTransformer.transform(smodel, te.fluidStack.getFluid().getBlock().getDefaultState(), 0L, new FluidColorTransformer(color));
+            model = ModelTransformer.transform(smodel, contents.getFluid().getBlock().getDefaultState(), 0L, new FluidColorTransformer(color));
         }
 
-        renderer.renderModel(new TankBlockAccess(getWorld(), light), model, te.fluidStack.getFluid().getBlock().getDefaultState(), pos, vertexBuffer, false, 0L);
+        renderer.renderModel(new TankBlockAccess(access, light), model, contents.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
+    }
+
+    @Override
+    public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, @Nonnull VertexBuffer vertexBuffer) {
+        boolean isCarrying = te.getWorld() != null;
+        if (te.fluidStack == null || (!isCarrying && te.getBottomTank() != te))
+            return;
+
+        BlockPos pos = te.getPos();
+        vertexBuffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+
+        FluidStack contents = !isCarrying ? te.getContents() : te.fluidStack;
+        int tankCount = !isCarrying ? (te.getCapacity() / TileTank.CAPACITY) : TileTank.CAPACITY;
+        renderModel(getWorld(), pos, vertexBuffer, contents, tankCount);
+
         vertexBuffer.setTranslation(0, 0, 0);
     }
 }

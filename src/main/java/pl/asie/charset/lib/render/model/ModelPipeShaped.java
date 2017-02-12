@@ -65,7 +65,7 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
 
     private List<BakedQuad> getPipeQuads(int i) {
         if (i == 64)
-            i = 48;
+            i = 0;
 
         if (DEBUG || lists[i] == null) {
             boolean[] connections = new boolean[6];
