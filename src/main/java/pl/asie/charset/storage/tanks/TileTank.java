@@ -215,7 +215,10 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
         int toDrain = maxDrain;
-        FluidStack typeSrc = bottomTank.fluidStack;
+        FluidStack typeSrc = getBottomTank().fluidStack;
+        if (typeSrc == null) {
+            return null;
+        }
 
         Stack<TileTank> drainTanks = new Stack<TileTank>();
         Iterator<TileTank> i = getAllTanks();

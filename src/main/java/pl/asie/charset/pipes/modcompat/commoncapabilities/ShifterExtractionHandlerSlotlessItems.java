@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ItemMatch;
@@ -25,12 +26,9 @@ public class ShifterExtractionHandlerSlotlessItems implements TileShifter.Extrac
 	@CapabilityInject(ISlotlessItemHandler.class)
 	public static Capability<ISlotlessItemHandler> CAP;
 
-	@CharsetModule.Instance
-	public static ShifterExtractionHandlerSlotlessItems instance;
-
 	@Mod.EventHandler
-	public void register(FMLPostInitializationEvent event) {
-		TileShifter.registerExtractionHandler(instance);
+	public void register(FMLInitializationEvent event) {
+		TileShifter.registerExtractionHandler(this);
 	}
 
 	@Override

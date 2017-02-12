@@ -123,6 +123,6 @@ public class CharsetPipes {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		TileShifter.registerVanillaExtractionHandlers();
+		TileShifter.registerDefaultHandlers();
 	}
 }

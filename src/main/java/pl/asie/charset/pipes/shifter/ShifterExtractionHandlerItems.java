@@ -21,6 +21,11 @@ public class ShifterExtractionHandlerItems implements TileShifter.ExtractionHand
 	}
 
 	@Override
+	public int getPriority() {
+		return -1000;
+	}
+
+	@Override
 	public TileShifter.ExtractionType getExtractionType() {
 		return TileShifter.ExtractionType.ITEMS;
 	}

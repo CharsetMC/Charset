@@ -1,6 +1,7 @@
 * Rewritten internal mod structure (the whole thing!)
     * One mod ID with modules (higher granularity than previously) configurable in config/charset/modules.
 * [audio.tapes] Temporaily removed due to a potential incoming redesign. That's the only breaking part of this update - sorry!
+* [pipes] Add support for CommonCapabilities' IInventoryState for further optimizations.
 * [storage.barrels] Fixed many issues with barrel carts.
 * [storage.barrels] Sticky barrel upgrade can now use OreDict-ed slimeballs.
 * [storage.tanks] New module! Who doesn't like BuildCraft-styled tanks?

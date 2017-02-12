@@ -18,6 +18,8 @@ package pl.asie.charset.pipes.shifter;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.TreeMultimap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -43,6 +45,7 @@ import pl.asie.charset.pipes.PipeUtils;
 import pl.asie.charset.pipes.pipe.TilePipe;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 
 public class TileShifter extends TileBase implements IShifter, ITickable {
 	public enum ExtractionType {
@@ -58,17 +61,29 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 
 	public interface ExtractionHandler<T> {
 		Capability<T> getCapability();
+
+		default int getPriority() {
+			return 0;
+		}
+
 		ExtractionType getExtractionType();
 		EnumActionResult extract(T input, TilePipe output, TileShifter shifter, EnumFacing direction);
 	}
 
-	private static final Multimap<ExtractionType, ExtractionHandler<?>> extractionHandlers = LinkedListMultimap.create();
+	private static final Multimap<ExtractionType, ExtractionHandler<?>> extractionHandlers =
+			MultimapBuilder.enumKeys(ExtractionType.class)
+			.treeSetValues((a, b) -> {
+				int p = ((ExtractionHandler) b).getPriority() - ((ExtractionHandler) a).getPriority();
+				if (p != 0) return p * 2;
+				else if (b == a) return 0;
+				else return b.hashCode() > a.hashCode() ? 1 : -1;
+			}).build();
 
 	public static void registerExtractionHandler(ExtractionHandler<?> handler) {
 		extractionHandlers.put(handler.getExtractionType(), handler);
 	}
 
-	public static void registerVanillaExtractionHandlers() {
+	public static void registerDefaultHandlers() {
 		registerExtractionHandler(new ShifterExtractionHandlerItems());
 		registerExtractionHandler(new ShifterExtractionHandlerFluids());
 	}
@@ -77,6 +92,10 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 	private boolean updateRedstoneLevels;
 	private int redstoneLevel;
 	private int ticker = CharsetPipes.instance.rand.nextInt(256);
+
+	// CommonCapabilities values
+	public int ccInvHash;
+	public boolean ccInvHashSet;
 
 	public TileShifter() {
 		for (int i = 0; i < filters.length; i++)
@@ -220,6 +239,7 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 			for (ExtractionType type : extractionHandlers.keySet()) {
 				if (ticker % type.tickerSpeed == 0) {
 					EnumActionResult result = EnumActionResult.PASS;
+
 					for (ExtractionHandler handler : extractionHandlers.get(type)) {
 						Object inputHandler = CapabilityHelper.get(handler.getCapability(), input, direction);
 						if (inputHandler != null) {
