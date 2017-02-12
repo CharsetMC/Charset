@@ -13,7 +13,7 @@ public class RecipeObjectOreDict implements IRecipeObject {
 
     @Override
     public boolean test(ItemStack stack) {
-        return stack != null && ArrayUtils.contains(OreDictionary.getOreIDs(stack), id);
+        return !stack.isEmpty() && ArrayUtils.contains(OreDictionary.getOreIDs(stack), id);
     }
 
     @Override

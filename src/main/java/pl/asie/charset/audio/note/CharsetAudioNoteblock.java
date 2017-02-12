@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.audio.types.AudioDataGameSound;
@@ -30,15 +31,14 @@ import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @CharsetModule(
         name = "audio.noteblock",
         description = "Noteblock rework. WIP"
 )
 public class CharsetAudioNoteblock {
-    private static final Map<Predicate<IBlockState>, SoundEvent> INSTRUMENTS = new HashMap<>();
+    private static final List<Pair<Predicate<IBlockState>, SoundEvent>> INSTRUMENTS = new ArrayList<>();
     private static final SoundEvent DEFAULT_INSTRUMENT;
     private static final ResourceLocation NOTE_SOURCE_KEY = new ResourceLocation("charsetaudio:noteSource");
 
@@ -49,16 +49,16 @@ public class CharsetAudioNoteblock {
     static {
         DEFAULT_INSTRUMENT = SoundEvents.BLOCK_NOTE_HARP;
 
-        INSTRUMENTS.put(input -> input.getMaterial() == Material.ROCK, SoundEvents.BLOCK_NOTE_BASEDRUM);
-        INSTRUMENTS.put(input -> input.getMaterial() == Material.SAND, SoundEvents.BLOCK_NOTE_SNARE);
-        INSTRUMENTS.put(input -> input.getMaterial() == Material.GLASS, SoundEvents.BLOCK_NOTE_HAT);
-        INSTRUMENTS.put(input -> input.getMaterial() == Material.WOOD, SoundEvents.BLOCK_NOTE_BASS);
+        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.ROCK, SoundEvents.BLOCK_NOTE_BASEDRUM));
+        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.SAND, SoundEvents.BLOCK_NOTE_SNARE));
+        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.GLASS, SoundEvents.BLOCK_NOTE_HAT));
+        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.WOOD, SoundEvents.BLOCK_NOTE_BASS));
     }
 
     public static SoundEvent getSound(IBlockState state) {
-        for (Predicate<IBlockState> predicate : INSTRUMENTS.keySet()) {
-            if (predicate.apply(state)) {
-                return INSTRUMENTS.get(predicate);
+        for (Pair<Predicate<IBlockState>, SoundEvent> predicate : INSTRUMENTS) {
+            if (predicate.getKey().apply(state)) {
+                return predicate.getValue();
             }
         }
 

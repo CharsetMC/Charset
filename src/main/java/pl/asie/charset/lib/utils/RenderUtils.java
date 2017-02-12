@@ -128,6 +128,18 @@ public final class RenderUtils {
 	}
 
 	public static BufferedImage getTextureImage(ResourceLocation location) {
+		Minecraft mc = Minecraft.getMinecraft();
+		/* TextureAtlasSprite sprite = mc.getTextureMapBlocks().getTextureExtry(location.toString());
+		if (sprite != null) {
+			int[][] dataM = sprite.getFrameTextureData(0);
+			if (dataM != null && dataM.length > 0) {
+				int[] data = dataM[0];
+				BufferedImage image = new BufferedImage(sprite.getIconWidth(), sprite.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+				image.setRGB(0, 0, image.getWidth(), image.getHeight(), data, 0, image.getWidth());
+				return image;
+			}
+		} */
+
 		try {
 			ResourceLocation pngLocation = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {"textures", location.getResourcePath(), ".png"}));
 			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(pngLocation);

@@ -37,6 +37,7 @@
 package pl.asie.charset.storage.barrels;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -123,25 +124,23 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         TextureAtlasSprite top = info.isMetal ? group.top_metal : group.top;
         TextureAtlasSprite front = group.front;
         TextureAtlasSprite side = group.side;
-        HashMap<String, String> textures = new HashMap<String, String>();
+        ImmutableMap.Builder<String, String> textures = new ImmutableMap.Builder<>();
         if (isItem || layer == BlockRenderLayer.SOLID) {
             textures.put("log", log.getIconName());
             textures.put("plank", plank.getIconName());
+            textures.put("#top", ""); textures.put("top", "");
+            textures.put("#front", ""); textures.put("front", "");
+            textures.put("#side", ""); textures.put("side", "");
         }
         if (isItem || layer == BlockRenderLayer.TRANSLUCENT) {
             textures.put("top", top.getIconName());
             textures.put("front", front.getIconName());
             textures.put("side", side.getIconName());
-        }
-        for (String s : new String[]{"log", "plank", "top", "front", "side"}) {
-            if (!textures.containsKey(s)) {
-                textures.put("#"+s, "");
-                textures.put(s, "");
-            }
+            textures.put("#log", ""); textures.put("log", "");
+            textures.put("#plank", ""); textures.put("plank", "");
         }
         IModelState state = info.orientation.toTransformation();
-        ImmutableMap<String, String> textureMap = ImmutableMap.copyOf(textures);
-        IModel retexture = template.retexture(textureMap);
+        IModel retexture = template.retexture(textures.build());
         return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter), log).addDefaultBlockTransforms();
     }
 
