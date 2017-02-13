@@ -69,6 +69,10 @@ public abstract class BlockBase extends Block {
 		super(materialIn);
 	}
 
+	public int getParticleTintIndex() {
+		return -1;
+	}
+
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		if (isTileProvider) {
@@ -229,7 +233,7 @@ public abstract class BlockBase extends Block {
 							double d0 = ((double)j + 0.5D) / 4.0D;
 							double d1 = ((double)k + 0.5D) / 4.0D;
 							double d2 = ((double)l + 0.5D) / 4.0D;
-							manager.addEffect(new ParticleDiggingCharset(world, (double)pos.getX() + d0, (double)pos.getY() + d1, (double)pos.getZ() + d2, d0 - 0.5D, d1 - 0.5D, d2 - 0.5D, state, pos, sprite));
+							manager.addEffect(new ParticleDiggingCharset(world, (double)pos.getX() + d0, (double)pos.getY() + d1, (double)pos.getZ() + d2, d0 - 0.5D, d1 - 0.5D, d2 - 0.5D, state, pos, sprite, getParticleTintIndex()));
 						}
 					}
 				}
@@ -290,7 +294,7 @@ public abstract class BlockBase extends Block {
 					d0 = (double)i + axisalignedbb.maxX + 0.10000000149011612D;
 				}
 
-				Particle particle = new ParticleDiggingCharset(world, d0, d1, d2, 0.0D, 0.0D, 0.0D, state, pos, sprite)
+				Particle particle = new ParticleDiggingCharset(world, d0, d1, d2, 0.0D, 0.0D, 0.0D, state, pos, sprite, getParticleTintIndex())
 						.multiplyVelocity(0.2F)
 						.multipleParticleScaleBy(0.6F);
 				manager.addEffect(particle);

@@ -39,7 +39,6 @@ public class CharsetTweakChat {
     public void onServerChat(ServerChatEvent event) {
         if (!PlayerUtils.isFake(event.getPlayer())) {
             String message = event.getMessage();
-            String oldMessage = message;
 
             for (int i = 0; i < message.length() - 1; i++) {
                 if (message.charAt(i) == '>'

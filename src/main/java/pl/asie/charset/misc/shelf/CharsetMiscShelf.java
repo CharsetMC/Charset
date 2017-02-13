@@ -17,6 +17,7 @@
 package pl.asie.charset.misc.shelf;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,6 +38,7 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.render.ShadingTintColorHandler;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
@@ -71,6 +73,8 @@ public class CharsetMiscShelf {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileShelf.class, new TileShelfRenderer());
+		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(ShadingTintColorHandler.INSTANCE, shelfBlock);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ShadingTintColorHandler.INSTANCE, shelfItem);
 	}
 
 	private void registerShelfRecipe(ItemMaterial plankMaterial) {
@@ -104,6 +108,7 @@ public class CharsetMiscShelf {
 				event.getModelRegistry().putObject(new ModelResourceLocation("charset:shelf", "back=" + BlockShelf.BACK.getName(backValue) + ",facing=" + Properties.FACING4.getName(facingValue)), ModelShelf.INSTANCE);
 			}
 		}
+
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:shelf", "inventory"), ModelShelf.INSTANCE);
 
 		ModelShelf.shelfModel = (IRetexturableModel) RenderUtils.getModel(new ResourceLocation("charset:block/shelf"));
