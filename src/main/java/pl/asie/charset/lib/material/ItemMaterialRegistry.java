@@ -1,11 +1,6 @@
 package pl.asie.charset.lib.material;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Table;
+import com.google.common.collect.*;
 import net.minecraft.item.ItemStack;
 
 import java.util.Collection;
@@ -17,7 +12,7 @@ public class ItemMaterialRegistry {
 	public static final ItemMaterialRegistry INSTANCE = new ItemMaterialRegistry();
 	private final Map<String, ItemMaterial> materialsById = new HashMap<>();
 	private final LinkedListMultimap<String, ItemMaterial> materialsByType = LinkedListMultimap.create();
-	private final Multimap<ItemMaterial, String> materialTypes = HashMultimap.create();
+	private final Multimap<ItemMaterial, String> materialTypes = MultimapBuilder.hashKeys().hashSetValues().build();
 	protected final Table<ItemMaterial, String, ItemMaterial> materialRelations = HashBasedTable.create();
 
 	protected ItemMaterialRegistry() {
