@@ -42,7 +42,7 @@ public final class DataSerializersCharset {
         }
 
         @Override
-        public NBTTagCompound read(PacketBuffer buf) throws IOException {
+        public NBTTagCompound read(PacketBuffer buf) {
             return ByteBufUtils.readTag(buf);
         }
 

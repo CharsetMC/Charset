@@ -190,7 +190,7 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 		if (entry.color == -1) {
 			return smodel;
 		} else {
-			return ModelTransformer.transform(smodel, entry.stack.getFluid().getBlock().getDefaultState(), 0L, new FluidColorTransformer(entry.color));
+			return ModelTransformer.transform(smodel, DEFAULT_STATE, 0L, new FluidColorTransformer(entry.color));
 		}
 	}
 
@@ -260,7 +260,7 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 						fluidModelCache.put(entry, model);
 					}
 
-					renderer.renderModelSmooth(world, model, entry.stack.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
+					renderer.renderModelSmooth(world, model, DEFAULT_STATE, pos, buffer, false, 0L);
 				}
 			}
 		}
