@@ -234,7 +234,10 @@ public class TileShifter extends TileBase implements IShifter, ITickable {
 		if (redstoneLevel > 0) {
 			EnumFacing direction = getDirection();
 			TileEntity input = getNeighbourTile(direction.getOpposite());
+			if (input == null) return;
+
 			TilePipe output = PipeUtils.getPipe(getWorld(), getPos().offset(direction), direction.getOpposite());
+			if (output == null) return;
 
 			for (ExtractionType type : extractionHandlers.keySet()) {
 				if (ticker % type.tickerSpeed == 0) {
