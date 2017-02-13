@@ -118,6 +118,11 @@ public class AnnotationHandler {
 			String desc = (String) info.get("description");
 			Boolean enabled = (Boolean) info.getOrDefault("isDefault", true);
 			Boolean compat = (Boolean) info.getOrDefault("isModCompat", false);
+			Boolean devOnly = (Boolean) info.getOrDefault("isDevOnly", false);
+			if (devOnly && !ModCharset.INDEV) {
+				continue;
+			}
+
 			if ((Boolean) info.getOrDefault("isVisible", true)) {
 				Property prop = ModCharset.configModules.get(
 						compat ? "modules.compat" : "modules",

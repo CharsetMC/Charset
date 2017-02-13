@@ -14,6 +14,7 @@ public @interface CharsetModule {
 	String description() default "";
 	boolean isVisible() default true;
 	boolean isDefault() default true;
+	boolean isDevOnly() default false;
 	boolean isModCompat() default false;
 	String[] dependencies() default {};
 

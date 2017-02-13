@@ -64,11 +64,16 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
     protected int[] shifterDistance = new int[6];
 
+    private final PipeLogic logic = new PipeLogic(this);
     private final IItemInsertionHandler[] insertionHandlers = new IItemInsertionHandler[6];
     private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
     private byte connectionCache = 0;
     private int neighborsUpdate = 0;
     private boolean requestUpdate;
+
+    public PipeLogic getLogic() {
+        return logic;
+    }
 
     public TilePipe() {
         for (EnumFacing facing : EnumFacing.VALUES)

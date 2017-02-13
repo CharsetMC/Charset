@@ -35,6 +35,8 @@ item.charset.pocket_crafting_table.name=Pocket Crafting Table
 item.charset.poster.name=Poster
 tile.charset.scaffold.name=Scaffold
 tile.charset.scaffold.format=%s Scaffold
+tile.charset.shelf.name=Shelf
+tile.charset.shelf.format=%s Shelf
 
 # CharsetDrama
 item.charset.dramaInABottle.name=Drama in a Bottle

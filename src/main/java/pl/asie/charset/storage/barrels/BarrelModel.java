@@ -128,17 +128,21 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         if (isItem || layer == BlockRenderLayer.SOLID) {
             textures.put("log", log.getIconName());
             textures.put("plank", plank.getIconName());
-            textures.put("#top", ""); textures.put("top", "");
-            textures.put("#front", ""); textures.put("front", "");
-            textures.put("#side", ""); textures.put("side", "");
+        } else {
+            textures.put("#log", ""); textures.put("log", "");
+            textures.put("#plank", ""); textures.put("plank", "");
         }
+
         if (isItem || layer == BlockRenderLayer.TRANSLUCENT) {
             textures.put("top", top.getIconName());
             textures.put("front", front.getIconName());
             textures.put("side", side.getIconName());
-            textures.put("#log", ""); textures.put("log", "");
-            textures.put("#plank", ""); textures.put("plank", "");
+        } else {
+            textures.put("#top", ""); textures.put("top", "");
+            textures.put("#front", ""); textures.put("front", "");
+            textures.put("#side", ""); textures.put("side", "");
         }
+
         IModelState state = info.orientation.toTransformation();
         IModel retexture = template.retexture(textures.build());
         return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter), log).addDefaultBlockTransforms();

@@ -475,12 +475,14 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return isTop(facing) || isBottom(facing) || facing == null;
+            if (isTop(facing) || isBottom(facing) || facing == null) {
+                return true;
+            }
         } else if (capability == Capabilities.AXIS_ROTATABLE) {
             return facing != null;
-        } else {
-            return false;
         }
+
+        return super.hasCapability(capability, facing);
     }
 
     @Override
@@ -497,7 +499,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return Capabilities.AXIS_ROTATABLE.cast(this);
         }
 
-        return null;
+        return super.getCapability(capability, facing);
     }
 
     public void clear() {
