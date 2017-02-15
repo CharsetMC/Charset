@@ -61,8 +61,15 @@ public final class ItemMaterialHeuristics {
     }
 
     private static void initLogMaterial(ItemStack log) {
+        // Check if already registered
+        ItemMaterial material = reg.getMaterialIfPresent(log);
+        if (material != null && material.getTypes().contains("log")) {
+            return;
+        }
+
         // We look for the plank first to ensure only valid logs
         // get registered.
+
         ItemStack plank = RecipeUtils.getCraftingResult(null, 3, 3, log);
         if (!plank.isEmpty() && ItemUtils.isOreType(plank, "plankWood")) {
             ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
@@ -84,7 +91,7 @@ public final class ItemMaterialHeuristics {
                     ItemMaterial stickMaterial = reg.getOrCreateMaterial(stick);
                     if (reg.registerTypes(stickMaterial, "stick", "wood", "item")) {
                         reg.registerRelation(plankMaterial, stickMaterial, "stick", "plank");
-                        reg.registerRelation(stickMaterial, logMaterial, "log");
+                        reg.registerRelation(stickMaterial, logMaterial, "log", "stick");
                     }
                 }
             }
@@ -209,6 +216,19 @@ public final class ItemMaterialHeuristics {
         initialized = true;
 
         bar.step("Wood");
+        // Pre-initialize vanilla woods
+        for (int i = 0; i < 6; i++) {
+            ItemMaterial log = reg.getOrCreateMaterial(new ItemStack(i >= 4 ? Blocks.LOG2 : Blocks.LOG, 1, i % 4));
+            ItemMaterial plank = reg.getOrCreateMaterial(new ItemStack(Blocks.PLANKS, 1, i));
+            ItemMaterial stick = reg.getOrCreateMaterial(new ItemStack(Items.STICK));
+            reg.registerTypes(log, "log", "block", "wood");
+            reg.registerTypes(plank, "plank", "block", "wood");
+            reg.registerTypes(stick, "stick", "item", "wood");
+            reg.registerRelation(log, plank, "plank", "log");
+            reg.registerRelation(plank, stick, "stick", "plank");
+            reg.registerRelation(stick, log, "log", "stick");
+        }
+
         supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
 
         bar.step("Ores");
