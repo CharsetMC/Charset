@@ -62,6 +62,11 @@ public class TileTankRenderer extends FastTESR<TileTank> {
         }
     }
 
+    private static IBlockState getFluidState(FluidStack stack, IBlockState default_state) {
+        return stack.getFluid().getBlock() != null ? stack.getFluid().getBlock().getDefaultState() : default_state;
+    }
+
+    // TODO: Rewrite this to render per-tank-block?
     public static void renderModel(IBlockAccess access, BlockPos pos, VertexBuffer buffer, FluidStack contents, int tankCount) {
         TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
         TextureAtlasSprite sprite = map.getTextureExtry(contents.getFluid().getStill().toString());
@@ -84,10 +89,12 @@ public class TileTankRenderer extends FastTESR<TileTank> {
         smodel.addQuad(null, RenderUtils.createQuad(from, to, EnumFacing.UP, sprite, -1));
 
         IBakedModel model;
+        IBlockState state = getFluidState(contents, CharsetStorageTanks.tankBlock.getDefaultState());
+
         if (color == -1) {
             model = smodel;
         } else {
-            model = ModelTransformer.transform(smodel, contents.getFluid().getBlock().getDefaultState(), 0L, new FluidColorTransformer(color));
+            model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
         }
 
         renderer.renderModel(tankAccess, model, contents.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
@@ -105,10 +112,10 @@ public class TileTankRenderer extends FastTESR<TileTank> {
             if (color == -1) {
                 model = smodel;
             } else {
-                model = ModelTransformer.transform(smodel, contents.getFluid().getBlock().getDefaultState(), 0L, new FluidColorTransformer(color));
+                model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
             }
 
-            renderer.renderModel(tankAccess, model, contents.getFluid().getBlock().getDefaultState(), pos1, buffer, false, 0L);
+            renderer.renderModel(tankAccess, model, state, pos1, buffer, false, 0L);
         }
     }
 

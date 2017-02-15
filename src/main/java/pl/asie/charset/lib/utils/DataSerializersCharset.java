@@ -15,12 +15,15 @@ public final class DataSerializersCharset {
     }
 
     public static final DataSerializer<Quaternion> OUATERNION = new DataSerializer<Quaternion>() {
+        @Override
         public void write(PacketBuffer buf, Quaternion value) {
             buf.writeFloat((float) value.w);
             buf.writeFloat((float) value.x);
             buf.writeFloat((float) value.y);
             buf.writeFloat((float) value.z);
         }
+
+        @Override
         public Quaternion read(PacketBuffer buf) {
             double w = buf.readFloat();
             double x = buf.readFloat();
@@ -28,6 +31,8 @@ public final class DataSerializersCharset {
             double z = buf.readFloat();
             return new Quaternion(w, x, y, z);
         }
+
+        @Override
         public DataParameter<Quaternion> createKey(int id)
         {
             return new DataParameter(id, this);
@@ -41,7 +46,7 @@ public final class DataSerializersCharset {
         }
 
         @Override
-        public NBTTagCompound read(PacketBuffer buf) throws IOException {
+        public NBTTagCompound read(PacketBuffer buf) {
             return ByteBufUtils.readTag(buf);
         }
 
