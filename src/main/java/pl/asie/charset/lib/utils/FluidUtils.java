@@ -7,6 +7,8 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.wrappers.FluidHandlerWrapper;
 
+import javax.annotation.Nullable;
+
 public final class FluidUtils {
     private FluidUtils() {
 
@@ -24,8 +26,8 @@ public final class FluidUtils {
         return null;
     }
 
-    public static void push(IFluidHandler from, IFluidHandler to, int amt) {
-        if (amt > 0) {
+    public static void push(IFluidHandler from, @Nullable IFluidHandler to, int amt) {
+        if (amt > 0 && to != null) {
             FluidStack drained = from.drain(amt, false);
             if (drained != null && drained.amount > 0) {
                 amt = to.fill(drained, true);
@@ -38,8 +40,8 @@ public final class FluidUtils {
         }
     }
 
-    public static void push(IFluidHandler from, IFluidHandler to, FluidStack out) {
-        if (out != null && out.amount > 0) {
+    public static void push(IFluidHandler from, @Nullable IFluidHandler to, FluidStack out) {
+        if (to != null && out != null && out.amount > 0) {
             FluidStack drained = from.drain(out, false);
             if (drained != null && drained.amount > 0) {
                 int amt = to.fill(drained, true);

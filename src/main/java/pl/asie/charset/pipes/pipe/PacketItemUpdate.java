@@ -105,7 +105,7 @@ public class PacketItemUpdate extends PacketPart {
 	public void writeItemData(ByteBuf buf) {
 		buf.writeShort(item.id);
 		buf.writeByte(DirectionUtils.ordinal(item.input) | (DirectionUtils.ordinal(item.output) << 3));
-		buf.writeByte((item.reachedCenter ? 0x01 : 0) | (item.isStuck() ? 0x02 : 0) | (syncStack ? 0x04 : 0));
+		buf.writeByte((item.reachedCenter ? 0x01 : 0) | (item.isStuck(null) ? 0x02 : 0) | (syncStack ? 0x04 : 0));
 		buf.writeByte(item.progress);
 
 		if (syncStack) {

@@ -541,7 +541,7 @@ public class PartPipe extends Multipart implements IConnectable, ISlottedPart, I
 
 			synchronized (itemSet) {
 				for (PipeItem p : itemSet) {
-					if (p.isStuck()) {
+					if (p.isStuck(dir)) {
 						stuckItems++;
 
 						if (stuckItems >= 1) {

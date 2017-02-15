@@ -19,10 +19,14 @@ package pl.asie.charset.tweaks;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -50,6 +54,26 @@ public class TweakMobControl extends Tweak {
 				if (!enabled) {
 					disabledClasses.add(entity);
 				}
+			}
+		}
+
+		Set<String> enderCarrySet = new HashSet<>();
+		for (Block b : Block.REGISTRY) {
+			if (EntityEnderman.getCarriable(b)) {
+				enderCarrySet.add(b.getRegistryName().toString());
+				EntityEnderman.setCarriable(b, false);
+			}
+		}
+		String[] enderCarry = enderCarrySet.toArray(new String[enderCarrySet.size()]);
+
+		if (!config.hasCategory("tweaks")) {
+			enderCarry = config.getStringList("endermanCarriable", "tweaks", enderCarry, "The list of blocks carriable by endermen.");
+		}
+
+		for (String s : enderCarry) {
+			Block b = Block.getBlockFromName(s);
+			if (b != null && b != Blocks.AIR) {
+				EntityEnderman.setCarriable(b, true);
 			}
 		}
 

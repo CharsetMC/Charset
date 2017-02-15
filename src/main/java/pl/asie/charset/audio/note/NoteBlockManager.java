@@ -3,6 +3,7 @@ package pl.asie.charset.audio.note;
 import com.google.common.base.Predicate;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityNote;
@@ -54,7 +55,6 @@ public class NoteBlockManager {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onNoteEvent(NoteBlockEvent.Play event) {
-        event.setCanceled(true);
         World worldIn = event.getWorld();
         BlockPos pos = event.getPos();
         SoundEvent sound = getSound(worldIn.getBlockState(pos.offset(EnumFacing.DOWN)));
@@ -75,14 +75,19 @@ public class NoteBlockManager {
                 }
 
                 if (packet.getSinkCount() > 0) {
+                    event.setCanceled(true);
                     packet.send();
                     return;
                 }
             }
 
-            // Did not send sound via speaker - use default implementation
-            worldIn.playSound(null, pos, sound, SoundCategory.BLOCKS, 3.0F, pitch);
-            ModCharsetAudio.packet.sendToAllAround(new PacketNoteParticle(note, param), note, 32);
+            // Did not send sound via speaker - use default implementation *for vanilla note blocks*
+            if (event.getState().getBlock() == Blocks.NOTEBLOCK) {
+                event.setCanceled(true);
+
+                worldIn.playSound(null, pos, sound, SoundCategory.BLOCKS, 3.0F, pitch);
+                ModCharsetAudio.packet.sendToAllAround(new PacketNoteParticle(note, param), note, 32);
+            }
         }
     }
 
