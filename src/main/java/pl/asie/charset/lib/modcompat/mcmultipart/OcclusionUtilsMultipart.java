@@ -22,7 +22,7 @@ public class OcclusionUtilsMultipart extends OcclusionUtils {
         if (world instanceof IMultipartBlockAccess) {
             IPartInfo info = ((IMultipartBlockAccess) world).getPartInfo();
             for (IPartInfo info2 : info.getContainer().getParts().values()) {
-                if (info2 != info && OcclusionHelper.testPartIntersection(info, info2)) {
+                if (info2 != info && intersects(boxes1, info2.getPart().getOcclusionBoxes(info2.getWorld(), info2.getPos(), info2))) {
                     return true;
                 }
             }
