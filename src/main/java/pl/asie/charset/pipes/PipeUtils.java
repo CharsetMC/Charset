@@ -31,30 +31,15 @@ public final class PipeUtils {
 	public static TilePipe getPipe(TileEntity tile) {
 		if (tile == null)
 			return null;
-
-		return tile instanceof TilePipe ? (TilePipe) tile : (TilePipe) tile.getCapability(Capabilities.PIPE_VIEW, null);
+		if (tile instanceof TilePipe)
+			return (TilePipe) tile;
+		if (tile.hasCapability(Capabilities.PIPE_VIEW, null))
+			return (TilePipe) tile.getCapability(Capabilities.PIPE_VIEW, null);
+		return null;
 	}
 
 	public static TilePipe getPipe(IBlockAccess world, BlockPos blockPos, EnumFacing side) {
 		TileEntity tile = world.getTileEntity(blockPos);
 		return getPipe(tile);
-		/* IMultipartContainer ui = MultipartHelper.getPartContainer(world, blockPos);
-		if (ui == null) {
-			return null;
-		}
-
-		if (side != null) {
-			ISlottedPart part = ui.getPartInSlot(PartSlot.getFaceSlot(side));
-			if (part instanceof IMicroblock.IFaceMicroblock && !((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
-				return null;
-			}
-		}
-
-		ISlottedPart part = ui.getPartInSlot(PartSlot.CENTER);
-		if (part instanceof TilePipe) {
-			return (TilePipe) part;
-		} else {
-			return null;
-		} */
 	}
 }

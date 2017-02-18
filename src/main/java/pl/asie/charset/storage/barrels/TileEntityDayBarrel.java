@@ -804,13 +804,15 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     @Override
-    public boolean rotateAround(EnumFacing axis) {
+    public boolean rotateAround(EnumFacing axis, boolean simulate) {
         Orientation newOrientation = orientation.rotateAround(axis);
 
         if (orientation != newOrientation) {
-            orientation = newOrientation;
-            markBlockForUpdate();
-            getWorld().notifyNeighborsRespectDebug(pos, getBlockType(), true);
+            if (!simulate) {
+                orientation = newOrientation;
+                markBlockForUpdate();
+                getWorld().notifyNeighborsRespectDebug(pos, getBlockType(), true);
+            }
             return true;
         } else {
             return false;

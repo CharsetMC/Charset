@@ -34,6 +34,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -57,7 +58,7 @@ import java.util.Random;
 public class CharsetPipes {
 	public static final double PIPE_TESR_DISTANCE = 64.0D;
 
-	@SidedProxy(clientSide = "pl.asie.charset.pipes.ProxyClient", serverSide = "pl.asie.charset.pipes.ProxyCommon")
+	@SidedProxy(clientSide = "pl.asie.charset.pipes.ProxyClient", serverSide = "pl.asie.charset.pipes.ProxyCommon", modId = ModCharset.MODID)
 	public static ProxyCommon proxy;
 
 	@CapabilityInject(IShifter.class)
@@ -70,7 +71,8 @@ public class CharsetPipes {
 	public static CharsetPipes instance;
 
 	public static Block shifterBlock;
-	public static Block blockPipe;
+	public static BlockPipe blockPipe;
+	public static ItemBlock itemPipe;
 	public static final Random rand = new Random();
 
 	@Mod.EventHandler
@@ -78,7 +80,7 @@ public class CharsetPipes {
 		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
 
 		blockPipe = new BlockPipe();
-		RegistryUtils.register(blockPipe, new ItemBlock(blockPipe),"pipe");
+		RegistryUtils.register(blockPipe, itemPipe = new ItemBlock(blockPipe),"pipe");
 		GameRegistry.registerTileEntityWithAlternatives(TilePipe.class, "charset:pipe", "charsetpipes:pipe");
 
 		shifterBlock = new BlockShifter();

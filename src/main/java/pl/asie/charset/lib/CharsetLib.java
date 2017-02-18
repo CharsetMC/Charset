@@ -121,7 +121,7 @@ public class CharsetLib {
 //			ModCharset.proxy.registerItemModel(WireManager.ITEM, i, "charsetlib:wire");
 //		}
 
-		Capabilities.init();
+		Capabilities.preInit();
 		NotifyImplementation.init();
 
 		config.save();
@@ -143,6 +143,7 @@ public class CharsetLib {
 
 		MinecraftForge.EVENT_BUS.register(this);
 
+		Capabilities.init();
 		ColorUtils.init();
 		DataSerializersCharset.init();
 

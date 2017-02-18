@@ -1,6 +1,7 @@
 package pl.asie.charset.pipes.pipe;
 
 import com.google.common.collect.ImmutableList;
+import mcmultipart.api.multipart.IMultipartTile;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -22,18 +23,19 @@ import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.ObserverHelper;
+import pl.asie.charset.lib.utils.OcclusionUtils;
 import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable, IDebuggable {
+    public class MultipartHandler implements IMultipartTile {
+
+    }
+
     public class InsertionHandler implements IItemInsertionHandler {
         private final EnumFacing facing;
 
@@ -85,16 +87,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     }
 
     private boolean internalConnects(EnumFacing side) {
-        /* ISlottedPart part = getContainer().getPartInSlot(PartSlot.getFaceSlot(side));
-        if (part instanceof IMicroblock.IFaceMicroblock) {
-            if (!((IMicroblock.IFaceMicroblock) part).isFaceHollow()) {
-                return false;
-            }
-        }
-
-        if (!OcclusionHelper.occlusionTest(OcclusionHelper.boxes(BOXES[side.ordinal()]), p -> p == this, getContainer())) {
+        if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(BlockPipe.BOXES[side.ordinal()]), world, pos)) {
             return false;
-        } */
+        }
 
         if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
             return true;
@@ -532,14 +527,14 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (capability == Capabilities.DEBUGGABLE)
+        if (capability == Capabilities.DEBUGGABLE || capability == Capabilities.PIPE_VIEW)
             return true;
 
         if (facing != null && connects(facing)) {
             return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
                     || capability == Capabilities.ITEM_INSERTION_HANDLER;
         } else {
-            return capability == Capabilities.PIPE_VIEW;
+            return super.hasCapability(capability, facing);
         }
     }
 
@@ -547,6 +542,8 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         if (capability == Capabilities.DEBUGGABLE)
             return Capabilities.DEBUGGABLE.cast(this);
+        if (capability == Capabilities.PIPE_VIEW)
+            return Capabilities.PIPE_VIEW.cast(this);
 
         if (facing != null && connects(facing)) {
             if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
@@ -554,12 +551,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             } else if (capability == Capabilities.ITEM_INSERTION_HANDLER) {
                 return Capabilities.ITEM_INSERTION_HANDLER.cast(insertionHandlers[facing.ordinal()]);
             }
-        } else {
-            if (capability == Capabilities.PIPE_VIEW) {
-                return Capabilities.PIPE_VIEW.cast(this);
-            }
         }
-        return null;
+
+        return super.getCapability(capability, facing);
     }
 
     @Override

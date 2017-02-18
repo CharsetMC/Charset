@@ -16,14 +16,21 @@
 
 package pl.asie.charset.lib.capability.redstone;
 
-import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;
+import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
-public class RedstoneReceiverWrapper implements ICapabilityWrapper<IRedstoneReceiver> {
+public class RedstoneReceiverWrapper implements Function<List<IRedstoneReceiver>, IRedstoneReceiver> {
+	@Override
+	public IRedstoneReceiver apply(List<IRedstoneReceiver> iRedstoneReceivers) {
+		return new WrappedReceiver(iRedstoneReceivers);
+	}
+
 	private class WrappedReceiver implements IRedstoneReceiver {
 		private final Collection<IRedstoneReceiver> receiverSet;
 
@@ -37,15 +44,5 @@ public class RedstoneReceiverWrapper implements ICapabilityWrapper<IRedstoneRece
 				r.onRedstoneInputChange();
 			}
 		}
-	}
-
-	@Override
-	public Capability<IRedstoneReceiver> getCapability() {
-		return Capabilities.REDSTONE_RECEIVER;
-	}
-
-	@Override
-	public IRedstoneReceiver wrapImplementations(Collection<IRedstoneReceiver> collection) {
-		return new WrappedReceiver(collection);
 	}
 }

@@ -20,10 +20,10 @@ public class TrainLinker {
 	}
 
 	@SubscribeEvent
-	public void onAttachCapabilities(AttachCapabilitiesEvent.Entity event) {
+	public void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
 		if (event.getObject() instanceof EntityMinecart) {
 			Linkable link = new Linkable(event.getObject());
-			event.addCapability(Linkable.ID, Linkable.PROVIDER.create(link));
+			event.addCapability(Linkable.ID, Linkable.PROVIDER.get().create(link));
 			linkableMap.put(link.getId(), link);
 		}
 	}

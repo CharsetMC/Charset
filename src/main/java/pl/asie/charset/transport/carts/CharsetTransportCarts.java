@@ -75,7 +75,7 @@ public class CharsetTransportCarts {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         minecartStackSize = config.getInt("minecartStackSize", "tweaks", 4, 1, 64, "Sets the minimum stack size for all minecarts.");
-        CapabilityManager.INSTANCE.register(Linkable.class, Linkable.PROVIDER.getStorage(), Linkable.class);
+        CapabilityManager.INSTANCE.register(Linkable.class, Linkable.STORAGE, Linkable.class);
 
         if (ModCharset.INDEV) {
             linker = new TrainLinker();

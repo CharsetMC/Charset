@@ -1,5 +1,6 @@
 package pl.asie.charset.transport.carts.link;
 
+import com.google.common.base.Suppliers;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -7,13 +8,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
+import pl.asie.charset.lib.utils.FunctionalUtils;
 import pl.asie.charset.transport.carts.CharsetTransportCarts;
 import pl.asie.charset.transport.carts.ModCharsetCarts;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public final class Linkable {
-	public static final CapabilityProviderFactory<Linkable> PROVIDER = new CapabilityProviderFactory<>(CharsetTransportCarts.LINKABLE, new Storage());
+	public static final Storage STORAGE = new Storage();
+	public static final Supplier<CapabilityProviderFactory<Linkable>> PROVIDER = FunctionalUtils.lazySupplier(() -> new CapabilityProviderFactory<Linkable>(
+			CharsetTransportCarts.LINKABLE, STORAGE
+	));
 	public static final ResourceLocation ID = new ResourceLocation("charsetcarts", "linkable");
 	public Linkable previous, next;
 	private final Entity owner;

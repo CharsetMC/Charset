@@ -82,7 +82,7 @@ public final class RotationUtils {
 		IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof IAxisRotatable.IAxisRotatableBlock) {
 			for (int i = 0; i < count; i++)
-				if (!((IAxisRotatable.IAxisRotatableBlock) state.getBlock()).rotateAround(world, pos, axis))
+				if (!((IAxisRotatable.IAxisRotatableBlock) state.getBlock()).rotateAround(world, pos, axis, false))
 					return false;
 
 			return true;
@@ -93,7 +93,7 @@ public final class RotationUtils {
 			IAxisRotatable rotatable = CapabilityHelper.get(Capabilities.AXIS_ROTATABLE, tile, axis);
 			if (rotatable != null) {
 				for (int i = 0; i < count; i++)
-					if (!rotatable.rotateAround(axis))
+					if (!rotatable.rotateAround(axis, false))
 						return false;
 
 				return true;

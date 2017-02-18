@@ -22,15 +22,17 @@ public interface IAxisRotatable {
 		 * @param world The world.
 		 * @param pos The block position.
 		 * @param axis The axis.
+		 * @param simulate Whether the rotation should only be simulated.
 		 * @return Whether the rotation was successful.
 		 */
-		boolean rotateAround(World world, BlockPos pos, EnumFacing axis);
+		boolean rotateAround(World world, BlockPos pos, EnumFacing axis, boolean simulate);
 	}
 
 	/**
 	 * Rotate clockwise around the given axis.
 	 * @param axis The axis.
+	 * @param simulate Whether the rotation should only be simulated.
 	 * @return Whether the rotation was successful.
 	 */
-	boolean rotateAround(EnumFacing axis);
+	boolean rotateAround(EnumFacing axis, boolean simulate);
 }

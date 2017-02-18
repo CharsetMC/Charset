@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
  * Implement this class as a capability if you want to
  * emit a bundled cable signal.
  */
+@Deprecated
 public interface IBundledEmitter {
 	/**
 	 * Get the signal values of a bundled signal emitter.

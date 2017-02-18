@@ -16,21 +16,17 @@
 
 package pl.asie.charset.lib.capability.redstone;
 
-import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
-public class RedstoneEmitterWrapper implements ICapabilityWrapper<IRedstoneEmitter> {
+public class RedstoneEmitterWrapper implements Function<List<IRedstoneEmitter>, IRedstoneEmitter> {
 	@Override
-	public Capability<IRedstoneEmitter> getCapability() {
-		return Capabilities.REDSTONE_EMITTER;
-	}
-
-	@Override
-	public IRedstoneEmitter wrapImplementations(Collection<IRedstoneEmitter> collection) {
+	public IRedstoneEmitter apply(List<IRedstoneEmitter> collection) {
 		int data = 0;
 
 		for (IRedstoneEmitter emitter : collection) {

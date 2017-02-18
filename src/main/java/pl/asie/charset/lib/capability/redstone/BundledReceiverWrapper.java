@@ -16,14 +16,15 @@
 
 package pl.asie.charset.lib.capability.redstone;
 
-import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
-public class BundledReceiverWrapper implements ICapabilityWrapper<IBundledReceiver> {
+public class BundledReceiverWrapper implements Function<List<IBundledReceiver>, IBundledReceiver> {
 	private class WrappedReceiver implements IBundledReceiver {
 		private final Collection<IBundledReceiver> receiverSet;
 
@@ -40,12 +41,7 @@ public class BundledReceiverWrapper implements ICapabilityWrapper<IBundledReceiv
 	}
 
 	@Override
-	public Capability<IBundledReceiver> getCapability() {
-		return Capabilities.BUNDLED_RECEIVER;
-	}
-
-	@Override
-	public IBundledReceiver wrapImplementations(Collection<IBundledReceiver> collection) {
-		return new WrappedReceiver(collection);
+	public IBundledReceiver apply(List<IBundledReceiver> iBundledReceivers) {
+		return new WrappedReceiver(iBundledReceivers);
 	}
 }

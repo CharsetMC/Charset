@@ -20,6 +20,7 @@ package pl.asie.charset.api.wires;
  * Implement this class as a capability if you want to
  * receive signals from bundled cables.
  */
+@Deprecated
 public interface IBundledReceiver {
 	/**
 	 * This function will be called when a connected bundled cable changes.

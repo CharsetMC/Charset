@@ -16,21 +16,17 @@
 
 package pl.asie.charset.lib.capability.redstone;
 
-import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
-public class BundledEmitterWrapper implements ICapabilityWrapper<IBundledEmitter> {
+public class BundledEmitterWrapper implements Function<List<IBundledEmitter>, IBundledEmitter> {
 	@Override
-	public Capability<IBundledEmitter> getCapability() {
-		return Capabilities.BUNDLED_EMITTER;
-	}
-
-	@Override
-	public IBundledEmitter wrapImplementations(Collection<IBundledEmitter> collection) {
+	public IBundledEmitter apply(List<IBundledEmitter> collection) {
 		byte[] data = new byte[16];
 
 		for (IBundledEmitter emitter : collection) {

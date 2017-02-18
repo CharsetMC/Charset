@@ -12,6 +12,7 @@ import mezz.jei.api.recipe.IStackHelper;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import pl.asie.charset.lib.annotation.AnnotatedPluginHandler;
 import pl.asie.charset.lib.annotation.AnnotationHandler;
 
 import javax.annotation.Nonnull;
@@ -19,30 +20,13 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 @JEIPlugin
-public class JEIPluginCharset implements IModPlugin {
+public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> implements IModPlugin {
     public static IStackHelper STACKS;
     public static IRecipeTransferHandlerHelper RECIPE_TRANSFER_HANDLERS;
     public static IGuiHelper GUIS;
 
-    private Set<IModPlugin> plugins = null;
-
-    public Set<IModPlugin> getPlugins() {
-        if (plugins == null) {
-            ImmutableSet.Builder<IModPlugin> builder = new ImmutableSet.Builder<>();
-
-            for (String s : AnnotationHandler.jeiPluginClassNames) {
-                try {
-                    IModPlugin plugin = (IModPlugin) Class.forName(s).newInstance();
-                    builder.add(plugin);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            plugins = builder.build();
-            AnnotationHandler.jeiPluginClassNames.clear();
-        }
-        return plugins;
+    public JEIPluginCharset() {
+        super(CharsetJEIPlugin.class);
     }
 
     @Override

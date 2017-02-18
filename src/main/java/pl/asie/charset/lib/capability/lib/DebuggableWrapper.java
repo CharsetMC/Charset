@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.capability.lib;
 
-import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
@@ -8,8 +7,14 @@ import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
-public class DebuggableWrapper implements ICapabilityWrapper<IDebuggable> {
+public class DebuggableWrapper implements Function<List<IDebuggable>, IDebuggable> {
+	@Override
+	public IDebuggable apply(List<IDebuggable> iDebuggables) {
+		return new Wrapped(iDebuggables);
+	}
+
 	private class Wrapped implements IDebuggable {
 		private final Collection<IDebuggable> receivers;
 
@@ -22,15 +27,5 @@ public class DebuggableWrapper implements ICapabilityWrapper<IDebuggable> {
 			for (IDebuggable debug : receivers)
 				debug.addDebugInformation(stringList, side);
 		}
-	}
-
-	@Override
-	public Capability<IDebuggable> getCapability() {
-		return Capabilities.DEBUGGABLE;
-	}
-
-	@Override
-	public IDebuggable wrapImplementations(Collection<IDebuggable> implementations) {
-		return new Wrapped(implementations);
 	}
 }

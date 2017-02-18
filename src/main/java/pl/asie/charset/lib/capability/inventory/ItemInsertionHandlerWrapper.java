@@ -16,15 +16,21 @@
 
 package pl.asie.charset.lib.capability.inventory;
 
-import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
-public class ItemInsertionHandlerWrapper implements ICapabilityWrapper<IItemInsertionHandler> {
+public class ItemInsertionHandlerWrapper implements Function<List<IItemInsertionHandler>, IItemInsertionHandler> {
+    @Override
+    public IItemInsertionHandler apply(List<IItemInsertionHandler> iItemInsertionHandlers) {
+        return new WrappedInserter(iItemInsertionHandlers);
+    }
+
     private class WrappedInserter implements IItemInsertionHandler {
         private final Collection<IItemInsertionHandler> receivers;
 
@@ -36,21 +42,11 @@ public class ItemInsertionHandlerWrapper implements ICapabilityWrapper<IItemInse
         public ItemStack insertItem(ItemStack stack, boolean simulate) {
             ItemStack toInsert = stack;
             for (IItemInsertionHandler insertionHandler : receivers) {
+                toInsert = insertionHandler.insertItem(toInsert, simulate);
                 if (toInsert.isEmpty())
                     break;
-                toInsert = insertionHandler.insertItem(toInsert, simulate);
             }
             return toInsert;
         }
-    }
-
-    @Override
-    public Capability<IItemInsertionHandler> getCapability() {
-        return Capabilities.ITEM_INSERTION_HANDLER;
-    }
-
-    @Override
-    public IItemInsertionHandler wrapImplementations(Collection<IItemInsertionHandler> implementations) {
-        return new WrappedInserter(implementations);
     }
 }

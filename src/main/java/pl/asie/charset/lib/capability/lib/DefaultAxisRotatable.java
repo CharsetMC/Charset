@@ -5,7 +5,7 @@ import pl.asie.charset.api.lib.IAxisRotatable;
 
 public class DefaultAxisRotatable implements IAxisRotatable {
 	@Override
-	public boolean rotateAround(EnumFacing axis) {
+	public boolean rotateAround(EnumFacing axis, boolean simulate) {
 		return false;
 	}
 }

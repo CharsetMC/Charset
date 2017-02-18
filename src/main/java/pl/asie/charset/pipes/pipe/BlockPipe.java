@@ -1,5 +1,9 @@
 package pl.asie.charset.pipes.pipe;
 
+import mcmultipart.api.container.IPartInfo;
+import mcmultipart.api.multipart.IMultipart;
+import mcmultipart.api.slot.EnumCenterSlot;
+import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -7,6 +11,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -28,10 +33,12 @@ import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+
 public class BlockPipe extends BlockContainer {
-	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
+	protected static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 	private AxisAlignedBB lastSelectionBox = BOXES[6];
 
 	static {
@@ -75,6 +82,11 @@ public class BlockPipe extends BlockContainer {
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new TilePipe();
+	}
+
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return BlockPipe.BOXES[6];
 	}
 
 	@Override

@@ -16,6 +16,7 @@
 
 package pl.asie.charset.lib.capability;
 
+import mcmultipart.api.capability.MCMPCapabilityHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -34,21 +35,18 @@ import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
+import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
-import pl.asie.charset.lib.capability.lib.DefaultAxisRotatable;
-import pl.asie.charset.lib.capability.lib.DefaultDebuggable;
-import pl.asie.charset.lib.capability.lib.DefaultMovable;
+import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
+import pl.asie.charset.lib.capability.lib.*;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.providers.CapabilityWrapperInventory;
-import pl.asie.charset.lib.capability.redstone.DefaultBundledEmitter;
-import pl.asie.charset.lib.capability.redstone.DefaultBundledEmitterStorage;
-import pl.asie.charset.lib.capability.redstone.DefaultRedstoneEmitter;
-import pl.asie.charset.lib.capability.redstone.DefaultRedstoneEmitterStorage;
-import pl.asie.charset.lib.capability.redstone.DummyRedstoneReceiver;
+import pl.asie.charset.lib.capability.redstone.*;
+import pl.asie.charset.lib.wires.Wire;
 
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)
@@ -77,38 +75,40 @@ public class Capabilities {
 	@CapabilityInject(IRedstoneReceiver.class)
 	public static Capability<IRedstoneReceiver> REDSTONE_RECEIVER;
 
-	public static void init() {
-		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<IAudioSource>(), DefaultAudioSource::new);
-		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<IAudioReceiver>(), DefaultAudioReceiver::new);
+	public static void preInit() {
+		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<>(), DefaultAudioSource::new);
+		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<>(), DefaultAudioReceiver::new);
 
-		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new NullCapabilityStorage<IAxisRotatable>(), DefaultAxisRotatable::new);
-		CapabilityManager.INSTANCE.register(IDebuggable.class, new NullCapabilityStorage<IDebuggable>(), DefaultDebuggable::new);
-		CapabilityManager.INSTANCE.register(IMovable.class, new NullCapabilityStorage<IMovable>(), DefaultMovable::new);
+		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new NullCapabilityStorage<>(), DefaultAxisRotatable::new);
+		CapabilityManager.INSTANCE.register(IDebuggable.class, new NullCapabilityStorage<>(), DefaultDebuggable::new);
+		CapabilityManager.INSTANCE.register(IMovable.class, new NullCapabilityStorage<>(), DefaultMovable::new);
 
-		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<IItemInsertionHandler>(), DefaultItemInsertionHandler::new);
-		CapabilityManager.INSTANCE.register(IPipeView.class, new NullCapabilityStorage<IPipeView>(), DefaultPipeView::new);
+		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<>(), DefaultItemInsertionHandler::new);
+		CapabilityManager.INSTANCE.register(IPipeView.class, new NullCapabilityStorage<>(), DefaultPipeView::new);
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter::new);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter::new);
-		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<IBundledReceiver>(), DummyRedstoneReceiver::new);
-		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<IRedstoneReceiver>(), DummyRedstoneReceiver::new);
+		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<>(), DummyRedstoneReceiver::new);
+		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<>(), DummyRedstoneReceiver::new);
+ 	}
 
+ 	public static void init() {
 		if (Loader.isModLoaded("mcmultipart")) {
 			initMultiplePants();
 		}
- 	}
+	}
 
 	@Optional.Method(modid = "mcmultipart")
 	private static void initMultiplePants() {
-		// TODO 1.11
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new AudioReceiverWrapper());
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledEmitterWrapper());
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneEmitterWrapper());
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new BundledReceiverWrapper());
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new RedstoneReceiverWrapper());
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new DebuggableWrapper());
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new ItemInsertionHandlerWrapper());
-//		CapabilityWrapperRegistry.registerCapabilityWrapper(new PipeViewWrapper());
+		MCMPCapabilityHelper.registerCapabilityJoiner(AUDIO_RECEIVER, new AudioReceiverWrapper());
+		MCMPCapabilityHelper.registerCapabilityJoiner(BUNDLED_EMITTER, new BundledEmitterWrapper());
+		MCMPCapabilityHelper.registerCapabilityJoiner(REDSTONE_EMITTER, new RedstoneEmitterWrapper());
+		MCMPCapabilityHelper.registerCapabilityJoiner(BUNDLED_RECEIVER, new BundledReceiverWrapper());
+		MCMPCapabilityHelper.registerCapabilityJoiner(REDSTONE_RECEIVER, new RedstoneReceiverWrapper());
+
+		MCMPCapabilityHelper.registerCapabilityJoiner(AXIS_ROTATABLE, new AxisRotatableWrapper());
+		MCMPCapabilityHelper.registerCapabilityJoiner(DEBUGGABLE, new DebuggableWrapper());
+		MCMPCapabilityHelper.registerCapabilityJoiner(ITEM_INSERTION_HANDLER, new ItemInsertionHandlerWrapper());
 	}
 
 	public static void registerVanillaWrappers() {

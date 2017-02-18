@@ -24,27 +24,31 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.api.audio.AudioPacket;
+import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.audio.types.AudioDataGameSound;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.utils.FunctionalUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Supplier;
 
 @CharsetModule(
         name = "audio.noteblock",
         description = "Noteblock rework. WIP"
 )
 public class CharsetAudioNoteblock {
+    private static final Supplier<CapabilityProviderFactory<IAudioSource>> PROVIDER = FunctionalUtils.lazySupplier(() -> new CapabilityProviderFactory<>(Capabilities.AUDIO_SOURCE));
     private static final List<Pair<Predicate<IBlockState>, SoundEvent>> INSTRUMENTS = new ArrayList<>();
     private static final SoundEvent DEFAULT_INSTRUMENT;
     private static final ResourceLocation NOTE_SOURCE_KEY = new ResourceLocation("charsetaudio:noteSource");
 
     @CharsetModule.PacketRegistry
     public PacketRegistry packet;
-
 
     static {
         DEFAULT_INSTRUMENT = SoundEvents.BLOCK_NOTE_HARP;
@@ -110,21 +114,9 @@ public class CharsetAudioNoteblock {
     }
 
     @SubscribeEvent
-    public void onAttach(AttachCapabilitiesEvent.TileEntity event) {
-        if (event.getTileEntity() instanceof TileEntityNote) {
-            event.addCapability(NOTE_SOURCE_KEY, new ICapabilityProvider() {
-                private final DefaultAudioSource source = new DefaultAudioSource();
-
-                @Override
-                public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-                    return capability == Capabilities.AUDIO_SOURCE;
-                }
-
-                @Override
-                public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-                    return capability == Capabilities.AUDIO_SOURCE ? Capabilities.AUDIO_SOURCE.cast(source) : null;
-                }
-            });
+    public void onAttach(AttachCapabilitiesEvent<TileEntity> event) {
+        if (event.getObject() instanceof TileEntityNote) {
+            event.addCapability(NOTE_SOURCE_KEY, PROVIDER.get().create(new DefaultAudioSource()));
         }
     }
 }

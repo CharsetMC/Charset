@@ -16,15 +16,21 @@
 
 package pl.asie.charset.lib.capability.audio;
 
-import mcmultipart.capabilities.ICapabilityWrapper;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
-public class AudioReceiverWrapper implements ICapabilityWrapper<IAudioReceiver> {
+public class AudioReceiverWrapper implements Function<List<IAudioReceiver>, IAudioReceiver> {
+    @Override
+    public IAudioReceiver apply(List<IAudioReceiver> iAudioReceivers) {
+        return new WrappedReceiver(iAudioReceivers);
+    }
+
     private class WrappedReceiver implements IAudioReceiver {
         private final Collection<IAudioReceiver> receivers;
 
@@ -40,15 +46,5 @@ public class AudioReceiverWrapper implements ICapabilityWrapper<IAudioReceiver> 
             }
             return received;
         }
-    }
-
-    @Override
-    public Capability<IAudioReceiver> getCapability() {
-        return Capabilities.AUDIO_RECEIVER;
-    }
-
-    @Override
-    public IAudioReceiver wrapImplementations(Collection<IAudioReceiver> implementations) {
-        return new WrappedReceiver(implementations);
     }
 }

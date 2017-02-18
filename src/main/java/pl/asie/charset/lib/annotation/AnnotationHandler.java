@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.event.FMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
+import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 import java.lang.invoke.MethodHandle;
@@ -32,7 +33,7 @@ import java.util.function.BiConsumer;
 
 public class AnnotationHandler {
 	public static final AnnotationHandler INSTANCE = new AnnotationHandler();
-	public static final Set<String> jeiPluginClassNames = new HashSet<>();
+	public static final Multimap<Class, String> classNames = HashMultimap.create();
 
 	private static final Multimap<String, String> dependencies = HashMultimap.create();
 	private static final Multimap<Class, Pair<String, MethodHandle>> loaderHandles =
@@ -104,6 +105,22 @@ public class AnnotationHandler {
 		for (ASMDataTable.ASMData data : table.getAll(annotation)) {
 			if (loadedModulesByClass.containsKey(data.getClassName())) {
 				c.accept(data, loadedModulesByClass.get(data.getClassName()));
+			}
+		}
+	}
+
+	private void addClassNames(ASMDataTable table, Class annotationClass, String confType) {
+		for (ASMDataTable.ASMData data : table.getAll(annotationClass.getName())) {
+			String id = (String) data.getAnnotationInfo().get("value");
+			Property prop = ModCharset.configModules.get(
+					"modules.compat",
+					confType + ":" + id,
+					true
+			);
+			boolean enabled = prop.getBoolean();
+
+			if (enabled && loadedModules.containsKey(id)) {
+				classNames.put(annotationClass, data.getClassName());
 			}
 		}
 	}
@@ -189,10 +206,6 @@ public class AnnotationHandler {
 			throw new RuntimeException("The following dependencies were not met: " + deps);
 		}
 
-		if (ModCharset.configModules.hasChanged()) {
-			ModCharset.configModules.save();
-		}
-
 		iterateModules(table, Mod.EventHandler.class.getName(), (data, instance) -> {
 			String methodName = data.getObjectName().substring(0, data.getObjectName().indexOf('('));
 			String methodDesc = data.getObjectName().substring(methodName.length());
@@ -253,12 +266,8 @@ public class AnnotationHandler {
 			}
 		});
 
-		for (ASMDataTable.ASMData data : table.getAll(CharsetJEIPlugin.class.getName())) {
-			String id = (String) data.getAnnotationInfo().get("value");
-			if (loadedModules.containsKey(id)) {
-				jeiPluginClassNames.add(data.getClassName());
-			}
-		}
+		addClassNames(table, CharsetJEIPlugin.class, "jei");
+		addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
 	}
 
 	public void passEvent(FMLEvent o) {
@@ -274,6 +283,10 @@ public class AnnotationHandler {
 
 	public void preInit(ASMDataTable table) {
 		readDataTable(table);
+
+		if (ModCharset.configModules.hasChanged()) {
+			ModCharset.configModules.save();
+		}
 	}
 
 	public void init() {

@@ -13,8 +13,8 @@ public class CapabilityProviderFactory<T> {
 	private final Capability<T> capability;
 	private final Capability.IStorage<T> storage;
 
-	private class Provider implements ICapabilitySerializable<NBTBase> {
-		private final T object;
+	private class Provider implements ICapabilityProvider {
+		protected final T object;
 
 		private Provider(T object) {
 			this.object = object;
@@ -30,6 +30,12 @@ public class CapabilityProviderFactory<T> {
 		public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
 			return capability == CapabilityProviderFactory.this.capability ? CapabilityProviderFactory.this.capability.cast(object) : null;
 		}
+	}
+
+	private class ProviderSerializable extends Provider implements ICapabilitySerializable<NBTBase> {
+		private ProviderSerializable(T object) {
+			super(object);
+		}
 
 		@Override
 		public NBTBase serializeNBT() {
@@ -38,17 +44,21 @@ public class CapabilityProviderFactory<T> {
 
 		@Override
 		public void deserializeNBT(NBTBase nbt) {
-			storage.readNBT(capability, object, null, nbt);
+			if (storage != null) storage.readNBT(capability, object, null, nbt);
 		}
 	}
 
-	public CapabilityProviderFactory(Capability<T> capability, Capability.IStorage<T> storage) {
+	public CapabilityProviderFactory(@Nonnull Capability<T> capability) {
+		this(capability, null);
+	}
+
+	public CapabilityProviderFactory(@Nonnull Capability<T> capability, @Nullable Capability.IStorage<T> storage) {
 		this.capability = capability;
 		this.storage = storage;
 	}
 
 	public ICapabilityProvider create(T object) {
-		return new Provider(object);
+		return storage != null ? new ProviderSerializable(object) : new Provider(object);
 	}
 
 	public Capability.IStorage<T> getStorage() {

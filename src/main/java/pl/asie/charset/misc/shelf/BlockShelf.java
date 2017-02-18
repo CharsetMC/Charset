@@ -140,6 +140,16 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
                 .withProperty(BACK, meta >= 4);
     }
 
+    public static EnumFacing getFace(EnumFacing facing, boolean back) {
+        return back ? facing.getOpposite() : facing;
+    }
+
+    public static EnumFacing getFacePlaced(EnumFacing facing, float hitX, float hitY, float hitZ, EntityLivingBase placer) {
+        Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ());
+        placementVec = placementVec.rotateYaw(placer.getHorizontalFacing().getHorizontalAngle() / 180 * (float) Math.PI);
+        return getFace(placer.getHorizontalFacing(), placementVec.zCoord > 0);
+    }
+
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ());
