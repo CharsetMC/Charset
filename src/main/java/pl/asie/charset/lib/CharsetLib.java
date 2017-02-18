@@ -102,7 +102,7 @@ public class CharsetLib {
 		ModelFactory.clearCaches();
 		ColorLookupHandler.INSTANCE.clear();
 
-		//	for (WireFactory factory : WireManager.REGISTRY.getValues()) {
+		//	for (WireProvider factory : WireManager.REGISTRY.getValues()) {
 		//		rendererWire.registerSheet(event.getMap(), factory);
 		//	}
 	}
@@ -154,7 +154,7 @@ public class CharsetLib {
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
 
-//		for (WireFactory factory : WireManager.REGISTRY.getValues()) {
+//		for (WireProvider factory : WireManager.REGISTRY.getValues()) {
 //			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, false, 1))
 //					.shapeless(new RecipeObjectWire(factory, true)).build());
 //			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, true, 1))

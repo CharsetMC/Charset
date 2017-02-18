@@ -212,8 +212,8 @@ public class PipeItem {
 	}
 
 	protected void sendPacket(boolean syncStack) {
-		if (owner.getWorld() != null && !owner.getWorld().isRemote) {
-			CharsetPipes.instance.packet.sendToAllAround(getSyncPacket(syncStack), owner, CharsetPipes.PIPE_TESR_DISTANCE);
+		if (!owner.getWorld().isRemote) {
+			CharsetPipes.packet.sendToAllAround(getSyncPacket(syncStack), owner, CharsetPipes.PIPE_TESR_DISTANCE);
 		}
 	}
 
@@ -280,7 +280,7 @@ public class PipeItem {
 					// subtraction, as it re-uses the same object instance.
 					// Therefore, we need to quit here.
 					return;
-				} else {
+				} else if (pipe == null) {
 					TileEntity tile = owner.getNeighbourTile(output);
 					passToInjectable(tile, output, false);
 				}
@@ -328,10 +328,12 @@ public class PipeItem {
 		}
 		// }
 
-		TileEntity tile = owner.getNeighbourTile(dir);
+		if (pipe == null) {
+			TileEntity tile = owner.getNeighbourTile(dir);
 
-		if (passToInjectable(tile, dir, true)) {
-			return true;
+			if (passToInjectable(tile, dir, true)) {
+				return true;
+			}
 		}
 
 		return false;
@@ -467,10 +469,6 @@ public class PipeItem {
 	}
 
 	private boolean passToInjectable(TileEntity tile, EnumFacing dir, boolean simulate) {
-		if (tile instanceof TilePipe) {
-			return false;
-		}
-
 		IItemInsertionHandler handler = CapabilityHelper.get(Capabilities.ITEM_INSERTION_HANDLER, tile, dir.getOpposite());
 		if (handler != null) {
 			if (owner.getWorld().isRemote) {

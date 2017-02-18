@@ -55,18 +55,18 @@ public class RendererWire extends ModelFactory<Wire> {
     };
 
     private final TIntObjectMap<Wire> stackMap = new TIntObjectHashMap<>();
-    private final Map<WireFactory, WireSheet> sheetMap = new HashMap<>();
+    private final Map<WireProvider, WireSheet> sheetMap = new HashMap<>();
 
     public RendererWire() {
         super(Wire.PROPERTY, new ResourceLocation("charset:blocks/wire_normal_particle"));
         addDefaultBlockTransforms();
     }
 
-    public WireSheet getSheet(WireFactory type) {
+    public WireSheet getSheet(WireProvider type) {
         return sheetMap.get(type);
     }
 
-    public void registerSheet(TextureMap map, WireFactory type) {
+    public void registerSheet(TextureMap map, WireProvider type) {
         ResourceLocation location = type.getTexturePrefix();
         String domain = location.getResourceDomain();
         String path = location.getResourcePath();
@@ -103,7 +103,7 @@ public class RendererWire extends ModelFactory<Wire> {
         }
 
         if (!wc(wire, side.facing) && wire.getFactory() != null) {
-            h = 8.0f - (sheetMap.get(wire.getFactory()).width / 2); // TODO: Replace with WireFactory call?
+            h = 8.0f - (sheetMap.get(wire.getFactory()).width / 2); // TODO: Replace with WireProvider call?
         }
 
         return side.facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;

@@ -316,7 +316,7 @@ public class SpecialRendererPipe extends DualTileEntitySpecialRenderer<TilePipe>
 			for (PipeItem item : part.getPipeItems()) {
 				EnumFacing id = item.getDirection();
 				ItemStack stack = item.getStack();
-				if (stack == null || stack.getItem() == null) {
+				if (stack == null) {
 					continue;
 				}
 

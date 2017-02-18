@@ -4,10 +4,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.*;
 
 public final class WireManager {
-    public static final IForgeRegistry<WireFactory> REGISTRY = new RegistryBuilder()
+    public static final IForgeRegistry<WireProvider> REGISTRY = new RegistryBuilder()
             .setName(new ResourceLocation("charset:wire"))
             .setIDRange(1, 255)
-            .setType(WireFactory.class)
+            .setType(WireProvider.class)
             .create();
 
     public static ItemWire ITEM;
@@ -16,9 +16,7 @@ public final class WireManager {
 
     }
 
-    public static void register(WireFactory factory) {
+    public static void register(WireProvider factory) {
         REGISTRY.register(factory);
-        // TODO
-        // MultipartRegistry.registerPartFactory(factory, factory.getRegistryName().toString());
     }
 }

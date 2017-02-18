@@ -1,6 +1,8 @@
 package pl.asie.charset.lib.wires;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import pl.asie.charset.api.wires.WireFace;
 
 public final class WireUtils {
@@ -20,5 +22,10 @@ public final class WireUtils {
 
     public static EnumFacing[] getConnectionsForRender(WireFace face) {
         return CONNECTION_DIRS[face.ordinal()];
+    }
+
+    public static Wire getWire(IBlockAccess access, BlockPos pos, WireFace face) {
+        // TODO
+        return null;
     }
 }

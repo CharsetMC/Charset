@@ -32,10 +32,6 @@ import pl.asie.charset.pipes.PipeUtils;
 import java.util.*;
 
 public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable, IDebuggable {
-    public class MultipartHandler implements IMultipartTile {
-
-    }
-
     public class InsertionHandler implements IItemInsertionHandler {
         private final EnumFacing facing;
 

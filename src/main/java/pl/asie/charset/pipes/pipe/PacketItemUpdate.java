@@ -84,13 +84,14 @@ public class PacketItemUpdate extends PacketTile {
 		WeakReference<PipeItem> ref = itemIdCache.get(id);
 		item = ref != null ? ref.get() : null;
 
-		if (item != null && (item.getOwner() != tile || !item.getOwner().getPipeItems().contains(item))) {
+		TilePipe pipe = PipeUtils.getPipe(tile);
+
+		if (item != null && (item.getOwner() != pipe || !item.getOwner().getPipeItems().contains(item))) {
 			item.getOwner().removeItemClientSide(item);
 			itemIdCache.remove(id);
 			item = null;
 		}
 
-		TilePipe pipe = PipeUtils.getPipe(tile);
 		if (pipe == null) {
 			return;
 		}
