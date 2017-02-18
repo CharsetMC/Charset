@@ -21,7 +21,6 @@ import net.minecraft.util.EnumFacing;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Deprecated
 public enum WireFace {
 	DOWN,
 	UP,

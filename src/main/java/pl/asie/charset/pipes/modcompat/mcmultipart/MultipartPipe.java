@@ -13,7 +13,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.pipes.CharsetPipes;
+import pl.asie.charset.pipes.PipeUtils;
 import pl.asie.charset.pipes.pipe.BlockPipe;
+import pl.asie.charset.pipes.pipe.TilePipe;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,5 +34,13 @@ public class MultipartPipe implements IMultipart {
     @Override
     public IPartSlot getSlotFromWorld(IBlockAccess world, BlockPos pos, IBlockState state) {
         return EnumCenterSlot.CENTER;
+    }
+
+    @Override
+    public void onPartChanged(IPartInfo part, IPartInfo otherPart) {
+        TilePipe pipe = PipeUtils.getPipe(part.getTile().getTileEntity());
+        if (pipe != null) {
+            pipe.scheduleFullNeighborUpdate();
+        }
     }
 }

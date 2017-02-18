@@ -75,10 +75,9 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
         return null; // !?
     }
 
-    private AxisAlignedBB getCornerBox(WireFace location, int i) {
+    public AxisAlignedBB getCornerBox(WireFace location, int i) {
         return cornerBoxes[location.ordinal() * 4 + i];
     }
-
 
     public abstract float getWidth();
     public abstract float getHeight();

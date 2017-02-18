@@ -1,6 +1,7 @@
 package pl.asie.charset.pipes.pipe;
 
 import com.google.common.collect.ImmutableList;
+import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -458,9 +459,11 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     }
 
     protected void scheduleRenderUpdate() {
-        if (getWorld() != null) {
-            getWorld().markBlockRangeForRenderUpdate(getPos(), getPos());
-        }
+         markBlockForRenderUpdate();
+    }
+
+    public void scheduleFullNeighborUpdate() {
+        neighborsUpdate |= 0x3F;
     }
 
     public void onNeighborBlockChange(Block block, BlockPos neighborPos) {
