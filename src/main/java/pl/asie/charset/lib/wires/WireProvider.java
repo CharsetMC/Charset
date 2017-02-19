@@ -53,7 +53,11 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     public abstract Wire create(IWireContainer container, WireFace location);
 
     public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
-        return face == WireFace.CENTER || access.isSideSolid(pos.offset(face.facing), face.facing.getOpposite(), false);
+        if (face == WireFace.CENTER) {
+            return !isFlat();
+        } else {
+            return access.isSideSolid(pos.offset(face.facing), face.facing.getOpposite(), false);
+        }
     }
 
     public AxisAlignedBB getBox(WireFace location, int i) {

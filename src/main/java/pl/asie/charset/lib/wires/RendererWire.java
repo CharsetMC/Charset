@@ -191,6 +191,10 @@ public class RendererWire extends ModelFactory<Wire> {
     }
 
     public void addCorner(Wire wire, WireSheet sheet, EnumFacing dir, int renderColor, List<BakedQuad> quads) {
+        if (wire.getFactory().isFlat()) {
+            return;
+        }
+
         int width = sheet.width;
         int height = sheet.height;
 
@@ -409,123 +413,125 @@ public class RendererWire extends ModelFactory<Wire> {
                 )
         );
 
-        from.setY(0.0F);
-        to.setY(0.0F);
-        quads.add(
-                RenderUtils.BAKERY.makeBakedQuad(
-                        from, to,
-                        renderColor, new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
-                        sheet.top[cmc], EnumFacing.DOWN, rot, true
-                )
-        );
-
-
-        // Side faces
-        Vector3f fromZ = new Vector3f(from.getX(), 0.0f, min);
-        Vector3f toZ = new Vector3f(to.getX(), sheet.height, min);
-        Vector3f fromX = new Vector3f(min, 0.0f, from.getZ());
-        Vector3f toX = new Vector3f(min, sheet.height, to.getZ());
-
-        // Should we render a faux side wire on this side? (For bundled)
-        boolean crossroadsX = connectionMatrix[2] && !connectionMatrix[3];
-        boolean crossroadsZ = connectionMatrix[0] && !connectionMatrix[1];
-
-        // getIcon(false, cmc == 1, crossroadsX, EnumFacing.WEST)
-        if (sheet.side != null) {
+        if (!wire.getFactory().isFlat()) {
+            from.setY(0.0F);
+            to.setY(0.0F);
             quads.add(
                     RenderUtils.BAKERY.makeBakedQuad(
-                            fromX, toX,
-                            renderColor, new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-                            sheet.side, EnumFacing.WEST, rot, false
+                            from, to,
+                            renderColor, new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
+                            sheet.top[cmc], EnumFacing.DOWN, rot, true
                     )
             );
 
-            // getIcon(false, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH)
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            fromZ, toZ,
-                            renderColor, new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
-                            sheet.side, EnumFacing.NORTH, rot, false
-                    )
-            );
-        }
 
-        fromX.setX(max);
-        toX.setX(max);
+            // Side faces
+            Vector3f fromZ = new Vector3f(from.getX(), 0.0f, min);
+            Vector3f toZ = new Vector3f(to.getX(), sheet.height, min);
+            Vector3f fromX = new Vector3f(min, 0.0f, from.getZ());
+            Vector3f toX = new Vector3f(min, sheet.height, to.getZ());
 
-        fromZ.setZ(max);
-        toZ.setZ(max);
+            // Should we render a faux side wire on this side? (For bundled)
+            boolean crossroadsX = connectionMatrix[2] && !connectionMatrix[3];
+            boolean crossroadsZ = connectionMatrix[0] && !connectionMatrix[1];
 
-        if (sheet.side != null) {
-            // getIcon(false, cmc == 2, crossroadsX, EnumFacing.EAST)
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            fromX, toX,
-                            renderColor, new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
-                            sheet.side, EnumFacing.EAST, rot, false
-                    )
-            );
-
-            // getIcon(false, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH)
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            fromZ, toZ,
-                            renderColor, new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-                            sheet.side, EnumFacing.SOUTH, rot, false
-                    )
-            );
-        }
-
-        // Edge faces
-        float[] edgeUV = new float[]{min, minH, max, maxH};
-        float[] edgeUVFlipped = new float[]{max, minH, min, maxH};
-
-        if (sheet.edge != null) {
-            if (connectionMatrix[0]) {
+            // getIcon(false, cmc == 1, crossroadsX, EnumFacing.WEST)
+            if (sheet.side != null) {
                 quads.add(
                         RenderUtils.BAKERY.makeBakedQuad(
-                                new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
-                                renderColor, edgeUVFlipped,
-                                sheet.edge, EnumFacing.NORTH, rot, false
+                                fromX, toX,
+                                renderColor, new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
+                                sheet.side, EnumFacing.WEST, rot, false
+                        )
+                );
+
+                // getIcon(false, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH)
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                fromZ, toZ,
+                                renderColor, new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
+                                sheet.side, EnumFacing.NORTH, rot, false
                         )
                 );
             }
 
-            if (connectionMatrix[1]) {
+            fromX.setX(max);
+            toX.setX(max);
+
+            fromZ.setZ(max);
+            toZ.setZ(max);
+
+            if (sheet.side != null) {
+                // getIcon(false, cmc == 2, crossroadsX, EnumFacing.EAST)
                 quads.add(
                         RenderUtils.BAKERY.makeBakedQuad(
-                                new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
-                                renderColor, edgeUV,
-                                sheet.edge, EnumFacing.SOUTH, rot, false
+                                fromX, toX,
+                                renderColor, new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
+                                sheet.side, EnumFacing.EAST, rot, false
+                        )
+                );
+
+                // getIcon(false, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH)
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                fromZ, toZ,
+                                renderColor, new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
+                                sheet.side, EnumFacing.SOUTH, rot, false
                         )
                 );
             }
 
-            if (connectionMatrix[2]) {
-                quads.add(
-                        RenderUtils.BAKERY.makeBakedQuad(
-                                new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
-                                renderColor, edgeUV,
-                                sheet.edge, EnumFacing.WEST, rot, false
-                        )
-                );
+            // Edge faces
+            float[] edgeUV = new float[]{min, minH, max, maxH};
+            float[] edgeUVFlipped = new float[]{max, minH, min, maxH};
+
+            if (sheet.edge != null) {
+                if (connectionMatrix[0]) {
+                    quads.add(
+                            RenderUtils.BAKERY.makeBakedQuad(
+                                    new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
+                                    renderColor, edgeUVFlipped,
+                                    sheet.edge, EnumFacing.NORTH, rot, false
+                            )
+                    );
+                }
+
+                if (connectionMatrix[1]) {
+                    quads.add(
+                            RenderUtils.BAKERY.makeBakedQuad(
+                                    new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
+                                    renderColor, edgeUV,
+                                    sheet.edge, EnumFacing.SOUTH, rot, false
+                            )
+                    );
+                }
+
+                if (connectionMatrix[2]) {
+                    quads.add(
+                            RenderUtils.BAKERY.makeBakedQuad(
+                                    new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
+                                    renderColor, edgeUV,
+                                    sheet.edge, EnumFacing.WEST, rot, false
+                            )
+                    );
+                }
+
+                if (connectionMatrix[3]) {
+                    quads.add(
+                            RenderUtils.BAKERY.makeBakedQuad(
+                                    new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
+                                    renderColor, edgeUVFlipped,
+                                    sheet.edge, EnumFacing.EAST, rot, false
+                            )
+                    );
+                }
             }
 
-            if (connectionMatrix[3]) {
-                quads.add(
-                        RenderUtils.BAKERY.makeBakedQuad(
-                                new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
-                                renderColor, edgeUVFlipped,
-                                sheet.edge, EnumFacing.EAST, rot, false
-                        )
-                );
-            }
-        }
-
-        EnumFacing[] dirs0 = WireUtils.getConnectionsForRender(WireFace.DOWN);
-        for (int i = 0; i < 4; i++) {
-            if (cornerConnectionMatrix[i]) {
-                addCorner(wire, sheet, dirs0[i], renderColor, quads);
+            EnumFacing[] dirs0 = WireUtils.getConnectionsForRender(WireFace.DOWN);
+            for (int i = 0; i < 4; i++) {
+                if (cornerConnectionMatrix[i]) {
+                    addCorner(wire, sheet, dirs0[i], renderColor, quads);
+                }
             }
         }
     }

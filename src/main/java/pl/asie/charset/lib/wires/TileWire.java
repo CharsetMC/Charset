@@ -4,9 +4,11 @@ import mcmultipart.api.capability.MCMPCapabilities;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
 import mcmultipart.api.world.IMultipartWorld;
+import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -14,22 +16,27 @@ import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.blocks.TileBase;
 
-public class TileWire extends TileBase implements IMultipartTile, IWireContainer {
-    private Wire wire;
+public class TileWire extends TileBase implements IMultipartTile, ITickable, IWireContainer {
+    protected Wire wire;
 
     @Override
-    public void invalidate() {
-        super.invalidate();
-        wire = null;
+    public void update() {
+        super.update();
+        if (wire != null) {
+            wire.update();
+        }
     }
 
     @Override
     public void readNBTData(NBTTagCompound nbt, boolean isClient) {
-        if (nbt.hasKey("f", Constants.NBT.TAG_BYTE)) {
+        if (nbt.hasKey("f")) {
             WireProvider factory = WireManager.REGISTRY.getObjectById(nbt.getByte("f"));
             WireFace location = WireFace.VALUES[nbt.getByte("l")];
             wire = factory.create(this, location);
             wire.readNBTData(nbt, isClient);
+            if (isClient) {
+                markBlockForRenderUpdate();
+            }
         } else {
             wire = null;
         }
@@ -54,8 +61,9 @@ public class TileWire extends TileBase implements IMultipartTile, IWireContainer
         return new ItemStack(CharsetLibWires.itemWire, 1, getItemMetadata());
     }
 
-    public void onPlacedBy(EnumFacing facing, ItemStack stack) {
-        wire = WireManager.ITEM.fromStack(this, stack, facing);
+    public void onPlacedBy(WireFace facing, ItemStack stack) {
+        wire = WireManager.ITEM.fromStack(this, stack, facing.facing);
+        wire.onChanged(true);
         markBlockForUpdate();
     }
 
@@ -71,7 +79,7 @@ public class TileWire extends TileBase implements IMultipartTile, IWireContainer
 
     @Override
     public void requestNeighborUpdate(int connectionMask) {
-        if ((connectionMask & 0xFF) != 0) {
+        if ((connectionMask & 0xFF) != 0 && world instanceof IMultipartWorld) {
             IPartInfo info = ((IMultipartWorld) world).getPartInfo();
             info.getContainer().notifyChange(info);
         }
@@ -94,7 +102,14 @@ public class TileWire extends TileBase implements IMultipartTile, IWireContainer
 
     @Override
     public void requestRenderUpdate() {
+        requestNetworkUpdate();
         markBlockForRenderUpdate();
+    }
+
+    @Override
+    public void dropWire() {
+        Block.spawnAsEntity(world, pos, getDroppedBlock());
+        world.setBlockToAir(pos);
     }
 
     @Override

@@ -2,6 +2,7 @@ package pl.asie.charset.lib.wires;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,23 +17,25 @@ import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wire>, IWireProxy {
+public abstract class Wire implements ITickable, ICapabilityProvider, IRenderComparable<Wire> {
     public static final IUnlistedProperty<Wire> PROPERTY = new UnlistedPropertyGeneric<>("wire", Wire.class);
 
-    private final IWireContainer container;
-    private final WireProvider factory;
-    private final WireFace location;
-    private final net.minecraftforge.common.capabilities.CapabilityDispatcher capabilities;
+    private final @Nonnull IWireContainer container;
+    private final @Nonnull WireProvider factory;
+    private final @Nonnull WireFace location;
+    private final @Nullable net.minecraftforge.common.capabilities.CapabilityDispatcher capabilities;
 
     private byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
     private boolean connectionCheckDirty;
 
-    protected Wire(IWireContainer container, WireProvider factory, WireFace location) {
+    protected Wire(@Nonnull IWireContainer container, @Nonnull WireProvider factory, @Nonnull WireFace location) {
         this.container = container;
         this.factory = factory;
         this.location = location;
@@ -42,16 +45,22 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
         this.capabilities = event.getCapabilities().size() > 0 ? new CapabilityDispatcher(event.getCapabilities()) : null;
     }
 
+    @Override
+    public void update() {
+        if (connectionCheckDirty) {
+            updateConnections();
+        }
+    }
+
     public void readNBTData(NBTTagCompound nbt, boolean isClient) {
         internalConnections = nbt.getByte("iC");
         externalConnections = nbt.getByte("eC");
-        cornerConnections = nbt.getByte("cC");
-        occludedSides = nbt.getByte("oS");
-        cornerOccludedSides = nbt.getByte("coS");
+        cornerConnections = nbt.hasKey("cC") ? nbt.getByte("cC") : 0;
+        occludedSides = nbt.hasKey("oS") ? nbt.getByte("oS") : 0;
+        cornerOccludedSides = nbt.hasKey("coS") ? nbt.getByte("coS") : 0;
     }
 
     public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
-        nbt.setByte("l", (byte) location.ordinal());
         nbt.setByte("iC", internalConnections);
         nbt.setByte("eC", externalConnections);
         if (location != WireFace.CENTER) {
@@ -64,7 +73,12 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
         return nbt;
     }
 
-    public void onChanged() {
+    public void onChanged(boolean external) {
+        if (external) {
+            if (!factory.canPlace(getContainer().world(), getContainer().pos(), location)) {
+                getContainer().dropWire();
+            }
+        }
         connectionCheckDirty = true;
     }
 
@@ -93,7 +107,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
     }
 
     public final boolean connectsAny(EnumFacing direction) {
-        return ((internalConnections | externalConnections | cornerConnections) & (1 << direction.ordinal())) != 0;
+        return ((internalConnections | externalConnections | cornerConnections) & (1 << (direction != null ? direction.ordinal() : 6))) != 0;
     }
 
     public final boolean connectsCorner(EnumFacing direction) {
@@ -101,7 +115,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
     }
 
     public final boolean connects(EnumFacing direction) {
-        return ((internalConnections | externalConnections) & (1 << direction.ordinal())) != 0;
+        return ((internalConnections | externalConnections) & (1 << (direction != null ? direction.ordinal() : 6))) != 0;
     }
 
     public final boolean isOccluded(EnumFacing face) {
@@ -148,7 +162,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
                 boolean found = false;
                 AxisAlignedBB mask = factory.getBox(location, i + 1);
                 if (mask != null) {
-                    if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos())) {
+                    if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos())) {
                         occludedSides |= 1 << connFaces[i].ordinal();
                         validSides.remove(face);
                         found = true;
@@ -159,7 +173,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
                     BlockPos cPos = container.pos().offset(connFaces[i]);
                     AxisAlignedBB cornerMask = factory.getCornerBox(location, i ^ 1);
                     if (cornerMask != null) {
-                        if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(cornerMask), container.world(), cPos)) {
+                        if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(cornerMask), container.world(), cPos)) {
                             cornerOccludedSides |= 1 << connFaces[i].ordinal();
                             invalidCornerSides.add(face);
                         }
@@ -171,7 +185,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
         if (validSides.contains(WireFace.CENTER)) {
             AxisAlignedBB mask = factory.getBox(WireFace.CENTER, 1 + location.ordinal());
             if (mask != null) {
-                if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos())) {
+                if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos())) {
                     occludedSides |= 1 << 6;
                     validSides.remove(WireFace.CENTER);
                 }

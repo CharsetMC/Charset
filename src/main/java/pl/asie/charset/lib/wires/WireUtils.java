@@ -1,15 +1,24 @@
 package pl.asie.charset.lib.wires;
 
+import mcmultipart.api.container.IMultipartContainer;
+import mcmultipart.api.container.IPartInfo;
+import mcmultipart.api.multipart.IMultipart;
+import mcmultipart.api.multipart.IMultipartTile;
+import mcmultipart.api.multipart.MultipartHelper;
 import mcmultipart.api.slot.EnumCenterSlot;
 import mcmultipart.api.slot.EnumFaceSlot;
 import mcmultipart.api.slot.IPartSlot;
+import mcmultipart.api.world.IMultipartBlockAccess;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.wires.WireFace;
 
 import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Optional;
 
 public final class WireUtils {
     private static final EnumFacing[][] CONNECTION_DIRS = new EnumFacing[][]{
@@ -79,23 +88,39 @@ public final class WireUtils {
     }
 
     public static @Nullable Wire getWire(IBlockAccess access, BlockPos pos, WireFace face) {
+        Optional<IMultipartContainer> container = MultipartHelper.getContainer(access, pos);
+        if (container.isPresent()) {
+            Optional<IMultipartTile> tile = container.get().getPartTile(toPartSlot(face));
+            if (tile.isPresent() && tile.get().getTileEntity() instanceof TileWire) {
+                Wire wire = ((TileWire) tile.get().getTileEntity()).wire;
+                if (wire != null && wire.getLocation() == face) {
+                    return ((TileWire) tile.get().getTileEntity()).wire;
+                }
+            }
+
+            return null;
+        }
+
         TileEntity tile = access.getTileEntity(pos);
-        if (tile != null) {
-            IWireProxy proxy = tile.getCapability(CharsetLibWires.WIRE_CAP, face.facing);
-            return proxy instanceof Wire && ((Wire) proxy).getLocation() == face ? (Wire) proxy : null;
+        if (tile != null && tile instanceof TileWire && ((TileWire) tile).wire != null && ((TileWire) tile).wire.getLocation() == face) {
+            return ((TileWire) tile).wire;
         } else {
             return null;
         }
     }
 
     public static @Nullable Wire getAnyWire(IBlockAccess access, BlockPos pos) {
-        return getAnyWire(access.getTileEntity(pos));
+        if (access instanceof IMultipartBlockAccess) {
+            TileWire tileWire = (TileWire) ((IMultipartBlockAccess) access).getPartInfo().getTile().getTileEntity();
+            return tileWire.wire;
+        } else {
+            return getAnyWire(access.getTileEntity(pos));
+        }
     }
 
     public static @Nullable Wire getAnyWire(TileEntity tile) {
-        if (tile != null) {
-            IWireProxy proxy = tile.getCapability(CharsetLibWires.WIRE_CAP, null);
-            return proxy instanceof Wire ? (Wire) proxy : null;
+        if (tile != null && tile instanceof TileWire) {
+            return ((TileWire) tile).wire;
         } else {
             return null;
         }

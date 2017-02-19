@@ -48,9 +48,6 @@ public class CharsetLibWires {
 	@CharsetModule.Instance
 	public static CharsetLibWires instance;
 
-	@CapabilityInject(IWireProxy.class)
-	public static Capability<IWireProxy> WIRE_CAP;
-
 	public static BlockWire blockWire;
 	public static ItemWire itemWire;
 
@@ -59,8 +56,6 @@ public class CharsetLibWires {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		CapabilityManager.INSTANCE.register(IWireProxy.class, new NullCapabilityStorage<>(), IWireProxy.Dummy::new);
-
 		RegistryUtils.register(blockWire = new BlockWire(), itemWire = new ItemWire(blockWire), "wire");
 		WireManager.ITEM = itemWire;
 

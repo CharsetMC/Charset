@@ -9,6 +9,7 @@ public interface IWireContainer {
     void requestNeighborUpdate(int connectionMask);
     void requestNetworkUpdate();
     void requestRenderUpdate();
+    void dropWire();
 
     class Dummy implements IWireContainer {
         @Override
@@ -33,6 +34,11 @@ public interface IWireContainer {
 
         @Override
         public void requestRenderUpdate() {
+
+        }
+
+        @Override
+        public void dropWire() {
 
         }
     }
