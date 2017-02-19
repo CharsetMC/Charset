@@ -4,65 +4,84 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityDispatcher;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTTagCompound>, IRenderComparable<Wire> {
+public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wire>, IWireProxy {
     public static final IUnlistedProperty<Wire> PROPERTY = new UnlistedPropertyGeneric<>("wire", Wire.class);
 
-    protected final WireProvider factory;
-    protected World world;
-    protected BlockPos pos;
-    protected byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
-    protected boolean connectionCheckDirty;
-    public WireFace location;
+    private final IWireContainer container;
+    private final WireProvider factory;
+    private final WireFace location;
+    private final net.minecraftforge.common.capabilities.CapabilityDispatcher capabilities;
 
-    protected Wire(WireProvider factory) {
+    private byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
+    private boolean connectionCheckDirty;
+
+    protected Wire(IWireContainer container, WireProvider factory, WireFace location) {
+        this.container = container;
         this.factory = factory;
+        this.location = location;
+
+        AttachCapabilitiesEvent<Wire> event = new AttachCapabilitiesEvent<Wire>(Wire.class,this);
+        MinecraftForge.EVENT_BUS.register(event);
+        this.capabilities = event.getCapabilities().size() > 0 ? new CapabilityDispatcher(event.getCapabilities()) : null;
     }
 
-    @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-        return false;
+    public void readNBTData(NBTTagCompound nbt, boolean isClient) {
+        internalConnections = nbt.getByte("iC");
+        externalConnections = nbt.getByte("eC");
+        cornerConnections = nbt.getByte("cC");
+        occludedSides = nbt.getByte("oS");
+        cornerOccludedSides = nbt.getByte("coS");
     }
 
-    @Nullable
-    @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        return null;
+    public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
+        nbt.setByte("l", (byte) location.ordinal());
+        nbt.setByte("iC", internalConnections);
+        nbt.setByte("eC", externalConnections);
+        if (location != WireFace.CENTER) {
+            nbt.setByte("cC", cornerConnections);
+        }
+        if (!isClient) {
+            nbt.setByte("oS", occludedSides);
+            nbt.setByte("coS", cornerOccludedSides);
+        }
+        return nbt;
     }
 
-    @Override
-    public NBTTagCompound serializeNBT() {
-        return null;
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
-
+    public void onChanged() {
+        connectionCheckDirty = true;
     }
 
     public int getRenderColor() {
         return -1;
     }
 
+    public final IWireContainer getContainer() {
+        return container;
+    }
+
     public final WireProvider getFactory() {
         return factory;
+    }
+
+    public final WireFace getLocation() {
+        return location;
     }
 
     public final boolean connectsInternal(WireFace side) {
@@ -86,10 +105,6 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
     }
 
     public final boolean isOccluded(EnumFacing face) {
-        if (connectionCheckDirty) {
-            connectionCheckDirty = false;
-            updateConnections();
-        }
         return (occludedSides & (1 << face.ordinal())) != 0;
     }
 
@@ -102,6 +117,10 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
     }
 
     protected final void updateConnections() {
+        if (!connectionCheckDirty) {
+            return;
+        }
+
         Set<WireFace> validSides = EnumSet.noneOf(WireFace.class);
         Set<WireFace> invalidCornerSides = EnumSet.noneOf(WireFace.class);
 
@@ -117,7 +136,7 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
             validSides.add(facing);
         }
 
-        int oldConnectionCache = internalConnections << 12 | externalConnections << 6 | cornerConnections;
+        int oldConnectionCache = internalConnections | externalConnections << 8 | cornerConnections << 16;
         internalConnections = externalConnections = cornerConnections = occludedSides = cornerOccludedSides = 0;
 
         // Occlusion test
@@ -129,7 +148,7 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
                 boolean found = false;
                 AxisAlignedBB mask = factory.getBox(location, i + 1);
                 if (mask != null) {
-                    if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), world, pos)) {
+                    if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos())) {
                         occludedSides |= 1 << connFaces[i].ordinal();
                         validSides.remove(face);
                         found = true;
@@ -137,10 +156,10 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
                 }
 
                 if (!found && location != WireFace.CENTER) {
-                    BlockPos cPos = pos.offset(connFaces[i]);
+                    BlockPos cPos = container.pos().offset(connFaces[i]);
                     AxisAlignedBB cornerMask = factory.getCornerBox(location, i ^ 1);
                     if (cornerMask != null) {
-                        if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(cornerMask), world, cPos)) {
+                        if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(cornerMask), container.world(), cPos)) {
                             cornerOccludedSides |= 1 << connFaces[i].ordinal();
                             invalidCornerSides.add(face);
                         }
@@ -152,7 +171,7 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
         if (validSides.contains(WireFace.CENTER)) {
             AxisAlignedBB mask = factory.getBox(WireFace.CENTER, 1 + location.ordinal());
             if (mask != null) {
-                if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), world, pos)) {
+                if (!OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos())) {
                     occludedSides |= 1 << 6;
                     validSides.remove(WireFace.CENTER);
                 }
@@ -172,14 +191,14 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
             }
         }
 
-        int newConnectionCache = internalConnections << 12 | externalConnections << 6 | cornerConnections;
+        int newConnectionCache = internalConnections | externalConnections << 8 | cornerConnections << 16;
 
         if (oldConnectionCache != newConnectionCache) {
-            // TODO
-/*            scheduleNeighborUpdate((oldConnectionCache ^ newConnectionCache) >> 6);
-            scheduleLogicUpdate();
-            scheduleRenderUpdate();*/
+            container.requestNeighborUpdate(oldConnectionCache ^ newConnectionCache);
+            container.requestRenderUpdate();
         }
+
+        connectionCheckDirty = false;
     }
 
     protected boolean canConnectWire(Wire wire) {
@@ -208,5 +227,23 @@ public abstract class Wire implements ICapabilityProvider, INBTSerializable<NBTT
     @Override
     public int renderHashCode() {
         return Objects.hash(factory, location, internalConnections, externalConnections, cornerConnections);
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        if (connects(facing)) {
+            return capabilities != null ? capabilities.hasCapability(capability, facing) : false;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        if (connects(facing)) {
+            return capabilities != null ? capabilities.getCapability(capability, facing) : null;
+        } else {
+            return null;
+        }
     }
 }

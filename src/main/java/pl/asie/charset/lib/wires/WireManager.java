@@ -4,12 +4,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.*;
 
 public final class WireManager {
-    public static final IForgeRegistry<WireProvider> REGISTRY = new RegistryBuilder()
+    public static final int MAX_ID = 255;
+    public static final FMLControlledNamespacedRegistry<WireProvider> REGISTRY = (FMLControlledNamespacedRegistry<WireProvider>) new RegistryBuilder<WireProvider>()
             .setName(new ResourceLocation("charset:wire"))
-            .setIDRange(1, 255)
+            .setIDRange(1, MAX_ID)
             .setType(WireProvider.class)
             .create();
 
+    @Deprecated
     public static ItemWire ITEM;
 
     private WireManager() {

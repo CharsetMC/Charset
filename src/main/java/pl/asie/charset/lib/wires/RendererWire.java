@@ -34,14 +34,18 @@ import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.charset.lib.render.sprite.SpritesheetFactory;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RendererWire extends ModelFactory<Wire> {
     public static class WireSheet {
-        TextureAtlasSprite[] top;
-        TextureAtlasSprite side, edge, particle;
+        @Nonnull TextureAtlasSprite[] top;
+        @Nullable TextureAtlasSprite side;
+        @Nullable TextureAtlasSprite edge;
+        @Nonnull TextureAtlasSprite particle;
         int width, height;
     }
 
@@ -58,7 +62,7 @@ public class RendererWire extends ModelFactory<Wire> {
     private final Map<WireProvider, WireSheet> sheetMap = new HashMap<>();
 
     public RendererWire() {
-        super(Wire.PROPERTY, new ResourceLocation("charset:blocks/wire_normal_particle"));
+        super(Wire.PROPERTY, new ResourceLocation("minecraft:blocks/stone"));
         addDefaultBlockTransforms();
     }
 
@@ -72,10 +76,16 @@ public class RendererWire extends ModelFactory<Wire> {
         String path = location.getResourcePath();
         WireSheet sheet = new WireSheet();
 
-        sheet.top = SpritesheetFactory.register(map, new ResourceLocation(domain, path + "_top"), 4, 4);
-        sheet.particle = map.registerSprite(new ResourceLocation(domain, path + "_particle"));
-        sheet.edge = map.registerSprite(new ResourceLocation(domain, path + "_edge"));
-        sheet.side = map.registerSprite(new ResourceLocation(domain, path + "_side"));
+        if (!path.endsWith("/")) {
+            path += "_";
+        }
+
+        sheet.top = SpritesheetFactory.register(map, new ResourceLocation(domain, path + "top"), 4, 4);
+        sheet.particle = map.registerSprite(new ResourceLocation(domain, path + "particle"));
+        if (!type.isFlat()) {
+            sheet.edge = map.registerSprite(new ResourceLocation(domain, path + "edge"));
+            sheet.side = map.registerSprite(new ResourceLocation(domain, path + "side"));
+        }
 
         sheet.width = (int) (type.getWidth() * 16);
         sheet.height = (int) (type.getHeight() * 16);
@@ -164,16 +174,18 @@ public class RendererWire extends ModelFactory<Wire> {
             }
         }
 
-        for (EnumFacing f : EnumFacing.VALUES) {
-            if (wc(wire, f)) {
-                quads.add(
-                        RenderUtils.BAKERY.makeBakedQuad(
-                                new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
-                                renderColor,
-                                f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[]{max, min, min, max} : new float[]{min, min, max, max},
-                                sheet.edge, EnumFacing.DOWN, ROTATIONS[f.ordinal()], true
-                        )
-                );
+        if (sheet.edge != null) {
+            for (EnumFacing f : EnumFacing.VALUES) {
+                if (wc(wire, f)) {
+                    quads.add(
+                            RenderUtils.BAKERY.makeBakedQuad(
+                                    new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
+                                    renderColor,
+                                    f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[]{max, min, min, max} : new float[]{min, min, max, max},
+                                    sheet.edge, EnumFacing.DOWN, ROTATIONS[f.ordinal()], true
+                            )
+                    );
+                }
             }
         }
     }
@@ -182,7 +194,7 @@ public class RendererWire extends ModelFactory<Wire> {
         int width = sheet.width;
         int height = sheet.height;
 
-        ModelRotation rot = ROTATIONS[wire.location.ordinal()];
+        ModelRotation rot = ROTATIONS[wire.getLocation().ordinal()];
         float min = 8.0f - (width / 2);
         float max = 8.0f + (width / 2);
 
@@ -210,21 +222,23 @@ public class RendererWire extends ModelFactory<Wire> {
                     )
             );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(min, 0, -height), new Vector3f(min, height, 0),
-                            renderColor, edgeUV,
-                            sheet.edge, EnumFacing.WEST, rot, false
-                    )
-            );
+            if (sheet.edge != null) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(min, 0, -height), new Vector3f(min, height, 0),
+                                renderColor, edgeUV,
+                                sheet.edge, EnumFacing.WEST, rot, false
+                        )
+                );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(max, 0, -height), new Vector3f(max, height, 0),
-                            renderColor, edgeUVFlipped,
-                            sheet.edge, EnumFacing.EAST, rot, false
-                    )
-            );
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(max, 0, -height), new Vector3f(max, height, 0),
+                                renderColor, edgeUVFlipped,
+                                sheet.edge, EnumFacing.EAST, rot, false
+                        )
+                );
+            }
         } else if (dir == EnumFacing.SOUTH) {
             float[] topUV = new float[]{min, 0, max, height};
 
@@ -244,21 +258,23 @@ public class RendererWire extends ModelFactory<Wire> {
                     )
             );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(min, 0, 16), new Vector3f(min, height, 16 + height),
-                            renderColor, edgeUV,
-                            sheet.edge, EnumFacing.WEST, rot, false
-                    )
-            );
+            if (sheet.edge != null) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(min, 0, 16), new Vector3f(min, height, 16 + height),
+                                renderColor, edgeUV,
+                                sheet.edge, EnumFacing.WEST, rot, false
+                        )
+                );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(max, 0, 16), new Vector3f(max, height, 16 + height),
-                            renderColor, edgeUVFlipped,
-                            sheet.edge, EnumFacing.EAST, rot, false
-                    )
-            );
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(max, 0, 16), new Vector3f(max, height, 16 + height),
+                                renderColor, edgeUVFlipped,
+                                sheet.edge, EnumFacing.EAST, rot, false
+                        )
+                );
+            }
         } else if (dir == EnumFacing.WEST) {
             float[] topUV = new float[]{16 - height, min, 16, max};
 
@@ -278,21 +294,23 @@ public class RendererWire extends ModelFactory<Wire> {
                     )
             );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(-height, 0, min), new Vector3f(0, height, min),
-                            renderColor, edgeUVFlipped,
-                            sheet.edge, EnumFacing.NORTH, rot, false
-                    )
-            );
+            if (sheet.edge != null) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(-height, 0, min), new Vector3f(0, height, min),
+                                renderColor, edgeUVFlipped,
+                                sheet.edge, EnumFacing.NORTH, rot, false
+                        )
+                );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(-height, 0, max), new Vector3f(0, height, max),
-                            renderColor, edgeUV,
-                            sheet.edge, EnumFacing.SOUTH, rot, false
-                    )
-            );
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(-height, 0, max), new Vector3f(0, height, max),
+                                renderColor, edgeUV,
+                                sheet.edge, EnumFacing.SOUTH, rot, false
+                        )
+                );
+            }
         } else if (dir == EnumFacing.EAST) {
             float[] topUV = new float[]{0, min, height, max};
 
@@ -312,26 +330,28 @@ public class RendererWire extends ModelFactory<Wire> {
                     )
             );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(16, 0, min), new Vector3f(16 + height, height, min),
-                            renderColor, edgeUVFlipped,
-                            sheet.edge, EnumFacing.NORTH, rot, false
-                    )
-            );
+            if (sheet.edge != null) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(16, 0, min), new Vector3f(16 + height, height, min),
+                                renderColor, edgeUVFlipped,
+                                sheet.edge, EnumFacing.NORTH, rot, false
+                        )
+                );
 
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(16, 0, max), new Vector3f(16 + height, height, max),
-                            renderColor, edgeUV,
-                            sheet.edge, EnumFacing.SOUTH, rot, false
-                    )
-            );
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(16, 0, max), new Vector3f(16 + height, height, max),
+                                renderColor, edgeUV,
+                                sheet.edge, EnumFacing.SOUTH, rot, false
+                        )
+                );
+            }
         }
     }
 
     public void addWire(Wire wire, WireSheet sheet, List<BakedQuad> quads) {
-        WireFace side = wire.location;
+        WireFace side = wire.getLocation();
         int renderColor = wire.getRenderColor();
 
         if (side == WireFace.CENTER) {
@@ -411,22 +431,24 @@ public class RendererWire extends ModelFactory<Wire> {
         boolean crossroadsZ = connectionMatrix[0] && !connectionMatrix[1];
 
         // getIcon(false, cmc == 1, crossroadsX, EnumFacing.WEST)
-        quads.add(
-                RenderUtils.BAKERY.makeBakedQuad(
-                        fromX, toX,
-                        renderColor, new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-                        sheet.side, EnumFacing.WEST, rot, false
-                )
-        );
+        if (sheet.side != null) {
+            quads.add(
+                    RenderUtils.BAKERY.makeBakedQuad(
+                            fromX, toX,
+                            renderColor, new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
+                            sheet.side, EnumFacing.WEST, rot, false
+                    )
+            );
 
-        // getIcon(false, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH)
-        quads.add(
-                RenderUtils.BAKERY.makeBakedQuad(
-                        fromZ, toZ,
-                        renderColor, new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
-                        sheet.side, EnumFacing.NORTH, rot, false
-                )
-        );
+            // getIcon(false, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH)
+            quads.add(
+                    RenderUtils.BAKERY.makeBakedQuad(
+                            fromZ, toZ,
+                            renderColor, new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
+                            sheet.side, EnumFacing.NORTH, rot, false
+                    )
+            );
+        }
 
         fromX.setX(max);
         toX.setX(max);
@@ -434,66 +456,70 @@ public class RendererWire extends ModelFactory<Wire> {
         fromZ.setZ(max);
         toZ.setZ(max);
 
-        // getIcon(false, cmc == 2, crossroadsX, EnumFacing.EAST)
-        quads.add(
-                RenderUtils.BAKERY.makeBakedQuad(
-                        fromX, toX,
-                        renderColor, new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
-                        sheet.side, EnumFacing.EAST, rot, false
-                )
-        );
+        if (sheet.side != null) {
+            // getIcon(false, cmc == 2, crossroadsX, EnumFacing.EAST)
+            quads.add(
+                    RenderUtils.BAKERY.makeBakedQuad(
+                            fromX, toX,
+                            renderColor, new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
+                            sheet.side, EnumFacing.EAST, rot, false
+                    )
+            );
 
-        // getIcon(false, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH)
-        quads.add(
-                RenderUtils.BAKERY.makeBakedQuad(
-                        fromZ, toZ,
-                        renderColor, new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-                        sheet.side, EnumFacing.SOUTH, rot, false
-                )
-        );
+            // getIcon(false, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH)
+            quads.add(
+                    RenderUtils.BAKERY.makeBakedQuad(
+                            fromZ, toZ,
+                            renderColor, new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
+                            sheet.side, EnumFacing.SOUTH, rot, false
+                    )
+            );
+        }
 
         // Edge faces
         float[] edgeUV = new float[]{min, minH, max, maxH};
         float[] edgeUVFlipped = new float[]{max, minH, min, maxH};
 
-        if (connectionMatrix[0]) {
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
-                            renderColor, edgeUVFlipped,
-                            sheet.edge, EnumFacing.NORTH, rot, false
-                    )
-            );
-        }
+        if (sheet.edge != null) {
+            if (connectionMatrix[0]) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
+                                renderColor, edgeUVFlipped,
+                                sheet.edge, EnumFacing.NORTH, rot, false
+                        )
+                );
+            }
 
-        if (connectionMatrix[1]) {
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
-                            renderColor, edgeUV,
-                            sheet.edge, EnumFacing.SOUTH, rot, false
-                    )
-            );
-        }
+            if (connectionMatrix[1]) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
+                                renderColor, edgeUV,
+                                sheet.edge, EnumFacing.SOUTH, rot, false
+                        )
+                );
+            }
 
-        if (connectionMatrix[2]) {
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
-                            renderColor, edgeUV,
-                            sheet.edge, EnumFacing.WEST, rot, false
-                    )
-            );
-        }
+            if (connectionMatrix[2]) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
+                                renderColor, edgeUV,
+                                sheet.edge, EnumFacing.WEST, rot, false
+                        )
+                );
+            }
 
-        if (connectionMatrix[3]) {
-            quads.add(
-                    RenderUtils.BAKERY.makeBakedQuad(
-                            new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
-                            renderColor, edgeUVFlipped,
-                            sheet.edge, EnumFacing.EAST, rot, false
-                    )
-            );
+            if (connectionMatrix[3]) {
+                quads.add(
+                        RenderUtils.BAKERY.makeBakedQuad(
+                                new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
+                                renderColor, edgeUVFlipped,
+                                sheet.edge, EnumFacing.EAST, rot, false
+                        )
+                );
+            }
         }
 
         EnumFacing[] dirs0 = WireUtils.getConnectionsForRender(WireFace.DOWN);
@@ -522,7 +548,7 @@ public class RendererWire extends ModelFactory<Wire> {
         if (stackMap.containsKey(md)) {
             return stackMap.get(md);
         } else {
-            Wire wire = WireManager.ITEM.fromStack(stack, EnumFacing.DOWN);
+            Wire wire = WireManager.ITEM.fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
             wire.setConnectionsForItemRender();
 
             stackMap.put(md, wire);

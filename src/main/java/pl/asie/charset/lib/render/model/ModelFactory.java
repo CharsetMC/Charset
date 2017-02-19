@@ -141,7 +141,8 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     @Override
     public TextureAtlasSprite getParticleTexture(IBlockState state) {
-        return getModel(state).getParticleTexture();
+        IBakedModel model = getModel(state);
+        return model != null ? model.getParticleTexture() : getParticleTexture();
     }
 
     @Override

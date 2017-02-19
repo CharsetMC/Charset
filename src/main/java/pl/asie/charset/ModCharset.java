@@ -58,7 +58,7 @@ public class ModCharset {
 	public static final String MODID = "charset";
 	public static final String NAME = "Charset";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_LIB = "required-after:forge@[13.19.1.2188,);after:jei@[4.0.5.201,);before:betterwithmods;before:mcmultipart";
+	public static final String DEP_LIB = "required-after:forge@[13.19.1.2188,);after:jei@[4.0.5.201,);before:betterwithmods;after:mcmultipart";
 
 	public static final boolean INDEV = ("@version@".equals(VERSION.toLowerCase()));
 

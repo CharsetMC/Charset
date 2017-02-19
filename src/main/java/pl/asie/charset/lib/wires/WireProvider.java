@@ -50,7 +50,7 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
         boxes[30] = new AxisAlignedBB(xMin, xMin, xMin, xMax, xMax, xMax);
     }
 
-    public abstract Wire fromStack(ItemStack stack);
+    public abstract Wire create(IWireContainer container, WireFace location);
 
     public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
         return face == WireFace.CENTER || access.isSideSolid(pos.offset(face.facing), face.facing.getOpposite(), false);
@@ -82,6 +82,10 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     public abstract float getWidth();
     public abstract float getHeight();
     public abstract ResourceLocation getTexturePrefix();
+
+    public boolean isFlat() {
+        return false;
+    }
 
     @Override
     public WireProvider setRegistryName(ResourceLocation name) {

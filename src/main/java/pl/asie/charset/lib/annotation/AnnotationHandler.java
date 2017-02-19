@@ -23,12 +23,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class AnnotationHandler {
@@ -127,18 +122,26 @@ public class AnnotationHandler {
 
 	@SuppressWarnings("unchecked")
 	private void readDataTable(ASMDataTable table) {
-		Set<String> unmetDependencies = new HashSet<>();
+		Multimap<String, String> unmetDependencies = HashMultimap.create();
+		Set<String> lazyModuleNames = new HashSet<>();
+		Set<String> enabledModules = new HashSet<>();
+		Set<String> compatModules = new HashSet<>();
+		Map<String, ASMDataTable.ASMData> moduleData = new HashMap<>();
 
 		for (ASMDataTable.ASMData data : table.getAll(CharsetModule.class.getName())) {
 			Map<String, Object> info = data.getAnnotationInfo();
 			String name = (String) info.get("name");
 			String desc = (String) info.get("description");
 			Boolean enabled = (Boolean) info.getOrDefault("isDefault", true);
+			Boolean lazy = (Boolean) info.getOrDefault("isLazy", false);
 			Boolean compat = (Boolean) info.getOrDefault("isModCompat", false);
 			Boolean devOnly = (Boolean) info.getOrDefault("isDevOnly", false);
 			if (devOnly && !ModCharset.INDEV) {
 				continue;
 			}
+
+			if (lazy) lazyModuleNames.add(name);
+			moduleData.put(name, data);
 
 			if ((Boolean) info.getOrDefault("isVisible", true)) {
 				Property prop = ModCharset.configModules.get(
@@ -150,60 +153,82 @@ public class AnnotationHandler {
 				enabled = prop.getBoolean();
 			}
 
-			if (!"lib".equals(name)) {
-				dependencies.put(name, "lib");
+			if (compat) {
+				compatModules.add(name);
 			}
 
 			if (enabled) {
-				boolean canLoad = true;
+				enabledModules.add(name);
 				List<String> deps = (List<String>) info.get("dependencies");
 				if (deps != null) {
-					for (String dep : deps) {
-						boolean optional = false;
-						if (dep.startsWith("optional:")) {
-							optional = true;
-							dep = dep.substring("optional:".length());
-						}
-
-						dependencies.put(name, dep);
-
-						boolean met = true;
-						if (!optional) {
-							if (dep.startsWith("mod:")) {
-								if (!Loader.isModLoaded(dep.substring("mod:".length()))) {
-									met = false;
-								}
-							} else {
-								if (!loadedModules.containsKey(dep)) {
-									met = false;
-								}
-							}
-						}
-
-						if (!met) {
-							canLoad = false;
-							if (!compat) {
-								unmetDependencies.add(dep);
-							}
-						}
-					}
-				}
-
-				if (canLoad) {
-					try {
-						Object o = getClass(data).newInstance();
-						loadedModules.put(name, o);
-						loadedModulesByClass.put(data.getClassName(), o);
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
+					dependencies.putAll(name, deps);
 				}
 			}
 		}
 
+		for (String name : enabledModules) {
+			boolean canLoad = true;
+			boolean compat = compatModules.contains(name);
+
+			if (dependencies.containsKey(name)) {
+				for (String dep : dependencies.get(name)) {
+					boolean optional = false;
+					if (dep.startsWith("optional:")) {
+						optional = true;
+						dep = dep.substring("optional:".length());
+					}
+
+					boolean met = true;
+					if (!optional) {
+						if (dep.startsWith("mod:")) {
+							if (!Loader.isModLoaded(dep.substring("mod:".length()))) {
+								met = false;
+							}
+						} else {
+							if (!enabledModules.contains(dep)) {
+								met = false;
+							}
+						}
+					}
+
+					if (!met) {
+						canLoad = false;
+						if (!compat) {
+							unmetDependencies.put(name, dep);
+						}
+					}
+				}
+			}
+
+			if (canLoad) {
+				ASMDataTable.ASMData data = moduleData.get(name);
+				try {
+					Object o = getClass(data).newInstance();
+					loadedModules.put(name, o);
+					loadedModulesByClass.put(data.getClassName(), o);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+
+		Joiner joinerComma = Joiner.on(", ");
+
+		Iterator<String> unmetDepKey = unmetDependencies.keySet().iterator();
+		while (unmetDepKey.hasNext()) {
+			String depMod = unmetDepKey.next();
+			if (lazyModuleNames.contains(depMod)) {
+				ModCharset.logger.warn("Lazy module " + depMod + " requires " + joinerComma.join(unmetDependencies.get(depMod)));
+				unmetDepKey.remove();
+			}
+		}
+
 		if (unmetDependencies.size() > 0) {
-			String deps = Joiner.on(", ").join(unmetDependencies);
-			throw new RuntimeException("The following dependencies were not met: " + deps);
+			List<String> depStrings = new ArrayList<>(unmetDependencies.size());
+			for (String depMod : unmetDependencies.keys()) {
+				depStrings.add(depMod + "<-[" + joinerComma.join(unmetDependencies.get(depMod)) + "]");
+			}
+			throw new RuntimeException("The following mandatory dependencies were not met: " + joinerComma.join(depStrings));
 		}
 
 		iterateModules(table, Mod.EventHandler.class.getName(), (data, instance) -> {
