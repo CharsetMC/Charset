@@ -34,7 +34,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.capability.NullCapabilityStorage;
+import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.utils.TriResult;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,7 +58,7 @@ public class CharsetLibWires {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		WireManager.REGISTRY.toString(); // HACK - Poke WireManager for it to initialize
+		WireManager.REGISTRY.toString(); // Poke REGISTRY <- this is a hack to initialize it
 
 		RegistryUtils.register(blockWire = new BlockWire(), itemWire = new ItemWire(blockWire), "wire");
 
@@ -84,6 +86,16 @@ public class CharsetLibWires {
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
 		RegistryUtils.register(TileWire.class, "wire");
+
+		// Add default conversion recipes
+		for (WireProvider provider : WireManager.REGISTRY) {
+			if (provider.hasFreestandingWire() && provider.hasSidedWire()) {
+				GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(provider, false, 1))
+						.shapeless(new RecipeObjectWire(provider, TriResult.YES)).build());
+				GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(provider, true, 1))
+						.shapeless(new RecipeObjectWire(provider, TriResult.NO)).build());
+			}
+		}
 	}
 
 	@Mod.EventHandler

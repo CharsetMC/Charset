@@ -103,4 +103,9 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
 
         return super.getCapability(capability, facing);
     }
+
+    @Override
+    public String getDisplayName() {
+        return "charset.audioCable";
+    }
 }

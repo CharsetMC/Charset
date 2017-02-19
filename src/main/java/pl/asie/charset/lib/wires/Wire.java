@@ -264,4 +264,6 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
             return null;
         }
     }
+
+    public abstract String getDisplayName();
 }

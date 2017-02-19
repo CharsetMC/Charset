@@ -8,6 +8,7 @@ import mcmultipart.api.multipart.MultipartHelper;
 import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -22,17 +23,36 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.lib.utils.RegistryUtils;
 
 public class ItemWire extends ItemBlockMultipart {
     public ItemWire(Block block) {
         super(block, (IMultipart) block);
+        setHasSubtypes(true);
+    }
+
+    @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        Wire wire = fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
+        String tr = "tile.wire.null";
+        if (wire != null) {
+            String name = wire.getDisplayName();
+            tr = "tile." + (wire.getLocation() == WireFace.CENTER ? name + ".freestanding" : name) + ".name";
+        }
+        return I18n.format(tr);
     }
 
     public Wire fromStack(IWireContainer container, ItemStack stack, EnumFacing facing) {
         WireProvider factory = WireManager.REGISTRY.getObjectById(stack.getMetadata() >> 1);
-        WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing);
-        return factory.create(container, location);
+        if (factory != null) {
+            WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing);
+            return factory.create(container, location);
+        } else {
+            return null;
+        }
+    }
+
+    public ItemStack toStack(WireProvider provider, boolean freestanding, int amount) {
+        return new ItemStack(this, amount, (WireManager.REGISTRY.getId(provider) << 1) | (freestanding ? 1 : 0));
     }
 
     @Override
@@ -78,8 +98,12 @@ public class ItemWire extends ItemBlockMultipart {
     public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
         for (WireProvider provider : WireManager.REGISTRY.getValues()) {
             int id = WireManager.REGISTRY.getId(provider);
-            subItems.add(new ItemStack(this, 1, id * 2));
-            subItems.add(new ItemStack(this, 1, id * 2 + 1));
+            if (provider.hasSidedWire()) {
+                subItems.add(new ItemStack(this, 1, id * 2));
+            }
+            if (provider.hasFreestandingWire()) {
+                subItems.add(new ItemStack(this, 1, id * 2 + 1));
+            }
         }
     }
 }

@@ -91,20 +91,9 @@ public class CharsetLib {
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void onPostBake(ModelBakeEvent event) {
-		//	event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "multipart"), rendererWire);
-		//	event.getModelRegistry().putObject(new ModelResourceLocation("charsetlib:wire", "inventory"), rendererWire);
-	}
-
-	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		ModelFactory.clearCaches();
 		ColorLookupHandler.INSTANCE.clear();
-
-		//	for (WireProvider factory : WireManager.REGISTRY.getValues()) {
-		//		rendererWire.registerSheet(event.getMap(), factory);
-		//	}
 	}
 
 	@Mod.EventHandler
@@ -112,14 +101,6 @@ public class CharsetLib {
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
 		enableDebugInfo = config.getBoolean("enableDebugInfo", "expert", false, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.");
 		// showAllItemTypes = config.getBoolean("showAllItemTypes", "general", true, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
-
-		// TODO 1.11
-//		WireManager.ITEM = new ItemWire();
-//		GameRegistry.register(WireManager.ITEM.setRegistryName("wire"));
-
-//		for (int i = 0; i < 512; i++) { // TODO
-//			ModCharset.proxy.registerItemModel(WireManager.ITEM, i, "charsetlib:wire");
-//		}
 
 		Capabilities.preInit();
 		NotifyImplementation.init();
@@ -153,13 +134,6 @@ public class CharsetLib {
 		GameRegistry.addRecipe(new RecipeDyeableItem());
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
-
-//		for (WireProvider factory : WireManager.REGISTRY.getValues()) {
-//			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, false, 1))
-//					.shapeless(new RecipeObjectWire(factory, true)).build());
-//			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(factory, true, 1))
-//					.shapeless(new RecipeObjectWire(factory, false)).build());
-//		}
 
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
 		AudioAPI.DATA_REGISTRY.register(AudioDataGameSound.class);

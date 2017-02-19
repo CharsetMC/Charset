@@ -52,13 +52,13 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
         return nbt;
     }
 
-    private int getItemMetadata() {
-        return WireManager.REGISTRY.getId(wire.getFactory()) * 2 + (wire.getLocation() == WireFace.CENTER ? 1 : 0);
-    }
-
     @Override
     public ItemStack getDroppedBlock() {
-        return new ItemStack(CharsetLibWires.itemWire, 1, getItemMetadata());
+        if (wire != null) {
+            return CharsetLibWires.itemWire.toStack(wire.getFactory(), wire.getLocation() == WireFace.CENTER, 1);
+        } else {
+            return ItemStack.EMPTY;
+        }
     }
 
     public void onPlacedBy(WireFace facing, ItemStack stack) {

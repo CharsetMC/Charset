@@ -20,6 +20,7 @@ item.charset.tape.quartz.tip=Precise
 item.charset.tape.emerald.tip=Best of Trade
 
 tile.charset.audioCable.name=Audio Cable
+tile.charset.audioCable.freestanding.name=Hovering Audio Cable
 tile.charset.ironNoteBlock.name=Iron Note Block
 
 tooltip.charset.tape.none=No Tape

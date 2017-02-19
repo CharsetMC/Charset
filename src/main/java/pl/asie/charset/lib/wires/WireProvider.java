@@ -54,9 +54,9 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
 
     public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
         if (face == WireFace.CENTER) {
-            return !isFlat();
+            return hasFreestandingWire();
         } else {
-            return access.isSideSolid(pos.offset(face.facing), face.facing.getOpposite(), false);
+            return hasSidedWire() && access.isSideSolid(pos.offset(face.facing), face.facing.getOpposite(), false);
         }
     }
 
@@ -86,6 +86,14 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     public abstract float getWidth();
     public abstract float getHeight();
     public abstract ResourceLocation getTexturePrefix();
+
+    public boolean hasSidedWire() {
+        return true;
+    }
+
+    public boolean hasFreestandingWire() {
+        return !isFlat();
+    }
 
     public boolean isFlat() {
         return false;

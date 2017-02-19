@@ -4,7 +4,8 @@ import pl.asie.charset.lib.annotation.CharsetModule;
 
 @CharsetModule(
         name = "power",
-        description = "Charset's own power system"
+        description = "Charset's own power system",
+        isDevOnly = true
 )
 public class CharsetPower {
 }

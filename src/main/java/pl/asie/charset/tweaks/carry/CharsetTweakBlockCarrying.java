@@ -37,6 +37,7 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.utils.TriResult;
 import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecart;
 import pl.asie.charset.tweaks.carry.transforms.CarryTransformerEntityMinecartDayBarrel;
 
@@ -125,11 +126,11 @@ public class CharsetTweakBlockCarrying {
         for (ResourceLocation r : locs)
             names.add(r.toString());
 
-        CharsetIMC.Result allowedIMC = CharsetIMC.INSTANCE.allows("carry", locs);
+        TriResult allowedIMC = CharsetIMC.INSTANCE.allows("carry", locs);
 
-        if (!Collections.disjoint(blacklist, names) || allowedIMC == CharsetIMC.Result.NO) {
+        if (!Collections.disjoint(blacklist, names) || allowedIMC == TriResult.NO) {
             return false;
-        } else if (!Collections.disjoint(whitelist, names) || allowedIMC == CharsetIMC.Result.YES) {
+        } else if (!Collections.disjoint(whitelist, names) || allowedIMC == TriResult.YES) {
             return true;
         }
 

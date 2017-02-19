@@ -3,6 +3,7 @@ package pl.asie.charset.lib;
 import com.google.common.collect.Lists;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import pl.asie.charset.lib.utils.TriResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,20 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 public final class CharsetIMC {
-    public enum Result {
-        YES,
-        MAYBE,
-        NO;
-
-        public Result or(Result other) {
-            if (this == YES || other == YES)
-                return YES;
-            else if (this == NO || other == NO)
-                return NO;
-            else
-                return MAYBE;
-        }
-    }
 
     public static CharsetIMC INSTANCE = new CharsetIMC();
     private static final Map<String, Set<ResourceLocation>> registryLocs = new HashMap<>();
@@ -40,20 +27,20 @@ public final class CharsetIMC {
         return registryLocs.getOrDefault(key, Collections.emptySet());
     }
 
-    public Result allows(String key, ResourceLocation location) {
-        return getResourceLocationEntries("b:" + key).contains(location) ? Result.NO
-                : getResourceLocationEntries("w:" + key).contains(location) ? Result.YES
-                : Result.MAYBE;
+    public TriResult allows(String key, ResourceLocation location) {
+        return getResourceLocationEntries("b:" + key).contains(location) ? TriResult.NO
+                : getResourceLocationEntries("w:" + key).contains(location) ? TriResult.YES
+                : TriResult.MAYBE;
     }
 
-    public Result allows(String key, Set<ResourceLocation> locations) {
-        Result result = Result.MAYBE;
+    public TriResult allows(String key, Set<ResourceLocation> locations) {
+        TriResult result = TriResult.MAYBE;
 
         for (ResourceLocation loc : locations) {
-            Result newResult = allows(key, loc);
-            if (newResult == Result.NO)
-                return Result.NO;
-            else if (result != Result.YES)
+            TriResult newResult = allows(key, loc);
+            if (newResult == TriResult.NO)
+                return TriResult.NO;
+            else if (result != TriResult.YES)
                 result = newResult;
         }
 
