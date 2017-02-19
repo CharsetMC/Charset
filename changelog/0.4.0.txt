@@ -2,11 +2,16 @@
     * One mod ID with modules (higher granularity than previously) configurable in config/charset/modules.
     * The above, of course, makes "@Charset" work in JEI.
 * [audio.tapes] Temporaily removed due to a potential incoming redesign. That's the only breaking part of this update - sorry!
+* [audio.transport] New module - adds Audio Cables (requires MCMultiPart2)
 * [lib] [#123] Work around issues with mods which change wood recipes, like BetterWithMods
 * [misc.drama] [#120] Fix IllegalArgumentException
 * [misc.scaffolds] Improved JEI support.
 * [pipes] [#121] Fix Shifter crashes
-* [pipes] Add support for CommonCapabilities' IInventoryState for further optimizations.
+* [pipes] Added support for CommonCapabilities' IInventoryState for further optimizations.
+* [pipes] Added MCMultiPart2 support.
+* [storage.barrels] Added support for locking Hopping Barrels with a redstone signal.
+* [storage.barrels] Added MCMultiPart2 support.
+* [storage.barrels] Fixed Creative Barrel behaviour on stack insertion.
 * [storage.barrels] Fixed many issues with barrel carts.
 * [storage.barrels] Improved JEI support.
 * [storage.barrels] Sticky barrel upgrade can now use OreDict-ed slimeballs.

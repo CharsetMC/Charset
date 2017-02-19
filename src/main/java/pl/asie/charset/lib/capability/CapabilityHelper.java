@@ -59,7 +59,7 @@ public final class CapabilityHelper {
                 return result;
         }
 
-        if (entities) {
+        if (entities && !world.isSideSolid(pos, facing, false)) {
             List<Entity> entityList = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos));
             for (Entity entity : entityList) {
                 T result = get(capability, entity, facing);

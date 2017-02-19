@@ -60,6 +60,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
@@ -70,8 +71,12 @@ import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RayTraceUtils;
+import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.SpaceUtils;
+import pl.asie.charset.pipes.PipeUtils;
+import pl.asie.charset.pipes.pipe.TilePipe;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -203,6 +208,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return this == HOPPING || this == CREATIVE;
         }
     }
+
+    private boolean updateRedstoneLevels;
+    private int redstoneLevel;
     private int last_mentioned_count = -1;
 
     public TileEntityDayBarrel() {
@@ -231,6 +239,22 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     @Override
+    public void validate() {
+        super.validate();
+        updateRedstoneLevels = true;
+    }
+
+    public void updateRedstoneLevel() {
+        redstoneLevel = 0;
+        for (EnumFacing d : EnumFacing.VALUES) {
+            if (isTop(d) || isTop(d.getOpposite()))
+                continue;
+
+            redstoneLevel = Math.max(redstoneLevel, RedstoneUtils.getRedstonePower(world, pos.offset(d), d));
+        }
+    }
+
+    @Override
     public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
         ItemUtils.writeToNBT(item, compound, "item");
         compound.setString("log", woodLog.getId());
@@ -253,7 +277,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return;
         }
 
-        if (!scheduledTick || (getWorld().getTotalWorldTime() % getLogicSpeed()) != 0) {
+        if (updateRedstoneLevels) {
+            updateRedstoneLevel();
+            updateRedstoneLevels = false;
+        }
+
+        if (redstoneLevel > 0 || !scheduledTick || (getWorld().getTotalWorldTime() % getLogicSpeed()) != 0) {
             return;
         }
 
@@ -305,7 +334,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack got = handler.insertItem(i, toPush, false);
                     if (got.isEmpty()) {
-                        item.shrink(1);
+                        if (type != Type.CREATIVE) {
+                            item.shrink(1);
+                        }
                         itemChanged = true;
                         break;
                     }
@@ -323,9 +354,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public void neighborChanged(BlockPos pos, BlockPos fromPos) {
-        // X/Z can be equal, as we only care about top/bottom neighbors
-        if (type.isHopping() && pos.getX() == fromPos.getX() && pos.getZ() == fromPos.getZ()) {
-            needLogic();
+        if (type.isHopping()) {
+            updateRedstoneLevel();
+            // X/Z can be equal, as we only care about top/bottom neighbors for this
+            if (pos.getX() == fromPos.getX() && pos.getZ() == fromPos.getZ()) {
+                needLogic();
+            }
         }
     }
 
