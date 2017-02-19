@@ -56,11 +56,12 @@ public class CharsetLibWires {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		WireManager.REGISTRY.toString(); // HACK - Poke WireManager for it to initialize
+
 		RegistryUtils.register(blockWire = new BlockWire(), itemWire = new ItemWire(blockWire), "wire");
-		WireManager.ITEM = itemWire;
 
 		for (int i = 0; i < WireManager.MAX_ID * 2; i++) {
-			RegistryUtils.registerModel(WireManager.ITEM, i, "charset:wire");
+			RegistryUtils.registerModel(itemWire, i, "charset:wire");
 		}
 	}
 
@@ -83,5 +84,11 @@ public class CharsetLibWires {
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(this);
 		RegistryUtils.register(TileWire.class, "wire");
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void initClient(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(new WireHighlightHandler());
 	}
 }

@@ -27,7 +27,6 @@ public abstract class AnnotatedPluginHandler<T> {
             }
 
             plugins = builder.build();
-            AnnotationHandler.classNames.removeAll(annotationClass);
         }
         return plugins;
     }

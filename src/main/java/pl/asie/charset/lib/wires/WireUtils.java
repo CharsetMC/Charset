@@ -4,8 +4,10 @@ import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.multipart.IMultipartTile;
+import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import mcmultipart.api.multipart.MultipartHelper;
 import mcmultipart.api.slot.EnumCenterSlot;
+import mcmultipart.api.slot.EnumEdgeSlot;
 import mcmultipart.api.slot.EnumFaceSlot;
 import mcmultipart.api.slot.IPartSlot;
 import mcmultipart.api.world.IMultipartBlockAccess;
@@ -13,8 +15,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -39,10 +43,42 @@ public final class WireUtils {
         return CONNECTION_DIRS[face.ordinal()];
     }
 
-    public static boolean canConnectInternal(Wire wire, WireFace side) {
-        WireFace location = wire.getLocation();
+    public static boolean hasCapability(Wire wire, BlockPos pos, Capability<?> capability, EnumFacing face) {
+        TileWire.isWireCheckingForCaps = true;
+        if (wire.getLocation() != WireFace.CENTER) {
+            Optional<IMultipartContainer> container = MultipartHelper.getContainer(wire.getContainer().world(), pos);
+            if (container.isPresent()) {
+                boolean result = MultipartCapabilityHelper.hasCapability(container.get(), capability, EnumEdgeSlot.fromFaces(wire.getLocation().facing, face), face);
+                TileWire.isWireCheckingForCaps = false;
+                return result;
+            }
+        }
 
-        if (side == location) {
+        TileEntity tile = wire.getContainer().world().getTileEntity(pos);
+        boolean result = tile != null && tile.hasCapability(capability, face);
+        TileWire.isWireCheckingForCaps = false;
+        return result;
+    }
+
+    public static <T> T getCapability(Wire wire, BlockPos pos, Capability<T> capability, EnumFacing face) {
+        TileWire.isWireCheckingForCaps = true;
+        if (wire.getLocation() != WireFace.CENTER) {
+            Optional<IMultipartContainer> container = MultipartHelper.getContainer(wire.getContainer().world(), pos);
+            if (container.isPresent()) {
+                T result = MultipartCapabilityHelper.getCapability(container.get(), capability, EnumEdgeSlot.fromFaces(wire.getLocation().facing, face), face);
+                TileWire.isWireCheckingForCaps = false;
+                return result;
+            }
+        }
+
+        TileEntity tile = wire.getContainer().world().getTileEntity(pos);
+        T result = tile != null ? tile.getCapability(capability, face) : null;
+        TileWire.isWireCheckingForCaps = false;
+        return result;
+    }
+
+    public static boolean canConnectInternal(Wire wire, WireFace side) {
+        if (side == wire.getLocation()) {
             return false;
         }
 
@@ -88,9 +124,18 @@ public final class WireUtils {
     }
 
     public static @Nullable Wire getWire(IBlockAccess access, BlockPos pos, WireFace face) {
-        Optional<IMultipartContainer> container = MultipartHelper.getContainer(access, pos);
-        if (container.isPresent()) {
-            Optional<IMultipartTile> tile = container.get().getPartTile(toPartSlot(face));
+        IMultipartContainer container = null;
+        if (access instanceof IMultipartBlockAccess) {
+            access = ((IMultipartBlockAccess) access).getActualWorld();
+        }
+
+        Optional<IMultipartContainer> containerOpt = MultipartHelper.getContainer(access, pos);
+        if (containerOpt.isPresent()) {
+            container = containerOpt.get();
+        }
+
+        if (container != null) {
+            Optional<IMultipartTile> tile = container.getPartTile(toPartSlot(face));
             if (tile.isPresent() && tile.get().getTileEntity() instanceof TileWire) {
                 Wire wire = ((TileWire) tile.get().getTileEntity()).wire;
                 if (wire != null && wire.getLocation() == face) {

@@ -1,12 +1,7 @@
 package pl.asie.charset.lib.annotation;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.*;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.Loader;
@@ -31,28 +26,7 @@ public class AnnotationHandler {
 	public static final Multimap<Class, String> classNames = HashMultimap.create();
 
 	private static final Multimap<String, String> dependencies = HashMultimap.create();
-	private static final Multimap<Class, Pair<String, MethodHandle>> loaderHandles =
-		MultimapBuilder.hashKeys().treeSetValues(
-			(aO, bO) -> {
-				Pair<String, MethodHandle> a = (Pair<String, MethodHandle>) aO;
-				Pair<String, MethodHandle> b = (Pair<String, MethodHandle>) bO;
-
-				if (!a.getKey().equals(b.getKey())) {
-					boolean forwardDep = dependencies.get(a.getKey()).contains(b.getKey());
-					boolean backwardDep = dependencies.get(b.getKey()).contains(a.getKey());
-					if (forwardDep && backwardDep) {
-						throw new RuntimeException("Circular dependency found! " + a.getKey() + " <-> " + b.getKey());
-					} else if (forwardDep) {
-						return 1000;
-					} else if (backwardDep) {
-						return -1000;
-					}
-				}
-
-				if (a.getValue() == b.getValue()) return 0;
-				else return a.getValue().hashCode() < b.getKey().hashCode() ? -1 : 1;
-			}
-		).build();
+	private static final Map<Class, List<Pair<String, MethodHandle>>> loaderHandles = new IdentityHashMap<>();
 
 	private static final BiMap<String, Object> loadedModules = HashBiMap.create();
 	private static final Map<String, Object> loadedModulesByClass = new HashMap<>();
@@ -159,6 +133,7 @@ public class AnnotationHandler {
 
 			if (enabled) {
 				enabledModules.add(name);
+				if (!"lib".equals(name)) dependencies.put(name, "lib");
 				List<String> deps = (List<String>) info.get("dependencies");
 				if (deps != null) {
 					dependencies.putAll(name, deps);
@@ -241,18 +216,13 @@ public class AnnotationHandler {
 
 			try {
 				MethodHandle methodHandle = MethodHandles.lookup().findVirtual(getClass(data), methodName, methodType);
-				loaderHandles.put(methodType.parameterType(0), Pair.of(loadedModules.inverse().get(instance), methodHandle));
+				List<Pair<String, MethodHandle>> list = loaderHandles.computeIfAbsent(methodType.parameterType(0), k -> new ArrayList<>());
+
+				list.add(Pair.of(loadedModules.inverse().get(instance), methodHandle));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		});
-
-		/* for (Class c : loaderHandles.keySet()) {
-			System.out.println(c.getName());
-			for (Pair<String, MethodHandle> pair : loaderHandles.get(c)) {
-				System.out.println("- " + pair.getKey());
-			}
-		} */
 
 		iterateModules(table, CharsetModule.Instance.class.getName(), (data, instance) -> {
 			try {
@@ -291,17 +261,53 @@ public class AnnotationHandler {
 			}
 		});
 
+		List<String> sortedModules = new ArrayList<>();
+		Set<String> remainingModules = Sets.newHashSet(enabledModules);
+		while (!remainingModules.isEmpty()) {
+			Iterator<String> remainingIterator = remainingModules.iterator();
+			boolean added = false;
+
+			while (remainingIterator.hasNext()) {
+				String s = remainingIterator.next();
+				boolean canAdd = true;
+
+				for (String dep : dependencies.get(s)) {
+					if (!dep.startsWith("mod:") && !dep.startsWith("optional:") && !sortedModules.contains(dep)) {
+						canAdd = false;
+						break;
+					}
+				}
+
+				if (canAdd) {
+					added = true;
+					sortedModules.add(s);
+					remainingIterator.remove();
+				}
+			}
+
+			if (!added) {
+				throw new RuntimeException("Cyclic dependency in Charset modules! Report!");
+			}
+		}
+
+		for (List<Pair<String, MethodHandle>> list : loaderHandles.values()) {
+			list.sort(Comparator.comparingInt(a -> sortedModules.indexOf(a.getKey())));
+		}
+
 		addClassNames(table, CharsetJEIPlugin.class, "jei");
 		addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
 	}
 
 	public void passEvent(FMLEvent o) {
 		Class<? extends FMLEvent> c = o.getClass();
-		for (Pair<String, MethodHandle> pair : loaderHandles.get(c)) {
-			try {
-				pair.getValue().invoke(loadedModules.get(pair.getKey()), o);
-			} catch (Throwable t) {
-				throw new RuntimeException(t);
+		List<Pair<String, MethodHandle>> list = loaderHandles.get(c);
+		if (list != null) {
+			for (Pair<String, MethodHandle> pair : list) {
+				try {
+					pair.getValue().invoke(loadedModules.get(pair.getKey()), o);
+				} catch (Throwable t) {
+					throw new RuntimeException(t);
+				}
 			}
 		}
 	}

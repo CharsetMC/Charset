@@ -32,29 +32,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class UtilProxyClient extends UtilProxyCommon {
-	// TODO 1.11
-	/*
-	public static final RendererWire rendererWire = new RendererWire();
-
-	@Override
-	public void drawWireHighlight(PartWire wire) {
-		int lineMaskCenter = 0xFFF;
-		EnumFacing[] faces = WireUtils.getConnectionsForRender(wire.location);
-		for (int i = 0; i < faces.length; i++) {
-			EnumFacing face = faces[i];
-			if (wire.connectsAny(face)) {
-				int lineMask = 0xfff;
-				lineMask &= ~RenderUtils.getSelectionMask(face.getOpposite());
-				RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(i + 1), lineMask);
-				lineMaskCenter &= ~RenderUtils.getSelectionMask(face);
-			}
-		}
-		if (lineMaskCenter != 0) {
-			RenderUtils.drawSelectionBoundingBox(wire.getSelectionBox(0), lineMaskCenter);
-		}
-	}
-	*/
-
 	@Override
 	public EntityPlayer getPlayer(INetHandler handler) {
 		return (handler instanceof INetHandlerPlayClient || handler instanceof INetHandlerLoginClient)

@@ -150,7 +150,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
             validSides.add(facing);
         }
 
-        int oldConnectionCache = internalConnections | externalConnections << 8 | cornerConnections << 16;
+        int oldConnectionCache = getConnectionMask();
         internalConnections = externalConnections = cornerConnections = occludedSides = cornerOccludedSides = 0;
 
         // Occlusion test
@@ -205,7 +205,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
             }
         }
 
-        int newConnectionCache = internalConnections | externalConnections << 8 | cornerConnections << 16;
+        int newConnectionCache = getConnectionMask();
 
         if (oldConnectionCache != newConnectionCache) {
             container.requestNeighborUpdate(oldConnectionCache ^ newConnectionCache);
@@ -213,6 +213,10 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         }
 
         connectionCheckDirty = false;
+    }
+
+    protected int getConnectionMask() {
+        return internalConnections | externalConnections << 8 | cornerConnections << 16;
     }
 
     protected boolean canConnectWire(Wire wire) {

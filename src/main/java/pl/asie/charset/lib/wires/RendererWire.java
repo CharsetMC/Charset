@@ -42,11 +42,26 @@ import java.util.Map;
 
 public class RendererWire extends ModelFactory<Wire> {
     public static class WireSheet {
-        @Nonnull TextureAtlasSprite[] top;
-        @Nullable TextureAtlasSprite side;
-        @Nullable TextureAtlasSprite edge;
-        @Nonnull TextureAtlasSprite particle;
-        int width, height;
+        @Nonnull final TextureAtlasSprite[] top;
+        @Nullable final TextureAtlasSprite side;
+        @Nullable final TextureAtlasSprite edge;
+        @Nonnull final TextureAtlasSprite particle;
+        final int width, height;
+
+        private WireSheet(TextureMap map, String domain, String path, WireProvider type) {
+            top = SpritesheetFactory.register(map, new ResourceLocation(domain, path + "top"), 4, 4);
+            particle = map.registerSprite(new ResourceLocation(domain, path + "particle"));
+            if (!type.isFlat()) {
+                edge = map.registerSprite(new ResourceLocation(domain, path + "edge"));
+                side = map.registerSprite(new ResourceLocation(domain, path + "side"));
+            } else {
+                edge = null;
+                side = null;
+            }
+
+            width = (int) (type.getWidth() * 16);
+            height = (int) (type.getHeight() * 16);
+        }
     }
 
     private final ModelRotation[] ROTATIONS = new ModelRotation[]{
@@ -74,22 +89,12 @@ public class RendererWire extends ModelFactory<Wire> {
         ResourceLocation location = type.getTexturePrefix();
         String domain = location.getResourceDomain();
         String path = location.getResourcePath();
-        WireSheet sheet = new WireSheet();
 
         if (!path.endsWith("/")) {
             path += "_";
         }
 
-        sheet.top = SpritesheetFactory.register(map, new ResourceLocation(domain, path + "top"), 4, 4);
-        sheet.particle = map.registerSprite(new ResourceLocation(domain, path + "particle"));
-        if (!type.isFlat()) {
-            sheet.edge = map.registerSprite(new ResourceLocation(domain, path + "edge"));
-            sheet.side = map.registerSprite(new ResourceLocation(domain, path + "side"));
-        }
-
-        sheet.width = (int) (type.getWidth() * 16);
-        sheet.height = (int) (type.getHeight() * 16);
-
+        WireSheet sheet = new WireSheet(map, domain, path, type);
         sheetMap.put(type, sheet);
     }
 
@@ -554,7 +559,7 @@ public class RendererWire extends ModelFactory<Wire> {
         if (stackMap.containsKey(md)) {
             return stackMap.get(md);
         } else {
-            Wire wire = WireManager.ITEM.fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
+            Wire wire = CharsetLibWires.itemWire.fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
             wire.setConnectionsForItemRender();
 
             stackMap.put(md, wire);

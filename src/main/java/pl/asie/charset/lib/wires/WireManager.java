@@ -11,14 +11,7 @@ public final class WireManager {
             .setType(WireProvider.class)
             .create();
 
-    @Deprecated
-    public static ItemWire ITEM;
-
     private WireManager() {
 
-    }
-
-    public static void register(WireProvider factory) {
-        REGISTRY.register(factory);
     }
 }

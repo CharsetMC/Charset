@@ -21,6 +21,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -72,8 +73,11 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        Wire wire = WireUtils.getAnyWire(worldIn, pos);
+        int connMask = wire.getConnectionMask();
+
         super.breakBlock(worldIn, pos, state);
-        worldIn.notifyNeighborsRespectDebug(pos, this, false);
+        requestNeighborUpdate(worldIn, pos, wire.getLocation(), connMask);
     }
 
     @Override
@@ -95,6 +99,13 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
         } else {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public RayTraceResult collisionRayTrace(IPartInfo part, Vec3d start, Vec3d end) {
+        RayTraceResult result = part.getState().collisionRayTrace(part.getWorld(), part.getPos(), start, end);
+        if (result != null) result.hitInfo = part;
+        return result;
     }
 
     @Override
@@ -136,12 +147,9 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
 
     @Override
     public IPartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState state, EnumFacing facing, float hitX, float hitY, float hitZ, EntityLivingBase placer) {
-        Wire wire = WireUtils.getWire(world, pos, WireFace.get(facing));
-        if (wire != null) {
-            return EnumCenterSlot.CENTER;
-        } else {
-            return EnumFaceSlot.fromFace(facing.getOpposite());
-        }
+        ItemStack stack = placer.getHeldItemMainhand();
+        WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing.getOpposite());
+        return WireUtils.toPartSlot(location);
     }
 
     @Override
@@ -153,4 +161,22 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
             return EnumCenterSlot.CENTER;
         }
     }
+
+    public void requestNeighborUpdate(World world, BlockPos pos, WireFace location, int connectionMask) {
+        if ((connectionMask & 0xFF) != 0 && world instanceof IMultipartWorld) {
+            IPartInfo info = ((IMultipartWorld) world).getPartInfo();
+            info.getContainer().notifyChange(info);
+        }
+
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if ((connectionMask & (1 << (facing.ordinal() + 8))) != 0) {
+                world.neighborChanged(pos.offset(facing), this, pos);
+            }
+
+            if (location != WireFace.CENTER && (connectionMask & (1 << (facing.ordinal() + 16))) != 0) {
+                world.neighborChanged(pos.offset(facing).offset(location.facing), this, pos);
+            }
+        }
+    }
+
 }

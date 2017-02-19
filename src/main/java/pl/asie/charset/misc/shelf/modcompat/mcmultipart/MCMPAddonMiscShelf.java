@@ -2,9 +2,9 @@ package pl.asie.charset.misc.shelf.modcompat.mcmultipart;
 
 import mcmultipart.api.addon.IMCMPAddon;
 import mcmultipart.api.addon.IWrappedBlock;
-import mcmultipart.api.capability.MCMPCapabilities;
 import mcmultipart.api.multipart.IMultipartRegistry;
 import mcmultipart.api.multipart.IMultipartTile;
+import mcmultipart.api.ref.MCMPCapabilities;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;

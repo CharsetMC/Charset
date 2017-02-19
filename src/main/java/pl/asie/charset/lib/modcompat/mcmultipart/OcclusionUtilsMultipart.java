@@ -3,7 +3,6 @@ package pl.asie.charset.lib.modcompat.mcmultipart;
 import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.MultipartHelper;
-import mcmultipart.api.multipart.OcclusionHelper;
 import mcmultipart.api.world.IMultipartBlockAccess;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.AxisAlignedBB;

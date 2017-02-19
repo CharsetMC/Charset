@@ -16,7 +16,7 @@
 
 package pl.asie.charset.lib.capability;
 
-import mcmultipart.api.capability.MCMPCapabilityHelper;
+import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -100,15 +100,15 @@ public class Capabilities {
 
 	@Optional.Method(modid = "mcmultipart")
 	private static void initMultiplePants() {
-		MCMPCapabilityHelper.registerCapabilityJoiner(AUDIO_RECEIVER, new AudioReceiverWrapper());
-		MCMPCapabilityHelper.registerCapabilityJoiner(BUNDLED_EMITTER, new BundledEmitterWrapper());
-		MCMPCapabilityHelper.registerCapabilityJoiner(REDSTONE_EMITTER, new RedstoneEmitterWrapper());
-		MCMPCapabilityHelper.registerCapabilityJoiner(BUNDLED_RECEIVER, new BundledReceiverWrapper());
-		MCMPCapabilityHelper.registerCapabilityJoiner(REDSTONE_RECEIVER, new RedstoneReceiverWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(AUDIO_RECEIVER, new AudioReceiverWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(BUNDLED_EMITTER, new BundledEmitterWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(REDSTONE_EMITTER, new RedstoneEmitterWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(BUNDLED_RECEIVER, new BundledReceiverWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(REDSTONE_RECEIVER, new RedstoneReceiverWrapper());
 
-		MCMPCapabilityHelper.registerCapabilityJoiner(AXIS_ROTATABLE, new AxisRotatableWrapper());
-		MCMPCapabilityHelper.registerCapabilityJoiner(DEBUGGABLE, new DebuggableWrapper());
-		MCMPCapabilityHelper.registerCapabilityJoiner(ITEM_INSERTION_HANDLER, new ItemInsertionHandlerWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(AXIS_ROTATABLE, new AxisRotatableWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(DEBUGGABLE, new DebuggableWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(ITEM_INSERTION_HANDLER, new ItemInsertionHandlerWrapper());
 	}
 
 	public static void registerVanillaWrappers() {

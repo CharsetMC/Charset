@@ -29,6 +29,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -261,7 +262,14 @@ public final class RenderUtils {
 	}
 
 	public static void drawSelectionBoundingBox(AxisAlignedBB box, int lineMask) {
-		AxisAlignedBB boundingBox = box.expand(0.0020000000949949026D, 0.0020000000949949026D, 0.0020000000949949026D);
+		EntityPlayer player = Minecraft.getMinecraft().player;
+		float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
+
+		double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
+		double d1 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
+		double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
+
+		AxisAlignedBB boundingBox = box.expandXyz(0.0020000000949949026D).offset(-d0, -d1, -d2);
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 		GlStateManager.color(0.0F, 0.0F, 0.0F, 0.4F);

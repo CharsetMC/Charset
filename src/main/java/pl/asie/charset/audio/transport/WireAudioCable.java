@@ -1,5 +1,6 @@
 package pl.asie.charset.audio.transport;
 
+import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -30,25 +31,14 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
 
     @Override
     public boolean canConnectBlock(BlockPos pos, EnumFacing direction) {
-        TileEntity tileEntity = getContainer().world().getTileEntity(pos);
-        if (tileEntity != null) {
-            if (tileEntity.hasCapability(Capabilities.AUDIO_SOURCE, direction)
-                    || tileEntity.hasCapability(Capabilities.AUDIO_RECEIVER, direction)) {
-                return true;
-            }
-        }
-
-        return false;
+        return WireUtils.hasCapability(this, pos, Capabilities.AUDIO_SOURCE, direction)
+                || WireUtils.hasCapability(this, pos, Capabilities.AUDIO_RECEIVER, direction);
     }
 
-    // TODO: Add multipart-friendly CapabilityHelper
     private boolean receive(BlockPos pos, EnumFacing facing, AudioPacket packet) {
-        TileEntity tileEntity = getContainer().world().getTileEntity(pos);
-        if (tileEntity != null) {
-            IAudioReceiver receiver = CapabilityHelper.get(Capabilities.AUDIO_RECEIVER, tileEntity, facing);
-            if (receiver != null) {
-                return receiver.receive(packet);
-            }
+        IAudioReceiver receiver = WireUtils.getCapability(this, pos, Capabilities.AUDIO_RECEIVER, facing);
+        if (receiver != null) {
+            return receiver.receive(packet);
         }
 
         return false;

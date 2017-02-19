@@ -1,8 +1,8 @@
 package pl.asie.charset.lib.wires;
 
-import mcmultipart.api.capability.MCMPCapabilities;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
+import mcmultipart.api.ref.MCMPCapabilities;
 import mcmultipart.api.world.IMultipartWorld;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
@@ -12,8 +12,8 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.blocks.TileBase;
 
 public class TileWire extends TileBase implements IMultipartTile, ITickable, IWireContainer {
@@ -62,7 +62,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     }
 
     public void onPlacedBy(WireFace facing, ItemStack stack) {
-        wire = WireManager.ITEM.fromStack(this, stack, facing.facing);
+        wire = CharsetLibWires.itemWire.fromStack(this, stack, facing.facing);
         wire.onChanged(true);
         markBlockForUpdate();
     }
@@ -79,20 +79,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
 
     @Override
     public void requestNeighborUpdate(int connectionMask) {
-        if ((connectionMask & 0xFF) != 0 && world instanceof IMultipartWorld) {
-            IPartInfo info = ((IMultipartWorld) world).getPartInfo();
-            info.getContainer().notifyChange(info);
-        }
-
-        for (EnumFacing facing : EnumFacing.VALUES) {
-            if ((connectionMask & (1 << (facing.ordinal() + 8))) != 0) {
-                world.neighborChanged(pos.offset(facing), getBlockType(), pos);
-            }
-
-            if (wire.getLocation() != WireFace.CENTER && (connectionMask & (1 << (facing.ordinal() + 16))) != 0) {
-                world.neighborChanged(pos.offset(facing).offset(wire.getLocation().facing), getBlockType(), pos);
-            }
-        }
+        CharsetLibWires.blockWire.requestNeighborUpdate(world, pos, wire.getLocation(), connectionMask);
     }
 
     @Override
@@ -112,9 +99,12 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
         world.setBlockToAir(pos);
     }
 
+    // I'm a horrible, horrible dev
+    protected static boolean isWireCheckingForCaps;
+
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == MCMPCapabilities.MULTIPART_TILE || (wire != null && wire.hasCapability(capability, facing)) || super.hasCapability(capability, facing);
+        return capability == MCMPCapabilities.MULTIPART_TILE || (wire != null && !isWireCheckingForCaps && wire.hasCapability(capability, facing)) || super.hasCapability(capability, facing);
     }
 
     @Override
@@ -123,7 +113,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
             return MCMPCapabilities.MULTIPART_TILE.cast(this);
         }
 
-        if (wire != null) {
+        if (wire != null && !isWireCheckingForCaps) {
             T result = wire.getCapability(capability, facing);
             if (result != null) {
                 return result;
