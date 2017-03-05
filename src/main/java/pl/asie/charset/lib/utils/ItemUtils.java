@@ -28,6 +28,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
@@ -100,11 +101,15 @@ public final class ItemUtils {
 	}
 
 	public static IBlockState getBlockState(ItemStack stack) {
-		Block block = Block.getBlockFromItem(stack.getItem());
-		if (block == null) {
-			return Blocks.AIR.getDefaultState();
+		if (stack.getItem() instanceof ItemBlock) {
+			return ((ItemBlock) stack.getItem()).getBlock().getDefaultState();
 		} else {
-			return block.getDefaultState();
+			Block block = Block.getBlockFromItem(stack.getItem());
+			if (block == null) {
+				return Blocks.AIR.getDefaultState();
+			} else {
+				return block.getDefaultState();
+			}
 		}
 	}
 

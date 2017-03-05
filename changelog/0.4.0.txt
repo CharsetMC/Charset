@@ -10,9 +10,10 @@
 * [pipes] Added support for CommonCapabilities' IInventoryState for further optimizations.
 * [pipes] Added MCMultiPart2 support.
 * [storage.barrels] Added support for locking Hopping Barrels with a redstone signal.
-* [storage.barrels] Added MCMultiPart2 support.
 * [storage.barrels] Fixed Creative Barrel behaviour on stack insertion.
 * [storage.barrels] Fixed many issues with barrel carts.
+* [storage.barrels] Improved Creative Mode handling.
+* [storage.barrels] Improved fire handling.
 * [storage.barrels] Improved JEI support.
 * [storage.barrels] Sticky barrel upgrade can now use OreDict-ed slimeballs.
 * [storage.tanks] New module! Who doesn't like BuildCraft-styled tanks?

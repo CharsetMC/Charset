@@ -46,6 +46,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
@@ -70,6 +71,7 @@ import pl.asie.charset.lib.notify.INoticeUpdater;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
+import pl.asie.charset.lib.utils.ProxiedBlockAccess;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.SpaceUtils;
@@ -84,6 +86,7 @@ import java.util.WeakHashMap;
 public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRotatable {
     public ItemStack item = ItemStack.EMPTY;
     public ItemMaterial woodLog, woodSlab;
+    public ProxiedBlockAccess woodLogAccess;
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
     public Type type = Type.NORMAL;
     Object notice_target = this;
@@ -242,6 +245,33 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public void validate() {
         super.validate();
         updateRedstoneLevels = true;
+        woodLogAccess = new ProxiedBlockAccess(getWorld()) {
+            @Nullable
+            @Override
+            public TileEntity getTileEntity(BlockPos pos) {
+                return getPos().equals(pos) ? null : access.getTileEntity(pos);
+            }
+
+            @Override
+            public IBlockState getBlockState(BlockPos pos) {
+                return getPos().equals(pos) ? ItemUtils.getBlockState(woodLog.getStack()) : access.getBlockState(pos);
+            }
+
+            @Override
+            public boolean isAirBlock(BlockPos pos) {
+                if (getPos().equals(pos)) {
+                    IBlockState state = getBlockState(pos);
+                    return state.getBlock().isAir(state, this, pos);
+                } else {
+                    return access.isAirBlock(pos);
+                }
+            }
+
+            @Override
+            public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+                return getPos().equals(pos) ? getBlockState(pos).isSideSolid(this, pos, side) : access.isSideSolid(pos, side, _default);
+            }
+        };
     }
 
     public void updateRedstoneLevel() {
@@ -662,7 +692,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         if (removeCount <= 0)
             return;
 
-        if (player.isSneaking()) {
+        if (player.isSneaking() && player.isCreative()) {
             removeCount = 1;
         } else if (removeCount == getItemCount() && removeCount > 1) {
             removeCount--;
@@ -676,9 +706,22 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             dropPos = dropPos.offset(orientation.facing);
         }
 
+        if (type == Type.CREATIVE) {
+            if (player.isSneaking()) {
+                item = ItemStack.EMPTY;
+                onItemChange(true);
+            } else {
+                giveOrSpawnItem(player, dropPos, removeCount);
+            }
+        } else {
+            giveOrSpawnItem(player, dropPos, removeCount);
+            item.shrink(removeCount);
+            onItemChange(false);
+        }
+    }
+
+    protected void giveOrSpawnItem(EntityPlayer player, BlockPos dropPos, int removeCount) {
         ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), makeStack(removeCount), 0.2f, 0.2f, 0.2f, 1);
-        item.shrink(removeCount);
-        onItemChange(false);
     }
 
     void info(final EntityPlayer entityplayer) {
@@ -893,7 +936,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         if (item.isEmpty()) {
             return true;
         }
-        if (player == null || !player.capabilities.isCreativeMode || player.isSneaking()) {
+
+        if (player == null || !player.capabilities.isCreativeMode) {
             return true;
         }
 
@@ -909,14 +953,34 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
 
     // TODO: Use the ItemMaterial system better!
     public boolean isWooden() {
-        return ItemUtils.getBlockState(woodLog.getStack()).getMaterial() == Material.WOOD;
+        try {
+            return ItemUtils.getBlockState(woodLog.getStack()).getMaterial() == Material.WOOD;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    public int getFlamability() {
+    public int getFlamability(EnumFacing face) {
         try {
-            return ItemUtils.getBlockState(woodLog.getStack()).getBlock().getFlammability(getWorld(), getPos(), null);
+            return ItemUtils.getBlockState(woodLog.getStack()).getBlock().getFlammability(woodLogAccess, getPos(), face);
         } catch (Exception e) {
             return isWooden() ? 20 : 0;
+        }
+    }
+
+    public boolean isFlammable(EnumFacing face) {
+        try {
+            return ItemUtils.getBlockState(woodLog.getStack()).getBlock().isFlammable(woodLogAccess, getPos(), face);
+        } catch (Exception e) {
+            return isWooden();
+        }
+    }
+
+    public int getFireSpreadSpeed(EnumFacing face) {
+        try {
+            return ItemUtils.getBlockState(woodLog.getStack()).getBlock().getFireSpreadSpeed(woodLogAccess, getPos(), face);
+        } catch (Exception e) {
+            return isWooden() ? 5 : 0;
         }
     }
 }

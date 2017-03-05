@@ -137,7 +137,27 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {
-            return ((TileEntityDayBarrel) tile).getFlamability();
+            return ((TileEntityDayBarrel) tile).getFlamability(face);
+        }
+
+        return 0;
+    }
+
+    @Override
+    public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityDayBarrel) {
+            return ((TileEntityDayBarrel) tile).isFlammable(face);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityDayBarrel) {
+            return ((TileEntityDayBarrel) tile).getFireSpreadSpeed(face);
         }
 
         return 0;

@@ -45,9 +45,11 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -274,16 +276,19 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
     @Override
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
-        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.minecart.MinecartInteractEvent(this, player, hand))) {
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.minecart.MinecartInteractEvent(this, player, hand)))
             return true;
-        }
+        return super.processInitialInteract(player, hand);
+    }
 
-        if (!player.isSneaking() && !world.isRemote) {
+    @Override
+    public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, EnumHand hand) {
+        if (!world.isRemote) {
             boolean result = barrel.activate(player, null, hand);
             updateDataWatcher(false);
-            return result;
+            return result ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
         } else {
-            return false;
+            return EnumActionResult.PASS;
         }
     }
 
