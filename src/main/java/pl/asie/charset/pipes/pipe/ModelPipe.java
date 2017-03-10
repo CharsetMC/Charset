@@ -36,7 +36,7 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
 
     @Override
     public int getInsideColor(EnumFacing facing) {
-        return facing.getAxis() == EnumFacing.Axis.Y ? 0xFFA0A0A0 : 0xFFE0E0E0;
+        return facing.getAxis() == EnumFacing.Axis.Y ? 0xFF8F8F8F : 0xFFFFFFFF;
     }
 
     @Override

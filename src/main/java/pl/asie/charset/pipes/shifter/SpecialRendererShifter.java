@@ -63,6 +63,10 @@ public class SpecialRendererShifter extends TileEntitySpecialRenderer {
 					z + 0.5 + translationConstant * itemDir.getFrontOffsetZ()
 			);
 
+			if (itemDir.getAxis() == EnumFacing.Axis.Y) {
+				GlStateManager.rotate(180.0F - shifter.getDirection().getHorizontalAngle(), 0.0F, 1.0F, 0.0F);
+			}
+
 			switch (itemDir) {
 				case NORTH:
 					GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
