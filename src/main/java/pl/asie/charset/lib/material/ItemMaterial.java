@@ -31,6 +31,10 @@ public final class ItemMaterial {
 		return stack;
 	}
 
+	public void writeToNBT(NBTTagCompound compound, String key) {
+		compound.setString(key, id);
+	}
+
 	@Override
 	public String toString() {
 		return "ItemMaterial[" + id + "]";

@@ -124,16 +124,7 @@ public class TileShelf extends TileBase {
 	}
 
 	public static ItemMaterial getPlankFromNBT(NBTTagCompound compound) {
-		ItemMaterial mat = null;
-		if (compound != null && compound.hasKey("plank", Constants.NBT.TAG_STRING)) {
-			mat = ItemMaterialRegistry.INSTANCE.getMaterial(compound.getString("plank"));
-		}
-
-		if (mat == null) {
-			mat = ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank");
-		}
-
-		return mat;
+		return ItemMaterialRegistry.INSTANCE.getMaterial(compound, "plank", "plank");
 	}
 
 	@Override
@@ -146,7 +137,7 @@ public class TileShelf extends TileBase {
 
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
-		compound.setString("plank", plank.getId());
+		plank.writeToNBT(compound, "plank");
 		compound.setTag("inv", handler.serializeNBT());
 		return compound;
 	}

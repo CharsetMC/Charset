@@ -287,8 +287,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     @Override
     public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
         ItemUtils.writeToNBT(item, compound, "item");
-        compound.setString("log", woodLog.getId());
-        compound.setString("slab", woodSlab.getId());
+        woodLog.writeToNBT(compound, "log");
+        woodSlab.writeToNBT(compound, "slab");
         compound.setByte("dir", (byte) orientation.ordinal());
         compound.setByte("type", (byte) type.ordinal());
         compound.setInteger("count", item.getCount());
@@ -844,30 +844,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public static ItemMaterial getLog(NBTTagCompound tag) {
-        return getMaterial(tag, "log");
+        return ItemMaterialRegistry.INSTANCE.getMaterial(tag, "log", "log");
     }
 
     public static ItemMaterial getSlab(NBTTagCompound tag) {
-        return getMaterial(tag, "slab");
-    }
-
-    private static ItemMaterial getMaterial(NBTTagCompound tag, String name) {
-        ItemMaterial result = null;
-
-        if (tag != null && tag.hasKey(name)) {
-            NBTBase nameTag = tag.getTag(name);
-            if (nameTag instanceof NBTTagString) {
-                result = ItemMaterialRegistry.INSTANCE.getMaterial(((NBTTagString) nameTag).getString());
-            } else if (nameTag instanceof NBTTagCompound) {
-                // TODO: Compatibility code! Remove in 1.12+
-                ItemStack stack = new ItemStack((NBTTagCompound) nameTag);
-                if (!stack.isEmpty()) {
-                    result = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stack);
-                }
-            }
-        }
-
-        return result == null ? ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType(name) : result;
+        return ItemMaterialRegistry.INSTANCE.getMaterial(tag, "slab", "slab");
     }
 
     static ItemStack addUpgrade(ItemStack barrel, Type upgrade) {

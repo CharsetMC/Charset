@@ -2,6 +2,9 @@ package pl.asie.charset.lib.material;
 
 import com.google.common.collect.*;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagString;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +20,29 @@ public class ItemMaterialRegistry {
 
 	protected ItemMaterialRegistry() {
 
+	}
+
+	public ItemMaterial getMaterial(NBTTagCompound tag, String name) {
+		return getMaterial(tag, name, null);
+	}
+
+	public ItemMaterial getMaterial(NBTTagCompound tag, String name, String defaultType) {
+		ItemMaterial result = null;
+
+		if (tag != null && tag.hasKey(name)) {
+			NBTBase nameTag = tag.getTag(name);
+			if (nameTag instanceof NBTTagString) {
+				result = getMaterial(((NBTTagString) nameTag).getString());
+			} else if (nameTag instanceof NBTTagCompound) {
+				// TODO: Compatibility code! Remove in 1.12+
+				ItemStack stack = new ItemStack((NBTTagCompound) nameTag);
+				if (!stack.isEmpty()) {
+					result = getOrCreateMaterial(stack);
+				}
+			}
+		}
+
+		return result == null ? (defaultType != null ? getDefaultMaterialByType(defaultType) : null) : result;
 	}
 
 	public static final String createId(ItemStack stack) {
