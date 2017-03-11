@@ -771,7 +771,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return 15;
         }
         float v = count/(float)max;
-        return (int) Math.max(1, v*14);
+        return (int) Math.max(1, Math.floor(v*15));
     }
 
     public List<ItemStack> getContentDrops(boolean silkTouch) {

@@ -56,7 +56,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
     public static ItemStack createStack(ItemMaterial plankMaterial, int stackSize) {
         ItemStack scaffold = new ItemStack(CharsetMiscShelf.shelfBlock, stackSize);
         scaffold.setTagCompound(new NBTTagCompound());
-        scaffold.getTagCompound().setString("plank", plankMaterial.getId());
+        plankMaterial.writeToNBT(scaffold.getTagCompound(), "plank");
         return scaffold;
     }
 

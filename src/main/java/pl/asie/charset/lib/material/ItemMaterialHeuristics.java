@@ -1,5 +1,6 @@
 package pl.asie.charset.lib.material;
 
+import com.google.common.base.Joiner;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
@@ -9,9 +10,13 @@ import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.ArrayUtils;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -268,5 +273,22 @@ public final class ItemMaterialHeuristics {
         }
 
         ProgressManager.pop(bar);
+
+        if (CharsetLib.enableDebugInfo) {
+            try {
+                File outputFile = new File("charsetItemMaterials.txt");
+                PrintWriter writer = new PrintWriter(outputFile);
+                Joiner commaJoiner = Joiner.on(",");
+
+                for (ItemMaterial material : reg.getAllMaterials()) {
+                    writer.println(material.getId());
+                    writer.println("- " + commaJoiner.join(material.getTypes()));
+                }
+
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -4,7 +4,10 @@ import com.google.common.collect.ImmutableList;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -12,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -23,6 +27,8 @@ import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ObserverHelper;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 import pl.asie.charset.lib.utils.SpaceUtils;
@@ -66,6 +72,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     private final PipeLogic logic = new PipeLogic(this);
     private final IItemInsertionHandler[] insertionHandlers = new IItemInsertionHandler[6];
     private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
+    private ItemMaterial material;
     private byte connectionCache = 0;
     private int neighborsUpdate = 0;
     private boolean requestUpdate;
@@ -88,7 +95,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             return false;
         }
 
-        if (PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite()) != null) {
+        TilePipe pipe = PipeUtils.getPipe(getWorld(), getPos().offset(side), side.getOpposite());
+
+        if (pipe != null && pipe.getMaterial().equals(material)) {
             return true;
         }
 
@@ -144,6 +153,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             fluid.readFromNBT(tag);
         }
 
+        material = ItemMaterialRegistry.INSTANCE.getMaterial(nbt, "material", "stone", new ItemStack(Blocks.STONE));
         connectionCache = nbt.getByte("cc");
 
         if (!isClient) {
@@ -154,6 +164,21 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         } else {
             requestUpdate = true;
         }
+    }
+
+    @Override
+    public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+        material = ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material", "stone", new ItemStack(Blocks.STONE));
+        markBlockForUpdate();
+    }
+
+    @Override
+    public ItemStack getDroppedBlock() {
+        return BlockPipe.createStack(material, 1);
+    }
+
+    public ItemMaterial getMaterial() {
+        return material;
     }
 
     private void readItems(NBTTagCompound nbt) {
@@ -197,6 +222,9 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             }
         }
 
+        if (material != null) {
+            material.writeToNBT(nbt, "material");
+        }
         nbt.setByte("cc", connectionCache);
         if (!isClient && shifterDistance != null) {
             nbt.setIntArray("shifterDist", shifterDistance);

@@ -21,6 +21,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -37,9 +38,12 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.annotation.CharsetModule;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.pipes.pipe.BlockPipe;
+import pl.asie.charset.pipes.pipe.ItemPipe;
 import pl.asie.charset.pipes.pipe.PacketFluidUpdate;
 import pl.asie.charset.pipes.pipe.PacketItemUpdate;
 import pl.asie.charset.pipes.pipe.PacketPipeSyncRequest;
@@ -80,7 +84,7 @@ public class CharsetPipes {
 		CapabilityManager.INSTANCE.register(IShifter.class, new ShifterStorage(), ShifterImpl.class);
 
 		blockPipe = new BlockPipe();
-		RegistryUtils.register(blockPipe, itemPipe = new ItemBlock(blockPipe),"pipe");
+		RegistryUtils.register(blockPipe, itemPipe = new ItemPipe(blockPipe),"pipe");
 		GameRegistry.registerTileEntityWithAlternatives(TilePipe.class, "charset:pipe", "charsetpipes:pipe");
 
 		shifterBlock = new BlockShifter();
@@ -115,16 +119,38 @@ public class CharsetPipes {
 					"mgm",
 					'g', "blockGlassColorless", 'm', "obsidian"));
 		}
-
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(blockPipe, 8),
-				"m",
-				"g",
-				"m",
-				'g', "blockGlassColorless", 'm', "obsidian"));
 	}
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		TileShifter.registerDefaultHandlers();
+
+		for (ItemMaterial material : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("stone", "block", "!brick")) {
+			BlockPipe.STONES.add(material);
+
+			if (Loader.isModLoaded("buildcrafttransport")) {
+				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 3),
+						"sss",
+						"ggg",
+						"sss",
+						'g', "blockGlassColorless", 's', material.getStack()));
+
+				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 3),
+						"sgs",
+						"sgs",
+						"sgs",
+						'g', "blockGlassColorless", 's', material.getStack()));
+			} else {
+				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 1),
+						"sgs",
+						'g', "blockGlassColorless", 's', material.getStack()));
+
+				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 1),
+						"s",
+						"g",
+						"s",
+						'g', "blockGlassColorless", 's', material.getStack()));
+			}
+		}
 	}
 }

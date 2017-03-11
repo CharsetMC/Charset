@@ -1,26 +1,26 @@
-package pl.asie.charset.misc.shelf;
+package pl.asie.charset.pipes.pipe;
 
 import com.google.common.base.Objects;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.misc.shelf.TileShelf;
 
-public class ItemShelf extends ItemBlock {
-	public ItemShelf(Block block) {
+public class ItemPipe extends ItemBlock {
+	public ItemPipe(Block block) {
 		super(block);
 		setHasSubtypes(true);
-		setUnlocalizedName("charset.shelf");
+		setUnlocalizedName("charset.pipe");
 	}
 
 	@Override
 	public String getItemStackDisplayName(ItemStack is) {
-		String lookup = "tile.charset.shelf.format";
-		TileShelf tile = new TileShelf();
-		tile.loadFromStack(is);
-		String displayName = Objects.firstNonNull(tile.getPlank().getRelated("log"), tile.getPlank()).getStack().getDisplayName();
+		String lookup = "tile.charset.pipe.format";
+		String displayName = ItemMaterialRegistry.INSTANCE.getMaterial(is.getTagCompound(), "material", "stone", new ItemStack(Blocks.STONE)).getStack().getDisplayName();
 		return I18n.translateToLocalFormatted(lookup, displayName);
 	}
 }

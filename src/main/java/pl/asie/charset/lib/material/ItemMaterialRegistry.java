@@ -22,11 +22,7 @@ public class ItemMaterialRegistry {
 
 	}
 
-	public ItemMaterial getMaterial(NBTTagCompound tag, String name) {
-		return getMaterial(tag, name, null);
-	}
-
-	public ItemMaterial getMaterial(NBTTagCompound tag, String name, String defaultType) {
+	private ItemMaterial getMaterialIfPresent(NBTTagCompound tag, String name) {
 		ItemMaterial result = null;
 
 		if (tag != null && tag.hasKey(name)) {
@@ -40,6 +36,25 @@ public class ItemMaterialRegistry {
 					result = getOrCreateMaterial(stack);
 				}
 			}
+		}
+
+		return result;
+	}
+
+	public ItemMaterial getMaterial(NBTTagCompound tag, String name) {
+		return getMaterial(tag, name, null);
+	}
+
+	public ItemMaterial getMaterial(NBTTagCompound tag, String name, String defaultType) {
+		ItemMaterial result = getMaterialIfPresent(tag, name);
+
+		return result == null ? (defaultType != null ? getDefaultMaterialByType(defaultType) : null) : result;
+	}
+
+	public ItemMaterial getMaterial(NBTTagCompound tag, String name, String defaultType, ItemStack defaultStack) {
+		ItemMaterial result = getMaterialIfPresent(tag, name);
+		if (result == null) {
+			result = getMaterialIfPresent(defaultStack);
 		}
 
 		return result == null ? (defaultType != null ? getDefaultMaterialByType(defaultType) : null) : result;
@@ -74,7 +89,7 @@ public class ItemMaterialRegistry {
 			boolean valid = true;
 			for (String type : types) {
 				if (type.charAt(0) == '!') {
-					if (srcTypes.contains(type)) {
+					if (srcTypes.contains(type.substring(1))) {
 						valid = false;
 						break;
 					}
@@ -142,5 +157,9 @@ public class ItemMaterialRegistry {
 
 	public Collection<String> getAllTypes() {
 		return materialsByType.keySet();
+	}
+
+	public Collection<ItemMaterial> getAllMaterials() {
+		return materialsById.values();
 	}
 }

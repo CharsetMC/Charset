@@ -16,6 +16,7 @@
 
 package pl.asie.charset.pipes;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -36,12 +37,15 @@ import pl.asie.charset.pipes.shifter.TileShifter;
 
 public class ProxyClient extends ProxyCommon {
 	private SpecialRendererPipe rendererPipe;
-	private ModelPipeShaped rendererPipeStatic;
+	private ModelPipe rendererPipeStatic;
 
 	@Override
 	public void registerRenderers() {
 		ClientRegistry.bindTileEntitySpecialRenderer(TilePipe.class, (rendererPipe = new SpecialRendererPipe()));
 		ClientRegistry.bindTileEntitySpecialRenderer(TileShifter.class, new SpecialRendererShifter());
+
+		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(ModelPipe.colorizer, CharsetPipes.blockPipe);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ModelPipe.colorizer, CharsetPipes.itemPipe);
 	}
 
 	@SubscribeEvent

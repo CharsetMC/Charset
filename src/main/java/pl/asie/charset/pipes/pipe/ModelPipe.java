@@ -16,27 +16,53 @@
 
 package pl.asie.charset.pipes.pipe;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.ModelPipeShaped;
+import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.pipes.CharsetPipes;
+
+import javax.annotation.Nullable;
 
 public class ModelPipe extends ModelPipeShaped<TilePipe> {
     public static final ResourceLocation PIPE_TEXTURE_LOC = new ResourceLocation("charset", "blocks/pipe");
+    public static final Colorizer colorizer = new Colorizer();
     public static TextureAtlasSprite[] sprites;
 
     public ModelPipe() {
-        super(TilePipe.PROPERTY);
+        super(TilePipe.PROPERTY, CharsetPipes.blockPipe);
     }
 
     @Override
-    public float getThickness() {
-        return 7.995f;
+    public float getThickness(BlockRenderLayer layer) {
+        return layer == BlockRenderLayer.CUTOUT ? 7.995f : 7.990f;
     }
 
     @Override
-    public int getInsideColor(EnumFacing facing) {
-        return facing.getAxis() == EnumFacing.Axis.Y ? 0xFF8F8F8F : 0xFFFFFFFF;
+    public int getOutsideColor(EnumFacing facing, BlockRenderLayer layer) {
+        return layer == BlockRenderLayer.CUTOUT ? 0 : 1;
+    }
+
+    @Override
+    public int getInsideColor(EnumFacing facing, BlockRenderLayer layer) {
+        int color = getOutsideColor(facing, layer);
+        return facing.getAxis() == EnumFacing.Axis.Y ? (color | 0x100) : color;
     }
 
     @Override
@@ -45,12 +71,52 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
     }
 
     @Override
-    public TextureAtlasSprite getTexture(EnumFacing side, int connectionMatrix) {
+    public TextureAtlasSprite getTexture(EnumFacing side, BlockRenderLayer layer, int connectionMatrix) {
         return sprites != null ? sprites[connectionMatrix] : null;
+    }
+
+    public static int getMaterialTint(ItemMaterial material) {
+        // FIXME: Hacky workaround for andesite
+        if (material != null) {
+            if (material.getStack().getItem() == Item.getItemFromBlock(Blocks.STONE)) {
+                if (material.getStack().getMetadata() == 5) {
+                    return 0x7e8e93;
+                }
+            }
+        }
+        return material == null ? -1 : ColorLookupHandler.INSTANCE.getColor(material.getStack(), RenderUtils.AveragingMode.FULL);
     }
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
         return sprites != null ? sprites[15] : null;
+    }
+
+    public static class Colorizer implements IBlockColor, IItemColor {
+        @Override
+        public int colorMultiplier(IBlockState state, @Nullable IBlockAccess worldIn, @Nullable BlockPos pos, int tintIndex) {
+            int value = -1;
+            if (state instanceof IExtendedBlockState) {
+                TilePipe pipe = (((IExtendedBlockState) state).getValue(TilePipe.PROPERTY));
+                if (pipe != null) {
+                    value = getMaterialTint(pipe.getMaterial());
+                }
+            }
+            return modValue(value, tintIndex);
+        }
+
+        @Override
+        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+            int value = getMaterialTint(ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material"));
+            return modValue(value, tintIndex);
+        }
+
+        private int modValue(int value, int tintIndex) {
+            if ((tintIndex & 0x100) != 0) {
+                return (value & 0xFF000000) | ((value >> 1) & 0x007F7F7F);
+            } else {
+                return value;
+            }
+        }
     }
 }

@@ -1,17 +1,21 @@
 package pl.asie.charset.pipes.pipe;
 
+import com.google.common.collect.ImmutableList;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.slot.EnumCenterSlot;
 import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -27,17 +31,24 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.blocks.BlockBase;
+import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
+import pl.asie.charset.misc.shelf.CharsetMiscShelf;
+import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 
-public class BlockPipe extends BlockContainer {
+public class BlockPipe extends BlockBase implements ITileEntityProvider {
+	public static final Collection<ItemMaterial> STONES = new HashSet<>();
 	protected static final AxisAlignedBB[] BOXES = new AxisAlignedBB[7];
 	private AxisAlignedBB lastSelectionBox = BOXES[6];
 
@@ -52,6 +63,27 @@ public class BlockPipe extends BlockContainer {
 		super(Material.GLASS);
 		setUnlocalizedName("charset.pipe");
 		setHardness(0.3f);
+	}
+
+	@Override
+	protected Collection<ItemStack> getCreativeItems() {
+		return ImmutableList.of();
+	}
+
+	@Override
+	protected List<Collection<ItemStack>> getCreativeItemSets() {
+		List<Collection<ItemStack>> list = new ArrayList<>();
+		for (ItemMaterial s : STONES) {
+			list.add(ImmutableList.of(createStack(s, 1)));
+		}
+		return list;
+	}
+
+	public static ItemStack createStack(ItemMaterial material, int stackSize) {
+		ItemStack pipe = new ItemStack(CharsetPipes.blockPipe, stackSize);
+		pipe.setTagCompound(new NBTTagCompound());
+		material.writeToNBT(pipe.getTagCompound(), "material");
+		return pipe;
 	}
 
 	@Override
@@ -76,12 +108,6 @@ public class BlockPipe extends BlockContainer {
 		if (pipe != null) {
 			pipe.onNeighborBlockChange(neighborBlock, neighborPos);
 		}
-	}
-
-	@Nullable
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TilePipe();
 	}
 
 	@Override
@@ -153,11 +179,17 @@ public class BlockPipe extends BlockContainer {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
-		return BlockRenderLayer.TRANSLUCENT;
+		return BlockRenderLayer.CUTOUT;
 	}
 
 	@Override
 	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-		return layer == BlockRenderLayer.CUTOUT || layer == BlockRenderLayer.TRANSLUCENT;
+		return layer == BlockRenderLayer.CUTOUT /* || layer == BlockRenderLayer.TRANSLUCENT*/;
+	}
+
+	@Nullable
+	@Override
+	public TileEntity createNewTileEntity(World worldIn, int meta) {
+		return new TilePipe();
 	}
 }

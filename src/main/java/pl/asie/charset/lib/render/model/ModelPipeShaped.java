@@ -17,11 +17,15 @@
 package pl.asie.charset.lib.render.model;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import org.lwjgl.util.vector.Vector3f;
@@ -55,45 +59,65 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
             ModelRotation.X270_Y90
     };
 
-    private final List<BakedQuad>[] lists = new List[64];
+    private final List<BakedQuad>[] lists = new List[257];
     private final IUnlistedProperty<T> property;
+    private final Block block;
 
-    public ModelPipeShaped(IUnlistedProperty<T> property) {
+    public ModelPipeShaped(IUnlistedProperty<T> property, Block block) {
         this.property = property;
+        this.block = block;
         addDefaultBlockTransforms();
     }
 
-    private List<BakedQuad> getPipeQuads(int i) {
-        if (i == 64)
-            i = 0;
+    private List<BakedQuad> getPipeQuads(int i, BlockRenderLayer layer) {
+        if (layer == null) {
+            if (DEBUG || lists[256] == null) {
+                boolean[] connections = new boolean[6];
+                lists[256] = new ArrayList<>();
 
-        if (DEBUG || lists[i] == null) {
-            boolean[] connections = new boolean[6];
-            for (int j = 0; j < 6; j++) {
-                if ((i & (1 << j)) != 0) {
-                    connections[5 - j] = true;
+                for (BlockRenderLayer layer1 : BlockRenderLayer.values()) {
+                    if (block.canRenderInLayer(block.getDefaultState(), layer1)) {
+                        lists[256].addAll(generateQuads(connections, layer));
+                    }
                 }
             }
 
-            lists[i] = ImmutableList.copyOf(generateQuads(connections));
+            return lists[256];
+        } else {
+            i += 64 * layer.ordinal();
+        }
+
+        if (DEBUG || lists[i] == null) {
+            if (block.canRenderInLayer(block.getDefaultState(), layer)) {
+                boolean[] connections = new boolean[6];
+                for (int j = 0; j < 6; j++) {
+                    if ((i & (1 << j)) != 0) {
+                        connections[5 - j] = true;
+                    }
+                }
+
+                lists[i] = ImmutableList.copyOf(generateQuads(connections, layer));
+            } else {
+                lists[i] = ImmutableList.of();
+            }
         }
 
         return lists[i];
     }
 
-    public int getOutsideColor(EnumFacing facing) {
+    public int getOutsideColor(EnumFacing facing, BlockRenderLayer layer) {
         return -1;
     }
 
-    public int getInsideColor(EnumFacing facing) {
+    public int getInsideColor(EnumFacing facing, BlockRenderLayer layer) {
         return -1;
     }
 
-    public abstract float getThickness();
+    public abstract float getThickness(BlockRenderLayer layer);
     public abstract boolean isOpaque();
-    public abstract TextureAtlasSprite getTexture(EnumFacing side, int connectionMatrix);
+    public abstract TextureAtlasSprite getTexture(EnumFacing side, BlockRenderLayer layer, int connectionMatrix);
 
-    protected List<BakedQuad> generateQuads(boolean[] connections) {
+    protected List<BakedQuad> generateQuads(boolean[] connections, BlockRenderLayer layer) {
         List<BakedQuad> quads = new ArrayList<>();
         Vector3f from, to;
 
@@ -101,11 +125,11 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
             EnumFacing[] neighbors = CONNECTION_DIRS[facing.ordinal()];
             int connectionMatrix = (connections[neighbors[0].ordinal()] ? 8 : 0) | (connections[neighbors[1].ordinal()] ? 4 : 0)
                     | (connections[neighbors[2].ordinal()] ? 2 : 0) | (connections[neighbors[3].ordinal()] ? 1 : 0);
-            TextureAtlasSprite sprite = getTexture(facing, connectionMatrix);
-            float min = 8 - (getThickness() / 2);
-            float max = 8 + (getThickness() / 2);
-            int outsideColor = getOutsideColor(facing);
-            int insideColor = getInsideColor(facing);
+            TextureAtlasSprite sprite = getTexture(facing, layer, connectionMatrix);
+            float min = 8 - (getThickness(layer) / 2);
+            float max = 8 + (getThickness(layer) / 2);
+            int outsideColor = getOutsideColor(facing, layer);
+            int insideColor = getInsideColor(facing, layer);
             if (!isOpaque() && connections[facing.ordinal()]) {
                 // Connected; render up to four quads.
                 if (connections[neighbors[2].ordinal()]) {
@@ -148,6 +172,23 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
         return quads;
     }
 
+    protected boolean connects(T target, BlockRenderLayer layer, EnumFacing facing) {
+        return target.connects(facing);
+    }
+
+    public List<BakedQuad> getQuads(T target) {
+        if (target == null) {
+            return getPipeQuads(0, MinecraftForgeClient.getRenderLayer());
+        }
+
+        int pointer = 0;
+        for (EnumFacing f : EnumFacing.VALUES) {
+            pointer = (pointer << 1) | (connects(target, MinecraftForgeClient.getRenderLayer(), f) ? 1 : 0);
+        }
+
+        return getPipeQuads(pointer, MinecraftForgeClient.getRenderLayer());
+    }
+
     @Override
     public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
         if (side != null) {
@@ -159,15 +200,6 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
             target = ((IExtendedBlockState) state).getValue(property);
         }
 
-        if (target == null) {
-            return getPipeQuads(64);
-        }
-
-        int pointer = 0;
-        for (EnumFacing f : EnumFacing.VALUES) {
-            pointer = (pointer << 1) | (target.connects(f) ? 1 : 0);
-        }
-
-        return getPipeQuads(pointer);
+        return getQuads(target);
     }
 }
