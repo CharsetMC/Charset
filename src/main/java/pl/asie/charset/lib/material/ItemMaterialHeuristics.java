@@ -1,6 +1,7 @@
 package pl.asie.charset.lib.material;
 
 import com.google.common.base.Joiner;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
@@ -28,6 +29,10 @@ public final class ItemMaterialHeuristics {
 
     }
 
+    private static boolean isBlock(ItemStack stack) {
+        return !stack.isEmpty() && (stack.getItem() instanceof ItemBlock || Block.getBlockFromItem(stack.getItem()) != Blocks.AIR);
+    }
+
     private static void addResultingBlock(ItemMaterial base, ItemStack result, String source, String target) {
         if (!result.isEmpty()) {
             result.setCount(1);
@@ -51,7 +56,9 @@ public final class ItemMaterialHeuristics {
                 null, null, null,
                 null, null, null,
                 base.getStack(), base.getStack(), base.getStack());
-        addResultingBlock(base, slab, "block", "slab");
+        if (isBlock(slab)) {
+            addResultingBlock(base, slab, "block", "slab");
+        }
     }
 
     private static void findStair(ItemMaterial base) {
@@ -62,10 +69,15 @@ public final class ItemMaterialHeuristics {
                 null, null, base.getStack(),
                 null, base.getStack(), base.getStack(),
                 base.getStack(), base.getStack(), base.getStack());
-        addResultingBlock(base, slab, "block", "stairs");
+        if (isBlock(slab)) {
+            addResultingBlock(base, slab, "block", "stairs");
+        }
     }
 
     private static void initLogMaterial(ItemStack log) {
+        if (!isBlock(log))
+            return;
+
         // Check if already registered
         ItemMaterial material = reg.getMaterialIfPresent(log);
         if (material != null && material.getTypes().contains("log")) {
@@ -76,7 +88,7 @@ public final class ItemMaterialHeuristics {
         // get registered.
 
         ItemStack plank = RecipeUtils.getCraftingResult(null, 3, 3, log);
-        if (!plank.isEmpty() && ItemUtils.isOreType(plank, "plankWood")) {
+        if (isBlock(plank) && ItemUtils.isOreType(plank, "plankWood")) {
             ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
             if (reg.registerTypes(logMaterial, "log", "wood", "block")) {
                 plank.setCount(1);
@@ -127,28 +139,28 @@ public final class ItemMaterialHeuristics {
         String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
         ItemMaterial ingotMat = reg.getOrCreateMaterial(stack);
 
-        reg.registerTypes(ingotMat, prefix, suffix, "item");
-
-        // Try crafting a nugget
-        if (prefix.equals("ingot")) {
-            ItemStack nugget = RecipeUtils.getCraftingResult(null, 1, 1,
-                    stack);
-            if (!nugget.isEmpty() && containsOreDict(nugget, "nugget" + suffixU)) {
-                ItemMaterial nuggetMat = reg.getOrCreateMaterial(nugget);
-                reg.registerTypes(nuggetMat, "nugget", suffix, "item");
-                reg.registerRelation(ingotMat, nuggetMat, "nugget", prefix);
+        if (reg.registerTypes(ingotMat, prefix, suffix, "item")) {
+            // Try crafting a nugget
+            if (prefix.equals("ingot")) {
+                ItemStack nugget = RecipeUtils.getCraftingResult(null, 1, 1,
+                        stack);
+                if (!nugget.isEmpty() && containsOreDict(nugget, "nugget" + suffixU)) {
+                    ItemMaterial nuggetMat = reg.getOrCreateMaterial(nugget);
+                    reg.registerTypes(nuggetMat, "nugget", suffix, "item");
+                    reg.registerRelation(ingotMat, nuggetMat, "nugget", prefix);
+                }
             }
-        }
 
-        // Try crafting a block
-        ItemStack block = RecipeUtils.getCraftingResult(null, 3, 3,
-                stack, stack, stack,
-                stack, stack, stack,
-                stack, stack, stack);
-        if (!block.isEmpty() && containsOreDict(block, "block" + suffixU)) {
-            ItemMaterial blockMat = reg.getOrCreateMaterial(block);
-            reg.registerTypes(blockMat, suffix, "block");
-            reg.registerRelation(ingotMat, blockMat, "block", prefix);
+            // Try crafting a block
+            ItemStack block = RecipeUtils.getCraftingResult(null, 3, 3,
+                    stack, stack, stack,
+                    stack, stack, stack,
+                    stack, stack, stack);
+            if (!block.isEmpty() && containsOreDict(block, "block" + suffixU)) {
+                ItemMaterial blockMat = reg.getOrCreateMaterial(block);
+                reg.registerTypes(blockMat, suffix, "block");
+                reg.registerRelation(ingotMat, blockMat, "block", prefix);
+            }
         }
     }
 
@@ -158,26 +170,31 @@ public final class ItemMaterialHeuristics {
         String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
 
         // Create ore materials for each ore
-        supplyExpandedStacks(OreDictionary.getOres(oreName), (stack -> reg.registerTypes(reg.getOrCreateMaterial(stack), prefix, suffix, "block")));
+        supplyExpandedStacks(OreDictionary.getOres(oreName), (stack -> {
+            if (isBlock(stack)) {
+                reg.registerTypes(reg.getOrCreateMaterial(stack), prefix, suffix, "block");
+            }
+        }));
     }
 
     private static void initStoneMaterial(String oreName, ItemStack stack) {
-        if (oreName.endsWith("Polished")) return;
+        if (oreName.endsWith("Polished") || !isBlock(stack)) return;
+
         String prefix = "stone";
         String suffixU = oreName.substring(prefix.length());
         String suffix = suffixU.length() > 0 ? suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1) : "";
 
         ItemMaterial stoneMat = reg.getOrCreateMaterial(stack);
-        reg.registerTypes(stoneMat, "stone", suffix, "block");
-
-        // Try crafting a brick
-        ItemStack block = RecipeUtils.getCraftingResult(null, 2, 2,
-                stack, stack,
-                stack, stack);
-        if (!block.isEmpty()) {
-            ItemMaterial brickMat = reg.getOrCreateMaterial(block);
-            reg.registerTypes(brickMat, "stone", "brick", suffix, "block");
-            reg.registerRelation(stoneMat, brickMat, "brick", "parent");
+        if (reg.registerTypes(stoneMat, "stone", suffix, "block")) {
+            // Try crafting a brick
+            ItemStack block = RecipeUtils.getCraftingResult(null, 2, 2,
+                    stack, stack,
+                    stack, stack);
+            if (!block.isEmpty()) {
+                ItemMaterial brickMat = reg.getOrCreateMaterial(block);
+                reg.registerTypes(brickMat, "stone", "brick", suffix, "block");
+                reg.registerRelation(stoneMat, brickMat, "brick", "parent");
+            }
         }
     }
 

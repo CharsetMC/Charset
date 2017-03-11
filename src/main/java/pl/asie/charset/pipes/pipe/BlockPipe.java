@@ -75,12 +75,13 @@ public class BlockPipe extends BlockBase implements ITileEntityProvider {
 	protected List<Collection<ItemStack>> getCreativeItemSets() {
 		List<Collection<ItemStack>> list = new ArrayList<>();
 		for (ItemMaterial s : STONES) {
-			ImmutableList.Builder<ItemStack> builder = new ImmutableList.Builder();
+			/* ImmutableList.Builder<ItemStack> builder = new ImmutableList.Builder();
 			builder.add(createStack(s, null, 1));
 			for (EnumDyeColor color : EnumDyeColor.values()) {
 				builder.add(createStack(s, color, 1));
 			}
-			list.add(builder.build());
+			list.add(builder.build()); */
+			list.add(ImmutableList.of(createStack(s, null, 1)));
 		}
 		return list;
 	}
@@ -191,7 +192,7 @@ public class BlockPipe extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-		return layer == BlockRenderLayer.CUTOUT || layer == BlockRenderLayer.TRANSLUCENT;
+		return layer == BlockRenderLayer.CUTOUT /* || layer == BlockRenderLayer.TRANSLUCENT */;
 	}
 
 	@Nullable

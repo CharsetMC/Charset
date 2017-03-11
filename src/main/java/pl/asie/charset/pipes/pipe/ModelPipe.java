@@ -115,6 +115,8 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
                         EnumDyeColor color = pipe.getColor();
                         if (color != null) {
                             value = ColorUtils.getIntColor(color);
+                        } else {
+                            value = 0;
                         }
                     } else {
                         value = getMaterialTint(pipe.getMaterial());
@@ -129,7 +131,7 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
             int value;
             if ((tintIndex & 0xFF) == 1) {
                 int color = stack.hasTagCompound() ? stack.getTagCompound().getByte("color") : 0;
-                value = color > 0 ? ColorUtils.getIntColor(EnumDyeColor.byMetadata(color - 1)) : -1;
+                value = color > 0 ? ColorUtils.getIntColor(EnumDyeColor.byMetadata(color - 1)) : 0;
             } else {
                 value = getMaterialTint(ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material"));
             }

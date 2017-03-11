@@ -157,9 +157,9 @@ public class CharsetPipes {
 			BlockPipe.STONES.add(material);
 
 			addPipeRecipe(material, null, "blockGlassColorless");
-			for (EnumDyeColor color : EnumDyeColor.values()) {
+/*			for (EnumDyeColor color : EnumDyeColor.values()) {
 				addPipeRecipe(material, color, ColorUtils.getOreDictEntry("blockGlass", color.getMetadata()));
-			}
+			} */
 		}
 	}
 }
