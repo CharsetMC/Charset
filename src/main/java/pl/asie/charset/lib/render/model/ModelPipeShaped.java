@@ -29,6 +29,7 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import org.lwjgl.util.vector.Vector3f;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.IConnectable;
 import pl.asie.charset.lib.utils.RenderUtils;
 
@@ -37,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedModel {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = ModCharset.INDEV;
     private static final boolean RENDER_INNER_FACES = true;
     private static final boolean RENDER_OUTER_FACES = true;
 
@@ -77,7 +78,7 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
 
                 for (BlockRenderLayer layer1 : BlockRenderLayer.values()) {
                     if (block.canRenderInLayer(block.getDefaultState(), layer1)) {
-                        lists[256].addAll(generateQuads(connections, layer));
+                        lists[256].addAll(generateQuads(connections, layer1));
                     }
                 }
             }
@@ -111,6 +112,10 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
 
     public int getInsideColor(EnumFacing facing, BlockRenderLayer layer) {
         return -1;
+    }
+
+    public boolean shouldRender(T target, BlockRenderLayer layer) {
+        return true;
     }
 
     public abstract float getThickness(BlockRenderLayer layer);
@@ -177,6 +182,10 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
     }
 
     public List<BakedQuad> getQuads(T target) {
+        if (!shouldRender(target, MinecraftForgeClient.getRenderLayer())) {
+            return Collections.emptyList();
+        }
+
         if (target == null) {
             return getPipeQuads(0, MinecraftForgeClient.getRenderLayer());
         }

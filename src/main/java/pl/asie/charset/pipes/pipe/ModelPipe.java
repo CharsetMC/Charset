@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
@@ -35,6 +36,7 @@ import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.ModelPipeShaped;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.pipes.CharsetPipes;
 
@@ -42,8 +44,9 @@ import javax.annotation.Nullable;
 
 public class ModelPipe extends ModelPipeShaped<TilePipe> {
     public static final ResourceLocation PIPE_TEXTURE_LOC = new ResourceLocation("charset", "blocks/pipe");
+    public static final ResourceLocation PIPE_OVERLAY_TEXTURE_LOC = new ResourceLocation("charset", "blocks/pipe_overlay");
     public static final Colorizer colorizer = new Colorizer();
-    public static TextureAtlasSprite[] sprites;
+    public static TextureAtlasSprite[] sprites0, sprites1;
 
     public ModelPipe() {
         super(TilePipe.PROPERTY, CharsetPipes.blockPipe);
@@ -71,7 +74,16 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
     }
 
     @Override
+    public boolean shouldRender(TilePipe target, BlockRenderLayer layer) {
+        if (layer == BlockRenderLayer.TRANSLUCENT) {
+            return target.getColor() != null;
+        }
+        return true;
+    }
+
+    @Override
     public TextureAtlasSprite getTexture(EnumFacing side, BlockRenderLayer layer, int connectionMatrix) {
+        TextureAtlasSprite[] sprites = layer == BlockRenderLayer.TRANSLUCENT ? sprites1 : sprites0;
         return sprites != null ? sprites[connectionMatrix] : null;
     }
 
@@ -89,7 +101,7 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return sprites != null ? sprites[15] : null;
+        return sprites0 != null ? sprites0[15] : null;
     }
 
     public static class Colorizer implements IBlockColor, IItemColor {
@@ -99,7 +111,14 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
             if (state instanceof IExtendedBlockState) {
                 TilePipe pipe = (((IExtendedBlockState) state).getValue(TilePipe.PROPERTY));
                 if (pipe != null) {
-                    value = getMaterialTint(pipe.getMaterial());
+                    if ((tintIndex & 0xFF) == 1) {
+                        EnumDyeColor color = pipe.getColor();
+                        if (color != null) {
+                            value = ColorUtils.getIntColor(color);
+                        }
+                    } else {
+                        value = getMaterialTint(pipe.getMaterial());
+                    }
                 }
             }
             return modValue(value, tintIndex);
@@ -107,7 +126,13 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
 
         @Override
         public int getColorFromItemstack(ItemStack stack, int tintIndex) {
-            int value = getMaterialTint(ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material"));
+            int value;
+            if ((tintIndex & 0xFF) == 1) {
+                int color = stack.hasTagCompound() ? stack.getTagCompound().getByte("color") : 0;
+                value = color > 0 ? ColorUtils.getIntColor(EnumDyeColor.byMetadata(color - 1)) : -1;
+            } else {
+                value = getMaterialTint(ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material"));
+            }
             return modValue(value, tintIndex);
         }
 

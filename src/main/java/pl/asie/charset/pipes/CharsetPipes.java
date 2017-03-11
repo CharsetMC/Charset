@@ -19,6 +19,7 @@ package pl.asie.charset.pipes;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -41,6 +42,7 @@ import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.pipes.pipe.BlockPipe;
 import pl.asie.charset.pipes.pipe.ItemPipe;
@@ -121,35 +123,42 @@ public class CharsetPipes {
 		}
 	}
 
+	private void addPipeRecipe(ItemMaterial material, EnumDyeColor color, String glassKey) {
+		if (Loader.isModLoaded("buildcrafttransport")) {
+			GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, color, 3),
+					"sss",
+					"ggg",
+					"sss",
+					'g', glassKey, 's', material.getStack()));
+
+			GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, color, 3),
+					"sgs",
+					"sgs",
+					"sgs",
+					'g', glassKey, 's', material.getStack()));
+		} else {
+			GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, color, 1),
+					"sgs",
+					'g', glassKey, 's', material.getStack()));
+
+			GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, color, 1),
+					"s",
+					"g",
+					"s",
+					'g', glassKey, 's', material.getStack()));
+		}
+	}
+
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		TileShifter.registerDefaultHandlers();
 
-		for (ItemMaterial material : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("stone", "block", "!brick")) {
+		for (ItemMaterial material : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("stone", "block", "!brick", "!cobblestone")) {
 			BlockPipe.STONES.add(material);
 
-			if (Loader.isModLoaded("buildcrafttransport")) {
-				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 3),
-						"sss",
-						"ggg",
-						"sss",
-						'g', "blockGlassColorless", 's', material.getStack()));
-
-				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 3),
-						"sgs",
-						"sgs",
-						"sgs",
-						'g', "blockGlassColorless", 's', material.getStack()));
-			} else {
-				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 1),
-						"sgs",
-						'g', "blockGlassColorless", 's', material.getStack()));
-
-				GameRegistry.addRecipe(new ShapedOreRecipe(BlockPipe.createStack(material, 1),
-						"s",
-						"g",
-						"s",
-						'g', "blockGlassColorless", 's', material.getStack()));
+			addPipeRecipe(material, null, "blockGlassColorless");
+			for (EnumDyeColor color : EnumDyeColor.values()) {
+				addPipeRecipe(material, color, ColorUtils.getOreDictEntry("blockGlass", color.getMetadata()));
 			}
 		}
 	}

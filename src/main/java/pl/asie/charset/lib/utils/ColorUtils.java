@@ -20,6 +20,7 @@ import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
@@ -71,6 +72,10 @@ public final class ColorUtils {
 		for (int i = 0; i < 16; i++) {
 			OREDICT_DYE_IDS[i] = OreDictionary.getOreID("dye" + UPPERCASE_DYE_SUFFIXES[i]);
 		}
+	}
+
+	public static String getFormatting(int color) {
+		return "\u00a7" + WOOL_TO_CHAT[color];
 	}
 
 	public static @Nullable EnumDyeColor getColorFromDye(ItemStack stack) {

@@ -59,7 +59,8 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		ModelPipe.sprites = SpritesheetFactory.register(event.getMap(), ModelPipe.PIPE_TEXTURE_LOC, 4, 4);
+		ModelPipe.sprites0 = SpritesheetFactory.register(event.getMap(), ModelPipe.PIPE_TEXTURE_LOC, 4, 4);
+		ModelPipe.sprites1 = SpritesheetFactory.register(event.getMap(), ModelPipe.PIPE_OVERLAY_TEXTURE_LOC, 4, 4);
 		if (rendererPipe != null) {
 			rendererPipe.clearCache();
 		}

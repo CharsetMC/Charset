@@ -8,6 +8,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -36,6 +37,7 @@ import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable, IDebuggable {
@@ -73,6 +75,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     private final IItemInsertionHandler[] insertionHandlers = new IItemInsertionHandler[6];
     private final Set<PipeItem> itemSet = new HashSet<PipeItem>();
     private ItemMaterial material;
+    private byte color = 0;
     private byte connectionCache = 0;
     private int neighborsUpdate = 0;
     private boolean requestUpdate;
@@ -169,16 +172,22 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     @Override
     public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
         material = ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material", "stone", new ItemStack(Blocks.STONE));
+        color = stack.hasTagCompound() ? stack.getTagCompound().getByte("color") : 0;
         markBlockForUpdate();
     }
 
     @Override
     public ItemStack getDroppedBlock() {
-        return BlockPipe.createStack(material, 1);
+        return BlockPipe.createStack(material, getColor(), 1);
     }
 
     public ItemMaterial getMaterial() {
         return material;
+    }
+
+    @Nullable
+    public EnumDyeColor getColor() {
+        return color == 0 ? null : EnumDyeColor.byMetadata(color - 1);
     }
 
     private void readItems(NBTTagCompound nbt) {
@@ -225,6 +234,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         if (material != null) {
             material.writeToNBT(nbt, "material");
         }
+        nbt.setByte("color", color);
         nbt.setByte("cc", connectionCache);
         if (!isClient && shifterDistance != null) {
             nbt.setIntArray("shifterDist", shifterDistance);

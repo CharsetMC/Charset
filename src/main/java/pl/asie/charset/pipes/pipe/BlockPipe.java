@@ -14,6 +14,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -74,15 +75,21 @@ public class BlockPipe extends BlockBase implements ITileEntityProvider {
 	protected List<Collection<ItemStack>> getCreativeItemSets() {
 		List<Collection<ItemStack>> list = new ArrayList<>();
 		for (ItemMaterial s : STONES) {
-			list.add(ImmutableList.of(createStack(s, 1)));
+			ImmutableList.Builder<ItemStack> builder = new ImmutableList.Builder();
+			builder.add(createStack(s, null, 1));
+			for (EnumDyeColor color : EnumDyeColor.values()) {
+				builder.add(createStack(s, color, 1));
+			}
+			list.add(builder.build());
 		}
 		return list;
 	}
 
-	public static ItemStack createStack(ItemMaterial material, int stackSize) {
+	public static ItemStack createStack(ItemMaterial material, @Nullable EnumDyeColor color, int stackSize) {
 		ItemStack pipe = new ItemStack(CharsetPipes.blockPipe, stackSize);
 		pipe.setTagCompound(new NBTTagCompound());
 		material.writeToNBT(pipe.getTagCompound(), "material");
+		pipe.getTagCompound().setByte("color", color == null ? 0 : (byte) (color.ordinal() + 1));
 		return pipe;
 	}
 
@@ -184,7 +191,7 @@ public class BlockPipe extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-		return layer == BlockRenderLayer.CUTOUT /* || layer == BlockRenderLayer.TRANSLUCENT*/;
+		return layer == BlockRenderLayer.CUTOUT || layer == BlockRenderLayer.TRANSLUCENT;
 	}
 
 	@Nullable
