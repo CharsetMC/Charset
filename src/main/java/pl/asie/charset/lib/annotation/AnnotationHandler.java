@@ -51,7 +51,7 @@ public class AnnotationHandler {
 
 	private Field getField(ASMDataTable.ASMData data) {
 		try {
-			Field f = getClass(data).getField(data.getObjectName());
+			Field f = getClass(data).getDeclaredField(data.getObjectName());
 			f.setAccessible(true);
 			return f;
 		} catch (NoSuchFieldException e) {
