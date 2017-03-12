@@ -105,7 +105,7 @@ public class CharsetTweakUnifyColors {
 	private void recolorTextures(TextureMap map, String prefix) {
 		ResourceLocation source = new ResourceLocation(prefix + "white");
 		for (int i = 0; i < 16; i++) { // skip white
-			String s = ColorUtils.UNDERSCORE_DYE_SUFFIXES[i];
+			String s = ColorUtils.getUnderscoredSuffix(EnumDyeColor.byMetadata(i));
 			ResourceLocation target = new ResourceLocation(prefix + s);
 			if (prefix.contains("hardened_clay")) {
 				BufferedImage image = RenderUtils.getTextureImage(new ResourceLocation("minecraft:blocks/hardened_clay"));
@@ -150,10 +150,11 @@ public class CharsetTweakUnifyColors {
 			);
 
 			for (int i = 0; i < 16; i++) {
-				String key = ColorUtils.UNDERSCORE_DYE_SUFFIXES[i];
+				EnumDyeColor color = EnumDyeColor.byMetadata(i);
+				String key = ColorUtils.getUnderscoredSuffix(color);
 				if (colorPalette.containsKey(key)) {
 					float[] src = colorPalette.get(key);
-					float[] dst = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(i));
+					float[] dst = EntitySheep.getDyeRgb(color);
 					dst[0] = src[0];
 					dst[1] = src[1];
 					dst[2] = src[2];

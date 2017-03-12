@@ -16,31 +16,22 @@
 
 package pl.asie.charset.lib.utils;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 
-// TODO: Refactor me
 public final class ColorUtils {
-	public static final String[] UNDERSCORE_DYE_SUFFIXES = new String[]{
+	private static final String[] UNDERSCORE_DYE_SUFFIXES = new String[]{
 			"white", "orange", "magenta", "light_blue",
 			"yellow", "lime", "pink", "gray",
 			"silver", "cyan", "purple", "blue",
 			"brown", "green", "red", "black"
-	};
-
-	// TODO: Remove in 1.12
-	public static final int[] LEGACY_COLORS = new int[]{
-			0xFAFAFA, 0xD87F33, 0xB24CD8, 0x6699D8,
-			0xE5E533, 0x7FCC19, 0xF27FA5, 0x4C4C4C,
-			0x999999, 0x4C7F99, 0x7F3FB2, 0x334CB2,
-			0x664C33, 0x667F33, 0x993333, 0x191919
 	};
 
 	private static final String[] UPPERCASE_DYE_SUFFIXES = new String[]{
@@ -57,7 +48,7 @@ public final class ColorUtils {
 			"brown", "green", "red", "black"
 	};
 
-	private static final int[] OREDICT_DYE_IDS = new int[16];
+	private static TIntObjectMap<EnumDyeColor> oredictDyeIdMap;
 
 	private static final char[] WOOL_TO_CHAT = new char[]{
 			'f', '6', 'd', '9', 'e', 'a', 'd', '8',
@@ -68,17 +59,22 @@ public final class ColorUtils {
 
 	}
 
-	public static void init() {
-		for (int i = 0; i < 16; i++) {
-			OREDICT_DYE_IDS[i] = OreDictionary.getOreID("dye" + UPPERCASE_DYE_SUFFIXES[i]);
+	public static TIntObjectMap<EnumDyeColor> getOredictDyeIdMap() {
+		if (oredictDyeIdMap == null) {
+		    oredictDyeIdMap = new TIntObjectHashMap<>();
+			for (int i = 0; i < 16; i++) {
+				oredictDyeIdMap.put(OreDictionary.getOreID("dye" + UPPERCASE_DYE_SUFFIXES[i]), EnumDyeColor.byMetadata(i));
+			}
 		}
+
+		return oredictDyeIdMap;
 	}
 
-	public static String getFormatting(int color) {
-		return "\u00a7" + WOOL_TO_CHAT[color];
+	public static String getNearestTextFormatting(EnumDyeColor color) {
+		return "\u00a7" + WOOL_TO_CHAT[color.getMetadata()];
 	}
 
-	public static @Nullable EnumDyeColor getColorFromDye(ItemStack stack) {
+	public static @Nullable EnumDyeColor getDyeColor(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return null;
 		}
@@ -88,22 +84,21 @@ public final class ColorUtils {
 		}
 
 		int[] itemOreIDs = OreDictionary.getOreIDs(stack);
-		for (int i = 0; i < 16; i++) {
-			for (int id : itemOreIDs) {
-				if (OREDICT_DYE_IDS[i] == id) {
-					return EnumDyeColor.byMetadata(i);
-				}
-			}
+		TIntObjectMap<EnumDyeColor> map = getOredictDyeIdMap();
+		for (int id : itemOreIDs) {
+			EnumDyeColor color = map.get(id);
+			if (color != null)
+				return color;
 		}
 
 		return null;
 	}
 
 	public static boolean isDye(ItemStack stack) {
-		return getColorFromDye(stack) != null;
+		return getDyeColor(stack) != null;
 	}
 
-	public static int getIntColor(EnumDyeColor color) {
+	public static int toIntColor(EnumDyeColor color) {
 		float[] d = EntitySheep.getDyeRgb(color);
 		return    (Math.min(Math.round(d[0] * 255.0F), 255) << 16)
 				| (Math.min(Math.round(d[1] * 255.0F), 255) << 8)
@@ -111,19 +106,20 @@ public final class ColorUtils {
 				| 0xFF000000;
 	}
 
-	public static String getOreDictEntry(String prefix, int wool) {
-		return prefix + UPPERCASE_DYE_SUFFIXES[wool & 15];
+	public static String getOreDictEntry(String prefix, EnumDyeColor wool) {
+		return prefix + UPPERCASE_DYE_SUFFIXES[wool.getMetadata()];
 	}
 
-	public static String getLangEntry(String prefix, int wool) {
-		return prefix + LOWERCASE_DYE_SUFFIXES[wool & 15];
+	public static String getLangEntry(String prefix, EnumDyeColor wool) {
+		return prefix + LOWERCASE_DYE_SUFFIXES[wool.getMetadata()];
 	}
 
-	public static String ampersandToColor(String chat) {
-		return chat.replaceAll("&(?=[0-9A-FK-ORa-fk-or])", "\u00a7");
+	// TODO: Move to ChatUtils?
+	public static String stripChatColor(String chat) {
+		return chat.replaceAll("[§][0-9A-FK-ORa-fk-or]", "");
 	}
 
-	public static String stripColor(String chat) {
-		return chat.replaceAll("[&§][0-9A-FK-ORa-fk-or]", "");
+	public static String getUnderscoredSuffix(EnumDyeColor color) {
+		return UNDERSCORE_DYE_SUFFIXES[color.getMetadata()];
 	}
 }

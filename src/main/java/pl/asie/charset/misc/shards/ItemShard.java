@@ -57,7 +57,7 @@ public class ItemShard extends Item {
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
 		if (stack.getItemDamage() > 0 && stack.getItemDamage() <= 16) {
-			return I18n.translateToLocalFormatted("item.charset.shard.colored.name", I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", stack.getItemDamage() - 1)));
+			return I18n.translateToLocalFormatted("item.charset.shard.colored.name", I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", EnumDyeColor.byMetadata(stack.getItemDamage() - 1))));
 		} else {
 			return I18n.translateToLocal("item.charset.shard.name");
 		}

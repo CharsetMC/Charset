@@ -34,10 +34,6 @@ class UtilProxyCommon implements IThreadListener {
 	@SidedProxy(clientSide = "pl.asie.charset.lib.utils.UtilProxyClient", serverSide = "pl.asie.charset.lib.utils.UtilProxyCommon", modId = ModCharset.MODID)
 	public static UtilProxyCommon proxy;
 
-	// TODO 1.11
-//	public void drawWireHighlight(PartWire wire) {
-//	}
-
 	public EntityPlayer getPlayer(INetHandler handler) {
 		return handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).player : null;
 	}

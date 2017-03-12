@@ -105,7 +105,7 @@ public class TestWools {
 		System.out.println("{");
 		for (int i = 0; i < 16; i++) {
 			float[] color1 = colorMultiplier("", EnumDyeColor.byMetadata(i));
-			String name = ColorUtils.UNDERSCORE_DYE_SUFFIXES[i];
+			String name = ColorUtils.getUnderscoredSuffix(EnumDyeColor.byMetadata(i));
 			System.out.println("\t\"" + name + "\": [" + color1[0] + ", " + color1[1] + ", " + color1[2] + "],");
 		}
 		System.out.println("}");

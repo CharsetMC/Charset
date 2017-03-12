@@ -16,6 +16,10 @@
 
 package pl.asie.charset.tools.wrench;
 
+import mcmultipart.api.container.IMultipartContainer;
+import mcmultipart.api.container.IPartInfo;
+import mcmultipart.api.multipart.IMultipart;
+import mcmultipart.api.multipart.MultipartHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -24,9 +28,15 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.utils.RayTraceUtils;
+
+import java.util.Optional;
 
 public class ItemWrench extends Item {
     public ItemWrench() {
@@ -43,35 +53,37 @@ public class ItemWrench extends Item {
     }
 
     // TODO 1.11
-    /* @Optional.Method(modid = "mcmultipart")
+    @net.minecraftforge.fml.common.Optional.Method(modid = "mcmultipart")
     public EnumActionResult tryRotateMultipart(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing targetFacing) {
-        IMultipartContainer ui = MultipartHelper.getPartContainer(worldIn, pos);
-        if (ui != null) {
+        Optional<IMultipartContainer> uio = MultipartHelper.getContainer(worldIn, pos);
+        if (uio.isPresent()) {
+            IMultipartContainer ui = uio.get();
             Vec3d start = RayTraceUtils.getStart(playerIn);
             Vec3d end = RayTraceUtils.getEnd(playerIn);
             double dist = Double.POSITIVE_INFINITY;
-            RayTraceUtils.AdvancedRayTraceResultPart result = null;
+            IPartInfo part = null;
 
-            for (IMultipart p : ui.getParts()) {
-                RayTraceUtils.AdvancedRayTraceResultPart pResult = p.collisionRayTrace(start, end);
-                if (pResult != null) {
-                    double d = pResult.squareDistanceTo(start);
+            for (IPartInfo p : ui.getParts().values()) {
+                RayTraceResult pResult = p.getPart().collisionRayTrace(p, start, end);
+                if (pResult != null && pResult.hitVec != null) {
+                    double d = pResult.hitVec.squareDistanceTo(start);
                     if (d <= dist) {
                         dist = d;
-                        result = pResult;
+                        part = p;
                     }
                 }
             }
 
-            if (result != null && result.hit != null && result.hit.partHit != null) {
-                return result.hit.partHit.rotatePart(targetFacing) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+            if (part != null) {
+                // TODO return ... ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+                return EnumActionResult.FAIL;
             } else {
                 return EnumActionResult.FAIL;
             }
         } else {
             return EnumActionResult.PASS;
         }
-    } */
+    }
 
     @Override
     public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -81,12 +93,12 @@ public class ItemWrench extends Item {
                 targetFacing = targetFacing.getOpposite();
             }
 
-            /* if (Loader.isModLoaded("mcmultipart")) {
+            if (Loader.isModLoaded("mcmultipart")) {
                 EnumActionResult result = tryRotateMultipart(playerIn, worldIn, pos, targetFacing);
-                if (res2ult != EnumActionResult.PASS) {
+                if (result != EnumActionResult.PASS) {
                     return result;
                 }
-            } */
+            }
 
             IBlockState state = worldIn.getBlockState(pos);
             if (state != null) {

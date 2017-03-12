@@ -143,7 +143,7 @@ public class CharsetTransportDyeableMinecarts {
 				 && ColorUtils.isDye(event.getEntityPlayer().getHeldItem(event.getHand()))) {
 			MinecartDyeable properties = MinecartDyeable.get((EntityMinecart) event.getTarget());
 			if (properties != null) {
-				properties.setColor(ColorUtils.getColorFromDye(event.getEntityPlayer().getHeldItem(event.getHand())));
+				properties.setColor(ColorUtils.getDyeColor(event.getEntityPlayer().getHeldItem(event.getHand())));
 
 				event.setCanceled(true);
 				event.getEntityPlayer().swingArm(event.getHand());

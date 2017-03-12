@@ -19,6 +19,7 @@ package pl.asie.charset.misc.shards;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
@@ -61,7 +62,7 @@ public class CharsetMiscShards {
 
 		for (int i = 0; i < 16; i++) {
 			GameRegistry.addShapedRecipe(new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(shardItem, 1, i + 1));
-			OreDictionary.registerOre(ColorUtils.getOreDictEntry("shardGlass", i), new ItemStack(shardItem, 1, i + 1));
+			OreDictionary.registerOre(ColorUtils.getOreDictEntry("shardGlass", EnumDyeColor.byMetadata(i)), new ItemStack(shardItem, 1, i + 1));
 		}
 	}
 

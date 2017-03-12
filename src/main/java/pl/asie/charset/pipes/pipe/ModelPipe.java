@@ -16,7 +16,6 @@
 
 package pl.asie.charset.pipes.pipe;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -31,7 +30,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -114,7 +112,7 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
                     if ((tintIndex & 0xFF) == 1) {
                         EnumDyeColor color = pipe.getColor();
                         if (color != null) {
-                            value = ColorUtils.getIntColor(color);
+                            value = ColorUtils.toIntColor(color);
                         } else {
                             value = 0;
                         }
@@ -131,7 +129,7 @@ public class ModelPipe extends ModelPipeShaped<TilePipe> {
             int value;
             if ((tintIndex & 0xFF) == 1) {
                 int color = stack.hasTagCompound() ? stack.getTagCompound().getByte("color") : 0;
-                value = color > 0 ? ColorUtils.getIntColor(EnumDyeColor.byMetadata(color - 1)) : 0;
+                value = color > 0 ? ColorUtils.toIntColor(EnumDyeColor.byMetadata(color - 1)) : 0;
             } else {
                 value = getMaterialTint(ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material"));
             }

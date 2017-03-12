@@ -125,7 +125,6 @@ public class CharsetLib {
 		MinecraftForge.EVENT_BUS.register(this);
 
 		Capabilities.init();
-		ColorUtils.init();
 		DataSerializersCharset.init();
 
 		if (ModCharset.INDEV || enableDebugInfo)
