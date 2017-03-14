@@ -314,7 +314,7 @@ public class SpecialRendererPipe extends DualTileEntitySpecialRenderer<TilePipe>
 
 		synchronized (part.getPipeItems()) {
 			for (PipeItem item : part.getPipeItems()) {
-				EnumFacing id = item.getDirection();
+				EnumFacing id = item.getRenderDirection();
 				ItemStack stack = item.getStack();
 				if (stack == null) {
 					continue;
@@ -384,7 +384,7 @@ public class SpecialRendererPipe extends DualTileEntitySpecialRenderer<TilePipe>
 
 		if (SLOW_ITEMS.size() > 0) {
 			for (PipeItem item : SLOW_ITEMS) {
-				EnumFacing id = item.getDirection();
+				EnumFacing id = item.getRenderDirection();
 				ItemStack stack = item.getStack();
 				float scale = getItemScale(item);
 				float[] offset = calculateItemOffset(item, partialTicks);

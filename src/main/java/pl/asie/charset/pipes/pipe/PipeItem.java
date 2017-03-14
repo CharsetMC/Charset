@@ -16,6 +16,7 @@
 
 package pl.asie.charset.pipes.pipe;
 
+import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -46,6 +47,7 @@ public class PipeItem {
 	byte blocksSinceSync;
 
 	protected EnumFacing input, output;
+	protected EnumFacing renderDirection;
 	protected boolean reachedCenter;
 	protected ItemStack stack = ItemStack.EMPTY;
 	protected int progress;
@@ -56,6 +58,16 @@ public class PipeItem {
 	private int activeShifterDistance;
 	private TilePipe owner;
 	private boolean stuck;
+
+	protected void updateRenderDirection() {
+		if (renderDirection == null || (getDirection() != null && getDirection().getAxis() != EnumFacing.Axis.Y)) {
+			renderDirection = getDirection();
+		}
+	}
+
+	public EnumFacing getRenderDirection() {
+		return renderDirection;
+	}
 
 	public PipeItem(TilePipe owner, ItemStack stack, EnumFacing side) {
 		this.id = nextId++;
@@ -137,7 +149,11 @@ public class PipeItem {
 
 	// This version takes priority into account (filtered shifters are
 	// prioritized over unfiltered shifters at the same distance).
-	private int getInternalShifterStrength(IShifter shifter, EnumFacing dir) {
+	private int getInternalShifterStrength(PipeLogic.Direction dir) {
+		return getInternalShifterStrength(dir.dir, dir.shifter);
+	}
+
+	private int getInternalShifterStrength(EnumFacing dir, IShifter shifter) {
 		if (shifter == null) {
 			return 0;
 		} else {
@@ -159,7 +175,7 @@ public class PipeItem {
 				// Find the closest shifter affecting the item.
 				for (EnumFacing dir : EnumFacing.VALUES) {
 					IShifter p = owner.getNearestShifter(dir);
-					int ps = getInternalShifterStrength(p, dir);
+					int ps = getInternalShifterStrength(dir, p);
 					if (ps > 0 && ps < minimumShifterDistance
 							&& isShifterPushing(p, output)) {
 						minimumShifterDistance = ps;
@@ -170,7 +186,7 @@ public class PipeItem {
 				if (
 						(!foundShifter && activeShifterDistance > 0)
 								|| (foundShifter && activeShifterDistance != minimumShifterDistance)
-								|| (foundShifter && activeShifterDistance != getInternalShifterStrength(owner.getNearestShifter(output), output))
+								|| (foundShifter && activeShifterDistance != getInternalShifterStrength(output, owner.getNearestShifter(output)))
 						) {
 					TileEntity shifterTile = owner.getWorld().getTileEntity(owner.getPos().offset(output.getOpposite(), activeShifterDistance));
 
@@ -351,98 +367,46 @@ public class PipeItem {
 			return;
 		}
 
-		List<EnumFacing> directionList = new ArrayList<EnumFacing>();
-		List<EnumFacing> pressureList = new ArrayList<EnumFacing>();
+		PipeLogic.Direction dir = null;
+
+		for (PipeLogic.Direction iDir : owner.getLogic().getPressuredDirections()) {
+			if (!iDir.test(stack))
+				continue;
+
+			dir = iDir;
+			if (canMoveDirection(dir.dir, true)) {
+				// Pressurizer prioritizing valid direction, move.
+				this.output = dir.dir;
+				activeShifterDistance = getInternalShifterStrength(dir);
+				return;
+			} else if (owner.getLogic().hasPressure(dir.dir.getOpposite())
+					&& owner.getShifterStrength(dir.dir) == owner.getShifterStrength(dir.dir.getOpposite())) {
+				// Pressurizers freezing an item in place.
+				this.output = dir.dir;
+				activeShifterDistance = getInternalShifterStrength(dir);
+				return;
+			}
+		}
 
 		activeShifterDistance = 0;
 
-		// Step 1: Make a list of all valid directions, as well as all shifters.
-		for (EnumFacing direction : EnumFacing.VALUES) {
-			if (isValidDirection(direction)) {
-				directionList.add(direction);
+		List<PipeLogic.Direction> directionList = Lists.newArrayList(owner.getLogic().getNonPressuredDirections());
+		Collections.shuffle(directionList);
+
+		for (int i = directionList.size() - 1; i >= 0; i--) {
+			PipeLogic.Direction iDir = directionList.get(i);
+			if (iDir.dir == input || !iDir.test(stack)) {
+				continue;
 			}
 
-			IShifter p = owner.getNearestShifter(direction);
-
-			if (p != null && isShifterPushing(p, direction)) {
-				pressureList.add(direction);
+			dir = iDir;
+			if (canMoveDirection(iDir.dir, true)) {
+				this.output = iDir.dir;
+				return;
 			}
 		}
 
-		// Step 2: Sort the shifter list.
-		Collections.sort(pressureList, new Comparator<EnumFacing>() {
-			@Override
-			public int compare(EnumFacing o1, EnumFacing o2) {
-				return getInternalShifterStrength(owner.getNearestShifter(o1), o1) - getInternalShifterStrength(owner.getNearestShifter(o2), o2);
-			}
-		});
-
-
-		EnumFacing firstOutput = null;
-
-		// Step 3: Pick the next path.
-		for (EnumFacing dir : pressureList) {
-			if (canMoveDirection(dir, true)) {
-				// Pressurizer prioritizing valid direction, move.
-				this.output = dir;
-				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
-				return;
-			} else if (pressureList.contains(dir.getOpposite())
-					&& owner.getShifterStrength(dir) == owner.getShifterStrength(dir.getOpposite())) {
-				// Pressurizers freezing an item in place.
-				this.output = dir;
-				activeShifterDistance = getInternalShifterStrength(owner.getNearestShifter(dir), dir);
-				return;
-			} else if (directionList.contains(dir) && firstOutput == null) {
-				firstOutput = dir;
-			}
-		}
-
-		directionList.removeAll(pressureList);
-		directionList.remove(input);
-
-		if (directionList.size() > 0) {
-			EnumFacing dir;
-			int i = 0;
-
-			// Step 3b: Pick the first "unforced" direction to scan.
-			// A direction opposite to input (aka. "straight line")
-			// takes priority.
-			if (directionList.contains(input.getOpposite())) {
-				dir = input.getOpposite();
-				directionList.remove(input.getOpposite());
-			} else if (directionList.size() > 1) {
-				Collections.shuffle(directionList);
-				dir = directionList.get(0);
-				i = 1;
-			} else if (directionList.size() == 1) {
-				this.output = directionList.get(0);
-				return;
-			} else {
-				this.output = null;
-				return;
-			}
-
-			if (firstOutput == null) {
-				firstOutput = dir;
-			}
-
-			while (!canMoveDirection(dir, true) && i < directionList.size()) {
-				dir = directionList.get(i);
-				i++;
-			}
-
-			// Step 3c: If a valid, free direction has been found, use that.
-			// Otherwise, set it to the first output direction selected to
-			// prioritize that, for some reason.
-			if (canMoveDirection(dir, true)) {
-				this.output = dir;
-			} else {
-				this.output = firstOutput;
-			}
-		} else {
-			this.output = firstOutput;
-		}
+		this.output = dir != null ? dir.dir : null;
 	}
 
 	private void onReachedCenter() {
@@ -455,6 +419,7 @@ public class PipeItem {
 
 		owner.updateObservers(stack);
 		calculateOutputDirection();
+		updateRenderDirection();
 		updateStuckFlag();
 		sendPacket(false);
 	}
@@ -532,9 +497,7 @@ public class PipeItem {
 		this.stuck = false;
 		this.progress = 0;
 
-		if (owner.getWorld().isRemote) {
-
-		}
+		updateRenderDirection();
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {
@@ -549,6 +512,10 @@ public class PipeItem {
 		if (nbt.hasKey("activePD")) {
 			activeShifterDistance = nbt.getInteger("activePD");
 		}
+		if (nbt.hasKey("rendir")) {
+			renderDirection = SpaceUtils.getFacing(nbt.getByte("rendir"));
+		}
+		updateRenderDirection();
 	}
 
 	public void writeToNBT(NBTTagCompound nbt) {
@@ -556,6 +523,7 @@ public class PipeItem {
 		nbt.setShort("p", (short) progress);
 		nbt.setByte("in", (byte) SpaceUtils.ordinal(input));
 		nbt.setByte("out", (byte) SpaceUtils.ordinal(output));
+		nbt.setByte("rendir", (byte) SpaceUtils.ordinal(renderDirection));
 		nbt.setBoolean("reachedCenter", reachedCenter);
 		if (stuck) {
 			nbt.setBoolean("stuck", stuck);

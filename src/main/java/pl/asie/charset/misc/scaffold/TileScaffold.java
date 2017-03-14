@@ -13,6 +13,10 @@ public class TileScaffold extends TileBase {
 	public static final UnlistedPropertyGeneric<ScaffoldCacheInfo> PROPERTY = new UnlistedPropertyGeneric<>("tile", ScaffoldCacheInfo.class);
 	private ItemMaterial plank;
 
+	public TileScaffold() {
+		plank = getPlankFromNBT(null);
+	}
+
 	public ItemMaterial getPlank() {
 		return plank;
 	}

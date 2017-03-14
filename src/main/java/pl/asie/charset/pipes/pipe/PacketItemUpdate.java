@@ -65,7 +65,7 @@ public class PacketItemUpdate extends PacketTile {
 	public void writeItemData(ByteBuf buf) {
 		buf.writeShort(item.id);
 		buf.writeByte(SpaceUtils.ordinal(item.input) | (SpaceUtils.ordinal(item.output) << 3));
-		buf.writeByte((item.reachedCenter ? 0x01 : 0) | (item.isStuck(null) ? 0x02 : 0) | (syncStack ? 0x04 : 0));
+		buf.writeByte((item.reachedCenter ? 0x01 : 0) | (item.isStuck(null) ? 0x02 : 0) | (syncStack ? 0x04 : 0) | (SpaceUtils.ordinal(item.renderDirection) << 4));
 		buf.writeByte(item.progress);
 
 		if (syncStack) {
@@ -111,6 +111,7 @@ public class PacketItemUpdate extends PacketTile {
 
 		item.input = SpaceUtils.getFacing(dirs & 7);
 		item.output = SpaceUtils.getFacing((dirs >> 3) & 7);
+		item.renderDirection = SpaceUtils.getFacing((flags >> 4) & 7);
 		item.reachedCenter = (flags & 0x01) != 0;
 		item.blocksSinceSync = 0;
 		if (addWhenDone) {

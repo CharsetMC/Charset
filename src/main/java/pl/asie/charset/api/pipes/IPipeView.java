@@ -17,6 +17,7 @@
 package pl.asie.charset.api.pipes;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 
 import java.util.Collection;
 
@@ -24,7 +25,7 @@ import java.util.Collection;
  * This interface is used for viewing items travelling through a pipe.
  * Note that the pipe can decide the contents at its own discretion and
  * that it is not necessarily exhaustive - the idea is to let other mods
- * react - and only react - to the act of items travelling inside a pipe.
+ * react - and only react - to the action of items travelling inside a pipe.
  */
 public interface IPipeView {
 	/**

@@ -52,7 +52,6 @@ public class ItemWrench extends Item {
         return false;
     }
 
-    // TODO 1.11
     @net.minecraftforge.fml.common.Optional.Method(modid = "mcmultipart")
     public EnumActionResult tryRotateMultipart(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing targetFacing) {
         Optional<IMultipartContainer> uio = MultipartHelper.getContainer(worldIn, pos);

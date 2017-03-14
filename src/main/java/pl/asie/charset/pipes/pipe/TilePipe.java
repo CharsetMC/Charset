@@ -85,6 +85,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     }
 
     public TilePipe() {
+        material = getMaterialFromNBT(null);
         for (EnumFacing facing : EnumFacing.VALUES)
             insertionHandlers[facing.ordinal()] = new InsertionHandler(facing);
     }
@@ -156,7 +157,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             fluid.readFromNBT(tag);
         }
 
-        material = ItemMaterialRegistry.INSTANCE.getMaterial(nbt, "material", "stone", new ItemStack(Blocks.STONE));
+        material = getMaterialFromNBT(nbt);
         connectionCache = nbt.getByte("cc");
 
         if (!isClient) {
@@ -169,9 +170,13 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
     }
 
+    protected ItemMaterial getMaterialFromNBT(NBTTagCompound compound) {
+        return ItemMaterialRegistry.INSTANCE.getMaterial(compound, "material", "stone", new ItemStack(Blocks.STONE));
+    }
+
     @Override
     public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
-        material = ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material", "stone", new ItemStack(Blocks.STONE));
+        material = getMaterialFromNBT(stack.getTagCompound());
         color = stack.hasTagCompound() ? stack.getTagCompound().getByte("color") : 0;
         markBlockForUpdate();
     }
@@ -255,7 +260,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     @Override
     public void validate() {
         super.validate();
-        neighborsUpdate = 0x3F;
+        scheduleFullNeighborUpdate();
         scheduleRenderUpdate();
     }
 
@@ -301,7 +306,12 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             shifterDistance[i] = 0;
         }
 
-        return oldDistance != shifterDistance[i];
+        if (oldDistance != shifterDistance[i]) {
+            logic.updateDirections();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void propagateShifterChange(EnumFacing dir, IShifter shifter, int shifterDist) {
@@ -344,10 +354,12 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             }
         }
 
-        // TODO
-        // fluid.markFlowPath(null, false);
+        if (!getWorld().isRemote) {
+            logic.updateDirections();
+        }
 
         if (sendPacket && connectionCache != oc) {
+            world.notifyNeighborsRespectDebug(pos, getBlockType(), false);
             markBlockForUpdate();
         }
     }
@@ -603,13 +615,29 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
         stringList.add(info.toString());
 
+        int directions = 0;
+        int pDirections = 0;
+        for (PipeLogic.Direction direction : getLogic().getPressuredDirections()) {
+            pDirections |= 1 << direction.dir.ordinal();
+        }
+        for (PipeLogic.Direction direction : getLogic().getNonPressuredDirections()) {
+            directions |= 1 << direction.dir.ordinal();
+        }
+
         for (int i = 0; i <= 6; i++) {
             EnumFacing facing = SpaceUtils.getFacing(i);
             StringBuilder sideInfo = new StringBuilder();
 
             sideInfo.append(facing != null ? facing.name().charAt(0) : 'C');
             sideInfo.append(": ");
-            sideInfo.append(i < 6 && connects(facing) ? '+' : '-');
+            if (i < 6) {
+                sideInfo.append(connects(facing) ? '+' : '-');
+                sideInfo.append(
+                        (((pDirections) & (1 << facing.ordinal())) != 0) ? '>' :
+                                ((((directions) & (1 << facing.ordinal())) != 0) ? '+' : '-'));
+            } else {
+                sideInfo.append("--");
+            }
             sideInfo.append(" f" + fluid.tanks[i].type.name().charAt(0) + "(" + fluid.tanks[i].amount + ")");
             if (i < 6) {
                 sideInfo.append(" s" + shifterDistance[i]);
