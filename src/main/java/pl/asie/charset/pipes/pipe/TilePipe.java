@@ -150,17 +150,18 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
     @Override
     public void readNBTData(NBTTagCompound nbt, boolean isClient) {
+        material = getMaterialFromNBT(nbt);
+        color = nbt.getByte("color");
+        connectionCache = nbt.getByte("cc");
+
+        logic.deserializeNBT(nbt.getCompoundTag("logic"));
+
         if (!isClient) {
             readItems(nbt);
 
             NBTTagCompound tag = nbt.getCompoundTag("fluid");
             fluid.readFromNBT(tag);
-        }
 
-        material = getMaterialFromNBT(nbt);
-        connectionCache = nbt.getByte("cc");
-
-        if (!isClient) {
             shifterDistance = nbt.getIntArray("shifterDist");
             if (shifterDistance == null || shifterDistance.length != 6) {
                 shifterDistance = new int[6];
@@ -234,16 +235,19 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             if (tag.getSize() > 0) {
                 nbt.setTag("fluid", tag);
             }
+
+            if (shifterDistance != null) {
+                nbt.setIntArray("shifterDist", shifterDistance);
+            }
         }
+
+        nbt.setTag("logic", logic.serializeNBT());
 
         if (material != null) {
             material.writeToNBT(nbt, "material");
         }
         nbt.setByte("color", color);
         nbt.setByte("cc", connectionCache);
-        if (!isClient && shifterDistance != null) {
-            nbt.setIntArray("shifterDist", shifterDistance);
-        }
         return nbt;
     }
 
@@ -547,11 +551,11 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     protected void onSyncRequest(EntityPlayer player) {
         synchronized (itemSet) {
             for (PipeItem p : itemSet) {
-                CharsetPipes.instance.packet.sendTo(p.getSyncPacket(true), player);
+                CharsetPipes.packet.sendTo(p.getSyncPacket(true), player);
             }
         }
 
-        CharsetPipes.instance.packet.sendTo(fluid.getSyncPacket(true), player);
+        CharsetPipes.packet.sendTo(fluid.getSyncPacket(true), player);
     }
 
     @Override
@@ -618,10 +622,14 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         int directions = 0;
         int pDirections = 0;
         for (PipeLogic.Direction direction : getLogic().getPressuredDirections()) {
-            pDirections |= 1 << direction.dir.ordinal();
+            if (direction != null) {
+                pDirections |= 1 << direction.dir.ordinal();
+            }
         }
         for (PipeLogic.Direction direction : getLogic().getNonPressuredDirections()) {
-            directions |= 1 << direction.dir.ordinal();
+            if (direction != null) {
+                directions |= 1 << direction.dir.ordinal();
+            }
         }
 
         for (int i = 0; i <= 6; i++) {

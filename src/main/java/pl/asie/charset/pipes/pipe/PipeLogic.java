@@ -1,8 +1,10 @@
 package pl.asie.charset.pipes.pipe;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import pl.asie.charset.api.pipes.IShifter;
@@ -13,7 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class PipeLogic {
+public class PipeLogic implements INBTSerializable<NBTTagCompound> {
     public enum DirectionType {
         ITEM_TARGET(true, false),
         FLUID_TARGET(false, true),
@@ -27,7 +29,7 @@ public class PipeLogic {
         }
     }
 
-    public static class Direction {
+    public static class Direction implements Comparable<Direction> {
         public final DirectionType type;
         public final EnumFacing dir;
         public final IShifter shifter;
@@ -53,22 +55,42 @@ public class PipeLogic {
         public boolean test(FluidStack stack) {
             return type.acceptsFluids && (shifter != null && (canShift() && shifter.matches(stack)));
         }
+
+        @Override
+        public int compareTo(Direction direction) {
+            return dir.compareTo(direction.dir);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || !(o instanceof Direction)) {
+                return false;
+            }
+
+            Direction od = (Direction) o;
+            return this.dir == od.dir && this.type == od.type && Objects.equals(this.shifter, od.shifter);
+        }
+
+        @Override
+        public int hashCode() {
+            return (this.type.ordinal() * 3 + this.dir.ordinal()) * 7 + (this.shifter != null ? this.shifter.hashCode() : 0);
+        }
     }
 
     private final TilePipe owner;
-    private byte pressuredDirMask;
-    private List<Direction> pressureDirections = new ArrayList<>(6);
-    private List<Direction> nonPressureDirections = new ArrayList<>(6);
+    private Direction[] pressureDirections = new Direction[6];
+    private Direction[] nonPressureDirections = new Direction[6];
+    private EnumFacing[] roundRobinPosition = new EnumFacing[6];
 
     public PipeLogic(TilePipe owner) {
         this.owner = owner;
     }
 
-    public Collection<Direction> getPressuredDirections() {
+    public Direction[] getPressuredDirections() {
         return pressureDirections;
     }
 
-    public Collection<Direction> getNonPressuredDirections() {
+    public Direction[] getNonPressuredDirections() {
         return nonPressureDirections;
     }
 
@@ -96,8 +118,6 @@ public class PipeLogic {
     public void updateDirections() {
         System.out.println("Update " + owner.getPos());
 
-        pressuredDirMask = 0;
-
         Set<EnumFacing> directionSet = EnumSet.noneOf(EnumFacing.class);
         List<IShifter> shifterList = new ArrayList<>(6);
 
@@ -111,37 +131,68 @@ public class PipeLogic {
             IShifter p = owner.getNearestShifter(direction);
 
             if (p != null && p.getDirection() == direction) {
-                pressuredDirMask |= (1 << direction.ordinal());
                 shifterList.add(p);
             }
         }
 
-        // Step 2: Sort the shifter list.
-        Collections.sort(shifterList, Comparator.comparingInt(o -> getInternalShifterStrength(o, o.getDirection())));
+        for (int i = 0; i < 6; i++) {
+            pressureDirections[i] = null;
+            nonPressureDirections[i] = null;
+        }
 
-        pressureDirections.clear();
         for (IShifter shifter : shifterList) {
             DirectionType type = calcDirectionType(shifter.getDirection());
             if (type != null) {
                 //noinspection ConstantConditions
-                pressureDirections.add(new Direction(type, shifter.getDirection(), shifter));
+                pressureDirections[shifter.getDirection().ordinal()] = new Direction(type, shifter.getDirection(), shifter);
             }
         }
 
-        nonPressureDirections.clear();
         for (EnumFacing direction : directionSet) {
             DirectionType type = calcDirectionType(direction);
             if (type != null) {
-                nonPressureDirections.add(new Direction(type, direction, null));
+                nonPressureDirections[direction.ordinal()] = new Direction(type, direction, null);
             }
         }
     }
 
     public boolean hasPressure(EnumFacing direction) {
-        return (pressuredDirMask & (1 << direction.ordinal())) != 0;
+        return pressureDirections[direction.ordinal()] != null;
     }
 
-    public boolean hasPressure() {
-        return pressuredDirMask != 0;
+    @Override
+    public NBTTagCompound serializeNBT() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        int rrp = 0;
+        for (int i = 0; i < 6; i++) {
+            if (roundRobinPosition[i] != null) {
+                rrp |= (roundRobinPosition[i].ordinal() << (i * 3));
+            }
+        }
+        nbt.setInteger("rrp", rrp);
+        return nbt;
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        for (int i = 0; i < 6; i++) {
+            roundRobinPosition[i] = EnumFacing.DOWN;
+        }
+
+        int rrp = nbt != null ? nbt.getInteger("rrp") : -1;
+        if (rrp >= 0) {
+            for (int i = 0; i < 6; i++) {
+                roundRobinPosition[i] = EnumFacing.getFront((rrp >> (i * 3) & 7));
+            }
+        }
+    }
+
+    public EnumFacing getRoundRobinPosition(EnumFacing input) {
+        EnumFacing facing = this.roundRobinPosition[input.ordinal()];
+        return facing == null ? EnumFacing.DOWN : facing;
+    }
+
+    public void setRoundRobinPosition(EnumFacing input, EnumFacing roundRobinPosition) {
+        this.roundRobinPosition[input.ordinal()] = roundRobinPosition;
     }
 }

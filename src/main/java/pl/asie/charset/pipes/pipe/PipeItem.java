@@ -32,10 +32,7 @@ import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class PipeItem {
 	public static final int MAX_PROGRESS = 128;
@@ -367,46 +364,78 @@ public class PipeItem {
 			return;
 		}
 
-		PipeLogic.Direction dir = null;
+		PipeLogic.Direction targetDir = null;
+		activeShifterDistance = Integer.MAX_VALUE;
 
-		for (PipeLogic.Direction iDir : owner.getLogic().getPressuredDirections()) {
-			if (!iDir.test(stack))
+		PipeLogic.Direction[] directions = new PipeLogic.Direction[6];
+		boolean noDirs = true;
+
+		PipeLogic.Direction[] pDirections = owner.getLogic().getPressuredDirections();
+
+		for (int i = 0; i < 6; i++) {
+			PipeLogic.Direction dir = pDirections[i];
+			if (dir == null || !dir.test(stack))
 				continue;
 
-			dir = iDir;
 			if (canMoveDirection(dir.dir, true)) {
 				// Pressurizer prioritizing valid direction, move.
-				this.output = dir.dir;
-				activeShifterDistance = getInternalShifterStrength(dir);
-				return;
 			} else if (owner.getLogic().hasPressure(dir.dir.getOpposite())
 					&& owner.getShifterStrength(dir.dir) == owner.getShifterStrength(dir.dir.getOpposite())) {
 				// Pressurizers freezing an item in place.
-				this.output = dir.dir;
-				activeShifterDistance = getInternalShifterStrength(dir);
-				return;
+			} else {
+				continue;
+			}
+
+			int newDistance = getInternalShifterStrength(dir);
+			if (activeShifterDistance < newDistance) {
+				continue;
+			} else if (activeShifterDistance > newDistance) {
+				activeShifterDistance = newDistance;
+				if (!noDirs) {
+					for (int j = 0; j < i; j++) {
+						directions[j] = null;
+					}
+				}
+			}
+
+			directions[i] = dir;
+			noDirs = false;
+		}
+
+		int offset = getOwner().getLogic().getRoundRobinPosition(input).ordinal() + 1;
+
+		if (!noDirs) {
+			for (int i = 0; i < 6; i++) {
+				PipeLogic.Direction dir = directions[(i + offset) % 6];
+				if (dir == null || dir.dir == input) {
+					continue;
+				}
+
+				targetDir = dir;
+				if (canMoveDirection(dir.dir, true)) {
+					this.output = dir.dir;
+					return;
+				}
 			}
 		}
 
 		activeShifterDistance = 0;
+		directions = owner.getLogic().getNonPressuredDirections();
 
-		List<PipeLogic.Direction> directionList = Lists.newArrayList(owner.getLogic().getNonPressuredDirections());
-		Collections.shuffle(directionList);
-
-		for (int i = directionList.size() - 1; i >= 0; i--) {
-			PipeLogic.Direction iDir = directionList.get(i);
-			if (iDir.dir == input || !iDir.test(stack)) {
+		for (int i = 0; i < 6; i++) {
+			PipeLogic.Direction dir = directions[(i + offset) % 6];
+			if (dir == null || dir.dir == input || !dir.test(stack)) {
 				continue;
 			}
 
-			dir = iDir;
-			if (canMoveDirection(iDir.dir, true)) {
-				this.output = iDir.dir;
+			targetDir = dir;
+			if (canMoveDirection(dir.dir, true)) {
+				this.output = dir.dir;
 				return;
 			}
 		}
 
-		this.output = dir != null ? dir.dir : null;
+		this.output = targetDir != null ? targetDir.dir : null;
 	}
 
 	private void onReachedCenter() {
@@ -419,6 +448,9 @@ public class PipeItem {
 
 		owner.updateObservers(stack);
 		calculateOutputDirection();
+		if (output != null) {
+			getOwner().getLogic().setRoundRobinPosition(input, output);
+		}
 		updateRenderDirection();
 		updateStuckFlag();
 		sendPacket(false);

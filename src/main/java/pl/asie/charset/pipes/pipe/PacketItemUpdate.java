@@ -126,7 +126,7 @@ public class PacketItemUpdate extends PacketTile {
 			item.stack = stack;
 		}
 
-		itemIdCache.put(id, new WeakReference<PipeItem>(item));
+		itemIdCache.put(id, new WeakReference<>(item));
 
 		if (addWhenDone) {
 			pipe.addItemClientSide(item);
