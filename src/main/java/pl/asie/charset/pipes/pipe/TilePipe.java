@@ -631,10 +631,14 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             sideInfo.append(facing != null ? facing.name().charAt(0) : 'C');
             sideInfo.append(": ");
             if (i < 6) {
+                boolean isPressured = (((pDirections) & (1 << facing.ordinal())) != 0);
+                boolean isNotPressured = (((directions) & (1 << facing.ordinal())) != 0);
+
                 sideInfo.append(connects(facing) ? '+' : '-');
-                sideInfo.append(
-                        (((pDirections) & (1 << facing.ordinal())) != 0) ? '>' :
-                                ((((directions) & (1 << facing.ordinal())) != 0) ? '+' : '-'));
+                sideInfo.append(isPressured
+                        ? (isNotPressured ? '%' : '>')
+                        : (isNotPressured ? '+' : '-')
+                );
             } else {
                 sideInfo.append("--");
             }

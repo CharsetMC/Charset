@@ -126,7 +126,6 @@ public class PipeLogic {
                 //noinspection ConstantConditions
                 pressureDirections.add(new Direction(type, shifter.getDirection(), shifter));
             }
-            directionSet.remove(shifter.getDirection());
         }
 
         nonPressureDirections.clear();
