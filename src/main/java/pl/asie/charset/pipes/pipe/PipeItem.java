@@ -22,6 +22,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.pipes.IShifter;
 import pl.asie.charset.lib.capability.Capabilities;
@@ -36,8 +37,9 @@ import java.util.*;
 
 public class PipeItem {
 	public static final int MAX_PROGRESS = 128;
+	public static final int TICKS_PER_BLOCK = 16;
 	public static final int CENTER_PROGRESS = MAX_PROGRESS / 2;
-	public static final int SPEED = MAX_PROGRESS / 16;
+	public static final int SPEED = MAX_PROGRESS / TICKS_PER_BLOCK;
 	private static short nextId;
 
 	public final short id;
@@ -51,6 +53,8 @@ public class PipeItem {
 
 	protected EnumFacing transformedFacing;
 	protected Object transformedModel;
+
+	private long lastRecalculationTime = -1;
 
 	private int activeShifterDistance;
 	private TilePipe owner;
@@ -160,43 +164,16 @@ public class PipeItem {
 
 	private void updateStuckFlag() {
 		if (progress <= CENTER_PROGRESS) {
-			boolean needsRecalculation = false;
-
 			if (!isValidDirection(output)) {
-				needsRecalculation = true;
-			} else if (stuck && isCentered()) {
-				// Detect changes in shifter air stream.
-				boolean foundShifter = false;
-				int minimumShifterDistance = Integer.MAX_VALUE;
-
-				// Find the closest shifter affecting the item.
-				for (EnumFacing dir : EnumFacing.VALUES) {
-					IShifter p = owner.getNearestShifter(dir);
-					int ps = getInternalShifterStrength(dir, p);
-					if (ps > 0 && ps < minimumShifterDistance
-							&& isShifterPushing(p, output)) {
-						minimumShifterDistance = ps;
-						foundShifter = true;
-					}
-				}
-
-				if (
-						(!foundShifter && activeShifterDistance > 0)
-								|| (foundShifter && activeShifterDistance != minimumShifterDistance)
-								|| (foundShifter && activeShifterDistance != getInternalShifterStrength(output, owner.getNearestShifter(output)))
-						) {
-					TileEntity shifterTile = owner.getWorld().getTileEntity(owner.getPos().offset(output.getOpposite(), activeShifterDistance));
-
-					if (shifterTile == null
-							|| !shifterTile.hasCapability(CharsetPipes.CAP_SHIFTER, output)
-							|| !isShifterPushing(shifterTile.getCapability(CharsetPipes.CAP_SHIFTER, output), output)) {
-						needsRecalculation = true;
-					}
-				}
-			}
-
-			if (needsRecalculation) {
 				calculateOutputDirection();
+			} else {
+				long time = getOwner().getWorld().getTotalWorldTime();
+				if (lastRecalculationTime == -1) {
+					lastRecalculationTime = time - (getOwner().getPos().hashCode() % TICKS_PER_BLOCK);
+				} else if ((lastRecalculationTime + (TICKS_PER_BLOCK)) <= time) {
+					calculateOutputDirection();
+					lastRecalculationTime = time - (getOwner().getPos().hashCode() % TICKS_PER_BLOCK);
+				}
 			}
 		} else {
 			if (!isValidDirection(output)) {
