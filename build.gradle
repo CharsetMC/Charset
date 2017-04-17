@@ -23,12 +23,12 @@ group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.11.2-13.20.0.2232"
+	version = "1.11.2-13.20.0.2282"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20170218"
+	mappings = "snapshot_20170417"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version

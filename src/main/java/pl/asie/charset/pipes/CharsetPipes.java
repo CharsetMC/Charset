@@ -115,12 +115,6 @@ public class CharsetPipes {
 				"c^c",
 				"crc",
 				'c', "cobblestone", 'P', Blocks.PISTON, 'r', "dustRedstone", '^', Items.ARROW));
-
-		if (!Loader.isModLoaded("BuildCraft|Transport")) {
-			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(blockPipe, 8),
-					"mgm",
-					'g', "blockGlassColorless", 'm', "obsidian"));
-		}
 	}
 
 	private void addPipeRecipe(ItemMaterial material, EnumDyeColor color, String glassKey) {
