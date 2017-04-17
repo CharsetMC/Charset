@@ -47,6 +47,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.items.ItemMinecartCharset;
 import pl.asie.charset.lib.material.ColorLookupHandler;
@@ -56,6 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemMinecartDayBarrel extends ItemMinecartCharset {
+    @SideOnly(Side.CLIENT)
     public static class Color implements IItemColor {
         @Override
         public int getColorFromItemstack(ItemStack stack, int tintIndex) {

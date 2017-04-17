@@ -21,7 +21,7 @@ import java.util.Queue;
 		description = "Fixes player directional damage animation."
 )
 public class CharsetTweakFixPlayerDamageAnimation {
-	@CharsetModule.PacketRegistry
+	@CharsetModule.PacketRegistry("fixPlyrDmgAnim")
 	private PacketRegistry registry;
 	private final Queue<EntityLivingBase> players = new ArrayDeque<>();
 

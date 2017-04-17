@@ -17,8 +17,10 @@
 package pl.asie.charset.lib.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.network.INetHandler;
@@ -29,6 +31,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class UtilProxyClient extends UtilProxyCommon {
@@ -93,5 +96,19 @@ public class UtilProxyClient extends UtilProxyCommon {
 	@Override
 	public boolean isClient() {
 		return true;
+	}
+
+	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
+		if (entry instanceof Block) {
+			Block block = (Block) entry;
+			if (block.getCreativeTabToDisplayOn() == null) {
+				block.setCreativeTab(tab);
+			}
+		} else if (entry instanceof Item) {
+			Item item = (Item) entry;
+			if (item.getCreativeTab() == null) {
+				item.setCreativeTab(tab);
+			}
+		}
 	}
 }

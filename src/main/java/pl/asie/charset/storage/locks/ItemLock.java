@@ -32,6 +32,7 @@ import pl.asie.charset.ModCharset;
 import java.util.List;
 
 public class ItemLock extends Item {
+    @SideOnly(Side.CLIENT)
     public static class Color implements IItemColor {
         @Override
         public int getColorFromItemstack(ItemStack stack, int tintIndex) {

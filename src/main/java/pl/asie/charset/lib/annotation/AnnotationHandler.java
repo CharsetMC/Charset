@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.*;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
@@ -110,6 +111,8 @@ public class AnnotationHandler {
 			Boolean lazy = (Boolean) info.getOrDefault("isLazy", false);
 			Boolean compat = (Boolean) info.getOrDefault("isModCompat", false);
 			Boolean devOnly = (Boolean) info.getOrDefault("isDevOnly", false);
+			Boolean clientOnly = (Boolean) info.getOrDefault("isClientOnly", false);
+			Boolean serverOnly = (Boolean) info.getOrDefault("isServerOnly", false);
 			if (devOnly && !ModCharset.INDEV) {
 				continue;
 			}
@@ -125,6 +128,14 @@ public class AnnotationHandler {
 				);
 				if (desc != null && desc.length() > 0) prop.setComment(desc);
 				enabled = prop.getBoolean();
+			}
+
+			if (clientOnly && !FMLCommonHandler.instance().getSide().isClient()) {
+				continue;
+			}
+
+			if (serverOnly && !FMLCommonHandler.instance().getSide().isServer()) {
+				continue;
 			}
 
 			if (compat) {
@@ -176,6 +187,9 @@ public class AnnotationHandler {
 			}
 
 			if (canLoad) {
+				if (ModCharset.INDEV) {
+					ModCharset.logger.debug("Instantiating module " + name);
+				}
 				ASMDataTable.ASMData data = moduleData.get(name);
 				try {
 					Object o = getClass(data).newInstance();
@@ -210,8 +224,10 @@ public class AnnotationHandler {
 			String methodName = data.getObjectName().substring(0, data.getObjectName().indexOf('('));
 			String methodDesc = data.getObjectName().substring(methodName.length());
 			MethodType methodType = MethodType.fromMethodDescriptorString(methodDesc, classLoader);
-			if (methodType.parameterCount() != 1) {
-				throw new RuntimeException("Invalid parameter count " + methodType.parameterCount() + " for EventHandler in " + instance.getClass() + "!");
+			if (ModCharset.INDEV) {
+				if (methodType.parameterCount() != 1) {
+					throw new RuntimeException("Invalid parameter count " + methodType.parameterCount() + " for EventHandler in " + instance.getClass() + "!");
+				}
 			}
 
 			try {
@@ -219,6 +235,8 @@ public class AnnotationHandler {
 				List<Pair<String, MethodHandle>> list = loaderHandles.computeIfAbsent(methodType.parameterType(0), k -> new ArrayList<>());
 
 				list.add(Pair.of(loadedModules.inverse().get(instance), methodHandle));
+			} catch (NoSuchMethodException e) {
+				// method has been annotated away, ignore
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -242,7 +260,8 @@ public class AnnotationHandler {
 			String id = (String) data.getAnnotationInfo().get("value");
 			if (id == null) id = loadedModules.inverse().get(instance);
 			try {
-				getField(data).set(instance, new PacketRegistry("charset:" + id));
+				String channelName = "chrs:" + id.substring(id.lastIndexOf('.') + 1);
+				getField(data).set(instance, new PacketRegistry(channelName));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

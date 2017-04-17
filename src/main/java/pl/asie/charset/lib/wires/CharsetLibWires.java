@@ -54,7 +54,7 @@ public class CharsetLibWires {
 	public static ItemWire itemWire;
 
 	@SideOnly(Side.CLIENT)
-	private RendererWire rendererWire = new RendererWire();
+	private RendererWire rendererWire;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -65,6 +65,12 @@ public class CharsetLibWires {
 		for (int i = 0; i < WireManager.MAX_ID * 2; i++) {
 			RegistryUtils.registerModel(itemWire, i, "charset:wire");
 		}
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void preInitClient(FMLPreInitializationEvent event) {
+		rendererWire = new RendererWire();
 	}
 
 	@SubscribeEvent

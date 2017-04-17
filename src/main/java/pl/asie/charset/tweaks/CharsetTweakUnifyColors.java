@@ -28,7 +28,8 @@ import java.util.Map;
 
 @CharsetModule(
 		name = "tweak.unifyColors",
-		description = "Unifies various colored blocks and items' colors. Works with resource packs!"
+		description = "Unifies various colored blocks and items' colors. Works with resource packs!",
+		isClientOnly = true
 )
 public class CharsetTweakUnifyColors {
 	private final Gson gson = new Gson();
