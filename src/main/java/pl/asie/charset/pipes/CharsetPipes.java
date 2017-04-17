@@ -44,12 +44,7 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.pipes.pipe.BlockPipe;
-import pl.asie.charset.pipes.pipe.ItemPipe;
-import pl.asie.charset.pipes.pipe.PacketFluidUpdate;
-import pl.asie.charset.pipes.pipe.PacketItemUpdate;
-import pl.asie.charset.pipes.pipe.PacketPipeSyncRequest;
-import pl.asie.charset.pipes.pipe.TilePipe;
+import pl.asie.charset.pipes.pipe.*;
 import pl.asie.charset.pipes.shifter.BlockShifter;
 import pl.asie.charset.pipes.shifter.ShifterImpl;
 import pl.asie.charset.pipes.shifter.ShifterStorage;
@@ -106,9 +101,11 @@ public class CharsetPipes {
 	public void init(FMLInitializationEvent event) {
 		proxy.registerRenderers();
 
-		packet.registerPacket(0x01, PacketItemUpdate.class);
+		packet.registerPacket(0x01, PacketPipeSyncExplosionTimer.class);
 		packet.registerPacket(0x02, PacketPipeSyncRequest.class);
-		packet.registerPacket(0x03, PacketFluidUpdate.class);
+
+		packet.registerPacket(0x11, PacketItemUpdate.class);
+		packet.registerPacket(0x12, PacketFluidUpdate.class);
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(shifterBlock),
 				"cPc",

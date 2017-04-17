@@ -33,6 +33,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.blocks.BlockBase;
+import pl.asie.charset.lib.blocks.TileBase;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.RotationUtils;
@@ -193,6 +194,20 @@ public class BlockPipe extends BlockBase implements ITileEntityProvider {
 	@Override
 	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
 		return layer == BlockRenderLayer.CUTOUT /* || layer == BlockRenderLayer.TRANSLUCENT */;
+	}
+
+	@Override
+	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
+		TilePipe pipe = PipeUtils.getPipe(te);
+
+		if (pipe != null) {
+			List<ItemStack> stacks = new ArrayList<ItemStack>();
+			stacks.add(pipe.getDroppedBlock());
+			stacks.addAll(pipe.getDrops());
+			return stacks;
+		}
+
+		return super.getDrops(world, pos, state, fortune);
 	}
 
 	@Nullable

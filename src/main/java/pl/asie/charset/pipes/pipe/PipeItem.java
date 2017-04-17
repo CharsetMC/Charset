@@ -177,13 +177,14 @@ public class PipeItem {
 			}
 		} else {
 			if (!isValidDirection(output)) {
-				output = null;
+				dropItem(false);
+				return;
 			}
 		}
 
 		if (output == null) {
-			// Never stuck when UNKNOWN, because the item will drop anyway.
-			stuck = false;
+			// Always stuck when UNKNOWN, because the item won't drop anyway. :)
+			stuck = true;
 		} else {
 			if (isCentered() && activeShifterDistance > 0
 					&& owner.getShifterStrength(output.getOpposite()) == owner.getShifterStrength(output)
@@ -384,7 +385,11 @@ public class PipeItem {
 		if (!noDirs) {
 			for (int i = 0; i < 6; i++) {
 				PipeLogic.Direction dir = directions[(i + offset) % 6];
-				if (dir == null || dir.dir == input) {
+				if (dir == null) {
+					continue;
+				}
+
+				if (dir.shifter != null && dir.shifter.getMode() == IShifter.Mode.Extract && dir.dir == input) {
 					continue;
 				}
 

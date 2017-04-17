@@ -1,6 +1,7 @@
 package pl.asie.charset.pipes.pipe;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Chars;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
 import net.minecraft.block.Block;
@@ -8,14 +9,18 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -30,10 +35,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
-import pl.asie.charset.lib.utils.ObserverHelper;
-import pl.asie.charset.lib.utils.OcclusionUtils;
-import pl.asie.charset.lib.utils.SpaceUtils;
-import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
+import pl.asie.charset.lib.utils.*;
 import pl.asie.charset.pipes.CharsetPipes;
 import pl.asie.charset.pipes.PipeUtils;
 
@@ -41,6 +43,9 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class TilePipe extends TileBase implements IConnectable, IPipeView, ITickable, IDebuggable {
+    public static final int EXPLOSION_TIME = 20 * 30;
+    public static final int EXPLOSION_ITEM_AMOUNT = (int) Math.round(PipeItem.TICKS_PER_BLOCK * 1.25);
+
     public class InsertionHandler implements IItemInsertionHandler {
         private final EnumFacing facing;
 
@@ -68,6 +73,7 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
     final PipeFluidContainer fluid = new PipeFluidContainer(this);
     boolean renderFast = false;
+    int explosionTimer;
 
     protected int[] shifterDistance = new int[6];
 
@@ -154,9 +160,16 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         color = nbt.getByte("color");
         connectionCache = nbt.getByte("cc");
 
+        if (nbt.hasKey("expT")) {
+            explosionTimer = nbt.getShort("expT");
+        } else {
+            explosionTimer = 0;
+        }
+
         logic.deserializeNBT(nbt.getCompoundTag("logic"));
 
         if (!isClient) {
+
             readItems(nbt);
 
             NBTTagCompound tag = nbt.getCompoundTag("fluid");
@@ -241,6 +254,10 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
             }
         }
 
+        if (explosionTimer > 0) {
+            nbt.setShort("expT", (short) explosionTimer);
+        }
+
         nbt.setTag("logic", logic.serializeNBT());
 
         if (material != null) {
@@ -284,6 +301,40 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
         }
 
         fluid.update();
+
+        if (!getWorld().isRemote) {
+            if (itemSet.size() >= EXPLOSION_ITEM_AMOUNT) {
+                if (explosionTimer == 0) {
+                    CharsetPipes.packet.sendToWatching(new PacketPipeSyncExplosionTimer(this, true), this);
+                    explosionTimer = CharsetPipes.rand.nextInt(16);
+                } else {
+                    explosionTimer++;
+                    if (explosionTimer >= EXPLOSION_TIME) {
+                        Block.spawnAsEntity(world, pos, getDroppedBlock());
+                        for (ItemStack stack : getDrops()) {
+                            Block.spawnAsEntity(world, pos, stack);
+                        }
+                        world.setBlockToAir(pos);
+                        this.world.playSound(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F) * 0.7F);
+                        this.world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 1.0D, 0.0D, 0.0D, new int[0]);
+                    }
+                }
+            } else {
+                if (explosionTimer > 0) {
+                    CharsetPipes.packet.sendToWatching(new PacketPipeSyncExplosionTimer(this, false), this);
+                }
+                explosionTimer = 0;
+            }
+        } else {
+            if (explosionTimer > 0) {
+                for (int i = 0; i < Math.ceil(explosionTimer / 100.0); i++) {
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+                            pos.getX() + 0.25D + CharsetPipes.rand.nextDouble() * 0.5D,
+                            pos.getY() + 0.25D + CharsetPipes.rand.nextDouble() * 0.5D,
+                            pos.getZ() + 0.25D + CharsetPipes.rand.nextDouble() * 0.5D, CharsetPipes.rand.nextDouble() * 0.002D - 0.001D, 0.01D + (explosionTimer / 10000.0) + CharsetPipes.rand.nextDouble() * 0.03D, CharsetPipes.rand.nextDouble() * 0.002D - 0.001D, new int[0]);
+                }
+            }
+        }
 
         synchronized (itemSet) {
             Iterator<PipeItem> itemIterator = itemSet.iterator();
@@ -486,10 +537,8 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
     protected boolean injectItemInternal(PipeItem item, EnumFacing dir, boolean simulate) {
         if (item.isValid()) {
             synchronized (itemSet) {
-                for (PipeItem p : itemSet) {
-                    if (p.isStuck(dir)) {
-                        return false;
-                    }
+                if (isLikelyToFailInsertingItem(dir)) {
+                    return false;
                 }
 
                 if (!simulate) {
@@ -657,5 +706,19 @@ public class TilePipe extends TileBase implements IConnectable, IPipeView, ITick
 
             stringList.add(sideInfo.toString());
         }
+    }
+
+    public List<ItemStack> getDrops() {
+        List<ItemStack> list = new ArrayList<>();
+
+        synchronized (itemSet) {
+            for (PipeItem item : itemSet) {
+                if (!item.getStack().isEmpty()) {
+                    list.add(item.getStack());
+                }
+            }
+        }
+
+        return list;
     }
 }
