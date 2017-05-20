@@ -93,7 +93,7 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
 
     @Override
     public List<AxisAlignedBB> getOcclusionBoxes(IPartInfo part) {
-        Wire wire = WireUtils.getAnyWire(part.getWorld(), part.getPos());
+        Wire wire = WireUtils.getAnyWire(part.getPartWorld(), part.getPartPos());
         if (wire != null) {
             return Collections.singletonList(wire.getFactory().getSelectionBox(wire.getLocation(), 0));
         } else {
@@ -103,7 +103,7 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
 
     @Override
     public RayTraceResult collisionRayTrace(IPartInfo part, Vec3d start, Vec3d end) {
-        RayTraceResult result = part.getState().collisionRayTrace(part.getWorld(), part.getPos(), start, end);
+        RayTraceResult result = part.getState().collisionRayTrace(part.getPartWorld(), part.getPartPos(), start, end);
         if (result != null) result.hitInfo = part;
         return result;
     }
@@ -130,7 +130,7 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
     @Override
     public void onPartChanged(IPartInfo part, IPartInfo otherPart) {
         if (part != otherPart) {
-            Wire wire = WireUtils.getAnyWire(part.getWorld(), part.getPos());
+            Wire wire = WireUtils.getAnyWire(part.getPartWorld(), part.getPartPos());
             if (wire != null) {
                 wire.onChanged(false);
             }

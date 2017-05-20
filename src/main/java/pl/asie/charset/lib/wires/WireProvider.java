@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.wires;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -111,7 +110,7 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     }
 
     @Override
-    public Class<? super WireProvider> getRegistryType() {
+    public Class<WireProvider> getRegistryType() {
         return WireProvider.class;
     }
 }

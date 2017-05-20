@@ -1,8 +1,6 @@
 * [all] [#130] Fix dedicated server crashes.
 * [all] A few minor bugfixes here and there.
+* [all] Updated mod dependencies.
 * [misc.scaffold] [#127] Fix rare scaffold render crash.
-* [pipes] Pipe logic rewrite!
-    * Pipes are now stone pipes, craftable out of any kind of stone detected by Charset.
-    * Pipes now select directions in a round-robin manner between otherwise equal directions.
-    * Slight improvements to pipe item rendering logic.
+* [pipes] Removed, I'm afraid. At least for the time being. Sorry.
 * [tweak.playerdamageanimation] New small bugfix tweak inspired by unascribed's work.

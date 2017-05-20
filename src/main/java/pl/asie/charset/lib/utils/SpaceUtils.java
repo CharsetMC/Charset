@@ -579,8 +579,8 @@ public final class SpaceUtils {
     }
 
     public static AxisAlignedBB getChunkBoundingBox(Chunk chunk) {
-        int minX = chunk.xPosition << 4;
-        int minZ = chunk.zPosition << 4;
+        int minX = chunk.x << 4;
+        int minZ = chunk.z << 4;
         return new AxisAlignedBB(minX, 0, minZ, minX + 16, 0xFF, minZ + 16);
     }
 }
