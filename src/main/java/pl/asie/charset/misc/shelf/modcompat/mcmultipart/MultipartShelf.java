@@ -14,7 +14,6 @@ import net.minecraft.world.World;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.misc.shelf.BlockShelf;
 import pl.asie.charset.misc.shelf.CharsetMiscShelf;
-import pl.asie.charset.pipes.CharsetPipes;
 
 public class MultipartShelf implements IMultipart {
     @Override

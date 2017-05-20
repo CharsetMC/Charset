@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.modcompat.jei;
 
-import com.google.common.collect.ImmutableSet;
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;
@@ -9,15 +8,12 @@ import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import mezz.jei.api.recipe.IStackHelper;
+import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.annotation.AnnotatedPluginHandler;
-import pl.asie.charset.lib.annotation.AnnotationHandler;
+import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Set;
 
 @JEIPlugin
 public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> implements IModPlugin {
@@ -49,7 +45,7 @@ public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> impleme
         GUIS = registry.getJeiHelpers().getGuiHelper();
         RECIPE_TRANSFER_HANDLERS = registry.getJeiHelpers().recipeTransferHandlerHelper();
 
-        registry.addRecipeHandlers(new JEIRecipeCharset.Handler());
+        registry.handleRecipes(RecipeCharset.class, new JEIRecipeCharset.Factory(), VanillaRecipeCategoryUid.CRAFTING);
 
         for (IModPlugin plugin : getPlugins()) {
             plugin.register(registry);

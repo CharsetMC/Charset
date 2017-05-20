@@ -71,7 +71,7 @@ public class CharsetTweakDoubleDoors {
 			try {
 				if (block != null && block instanceof BlockDoor) {
 					Class c = block.getClass();
-					Method m = ReflectionHelper.findMethod(c, block, new String[]{"onBlockActivated", "func_180639_a"},
+					Method m = ReflectionHelper.findMethod(c, "onBlockActivated", "func_180639_a",
 							World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
 							EnumHand.class, EnumFacing.class,
 							float.class, float.class, float.class);

@@ -22,7 +22,6 @@ import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.charset.lib.utils.ProxiedBlockAccess;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.pipes.pipe.SpecialRendererPipe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

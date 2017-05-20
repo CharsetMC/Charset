@@ -27,6 +27,9 @@ public class TileShelf extends TileBase {
 	private ItemMaterial plank;
 
 	public ItemMaterial getPlank() {
+		if (plank == null) {
+			plank = getPlankFromNBT(null);
+		}
 		return plank;
 	}
 

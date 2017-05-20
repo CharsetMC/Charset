@@ -1,10 +1,7 @@
 package pl.asie.charset.lib.modcompat.jei;
 
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.BlankRecipeWrapper;
-import mezz.jei.api.recipe.IRecipeHandler;
-import mezz.jei.api.recipe.IRecipeWrapper;
-import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
+import mezz.jei.api.recipe.*;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.recipe.IRecipeObject;
@@ -15,28 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapper {
-    public static class Handler implements IRecipeHandler<RecipeCharset> {
-        @Nonnull
-        @Override
-        public Class<RecipeCharset> getRecipeClass() {
-            return RecipeCharset.class;
-        }
-
-        @Nonnull
-        @Override
-        public String getRecipeCategoryUid(@Nonnull RecipeCharset recipe) {
-            return VanillaRecipeCategoryUid.CRAFTING;
-        }
-
+    public static class Factory implements IRecipeWrapperFactory<RecipeCharset> {
         @Nonnull
         @Override
         public IRecipeWrapper getRecipeWrapper(@Nonnull RecipeCharset recipe) {
             return create(recipe);
-        }
-
-        @Override
-        public boolean isRecipeValid(@Nonnull RecipeCharset recipe) {
-            return true;
         }
     }
 

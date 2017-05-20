@@ -75,8 +75,6 @@ import pl.asie.charset.lib.utils.ProxiedBlockAccess;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.utils.SpaceUtils;
-import pl.asie.charset.pipes.PipeUtils;
-import pl.asie.charset.pipes.pipe.TilePipe;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
