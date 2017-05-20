@@ -17,6 +17,7 @@
 package pl.asie.charset.lib.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -28,9 +29,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import pl.asie.charset.ModCharset;
 
-class UtilProxyCommon implements IThreadListener {
+public class UtilProxyCommon implements IThreadListener {
 	@SidedProxy(clientSide = "pl.asie.charset.lib.utils.UtilProxyClient", serverSide = "pl.asie.charset.lib.utils.UtilProxyCommon", modId = ModCharset.MODID)
 	public static UtilProxyCommon proxy;
 
@@ -74,5 +76,9 @@ class UtilProxyCommon implements IThreadListener {
 
 	public boolean isClient() {
 		return false;
+	}
+
+	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
+
 	}
 }

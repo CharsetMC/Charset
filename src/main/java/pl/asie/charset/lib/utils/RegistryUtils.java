@@ -62,18 +62,7 @@ public final class RegistryUtils {
 	public static void register(IForgeRegistryEntry entry, String name, CreativeTabs tab) {
 		entry.setRegistryName(new ResourceLocation(ModCharset.MODID, name));
 		GameRegistry.register(entry);
-
-		if (entry instanceof Block) {
-			Block block = (Block) entry;
-			if (block.getCreativeTabToDisplayOn() == null) {
-				block.setCreativeTab(tab);
-			}
-		} else if (entry instanceof Item) {
-			Item item = (Item) entry;
-			if (item.getCreativeTab() == null) {
-				item.setCreativeTab(tab);
-			}
-		}
+		UtilProxyCommon.proxy.setCreativeTabIfNotPresent(entry, tab);
 	}
 
 	public static void register(Block block, Item item, String name) {

@@ -38,6 +38,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.annotation.CharsetModule;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.ColorUtils;
@@ -74,7 +76,7 @@ public class CharsetTransportDyeableMinecarts {
 		}
 	}
 
-	@CharsetModule.PacketRegistry
+	@CharsetModule.PacketRegistry("dyeMinecarts")
 	public static PacketRegistry packet;
 
 	@CapabilityInject(MinecartDyeable.class)
@@ -92,6 +94,7 @@ public class CharsetTransportDyeableMinecarts {
 	}
 
 	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
 	public void overrideRenderers(FMLPostInitializationEvent event) {
 		Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap = Minecraft.getMinecraft().getRenderManager().entityRenderMap;
 

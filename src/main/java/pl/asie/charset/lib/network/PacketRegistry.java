@@ -32,16 +32,31 @@ import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
+import pl.asie.charset.ModCharset;
 
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.StringJoiner;
 
 public class PacketRegistry {
+	private static final HashSet<String> usedChannelNames = new HashSet<>();
+
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
 	private TIntObjectMap<Class<? extends Packet>> idPacketMap = new TIntObjectHashMap<Class<? extends Packet>>();
 	private TObjectIntMap<Class<? extends Packet>> packetIdMap = new TObjectIntHashMap<Class<? extends Packet>>();
 
 	public PacketRegistry(String channelName) {
+		if (channelName.length() > 20) {
+			String trunc = channelName.substring(0, 20);
+			ModCharset.logger.warn("Channel name too long: " + channelName + ", truncating to " + trunc);
+			channelName = trunc;
+		}
+		if (usedChannelNames.contains(channelName)) {
+			throw new RuntimeException("Channel name already used: " + channelName);
+		}
+
 		channels = NetworkRegistry.INSTANCE.newChannel(channelName, new PacketChannelHandler(this));
+		usedChannelNames.add(channelName);
 	}
 
 	public void registerPacket(int id, Class<? extends Packet> packet) {

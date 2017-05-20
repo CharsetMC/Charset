@@ -30,6 +30,7 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ColorUtils;
 
 public class ItemShard extends Item {
+	@SideOnly(Side.CLIENT)
 	public static class Color implements IItemColor {
 		@Override
 		public int getColorFromItemstack(ItemStack stack, int tintIndex) {
