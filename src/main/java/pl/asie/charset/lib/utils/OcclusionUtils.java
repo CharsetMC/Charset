@@ -1,5 +1,6 @@
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -32,14 +33,27 @@ public class OcclusionUtils {
 
         if (world instanceof World) {
             List<AxisAlignedBB> boxes2 = new ArrayList<>();
-            AxisAlignedBB collisionBox = new AxisAlignedBB(0,0,0,0,0,0);
+            AxisAlignedBB collisionBox = null;
             for (AxisAlignedBB box : boxes1) {
-                collisionBox = collisionBox.union(box);
+                if (collisionBox == null) {
+                    collisionBox = box;
+                } else {
+                    collisionBox = collisionBox.union(box);
+                }
             }
-            // TODO: Is false right?
-            world.getBlockState(pos).addCollisionBoxToList((World) world, pos, collisionBox, boxes2, null, false);
 
-            return intersects(boxes1, boxes2);
+            // TODO: Is false right?
+            world.getBlockState(pos).addCollisionBoxToList((World) world, pos, collisionBox.offset(pos), boxes2, null, false);
+            if (boxes2.size() > 0) {
+                BlockPos negPos = new BlockPos(-pos.getX(), -pos.getY(), -pos.getZ());
+                for (int i = 0; i < boxes2.size(); i++) {
+                    boxes2.set(i, boxes2.get(i).offset(negPos));
+                }
+
+                return intersects(boxes1, boxes2);
+            } else {
+                return false;
+            }
         } else {
             return intersects(boxes1, world.getBlockState(pos).getBoundingBox(world, pos));
         }

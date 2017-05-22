@@ -13,14 +13,17 @@ import mcmultipart.api.slot.IPartSlot;
 import mcmultipart.api.world.IMultipartBlockAccess;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.utils.OcclusionUtils;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -110,6 +113,11 @@ public final class WireUtils {
         BlockPos middlePos = wire.getContainer().pos().offset(direction);
 
         if (wire.getContainer().world().isSideSolid(middlePos, direction.getOpposite()) || wire.getContainer().world().isSideSolid(middlePos, side.getOpposite())) {
+            return false;
+        }
+
+        AxisAlignedBB mask = wire.getFactory().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
+        if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos)) {
             return false;
         }
 

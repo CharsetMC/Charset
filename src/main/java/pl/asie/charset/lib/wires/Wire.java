@@ -168,7 +168,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                         found = true;
                     }
                 }
-
+/*
                 if (!found && location != WireFace.CENTER) {
                     BlockPos cPos = container.pos().offset(connFaces[i]);
                     AxisAlignedBB cornerMask = factory.getCornerBox(location, i ^ 1);
@@ -178,7 +178,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                             invalidCornerSides.add(face);
                         }
                     }
-                }
+                } */
             }
         }
 
