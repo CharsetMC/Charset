@@ -28,7 +28,6 @@ import java.util.function.Supplier;
 public class MCMPAddonMiscShelf extends MCMPAddonBase {
     public MCMPAddonMiscShelf() {
         super(CharsetMiscShelf.shelfBlock, CharsetMiscShelf.shelfItem,
-                MultipartShelf::new, (tile) -> new MultipartTileShelf((TileShelf) tile),
-                (tile) -> tile instanceof TileShelf);
+                MultipartShelf::new, (tile) -> tile instanceof TileShelf);
     }
 }

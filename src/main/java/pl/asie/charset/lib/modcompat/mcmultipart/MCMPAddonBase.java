@@ -24,11 +24,15 @@ public class MCMPAddonBase implements IMCMPAddon {
     protected final Block block;
     protected final Item item;
     protected final Supplier<IMultipart> multipartSupplier;
-    protected final Function<TileEntity, MultipartTile> multipartTileSupplier;
+    protected final Function<TileEntity, IMultipartTile> multipartTileSupplier;
     protected final Predicate<TileEntity> tileEntityPredicate;
     private CapabilityProviderFactory<IMultipartTile> factory;
 
-    public MCMPAddonBase(Block block, Item item, Supplier<IMultipart> multipartSupplier, Function<TileEntity, MultipartTile> multipartTileSupplier, Predicate<TileEntity> tileEntityPredicate) {
+    public MCMPAddonBase(Block block, Item item, Supplier<IMultipart> multipartSupplier, Predicate<TileEntity> tileEntityPredicate) {
+        this(block, item, multipartSupplier, IMultipartTile::wrap, tileEntityPredicate);
+    }
+
+    public MCMPAddonBase(Block block, Item item, Supplier<IMultipart> multipartSupplier, Function<TileEntity, IMultipartTile> multipartTileSupplier, Predicate<TileEntity> tileEntityPredicate) {
         this.block = block;
         this.item = item;
         this.multipartSupplier = multipartSupplier;

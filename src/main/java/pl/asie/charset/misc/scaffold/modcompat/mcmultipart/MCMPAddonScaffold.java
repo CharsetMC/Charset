@@ -9,7 +9,6 @@ import pl.asie.charset.misc.scaffold.TileScaffold;
 public class MCMPAddonScaffold extends MCMPAddonBase {
     public MCMPAddonScaffold() {
         super(CharsetMiscScaffold.scaffoldBlock, CharsetMiscScaffold.scaffoldItem,
-                MultipartScaffold::new, (tile) -> new MultipartTileScaffold((TileScaffold) tile),
-                (tile) -> tile instanceof TileScaffold);
+                MultipartScaffold::new, (tile) -> tile instanceof TileScaffold);
     }
 }
