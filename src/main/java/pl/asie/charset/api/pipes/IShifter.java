@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
  * as a Shifter, that is control the flow of items and fluids
  * in Charset pipes.
  */
+@Deprecated
 public interface IShifter {
 	enum Mode {
 		Extract,

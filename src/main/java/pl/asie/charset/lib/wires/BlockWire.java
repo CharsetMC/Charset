@@ -43,6 +43,8 @@ import java.util.List;
 public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvider {
     public BlockWire() {
         super(Material.CIRCUITS);
+        setOpaqueCube(false);
+        setFullCube(false);
     }
 
     @Nullable
@@ -54,21 +56,6 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
     @Override
     protected BlockStateContainer createBlockState() {
         return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[]{Wire.PROPERTY});
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-        return false;
     }
 
     @Override

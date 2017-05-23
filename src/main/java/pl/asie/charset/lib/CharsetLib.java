@@ -18,7 +18,6 @@ package pl.asie.charset.lib;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -55,7 +54,7 @@ import pl.asie.charset.lib.notify.PacketPoint;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.RecipeDyeableItem;
 import pl.asie.charset.lib.render.model.ModelFactory;
-import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
 import pl.asie.charset.lib.utils.DataSerializersCharset;
 
 import java.util.Calendar;
@@ -98,6 +97,9 @@ public class CharsetLib {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		AudioAPI.DATA_REGISTRY = new CharsetSimpleInstantiatingRegistry<>();
+		AudioAPI.SINK_REGISTRY = new CharsetSimpleInstantiatingRegistry<>();
+
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
 		enableDebugInfo = config.getBoolean("enableDebugInfo", "expert", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.");
 		// showAllItemTypes = config.getBoolean("showAllItemTypes", "general", true, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
@@ -134,9 +136,9 @@ public class CharsetLib {
 		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
 
-		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class);
-		AudioAPI.DATA_REGISTRY.register(AudioDataGameSound.class);
-		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class);
+		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class, AudioDataDFPWM::new);
+		AudioAPI.DATA_REGISTRY.register(AudioDataGameSound.class, AudioDataGameSound::new);
+		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class, AudioSinkBlock::new);
 	}
 
 	@Mod.EventHandler

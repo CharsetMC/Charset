@@ -1,13 +1,11 @@
 package pl.asie.charset.lib.utils;
 
-import pl.asie.charset.lib.CharsetIMC;
-
-public enum TriResult {
+public enum ThreeState {
     YES,
     MAYBE,
     NO;
 
-    public TriResult or(TriResult other) {
+    public ThreeState or(ThreeState other) {
         if (this == YES || other == YES)
             return YES;
         else if (this == NO || other == NO)

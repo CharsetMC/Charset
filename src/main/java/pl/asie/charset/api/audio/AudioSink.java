@@ -32,7 +32,7 @@ public abstract class AudioSink implements IAudioReceiver {
     }
 
     public void writeData(ByteBuf buffer) {
-        buffer.writeShort(AudioAPI.SINK_REGISTRY.getId(this.getClass()));
+        buffer.writeShort(AudioAPI.SINK_REGISTRY.getId(this));
     }
 
     public void readData(ByteBuf buffer) {
@@ -41,7 +41,7 @@ public abstract class AudioSink implements IAudioReceiver {
 
     public static AudioSink create(ByteBuf buffer) {
         try {
-            AudioSink sink = AudioAPI.SINK_REGISTRY.get(buffer.readUnsignedShort()).newInstance();
+            AudioSink sink = AudioAPI.SINK_REGISTRY.create(buffer.readUnsignedShort());
             sink.readData(buffer);
             return sink;
         } catch (Exception e) {

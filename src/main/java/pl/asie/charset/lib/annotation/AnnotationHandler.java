@@ -305,7 +305,7 @@ public class AnnotationHandler {
 			}
 
 			if (!added) {
-				throw new RuntimeException("Cyclic dependency in Charset modules! Report!");
+				throw new RuntimeException("Cyclic dependency within Charset modules! Report!");
 			}
 		}
 

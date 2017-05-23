@@ -3,7 +3,7 @@ package pl.asie.charset.lib;
 import com.google.common.collect.Lists;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-import pl.asie.charset.lib.utils.TriResult;
+import pl.asie.charset.lib.utils.ThreeState;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,20 +27,20 @@ public final class CharsetIMC {
         return registryLocs.getOrDefault(key, Collections.emptySet());
     }
 
-    public TriResult allows(String key, ResourceLocation location) {
-        return getResourceLocationEntries("b:" + key).contains(location) ? TriResult.NO
-                : getResourceLocationEntries("w:" + key).contains(location) ? TriResult.YES
-                : TriResult.MAYBE;
+    public ThreeState allows(String key, ResourceLocation location) {
+        return getResourceLocationEntries("b:" + key).contains(location) ? ThreeState.NO
+                : getResourceLocationEntries("w:" + key).contains(location) ? ThreeState.YES
+                : ThreeState.MAYBE;
     }
 
-    public TriResult allows(String key, Set<ResourceLocation> locations) {
-        TriResult result = TriResult.MAYBE;
+    public ThreeState allows(String key, Set<ResourceLocation> locations) {
+        ThreeState result = ThreeState.MAYBE;
 
         for (ResourceLocation loc : locations) {
-            TriResult newResult = allows(key, loc);
-            if (newResult == TriResult.NO)
-                return TriResult.NO;
-            else if (result != TriResult.YES)
+            ThreeState newResult = allows(key, loc);
+            if (newResult == ThreeState.NO)
+                return ThreeState.NO;
+            else if (result != ThreeState.YES)
                 result = newResult;
         }
 

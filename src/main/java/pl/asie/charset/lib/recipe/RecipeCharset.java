@@ -5,6 +5,8 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.RecipeSorter;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -213,6 +215,10 @@ public class RecipeCharset extends RecipeBase {
 
         public RecipeCharset build() {
             return recipe;
+        }
+
+        public void register() {
+            GameRegistry.addRecipe(recipe);
         }
     }
 }

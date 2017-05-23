@@ -72,7 +72,7 @@ public final class AudioPacket {
 
     public void writeData(ByteBuf buffer) {
         buffer.writeFloat(volume);
-        buffer.writeShort(AudioAPI.DATA_REGISTRY.getId(data.getClass()));
+        buffer.writeShort(AudioAPI.DATA_REGISTRY.getId(data));
         data.writeData(buffer);
         buffer.writeShort(sinks.size());
         for (AudioSink sink : sinks) {

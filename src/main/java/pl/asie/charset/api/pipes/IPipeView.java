@@ -27,6 +27,7 @@ import java.util.Collection;
  * that it is not necessarily exhaustive - the idea is to let other mods
  * react - and only react - to the action of items travelling inside a pipe.
  */
+@Deprecated
 public interface IPipeView {
 	/**
 	 * Get a list of visible stacks travelling in a pipe.

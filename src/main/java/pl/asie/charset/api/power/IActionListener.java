@@ -1,4 +1,4 @@
-package pl.asie.charset.api.power.discrete;
+package pl.asie.charset.api.power;
 
 @FunctionalInterface
 public interface IActionListener {

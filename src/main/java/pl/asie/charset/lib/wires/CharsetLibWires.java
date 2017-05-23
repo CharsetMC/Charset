@@ -16,24 +16,10 @@
 
 package pl.asie.charset.lib.wires;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.block.statemap.IStateMapper;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.ICustomModelLoader;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -41,17 +27,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.lib.annotation.CharsetModule;
-import pl.asie.charset.lib.capability.NullCapabilityStorage;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.lib.utils.TriResult;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Map;
+import pl.asie.charset.lib.utils.ThreeState;
 
 @CharsetModule(
 	name = "lib.wires",
@@ -108,10 +87,10 @@ public class CharsetLibWires {
 		// Add default conversion recipes
 		for (WireProvider provider : WireManager.REGISTRY) {
 			if (provider.hasFreestandingWire() && provider.hasSidedWire()) {
-				GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(provider, false, 1))
-						.shapeless(new RecipeObjectWire(provider, TriResult.YES)).build());
-				GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(provider, true, 1))
-						.shapeless(new RecipeObjectWire(provider, TriResult.NO)).build());
+				RecipeCharset.Builder.create(new RecipeResultWire(provider, false, 1))
+						.shapeless(new RecipeObjectWire(provider, ThreeState.YES)).register();
+				RecipeCharset.Builder.create(new RecipeResultWire(provider, true, 1))
+						.shapeless(new RecipeObjectWire(provider, ThreeState.NO)).register();
 			}
 		}
 	}

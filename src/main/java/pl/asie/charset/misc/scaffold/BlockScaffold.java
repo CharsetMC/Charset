@@ -46,6 +46,8 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 		super(Material.WOOD);
 		setHardness(1.0F);
 		setHarvestLevel("axe", 0);
+		setOpaqueCube(false);
+		setFullCube(false);
 		setSoundType(SoundType.WOOD);
 		setUnlocalizedName("charset.scaffold");
 	}
@@ -145,21 +147,6 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	@Override
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.CUTOUT;
-	}
-
-	@Override
-	public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return false;
-	}
-
-	@Override
-	public boolean isOpaqueCube(IBlockState state) {
-		return false;
-	}
-
-	@Override
-	public boolean isFullCube(IBlockState state) {
-		return false;
 	}
 
 	@Override

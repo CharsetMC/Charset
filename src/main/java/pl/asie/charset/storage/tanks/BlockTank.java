@@ -47,6 +47,8 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         super(Material.GLASS);
         setHardness(0.6F);
         setUnlocalizedName("charset.tank");
+        setFullCube(false);
+        setOpaqueCube(false);
     }
 
     @Override
@@ -91,21 +93,6 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         return BOUNDING_BOX;
-    }
-
-    @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
     }
 
     @Override
@@ -201,7 +188,6 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         }
     }
 
-    @Nullable
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileTank();

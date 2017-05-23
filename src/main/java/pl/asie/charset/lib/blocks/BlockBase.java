@@ -63,10 +63,36 @@ import java.util.Random;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider = this instanceof ITileEntityProvider;
+	private boolean fullCube = true, opaqueCube = true;
 	private ImmutableList<ItemStack> items;
 
 	public BlockBase(Material materialIn) {
 		super(materialIn);
+	}
+
+	protected BlockBase setFullCube(boolean value) {
+		fullCube = value;
+		return this;
+	}
+
+	protected BlockBase setOpaqueCube(boolean value) {
+		opaqueCube = value;
+		return this;
+	}
+
+	@Override
+	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+		return isNormalCube(base_state, world, pos);
+	}
+
+	@Override
+	public boolean isFullCube(IBlockState state) {
+		return fullCube;
+	}
+
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+		return opaqueCube;
 	}
 
 	public int getParticleTintIndex() {

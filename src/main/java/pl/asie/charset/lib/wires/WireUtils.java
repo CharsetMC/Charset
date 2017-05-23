@@ -65,6 +65,8 @@ public final class WireUtils {
 
     public static <T> T getCapability(Wire wire, BlockPos pos, Capability<T> capability, EnumFacing face) {
         TileWire.isWireCheckingForCaps = true;
+
+        // for non-center wires, use multiparts to check for potential edge connections
         if (wire.getLocation() != WireFace.CENTER) {
             Optional<IMultipartContainer> container = MultipartHelper.getContainer(wire.getContainer().world(), pos);
             if (container.isPresent()) {

@@ -1,4 +1,4 @@
-package pl.asie.charset.api.power.discrete;
+package pl.asie.charset.api.power;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;

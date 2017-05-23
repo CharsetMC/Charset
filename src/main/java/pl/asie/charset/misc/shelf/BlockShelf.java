@@ -51,6 +51,8 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
         setHarvestLevel("axe", 0);
         setSoundType(SoundType.WOOD);
         setUnlocalizedName("charset.shelf");
+        setOpaqueCube(false);
+        setFullCube(false);
     }
 
     public static ItemStack createStack(ItemMaterial plankMaterial, int stackSize) {
@@ -112,16 +114,6 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
             list.add(ImmutableList.of(createStack(s, 1)));
         }
         return list;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
     }
 
     @Override
