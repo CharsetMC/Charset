@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import org.cyclops.commoncapabilities.api.capability.itemhandler.ISlotlessItemHandler;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
-import pl.asie.charset.lib.annotation.CharsetModule;
+import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 

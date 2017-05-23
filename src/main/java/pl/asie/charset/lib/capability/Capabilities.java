@@ -42,11 +42,10 @@ import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
 import pl.asie.charset.lib.capability.lib.*;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
-import pl.asie.charset.lib.capability.providers.CapabilityWrapperFluidStacks;
-import pl.asie.charset.lib.capability.providers.CapabilityWrapperInsertionToItemHandler;
-import pl.asie.charset.lib.capability.providers.CapabilityWrapperInventory;
+import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperFluidStacks;
+import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInsertionToItemHandler;
+import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInventory;
 import pl.asie.charset.lib.capability.redstone.*;
-import pl.asie.charset.lib.wires.Wire;
 
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)
@@ -76,20 +75,20 @@ public class Capabilities {
 	public static Capability<IRedstoneReceiver> REDSTONE_RECEIVER;
 
 	public static void preInit() {
-		CapabilityManager.INSTANCE.register(IAudioSource.class, new NullCapabilityStorage<>(), DefaultAudioSource::new);
-		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new NullCapabilityStorage<>(), DefaultAudioReceiver::new);
+		CapabilityManager.INSTANCE.register(IAudioSource.class, new DummyCapabilityStorage<>(), DefaultAudioSource::new);
+		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new DummyCapabilityStorage<>(), DefaultAudioReceiver::new);
 
-		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new NullCapabilityStorage<>(), DefaultAxisRotatable::new);
-		CapabilityManager.INSTANCE.register(IDebuggable.class, new NullCapabilityStorage<>(), DefaultDebuggable::new);
-		CapabilityManager.INSTANCE.register(IMovable.class, new NullCapabilityStorage<>(), DefaultMovable::new);
+		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new DummyCapabilityStorage<>(), DefaultAxisRotatable::new);
+		CapabilityManager.INSTANCE.register(IDebuggable.class, new DummyCapabilityStorage<>(), DefaultDebuggable::new);
+		CapabilityManager.INSTANCE.register(IMovable.class, new DummyCapabilityStorage<>(), DefaultMovable::new);
 
-		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new NullCapabilityStorage<>(), DefaultItemInsertionHandler::new);
-		CapabilityManager.INSTANCE.register(IPipeView.class, new NullCapabilityStorage<>(), DefaultPipeView::new);
+		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new DummyCapabilityStorage<>(), DefaultItemInsertionHandler::new);
+		CapabilityManager.INSTANCE.register(IPipeView.class, new DummyCapabilityStorage<>(), DefaultPipeView::new);
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter::new);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter::new);
-		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new NullCapabilityStorage<>(), DummyRedstoneReceiver::new);
-		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new NullCapabilityStorage<>(), DummyRedstoneReceiver::new);
+		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new DummyCapabilityStorage<>(), DummyRedstoneReceiver::new);
+		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new DummyCapabilityStorage<>(), DummyRedstoneReceiver::new);
  	}
 
  	public static void init() {

@@ -24,13 +24,12 @@ import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.IConnectable;
+import pl.asie.charset.lib.misc.IConnectable;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.ArrayList;

@@ -10,7 +10,7 @@ import mezz.jei.api.ingredients.IModIngredientRegistration;
 import mezz.jei.api.recipe.IStackHelper;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
-import pl.asie.charset.lib.annotation.AnnotatedPluginHandler;
+import pl.asie.charset.lib.loader.AnnotatedPluginHandler;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nonnull;

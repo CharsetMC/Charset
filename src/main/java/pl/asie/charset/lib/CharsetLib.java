@@ -34,7 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.RecipeSorter;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.audio.AudioAPI;
-import pl.asie.charset.lib.annotation.CharsetModule;
+import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
@@ -100,7 +100,7 @@ public class CharsetLib {
 		AudioAPI.DATA_REGISTRY = new CharsetSimpleInstantiatingRegistry<>();
 		AudioAPI.SINK_REGISTRY = new CharsetSimpleInstantiatingRegistry<>();
 
-		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking items out of barrels).");
+		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).");
 		enableDebugInfo = config.getBoolean("enableDebugInfo", "expert", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.");
 		// showAllItemTypes = config.getBoolean("showAllItemTypes", "general", true, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
 

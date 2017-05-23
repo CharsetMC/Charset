@@ -21,7 +21,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import pl.asie.charset.lib.items.IDyeableItem;
+import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 
 import java.util.ArrayList;

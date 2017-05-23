@@ -1,9 +1,7 @@
 package pl.asie.charset.lib.wires;
 
-import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
 import mcmultipart.api.ref.MCMPCapabilities;
-import mcmultipart.api.world.IMultipartWorld;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,8 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.lib.CharsetLib;
-import pl.asie.charset.lib.blocks.TileBase;
+import pl.asie.charset.lib.block.TileBase;
 
 public class TileWire extends TileBase implements IMultipartTile, ITickable, IWireContainer {
     protected Wire wire;

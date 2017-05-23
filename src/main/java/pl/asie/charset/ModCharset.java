@@ -42,9 +42,9 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pl.asie.charset.datafixes.CharsetUnifiedModIdFixer;
+import pl.asie.charset.upgrade.CharsetUnifiedModIdFixer;
 import pl.asie.charset.lib.CharsetIMC;
-import pl.asie.charset.lib.annotation.AnnotationHandler;
+import pl.asie.charset.lib.loader.ModuleLoader;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -103,7 +103,7 @@ public class ModCharset {
 		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 1);
 		dataFixes.registerFix(FixTypes.ENTITY, new CharsetUnifiedModIdFixer.Entity(oldPrefixes));
 
-		AnnotationHandler.INSTANCE.preInit(event.getAsmData());
+		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 
 		charsetIconItem = new IconCharset();
 		GameRegistry.register(charsetIconItem.setRegistryName("icon"));
@@ -111,48 +111,48 @@ public class ModCharset {
 
 		RegistryUtils.registerModel(charsetIconItem, 0, "charset:icon");
 
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEvent(event);
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, GuiHandlerCharset.INSTANCE);
 
-		AnnotationHandler.INSTANCE.init();
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.init();
+		ModuleLoader.INSTANCE.passEvent(event);
 
 		if (configIds.hasChanged()) configIds.save();
 	}
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		AnnotationHandler.INSTANCE.postInit();
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.postInit();
+		ModuleLoader.INSTANCE.passEvent(event);
 	}
 
 	@Mod.EventHandler
 	public void passThrough(FMLServerAboutToStartEvent event) {
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEvent(event);
 	}
 
 	@Mod.EventHandler
 	public void passThrough(FMLServerStartingEvent event) {
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEvent(event);
 	}
 
 	@Mod.EventHandler
 	public void passThrough(FMLServerStartedEvent event) {
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEvent(event);
 	}
 
 	@Mod.EventHandler
 	public void passThrough(FMLServerStoppingEvent event) {
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEvent(event);
 	}
 
 	@Mod.EventHandler
 	public void passThrough(FMLServerStoppedEvent event) {
-		AnnotationHandler.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEvent(event);
 	}
 
 	@Mod.EventHandler
@@ -194,6 +194,6 @@ public class ModCharset {
 	}
 
 	public static boolean isModuleLoaded(String s) {
-		return AnnotationHandler.INSTANCE.getLoadedModules().contains(s);
+		return ModuleLoader.INSTANCE.getLoadedModules().contains(s);
 	}
 }
