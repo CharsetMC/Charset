@@ -88,7 +88,7 @@ public class CharsetTweakMobEqualizer {
 		if (template == null) {
 			return;
 		}
-			int equipmentCount = 0;
+		int equipmentCount = 0;
 		ItemStack[] equipmentCopies = new ItemStack[6];
 		boolean copyArmor = event.getEntity() instanceof IRangedAttackMob || event.getWorld().rand.nextBoolean();
 		boolean copyWeapon = !(event.getEntity() instanceof IRangedAttackMob) || event.getWorld().rand.nextBoolean();
@@ -99,6 +99,8 @@ public class CharsetTweakMobEqualizer {
 				if (!is.isEmpty() && is.getItem().isValidArmor(is, slot, ent)) {
 					equipmentCopies[slot.ordinal()] = is.copy();
 					equipmentCount++;
+				} else {
+					equipmentCopies[slot.ordinal()] = ItemStack.EMPTY;
 				}
 			}
 		}
@@ -138,7 +140,7 @@ public class CharsetTweakMobEqualizer {
 		ent.setCanPickUpLoot(false);
 
 		for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-			if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR) {
+			if (equipmentCopies[slot.ordinal()] != null) {
 				ent.setItemStackToSlot(slot, equipmentCopies[slot.ordinal()]);
 			}
 			ent.setDropChance(slot, 0);
