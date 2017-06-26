@@ -106,8 +106,6 @@ public class CharsetTransportCarts {
             register(EntityMinecartImproved.class, "rminecart", EntityMinecart.class);
         }
 
-        MinecraftForge.EVENT_BUS.register(this);
-
         if (combiner != null) {
             MinecraftForge.EVENT_BUS.register(combiner);
 

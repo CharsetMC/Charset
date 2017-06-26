@@ -75,7 +75,6 @@ public class CharsetStorageBarrels {
 		barrelItem = new ItemDayBarrel(barrelBlock);
 		barrelCartItem = new ItemMinecartDayBarrel();
 
-		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(new BarrelEventListener());
 
 		renderBarrelItem3D = config.getBoolean("renderItem3D", "render", false, "Should items use fancy 3D rendering?");

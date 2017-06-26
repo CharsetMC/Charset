@@ -89,8 +89,6 @@ public class CharsetTransportDyeableMinecarts {
 		packet.registerPacket(0x02, PacketMinecartRequest.class);
 
 		CapabilityManager.INSTANCE.register(MinecartDyeable.class, new MinecartDyeable.Storage(), MinecartDyeable.class);
-
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@Mod.EventHandler

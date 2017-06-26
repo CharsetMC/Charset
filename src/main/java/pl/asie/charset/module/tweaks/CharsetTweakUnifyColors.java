@@ -59,11 +59,6 @@ public class CharsetTweakUnifyColors {
 				| 0xFF000000;
 	}
 
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-	}
-
 	private BufferedImage toGrayscale(BufferedImage image) {
 		BufferedImage imageGrayscale = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
 		for (int iy = 0; iy < image.getHeight(); iy++) {

@@ -51,6 +51,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import pl.asie.charset.lib.loader.CharsetModule;
 
@@ -67,7 +68,7 @@ public class CharsetTweakDoubleDoors {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		for (Block block : Block.REGISTRY) {
+		for (Block block : GameRegistry.findRegistry(Block.class)) {
 			try {
 				if (block != null && block instanceof BlockDoor) {
 					Class c = block.getClass();
@@ -84,8 +85,6 @@ public class CharsetTweakDoubleDoors {
 				// This is fine.
 			}
 		}
-
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	private IBlockState getActualState(IBlockAccess access, BlockPos pos) {

@@ -28,11 +28,6 @@ import pl.asie.charset.lib.loader.CharsetModule;
 		isDefault = false
 )
 public class CharsetTweakRemoveSprinting {
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-	}
-
 	@SubscribeEvent
 	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
 		if (event.player.isSprinting()) {

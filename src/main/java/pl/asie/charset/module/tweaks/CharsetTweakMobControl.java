@@ -77,8 +77,6 @@ public class CharsetTweakMobControl {
 				EntityEnderman.setCarriable(b, true);
 			}
 		}
-
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent

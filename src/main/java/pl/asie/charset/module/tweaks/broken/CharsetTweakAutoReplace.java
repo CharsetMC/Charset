@@ -57,11 +57,6 @@ import java.util.Set;
 ) */
 // TODO: Fix me, please!
 public class CharsetTweakAutoReplace {
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-	}
-
 	@SubscribeEvent
 	public void onPlayerDestroyItem(PlayerDestroyItemEvent event) {
 		if (!(event.getEntity() instanceof EntityPlayerMP) || event.getEntity().world.isRemote || event.getOriginal().isEmpty()) {

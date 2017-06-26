@@ -60,11 +60,6 @@ import java.util.Set;
 		name = "tweak.zorro"
 )
 public class CharsetTweakZorro {
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-	}
-
 	@SubscribeEvent
 	public void doTheZorroThing(PlayerInteractEvent.EntityInteract event) {
 		EntityPlayer player = event.getEntityPlayer();

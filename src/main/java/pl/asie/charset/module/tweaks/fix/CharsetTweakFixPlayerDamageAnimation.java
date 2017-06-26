@@ -28,7 +28,6 @@ public class CharsetTweakFixPlayerDamageAnimation {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		registry.registerPacket(0x01, PacketSyncAttackValue.class);
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent

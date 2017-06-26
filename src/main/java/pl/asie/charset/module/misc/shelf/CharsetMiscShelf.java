@@ -59,8 +59,6 @@ public class CharsetMiscShelf {
 	public void preInit(FMLPreInitializationEvent event) {
 		shelfBlock = new BlockShelf();
 		shelfItem = new ItemShelf(shelfBlock);
-
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent

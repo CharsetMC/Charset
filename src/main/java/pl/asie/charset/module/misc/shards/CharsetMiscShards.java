@@ -22,6 +22,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,6 +36,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.utils.ColorUtils;
@@ -50,8 +52,6 @@ public class CharsetMiscShards {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		shardItem = new ItemShard();
-
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent
@@ -67,15 +67,21 @@ public class CharsetMiscShards {
 		RegistryUtils.register(event.getRegistry(), shardItem, "shard");
 	}
 
+	@SubscribeEvent
+	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+		event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(shardItem, 1, 0)).setRegistryName(new ResourceLocation("charset:glassShard")));
+
+		for (int i = 0; i < 16; i++) {
+			event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(shardItem, 1, i + 1)).setRegistryName(new ResourceLocation("charset:glassShard_" + i)));
+		}
+	}
+
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		OreDictionary.registerOre("shardGlass", new ItemStack(shardItem, 1, OreDictionary.WILDCARD_VALUE));
-
-		GameRegistry.addShapedRecipe(new ResourceLocation("charset:glassShard"), new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(shardItem, 1, 0));
 		OreDictionary.registerOre("shardGlassColorless", new ItemStack(shardItem, 1, 0));
 
 		for (int i = 0; i < 16; i++) {
-			GameRegistry.addShapedRecipe(new ResourceLocation("charset:glassShard_" + i), new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(shardItem, 1, i + 1));
 			OreDictionary.registerOre(ColorUtils.getOreDictEntry("shardGlass", EnumDyeColor.byMetadata(i)), new ItemStack(shardItem, 1, i + 1));
 		}
 	}

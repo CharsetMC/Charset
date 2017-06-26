@@ -28,11 +28,6 @@ public class CharsetTweakChat {
         enableGreentext = config.getBoolean("greentext", "features", true, "Enables >implications, I suppose.");
     }
 
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
     @SubscribeEvent
     public void onServerChat(ServerChatEvent event) {
         if (!PlayerUtils.isFake(event.getPlayer())) {

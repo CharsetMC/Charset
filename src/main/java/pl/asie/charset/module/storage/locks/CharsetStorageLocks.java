@@ -73,9 +73,6 @@ public class CharsetStorageLocks {
 		keyItem = new ItemKey();
 		lockItem = new ItemLock();
 
-
-		MinecraftForge.EVENT_BUS.register(this);
-
 		enableKeyKeepInventory = config.getBoolean("keepKeysOnDeath", "locks", true, "Should keys be kept in inventory on death?");
 	}
 
@@ -122,6 +119,11 @@ public class CharsetStorageLocks {
 					return result;
 				}
 				return null;
+			}
+
+			@Override
+			public boolean isHidden() {
+				return true;
 			}
 		};
 

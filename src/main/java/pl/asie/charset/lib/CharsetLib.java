@@ -128,8 +128,6 @@ public class CharsetLib {
 		packet.registerPacket(0x10, PacketNotification.class);
 		packet.registerPacket(0x11, PacketPoint.class);
 
-		MinecraftForge.EVENT_BUS.register(this);
-
 		Capabilities.init();
 		DataSerializersCharset.init();
 

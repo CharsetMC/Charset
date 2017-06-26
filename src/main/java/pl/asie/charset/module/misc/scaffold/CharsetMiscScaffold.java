@@ -63,8 +63,6 @@ public class CharsetMiscScaffold {
 
 		scaffoldBlock = new BlockScaffold();
 		scaffoldItem = new ItemScaffold(scaffoldBlock);
-
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent

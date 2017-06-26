@@ -69,7 +69,6 @@ public class CharsetAudioNoteblock {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         packet.registerPacket(0x01, PacketNoteParticle.class);
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)

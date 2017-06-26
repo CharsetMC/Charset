@@ -62,11 +62,6 @@ import java.util.List;
 		description = "Allows a mob wearing armor comparable to yours to rarely spawn"
 )
 public class CharsetTweakMobEqualizer {
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-	}
-
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void upgradeMob(LivingSpawnEvent.SpecialSpawn event) {
 		EnumDifficulty difficulty = event.getWorld().getDifficulty();

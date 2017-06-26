@@ -33,7 +33,6 @@ public class CharsetTweakPushableTNT {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		RegistryUtils.register(EntityTNTImproved.class, "tnt", 64, 1, true);
-		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent

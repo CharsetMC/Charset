@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -81,6 +82,10 @@ public class ColorLookupHandler {
                 out = getDefaultColor(stack);
             } else {
                 out = RenderUtils.getAverageColor(sprite, mode);
+                int tintColor = Minecraft.getMinecraft().getItemColors().getColorFromItemstack(stack, 0);
+                if (tintColor != -1) {
+                    out = RenderUtils.multiplyColor(out, tintColor);
+                }
             }
             COLOR_MAP.put(key, out);
             return out;

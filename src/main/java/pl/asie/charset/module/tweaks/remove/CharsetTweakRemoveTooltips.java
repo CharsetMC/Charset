@@ -13,11 +13,6 @@ import pl.asie.charset.lib.loader.CharsetModule;
         isDefault = false
 )
 public class CharsetTweakRemoveTooltips {
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onItemTooltip(ItemTooltipEvent event) {
         event.getToolTip().clear();
