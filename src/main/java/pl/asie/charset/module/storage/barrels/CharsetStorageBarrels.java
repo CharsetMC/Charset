@@ -112,20 +112,11 @@ public class CharsetStorageBarrels {
 
 	@SubscribeEvent
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-		event.getRegistry().register(new BarrelCartRecipe("barrel_cart").setRegistryName("barrel_cart"));
-		BarrelUpgradeRecipes.addUpgradeRecipes(event.getRegistry());
-	}
-
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-		// TODO
 		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE,
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)),
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.DIAMOND_BLOCK))
 		);
-		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
 
-		// If you stop this from happening in postInit, please adjust TextureStitchEvent in ProxyClient
 		for (ItemMaterial log : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("log", "block")) {
 			ItemMaterial plank = log.getRelated("plank");
 			if (plank != null) {
@@ -136,6 +127,14 @@ public class CharsetStorageBarrels {
 				BarrelRegistry.INSTANCE.registerCraftable(log, slab);
 			}
 		}
+
+		event.getRegistry().register(new BarrelCartRecipe("barrel_cart").setRegistryName("barrel_cart"));
+		BarrelUpgradeRecipes.addUpgradeRecipes(event.getRegistry());
+	}
+
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
 	}
 
 	@Mod.EventHandler

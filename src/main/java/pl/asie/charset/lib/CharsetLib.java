@@ -19,6 +19,9 @@ package pl.asie.charset.lib;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.SearchTree;
+import net.minecraft.client.util.SearchTreeManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -31,9 +34,9 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.RecipeSorter;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.audio.AudioAPI;
 import pl.asie.charset.lib.block.BlockBase;
@@ -110,6 +113,7 @@ public class CharsetLib {
 		Capabilities.preInit();
 		NotifyImplementation.init();
 		ItemMaterialHeuristics.init(false);
+		ItemMaterialHeuristics.init(true);
 
 		config.save();
 	}
@@ -134,9 +138,6 @@ public class CharsetLib {
 		if (ModCharset.INDEV || enableDebugInfo)
 			MinecraftForge.EVENT_BUS.register(new DebugInfoProvider());
 
-		RecipeSorter.register("charsetDyeable", DyeableItemRecipeFactory.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
-		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
-
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class, AudioDataDFPWM::new);
 		AudioAPI.DATA_REGISTRY.register(AudioDataGameSound.class, AudioDataGameSound::new);
 		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class, AudioSinkBlock::new);
@@ -144,7 +145,6 @@ public class CharsetLib {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		ItemMaterialHeuristics.init(true);
 		Capabilities.registerVanillaWrappers();
 
 		if (deathHandler.hasPredicate()) {
@@ -154,12 +154,6 @@ public class CharsetLib {
 
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
-		for (Block b : GameRegistry.findRegistry(Block.class)) {
-			if (b instanceof BlockBase) {
-				((BlockBase) b).wipeSubBlocksCache();
-			}
-		}
-
 		NotifyImplementation.instance.registerServerCommands(event);
 	}
 

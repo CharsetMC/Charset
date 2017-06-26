@@ -92,8 +92,6 @@ public class CharsetStorageLocks {
 
 	@SubscribeEvent
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-
-
 		IRecipe recipeNewKey = new ShapedOreRecipe(new ResourceLocation("charset:newKey"), new ItemStack(keyItem), "ng", "ng", " g", 'n', "nuggetGold", 'g', "ingotGold") {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
@@ -104,7 +102,7 @@ public class CharsetStorageLocks {
 			}
 		};
 
-		IRecipe recipeDuplicateKey = new ShapedOreRecipe(new ResourceLocation("charset:duplicateKey"), new ItemStack(keyItem), "ng", "ng", "kg", 'n', "nuggetGold", 'g', "ingotGold", 'k', keyItem) {
+		IRecipe recipeDuplicateKey = new ShapedOreRecipe(new ResourceLocation("charset:duplicateKey"), new ItemStack(keyItem), "ng", "ng", "kg", 'n', "nuggetGold", 'g', "ingotGold", 'k', new ItemStack(keyItem, 1, 0)) {
 			@Override
 			public ItemStack getCraftingResult(InventoryCrafting inv) {
 				ItemStack key = inv.getStackInRowAndColumn(0, 2);

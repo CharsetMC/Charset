@@ -99,38 +99,32 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
             for (int yo = 0; yo <= inv.getHeight() - height; yo++) {
                 for (int xo = 0; xo <= inv.getWidth() - width; xo++) {
                     IngredientMatcher matcher = new IngredientMatcher(this);
-                    boolean noMatch = false;
+                    boolean matches = false;
 
                     for (int iIdx = 0; iIdx < input.size(); iIdx++) {
                         int i = (shapedOrdering != null ? shapedOrdering[iIdx] : iIdx);
                         int x = i % width + xo;
                         int y = i / width + yo;
-                        noMatch = matcher.add(inv.getStackInRowAndColumn(x, y), input.get(i));
+                        matches = matcher.add(inv.getStackInRowAndColumn(x, y), input.get(i));
 
-                        if (noMatch) {
-                            break;
-                        }
+                        if (!matches) break;
                     }
 
-                    if (noMatch && mirrored) {
+                    if (!matches && mirrored) {
                         matcher = new IngredientMatcher(this);
-                        noMatch = false;
+                        matches = false;
 
                         for (int iIdx = 0; iIdx < input.size(); iIdx++) {
                             int i = (shapedOrdering != null ? shapedOrdering[iIdx] : iIdx);
-                            int x = (width - 1) - (i % width + xo);
+                            int x = ((width - 1) - (i % width)) + xo;
                             int y = i / width + yo;
-                            noMatch = matcher.add(inv.getStackInRowAndColumn(x, y), input.get(i));
+                            matches = matcher.add(inv.getStackInRowAndColumn(x, y), input.get(i));
 
-                            if (noMatch) {
-                                break;
-                            }
+                            if (!matches) break;
                         }
                     }
 
-                    if (!noMatch) {
-                        return matcher;
-                    }
+                    if (matches) return matcher;
                 }
             }
 

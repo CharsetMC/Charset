@@ -543,11 +543,13 @@ public class RendererWire extends ModelFactory<Wire> {
 
     @Override
     public IBakedModel bake(Wire wire, boolean isItem, BlockRenderLayer layer) {
-        WireSheet sheet = sheetMap.get(wire.getFactory());
         SimpleBakedModel model = new SimpleBakedModel(this);
-        if (sheet != null) {
-            model.setParticle(sheet.particle);
-            addWire(wire, sheet, model.getQuads(null, null, 0));
+        if (wire != null) {
+            WireSheet sheet = sheetMap.get(wire.getFactory());
+            if (sheet != null) {
+                model.setParticle(sheet.particle);
+                addWire(wire, sheet, model.getQuads(null, null, 0));
+            }
         }
 
         return model;
@@ -560,10 +562,14 @@ public class RendererWire extends ModelFactory<Wire> {
             return stackMap.get(md);
         } else {
             Wire wire = CharsetLibWires.itemWire.fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
-            wire.setConnectionsForItemRender();
+            if (wire != null) {
+                wire.setConnectionsForItemRender();
 
-            stackMap.put(md, wire);
-            return wire;
+                stackMap.put(md, wire);
+                return wire;
+            } else {
+                return null;
+            }
         }
     }
 }

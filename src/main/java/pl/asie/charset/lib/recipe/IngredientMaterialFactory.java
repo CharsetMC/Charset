@@ -56,6 +56,8 @@ public class IngredientMaterialFactory implements IIngredientFactory {
                     ItemMaterial base = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stackIn);
                     for (int i = 1; i < chain.length; i++) {
                         base = base.getRelated(chain[i]);
+                        if (base == null)
+                            return false;
                     }
 
                     return ItemMaterialRegistry.INSTANCE.matches(stack, base);

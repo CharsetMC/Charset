@@ -69,7 +69,7 @@ public class BarrelUpgradeRecipes {
 
         @Override
         public boolean apply(ItemStack stack) {
-            if (stack.getItem() == CharsetStorageBarrels.barrelItem) {
+            if (!stack.isEmpty() && stack.getItem() == CharsetStorageBarrels.barrelItem) {
                 TileEntityDayBarrel rep = new TileEntityDayBarrel();
                 rep.loadFromStack(stack);
                 return rep.type == TileEntityDayBarrel.Type.NORMAL;

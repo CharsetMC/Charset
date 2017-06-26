@@ -6,6 +6,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -117,8 +118,8 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-        return base_state.getValue(BACK) && side == base_state.getValue(Properties.FACING4).getOpposite();
+    public BlockFaceShape getBlockFaceShape(IBlockAccess access, IBlockState base_state, BlockPos pos, EnumFacing side) {
+        return (base_state.getValue(BACK) && side == base_state.getValue(Properties.FACING4).getOpposite()) ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
     }
 
     @Override

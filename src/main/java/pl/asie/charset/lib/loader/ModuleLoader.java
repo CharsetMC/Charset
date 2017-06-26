@@ -234,6 +234,7 @@ public class ModuleLoader {
 			try {
 				MethodHandle methodHandle = MethodHandles.lookup().findVirtual(getClass(data), methodName, methodType);
 				List<Pair<String, MethodHandle>> list = loaderHandles.computeIfAbsent(methodType.parameterType(0), k -> new ArrayList<>());
+				list.sort(Comparator.comparing(Pair::getLeft));
 
 				list.add(Pair.of(loadedModules.inverse().get(instance), methodHandle));
 			} catch (NoSuchMethodException e) {
