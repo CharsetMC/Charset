@@ -17,6 +17,7 @@
 package pl.asie.charset.module.storage.locks;
 
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -92,7 +93,7 @@ public class ItemLock extends ItemBase {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+    public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
         if (ItemKey.DEBUG_KEY_ID) {
             tooltip.add(getKey(stack));
         }

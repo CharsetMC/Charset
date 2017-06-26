@@ -96,8 +96,8 @@ public class TileShelf extends TileBase {
 	protected int getSlotId(float hitX, float hitY, float hitZ) {
 		Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F);
 		placementVec = placementVec.rotateYaw(world.getBlockState(pos).getValue(Properties.FACING4).getHorizontalAngle() / 180 * (float) Math.PI);
-		if (placementVec.xCoord >= (-7F / 16F) && placementVec.xCoord <= (7F / 16F)) {
-			return (int) Math.floor((placementVec.xCoord + (7F / 16F)) * 7) + (placementVec.yCoord > 0 ? 7 : 0);
+		if (placementVec.x >= (-7F / 16F) && placementVec.x <= (7F / 16F)) {
+			return (int) Math.floor((placementVec.x + (7F / 16F)) * 7) + (placementVec.y > 0 ? 7 : 0);
 		}
 		return -1;
 	}

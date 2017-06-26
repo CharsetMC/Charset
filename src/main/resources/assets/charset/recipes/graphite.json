@@ -1,0 +1,14 @@
+{
+  "type": "charset:shapeless",
+  "group": "graphite",
+  "ingredients": [
+    {
+      "item": "minecraft:coal",
+      "data": 1
+    }
+  ],
+  "result": {
+    "item": "charset:graphite",
+    "count": 2
+  }
+}

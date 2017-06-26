@@ -16,10 +16,14 @@
 
 package pl.asie.charset.module.tools.wrench;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -34,13 +38,16 @@ public class CharsetToolsWrench {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		RegistryUtils.register(wrench = new ItemWrench(), "wrench");
+		wrench = new ItemWrench();
+	}
+
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(wrench, 0, "charset:wrench");
 	}
 
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(wrench),
-				" i ", " si", "i  ", 's', "stickWood", 'i', "ingotIron"));
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), wrench, "wrench");
 	}
 }

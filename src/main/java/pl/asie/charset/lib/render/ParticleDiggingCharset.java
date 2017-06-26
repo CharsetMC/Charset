@@ -13,8 +13,8 @@ public class ParticleDiggingCharset extends ParticleDigging {
 	private final IBlockState sourceState;
 	private final int particleTintIndex;
 
-	public ParticleDiggingCharset(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, IBlockState state, BlockPos pos, TextureAtlasSprite sprite, int particleTintIndex) {
-		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, state);
+	public ParticleDiggingCharset(World worldIn, double xIn, double yIn, double zIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, IBlockState state, BlockPos pos, TextureAtlasSprite sprite, int particleTintIndex) {
+		super(worldIn, xIn, yIn, zIn, xSpeedIn, ySpeedIn, zSpeedIn, state);
 		this.sourceState = state;
 		this.particleTintIndex = particleTintIndex;
 		setBlockPos(pos);

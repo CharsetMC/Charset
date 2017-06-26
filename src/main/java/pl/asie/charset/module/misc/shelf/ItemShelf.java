@@ -1,5 +1,6 @@
 package pl.asie.charset.module.misc.shelf;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
@@ -18,7 +19,7 @@ public class ItemShelf extends ItemBlock {
 		String lookup = "tile.charset.shelf.format";
 		TileShelf tile = new TileShelf();
 		tile.loadFromStack(is);
-		String displayName = Objects.firstNonNull(tile.getPlank().getRelated("log"), tile.getPlank()).getStack().getDisplayName();
+		String displayName = MoreObjects.firstNonNull(tile.getPlank().getRelated("log"), tile.getPlank()).getStack().getDisplayName();
 		return I18n.translateToLocalFormatted(lookup, displayName);
 	}
 }

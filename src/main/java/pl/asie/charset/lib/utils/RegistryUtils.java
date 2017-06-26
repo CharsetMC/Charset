@@ -15,7 +15,8 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import pl.asie.charset.ModCharset;
 
 import java.util.Map;
@@ -29,10 +30,6 @@ public final class RegistryUtils {
 
 	public static void registerModel(Item item, int meta, String name) {
 		UtilProxyCommon.proxy.registerItemModel(item, meta, name);
-	}
-
-	public static void registerModel(Block block, int meta, String name) {
-		registerModel(Item.getItemFromBlock(block), meta, name);
 	}
 
 	public static void register(Class<? extends TileEntity> tileEntity, String name) {
@@ -55,19 +52,14 @@ public final class RegistryUtils {
 		takenEntityIds.put(id, name);
 	}
 
-	public static void register(IForgeRegistryEntry entry, String name) {
-		register(entry, name, ModCharset.CREATIVE_TAB);
+	public static <T extends IForgeRegistryEntry<T>> void register(IForgeRegistry<T> registry, T object, String name) {
+		register(registry, object, name, ModCharset.CREATIVE_TAB);
 	}
 
-	public static void register(IForgeRegistryEntry entry, String name, CreativeTabs tab) {
-		entry.setRegistryName(new ResourceLocation(ModCharset.MODID, name));
-		GameRegistry.register(entry);
-		UtilProxyCommon.proxy.setCreativeTabIfNotPresent(entry, tab);
-	}
-
-	public static void register(Block block, Item item, String name) {
-		register(block, name);
-		register(item, name);
+	public static <T extends IForgeRegistryEntry<T>> void register(IForgeRegistry<T> registry, T object, String name, CreativeTabs tab) {
+		object.setRegistryName(new ResourceLocation(ModCharset.MODID, name));
+		registry.register(object);
+		UtilProxyCommon.proxy.setCreativeTabIfNotPresent(object, tab);
 	}
 
 	public static void loadConfigIds(Configuration configIds) {

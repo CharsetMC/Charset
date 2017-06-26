@@ -16,10 +16,15 @@
 
 package pl.asie.charset.lib.wires;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -49,12 +54,36 @@ public class CharsetLibWires {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		WireManager.REGISTRY.toString(); // Poke REGISTRY <- this is a hack to initialize it
+		blockWire = new BlockWire();
+		itemWire = new ItemWire(blockWire);
+	}
 
-		RegistryUtils.register(blockWire = new BlockWire(), itemWire = new ItemWire(blockWire), "wire");
-
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		for (int i = 0; i < WireManager.MAX_ID * 2; i++) {
 			RegistryUtils.registerModel(itemWire, i, "charset:wire");
 		}
+	}
+
+	@SubscribeEvent
+	public void registerBlocks(RegistryEvent.Register<Block> event) {
+		RegistryUtils.register(event.getRegistry(), blockWire, "wire");
+	}
+
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), itemWire, "wire");
+	}
+
+	@SubscribeEvent
+	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+		event.getRegistry().register(new RecipeWireConversion(false).setRegistryName("charset:wire_conversion_to"));
+		event.getRegistry().register(new RecipeWireConversion(true).setRegistryName("charset:wire_conversion_from"));
+	}
+
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event) {
+		RegistryUtils.register(TileWire.class, "wire");
 	}
 
 	@Mod.EventHandler
@@ -76,22 +105,6 @@ public class CharsetLibWires {
 	public void onPostBake(ModelBakeEvent event) {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "normal"), rendererWire);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "inventory"), rendererWire);
-	}
-
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-		RegistryUtils.register(TileWire.class, "wire");
-
-		// Add default conversion recipes
-		for (WireProvider provider : WireManager.REGISTRY) {
-			if (provider.hasFreestandingWire() && provider.hasSidedWire()) {
-				RecipeCharset.Builder.create(new RecipeResultWire(provider, false, 1))
-						.shapeless(new RecipeObjectWire(provider, ThreeState.YES)).register();
-				RecipeCharset.Builder.create(new RecipeResultWire(provider, true, 1))
-						.shapeless(new RecipeObjectWire(provider, ThreeState.NO)).register();
-			}
-		}
 	}
 
 	@Mod.EventHandler

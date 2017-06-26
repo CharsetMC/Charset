@@ -1,12 +1,16 @@
 package pl.asie.charset.module.storage.tanks;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -20,26 +24,33 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 )
 public class CharsetStorageTanks {
     public static Block tankBlock;
+    public static Item tankItem;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         tankBlock = new BlockTank();
-        RegistryUtils.register(tankBlock, new ItemBlock(tankBlock), "fluidTank");
+        tankItem = new ItemBlock(tankBlock);
+    }
 
-        RegistryUtils.registerModel(tankBlock, 0, "charset:fluidtank");
+    @SubscribeEvent
+    public void registerModels(ModelRegistryEvent event) {
+        RegistryUtils.registerModel(tankItem, 0, "charset:fluidtank");
+    }
 
-        FMLInterModComms.sendMessage("charset", "addCarry", tankBlock.getRegistryName());
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        RegistryUtils.register(event.getRegistry(), tankBlock, "fluidTank");
+    }
+
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        RegistryUtils.register(event.getRegistry(), tankItem, "fluidTank");
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         RegistryUtils.register(TileTank.class, "fluidTank");
-        GameRegistry.addRecipe(new ShapedOreRecipe(tankBlock,
-                "xxx",
-                "x x",
-                "xxx",
-                'x', "blockGlass"
-        ));
+        FMLInterModComms.sendMessage("charset", "addCarry", tankBlock.getRegistryName());
     }
 
     @Mod.EventHandler

@@ -54,7 +54,7 @@ public final class RayTraceUtils {
 		double reachDistance = player instanceof EntityPlayerMP ? ((EntityPlayerMP) player).interactionManager.getBlockReachDistance() : 5.0d;
 		Vec3d lookVec = player.getLookVec();
 
-		return getStart(player).addVector(lookVec.xCoord * reachDistance, lookVec.yCoord * reachDistance, lookVec.zCoord * reachDistance);
+		return getStart(player).addVector(lookVec.x * reachDistance, lookVec.y * reachDistance, lookVec.z * reachDistance);
 	}
 
 	public static Result getCollision(World world, BlockPos pos, EntityLivingBase player, List<AxisAlignedBB> list) {
@@ -190,14 +190,14 @@ public final class RayTraceUtils {
 	}
 
 	private static boolean isVecInsideYZBounds(AxisAlignedBB aabb, Vec3d point) {
-		return point == null ? false : point.yCoord >= aabb.minY && point.yCoord <= aabb.maxY && point.zCoord >= aabb.minZ && point.zCoord <= aabb.maxZ;
+		return point == null ? false : point.y >= aabb.minY && point.y <= aabb.maxY && point.z >= aabb.minZ && point.z <= aabb.maxZ;
 	}
 
 	private static boolean isVecInsideXZBounds(AxisAlignedBB aabb, Vec3d point) {
-		return point == null ? false : point.xCoord >= aabb.minX && point.xCoord <= aabb.maxX && point.zCoord >= aabb.minZ && point.zCoord <= aabb.maxZ;
+		return point == null ? false : point.x >= aabb.minX && point.x <= aabb.maxX && point.z >= aabb.minZ && point.z <= aabb.maxZ;
 	}
 
 	private static boolean isVecInsideXYBounds(AxisAlignedBB aabb, Vec3d point) {
-		return point == null ? false : point.xCoord >= aabb.minX && point.xCoord <= aabb.maxX && point.yCoord >= aabb.minY && point.yCoord <= aabb.maxY;
+		return point == null ? false : point.x >= aabb.minX && point.x <= aabb.maxX && point.y >= aabb.minY && point.y <= aabb.maxY;
 	}
 }

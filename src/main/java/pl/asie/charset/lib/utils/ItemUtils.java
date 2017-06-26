@@ -161,7 +161,7 @@ public final class ItemUtils {
 	}
 
 	public static EntityItem spawnItemEntity(World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
-		EntityItem entityItem = new EntityItem(world, loc.xCoord, loc.yCoord, loc.zCoord, stack);
+		EntityItem entityItem = new EntityItem(world, loc.x, loc.y, loc.z, stack);
 		entityItem.setDefaultPickupDelay();
 		if (randomness <= 0.0f) {
 			entityItem.motionX = mXm;

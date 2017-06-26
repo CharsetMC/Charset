@@ -1,0 +1,24 @@
+{
+  "type": "charset:shaped",
+  "group": "scaffold",
+  "pattern": [
+    "ppp",
+    " s ",
+    "s s"
+  ],
+  "key": {
+    "p": {
+      "type": "charset:material",
+      "material": ["plank", "block"],
+      "nbtKey": "plank"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    }
+  },
+  "result": {
+    "item": "charset:scaffold",
+    "count": 4
+  }
+}

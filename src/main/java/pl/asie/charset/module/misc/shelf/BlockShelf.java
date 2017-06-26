@@ -87,7 +87,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
             TileShelf bookshelf = (TileShelf) worldIn.getTileEntity(pos);
             if (bookshelf != null) {
                 Vec3d v = result.hitVec.subtract(pos.getX(), pos.getY(), pos.getZ());
-                bookshelf.onClicked((float) v.xCoord, (float) v.yCoord, (float) v.zCoord, playerIn);
+                bookshelf.onClicked((float) v.x, (float) v.y, (float) v.z, playerIn);
             }
         }
     }
@@ -139,14 +139,14 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
     public static EnumFacing getFacePlaced(EnumFacing facing, float hitX, float hitY, float hitZ, EntityLivingBase placer) {
         Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ());
         placementVec = placementVec.rotateYaw(placer.getHorizontalFacing().getHorizontalAngle() / 180 * (float) Math.PI);
-        return getFace(placer.getHorizontalFacing(), placementVec.zCoord > 0);
+        return getFace(placer.getHorizontalFacing(), placementVec.z > 0);
     }
 
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ());
         placementVec = placementVec.rotateYaw(placer.getHorizontalFacing().getHorizontalAngle() / 180 * (float) Math.PI);
-        return this.getDefaultState().withProperty(Properties.FACING4, placer.getHorizontalFacing()).withProperty(BACK, placementVec.zCoord > 0);
+        return this.getDefaultState().withProperty(Properties.FACING4, placer.getHorizontalFacing()).withProperty(BACK, placementVec.z > 0);
     }
 
     @Nullable

@@ -2,11 +2,13 @@ package pl.asie.charset.lib.material;
 
 import com.google.common.base.Joiner;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.ArrayUtils;
@@ -22,7 +24,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 public final class ItemMaterialHeuristics {
-    private static boolean initialized = false;
+    private static int initPhase = 0;
     private static ItemMaterialRegistry reg;
 
     private ItemMaterialHeuristics() {
@@ -215,9 +217,10 @@ public final class ItemMaterialHeuristics {
         for (ItemStack log : stacks) {
             try {
                 if (log.getMetadata() == OreDictionary.WILDCARD_VALUE) {
-                    for (int i = 0; i < (log.getItem() instanceof ItemBlock ? 16 : 128); i++) {
-                        ItemStack stack = new ItemStack(log.getItem(), 1, i);
-                        stackConsumer.accept(stack);
+                    NonNullList<ItemStack> stackList = NonNullList.create();
+                    log.getItem().getSubItems(CreativeTabs.SEARCH, stackList);
+                    for (int i = 0; i < stackList.size(); i++) {
+                        stackConsumer.accept(stackList.get(i));
                     }
                 } else {
                     stackConsumer.accept(log.copy());
@@ -228,70 +231,80 @@ public final class ItemMaterialHeuristics {
         }
     }
 
-    public static void init() {
-        if (initialized)
+    public static void init(boolean modded) {
+        if (initPhase >= (modded ? 2 : 1))
             return;
 
         ProgressManager.ProgressBar bar = ProgressManager.push("Material scanning", 6);
 
         reg = ItemMaterialRegistry.INSTANCE;
-        initialized = true;
+        initPhase = (modded ? 2 : 1);
 
         bar.step("Wood");
         // Pre-initialize vanilla woods
-        for (int i = 0; i < 6; i++) {
-            ItemMaterial log = reg.getOrCreateMaterial(new ItemStack(i >= 4 ? Blocks.LOG2 : Blocks.LOG, 1, i % 4));
-            ItemMaterial plank = reg.getOrCreateMaterial(new ItemStack(Blocks.PLANKS, 1, i));
-            ItemMaterial stick = reg.getOrCreateMaterial(new ItemStack(Items.STICK));
-            reg.registerTypes(log, "log", "block", "wood");
-            reg.registerTypes(plank, "plank", "block", "wood");
-            reg.registerTypes(stick, "stick", "item", "wood");
-            reg.registerRelation(log, plank, "plank", "log");
-            reg.registerRelation(plank, stick, "stick", "plank");
-            reg.registerRelation(stick, log, "log", "stick");
-        }
+        if (!modded)
+            for (int i = 0; i < 6; i++) {
+                ItemMaterial log = reg.getOrCreateMaterial(new ItemStack(i >= 4 ? Blocks.LOG2 : Blocks.LOG, 1, i % 4));
+                ItemMaterial plank = reg.getOrCreateMaterial(new ItemStack(Blocks.PLANKS, 1, i));
+                ItemMaterial stick = reg.getOrCreateMaterial(new ItemStack(Items.STICK));
+                reg.registerTypes(log, "log", "block", "wood");
+                reg.registerTypes(plank, "plank", "block", "wood");
+                reg.registerTypes(stick, "stick", "item", "wood");
+                reg.registerRelation(log, plank, "plank", "log");
+                reg.registerRelation(plank, stick, "stick", "plank");
+                reg.registerRelation(stick, log, "log", "stick");
+            }
 
-        supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
+        if (modded)
+            supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
 
         bar.step("Ores");
-        for (String oreName : OreDictionary.getOreNames()) {
-            if (oreName.startsWith("ore")) {
-                initOreMaterial(oreName);
+
+        if (modded)
+            for (String oreName : OreDictionary.getOreNames()) {
+                if (oreName.startsWith("ore")) {
+                    initOreMaterial(oreName);
+                }
             }
-        }
 
         bar.step("Ingots/Dusts/Gems");
-        for (String oreName : OreDictionary.getOreNames()) {
-            if (oreName.startsWith("ingot") || oreName.startsWith("dust") || oreName.startsWith("gem")) {
-                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initIngotLikeMaterial(oreName, s)));
+
+        if (modded)
+            for (String oreName : OreDictionary.getOreNames()) {
+                if (oreName.startsWith("ingot") || oreName.startsWith("dust") || oreName.startsWith("gem")) {
+                    supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initIngotLikeMaterial(oreName, s)));
+                }
             }
-        }
 
         bar.step("Stones");
-        for (String oreName : OreDictionary.getOreNames()) {
-            if (oreName.startsWith("stone")) {
-                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initStoneMaterial(oreName, s)));
+        if (modded)
+            for (String oreName : OreDictionary.getOreNames()) {
+                if (oreName.startsWith("stone")) {
+                    supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initStoneMaterial(oreName, s)));
+                }
             }
-        }
 
-        for (String oreName : OreDictionary.getOreNames()) {
-            if (oreName.startsWith("cobblestone")) {
-                supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initCobblestoneMaterial(oreName, s)));
+        if (modded)
+            for (String oreName : OreDictionary.getOreNames()) {
+                if (oreName.startsWith("cobblestone")) {
+                    supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initCobblestoneMaterial(oreName, s)));
+                }
             }
-        }
 
         bar.step("Misc");
-        reg.registerTypes(reg.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)), "block", "bedrock");
+        if (modded)
+            reg.registerTypes(reg.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)), "block", "bedrock");
 
         bar.step("Slabs/Stairs");
-        for (ItemMaterial material : reg.getMaterialsByType("block")) {
-            findSlab(material);
-            findStair(material);
-        }
+        if (modded)
+            for (ItemMaterial material : reg.getMaterialsByType("block")) {
+                findSlab(material);
+                findStair(material);
+            }
 
         ProgressManager.pop(bar);
 
-        if (CharsetLib.enableDebugInfo) {
+        if (CharsetLib.enableDebugInfo && initPhase == 2) {
             try {
                 File outputFile = new File("charsetItemMaterials.txt");
                 PrintWriter writer = new PrintWriter(outputFile);

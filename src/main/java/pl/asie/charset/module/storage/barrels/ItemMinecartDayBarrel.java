@@ -38,6 +38,7 @@ package pl.asie.charset.module.storage.barrels;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -84,9 +85,9 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     }
 
     @Override
-    public void addInformation(ItemStack is, EntityPlayer player, List list, boolean verbose) {
-        super.addInformation(is, player, list, verbose);
-        CharsetStorageBarrels.barrelItem.addExtraInformation(is, player, list, verbose);
+    public void addInformation(ItemStack is, World world, List list, ITooltipFlag verbose) {
+        super.addInformation(is, world, list, verbose);
+        CharsetStorageBarrels.barrelItem.addExtraInformation(is, world, list, verbose);
     }
 
     @Override
@@ -101,22 +102,23 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     List<ItemStack> todaysCarts = null;
 
     @Override
-    public void getSubItems(Item item, CreativeTabs tab, NonNullList<ItemStack> list) {
-        if (todaysCarts == null) {
-            todaysCarts = new ArrayList<>();
-            NonNullList<ItemStack> stacks = NonNullList.create();
-            CharsetStorageBarrels.barrelBlock.getSubBlocks(CharsetStorageBarrels.barrelItem,
-                    ModCharset.CREATIVE_TAB, stacks);
-            for (ItemStack barrel : stacks) {
-                TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
-                if (type == TileEntityDayBarrel.Type.NORMAL || type == TileEntityDayBarrel.Type.CREATIVE) {
-                    ItemStack barrelCart = makeBarrel(barrel);
-                    todaysCarts.add(barrelCart);
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
+        if (isInCreativeTab(tab)) {
+            if (todaysCarts == null) {
+                todaysCarts = new ArrayList<>();
+                NonNullList<ItemStack> stacks = NonNullList.create();
+                CharsetStorageBarrels.barrelBlock.getSubBlocks(ModCharset.CREATIVE_TAB, stacks);
+                for (ItemStack barrel : stacks) {
+                    TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
+                    if (type == TileEntityDayBarrel.Type.NORMAL || type == TileEntityDayBarrel.Type.CREATIVE) {
+                        ItemStack barrelCart = makeBarrel(barrel);
+                        todaysCarts.add(barrelCart);
+                    }
                 }
             }
-        }
 
-        list.addAll(todaysCarts);
+            list.addAll(todaysCarts);
+        }
     }
 
     public ItemStack makeBarrel(ItemStack barrelItem) {

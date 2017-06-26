@@ -150,15 +150,15 @@ public final class RotationUtils {
 			default:
 				return vec;
 			case UP:
-				return new Vec3d(vec.xCoord, 1 - vec.yCoord, vec.zCoord);
+				return new Vec3d(vec.x, 1 - vec.y, vec.z);
 			case NORTH:
-				return new Vec3d(vec.xCoord, vec.zCoord, vec.yCoord);
+				return new Vec3d(vec.x, vec.z, vec.y);
 			case SOUTH:
-				return new Vec3d(vec.xCoord, vec.zCoord, 1 - vec.yCoord);
+				return new Vec3d(vec.x, vec.z, 1 - vec.y);
 			case WEST:
-				return new Vec3d(vec.yCoord, vec.zCoord, vec.xCoord);
+				return new Vec3d(vec.y, vec.z, vec.x);
 			case EAST:
-				return new Vec3d(1 - vec.yCoord, vec.zCoord, vec.xCoord);
+				return new Vec3d(1 - vec.y, vec.z, vec.x);
 		}
 	}
 

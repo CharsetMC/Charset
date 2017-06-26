@@ -45,7 +45,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.model.IModelState;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.model.ModelColorHandler;
@@ -78,10 +77,10 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         public TextureAtlasSprite front, top, side, top_metal;
 
         public BarrelGroup(String type, TextureMap map) {
-            front = map.registerSprite(new ResourceLocation("charset:block/barrel/" + type + "/front"));
-            side = map.registerSprite(new ResourceLocation("charset:block/barrel/" + type + "/side"));
-            top = map.registerSprite(new ResourceLocation("charset:block/barrel/" + type + "/top"));
-            top_metal = map.registerSprite(new ResourceLocation("charset:block/barrel/" + type + "/top_metal"));
+            front = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/front"));
+            side = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/side"));
+            top = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/top"));
+            top_metal = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/top_metal"));
         }
 
         public static void add(Map<String, BarrelGroup> map, String type, TextureMap tMap) {
@@ -91,7 +90,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
 
     public final Map<String, BarrelGroup> TEXTURE_MAP = new HashMap<>();
     public TextureAtlasSprite font;
-    public IRetexturableModel template;
+    public IModel template;
 
     public void onTextureLoad(TextureMap map) {
         TEXTURE_MAP.clear();
@@ -99,7 +98,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         BarrelGroup.add(TEXTURE_MAP, "sticky", map);
         BarrelGroup.add(TEXTURE_MAP, "silky", map);
         BarrelGroup.add(TEXTURE_MAP, "normal", map);
-        font = map.registerSprite(new ResourceLocation("charset:block/barrel/font"));
+        font = map.registerSprite(new ResourceLocation("charset:blocks/barrel/font"));
     }
 
     private String getGroupName(TileEntityDayBarrel.Type type) {

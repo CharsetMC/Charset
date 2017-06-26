@@ -2,6 +2,7 @@ package pl.asie.charset.lib.loader;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.*;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -12,7 +13,6 @@ import net.minecraftforge.fml.common.event.FMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
-import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 import java.lang.invoke.MethodHandle;
@@ -193,6 +193,7 @@ public class ModuleLoader {
 				ASMDataTable.ASMData data = moduleData.get(name);
 				try {
 					Object o = getClass(data).newInstance();
+					MinecraftForge.EVENT_BUS.register(o);
 					loadedModules.put(name, o);
 					loadedModulesByClass.put(data.getClassName(), o);
 				} catch (Exception e) {
@@ -314,7 +315,8 @@ public class ModuleLoader {
 		}
 
 		addClassNames(table, CharsetJEIPlugin.class, "jei");
-		addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
+		// TODO: MCMultiPart
+		// addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
 	}
 
 	public void passEvent(FMLEvent o) {

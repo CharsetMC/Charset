@@ -19,7 +19,6 @@ package pl.asie.charset.lib.render.model;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import net.minecraftforge.common.model.TRSRTransformation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,7 +27,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import java.util.EnumMap;
 
-public abstract class BaseBakedModel implements IPerspectiveAwareModel {
+public abstract class BaseBakedModel implements IBakedModel {
     private final EnumMap<ItemCameraTransforms.TransformType, TRSRTransformation> transformMap = new EnumMap(ItemCameraTransforms.TransformType.class);
 
     @Override
@@ -50,11 +49,6 @@ public abstract class BaseBakedModel implements IPerspectiveAwareModel {
     @Override
     public boolean isBuiltInRenderer() {
         return false;
-    }
-
-    @Override
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return ItemCameraTransforms.DEFAULT;
     }
 
     @Override

@@ -1,0 +1,19 @@
+{
+  "type": "charset:shaped",
+  "group": "fluidTank",
+  "pattern": [
+    "xxx",
+    "x x",
+    "xxx"
+  ],
+  "key": {
+    "x": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlass"
+    }
+  },
+  "result": {
+    "item": "charset:fluidtank",
+    "count": 1
+  }
+}

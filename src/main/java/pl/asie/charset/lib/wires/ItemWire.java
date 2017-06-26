@@ -42,7 +42,7 @@ public class ItemWire extends ItemBlockMultipart {
     }
 
     public Wire fromStack(IWireContainer container, ItemStack stack, EnumFacing facing) {
-        WireProvider factory = WireManager.REGISTRY.getObjectById(stack.getMetadata() >> 1);
+        WireProvider factory = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
         if (factory != null) {
             WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing);
             return factory.create(container, location);
@@ -52,7 +52,7 @@ public class ItemWire extends ItemBlockMultipart {
     }
 
     public ItemStack toStack(WireProvider provider, boolean freestanding, int amount) {
-        return new ItemStack(this, amount, (WireManager.REGISTRY.getId(provider) << 1) | (freestanding ? 1 : 0));
+        return new ItemStack(this, amount, (WireManager.REGISTRY.getID(provider) << 1) | (freestanding ? 1 : 0));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ItemWire extends ItemBlockMultipart {
 
     public boolean placeWirePartAt(ItemStack stack, EntityPlayer player, EnumHand hand, World world, BlockPos pos, EnumFacing facing,
                                       float hitX, float hitY, float hitZ, IMultipart multipartBlock, IBlockState state) {
-        WireProvider factory = WireManager.REGISTRY.getObjectById(stack.getMetadata() >> 1);
+        WireProvider factory = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
         WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing.getOpposite());
         if (!factory.canPlace(world, pos, location)) {
             return false;
@@ -76,7 +76,7 @@ public class ItemWire extends ItemBlockMultipart {
     @Override
     public boolean placeBlockAtTested(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing facing, float hitX,
                                       float hitY, float hitZ, IBlockState newState) {
-        WireProvider factory = WireManager.REGISTRY.getObjectById(stack.getMetadata() >> 1);
+        WireProvider factory = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
         WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing.getOpposite());
         if (!factory.canPlace(world, pos, location)) {
             return false;
@@ -94,15 +94,16 @@ public class ItemWire extends ItemBlockMultipart {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
-        for (WireProvider provider : WireManager.REGISTRY.getValues()) {
-            int id = WireManager.REGISTRY.getId(provider);
-            if (provider.hasSidedWire()) {
-                subItems.add(new ItemStack(this, 1, id * 2));
-            }
-            if (provider.hasFreestandingWire()) {
-                subItems.add(new ItemStack(this, 1, id * 2 + 1));
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+        if (this.isInCreativeTab(tab)) {
+            for (WireProvider provider : WireManager.REGISTRY.getValues()) {
+                int id = WireManager.REGISTRY.getID(provider);
+                if (provider.hasSidedWire()) {
+                    subItems.add(new ItemStack(this, 1, id * 2));
+                }
+                if (provider.hasFreestandingWire()) {
+                    subItems.add(new ItemStack(this, 1, id * 2 + 1));
+                }
             }
         }
     }

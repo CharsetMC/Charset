@@ -18,6 +18,8 @@ package pl.asie.charset.lib;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import net.minecraft.block.Block;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -34,6 +36,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.RecipeSorter;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.audio.AudioAPI;
+import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
@@ -52,7 +55,7 @@ import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.notify.PacketNotification;
 import pl.asie.charset.lib.notify.PacketPoint;
 import pl.asie.charset.lib.recipe.RecipeCharset;
-import pl.asie.charset.lib.recipe.RecipeDyeableItem;
+import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
 import pl.asie.charset.lib.utils.DataSerializersCharset;
@@ -106,6 +109,7 @@ public class CharsetLib {
 
 		Capabilities.preInit();
 		NotifyImplementation.init();
+		ItemMaterialHeuristics.init(false);
 
 		config.save();
 	}
@@ -132,8 +136,7 @@ public class CharsetLib {
 		if (ModCharset.INDEV || enableDebugInfo)
 			MinecraftForge.EVENT_BUS.register(new DebugInfoProvider());
 
-		GameRegistry.addRecipe(new RecipeDyeableItem());
-		RecipeSorter.register("charsetDyeable", RecipeDyeableItem.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register("charsetDyeable", DyeableItemRecipeFactory.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		RecipeSorter.register("charset", RecipeCharset.class, RecipeSorter.Category.UNKNOWN, "before:minecraft:shaped");
 
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class, AudioDataDFPWM::new);
@@ -143,17 +146,22 @@ public class CharsetLib {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
+		ItemMaterialHeuristics.init(true);
 		Capabilities.registerVanillaWrappers();
 
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);
 		}
-
-		ItemMaterialHeuristics.init();
 	}
 
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
+		for (Block b : GameRegistry.findRegistry(Block.class)) {
+			if (b instanceof BlockBase) {
+				((BlockBase) b).wipeSubBlocksCache();
+			}
+		}
+
 		NotifyImplementation.instance.registerServerCommands(event);
 	}
 

@@ -20,17 +20,20 @@ import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.FixTypes;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.ModFixs;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
@@ -38,6 +41,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
@@ -91,6 +95,8 @@ public class ModCharset {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(this);
+
 		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");
 		if (!configurationDirectory.exists()) {
 			configurationDirectory.mkdir();
@@ -106,12 +112,19 @@ public class ModCharset {
 		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 
 		charsetIconItem = new IconCharset();
-		GameRegistry.register(charsetIconItem.setRegistryName("icon"));
 		charsetIconStack = new ItemStack(charsetIconItem);
 
-		RegistryUtils.registerModel(charsetIconItem, 0, "charset:icon");
-
 		ModuleLoader.INSTANCE.passEvent(event);
+	}
+
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
+		RegistryUtils.registerModel(charsetIconItem, 0, "charset:icon");
+	}
+
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		event.getRegistry().register(charsetIconItem.setRegistryName("icon"));
 	}
 
 	@Mod.EventHandler
@@ -169,25 +182,31 @@ public class ModCharset {
 			"charsetwrench"
 	);
 
-	@Mod.EventHandler
-	public void onMissingMappings(FMLMissingMappingsEvent event) {
-		for (FMLMissingMappingsEvent.MissingMapping mapping : event.getAll()) {
-			if (oldPrefixes.contains(mapping.resourceLocation.getResourceDomain())) {
-				ResourceLocation newName = new ResourceLocation("charset", mapping.resourceLocation.getResourcePath());
-				if (mapping.type == GameRegistry.Type.BLOCK) {
-					Block b = Block.getBlockFromName(newName.toString());
-					if (b != null && b != Blocks.AIR) {
-						mapping.remap(b);
-					} else {
-						mapping.warn();
-					}
-				} else if (mapping.type == GameRegistry.Type.ITEM) {
-					Item b = Item.getByNameOrId(newName.toString());
-					if (b != null) {
-						mapping.remap(b);
-					} else {
-						mapping.warn();
-					}
+	@SubscribeEvent
+	public void onMissingMappingsBlock(RegistryEvent.MissingMappings<Block> event) {
+		for (RegistryEvent.MissingMappings.Mapping<Block> mapping : event.getAllMappings()) {
+			if (oldPrefixes.contains(mapping.key.getResourceDomain())) {
+				ResourceLocation newName = new ResourceLocation("charset", mapping.key.getResourcePath());
+				Block b = Block.getBlockFromName(newName.toString());
+				if (b != null && b != Blocks.AIR) {
+					mapping.remap(b);
+				} else {
+					mapping.warn();
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onMissingMappingsItem(RegistryEvent.MissingMappings<Item> event) {
+		for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getAllMappings()) {
+			if (oldPrefixes.contains(mapping.key.getResourceDomain())) {
+				ResourceLocation newName = new ResourceLocation("charset", mapping.key.getResourcePath());
+				Item i = Item.getByNameOrId(newName.toString());
+				if (i != null && i != Items.AIR) {
+					mapping.remap(i);
+				} else {
+					mapping.warn();
 				}
 			}
 		}

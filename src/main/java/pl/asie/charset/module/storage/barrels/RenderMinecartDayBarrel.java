@@ -64,9 +64,9 @@ public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBar
         GlStateManager.rotate(90, 0, 1, 0);
         GlStateManager.translate(0, 0, 1);
         Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
-                BarrelModel.INSTANCE, state, minecart.getBrightness(partialTicks), true);
+                BarrelModel.INSTANCE, state, minecart.getBrightness(), true);
         GlStateManager.disableBlend();
-        tesr.renderTileEntityAt(minecart.barrel, 0, 0, 0, partialTicks, 0);
+        tesr.render(minecart.barrel, 0, 0, 0, partialTicks, 0, 1.0f);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
     }

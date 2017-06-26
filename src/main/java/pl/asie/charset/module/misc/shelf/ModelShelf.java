@@ -8,8 +8,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.IModelUVLock;
-import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.client.model.ModelStateComposition;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -27,7 +25,7 @@ public class ModelShelf extends ModelFactory<CacheInfoShelf> {
 			null,
 			null
 	);
-	public static IRetexturableModel shelfModel;
+	public static IModel shelfModel;
 
 	public ModelShelf() {
 		super(TileShelf.PROPERTY, TextureMap.LOCATION_MISSING_TEXTURE);
@@ -35,7 +33,7 @@ public class ModelShelf extends ModelFactory<CacheInfoShelf> {
 
 	@Override
 	public IBakedModel bake(CacheInfoShelf info, boolean isItem, BlockRenderLayer layer) {
-		IModel retexturedModel = ((IModelUVLock) shelfModel.retexture(ImmutableMap.of("plank", info.plank.getIconName()))).uvlock(false);
+		IModel retexturedModel = (shelfModel.retexture(ImmutableMap.of("plank", info.plank.getIconName()))).uvlock(false);
 		IModelState state = ModelRotation.getModelRotation(0, (int) info.facing.getHorizontalAngle());
 		if (info.back) {
 			state = new ModelStateComposition(state, STATE_BACK);

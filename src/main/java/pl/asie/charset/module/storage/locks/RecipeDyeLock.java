@@ -16,25 +16,27 @@
 
 package pl.asie.charset.module.storage.locks;
 
+import com.google.gson.JsonObject;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
-import pl.asie.charset.lib.recipe.RecipeDyeableItem;
+import net.minecraftforge.common.crafting.JsonContext;
+import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
 
 import java.util.Optional;
 
-public class RecipeDyeLock extends RecipeDyeableItem {
+public class RecipeDyeLock extends DyeableItemRecipeFactory.Recipe {
     private int layer = 0;
 
-    @Override
-    protected boolean isTarget(ItemStack stack) {
-        return stack.getItem() instanceof ItemKey || stack.getItem() instanceof ItemLock;
+    public RecipeDyeLock(String group) {
+        super(group, Ingredient.fromItems(CharsetStorageLocks.keyItem, CharsetStorageLocks.lockItem));
     }
 
     @Override
     protected int[] getColor(ItemStack stack) {
-        if (stack != null && isTarget(stack)) {
+        if (input.apply(stack)) {
             String key = "color" + layer;
             if (stack.hasTagCompound() && stack.getTagCompound().hasKey(key)) {
                 int c = stack.getTagCompound().getInteger(key);
@@ -53,7 +55,7 @@ public class RecipeDyeLock extends RecipeDyeableItem {
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack source = inv.getStackInSlot(i);
             if (!source.isEmpty()) {
-                if (isTarget(source)) {
+                if (input.apply(source)) {
                     target = source.copy();
                     target.setCount(1);
                 } else if (getColor(source) != null) {

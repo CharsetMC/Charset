@@ -107,9 +107,9 @@ public class NotifyImplementation {
                     z = (int) ent.posZ;
                 } else if (where instanceof Vec3d) {
                     Vec3d vec = (Vec3d) where;
-                    x = (int) vec.xCoord;
-                    y = (int) vec.yCoord;
-                    z = (int) vec.zCoord;
+                    x = (int) vec.x;
+                    y = (int) vec.y;
+                    z = (int) vec.z;
                 } else if (where instanceof BlockPos) {
                     pos = (BlockPos) where;
                 } else {

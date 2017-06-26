@@ -108,15 +108,15 @@ public class CommandPoint extends CommandBase {
         }
 
         Vec3d vec31 = player.getLook(par1);
-        Vec3d vec32 = vec3.addVector(vec31.xCoord * d0, vec31.yCoord * d0,
-                vec31.zCoord * d0);
+        Vec3d vec32 = vec3.addVector(vec31.x * d0, vec31.y * d0,
+                vec31.z * d0);
         pointedEntity = null;
         Vec3d vec33 = null;
         float f1 = 1.0F;
         List list = player.world.getEntitiesWithinAABBExcludingEntity(
                 player,
-                player.getEntityBoundingBox().addCoord(vec31.xCoord * d0,
-                        vec31.yCoord * d0, vec31.zCoord * d0).expand(
+                player.getEntityBoundingBox().offset(vec31.x * d0,
+                        vec31.y * d0, vec31.z * d0).expand(
                         (double) f1, (double) f1, (double) f1));
         double d2 = d1;
 
@@ -130,7 +130,7 @@ public class CommandPoint extends CommandBase {
                 RayTraceResult RayTraceResult = axisalignedbb
                         .calculateIntercept(vec3, vec32);
 
-                if (axisalignedbb.isVecInside(vec3)) {
+                if (axisalignedbb.contains(vec3)) {
                     if (0.0D < d2 || d2 == 0.0D) {
                         pointedEntity = entity;
                         vec33 = RayTraceResult == null ? vec3

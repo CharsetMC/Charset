@@ -22,10 +22,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.material.ItemMaterial;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
+import java.util.*;
 
 public final class BarrelRegistry {
     public static final BarrelRegistry INSTANCE = new BarrelRegistry();
@@ -41,16 +38,7 @@ public final class BarrelRegistry {
     public void registerCraftable(ItemMaterial log, ItemMaterial slab) {
         for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.VALUES) {
             if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
-
-            ItemStack barrel = register(type, log, slab);
-
-            if (type == TileEntityDayBarrel.Type.NORMAL && barrel != null) {
-                GameRegistry.addRecipe(new ShapedOreRecipe(barrel,
-                        "W-W",
-                        "W W",
-                        "WWW",
-                        'W', log.getStack(), '-', slab.getStack()));
-            }
+            register(type, log, slab);
         }
     }
 
@@ -64,11 +52,11 @@ public final class BarrelRegistry {
         return ret;
     }
 
-    public Collection<ItemStack> getBarrels() {
+    public List<ItemStack> getBarrels() {
         return Collections.unmodifiableList(BARRELS);
     }
 
-    public Collection<ItemStack> getBarrels(TileEntityDayBarrel.Type type) {
+    public List<ItemStack> getBarrels(TileEntityDayBarrel.Type type) {
         return Collections.unmodifiableList(BARRELS_TYPE.get(type));
     }
 }

@@ -79,7 +79,7 @@ public final class SpaceUtils {
     }
 
     public static Vec3d copy(Vec3d a) {
-        return new Vec3d(a.xCoord, a.yCoord, a.zCoord);
+        return new Vec3d(a.x, a.y, a.z);
     }
 
     public static AxisAlignedBB copy(AxisAlignedBB box) {
@@ -91,9 +91,9 @@ public final class SpaceUtils {
     }
 
     public static void setEntityVelocity(Entity ent, Vec3d vec) {
-        ent.motionX = vec.xCoord;
-        ent.motionY = vec.yCoord;
-        ent.motionZ = vec.zCoord;
+        ent.motionX = vec.x;
+        ent.motionY = vec.y;
+        ent.motionZ = vec.z;
     }
 
     public static int ordinal(@Nullable EnumFacing side) {
@@ -117,19 +117,19 @@ public final class SpaceUtils {
 
     /** Sets the entity's position directly. Does *NOT* update the bounding box! */
     public static void setEntityPosition(Entity ent, Vec3d pos) {
-        ent.posX = pos.xCoord;
-        ent.posY = pos.yCoord;
-        ent.posZ = pos.zCoord;
+        ent.posX = pos.x;
+        ent.posY = pos.y;
+        ent.posZ = pos.z;
     }
 
     /** Sets the entity's position using its setter. Will (presumably) update the bounding box. */
     public static void setEntPos(Entity ent, Vec3d pos) {
-        ent.setPosition(pos.xCoord, pos.yCoord, pos.zCoord);
+        ent.setPosition(pos.x, pos.y, pos.z);
     }
 
     public static AxisAlignedBB setMin(AxisAlignedBB aabb, Vec3d v) {
         return new AxisAlignedBB(
-                v.xCoord, v.yCoord, v.zCoord,
+                v.x, v.y, v.z,
                 aabb.maxX, aabb.maxY, aabb.maxZ);
     }
 
@@ -144,7 +144,7 @@ public final class SpaceUtils {
     public static AxisAlignedBB setMax(AxisAlignedBB aabb, Vec3d v) {
         return new AxisAlignedBB(
                 aabb.minX, aabb.minY, aabb.minZ,
-                v.xCoord, v.yCoord, v.zCoord);
+                v.x, v.y, v.z);
     }
 
     public static Vec3d getMiddle(AxisAlignedBB ab) {
@@ -163,12 +163,12 @@ public final class SpaceUtils {
     }
 
     public static Pair<Vec3d, Vec3d> sort(Vec3d left, Vec3d right) {
-        double minX = Math.min(left.xCoord, right.xCoord);
-        double maxX = Math.max(left.xCoord, right.xCoord);
-        double minY = Math.min(left.yCoord, right.yCoord);
-        double maxY = Math.max(left.yCoord, right.yCoord);
-        double minZ = Math.min(left.zCoord, right.zCoord);
-        double maxZ = Math.max(left.zCoord, right.zCoord);
+        double minX = Math.min(left.x, right.x);
+        double maxX = Math.max(left.x, right.x);
+        double minY = Math.min(left.y, right.y);
+        double maxY = Math.max(left.y, right.y);
+        double minZ = Math.min(left.z, right.z);
+        double maxZ = Math.max(left.z, right.z);
         return Pair.of(new Vec3d(minX, minY, minZ), new Vec3d(maxX, maxY, maxZ));
     }
 
@@ -212,7 +212,7 @@ public final class SpaceUtils {
     }
 
     public static Vec3d average(Vec3d a, Vec3d b) {
-        return new Vec3d((a.xCoord + b.xCoord) / 2, (a.yCoord + b.yCoord) / 2, (a.zCoord + b.zCoord) / 2);
+        return new Vec3d((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
     }
 
     public static double getAngle(Vec3d a, Vec3d b) {
@@ -229,35 +229,35 @@ public final class SpaceUtils {
     }
 
     public static Vec3d scale(Vec3d base, double s) {
-        return new Vec3d(base.xCoord * s, base.yCoord * s, base.zCoord * s);
+        return new Vec3d(base.x * s, base.y * s, base.z * s);
     }
 
     public static Vec3d componentMultiply(Vec3d a, Vec3d b) {
-        return new Vec3d(a.xCoord + b.xCoord, a.yCoord + b.yCoord, a.zCoord + b.zCoord);
+        return new Vec3d(a.x + b.x, a.y + b.y, a.z + b.z);
     }
 
     public static Vec3d componentMultiply(Vec3d a, double x, double y, double z) {
-        return new Vec3d(a.xCoord + x, a.yCoord + y, a.zCoord + z);
+        return new Vec3d(a.x + x, a.y + y, a.z + z);
     }
 
     public static AxisAlignedBB sortedBox(Vec3d min, Vec3d max) {
-        double minX = Math.min(min.xCoord, max.xCoord);
-        double minY = Math.min(min.yCoord, max.yCoord);
-        double minZ = Math.min(min.zCoord, max.zCoord);
-        double maxX = Math.max(min.xCoord, max.xCoord);
-        double maxY = Math.max(min.yCoord, max.yCoord);
-        double maxZ = Math.max(min.zCoord, max.zCoord);
+        double minX = Math.min(min.x, max.x);
+        double minY = Math.min(min.y, max.y);
+        double minZ = Math.min(min.z, max.z);
+        double maxX = Math.max(min.x, max.x);
+        double maxY = Math.max(min.y, max.y);
+        double maxZ = Math.max(min.z, max.z);
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public static AxisAlignedBB withPoint(AxisAlignedBB box, Vec3d vec) {
         return new AxisAlignedBB(
-                vec.xCoord < box.minX ? vec.xCoord : box.minX,
-                vec.yCoord < box.minY ? vec.yCoord : box.minY,
-                vec.zCoord < box.minZ ? vec.zCoord : box.minZ,
-                box.maxX < vec.xCoord ? vec.xCoord : box.maxX,
-                box.maxY < vec.yCoord ? vec.yCoord : box.maxY,
-                box.maxZ < vec.zCoord ? vec.zCoord : box.maxZ
+                vec.x < box.minX ? vec.x : box.minX,
+                vec.y < box.minY ? vec.y : box.minY,
+                vec.z < box.minZ ? vec.z : box.minZ,
+                box.maxX < vec.x ? vec.x : box.maxX,
+                box.maxY < vec.y ? vec.y : box.maxY,
+                box.maxZ < vec.z ? vec.z : box.maxZ
         );
     }
 
@@ -284,14 +284,14 @@ public final class SpaceUtils {
             if (v == null) continue;
             if (first) {
                 first = false;
-                x = v.xCoord;
-                y = v.yCoord;
-                z = v.zCoord;
+                x = v.x;
+                y = v.y;
+                z = v.z;
                 continue;
             }
-            if (v.xCoord < x) x = v.xCoord;
-            if (v.yCoord < y) y = v.yCoord;
-            if (v.zCoord < z) z = v.zCoord;
+            if (v.x < x) x = v.x;
+            if (v.y < y) y = v.y;
+            if (v.z < z) z = v.z;
         }
         return new Vec3d(x, y, z);
     }
@@ -305,20 +305,20 @@ public final class SpaceUtils {
             if (v == null) continue;
             if (first) {
                 first = false;
-                x = v.xCoord;
-                y = v.yCoord;
-                z = v.zCoord;
+                x = v.x;
+                y = v.y;
+                z = v.z;
                 continue;
             }
-            if (v.xCoord > x) x = v.xCoord;
-            if (v.yCoord > y) y = v.yCoord;
-            if (v.zCoord > z) z = v.zCoord;
+            if (v.x > x) x = v.x;
+            if (v.y > y) y = v.y;
+            if (v.z > z) z = v.z;
         }
         return new Vec3d(x, y, z);
     }
 
     public static boolean isZero(Vec3d vec) {
-        return vec.xCoord == 0 && vec.yCoord == 0 && vec.zCoord == 0;
+        return vec.x == 0 && vec.y == 0 && vec.z == 0;
     }
 
     /**
@@ -351,28 +351,28 @@ public final class SpaceUtils {
         switch (facing) {
             default:
             case DOWN:
-                u = 1 - hit.xCoord;
-                v = hit.zCoord;
+                u = 1 - hit.x;
+                v = hit.z;
                 break;
             case UP:
-                u = hit.xCoord;
-                v = hit.zCoord;
+                u = hit.x;
+                v = hit.z;
                 break;
             case NORTH:
-                u = hit.xCoord;
-                v = hit.yCoord;
+                u = hit.x;
+                v = hit.y;
                 break;
             case SOUTH:
-                u = 1 - hit.xCoord;
-                v = hit.yCoord;
+                u = 1 - hit.x;
+                v = hit.y;
                 break;
             case WEST:
-                u = 1 - hit.zCoord;
-                v = hit.yCoord;
+                u = 1 - hit.z;
+                v = hit.y;
                 break;
             case EAST:
-                u = hit.zCoord;
-                v = hit.yCoord;
+                u = hit.z;
+                v = hit.y;
                 break;
         }
         u -= 0.5;
@@ -413,7 +413,7 @@ public final class SpaceUtils {
     }
 
     public static double componentSum(Vec3d vec) {
-        return vec.xCoord + vec.yCoord + vec.zCoord;
+        return vec.x + vec.y + vec.z;
     }
 
     public static EnumFacing getClosestDirection(Vec3d vec) {
@@ -439,9 +439,9 @@ public final class SpaceUtils {
 
     public static Vec3d floor(Vec3d vec) {
         return new Vec3d(
-                Math.floor(vec.xCoord),
-                Math.floor(vec.yCoord),
-                Math.floor(vec.zCoord));
+                Math.floor(vec.x),
+                Math.floor(vec.y),
+                Math.floor(vec.z));
     }
 
     public static Vec3d normalize(Vec3d v) {
@@ -481,12 +481,12 @@ public final class SpaceUtils {
         double minZ = box.minZ;
         double maxZ = box.maxZ;
 
-        if (at.xCoord < minX) minX = at.xCoord;
-        if (at.xCoord > maxX) maxX = at.xCoord;
-        if (at.yCoord < minY) minY = at.yCoord;
-        if (at.yCoord > maxY) maxY = at.yCoord;
-        if (at.zCoord < minZ) minZ = at.zCoord;
-        if (at.zCoord > maxZ) maxZ = at.zCoord;
+        if (at.x < minX) minX = at.x;
+        if (at.x > maxX) maxX = at.x;
+        if (at.y < minY) minY = at.y;
+        if (at.y > maxY) maxY = at.y;
+        if (at.z < minZ) minZ = at.z;
+        if (at.z > maxZ) maxZ = at.z;
 
         return new AxisAlignedBB(
                 minX, minY, minZ,
@@ -575,7 +575,7 @@ public final class SpaceUtils {
     }
 
     public static Vector3d toJavaVector(Vec3d val) {
-        return new Vector3d(val.xCoord, val.yCoord, val.zCoord);
+        return new Vector3d(val.x, val.y, val.z);
     }
 
     public static AxisAlignedBB getChunkBoundingBox(Chunk chunk) {

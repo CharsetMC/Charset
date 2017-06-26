@@ -76,7 +76,7 @@ public class BarrelEventListener {
         }
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(-cameraPos.xCoord, -cameraPos.yCoord, -cameraPos.zCoord);
+        GlStateManager.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         EnumFacing fd = trace.sideHit;
         BlockPos v = trace.getBlockPos().add(fd.getDirectionVec());
         GlStateManager.translate(v.getX(), v.getY(), v.getZ());

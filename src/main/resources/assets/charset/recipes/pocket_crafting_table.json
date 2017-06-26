@@ -1,0 +1,22 @@
+{
+  "type": "charset:shaped",
+  "group": "pocket_crafting_table",
+  "pattern": [
+    " c",
+    "s "
+  ],
+  "key": {
+    "c": {
+      "type": "forge:ore_dict",
+      "ore": "workbench"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    }
+  },
+  "result": {
+    "item": "charset:pocketTable",
+    "count": 1
+  }
+}

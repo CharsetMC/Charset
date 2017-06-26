@@ -70,7 +70,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     protected ModelFactory(IUnlistedProperty<T> property, ResourceLocation particle) {
         super();
-        this.FACTORIES.add(this);
+        FACTORIES.add(this);
 
         this.particle = particle;
         this.cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();

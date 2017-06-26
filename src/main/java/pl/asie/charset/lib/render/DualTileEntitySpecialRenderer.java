@@ -1,10 +1,10 @@
 package pl.asie.charset.lib.render;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -17,9 +17,9 @@ import org.lwjgl.opengl.GL11;
 public class DualTileEntitySpecialRenderer<T extends TileEntity> extends TileEntitySpecialRenderer<T> {
 	protected final Minecraft mc = Minecraft.getMinecraft();
 
-	protected void renderTileEntityFastFromSlow(T part, double x, double y, double z, float partialTicks, int destroyStage) {
+	protected void renderTileEntityFastFromSlow(T part, double x, double y, double z, float partialTicks, int destroyStage, float todo_figure_me_out) {
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer VertexBuffer = tessellator.getBuffer();
+		BufferBuilder builder = tessellator.getBuffer();
 		this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		RenderHelper.disableStandardItemLighting();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -35,10 +35,10 @@ public class DualTileEntitySpecialRenderer<T extends TileEntity> extends TileEnt
 			GlStateManager.shadeModel(GL11.GL_FLAT);
 		}
 
-		VertexBuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+		builder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
-		renderTileEntityFast(part, x, y, z, partialTicks, destroyStage, VertexBuffer);
-		VertexBuffer.setTranslation(0, 0, 0);
+		renderTileEntityFast(part, x, y, z, partialTicks, destroyStage, todo_figure_me_out, builder);
+		builder.setTranslation(0, 0, 0);
 
 		tessellator.draw();
 

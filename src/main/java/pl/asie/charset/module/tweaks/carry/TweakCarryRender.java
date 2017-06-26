@@ -3,9 +3,9 @@ package pl.asie.charset.module.tweaks.carry;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -88,7 +88,7 @@ public class TweakCarryRender {
 
 			try {
 				Tessellator tessellator = Tessellator.getInstance();
-				VertexBuffer buffer = tessellator.getBuffer();
+				BufferBuilder buffer = tessellator.getBuffer();
 
 				if (carryHandler.getBlockState().getRenderType() == EnumBlockRenderType.MODEL) {
 					buffer.setTranslation(0, -64, 0);
@@ -131,7 +131,7 @@ public class TweakCarryRender {
 						}
 					} else {
 						try {
-							TileEntityRendererDispatcher.instance.renderTileEntityAt(tile, 0, 0, 0, partialTicks);
+							TileEntityRendererDispatcher.instance.render(tile, 0, 0, 0, partialTicks);
 						} catch (Exception e) {
 							// Hack of the Year award for the Least Graceful Recovery
 							buffer.setTranslation(0, 0, 0);

@@ -37,6 +37,7 @@
 package pl.asie.charset.lib.notify;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityMinecart;
@@ -97,7 +98,7 @@ class ClientMessage {
             EntityPlayer player = Minecraft.getMinecraft().player;
             ArrayList<String> bits = new ArrayList<String>();
             try {
-                item.getItem().addInformation(item, player, bits, false);
+                item.getItem().addInformation(item, player.getEntityWorld(), bits, ITooltipFlag.TooltipFlags.NORMAL);
             } catch (Throwable t) {
                 t.printStackTrace();
                 bits.add("" + TextFormatting.RED + TextFormatting.BOLD + "ERROR");

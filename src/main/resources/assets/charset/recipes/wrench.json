@@ -1,0 +1,23 @@
+{
+  "type": "charset:shaped",
+  "group": "wrench",
+  "pattern": [
+    " i ",
+    " si",
+    "i  "
+  ],
+  "key": {
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    }
+  },
+  "result": {
+    "item": "charset:wrench",
+    "count": 1
+  }
+}

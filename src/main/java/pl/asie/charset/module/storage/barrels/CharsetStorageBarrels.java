@@ -1,16 +1,20 @@
 package pl.asie.charset.module.storage.barrels;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -30,6 +34,7 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.module.misc.scaffold.ModelScaffold;
 
 @CharsetModule(
 		name = "storage.barrels",
@@ -69,30 +74,47 @@ public class CharsetStorageBarrels {
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
 		barrelCartItem = new ItemMinecartDayBarrel();
-		RegistryUtils.register(barrelBlock, barrelItem, "barrel");
-		RegistryUtils.register(barrelCartItem, "barrelCart");
 
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.register(new BarrelEventListener());
-
-		RegistryUtils.registerModel(barrelItem, 0, "charset:barrel");
-		RegistryUtils.registerModel(barrelCartItem, 0, "charset:barrelCart");
 
 		renderBarrelItem3D = config.getBoolean("renderItem3D", "render", false, "Should items use fancy 3D rendering?");
 		renderBarrelItem = config.getBoolean("renderItem", "render", true, "Should items be rendered on barrels?");
 		renderBarrelText = config.getBoolean("renderText", "render", true, "Should text be rendered on barrels?");
 		enableSilkyBarrels = config.getBoolean("enableSilkyBarrels", "features", !ModCharset.isModuleLoaded("tweak.blockCarrying"), "Enable silky barrels. On by default unless tweak.blockCarrying is also present.");
 		enableHoppingBarrels = config.getBoolean("enableHoppingBarrels", "features", true, "Enable hopping barrels. On by default.");
+	}
 
-		FMLInterModComms.sendMessage("charset", "addCarry", barrelBlock.getRegistryName());
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
+		RegistryUtils.registerModel(barrelItem, 0, "charset:barrel");
+		RegistryUtils.registerModel(barrelCartItem, 0, "charset:barrelCart");
+	}
+
+	@SubscribeEvent
+	public void registerBlocks(RegistryEvent.Register<Block> event) {
+		RegistryUtils.register(event.getRegistry(), barrelBlock, "barrel");
+	}
+
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), barrelItem, "barrel");
+		RegistryUtils.register(event.getRegistry(), barrelCartItem, "barrelCart");
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		GameRegistry.registerTileEntityWithAlternatives(TileEntityDayBarrel.class, "charset:barrel", "charsetstorage:barrel");
+		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
 		RegistryUtils.register(EntityMinecartDayBarrel.class, "barrelCart", 64, 1, true);
 
 		packet.registerPacket(0x01, PacketBarrelCountUpdate.class);
+		FMLInterModComms.sendMessage("charset", "addCarry", barrelBlock.getRegistryName());
+	}
+
+	@SubscribeEvent
+	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+		event.getRegistry().register(new BarrelCartRecipe("barrel_cart").setRegistryName("barrel_cart"));
+		BarrelUpgradeRecipes.addUpgradeRecipes(event.getRegistry());
 	}
 
 	@Mod.EventHandler
@@ -103,11 +125,6 @@ public class CharsetStorageBarrels {
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.DIAMOND_BLOCK))
 		);
 		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
-
-		GameRegistry.addRecipe(new BarrelCartRecipe());
-		BarrelUpgradeRecipes.addUpgradeRecipes();
-
-		RecipeSorter.register("charsetstorage:barrelCart", BarrelCartRecipe.class, RecipeSorter.Category.SHAPELESS, "");
 
 		// If you stop this from happening in postInit, please adjust TextureStitchEvent in ProxyClient
 		for (ItemMaterial log : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("log", "block")) {
@@ -125,7 +142,7 @@ public class CharsetStorageBarrels {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void preInitClient(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, manager -> new RenderMinecartDayBarrel(manager));
+		RenderingRegistry.registerEntityRenderingHandler(EntityMinecartDayBarrel.class, RenderMinecartDayBarrel::new);
 	}
 
 	@Mod.EventHandler
@@ -150,6 +167,6 @@ public class CharsetStorageBarrels {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:barrel", "normal"), BarrelModel.INSTANCE);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:barrel", "inventory"), BarrelModel.INSTANCE);
 
-		BarrelModel.INSTANCE.template = (IRetexturableModel) RenderUtils.getModel(new ResourceLocation("charset:block/barrel"));
+		BarrelModel.INSTANCE.template = RenderUtils.getModel(new ResourceLocation("charset:block/barrel"));
 	}
 }

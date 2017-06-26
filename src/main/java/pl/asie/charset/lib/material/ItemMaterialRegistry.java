@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -115,7 +116,7 @@ public class ItemMaterialRegistry {
 		return materialTypes.get(material);
 	}
 
-	protected ItemMaterial getMaterialIfPresent(ItemStack stack) {
+	public ItemMaterial getMaterialIfPresent(ItemStack stack) {
 		return materialsById.get(createId(stack));
 	}
 
@@ -162,4 +163,26 @@ public class ItemMaterialRegistry {
 	public Collection<ItemMaterial> getAllMaterials() {
 		return materialsById.values();
 	}
+
+	public boolean matches(ItemStack stack, ItemMaterial mat) {
+		return ItemUtils.canMerge(mat.getStack(), stack);
+	}
+
+    public boolean matches(ItemStack stack, String[] mats) {
+		for (String mat : mats) {
+			boolean valid = true;
+			if (mat.startsWith("!")) {
+				mat = mat.substring(1);
+				valid = false;
+			}
+
+			for (ItemMaterial material : materialsByType.get(mat)) {
+				if (ItemUtils.canMerge(material.getStack(), stack)) {
+					return valid;
+				}
+			}
+		}
+
+		return false;
+    }
 }

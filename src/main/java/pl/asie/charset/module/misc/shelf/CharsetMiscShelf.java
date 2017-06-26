@@ -24,8 +24,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.model.IRetexturableModel;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -58,10 +59,23 @@ public class CharsetMiscShelf {
 	public void preInit(FMLPreInitializationEvent event) {
 		shelfBlock = new BlockShelf();
 		shelfItem = new ItemShelf(shelfBlock);
-		RegistryUtils.register(shelfBlock, shelfItem, "shelf");
-		RegistryUtils.registerModel(shelfBlock, 0, "charset:shelf");
 
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
+		RegistryUtils.registerModel(shelfItem, 0, "charset:shelf");
+	}
+
+	@SubscribeEvent
+	public void registerBlocks(RegistryEvent.Register<Block> event) {
+		RegistryUtils.register(event.getRegistry(), shelfBlock, "shelf");
+	}
+
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), shelfItem, "shelf");
 	}
 
 	@Mod.EventHandler
@@ -77,29 +91,6 @@ public class CharsetMiscShelf {
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ShadingTintColorHandler.INSTANCE, shelfItem);
 	}
 
-	private void registerShelfRecipe(ItemMaterial plankMaterial) {
-		ItemStack plank = plankMaterial.getStack();
-		ItemStack shelf = BlockShelf.createStack(plankMaterial, 4);
-
-		BlockShelf.PLANKS.add(plankMaterial);
-
-		/* GameRegistry.addRecipe(new ShapedOreRecipe(shelf,
-				"ppp",
-				" s ",
-				"s s",
-				's', "stickWood", 'p', plank
-		)); */
-	}
-
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-		if (shelfBlock != null) {
-			for (ItemMaterial plankMaterial : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("plank", "block")) {
-				registerShelfRecipe(plankMaterial);
-			}
-		}
-	}
-
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
@@ -111,6 +102,6 @@ public class CharsetMiscShelf {
 
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:shelf", "inventory"), ModelShelf.INSTANCE);
 
-		ModelShelf.shelfModel = (IRetexturableModel) RenderUtils.getModel(new ResourceLocation("charset:block/shelf"));
+		ModelShelf.shelfModel = RenderUtils.getModel(new ResourceLocation("charset:block/shelf"));
 	}
 }

@@ -25,11 +25,11 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
 
-@CharsetModule(
+/* @CharsetModule(
 		name = "tweak.unifyColors",
 		description = "Unifies various colored block and item colors. Works with resource packs!",
 		isClientOnly = true
-)
+) */
 public class CharsetTweakUnifyColors {
 	private final Gson gson = new Gson();
 	private final ResourceLocation COLOR_PALETTE_LOC = new ResourceLocation("charset", "color_palette.json");

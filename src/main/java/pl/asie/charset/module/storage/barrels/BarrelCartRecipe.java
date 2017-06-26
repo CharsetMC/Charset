@@ -36,13 +36,19 @@
 
 package pl.asie.charset.module.storage.barrels;
 
+import com.google.gson.JsonObject;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.recipe.RecipeBase;
 
 public class BarrelCartRecipe extends RecipeBase {
+    public BarrelCartRecipe(String group) {
+        super(group);
+    }
+
     @Override
     public boolean matches(InventoryCrafting inv, World world) {
         boolean found_barrel = false, found_cart = false;
@@ -78,8 +84,8 @@ public class BarrelCartRecipe extends RecipeBase {
     }
 
     @Override
-    public int getRecipeSize() {
-        return 2;
+    public boolean canFit(int width, int height) {
+        return width * height >= 2;
     }
 
     @Override

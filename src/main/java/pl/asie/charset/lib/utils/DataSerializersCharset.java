@@ -37,6 +37,11 @@ public final class DataSerializersCharset {
         {
             return new DataParameter(id, this);
         }
+
+        @Override
+        public Quaternion copyValue(Quaternion value) {
+            return new Quaternion(value);
+        }
     };
 
     public static final DataSerializer<NBTTagCompound> NBT_TAG_COMPOUND = new DataSerializer<NBTTagCompound>() {
@@ -53,6 +58,11 @@ public final class DataSerializersCharset {
         @Override
         public DataParameter<NBTTagCompound> createKey(int id) {
             return new DataParameter(id, this);
+        }
+
+        @Override
+        public NBTTagCompound copyValue(NBTTagCompound value) {
+            return value.copy();
         }
     };
 

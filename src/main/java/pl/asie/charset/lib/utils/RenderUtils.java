@@ -16,12 +16,11 @@
 
 package pl.asie.charset.lib.utils;
 
-import com.google.common.base.Function;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
@@ -46,6 +45,7 @@ import pl.asie.charset.lib.render.CharsetFaceBakery;
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.function.Function;
 
 public final class RenderUtils {
 	public static final CharsetFaceBakery BAKERY = new CharsetFaceBakery();
@@ -221,7 +221,7 @@ public final class RenderUtils {
 		return 1 << (y * 4 + x * 2 + z);
 	}
 
-	private static void drawLine(VertexBuffer worldrenderer, Tessellator tessellator, double x1, double y1, double z1, double x2, double y2, double z2) {
+	private static void drawLine(BufferBuilder worldrenderer, Tessellator tessellator, double x1, double y1, double z1, double x2, double y2, double z2) {
 		worldrenderer.pos(x1, y1, z1).endVertex();
 		worldrenderer.pos(x2, y2, z2).endVertex();
 	}
@@ -269,7 +269,7 @@ public final class RenderUtils {
 		double d1 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
 		double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
 
-		AxisAlignedBB boundingBox = box.expandXyz(0.0020000000949949026D).offset(-d0, -d1, -d2);
+		AxisAlignedBB boundingBox = box.grow(0.0020000000949949026D).offset(-d0, -d1, -d2);
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 		GlStateManager.color(0.0F, 0.0F, 0.0F, 0.4F);
@@ -278,7 +278,7 @@ public final class RenderUtils {
 		GlStateManager.depthMask(false);
 
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer worldrenderer = tessellator.getBuffer();
+		BufferBuilder worldrenderer = tessellator.getBuffer();
 		worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 		if ((lineMask & getSelectionMask(0, 0, 0)) != 0) {
 			drawLine(worldrenderer, tessellator,

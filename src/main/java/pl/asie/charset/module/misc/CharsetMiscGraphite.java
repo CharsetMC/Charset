@@ -19,9 +19,12 @@ package pl.asie.charset.module.misc;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -37,14 +40,20 @@ public class CharsetMiscGraphite {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		graphite = new Item().setUnlocalizedName("charset.graphite");
-		RegistryUtils.register(graphite, "graphite");
+	}
 
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), graphite, "graphite");
+	}
+
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(graphite, 0, "charset:graphite");
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		OreDictionary.registerOre("dyeBlack", graphite);
-		GameRegistry.addShapelessRecipe(new ItemStack(graphite, 2, 0), new ItemStack(Items.COAL, 1, 1));
 	}
 }

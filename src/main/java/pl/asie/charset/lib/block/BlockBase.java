@@ -123,8 +123,12 @@ public abstract class BlockBase extends Block {
 		return 1;
 	}
 
+	public void wipeSubBlocksCache() {
+		items = null;
+	}
+
 	@Override
-	public void getSubBlocks(Item me, CreativeTabs tab, NonNullList<ItemStack> itemList) {
+	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> itemList) {
 		if (items == null) {
 			ImmutableList.Builder<ItemStack> builder = ImmutableList.builder();
 			builder.addAll(getCreativeItems());

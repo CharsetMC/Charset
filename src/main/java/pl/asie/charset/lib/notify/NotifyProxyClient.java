@@ -180,7 +180,7 @@ public class NotifyProxyClient extends NotifyProxy {
             }
             if (!m.style.contains(NoticeStyle.DRAWFAR)) {
                 Vec3d pos = m.getPosition(event.getPartialTicks());
-                double dist = camera.getDistance(pos.xCoord, pos.yCoord, pos.zCoord);
+                double dist = camera.getDistance(pos.x, pos.y, pos.z);
                 if (dist > 8) {
                     continue;
                 }
@@ -233,9 +233,9 @@ public class NotifyProxyClient extends NotifyProxy {
 
         Vec3d vec = m.getPosition(partial);
         
-        float x = (float) vec.xCoord;
-        float y = (float) vec.yCoord;
-        float z = (float) vec.zCoord;
+        float x = (float) vec.x;
+        float y = (float) vec.y;
+        float z = (float) vec.z;
         if (m.style.contains(NoticeStyle.SCALE_SIZE)) {
             double dx = x - cx;
             double dy = y - cy;

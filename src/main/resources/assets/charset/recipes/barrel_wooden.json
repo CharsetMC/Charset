@@ -1,0 +1,27 @@
+{
+  "type": "charset:shaped",
+  "group": "barrel",
+  "pattern": [
+    "W-W",
+    "W W",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "type": "charset:material",
+      "material": ["log", "block"],
+      "nbtKey": "log"
+    },
+    "-": {
+      "type": "charset:material",
+      "material": ["plank", "slab"],
+      "chain": "W.plank.slab",
+      "nbtKey": "slab"
+    }
+  },
+  "result": {
+    "item": "charset:barrel",
+    "count": 1
+  }
+}
+

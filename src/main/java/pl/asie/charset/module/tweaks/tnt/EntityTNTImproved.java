@@ -64,7 +64,7 @@ public class EntityTNTImproved extends EntityTNTPrimed {
             return false;
         } else {
             this.setBeenAttacked();
-            Entity entity = source.getEntity();
+            Entity entity = source.getImmediateSource(); // TODO: Correct?
 
             if (entity != null) {
                 double d1 = entity.posX - this.posX;

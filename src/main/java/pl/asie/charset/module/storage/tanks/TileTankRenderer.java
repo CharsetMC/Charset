@@ -3,7 +3,7 @@ package pl.asie.charset.module.storage.tanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -62,7 +62,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
     }
 
     // TODO: Rewrite this to render per-tank-block?
-    public static void renderModel(IBlockAccess access, BlockPos pos, VertexBuffer buffer, FluidStack contents, int tankCount) {
+    public static void renderModel(IBlockAccess access, BlockPos pos, BufferBuilder buffer, FluidStack contents, int tankCount) {
         TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
         TextureAtlasSprite sprite = map.getTextureExtry(contents.getFluid().getStill().toString());
         if (sprite == null) {
@@ -115,7 +115,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
     }
 
     @Override
-    public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, @Nonnull VertexBuffer vertexBuffer) {
+    public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, float todo_figure_me_out, @Nonnull BufferBuilder vertexBuffer) {
         boolean isCarrying = te.getWorld() == null;
         if (te.fluidStack == null || (!isCarrying && te.getBottomTank() != te))
             return;

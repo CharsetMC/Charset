@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.IRetexturableModel;
 import net.minecraftforge.common.model.TRSRTransformation;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.WrappedBakedModel;
@@ -15,7 +14,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 public class ModelScaffold extends ModelFactory<ScaffoldCacheInfo> {
 	public static final ModelScaffold INSTANCE = new ModelScaffold();
-	public static IRetexturableModel scaffoldModel;
+	public static IModel scaffoldModel;
 
 	public ModelScaffold() {
 		super(TileScaffold.PROPERTY, TextureMap.LOCATION_MISSING_TEXTURE);

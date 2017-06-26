@@ -20,6 +20,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -79,10 +80,14 @@ public class CharsetTransportCarts {
             MinecraftForge.EVENT_BUS.register(linker);
 
             itemLinker = new Item().setCreativeTab(ModCharset.CREATIVE_TAB).setUnlocalizedName("linker").setMaxStackSize(1);
-            RegistryUtils.register(itemLinker, "linker");
         }
 
         combiner = new TrackCombiner();
+    }
+
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        RegistryUtils.register(event.getRegistry(), itemLinker, "linker");
     }
 
     private void registerCombinerRecipeForDirs(Block railSrc, IProperty<BlockRailBase.EnumRailDirection> propSrc, Block railDst, IProperty<BlockRailBase.EnumRailDirection> propDst, ItemStack with) {

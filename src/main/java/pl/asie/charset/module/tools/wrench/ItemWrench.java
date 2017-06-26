@@ -18,7 +18,6 @@ package pl.asie.charset.module.tools.wrench;
 
 import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
-import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.multipart.MultipartHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;

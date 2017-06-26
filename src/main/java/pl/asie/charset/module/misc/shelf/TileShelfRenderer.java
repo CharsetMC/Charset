@@ -18,7 +18,7 @@ public class TileShelfRenderer extends TileEntitySpecialRenderer<TileShelf> {
     private final RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 
     @Override
-    public void renderTileEntityAt(TileShelf tile, double x, double y, double z, float partialTicks, int destroyStage) {
+    public void render(TileShelf tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         IBlockState state = getWorld().getBlockState(tile.getPos());
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
@@ -34,11 +34,11 @@ public class TileShelfRenderer extends TileEntitySpecialRenderer<TileShelf> {
                 IBakedModel model = renderItem.getItemModelWithOverrides(stack, tile.getWorld(), null);
                 GlStateManager.translate(x, y, z);
                 GlStateManager.rotate(state.getValue(Properties.FACING4).getHorizontalAngle(), 0, 1, 0);
-                GlStateManager.translate(offset.xCoord, offset.yCoord, offset.zCoord);
+                GlStateManager.translate(offset.x, offset.y, offset.z);
                 GlStateManager.scale(0.25F, 0.25F, 0.25F);
 
                 //
-                //GlStateManager.translate(offset.xCoord, offset.yCoord,  offset.zCoord);
+                //GlStateManager.translate(offset.x, offset.y,  offset.z);
                 //GlStateManager.scale(0.25F, 0.25F, 0.25F);]
 
                 renderItem.renderItem(stack, model);

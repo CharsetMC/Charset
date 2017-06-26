@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
+import java.util.function.Function;
 
 public abstract class PixelOperationSprite extends TextureAtlasSprite {
     public static class Multiply extends PixelOperationSprite {
@@ -38,7 +39,7 @@ public abstract class PixelOperationSprite extends TextureAtlasSprite {
     }
 
     @Override
-    public boolean load(IResourceManager manager, ResourceLocation loc) {
+    public boolean load(IResourceManager manager, ResourceLocation loc, Function<ResourceLocation, TextureAtlasSprite> getter) {
         BufferedImage image = RenderUtils.getTextureImage(location);
         if (image == null) {
             return false;

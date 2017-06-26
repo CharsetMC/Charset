@@ -199,7 +199,7 @@ public class Quaternion {
     }
     
     public void update(Vec3d v) {
-        update(0, v.xCoord, v.yCoord, v.zCoord);
+        update(0, v.x, v.y, v.z);
     }
 
     public Vec3d toVector() {
@@ -243,7 +243,7 @@ public class Quaternion {
     public static Quaternion getRotationQuaternionRadians(double angle, Vec3d axis) {
         double halfAngle = angle/2;
         double sin = Math.sin(halfAngle);
-        return new Quaternion(Math.cos(halfAngle), axis.xCoord*sin, axis.yCoord*sin, axis.zCoord*sin);
+        return new Quaternion(Math.cos(halfAngle), axis.x*sin, axis.y*sin, axis.z*sin);
     }
     
     public static Quaternion getRotationQuaternionRadians(double angle, EnumFacing axis) {

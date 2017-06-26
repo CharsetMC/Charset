@@ -35,7 +35,7 @@ public final class RecipeUtils {
     }
 
     public static ItemStack getCraftingResult(World world, InventoryCrafting crafting) {
-        IRecipe recipe = findMatchingRecipe(crafting, world);
+        IRecipe recipe = CraftingManager.findMatchingRecipe(crafting, world);
         if (recipe != null) {
             ItemStack output = recipe.getCraftingResult(crafting);
             if (!output.isEmpty()) {
@@ -46,13 +46,8 @@ public final class RecipeUtils {
         return ItemStack.EMPTY;
     }
 
+    @Deprecated
     public static IRecipe findMatchingRecipe(InventoryCrafting crafting, World world) {
-        for (IRecipe recipe : CraftingManager.getInstance().getRecipeList()) {
-            if (recipe.matches(crafting, world)) {
-                return recipe;
-            }
-        }
-
-        return null;
+        return CraftingManager.findMatchingRecipe(crafting, world);
     }
 }

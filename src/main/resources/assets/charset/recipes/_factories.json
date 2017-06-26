@@ -1,0 +1,10 @@
+{
+  "ingredients": {
+    "material": "pl.asie.charset.lib.recipe.IngredientMaterialFactory"
+  },
+  "recipes": {
+    "dyeable_item": "pl.asie.charset.lib.recipe.DyeableItemRecipeFactory",
+    "shaped": "pl.asie.charset.lib.recipe.RecipeCharset$Factory",
+    "shapeless": "pl.asie.charset.lib.recipe.RecipeCharset$Factory"
+  }
+}

@@ -44,9 +44,9 @@ public class AudioSinkBlock extends AudioSink {
     public void writeData(ByteBuf buf) {
         super.writeData(buf);
         buf.writeInt(world.provider.getDimension());
-        buf.writeDouble(pos.xCoord);
-        buf.writeDouble(pos.yCoord);
-        buf.writeDouble(pos.zCoord);
+        buf.writeDouble(pos.x);
+        buf.writeDouble(pos.y);
+        buf.writeDouble(pos.z);
     }
 
     @Override

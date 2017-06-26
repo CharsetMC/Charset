@@ -54,7 +54,7 @@ public class CharsetTweakRemoveVanillaTools {
 			}
 		}
 		if (getMode() >= 2) {
-			Iterator<IRecipe> iterator = CraftingManager.getInstance().getRecipeList().iterator();
+			Iterator<IRecipe> iterator = CraftingManager.REGISTRY.iterator();
 			while (iterator.hasNext()) {
 				ItemStack output = iterator.next().getRecipeOutput();
 				if (!output.isEmpty() && itemSet.contains(output.getItem())) {

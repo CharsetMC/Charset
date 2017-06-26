@@ -23,7 +23,6 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.model.IPerspectiveAwareModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -31,7 +30,7 @@ import javax.vecmath.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleBakedModel implements IPerspectiveAwareModel {
+public class SimpleBakedModel implements IBakedModel {
     private final List<BakedQuad>[] quads = new List[7];
     private final IBakedModel parent;
     private TextureAtlasSprite particle;
@@ -91,26 +90,17 @@ public class SimpleBakedModel implements IPerspectiveAwareModel {
     }
 
     @Override
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return ItemCameraTransforms.DEFAULT;
-    }
-
-    @Override
     public ItemOverrideList getOverrides() {
         return ItemOverrideList.NONE;
     }
 
     @Override
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
-        if (parent != null && parent instanceof IPerspectiveAwareModel) {
-            Pair<? extends IBakedModel, Matrix4f> pair = ((IPerspectiveAwareModel) parent).handlePerspective(cameraTransformType);
-            if (pair.getLeft() != parent) {
-                return pair;
-            } else {
-                return ImmutablePair.of(this, pair.getRight());
-            }
+        Pair<? extends IBakedModel, Matrix4f> pair = parent.handlePerspective(cameraTransformType);
+        if (pair.getLeft() != parent) {
+            return pair;
         } else {
-            return ImmutablePair.of(this, null);
+            return ImmutablePair.of(this, pair.getRight());
         }
     }
 }

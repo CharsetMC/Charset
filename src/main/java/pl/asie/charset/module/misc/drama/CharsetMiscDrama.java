@@ -19,10 +19,13 @@ package pl.asie.charset.module.misc.drama;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -41,8 +44,15 @@ public class CharsetMiscDrama {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		dramaInABottle = new ItemDramaInABottle();
+	}
 
-		RegistryUtils.register(dramaInABottle, "dramaInABottle");
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), dramaInABottle, "dramaInABottle");
+	}
+
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(dramaInABottle, 0, "charset:dramaInABottle");
 	}
 

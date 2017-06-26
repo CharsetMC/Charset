@@ -37,10 +37,13 @@
 package pl.asie.charset.module.storage.barrels;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
@@ -75,13 +78,13 @@ public class ItemDayBarrel extends ItemBlock {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        super.addInformation(stack, playerIn, tooltip, advanced);
-        addExtraInformation(stack, playerIn, tooltip, advanced);
+    public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+        super.addInformation(stack, world, tooltip, advanced);
+        addExtraInformation(stack, world, tooltip, advanced);
     }
 
     @SideOnly(Side.CLIENT) // Invokes a client-only function getTooltip
-    protected void addExtraInformation(ItemStack is, EntityPlayer player, List<String> list, boolean verbose) {
+    protected void addExtraInformation(ItemStack is, World world, List<String> list, ITooltipFlag verbose) {
         TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getUpgrade(is);
         if (upgrade == TileEntityDayBarrel.Type.SILKY) {
             list.add(I18n.translateToLocal("tile.charset.barrel.SILKY.silkhint"));
@@ -93,8 +96,8 @@ public class ItemDayBarrel extends ItemBlock {
                     list.add("?");
                     return;
                 }
-                List<String> sub = db.item.getTooltip/* Client-only */(player, false /* Propagating verbose would be natural, but let's keep the tool-tip short */);
-                db.item.getItem().addInformation(db.item, player, sub, verbose);
+                List<String> sub = db.item.getTooltip/* Client-only */(Minecraft.getMinecraft().player, ITooltipFlag.TooltipFlags.NORMAL /* Propagating verbose would be natural, but let's keep the tool-tip short */);
+                db.item.getItem().addInformation(db.item, world, sub, verbose);
                 if (!sub.isEmpty()) {
                     Object first = sub.get(0);
                     sub.set(0, count + " " + first);

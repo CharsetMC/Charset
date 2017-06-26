@@ -1,0 +1,18 @@
+{
+  "type": "charset:shaped",
+  "group": "railCharsetCross",
+  "pattern": [
+    " r ",
+    "r r",
+    " r "
+  ],
+  "key": {
+    "r": {
+      "item": "minecraft:rail"
+    }
+  },
+  "result": {
+    "item": "charset:rail_charset",
+    "count": 2
+  }
+}

@@ -16,27 +16,52 @@
 
 package pl.asie.charset.lib.recipe;
 
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemStack;
+import com.google.gson.JsonObject;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraft.util.JsonUtils;
+import net.minecraftforge.common.crafting.JsonContext;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public abstract class RecipeBase implements IRecipe {
-	@Override
-	public int getRecipeSize() {
-		return 10;
+public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
+	private final String group;
+	private final boolean hidden;
+
+	public RecipeBase(JsonContext context, JsonObject object) {
+		if (object != null && context != null) {
+			if (object.has("group")) {
+				group = JsonUtils.getString(object, "group");
+			} else {
+				group = "";
+			}
+
+			if (object.has("hidden")) {
+				hidden = JsonUtils.getBoolean(object, "hidden");
+			} else {
+				hidden = false;
+			}
+		} else {
+			group = "";
+			hidden = false;
+		}
+	}
+
+	public RecipeBase(String group) {
+		this.group = group;
+		this.hidden = false;
+	}
+
+	public RecipeBase(String group, boolean hidden) {
+		this.group = group;
+		this.hidden = hidden;
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
-		NonNullList<ItemStack> list = NonNullList.<ItemStack>withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+	public String getGroup() {
+		return group;
+	}
 
-		for (int i = 0; i < list.size(); ++i) {
-			ItemStack itemstack = inv.getStackInSlot(i);
-			list.set(i, ForgeHooks.getContainerItem(itemstack));
-		}
-
-		return list;
+	@Override
+	public boolean isHidden() {
+		return hidden;
 	}
 }

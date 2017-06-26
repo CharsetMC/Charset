@@ -1,11 +1,16 @@
 package pl.asie.charset.module.transport.rails;
 
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -16,16 +21,26 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 )
 public class CharsetTransportRails {
     public static BlockRailCharset blockRailCross;
+    public static ItemBlock itemRailCross;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         blockRailCross = new BlockRailCharset();
-        RegistryUtils.register(blockRailCross, new ItemBlock(blockRailCross),"rail_charset");
-        RegistryUtils.registerModel(blockRailCross, 0, "charset:rail_charset");
+        itemRailCross = new ItemBlock(blockRailCross);
     }
 
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        GameRegistry.addShapedRecipe(new ItemStack(CharsetTransportRails.blockRailCross, 2), " r ", "r r", " r ", 'r', new ItemStack(Blocks.RAIL));
+    @SubscribeEvent
+    public void registerModels(ModelRegistryEvent event) {
+        RegistryUtils.registerModel(itemRailCross, 0, "charset:rail_charset");
+    }
+
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        RegistryUtils.register(event.getRegistry(), blockRailCross, "rail_charset");
+    }
+
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        RegistryUtils.register(event.getRegistry(), itemRailCross, "rail_charset");
     }
 }

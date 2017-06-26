@@ -27,7 +27,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     @Override
     public void readNBTData(NBTTagCompound nbt, boolean isClient) {
         if (nbt.hasKey("f")) {
-            WireProvider factory = WireManager.REGISTRY.getObjectById(nbt.getByte("f"));
+            WireProvider factory = WireManager.REGISTRY.getValue(nbt.getByte("f"));
             WireFace location = WireFace.VALUES[nbt.getByte("l")];
             wire = factory.create(this, location);
             wire.readNBTData(nbt, isClient);
@@ -42,7 +42,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     @Override
     public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
         if (wire != null) {
-            nbt.setByte("f", (byte) WireManager.REGISTRY.getId(wire.getFactory()));
+            nbt.setByte("f", (byte) WireManager.REGISTRY.getID(wire.getFactory()));
             nbt.setByte("l", (byte) wire.getLocation().ordinal());
             nbt = wire.writeNBTData(nbt, isClient);
         }

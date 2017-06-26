@@ -159,9 +159,9 @@ public class PacketNotification extends Packet {
 				break;
 			case VEC3:
 				Vec3d v = (Vec3d) target;
-				output.writeDouble(v.xCoord);
-				output.writeDouble(v.yCoord);
-				output.writeDouble(v.zCoord);
+				output.writeDouble(v.x);
+				output.writeDouble(v.y);
+				output.writeDouble(v.z);
 				break;
 			case ENTITY:
 				Entity ent = (Entity) target;

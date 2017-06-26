@@ -59,7 +59,7 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.Orientation;
 
 public class EntityMinecartDayBarrel extends EntityMinecart {
-    private static final DataParameter<ItemStack> BARREL_ITEM = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.OPTIONAL_ITEM_STACK);
+    private static final DataParameter<ItemStack> BARREL_ITEM = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.ITEM_STACK);
     private static final DataParameter<String> BARREL_LOG = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
     private static final DataParameter<String> BARREL_SLAB = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
     private static final DataParameter<Byte> BARREL_ORIENTATION = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
@@ -252,13 +252,14 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float f) {
-        if (source.getEntity() instanceof EntityPlayer) {
+        // TODO: Fun uses of getTrueSource?
+        if (source.getImmediateSource() instanceof EntityPlayer) {
             int oldItemCount = barrel.getItemCount();
             if (!world.isRemote) {
-                barrel.click((EntityPlayer) source.getEntity()); // TODO
+                barrel.click((EntityPlayer) source.getImmediateSource()); // TODO
                 updateDataWatcher(false);
             }
-            if (source.getEntity().isSneaking()) {
+            if (source.getImmediateSource().isSneaking()) {
                 return super.attackEntityFrom(source, f);
             }
             if (world.isRemote) {

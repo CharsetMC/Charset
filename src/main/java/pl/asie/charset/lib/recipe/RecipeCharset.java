@@ -1,41 +1,59 @@
 package pl.asie.charset.lib.recipe;
 
-import net.minecraft.block.Block;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import gnu.trove.iterator.TCharIterator;
+import gnu.trove.map.TCharObjectMap;
+import gnu.trove.map.hash.TCharObjectHashMap;
+import gnu.trove.set.TCharSet;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.JsonUtils;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.IRecipeFactory;
+import net.minecraftforge.common.crafting.JsonContext;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class RecipeCharset extends RecipeBase {
+public class RecipeCharset extends RecipeBase implements IngredientMatcher.Container {
     public enum Type {
         SHAPED,
         SHAPELESS
     }
 
-    protected IRecipeObject[] input = null;
-    protected IRecipeResult output;
+    public RecipeCharset(JsonContext context, JsonObject object) {
+        super(context, object);
+    }
+
+    public RecipeCharset(String group) {
+        super(group);
+    }
+
+    protected final TCharObjectMap<Ingredient> charToIngredient = new TCharObjectHashMap<>();
+    protected int[] shapedOrdering;
+    protected NonNullList<Ingredient> input = null;
+    protected ItemStack output;
     protected int width = 0;
     protected int height = 0;
     protected boolean mirrored = false;
     protected boolean shapeless = false;
 
-    public IRecipeObject[] getInput() {
-        return input;
+    public List<ItemStack> getExampleOutputs() {
+        // TODO
+        return Collections.singletonList(output);
     }
 
-    public IRecipeResult getOutput() {
-        return output;
+    @Override
+    public NonNullList<Ingredient> getIngredients() {
+        return input;
     }
 
     public int getWidth() {
@@ -50,19 +68,19 @@ public class RecipeCharset extends RecipeBase {
         return shapeless ? Type.SHAPELESS : Type.SHAPED;
     }
 
-    @Override
-    public boolean matches(InventoryCrafting inv, @Nullable World worldIn) {
+    protected IngredientMatcher matchedOrNull(InventoryCrafting inv) {
         if (shapeless) {
-            Set<IRecipeObject> objectSet = new HashSet<>();
-            Collections.addAll(objectSet, input);
+            Set<Ingredient> objectSet = new HashSet<>();
+            objectSet.addAll(input);
+
             for (int y = 0; y < inv.getHeight(); y++) {
                 for (int x = 0; x < inv.getWidth(); x++) {
                     ItemStack stack = inv.getStackInRowAndColumn(x, y);
                     if (!stack.isEmpty()) {
                         boolean matches = false;
 
-                        for (IRecipeObject o : objectSet) {
-                            if (o.test(stack)) {
+                        for (Ingredient o : objectSet) {
+                            if (o.apply(stack)) {
                                 matches = true;
                                 objectSet.remove(o);
                                 break;
@@ -70,155 +88,186 @@ public class RecipeCharset extends RecipeBase {
                         }
 
                         if (!matches) {
-                            return false;
+                            return null;
                         }
                     }
                 }
             }
 
-            return objectSet.size() == 0;
+            return objectSet.size() == 0 ? new IngredientMatcher(this) : null;
         } else {
             for (int yo = 0; yo <= inv.getHeight() - height; yo++) {
                 for (int xo = 0; xo <= inv.getWidth() - width; xo++) {
+                    IngredientMatcher matcher = new IngredientMatcher(this);
                     boolean noMatch = false;
 
-                    for (int i = 0; i < input.length; i++) {
-                        IRecipeObject ro = input[i];
+                    for (int iIdx = 0; iIdx < input.size(); iIdx++) {
+                        int i = (shapedOrdering != null ? shapedOrdering[iIdx] : iIdx);
                         int x = i % width + xo;
                         int y = i / width + yo;
-
-                        if (ro == null) {
-                            if (!inv.getStackInRowAndColumn(x, y).isEmpty()) {
-                                noMatch = true;
-                            }
-                        } else {
-                            if (!ro.test(inv.getStackInRowAndColumn(x, y))) {
-                                noMatch = true;
-                            }
-                        }
+                        noMatch = matcher.add(inv.getStackInRowAndColumn(x, y), input.get(i));
 
                         if (noMatch) {
                             break;
                         }
                     }
 
+                    if (noMatch && mirrored) {
+                        matcher = new IngredientMatcher(this);
+                        noMatch = false;
+
+                        for (int iIdx = 0; iIdx < input.size(); iIdx++) {
+                            int i = (shapedOrdering != null ? shapedOrdering[iIdx] : iIdx);
+                            int x = (width - 1) - (i % width + xo);
+                            int y = i / width + yo;
+                            noMatch = matcher.add(inv.getStackInRowAndColumn(x, y), input.get(i));
+
+                            if (noMatch) {
+                                break;
+                            }
+                        }
+                    }
+
                     if (!noMatch) {
-                        return true;
+                        return matcher;
                     }
                 }
             }
 
-            return false;
+            return null;
         }
+    }
+
+    @Override
+    public boolean matches(InventoryCrafting inv, @Nullable World worldIn) {
+        return matchedOrNull(inv) != null;
     }
 
     @Nullable
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inv) {
-        if (!matches(inv, null)) {
-            return null;
+        IngredientMatcher matcher = matchedOrNull(inv);
+        if (matcher != null) {
+            return matcher.apply(output.copy());
+        } else {
+            return ItemStack.EMPTY;
         }
-
-        return output.apply(inv);
     }
 
     @Override
-    public int getRecipeSize() {
-        return input.length;
+    public boolean canFit(int i, int i1) {
+        return shapeless ? (i * i1) >= input.size() : this.width >= i && this.height >= i1;
     }
 
     @Override
     public ItemStack getRecipeOutput() {
-        return ItemStack.EMPTY;
+        return output;
     }
 
-    public static class Builder {
-        private RecipeCharset recipe;
+    @Override
+    public Ingredient getIngredient(char c) {
+        return charToIngredient.get(c);
+    }
 
-        private static IRecipeObject[] toRecipeObject(Object[] o) {
-            IRecipeObject[] objects = new IRecipeObject[o.length];
-            for (int i = 0; i < o.length; i++) {
-                objects[i] = IRecipeObject.of(o[i]);
-            }
-            return objects;
-        }
+    public static class Factory implements IRecipeFactory {
+        @Override
+        public IRecipe parse(JsonContext context, JsonObject json) {
+            RecipeCharset recipe = new RecipeCharset(context, json);
+            String type = JsonUtils.getString(json, "type");
 
-        public static Builder create(IRecipeResult output) {
-            Builder builder = new Builder();
-            builder.recipe = new RecipeCharset();
-            builder.recipe.output = output;
-            return builder;
-        }
+            if (type.equals("charset:shapeless")) {
+                recipe.shapeless = true;
+                JsonArray array = JsonUtils.getJsonArray(json, "ingredients");
+                recipe.input = NonNullList.create();
+                for (int i = 0; i < array.size(); i++) {
+                    recipe.input.add(CraftingHelper.getIngredient(array.get(i), context));
+                }
+            } else if (type.equals("charset:shaped")) {
+                recipe.shapeless = false;
+                recipe.mirrored = JsonUtils.getBoolean(json, "mirrored", false);
 
-        public static Builder create(ItemStack output) {
-            return create(new IRecipeResult() {
-                @Override
-                public Object preview() {
-                    return output;
+                List<String> shape = new ArrayList<>();
+
+                JsonArray pattern = JsonUtils.getJsonArray(json, "pattern");
+                for (int idx = 0; idx < pattern.size(); idx++) {
+                    String s = pattern.get(idx).getAsString();
+                    shape.add(s);
+                    recipe.width = Math.max(recipe.width, s.length());
+                }
+                recipe.height = pattern.size();
+
+                recipe.charToIngredient.put(' ', Ingredient.EMPTY);
+
+                JsonObject key = JsonUtils.getJsonObject(json, "key");
+                for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
+                    if (entry.getKey().length() > 1) {
+                        throw new RuntimeException("Invalid recipe key: '" + entry.getKey() + "'!");
+                    }
+                    recipe.charToIngredient.put(entry.getKey().charAt(0), CraftingHelper.getIngredient(entry.getValue(), context));
                 }
 
-                @Nullable
-                @Override
-                public ItemStack apply(@Nullable InventoryCrafting input) {
-                    return output.copy();
-                }
-            });
-        }
+                recipe.shapedOrdering = new int[recipe.width * recipe.height];
 
-        public Builder shapeless(Object... o) {
-            recipe.shapeless = true;
-            recipe.input = toRecipeObject(o);
-            return this;
-        }
+                recipe.input = NonNullList.create();
 
-        public Builder shaped(Object... o) {
-            int idx = 0;
-            recipe.shapeless = false;
-            List<String> shape = new ArrayList<>();
-            List<IRecipeObject> input = new ArrayList<>();
-            Map<Character, IRecipeObject> map = new HashMap<>();
-
-            while (o[idx] instanceof String) {
-                String s = (String) o[idx++];
-                shape.add(s);
-                recipe.width = Math.max(recipe.width, s.length());
-            }
-            recipe.height = shape.size();
-
-            map.put(' ', null);
-
-            while (idx < o.length) {
-                char c = (char) o[idx++];
-                IRecipeObject ro = IRecipeObject.of(o[idx++]);
-                map.put(c, ro);
-            }
-
-            for (int y = 0; y < recipe.height; y++) {
-                String s = shape.get(y);
-                for (int x = 0; x < recipe.width; x++) {
-                    if (x < s.length()) {
-                        input.add(map.get(s.charAt(x)));
-                    } else {
-                        input.add(null);
+                for (int y = 0; y < recipe.height; y++) {
+                    String s = shape.get(y);
+                    for (int x = 0; x < recipe.width; x++) {
+                        if (x < s.length()) {
+                            Ingredient i = recipe.charToIngredient.get(s.charAt(x));
+                            if (i == null) {
+                                throw new RuntimeException("Ingredient not found: '" + s.charAt(x) + "'!");
+                            }
+                            recipe.input.add(i);
+                        } else {
+                            recipe.input.add(Ingredient.EMPTY);
+                        }
                     }
                 }
+
+                Set<Ingredient> addedIngredients = new HashSet<>();
+                TIntSet addedPositions = new TIntHashSet();
+
+                int prevIdx;
+                int idx = 0;
+                while (idx < recipe.shapedOrdering.length) {
+                    prevIdx = idx;
+
+                    for (int i = 0; i < recipe.input.size(); i++) {
+                        if (!addedPositions.contains(i)) {
+                            Ingredient ingredient = recipe.input.get(i);
+                            TCharSet deps = ingredient instanceof IngredientCharset ? ((IngredientCharset) ingredient).getDependencies() : null;
+                            if (deps != null && deps.size() > 0) {
+                                boolean match = true;
+                                TCharIterator it = deps.iterator();
+                                while (it.hasNext()) {
+                                    if (!addedIngredients.contains(recipe.charToIngredient.get(it.next()))) {
+                                        match = false;
+                                        break;
+                                    }
+                                }
+
+                                if (!match) {
+                                    continue;
+                                }
+                            }
+
+                            recipe.shapedOrdering[idx++] = i;
+                            addedIngredients.add(ingredient);
+                            addedPositions.add(i);
+                        }
+                    }
+
+                    if (prevIdx == idx) {
+                        throw new RuntimeException("Cyclic dependency detected!");
+                    }
+                }
+            } else {
+                throw new RuntimeException("Unknown type: " + type);
             }
 
-            recipe.input = input.toArray(new IRecipeObject[input.size()]);
-            return this;
-        }
-
-        public Builder mirrored(boolean mirrored) {
-            recipe.mirrored = mirrored;
-            return this;
-        }
-
-        public RecipeCharset build() {
+            recipe.output = CraftingHelper.getItemStack(json.getAsJsonObject("result"), context);
             return recipe;
-        }
-
-        public void register() {
-            GameRegistry.addRecipe(recipe);
         }
     }
 }

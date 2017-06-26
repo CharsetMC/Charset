@@ -25,6 +25,7 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
+import java.util.function.Function;
 
 public class SpritesheetFactory {
     private final ResourceLocation location;
@@ -50,7 +51,7 @@ public class SpritesheetFactory {
         }
 
         @Override
-        public boolean load(IResourceManager manager, ResourceLocation loc) {
+        public boolean load(IResourceManager manager, ResourceLocation loc, Function<ResourceLocation, TextureAtlasSprite> getter) {
             if (sheet == null) {
                 sheet = RenderUtils.getTextureImage(location);
                 if (sheet == null) {

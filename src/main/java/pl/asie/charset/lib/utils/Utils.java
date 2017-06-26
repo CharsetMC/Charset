@@ -13,7 +13,7 @@ public final class Utils {
 
 	static {
 		try {
-			EXPLOSION_SIZE_GETTER = MethodHandles.lookup().unreflectGetter(ReflectionHelper.findField(Explosion.class, "explosionSize", "field_77280_f"));
+			EXPLOSION_SIZE_GETTER = MethodHandles.lookup().unreflectGetter(ReflectionHelper.findField(Explosion.class, "size", "field_77280_f"));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

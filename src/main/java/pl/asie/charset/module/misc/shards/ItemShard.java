@@ -69,10 +69,11 @@ public class ItemShard extends ItemBase {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems) {
-		for (int i = 0; i <= MAX_SHARD; i++) {
-			subItems.add(new ItemStack(itemIn, 1, i));
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
+		if (isInCreativeTab(tab)) {
+			for (int i = 0; i <= MAX_SHARD; i++) {
+				subItems.add(new ItemStack(this, 1, i));
+			}
 		}
 	}
 }

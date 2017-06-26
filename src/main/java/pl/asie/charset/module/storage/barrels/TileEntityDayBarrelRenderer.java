@@ -40,11 +40,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -103,7 +99,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
     }
 
     @Override
-    public void renderTileEntityAt(TileEntityDayBarrel barrel, double x, double y, double z, float partialTicks, int destroyStage) {
+    public void render(TileEntityDayBarrel barrel, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (barrel == null) {
             return;
         }
@@ -205,7 +201,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         final double char_width = 1.0/10.0;
         final double char_height = 1.0/10.0;
         final Tessellator tessI = Tessellator.getInstance(); //new Tessellator(len * 4);
-        VertexBuffer tess = tessI.getBuffer();
+        BufferBuilder tess = tessI.getBuffer();
         tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F, 0);
         tess.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX); // 3 double vertex positions + 2 double UV positions
         double du = (font.getMaxU() - font.getMinU()) / 4;

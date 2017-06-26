@@ -4,14 +4,14 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.*;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.item.ItemStack;
-import pl.asie.charset.lib.recipe.IRecipeObject;
+import net.minecraft.item.crafting.Ingredient;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapper {
+public class JEIRecipeCharset implements IRecipeWrapper {
     public static class Factory implements IRecipeWrapperFactory<RecipeCharset> {
         @Nonnull
         @Override
@@ -54,18 +54,15 @@ public class JEIRecipeCharset extends BlankRecipeWrapper implements IRecipeWrapp
 
     @Override
     public void getIngredients(IIngredients ingredients) {
-        List<Object> inputs = new ArrayList<Object>();
-        Object output = recipe.getOutput().preview();
+        // TODO
+        /* List<Object> inputs = new ArrayList<Object>();
+        Object output =
 
-        for (IRecipeObject o : recipe.getInput()) {
-            inputs.add(o != null ? o.preview() : null);
+        for (Ingredient o : recipe.getIngredients()) {
+            inputs.add(o);
         }
 
-        ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(inputs));
-        if (output instanceof ItemStack) {
-            ingredients.setOutputs(ItemStack.class, JEIPluginCharset.STACKS.getSubtypes((ItemStack) output));
-        } else if (output instanceof List) {
-            ingredients.setOutputs(ItemStack.class, (List<ItemStack>) output);
-        }
+        ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(inputs)); */
+        ingredients.setOutputs(ItemStack.class, recipe.getExampleOutputs());
     }
 }

@@ -27,6 +27,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
@@ -36,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public class BlockScaffold extends BlockBase implements ITileEntityProvider {
-	public static final Collection<ItemMaterial> PLANKS = new HashSet<>();
 	private static final int MAX_OVERHANG = 8;
 	private static final AxisAlignedBB COLLISION_BOX = new AxisAlignedBB(0.01, 0, 0.01, 0.99, 1, 0.99);
 	private static final AxisAlignedBB COLLISION_BOX_HACKY_SIDES = new AxisAlignedBB(0, 0, 0, 1, 1, 1).expand(-0.3125, 0, -0.3125);
@@ -67,7 +67,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	@Override
 	protected List<Collection<ItemStack>> getCreativeItemSets() {
 		List<Collection<ItemStack>> list = new ArrayList<>();
-		for (ItemMaterial s : PLANKS) {
+		for (ItemMaterial s : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("plank", "block")) {
 			list.add(ImmutableList.of(createStack(s, 1)));
 		}
 		return list;
@@ -97,16 +97,16 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean p_184something) {
 		if (ForgeModContainer.fullBoundingBoxLadders) {
-			if (entityBox.intersectsWith(COLLISION_BOX.offset(pos)))
+			if (entityBox.intersects(COLLISION_BOX.offset(pos)))
 				collidingBoxes.add(COLLISION_BOX.offset(pos));
 		} else {
 			// Hack!
-			if (entityBox.intersectsWith(COLLISION_BOX_HACKY_SIDES.offset(pos)))
+			if (entityBox.intersects(COLLISION_BOX_HACKY_SIDES.offset(pos)))
 				collidingBoxes.add(COLLISION_BOX_HACKY_SIDES.offset(pos));
 
 			if (!(entityIn instanceof EntityLivingBase) || !((EntityLivingBase) entityIn).isOnLadder()) {
 				if (pos.getY() + 0.9 <= entityBox.minY) {
-					if (entityBox.intersectsWith(COLLISION_BOX_HACKY_TOP.offset(pos)))
+					if (entityBox.intersects(COLLISION_BOX_HACKY_TOP.offset(pos)))
 						collidingBoxes.add(COLLISION_BOX_HACKY_TOP.offset(pos));
 				}
 			}

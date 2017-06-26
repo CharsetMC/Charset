@@ -64,11 +64,11 @@ public class PlayerDeathHandler {
 		while (itemIterator.hasNext()) {
 			EntityItem entityItem = itemIterator.next();
 
-			if (entityItem == null || entityItem.getEntityItem().isEmpty()) {
+			if (entityItem == null || entityItem.getItem().isEmpty()) {
 				continue;
 			}
 
-			ItemStack stack = entityItem.getEntityItem();
+			ItemStack stack = entityItem.getItem();
 			if (itemKeepPredicate.apply(stack)) {
 				itemIterator.remove();
 

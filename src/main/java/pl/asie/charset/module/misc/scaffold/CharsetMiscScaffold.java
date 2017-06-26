@@ -22,9 +22,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.model.IRetexturableModel;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -60,39 +63,38 @@ public class CharsetMiscScaffold {
 
 		scaffoldBlock = new BlockScaffold();
 		scaffoldItem = new ItemScaffold(scaffoldBlock);
-		RegistryUtils.register(scaffoldBlock, scaffoldItem, "scaffold");
-		RegistryUtils.registerModel(scaffoldBlock, 0, "charset:scaffold");
 
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+
+	@SubscribeEvent
+	public void registerModels(ModelRegistryEvent event) {
+		RegistryUtils.registerModel(scaffoldItem, 0, "charset:scaffold");
+	}
+
+	@SubscribeEvent
+	public void registerBlocks(RegistryEvent.Register<Block> event) {
+		RegistryUtils.register(event.getRegistry(), scaffoldBlock, "scaffold");
+	}
+
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), scaffoldItem, "scaffold");
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		if (scaffoldBlock != null) {
-			GameRegistry.registerTileEntityWithAlternatives(TileScaffold.class, "charset:scaffold", "charsetdecoration:scaffold");
+			RegistryUtils.register(TileScaffold.class, "scaffold");
 		}
 	}
 
-	private void registerScaffoldRecipe(ItemMaterial plankMaterial) {
-		ItemStack plank = plankMaterial.getStack();
-		ItemStack scaffold = BlockScaffold.createStack(plankMaterial, 4);
-
-		BlockScaffold.PLANKS.add(plankMaterial);
-
-		GameRegistry.addRecipe(new ShapedOreRecipe(scaffold,
-				"ppp",
-				" s ",
-				"s s",
-				's', "stickWood", 'p', plank
-		));
-	}
-
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-		if (scaffoldBlock != null) {
-			for (ItemMaterial plankMaterial : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("plank", "block")) {
-				registerScaffoldRecipe(plankMaterial);
-			}
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void addCustomModels(TextureStitchEvent.Pre event) {
+		ModelScaffold.scaffoldModel = RenderUtils.getModel(new ResourceLocation("charset:block/scaffold"));
+		for (ResourceLocation location : ModelScaffold.scaffoldModel.getTextures()) {
+			event.getMap().registerSprite(location);
 		}
 	}
 
@@ -101,7 +103,5 @@ public class CharsetMiscScaffold {
 	public void onPostBake(ModelBakeEvent event) {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:scaffold", "normal"), ModelScaffold.INSTANCE);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:scaffold", "inventory"), ModelScaffold.INSTANCE);
-
-		ModelScaffold.scaffoldModel = (IRetexturableModel) RenderUtils.getModel(new ResourceLocation("charset:block/scaffold"));
 	}
 }

@@ -63,23 +63,6 @@ public class MinecartDyeable {
 				instance.color = null;
 				if (compound.hasKey("id")) {
 					instance.setColor(EnumDyeColor.byMetadata(compound.getInteger("id")));
-				} else if (compound.hasKey("color")) {
-					// TODO: Remove in 1.12 - legacy handling
-					int color = compound.getInteger("color");
-					if (color != -1) {
-						color &= 0xFFFFFF;
-						EnumDyeColor currColorObj = null;
-						double currDist = Double.MAX_VALUE;
-						for (int i = 0; i < 16; i++) {
-							EnumDyeColor colorObj = EnumDyeColor.byMetadata(i);
-							double dist = ColorspaceUtils.getColorDistanceSq(ColorUtils.toIntColor(colorObj), color);
-							if (dist < currDist) {
-								currColorObj = colorObj;
-								currDist = dist;
-							}
-						}
-						instance.color = currColorObj;
-					}
 				}
 			}
 		}
