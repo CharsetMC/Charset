@@ -123,7 +123,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
 
     public ItemStack makeBarrel(ItemStack barrelItem) {
         ItemStack ret = new ItemStack(this, 1, barrelItem.getItemDamage());
-        ret.setTagCompound((NBTTagCompound) barrelItem.getTagCompound().copy());
+        ret.setTagCompound(barrelItem.getTagCompound().copy());
         return ret;
     }
 

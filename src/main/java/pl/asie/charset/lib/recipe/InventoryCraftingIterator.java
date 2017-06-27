@@ -11,17 +11,22 @@ import java.util.*;
 
 public class InventoryCraftingIterator extends InventoryCrafting implements Iterator<InventoryCrafting> {
     public static class Container {
-        private final List stacks;
-        private final ItemStack output;
+        private final List stacks, output;
         private final RecipeCharset base;
 
         private Container(InventoryCraftingIterator iterator) {
             base = iterator.recipe;
             stacks = new ArrayList<>();
+
             for (int i = 0; i < iterator.recipe.input.size(); i++) {
                 stacks.add(iterator.inputReal[i]);
             }
-            output = iterator.recipe.getCraftingResult(iterator);
+
+            if (iterator.permutations == 1) {
+                output = iterator.recipe.getExampleOutputs();
+            } else {
+                output = Collections.singletonList(iterator.recipe.getCraftingResult(iterator));
+            }
         }
 
         public List getInputs() {
@@ -29,7 +34,7 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
         }
 
         public List<ItemStack> getOutput() {
-            return Collections.singletonList(output);
+            return output;
         }
 
         public boolean isShapeless() {

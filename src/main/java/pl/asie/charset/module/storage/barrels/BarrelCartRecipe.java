@@ -36,40 +36,68 @@
 
 package pl.asie.charset.module.storage.barrels;
 
-import com.google.gson.JsonObject;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.common.crafting.JsonContext;
-import pl.asie.charset.lib.recipe.RecipeBase;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import pl.asie.charset.lib.recipe.IngredientCharset;
+import pl.asie.charset.lib.recipe.RecipeCharset;
 
-public class BarrelCartRecipe extends RecipeBase {
-    public BarrelCartRecipe(String group) {
-        super(group);
-    }
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-    @Override
-    public boolean matches(InventoryCrafting inv, World world) {
-        boolean found_barrel = false, found_cart = false;
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack is = inv.getStackInSlot(i);
-            if (!is.isEmpty()) {
-                if (is.getItem() == CharsetStorageBarrels.barrelItem) {
-                    if (TileEntityDayBarrel.getUpgrade(is) == TileEntityDayBarrel.Type.SILKY) {
-                        return false;
-                    }
-                    found_barrel = true;
-                } else if (is.getItem() == Items.MINECART) {
-                    found_cart = true;
-                } else {
-                    return false;
-                }
+public class BarrelCartRecipe extends RecipeCharset {
+    private static final Ingredient MINECART = CraftingHelper.getIngredient(Items.MINECART);
+    private static final Ingredient BARREL = new IngredientCharset(0) {
+        @Override
+        public boolean mustIteratePermutations() {
+            return false;
+        }
+
+        @Override
+        public ItemStack[] getMatchingStacks() {
+            Collection<ItemStack> stacks = new ArrayList<>();
+            stacks.addAll(BarrelRegistry.INSTANCE.getBarrels());
+            stacks.removeAll(BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.SILKY));
+            return stacks.toArray(new ItemStack[stacks.size()]);
+        }
+
+        @Override
+        public boolean apply(ItemStack stack) {
+            if (!stack.isEmpty() && stack.getItem() == CharsetStorageBarrels.barrelItem) {
+                TileEntityDayBarrel rep = new TileEntityDayBarrel();
+                rep.loadFromStack(stack);
+                return rep.type != TileEntityDayBarrel.Type.SILKY;
             } else {
                 return false;
             }
         }
-        return found_barrel && found_cart;
+    };
+
+    @Override
+    public List<ItemStack> getExampleOutputs() {
+        Collection<ItemStack> stacks = new ArrayList<>();
+        List<ItemStack> stacks2 = new ArrayList<>();
+        stacks.addAll(BarrelRegistry.INSTANCE.getBarrels());
+        stacks.removeAll(BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.SILKY));
+        for (ItemStack stack : stacks) {
+            stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrel(stack));
+        }
+        return stacks2;
+    }
+
+    public BarrelCartRecipe(String group) {
+        super(group);
+        this.width = 2;
+        this.height = 1;
+        this.shapeless = true;
+        this.input = NonNullList.create();
+        input.add(BARREL);
+        input.add(MINECART);
+        this.output = new ItemStack(CharsetStorageBarrels.barrelCartItem);
     }
 
     @Override
@@ -80,16 +108,6 @@ public class BarrelCartRecipe extends RecipeBase {
                 return CharsetStorageBarrels.barrelCartItem.makeBarrel(is);
             }
         }
-        return new ItemStack(CharsetStorageBarrels.barrelCartItem);
-    }
-
-    @Override
-    public boolean canFit(int width, int height) {
-        return width * height >= 2;
-    }
-
-    @Override
-    public ItemStack getRecipeOutput() {
         return new ItemStack(CharsetStorageBarrels.barrelCartItem);
     }
 }

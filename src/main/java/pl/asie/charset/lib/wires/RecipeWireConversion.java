@@ -7,16 +7,43 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.recipe.IngredientCharset;
 import pl.asie.charset.lib.recipe.RecipeBase;
+import pl.asie.charset.lib.recipe.RecipeCharset;
+import pl.asie.charset.module.storage.barrels.BarrelRegistry;
+import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-public class RecipeWireConversion extends RecipeBase {
+public class RecipeWireConversion extends RecipeCharset {
+    private static List<ItemStack> getMatchingStacks(int offset) {
+        List<ItemStack> stacks = new ArrayList<>();
+        for (WireProvider provider : WireManager.REGISTRY) {
+            if (provider.hasSidedWire() && provider.hasFreestandingWire()) {
+                stacks.add(new ItemStack(CharsetLibWires.itemWire, 1, (WireManager.REGISTRY.getID(provider) << 1) | offset));
+            }
+        }
+        return stacks;
+    }
+
     public static class IngredientWires extends IngredientCharset {
         private final int offset;
 
         protected IngredientWires(boolean freestanding) {
             super(0);
             offset = freestanding ? 1 : 0;
+        }
+
+        @Override
+        public boolean mustIteratePermutations() {
+            return true;
+        }
+
+        @Override
+        public ItemStack[] getMatchingStacks() {
+            Collection<ItemStack> stacks = RecipeWireConversion.getMatchingStacks(offset);
+            return stacks.toArray(new ItemStack[stacks.size()]);
         }
 
         @Override
@@ -30,34 +57,22 @@ public class RecipeWireConversion extends RecipeBase {
         }
     }
 
-    private final IngredientWires wireI;
-    private final NonNullList<Ingredient> ingredients;
+    private final int outputOffset;
 
     public RecipeWireConversion(boolean freestanding) {
         super("charset:wire_convert", true);
-        wireI = new IngredientWires(freestanding);
-        ingredients = NonNullList.from(wireI);
+        super.input = NonNullList.create();
+        super.input.add(new IngredientWires(freestanding));
+        super.output = ItemStack.EMPTY;
+        super.width = 1;
+        super.height = 1;
+        super.shapeless = true;
+        this.outputOffset = freestanding ? 0 : 1;
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
-        return ingredients;
-    }
-
-    @Override
-    public boolean matches(InventoryCrafting inv, World worldIn) {
-        boolean found = false;
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty()) {
-                if (!found && wireI.apply(stack)) {
-                    found = true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return found;
+    public List<ItemStack> getExampleOutputs() {
+        return getMatchingStacks(outputOffset);
     }
 
     @Override
@@ -71,16 +86,6 @@ public class RecipeWireConversion extends RecipeBase {
             }
         }
 
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public boolean canFit(int width, int height) {
-        return (width * height) >= 1;
-    }
-
-    @Override
-    public ItemStack getRecipeOutput() {
         return ItemStack.EMPTY;
     }
 }

@@ -37,6 +37,10 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
         super(group);
     }
 
+    public RecipeCharset(String group, boolean hidden) {
+        super(group, hidden);
+    }
+
     protected final TCharObjectMap<Ingredient> charToIngredient = new TCharObjectHashMap<>();
     protected int[] shapedOrdering;
     protected NonNullList<Ingredient> input = null;

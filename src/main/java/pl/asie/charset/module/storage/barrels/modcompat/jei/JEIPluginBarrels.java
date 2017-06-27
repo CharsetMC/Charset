@@ -25,6 +25,16 @@ public class JEIPluginBarrels implements IModPlugin {
                 return barrel.type.name() + ";" + barrel.woodLog.getId() + ";" + barrel.woodSlab.getId();
             }
         });
+
+        subtypeRegistry.registerSubtypeInterpreter(CharsetStorageBarrels.barrelCartItem, new ISubtypeRegistry.ISubtypeInterpreter() {
+            @Nullable
+            @Override
+            public String getSubtypeInfo(ItemStack itemStack) {
+                TileEntityDayBarrel barrel = new TileEntityDayBarrel();
+                barrel.loadFromStack(itemStack);
+                return barrel.type.name() + ";" + barrel.woodLog.getId() + ";" + barrel.woodSlab.getId();
+            }
+        });
     }
 
     @Override
