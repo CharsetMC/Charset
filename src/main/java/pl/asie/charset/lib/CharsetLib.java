@@ -22,16 +22,19 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.SearchTree;
 import net.minecraft.client.util.SearchTreeManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -40,6 +43,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.audio.AudioAPI;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.command.CommandCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
@@ -113,9 +117,13 @@ public class CharsetLib {
 		Capabilities.preInit();
 		NotifyImplementation.init();
 		ItemMaterialHeuristics.init(false);
-		ItemMaterialHeuristics.init(true);
 
 		config.save();
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void afterRecipesRegistered(RegistryEvent.Register<IRecipe> event) {
+		ItemMaterialHeuristics.init(true);
 	}
 
 	@Mod.EventHandler
@@ -154,6 +162,7 @@ public class CharsetLib {
 
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
+		event.registerServerCommand(new CommandCharset());
 		NotifyImplementation.instance.registerServerCommands(event);
 	}
 

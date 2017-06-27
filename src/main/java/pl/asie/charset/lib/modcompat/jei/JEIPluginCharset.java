@@ -7,13 +7,17 @@ import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
-import mezz.jei.api.recipe.IStackHelper;
-import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
+import mezz.jei.api.recipe.*;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.loader.AnnotatedPluginHandler;
+import pl.asie.charset.lib.recipe.InventoryCraftingIterator;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
 
 @JEIPlugin
 public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> implements IModPlugin {
@@ -45,7 +49,20 @@ public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> impleme
         GUIS = registry.getJeiHelpers().getGuiHelper();
         RECIPE_TRANSFER_HANDLERS = registry.getJeiHelpers().recipeTransferHandlerHelper();
 
-        registry.handleRecipes(RecipeCharset.class, new JEIRecipeCharset.Factory(), VanillaRecipeCategoryUid.CRAFTING);
+        for (IRecipe recipe : GameRegistry.findRegistry(IRecipe.class)) {
+            if (recipe instanceof RecipeCharset) {
+                InventoryCraftingIterator iterator = new InventoryCraftingIterator((RecipeCharset) recipe, false);
+                while (iterator.hasNext()) {
+                    iterator.next();
+                    if (recipe.matches(iterator, null)) {
+                        registry.addRecipes(Collections.singletonList(iterator.contain()), VanillaRecipeCategoryUid.CRAFTING);
+                    }
+                }
+            }
+        }
+
+        // registry.handleRecipes(RecipeCharset.class, JEIRecipeCharset::create, VanillaRecipeCategoryUid.CRAFTING);
+        registry.handleRecipes(InventoryCraftingIterator.Container.class, JEIRecipeContainer::create, VanillaRecipeCategoryUid.CRAFTING);
 
         for (IModPlugin plugin : getPlugins()) {
             plugin.register(registry);

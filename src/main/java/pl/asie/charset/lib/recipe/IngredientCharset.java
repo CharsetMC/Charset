@@ -31,6 +31,10 @@ public abstract class IngredientCharset extends Ingredient {
         return null;
     }
 
+    public boolean mustIteratePermutations() {
+        return getDependencies() != null;
+    }
+
     public boolean apply(IngredientMatcher matcher, ItemStack stack) {
         return apply(stack);
     }

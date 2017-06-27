@@ -12,14 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JEIRecipeCharset implements IRecipeWrapper {
-    public static class Factory implements IRecipeWrapperFactory<RecipeCharset> {
-        @Nonnull
-        @Override
-        public IRecipeWrapper getRecipeWrapper(@Nonnull RecipeCharset recipe) {
-            return create(recipe);
-        }
-    }
-
     public static class Shapeless extends JEIRecipeCharset {
         public Shapeless(RecipeCharset recipe) {
             super(recipe);
@@ -54,15 +46,7 @@ public class JEIRecipeCharset implements IRecipeWrapper {
 
     @Override
     public void getIngredients(IIngredients ingredients) {
-        // TODO
-        /* List<Object> inputs = new ArrayList<Object>();
-        Object output =
-
-        for (Ingredient o : recipe.getIngredients()) {
-            inputs.add(o);
-        }
-
-        ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(inputs)); */
+        ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(recipe.getIngredients()));
         ingredients.setOutputs(ItemStack.class, recipe.getExampleOutputs());
     }
 }

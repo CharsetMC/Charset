@@ -62,6 +62,11 @@ public class BarrelUpgradeRecipes {
     private static final Ingredient web = CraftingHelper.getIngredient(Blocks.WEB);
     private static final Ingredient barrel = new IngredientCharset(0) {
         @Override
+        public boolean mustIteratePermutations() {
+            return true;
+        }
+
+        @Override
         public ItemStack[] getMatchingStacks() {
             Collection<ItemStack> stacks = BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.NORMAL);
             return stacks.toArray(new ItemStack[stacks.size()]);

@@ -49,6 +49,11 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         }
 
         @Override
+        public boolean mustIteratePermutations() {
+            return super.mustIteratePermutations() || chain != null || nbtTag != null;
+        }
+
+        @Override
         public boolean apply(IngredientMatcher matcher, ItemStack stack) {
             if (chain != null) {
                 ItemStack stackIn = matcher.getStack(matcher.getIngredient(chain[0].charAt(0)));
@@ -71,11 +76,13 @@ public class IngredientMaterialFactory implements IIngredientFactory {
 
         @Override
         public void applyToStack(ItemStack stack, ItemStack source) {
-            if (!stack.hasTagCompound()) {
-                stack.setTagCompound(new NBTTagCompound());
-            }
+            if (nbtTag != null) {
+                if (!stack.hasTagCompound()) {
+                    stack.setTagCompound(new NBTTagCompound());
+                }
 
-            stack.getTagCompound().setString(nbtTag, ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(source).getId());
+                stack.getTagCompound().setString(nbtTag, ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(source).getId());
+            }
         }
 
         @Override

@@ -47,8 +47,19 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
     protected boolean shapeless = false;
 
     public List<ItemStack> getExampleOutputs() {
-        // TODO
-        return Collections.singletonList(output);
+        InventoryCraftingIterator inventoryCrafting = new InventoryCraftingIterator(this, true);
+        List<ItemStack> exampleOutputs = new ArrayList<>();
+
+        InventoryCraftingIterator it = inventoryCrafting;
+        while (it.hasNext()) {
+            InventoryCrafting ic = it.next();
+            ItemStack stack = getCraftingResult(ic);
+            if (!stack.isEmpty()) {
+                exampleOutputs.add(stack);
+            }
+        }
+
+        return exampleOutputs;
     }
 
     @Override
@@ -176,6 +187,8 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                 for (int i = 0; i < array.size(); i++) {
                     recipe.input.add(CraftingHelper.getIngredient(array.get(i), context));
                 }
+                recipe.width = recipe.input.size();
+                recipe.height = 1;
             } else if (type.equals("charset:shaped")) {
                 recipe.shapeless = false;
                 recipe.mirrored = JsonUtils.getBoolean(json, "mirrored", false);

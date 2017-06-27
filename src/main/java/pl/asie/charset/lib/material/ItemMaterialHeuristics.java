@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public final class ItemMaterialHeuristics {
@@ -296,11 +297,10 @@ public final class ItemMaterialHeuristics {
             reg.registerTypes(reg.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)), "block", "bedrock");
 
         bar.step("Slabs/Stairs");
-        if (modded)
-            for (ItemMaterial material : reg.getMaterialsByType("block")) {
-                findSlab(material);
-                findStair(material);
-            }
+        for (ItemMaterial material : reg.getMaterialsByType("block")) {
+            findSlab(material);
+            findStair(material);
+        }
 
         ProgressManager.pop(bar);
 
@@ -312,7 +312,10 @@ public final class ItemMaterialHeuristics {
 
                 for (ItemMaterial material : reg.getAllMaterials()) {
                     writer.println(material.getId());
-                    writer.println("- " + commaJoiner.join(material.getTypes()));
+                    writer.println("- Types: " + commaJoiner.join(material.getTypes()));
+                    for (Map.Entry<String, ItemMaterial> entry : ItemMaterialRegistry.INSTANCE.materialRelations.row(material).entrySet()) {
+                        writer.println("- Relation: " + entry.getKey() + " -> " + material.getId());
+                    }
                 }
 
                 writer.close();
