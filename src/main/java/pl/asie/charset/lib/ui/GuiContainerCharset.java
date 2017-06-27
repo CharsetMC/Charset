@@ -28,6 +28,17 @@ public class GuiContainerCharset extends GuiContainer {
 		this.ySize = ySize;
 	}
 
+	protected final boolean insideRect(int x, int y, int x0, int y0, int w, int h) {
+		return x >= x0 && y >= y0 && x < (x0 + w) && y < (y0 + h);
+	}
+
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		this.drawDefaultBackground();
+		super.drawScreen(mouseX, mouseY, partialTicks);
+		this.renderHoveredToolTip(mouseX, mouseY);
+	}
+
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		this.xCenter = (this.width - this.xSize) / 2;

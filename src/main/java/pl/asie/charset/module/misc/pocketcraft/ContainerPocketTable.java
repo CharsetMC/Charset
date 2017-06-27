@@ -73,7 +73,7 @@ public class ContainerPocketTable extends ContainerBase {
         super(player.inventory);
         this.player = player;
         this.playerInv = player.inventory;
-        craftResultSlot = (RedirectedSlotCrafting) addSlotToContainer(new RedirectedSlotCrafting(player, craftMatrix, craftResult, 208, 28));
+        craftResultSlot = (RedirectedSlotCrafting) addSlotToContainer(new RedirectedSlotCrafting(player, craftMatrix, craftResult, 207, 28));
         bindPlayerInventory(player.inventory, 8, 8);
         detectAndSendChanges();
         updateCraft();

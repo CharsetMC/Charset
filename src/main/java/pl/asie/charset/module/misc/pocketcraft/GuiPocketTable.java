@@ -40,33 +40,104 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.ui.GuiContainerCharset;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Locale;
 
-public class GuiPocketTable extends GuiContainer {
+public class GuiPocketTable extends GuiContainerCharset {
     private static final ResourceLocation POCKET_GUI = new ResourceLocation("charset:textures/gui/pocketgui.png");
+    private final int buttonGridX, buttonGridY, buttonGridCount;
 
     public ContainerPocketTable containerPocket;
 
     public GuiPocketTable(ContainerPocketTable container) {
-        super(container);
+        super(container, 235, 90);
         containerPocket = container;
-        xSize = 236;
-        ySize = 89;
+        buttonGridX = 196;
+        buttonGridY = 51;
+        buttonGridCount = 3;
     }
 
     private int open_time = 0;
+    private int button_pressed = -1;
+
+    @Override
+    protected void renderHoveredToolTip(int mouseX, int mouseY) {
+        super.renderHoveredToolTip(mouseX, mouseY);
+        for (int i = 0; i < buttonGridCount; i++) {
+            int x = xCenter + buttonGridX + (i * 11);
+            int y = yCenter + buttonGridY;
+            if (insideRect(mouseX, mouseY, x, y, 11, 11) && button_pressed < 0) {
+                drawHoveringText(Collections.singletonList(getActionDescription(i)), mouseX, mouseY, fontRenderer);
+            }
+        }
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        if (mouseButton == 0) {
+            for (int i = 0; i < buttonGridCount; i++) {
+                int x = xCenter + buttonGridX + (i * 11);
+                int y = yCenter + buttonGridY;
+                if (insideRect(mouseX, mouseY, x, y, 11, 11) && button_pressed < 0) {
+                    button_pressed = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int state) {
+        super.mouseReleased(mouseX, mouseY, state);
+
+        if (button_pressed >= 0) {
+            switch (button_pressed) {
+                case 0: CharsetMiscPocketcraft.packet.sendToServer(new PacketPTAction(PacketPTAction.CLEAR, 0)); break;
+                case 1: CharsetMiscPocketcraft.packet.sendToServer(new PacketPTAction(PacketPTAction.SWIRL, 0)); break;
+                case 2: CharsetMiscPocketcraft.packet.sendToServer(new PacketPTAction(PacketPTAction.BALANCE, 0)); break;
+            }
+            button_pressed = -1;
+        }
+    }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partial, int mouseX, int mouseY) {
+        super.drawGuiContainerBackgroundLayer(partial, mouseX, mouseY);
+
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(POCKET_GUI);
 
-        int l = (width - xSize) / 2;
-        int i1 = (height - ySize) / 2;
-        drawTexturedModalRect(l, i1, 0, 0, xSize, ySize);
+        drawTexturedModalRect(xCenter, yCenter, 0, 0, xSize, ySize);
+
+        for (int i = 0; i < buttonGridCount; i++) {
+            int x = xCenter + buttonGridX + (i * 11);
+            int y = yCenter + buttonGridY;
+            int state = 0;
+            if (button_pressed == i) {
+                state = 2;
+            } else if (insideRect(mouseX, mouseY, x, y, 11, 11)) {
+                state = 1;
+            }
+            drawTexturedModalRect(x, y, i * 11, ySize + (state * 11), 11, 11);
+        }
+
         open_time++;
+    }
+
+    private String getActionDescription(int i) {
+        String msg = null;
+        switch (i) {
+            case 0: msg = "Empty grid"; break;
+            case 1: msg = "Swirl items ↷"; break;
+            case 2: msg = "Balance items"; break;
+            case 3: msg = "Fill grid with item"; break;
+        }
+        return "[" + Character.toUpperCase(CharsetMiscPocketcraft.pocketActions.charAt(i)) + "] " + msg;
     }
 
     @Override
@@ -76,25 +147,20 @@ public class GuiPocketTable extends GuiContainer {
         // Could also make the tab a bit longer...
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
         this.fontRenderer.drawString("PcktCrftng", 178, 10, 4210752);
-        int color = 0xa0a0a0;
-        for (int i = 0; i < CharsetMiscPocketcraft.pocketActions.length(); i++) {
+        /* int color = 0xa0a0a0;
+        int length = 3;
+        int d = 10;
+        for (int i = 0; i < length; i++) {
             char key = CharsetMiscPocketcraft.pocketActions.charAt(i);
-            String msg = null;
-            switch (i) {
-            case 0: msg = "Empty the crafting grid"; break;
-            case 1: msg = "Swirl items ↷"; break;
-            case 2: msg = "Balance items"; break;
-            case 3: msg = "Fill grid with item under cursor"; break;
-            }
+            String msg = getActionDescription(i);
             if (msg == null) {
                 continue;
             }
-            int d = 10;
-            int y = -d* CharsetMiscPocketcraft.pocketActions.length() + d*i;
+            int y = d * (i - length);
             this.fontRenderer.drawString(key + ": " + msg, 8, y, color);
         }
         // this.fontRenderer.drawString("123456789", 178, 10, 4210752);
-        // we can fit only that much
+        // we can fit only that much */
     }
 
     @Override
@@ -103,23 +169,24 @@ public class GuiPocketTable extends GuiContainer {
             super.keyTyped(key, par2);
             return;
         }
+
         char my_key = ("" + key).toLowerCase(Locale.ROOT).charAt(0);
         int action = -1;
         int arg = 0;
 
-        if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(0) /* x */) {
+        if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(0)) {
             action = PacketPTAction.CLEAR;
-        } else if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(1) /* c */) {
+        } else if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(1)) {
             action = PacketPTAction.SWIRL;
-        } else if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(2) /* b */) {
+        } else if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(2)) {
             action = PacketPTAction.BALANCE;
-        } else if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(3) /* f */) {
+        }/* else if (my_key == CharsetMiscPocketcraft.pocketActions.charAt(3)) {
             Slot slot = getSlotUnderMouse();
             if (slot != null) {
                 action = PacketPTAction.FILL;
                 arg = slot.getSlotIndex();
             }
-        }
+        } */
 
         if (action != -1) {
             CharsetMiscPocketcraft.packet.sendToServer(new PacketPTAction(action, arg));
