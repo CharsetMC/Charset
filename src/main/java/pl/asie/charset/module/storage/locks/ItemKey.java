@@ -51,10 +51,6 @@ public class ItemKey extends ItemBase implements IKeyItem {
     }
 
     public String getKey(ItemStack stack) {
-        return "charset:key:" + getRawKey(stack);
-    }
-
-    public String getRawKey(ItemStack stack) {
         return stack.hasTagCompound() && stack.getTagCompound().hasKey("key") ? stack.getTagCompound().getString("key") : "null";
     }
 

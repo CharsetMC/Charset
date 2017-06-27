@@ -436,19 +436,19 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     boolean isTop(EnumFacing d) {
-        return d == orientation.top;
+        return orientation != null && d == orientation.top;
     }
 
     boolean isTopOrBack(EnumFacing d) {
-        return d == orientation.top || d == orientation.facing.getOpposite();
+        return orientation != null && (d == orientation.top || d == orientation.facing.getOpposite());
     }
 
     boolean isBottom(EnumFacing d) {
-        return d == orientation.top.getOpposite();
+        return orientation != null && d == orientation.top.getOpposite();
     }
 
     boolean isBack(EnumFacing d) {
-        return d == orientation.facing.getOpposite();
+        return orientation != null && d == orientation.facing.getOpposite();
     }
 
     private boolean spammed = false;

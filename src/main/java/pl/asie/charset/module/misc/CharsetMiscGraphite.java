@@ -35,20 +35,15 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 		description= "Adds a black dye replacement created from charcoal"
 )
 public class CharsetMiscGraphite {
-	private Item graphite;
-
-	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		graphite = new Item().setUnlocalizedName("charset.graphite");
-
-		ItemStack stack = new ItemStack(graphite, 1, 0);
-		OreDictionary.registerOre("dye", stack);
-		OreDictionary.registerOre("dyeBlack", stack);
-	}
+	private Item graphite = new Item().setUnlocalizedName("charset.graphite");
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
 		RegistryUtils.register(event.getRegistry(), graphite, "graphite");
+
+		ItemStack stack = new ItemStack(graphite, 1, 0);
+		OreDictionary.registerOre("dye", stack);
+		OreDictionary.registerOre("dyeBlack", stack);
 	}
 
 	@SubscribeEvent

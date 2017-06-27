@@ -17,6 +17,9 @@
 package pl.asie.charset.lib.capability;
 
 import mcmultipart.api.multipart.MultipartCapabilityHelper;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -30,6 +33,7 @@ import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.api.lib.IMovable;
+import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
@@ -46,6 +50,8 @@ import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInventory;
 import pl.asie.charset.lib.capability.redstone.*;
+
+import javax.annotation.Nullable;
 
 public class Capabilities {
 	@CapabilityInject(IAudioSource.class)
@@ -74,6 +80,24 @@ public class Capabilities {
 	@CapabilityInject(IRedstoneReceiver.class)
 	public static Capability<IRedstoneReceiver> REDSTONE_RECEIVER;
 
+	@CapabilityInject(Lockable.class)
+	public static Capability<Lockable> LOCKABLE;
+
+	public static Capability.IStorage<Lockable> LOCKABLE_STORAGE = new Capability.IStorage<Lockable>() {
+		@Nullable
+		@Override
+		public NBTBase writeNBT(Capability<Lockable> capability, Lockable instance, EnumFacing side) {
+			return instance.serializeNBT();
+		}
+
+		@Override
+		public void readNBT(Capability<Lockable> capability, Lockable instance, EnumFacing side, NBTBase nbt) {
+			if (nbt instanceof NBTTagCompound) {
+				instance.deserializeNBT((NBTTagCompound) nbt);
+			}
+		}
+	};
+
 	public static void preInit() {
 		CapabilityManager.INSTANCE.register(IAudioSource.class, new DummyCapabilityStorage<>(), DefaultAudioSource::new);
 		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new DummyCapabilityStorage<>(), DefaultAudioReceiver::new);
@@ -89,6 +113,8 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter::new);
 		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new DummyCapabilityStorage<>(), DummyRedstoneReceiver::new);
 		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new DummyCapabilityStorage<>(), DummyRedstoneReceiver::new);
+
+		CapabilityManager.INSTANCE.register(Lockable.class, LOCKABLE_STORAGE, Lockable::new);
  	}
 
  	public static void init() {

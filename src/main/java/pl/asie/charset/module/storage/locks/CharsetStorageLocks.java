@@ -113,7 +113,7 @@ public class CharsetStorageLocks {
 				if (!key.isEmpty() && key.getItem() instanceof ItemKey) {
 					ItemStack result = output.copy();
 					result.setTagCompound(new NBTTagCompound());
-					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getRawKey(key));
+					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getKey(key));
 					return result;
 				}
 				return null;
@@ -132,7 +132,7 @@ public class CharsetStorageLocks {
 				if (!key.isEmpty() && key.getItem() instanceof ItemKey) {
 					ItemStack result = output.copy();
 					result.setTagCompound(new NBTTagCompound());
-					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getRawKey(key));
+					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getKey(key));
 					return result;
 				}
 				return null;

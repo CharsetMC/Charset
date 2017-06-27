@@ -146,7 +146,7 @@ public class GuiPocketTable extends GuiContainerCharset {
         // I'd like it to say "Pocket Crafting", but that doesn't fit.
         // Could also make the tab a bit longer...
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
-        this.fontRenderer.drawString("PcktCrftng", 178, 10, 4210752);
+        this.fontRenderer.drawString("Crafting", 184, 11, 4210752);
         /* int color = 0xa0a0a0;
         int length = 3;
         int d = 10;
