@@ -29,24 +29,27 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
+import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class DyeableItemRecipeFactory implements IRecipeFactory {
-
 	public static class Recipe extends RecipeBase {
 		public class DyeIngredient extends IngredientCharset {
-
 			private DyeIngredient() {
-				super(16);
-				for (int i = 0; i < 16; i++) {
-					getMatchingStacks()[i] = new ItemStack(Items.DYE, 1, i);
-				}
+				super(0);
+			}
+
+			@Override
+			public ItemStack[] getMatchingStacks() {
+				Collection<ItemStack> stacks = OreDictionary.getOres("dye");
+				return stacks.toArray(new ItemStack[stacks.size()]);
 			}
 
 			@Override
@@ -55,8 +58,8 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			}
 		}
 
-		protected final DyeIngredient DYE = new DyeIngredient();
-		protected final Ingredient input;
+		public final DyeIngredient DYE = new DyeIngredient();
+		public final Ingredient input;
 
 		public Recipe(JsonContext context, JsonObject object, Ingredient ingredient) {
 			super(context, object);

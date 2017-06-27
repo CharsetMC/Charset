@@ -12,6 +12,7 @@ import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.loader.AnnotatedPluginHandler;
+import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
 import pl.asie.charset.lib.recipe.InventoryCraftingIterator;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
@@ -63,6 +64,7 @@ public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> impleme
 
         // registry.handleRecipes(RecipeCharset.class, JEIRecipeCharset::create, VanillaRecipeCategoryUid.CRAFTING);
         registry.handleRecipes(InventoryCraftingIterator.Container.class, JEIRecipeContainer::create, VanillaRecipeCategoryUid.CRAFTING);
+        registry.handleRecipes(DyeableItemRecipeFactory.Recipe.class, JEIRecipeDyeableItem::create, VanillaRecipeCategoryUid.CRAFTING);
 
         for (IModPlugin plugin : getPlugins()) {
             plugin.register(registry);

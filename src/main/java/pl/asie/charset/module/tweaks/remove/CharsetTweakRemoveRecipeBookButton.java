@@ -63,7 +63,7 @@ import java.util.Set;
 		isDefault = false,
 		isClientOnly = true
 )
-public class CharsetTweakHideRecipeBook {
+public class CharsetTweakRemoveRecipeBookButton {
 	@SubscribeEvent
 	public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
 		if (event.getGui() instanceof GuiInventory || event.getGui() instanceof GuiCrafting) {

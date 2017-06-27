@@ -24,6 +24,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class RecipeDyeLock extends DyeableItemRecipeFactory.Recipe {
     private int layer = 0;
 
     public RecipeDyeLock(String group) {
-        super(group, Ingredient.fromItems(CharsetStorageLocks.keyItem, CharsetStorageLocks.lockItem));
+        super(group, Ingredient.fromItems(CharsetStorageLocks.lockItem));
     }
 
     @Override
@@ -70,10 +71,7 @@ public class RecipeDyeLock extends DyeableItemRecipeFactory.Recipe {
             Optional<Integer> result = getMixedColor(inv, target, null);
             if (result.isPresent()) {
                 String key = "color" + layer;
-                if (!target.hasTagCompound()) {
-                    target.setTagCompound(new NBTTagCompound());
-                }
-                target.getTagCompound().setInteger(key, result.get());
+                ItemUtils.getTagCompound(target, true).setInteger(key, result.get());
                 return target;
             }
         }

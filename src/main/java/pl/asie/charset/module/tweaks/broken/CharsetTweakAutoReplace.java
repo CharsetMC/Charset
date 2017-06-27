@@ -46,6 +46,7 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nonnull;
@@ -53,9 +54,10 @@ import java.util.Set;
 
 /* @CharsetModule(
 		name = "tweak.autoReplace",
-		description = "Automatically replace items in vertical columns upon them breaking"
+		description = "Automatically replace items in vertical columns upon them breaking",
+		isDevOnly = true
 ) */
-// TODO: Fix me, please!
+// TODO: Fix me, please! (Might involve actually tracking the ItemStack in hand nowadays... :|)
 public class CharsetTweakAutoReplace {
 	@SubscribeEvent
 	public void onPlayerDestroyItem(PlayerDestroyItemEvent event) {

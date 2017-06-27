@@ -1,2 +1,5 @@
 * Minecraft 1.12 port.
+* Major improvements to Just Enough Items support.
 * [lib] Improve wire occlusion logic.
+* [misc.pocketcraft] Reworked pocket crafting table GUI.
+* [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.

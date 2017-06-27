@@ -40,6 +40,10 @@ public class CharsetMiscGraphite {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		graphite = new Item().setUnlocalizedName("charset.graphite");
+
+		ItemStack stack = new ItemStack(graphite, 1, 0);
+		OreDictionary.registerOre("dye", stack);
+		OreDictionary.registerOre("dyeBlack", stack);
 	}
 
 	@SubscribeEvent
@@ -50,10 +54,5 @@ public class CharsetMiscGraphite {
 	@SubscribeEvent
 	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(graphite, 0, "charset:graphite");
-	}
-
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		OreDictionary.registerOre("dyeBlack", graphite);
 	}
 }

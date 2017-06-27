@@ -12,6 +12,7 @@ import net.minecraftforge.common.crafting.IIngredientFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -83,11 +84,7 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         @Override
         public void applyToStack(ItemStack stack, ItemStack source) {
             if (nbtTag != null) {
-                if (!stack.hasTagCompound()) {
-                    stack.setTagCompound(new NBTTagCompound());
-                }
-
-                stack.getTagCompound().setString(nbtTag, ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(source).getId());
+                ItemUtils.getTagCompound(stack, true).setString(nbtTag, ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(source).getId());
             }
         }
 

@@ -21,6 +21,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -29,11 +30,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.item.ItemBase;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.List;
 
-public class ItemLock extends ItemBase {
+public class ItemLock extends ItemBase implements IDyeableItem {
     @SideOnly(Side.CLIENT)
     public static class Color implements IItemColor {
         @Override
@@ -97,5 +100,21 @@ public class ItemLock extends ItemBase {
         if (ItemKey.DEBUG_KEY_ID) {
             tooltip.add(getKey(stack));
         }
+    }
+
+
+    @Override
+    public int getColor(ItemStack stack) {
+        return hasColor(stack) ? stack.getTagCompound().getInteger("color1") : -1;
+    }
+
+    @Override
+    public boolean hasColor(ItemStack stack) {
+        return stack.hasTagCompound() && stack.getTagCompound().hasKey("color1");
+    }
+
+    @Override
+    public void setColor(ItemStack stack, int color) {
+        ItemUtils.getTagCompound(stack, true).setInteger("color1", color);
     }
 }

@@ -9,6 +9,7 @@ import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class JEIRecipeCharset implements IRecipeWrapper {
@@ -47,6 +48,6 @@ public class JEIRecipeCharset implements IRecipeWrapper {
     @Override
     public void getIngredients(IIngredients ingredients) {
         ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(recipe.getIngredients()));
-        ingredients.setOutputs(ItemStack.class, recipe.getExampleOutputs());
+        ingredients.setOutputLists(ItemStack.class, Collections.singletonList(recipe.getExampleOutputs()));
     }
 }

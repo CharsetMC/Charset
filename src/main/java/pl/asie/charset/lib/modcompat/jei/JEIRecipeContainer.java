@@ -7,6 +7,8 @@ import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.recipe.InventoryCraftingIterator;
 import pl.asie.charset.lib.recipe.InventoryCraftingIterator.Container;
 
+import java.util.Collections;
+
 public class JEIRecipeContainer implements IRecipeWrapper {
     public static class Shapeless extends JEIRecipeContainer {
         public Shapeless(InventoryCraftingIterator.Container recipe) {
@@ -43,6 +45,6 @@ public class JEIRecipeContainer implements IRecipeWrapper {
     @Override
     public void getIngredients(IIngredients ingredients) {
         ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(recipe.getInputs()));
-        ingredients.setOutputs(ItemStack.class, recipe.getOutput());
+        ingredients.setOutputLists(ItemStack.class, Collections.singletonList(recipe.getOutput()));
     }
 }
