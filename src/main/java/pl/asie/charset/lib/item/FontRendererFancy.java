@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FontRendererFancy extends FontRenderer {
-    private static final Pattern FANCY_COLOR = Pattern.compile("\ue51aC[0-9a-fA-F]{6}");
+    private static final Pattern FANCY_COLOR = Pattern.compile("\ue51a");
     private static final Field LOCATION_FONT_TEXTURE = ReflectionHelper.findField(FontRenderer.class,
             "locationFontTexture", "field_111273_g");
     private final FontRenderer parent;
@@ -27,12 +27,21 @@ public class FontRendererFancy extends FontRenderer {
     @Override
     public int drawString(String text, float x, float y, int color, boolean dropShadow) {
         Matcher matcher = FANCY_COLOR.matcher(text);
+        int origColor = color;
         int lastPos = 0;
         while (matcher.find()) {
             String subText = text.substring(lastPos, matcher.start());
             x = parent.drawString(subText, x, y, color, dropShadow);
-            color = 0xFF000000 | Integer.parseInt(text.substring(matcher.start() + 2, matcher.start() + 8), 16);
-            lastPos = matcher.start() + 8;
+            switch (text.charAt(matcher.start() + 1)) {
+                case 'C':
+                    color = 0xFF000000 | Integer.parseInt(text.substring(matcher.start() + 2, matcher.start() + 8), 16);
+                    lastPos = matcher.start() + 8;
+                    break;
+                case 'R':
+                    color = origColor;
+                    lastPos = matcher.start() + 2;
+                    break;
+            }
         }
         return parent.drawString(text.substring(lastPos), x, y, color, dropShadow);
     }
@@ -41,9 +50,15 @@ public class FontRendererFancy extends FontRenderer {
         return "\ue51aC" + String.format("%06X", color & 0xFFFFFF);
     }
 
+    public static String getColorResetFormat() {
+        return "\ue51aR";
+    }
+
     @Override
     public int getStringWidth(String text) {
-        return parent.getStringWidth(text.replaceAll("\ue51aC[0-9a-fA-F]{6}", ""));
+        text = text.replaceAll("\ue51aC[0-9a-fA-F]{6}", "");
+        text = text.replaceAll("\ue51aR", "");
+        return parent.getStringWidth(text);
     }
 
     @Override

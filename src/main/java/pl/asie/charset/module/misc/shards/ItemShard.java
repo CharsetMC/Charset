@@ -39,11 +39,7 @@ public class ItemShard extends ItemBase {
 			if (md == 0 || md > MAX_SHARD) {
 				return 16777215;
 			} else {
-				float[] colors = EntitySheep.getDyeRgb(EnumDyeColor.byMetadata(md - 1));
-				int r = (int) (colors[0] * 255.0f);
-				int g = (int) (colors[1] * 255.0f);
-				int b = (int) (colors[2] * 255.0f);
-				return (r << 16) | (g << 8) | b;
+				return ColorUtils.toIntColor(EnumDyeColor.byMetadata(md - 1));
 			}
 		}
 	}

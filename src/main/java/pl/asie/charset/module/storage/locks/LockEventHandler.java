@@ -18,10 +18,13 @@ package pl.asie.charset.module.storage.locks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketChat;
 import net.minecraft.network.play.server.SPacketSoundEffect;
 import net.minecraft.tileentity.TileEntity;
@@ -34,14 +37,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.LockCode;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.api.locks.Lockable;
@@ -49,6 +56,9 @@ import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
+import pl.asie.charset.lib.item.FontRendererFancy;
+import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.utils.ColorspaceUtils;
 import pl.asie.charset.lib.utils.ThreeState;
 import pl.asie.charset.module.tweaks.carry.CarryHandler;
 
@@ -161,6 +171,51 @@ public class LockEventHandler {
             Lockable lockable = getLock(tile);
             if (lockable != null && !unlockOrRaiseError(event.getPlayer(), tile, lockable)) {
                 event.setCanceled(true);
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private String getColorDyed(int color) {
+        color &= 0xFFFFFF;
+
+        double maxDistance = Double.MAX_VALUE;
+        EnumDyeColor closestColor = null;
+
+        for (EnumDyeColor dyeColor : EnumDyeColor.values()) {
+            int c = ColorUtils.toIntColor(dyeColor) & 0xFFFFFF;
+            if (color == c) {
+                closestColor = dyeColor;
+                break;
+            }
+
+            double d = ColorspaceUtils.getColorDistanceSq(c, color);
+            if (d < maxDistance) {
+                maxDistance = d;
+                closestColor = dyeColor;
+            }
+        }
+
+        return FontRendererFancy.getColorFormat(color)
+            + I18n.format(ColorUtils.getLangEntry("charset.color.", closestColor))
+            + FontRendererFancy.getColorResetFormat();
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SideOnly(Side.CLIENT)
+    public void onItemTooltip(ItemTooltipEvent event) {
+        if (event.getItemStack().getItem() instanceof ItemLockingDyeable) {
+            String name = event.getToolTip().get(0);
+            NBTTagCompound compound = event.getItemStack().getTagCompound();
+            if (compound != null) {
+                if (compound.hasKey("color1") && compound.hasKey("color0")) {
+                    name = getColorDyed(compound.getInteger("color1")) + "/" + getColorDyed(compound.getInteger("color0")) + " " + name;
+                } else if (compound.hasKey("color1")) {
+                    name = getColorDyed(compound.getInteger("color1")) + " " + name;
+                } else if (compound.hasKey("color0")) {
+                    name = getColorDyed(compound.getInteger("color0")) + " " + name;
+                }
+                event.getToolTip().set(0, name);
             }
         }
     }
