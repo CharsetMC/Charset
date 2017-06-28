@@ -36,8 +36,8 @@
 
 package pl.asie.charset.module.misc.pocketcraft;
 
-import com.sun.org.apache.xml.internal.security.utils.I18n;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -147,7 +147,7 @@ public class GuiPocketTable extends GuiContainerCharset {
         // I'd like it to say "Pocket Crafting", but that doesn't fit.
         // Could also make the tab a bit longer...
         // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
-        this.fontRenderer.drawString(I18n.translate("gui.charset.crafting.name"), 184, 11, 4210752);
+        this.fontRenderer.drawString(I18n.format("gui.charset.crafting.name"), 184, 11, 4210752);
         /* int color = 0xa0a0a0;
         int length = 3;
         int d = 10;

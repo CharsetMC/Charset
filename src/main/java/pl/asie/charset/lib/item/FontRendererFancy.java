@@ -42,6 +42,7 @@ public class FontRendererFancy extends FontRenderer {
                     lastPos = matcher.start() + 2;
                     break;
             }
+            if (dropShadow) x -= 1;
         }
         return parent.drawString(text.substring(lastPos), x, y, color, dropShadow);
     }

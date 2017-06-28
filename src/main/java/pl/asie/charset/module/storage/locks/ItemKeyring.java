@@ -167,6 +167,7 @@ public class ItemKeyring extends ItemBase implements IKeyItem {
                 }
             }
         }
+
         return false;
     }
 

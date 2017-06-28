@@ -131,7 +131,6 @@ public class LockEventHandler {
     }
 
     private static final ResourceLocation LOCKABLE = new ResourceLocation("charset:lockable");
-    private static final ResourceLocation KEYRING_KEYS = new ResourceLocation("charset:keys");
 
     @SubscribeEvent
     public void onAttachCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
@@ -155,6 +154,15 @@ public class LockEventHandler {
                 PROVIDER = new CapabilityProviderFactory<>(Capabilities.LOCKABLE, Capabilities.LOCKABLE_STORAGE);
             }
             event.addCapability(LOCKABLE, PROVIDER.create(new Lockable(tile)));
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onRightClick(PlayerInteractEvent.LeftClickBlock event) {
+        TileEntity tile = event.getWorld().getTileEntity(event.getPos());
+        Lockable lockable = getLock(tile);
+        if (lockable != null && !unlockOrRaiseError(event.getEntityPlayer(), tile, lockable)) {
+            event.setUseBlock(Event.Result.DENY);
         }
     }
 
@@ -226,7 +234,13 @@ public class LockEventHandler {
                 int color = compound.getInteger("color" + count);
                 if (color >= 0) {
                     if (cCount > 0) {
-                        builder.append(", ");
+                        if ((cCount % 5) == 0) {
+                            builder.append(',');
+                            event.getToolTip().add(builder.toString());
+                            builder = new StringBuilder();
+                        } else {
+                            builder.append(", ");
+                        }
                     }
                     builder.append(getColorDyed(color));
                     cCount++;

@@ -48,6 +48,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.ui.ContainerBase;
+import pl.asie.charset.lib.ui.SlotBlocked;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
@@ -57,6 +58,7 @@ import java.util.List;
 public class ContainerPocketTable extends ContainerBase {
     private final EntityPlayer player;
     private final InventoryPlayer playerInv;
+    private final int heldPos;
     private InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
     private IInventory craftResult = new InventoryCraftResult();
 
@@ -73,6 +75,7 @@ public class ContainerPocketTable extends ContainerBase {
         super(player.inventory);
         this.player = player;
         this.playerInv = player.inventory;
+        heldPos = this.playerInv.currentItem;
         craftResultSlot = (RedirectedSlotCrafting) addSlotToContainer(new RedirectedSlotCrafting(player, craftMatrix, craftResult, 207, 28));
         bindPlayerInventory(player.inventory, 8, 8);
         detectAndSendChanges();
@@ -82,6 +85,10 @@ public class ContainerPocketTable extends ContainerBase {
     @Override
     protected Slot addSlotToContainer(Slot slot) {
         if (slot.inventory instanceof InventoryPlayer) {
+            if (slot.isHere(slot.inventory, heldPos)) {
+                slot = new SlotBlocked(slot.inventory, slot.getSlotIndex(), slot.xPos, slot.yPos);
+            }
+
             if (slot.getSlotIndex() >= 9 && (slot.getSlotIndex() % 9) >= 6) {
                 slot = new Slot(slot.inventory, slot.getSlotIndex(), slot.xPos, slot.yPos) {
                     @Override
