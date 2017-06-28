@@ -19,6 +19,7 @@ package pl.asie.charset.lib.utils;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,8 +34,23 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import pl.asie.charset.lib.item.FontRendererFancy;
 
 public class UtilProxyClient extends UtilProxyCommon {
+	public static FontRenderer FONT_RENDERER_FANCY;
+
+	@Override
+	public void init() {
+		super.init();
+
+		try {
+			FONT_RENDERER_FANCY = new FontRendererFancy(Minecraft.getMinecraft().fontRenderer);
+		} catch (Exception e) {
+			e.printStackTrace();
+			FONT_RENDERER_FANCY = Minecraft.getMinecraft().fontRenderer;
+		}
+	}
+
 	@Override
 	public EntityPlayer getPlayer(INetHandler handler) {
 		return (handler instanceof INetHandlerPlayClient || handler instanceof INetHandlerLoginClient)

@@ -67,6 +67,7 @@ import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
 import pl.asie.charset.lib.utils.DataSerializersCharset;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -138,6 +139,7 @@ public class CharsetLib {
 
 		Capabilities.init();
 		DataSerializersCharset.init();
+		UtilProxyCommon.proxy.init();
 
 		if (ModCharset.INDEV || enableDebugInfo)
 			MinecraftForge.EVENT_BUS.register(new DebugInfoProvider());

@@ -87,7 +87,9 @@ public class CharsetTransportCarts {
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
-        RegistryUtils.register(event.getRegistry(), itemLinker, "linker");
+        if (ModCharset.INDEV) {
+            RegistryUtils.register(event.getRegistry(), itemLinker, "linker");
+        }
     }
 
     private void registerCombinerRecipeForDirs(Block railSrc, IProperty<BlockRailBase.EnumRailDirection> propSrc, Block railDst, IProperty<BlockRailBase.EnumRailDirection> propDst, ItemStack with) {

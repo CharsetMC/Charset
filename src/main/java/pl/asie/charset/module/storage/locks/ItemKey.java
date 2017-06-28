@@ -26,6 +26,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.item.ItemBase;
 
 import java.util.List;

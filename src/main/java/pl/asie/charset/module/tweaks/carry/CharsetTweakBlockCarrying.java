@@ -23,6 +23,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -112,6 +113,7 @@ public class CharsetTweakBlockCarrying {
 
         if (hasTileEntity) {
             TileEntity tile = world.getTileEntity(pos);
+
             if (tile != null) {
                 // Check IMultiblockStructure
                 IMultiblockStructure structure = tile.getCapability(Capabilities.MULTIBLOCK_STRUCTURE, null);
@@ -177,12 +179,32 @@ public class CharsetTweakBlockCarrying {
     public static void grabBlock(EntityPlayer player, World world, BlockPos pos) {
         if (!(player instanceof EntityPlayerMP)) {
             packet.sendToServer(new PacketCarryGrab(world, pos));
+            // TODO: Figure out a way to revert grabs
+            return;
         }
 
         CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && !carryHandler.isCarrying()) {
-            if (canCarry(world, pos)) {
+            boolean canCarry = canCarry(world, pos);
+
+            if (canCarry) {
+                // Can the player break this block?
+                if (world.getBlockState(pos).getPlayerRelativeBlockHardness(player, world, pos) < 0f) {
+                    canCarry = false;
+                }
+            }
+
+            if (canCarry) {
+                // Can the player /really/ break this block?
+                BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, world.getBlockState(pos), player);
+                if (MinecraftForge.EVENT_BUS.post(event)) {
+                    canCarry = false;
+                }
+            }
+
+            if (canCarry) {
                 carryHandler.grab(world, pos);
+                syncCarryWithClient(player, player);
             } else {
                 // Sync in case the client said "yes".
                 syncCarryWithClient(player, player);
@@ -206,7 +228,7 @@ public class CharsetTweakBlockCarrying {
                     }
                 }
             } else {
-                // Sync in case the client said "yes".
+                // Sync in case the client said "yes", and revert the block's changes.
                 syncCarryWithClient(player, player);
             }
         }

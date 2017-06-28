@@ -3,4 +3,6 @@
 * [lib] Improve wire occlusion logic.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
 * [storage.locks] Major rewrite! They work much more reliably now and can be placed on tanks!
+* [tweak.carry] Prevent the player from picking up blocks they can't break.
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.
+* [tweak.unifyColors] Temporarily removed - awaiting redesign.
