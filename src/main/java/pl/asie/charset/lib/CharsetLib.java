@@ -28,6 +28,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -121,11 +122,6 @@ public class CharsetLib {
 		config.save();
 	}
 
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void afterRecipesRegistered(RegistryEvent.Register<IRecipe> event) {
-		ItemMaterialHeuristics.init(true);
-	}
-
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
@@ -154,6 +150,7 @@ public class CharsetLib {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		Capabilities.registerVanillaWrappers();
+		ItemMaterialHeuristics.init(true);
 
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);

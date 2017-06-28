@@ -19,7 +19,7 @@ package pl.asie.charset.api.wires;
 /**
  * Implement this class as a capability if you want to
  * receive signals from redstone cables. Keep in mind, however,
- * that this does not replace vanilla redstone APIs.
+ * that this does not replace impl redstone APIs.
  */
 public interface IRedstoneReceiver {
 	/**

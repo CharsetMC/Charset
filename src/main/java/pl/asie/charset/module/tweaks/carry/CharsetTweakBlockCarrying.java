@@ -32,6 +32,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.api.lib.IMovable;
+import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -43,6 +44,7 @@ import pl.asie.charset.module.tweaks.carry.transforms.CarryTransformerEntityMine
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 @CharsetModule(
@@ -111,6 +113,16 @@ public class CharsetTweakBlockCarrying {
         if (hasTileEntity) {
             TileEntity tile = world.getTileEntity(pos);
             if (tile != null) {
+                // Check IMultiblockStructure
+                IMultiblockStructure structure = tile.getCapability(Capabilities.MULTIBLOCK_STRUCTURE, null);
+                if (structure != null && !structure.isSeparable()) {
+                    int count = 0;
+                    Iterator<BlockPos> it = structure.iterator();
+                    while (it.hasNext()) {
+                        if (++count >= 2) return false;
+                    }
+                }
+
                 // Check IMovable
                 IMovable movable = tile.getCapability(Capabilities.MOVABLE, null);
                 if (movable != null && !movable.canMoveFrom()) {
@@ -134,12 +146,11 @@ public class CharsetTweakBlockCarrying {
             return true;
         }
 
-        // We support all vanilla tile entities.
+        // We support all impl tile entities.
         if (!isVanilla && hasTileEntity) return false;
 
         // Class-based bans
         // if (block instanceof IPlantable) return false;
-        if (block instanceof BlockBed) return false;
         if (block instanceof BlockPistonExtension || block instanceof BlockPistonMoving) return false;
         if (block instanceof BlockPistonBase) {
             // If we don't have the BlockPistonBase.EXTENDED key, this piston

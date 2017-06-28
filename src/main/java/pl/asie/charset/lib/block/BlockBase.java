@@ -49,6 +49,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.material.ItemMaterialHeuristics;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 import pl.asie.charset.lib.render.model.ModelFactory;
@@ -129,10 +131,6 @@ public abstract class BlockBase extends Block {
 		return 1;
 	}
 
-	public void wipeSubBlocksCache() {
-		items = null;
-	}
-
 	@Override
 	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> itemList) {
 		if (items == null) {
@@ -157,6 +155,10 @@ public abstract class BlockBase extends Block {
 		}
 
 		itemList.addAll(items);
+
+		if (!ItemMaterialHeuristics.isFullyInitialized()) {
+			items = null;
+		}
 	}
 
 	@Override

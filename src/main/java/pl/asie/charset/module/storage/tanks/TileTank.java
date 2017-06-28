@@ -16,6 +16,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IMovable;
+import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 
@@ -24,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-public class TileTank extends TileBase implements IFluidHandler, IFluidTankProperties, IMovable, IDebuggable {
+public class TileTank extends TileBase implements IFluidHandler, IFluidTankProperties, IMovable, IDebuggable, IMultiblockStructure {
     public static class TankIterator implements Iterator<TileTank> {
         private TileTank currTank;
 
@@ -42,6 +43,26 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
             TileTank tank = currTank;
             currTank = currTank.getAboveTank();
             return tank;
+        }
+    }
+
+    private static class BlockPosIterator implements Iterator<BlockPos> {
+        private TileTank currTank;
+
+        public BlockPosIterator(TileTank tank) {
+            currTank = tank;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currTank != null;
+        }
+
+        @Override
+        public BlockPos next() {
+            TileTank tank = currTank;
+            currTank = currTank.getAboveTank();
+            return tank.getPos();
         }
     }
 
@@ -299,6 +320,8 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
             return true;
         } else if (capability == Capabilities.MOVABLE) {
             return true;
+        } else if (capability == Capabilities.MULTIBLOCK_STRUCTURE) {
+            return true;
         } else {
             return super.hasCapability(capability, facing);
         }
@@ -307,7 +330,8 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || capability == Capabilities.DEBUGGABLE || capability == Capabilities.MOVABLE) {
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || capability == Capabilities.DEBUGGABLE
+                || capability == Capabilities.MOVABLE || capability == Capabilities.MULTIBLOCK_STRUCTURE) {
             return (T) this;
         } else {
             return super.getCapability(capability, facing);
@@ -332,5 +356,28 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     @Override
     public boolean canMoveTo(World world, BlockPos pos) {
         return !(checkPlacementConflict(this, world.getTileEntity(pos.up())) || checkPlacementConflict(this, world.getTileEntity(pos.down())));
+    }
+
+    @Override
+    public Iterator<BlockPos> iterator() {
+        return new BlockPosIterator(this);
+    }
+
+    @Override
+    public boolean contains(BlockPos pos) {
+        if (pos.getX() == getPos().getX() && pos.getZ() == getPos().getZ() && pos.getY() >= getBottomTank().getPos().getY()) {
+            TileTank tank = this;
+            if (pos.getY() <= tank.getPos().getY()) {
+                return true;
+            }
+
+            while ((tank = tank.getAboveTank()) != null) {
+                if (pos.getY() <= tank.getPos().getY()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

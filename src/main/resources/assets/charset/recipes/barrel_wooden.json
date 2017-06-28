@@ -15,7 +15,7 @@
     "-": {
       "type": "charset:material",
       "material": ["plank", "slab"],
-      "chain": "W.plank.slab",
+      "chain": "W.plank.?slab",
       "nbtKey": "slab"
     }
   },

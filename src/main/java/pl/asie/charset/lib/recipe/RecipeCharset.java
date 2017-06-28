@@ -5,9 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import gnu.trove.iterator.TCharIterator;
 import gnu.trove.map.TCharObjectMap;
+import gnu.trove.map.TObjectCharMap;
 import gnu.trove.map.hash.TCharObjectHashMap;
+import gnu.trove.map.hash.TObjectCharHashMap;
 import gnu.trove.set.TCharSet;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TCharHashSet;
 import gnu.trove.set.hash.TIntHashSet;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -208,13 +211,16 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                 recipe.height = pattern.size();
 
                 recipe.charToIngredient.put(' ', Ingredient.EMPTY);
+                TObjectCharMap<Ingredient> ingredientToChar = new TObjectCharHashMap<>();
 
                 JsonObject key = JsonUtils.getJsonObject(json, "key");
                 for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
                     if (entry.getKey().length() > 1) {
                         throw new RuntimeException("Invalid recipe key: '" + entry.getKey() + "'!");
                     }
-                    recipe.charToIngredient.put(entry.getKey().charAt(0), CraftingHelper.getIngredient(entry.getValue(), context));
+                    char c = entry.getKey().charAt(0);
+                    recipe.charToIngredient.put(c, CraftingHelper.getIngredient(entry.getValue(), context));
+                    ingredientToChar.put(recipe.charToIngredient.get(c), c);
                 }
 
                 recipe.shapedOrdering = new int[recipe.width * recipe.height];
@@ -260,6 +266,12 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
 
                                 if (!match) {
                                     continue;
+                                }
+                            }
+
+                            if (!addedIngredients.contains(ingredient) && ingredient instanceof IngredientCharset) {
+                                for (Ingredient ing : addedIngredients) {
+                                    ((IngredientCharset) ingredient).addDependency(ingredientToChar.get(ing), ing);
                                 }
                             }
 

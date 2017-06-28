@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import gnu.trove.set.TCharSet;
 import gnu.trove.set.hash.TCharHashSet;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.JsonUtils;
 import net.minecraftforge.common.crafting.IIngredientFactory;
@@ -26,6 +27,7 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         private final TCharSet dependencies;
         private final String[] types;
         private final String nbtTag;
+        private net.minecraft.item.crafting.Ingredient dependency;
 
         protected Ingredient(String nbtTag, String... types) {
             super(0);
@@ -50,29 +52,40 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         }
 
         @Override
+        public void addDependency(char c, net.minecraft.item.crafting.Ingredient i) {
+            if (chain != null && c == chain[0].charAt(0)) {
+                dependency = i;
+            }
+        }
+
+        @Override
         public boolean mustIteratePermutations() {
             return super.mustIteratePermutations() || chain != null || nbtTag != null;
+        }
+
+        private ItemMaterial getChainedMaterial(ItemMaterial base) {
+            for (int i = 1; i < chain.length; i++) {
+                if (chain[i].charAt(0) == '?') {
+                    ItemMaterial nextBase = base.getRelated(chain[i].substring(1));
+                    if (nextBase != null)
+                        base = nextBase;
+                } else {
+                    base = base.getRelated(chain[i]);
+                    if (base == null)
+                        return null;
+                }
+            }
+
+            return base;
         }
 
         @Override
         public boolean apply(IngredientMatcher matcher, ItemStack stack) {
             if (chain != null) {
-                ItemStack stackIn = matcher.getStack(matcher.getIngredient(chain[0].charAt(0)));
+                ItemStack stackIn = matcher.getStack(dependency);
                 if (!stackIn.isEmpty()) {
-                    ItemMaterial base = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stackIn);
-                    for (int i = 1; i < chain.length; i++) {
-                        if (chain[i].charAt(0) == '?') {
-                            ItemMaterial nextBase = base.getRelated(chain[i].substring(1));
-                            if (nextBase != null)
-                                base = nextBase;
-                        } else {
-                            base = base.getRelated(chain[i]);
-                            if (base == null)
-                                return false;
-                        }
-                    }
-
-                    return ItemMaterialRegistry.INSTANCE.matches(stack, base);
+                    ItemMaterial base = getChainedMaterial(ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stackIn));
+                    return base != null && ItemMaterialRegistry.INSTANCE.matches(stack, base);
                 } else {
                     return false;
                 }
@@ -90,13 +103,25 @@ public class IngredientMaterialFactory implements IIngredientFactory {
 
         @Override
         public ItemStack[] getMatchingStacks() {
-            Collection<ItemMaterial> mats = ItemMaterialRegistry.INSTANCE.getMaterialsByTypes(types);
-            ItemStack[] stacks = new ItemStack[mats.size()];
-            int idx = 0;
-            for (ItemMaterial material : mats) {
-                stacks[idx++] = material.getStack();
+            if (chain != null) {
+                Collection<ItemStack> stacks = new ArrayList<>();
+                for (ItemStack stack : dependency.getMatchingStacks()) {
+                    ItemMaterial materialOut = getChainedMaterial(ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stack));
+                    if (materialOut != null) {
+                        stacks.add(materialOut.getStack());
+                    }
+                }
+
+                return stacks.toArray(new ItemStack[stacks.size()]);
+            } else {
+                Collection<ItemMaterial> mats = ItemMaterialRegistry.INSTANCE.getMaterialsByTypes(types);
+                ItemStack[] stacks = new ItemStack[mats.size()];
+                int idx = 0;
+                for (ItemMaterial material : mats) {
+                    stacks[idx++] = material.getStack();
+                }
+                return stacks;
             }
-            return stacks;
         }
 
         @Override

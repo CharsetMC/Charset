@@ -32,6 +32,10 @@ public final class ItemMaterialHeuristics {
 
     }
 
+    public static boolean isFullyInitialized() {
+        return initPhase >= 2;
+    }
+
     private static boolean isBlock(ItemStack stack) {
         return !stack.isEmpty() && (stack.getItem() instanceof ItemBlock || Block.getBlockFromItem(stack.getItem()) != Blocks.AIR);
     }
@@ -242,7 +246,7 @@ public final class ItemMaterialHeuristics {
         initPhase = (modded ? 2 : 1);
 
         bar.step("Wood");
-        // Pre-initialize vanilla woods
+        // Pre-initialize impl woods
         if (!modded)
             for (int i = 0; i < 6; i++) {
                 ItemMaterial log = reg.getOrCreateMaterial(new ItemStack(i >= 4 ? Blocks.LOG2 : Blocks.LOG, 1, i % 4));

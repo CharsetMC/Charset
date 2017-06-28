@@ -31,6 +31,10 @@ public abstract class IngredientCharset extends Ingredient {
         return null;
     }
 
+    public void addDependency(char c, Ingredient i) {
+
+    }
+
     public boolean mustIteratePermutations() {
         return getDependencies() != null;
     }

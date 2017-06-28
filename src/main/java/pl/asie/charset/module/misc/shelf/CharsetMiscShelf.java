@@ -45,7 +45,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 @CharsetModule(
 		name = "misc.shelf",
-		description = "Reworks vanilla shelf and adds fancy bookshelves.",
+		description = "Reworks impl shelf and adds fancy bookshelves.",
 		isDevOnly = true
 )
 public class CharsetMiscShelf {

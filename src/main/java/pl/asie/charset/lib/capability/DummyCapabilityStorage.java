@@ -21,6 +21,17 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 
 public class DummyCapabilityStorage<T> implements Capability.IStorage<T> {
+    private static final DummyCapabilityStorage INSTANCE = new DummyCapabilityStorage();
+
+    private DummyCapabilityStorage() {
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> DummyCapabilityStorage<T> get() {
+        return (DummyCapabilityStorage<T>) INSTANCE;
+    }
+
     @Override
     public NBTBase writeNBT(Capability<T> capability, T instance, EnumFacing side) {
         return null;

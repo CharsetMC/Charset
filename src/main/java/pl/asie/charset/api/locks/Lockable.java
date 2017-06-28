@@ -1,20 +1,20 @@
 package pl.asie.charset.api.locks;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public final class Lockable implements INBTSerializable<NBTTagCompound> {
-    private final World world;
+    private final TileEntity owner;
     private ILockingEntity lock;
 
     public Lockable() {
         this(null);
     }
 
-    public Lockable(World world) {
-        this.world = world;
+    public Lockable(TileEntity owner) {
+        this.owner = owner;
     }
 
     public ILockingEntity getLock() {
@@ -57,8 +57,8 @@ public final class Lockable implements INBTSerializable<NBTTagCompound> {
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
-        if (nbt.hasKey("lockILockingEntityId") && world != null) {
-            lock = (ILockingEntity) world.getEntityByID(nbt.getInteger("lockILockingEntityId"));
+        if (nbt.hasKey("lockILockingEntityId") && owner.getWorld() != null) {
+            lock = (ILockingEntity) owner.getWorld().getEntityByID(nbt.getInteger("lockILockingEntityId"));
         } else {
             lock = null;
         }

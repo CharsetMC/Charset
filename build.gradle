@@ -23,7 +23,7 @@ group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.12-14.21.0.2373"
+	version = "1.12-14.21.0.2380"
 
 	runDir = "run"
 	useDepAts = true

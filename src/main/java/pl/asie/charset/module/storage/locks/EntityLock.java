@@ -122,7 +122,9 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
         if (tile != null && tile.hasCapability(Capabilities.LOCKABLE, null)) {
             Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
             if (!lock.hasLock()) {
-                lock.addLock(this);
+                if (LockEventHandler.getLock(tile) == null) {
+                    lock.addLock(this);
+                }
             }
 
             return lock.getLock() == this ? lock : null;
@@ -184,17 +186,8 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
             }
         }
 
-        if (!world.isRemote && lockKey != null && lockKey.length() > 0) {
-            if (getAttachedTile() != null && getAttachedTile().hasCapability(Capabilities.LOCKABLE, null)) {
-                Lockable lock = getAttachedTile().getCapability(Capabilities.LOCKABLE, null);
-                if (!lock.hasLock()) {
-                    lock.addLock(this);
-                } else if (lock.getLock() != this) {
-                    drop();
-                }
-            } else {
-                drop();
-            }
+        if (!world.isRemote && lockKey != null && getAttachedLock() == null) {
+            drop();
         }
     }
 

@@ -28,6 +28,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -39,20 +40,38 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
+import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.module.tweaks.carry.CarryHandler;
 
+import java.util.Iterator;
+
 public class LockEventHandler {
     public static CapabilityProviderFactory<Lockable> PROVIDER;
 
     public static Lockable getLock(TileEntity tile) {
-        if (tile != null && tile.hasCapability(Capabilities.LOCKABLE, null)) {
-            Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
-            if (lock.hasLock()) {
-                return lock;
+        if (tile != null) {
+            if (tile.hasCapability(Capabilities.MULTIBLOCK_STRUCTURE, null)) {
+                IMultiblockStructure structure = tile.getCapability(Capabilities.MULTIBLOCK_STRUCTURE, null);
+                Iterator<BlockPos> iterator = structure.iterator();
+                while (iterator.hasNext()) {
+                    BlockPos pos = iterator.next();
+                    TileEntity tile2 = pos.equals(tile.getPos()) ? tile : tile.getWorld().getTileEntity(pos);
+                    if (tile2.hasCapability(Capabilities.LOCKABLE, null)) {
+                        Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
+                        if (lock.hasLock()) {
+                            return lock;
+                        }
+                    }
+                }
+            } else if (tile.hasCapability(Capabilities.LOCKABLE, null)) {
+                Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
+                if (lock.hasLock()) {
+                    return lock;
+                }
             }
         }
 
@@ -60,6 +79,10 @@ public class LockEventHandler {
     }
 
     public static boolean unlockOrRaiseError(EntityPlayer player, TileEntity tile, Lockable lock) {
+        if (player.getEntityWorld().isRemote) {
+            return true;
+        }
+
         ItemStack stack = player.getHeldItemMainhand();
 
         boolean canUnlock = false;
@@ -76,7 +99,7 @@ public class LockEventHandler {
             }
         }
 
-        if (!canUnlock && !player.getEntityWorld().isRemote) {
+        if (!canUnlock) {
             ITextComponent displayName = tile.getDisplayName();
             if (displayName == null) {
                 displayName = new TextComponentTranslation(tile.getBlockType().getUnlocalizedName());
@@ -106,7 +129,7 @@ public class LockEventHandler {
             if (PROVIDER == null) {
                 PROVIDER = new CapabilityProviderFactory<>(Capabilities.LOCKABLE, Capabilities.LOCKABLE_STORAGE);
             }
-            event.addCapability(LOCKABLE, PROVIDER.create(new Lockable(tile.getWorld())));
+            event.addCapability(LOCKABLE, PROVIDER.create(new Lockable(tile)));
         }
     }
 

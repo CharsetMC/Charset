@@ -99,7 +99,7 @@ public class CharsetAudioNoteblock {
                 }
             }
 
-            // Did not send sound via speaker - use default implementation *for vanilla note blocks*
+            // Did not send sound via speaker - use default implementation *for impl note blocks*
             if (event.getState().getBlock() == Blocks.NOTEBLOCK) {
                 event.setCanceled(true);
 

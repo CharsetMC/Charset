@@ -64,7 +64,7 @@ public class DramaGenerator {
 				"more drama", "less drama", "microblocks", "drama generation commands", "Blutricity support", "overpowered items", "underpowered items", "new ores",
 				"better SMP support", "achievements", "quests", "more annoying worldgen"));
 		COMBINATIONS.put("adj" , Arrays.asList("bad", "wrong", "illegal", "horrible", "nasty", "not on ForgeCraft",
-				"noncompliant with Mojang's EULA", "a serious problem", "incompatible", "a waste of time", "wonderful", "amazing", "toxic", "too vanilla",
+				"noncompliant with Mojang's EULA", "a serious problem", "incompatible", "a waste of time", "wonderful", "amazing", "toxic", "too impl",
 				"shameful", "disappointing", "bloated", "outdated", "incorrect", "full of drama", "too realistic"));
 		COMBINATIONS.put("badsoft" , Arrays.asList("malware", "spyware", "adware", "DRM", "viruses", "trojans", "keyloggers",
 				"stolen code", "easter eggs", "potential login stealers", "adf.ly links", "bad code", "stolen assets", "malicious code", "secret backdoors"));

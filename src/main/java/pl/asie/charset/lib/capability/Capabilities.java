@@ -19,20 +19,24 @@ package pl.asie.charset.lib.capability;
 import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityBed;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
-import pl.asie.charset.api.lib.IAxisRotatable;
-import pl.asie.charset.api.lib.IDebuggable;
-import pl.asie.charset.api.lib.IItemInsertionHandler;
-import pl.asie.charset.api.lib.IMovable;
+import pl.asie.charset.api.lib.*;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.wires.IBundledEmitter;
@@ -42,6 +46,8 @@ import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
+import pl.asie.charset.lib.capability.impl.MultiblockStructureBed;
+import pl.asie.charset.lib.capability.impl.MultiblockStructureChest;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
 import pl.asie.charset.lib.capability.lib.*;
@@ -83,6 +89,9 @@ public class Capabilities {
 	@CapabilityInject(Lockable.class)
 	public static Capability<Lockable> LOCKABLE;
 
+	@CapabilityInject(IMultiblockStructure.class)
+	public static Capability<IMultiblockStructure> MULTIBLOCK_STRUCTURE;
+
 	public static Capability.IStorage<Lockable> LOCKABLE_STORAGE = new Capability.IStorage<Lockable>() {
 		@Nullable
 		@Override
@@ -98,23 +107,31 @@ public class Capabilities {
 		}
 	};
 
+	private static final ResourceLocation MULTIBLOCK_STRUCTURE_LOC = new ResourceLocation("charset:multiblock_structure");
+	private static CapabilityProviderFactory<IMultiblockStructure> multiblockStructureFactory;
+
 	public static void preInit() {
-		CapabilityManager.INSTANCE.register(IAudioSource.class, new DummyCapabilityStorage<>(), DefaultAudioSource::new);
-		CapabilityManager.INSTANCE.register(IAudioReceiver.class, new DummyCapabilityStorage<>(), DefaultAudioReceiver::new);
+		CapabilityManager.INSTANCE.register(IAudioSource.class, DummyCapabilityStorage.get(), DefaultAudioSource::new);
+		CapabilityManager.INSTANCE.register(IAudioReceiver.class, DummyCapabilityStorage.get(), DefaultAudioReceiver::new);
 
-		CapabilityManager.INSTANCE.register(IAxisRotatable.class, new DummyCapabilityStorage<>(), DefaultAxisRotatable::new);
-		CapabilityManager.INSTANCE.register(IDebuggable.class, new DummyCapabilityStorage<>(), DefaultDebuggable::new);
-		CapabilityManager.INSTANCE.register(IMovable.class, new DummyCapabilityStorage<>(), DefaultMovable::new);
+		CapabilityManager.INSTANCE.register(IAxisRotatable.class, DummyCapabilityStorage.get(), DefaultAxisRotatable::new);
+		CapabilityManager.INSTANCE.register(IDebuggable.class, DummyCapabilityStorage.get(), DefaultDebuggable::new);
+		CapabilityManager.INSTANCE.register(IMovable.class, DummyCapabilityStorage.get(), DefaultMovable::new);
 
-		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, new DummyCapabilityStorage<>(), DefaultItemInsertionHandler::new);
-		CapabilityManager.INSTANCE.register(IPipeView.class, new DummyCapabilityStorage<>(), DefaultPipeView::new);
+		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, DummyCapabilityStorage.get(), DefaultItemInsertionHandler::new);
+		CapabilityManager.INSTANCE.register(IPipeView.class, DummyCapabilityStorage.get(), DefaultPipeView::new);
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter::new);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter::new);
-		CapabilityManager.INSTANCE.register(IBundledReceiver.class, new DummyCapabilityStorage<>(), DummyRedstoneReceiver::new);
-		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, new DummyCapabilityStorage<>(), DummyRedstoneReceiver::new);
+		CapabilityManager.INSTANCE.register(IBundledReceiver.class, DummyCapabilityStorage.get(), DummyRedstoneReceiver::new);
+		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, DummyCapabilityStorage.get(), DummyRedstoneReceiver::new);
 
 		CapabilityManager.INSTANCE.register(Lockable.class, LOCKABLE_STORAGE, Lockable::new);
+		CapabilityManager.INSTANCE.register(IMultiblockStructure.class, DummyCapabilityStorage.get(), DefaultMultiblockStructure::new);
+
+		MinecraftForge.EVENT_BUS.register(new Capabilities());
+
+		multiblockStructureFactory = new CapabilityProviderFactory<>(Capabilities.MULTIBLOCK_STRUCTURE, DummyCapabilityStorage.get());
  	}
 
  	public static void init() {
@@ -141,4 +158,14 @@ public class Capabilities {
 		CapabilityHelper.registerWrapper(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, new CapabilityWrapperFluidStacks());
 		CapabilityHelper.registerWrapper(Capabilities.ITEM_INSERTION_HANDLER, new CapabilityWrapperInsertionToItemHandler());
 	}
+
+	@SubscribeEvent
+	public void onAttachCapabilityTile(AttachCapabilitiesEvent<TileEntity> event) {
+		if (event.getObject() instanceof TileEntityChest) {
+			event.addCapability(MULTIBLOCK_STRUCTURE_LOC, multiblockStructureFactory.create(new MultiblockStructureChest((TileEntityChest) event.getObject())));
+		} else if (event.getObject() instanceof TileEntityBed) {
+			event.addCapability(MULTIBLOCK_STRUCTURE_LOC, multiblockStructureFactory.create(new MultiblockStructureBed((TileEntityBed) event.getObject())));
+		}
+	}
+
 }
