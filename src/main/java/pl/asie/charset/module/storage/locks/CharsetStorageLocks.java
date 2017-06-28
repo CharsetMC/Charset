@@ -39,7 +39,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.module.misc.pocketcraft.ContainerPocketTable;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -61,6 +63,7 @@ public class CharsetStorageLocks {
 
 	public static ItemMasterKey masterKeyItem;
 	public static ItemKey keyItem;
+	public static ItemKeyring keyringItem;
 	public static ItemLock lockItem;
 
 	public static boolean enableKeyKeepInventory;
@@ -69,6 +72,7 @@ public class CharsetStorageLocks {
 	public void preInit(FMLPreInitializationEvent event) {
 		masterKeyItem = new ItemMasterKey();
 		keyItem = new ItemKey();
+		keyringItem = new ItemKeyring();
 		lockItem = new ItemLock();
 
 		enableKeyKeepInventory = config.getBoolean("keepKeysOnDeath", "locks", true, "Should keys be kept in inventory on death?");
@@ -79,12 +83,18 @@ public class CharsetStorageLocks {
 		RegistryUtils.registerModel(masterKeyItem, 0, "charset:masterKey");
 		RegistryUtils.registerModel(keyItem, 0, "charset:key");
 		RegistryUtils.registerModel(lockItem, 0, "charset:lock");
+
+		RegistryUtils.registerModel(keyringItem, 0, "charset:keyring");
+		for (int i = 1; i <= 8; i++) {
+			RegistryUtils.registerModel(keyringItem, i, "charset:keyring#inventory_" + i);
+		}
 	}
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
 		event.getRegistry().register(masterKeyItem.setRegistryName("masterKey"));
 		event.getRegistry().register(keyItem.setRegistryName("key"));
+		event.getRegistry().register(keyringItem.setRegistryName("keyring"));
 		event.getRegistry().register(lockItem.setRegistryName("lock"));
 	}
 
@@ -130,6 +140,10 @@ public class CharsetStorageLocks {
 				if (!key.isEmpty() && key.getItem() instanceof ItemKey) {
 					ItemStack result = output.copy();
 					result.setTagCompound(new NBTTagCompound());
+					if (key.hasTagCompound() && key.getTagCompound().hasKey("color")) {
+						result.getTagCompound().setTag("color", key.getTagCompound().getTag("color"));
+					}
+
 					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getKey(key));
 					return result;
 				}
@@ -156,10 +170,8 @@ public class CharsetStorageLocks {
 				}
 			});
 		}
-	}
 
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.KEYRING, Side.SERVER, (r) -> new ContainerKeyring(r.player.inventory));
 	}
 
 	@Mod.EventHandler
@@ -173,5 +185,8 @@ public class CharsetStorageLocks {
 	public void initClient(FMLInitializationEvent event) {
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), CharsetStorageLocks.keyItem);
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), CharsetStorageLocks.lockItem);
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemKeyring.Color(), CharsetStorageLocks.keyringItem);
+
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.KEYRING, Side.CLIENT, (r) -> new GuiKeyring(new ContainerKeyring(r.player.inventory)));
 	}
 }

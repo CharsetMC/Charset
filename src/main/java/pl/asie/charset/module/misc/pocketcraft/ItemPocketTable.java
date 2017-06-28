@@ -24,6 +24,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBase;
+import pl.asie.charset.lib.ui.GuiHandlerCharset;
 
 public class ItemPocketTable extends ItemBase {
     
@@ -34,14 +35,10 @@ public class ItemPocketTable extends ItemBase {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-        return activateTable(worldIn, playerIn, handIn);
-    }
-    
-    ActionResult<ItemStack> activateTable(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         if (hand == EnumHand.MAIN_HAND) {
             if (!world.isRemote) {
-                player.openGui(ModCharset.instance, CharsetMiscPocketcraft.GUI_ID, player.getEntityWorld(),
+                player.openGui(ModCharset.instance, GuiHandlerCharset.POCKET_TABLE, player.getEntityWorld(),
                         player.inventory.currentItem, 0, 0);
             }
 

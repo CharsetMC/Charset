@@ -2,6 +2,8 @@
 * Major improvements to Just Enough Items support.
 * [lib] Improve wire occlusion logic.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
+* [storage.locks] Added keyrings! They store keys, in style!
+* [storage.locks] Locks, when crafted, now copy the color of the key.
 * [storage.locks] Major rewrite! They work much more reliably now and can be placed on tanks!
 * [tweak.carry] Prevent the player from picking up blocks they can't break.
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.

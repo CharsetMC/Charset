@@ -50,6 +50,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IKeyItem;
@@ -57,6 +59,7 @@ import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.item.FontRendererFancy;
+import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.ColorspaceUtils;
 import pl.asie.charset.lib.utils.ThreeState;
@@ -128,6 +131,7 @@ public class LockEventHandler {
     }
 
     private static final ResourceLocation LOCKABLE = new ResourceLocation("charset:lockable");
+    private static final ResourceLocation KEYRING_KEYS = new ResourceLocation("charset:keys");
 
     @SubscribeEvent
     public void onAttachCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
@@ -212,6 +216,27 @@ public class LockEventHandler {
                     name = getColorDyed(compound.getInteger("color")) + " " + name;
                     event.getToolTip().set(0, name);
                 }
+            }
+        } else if (event.getItemStack().getItem() instanceof ItemKeyring && event.getItemStack().hasTagCompound()) {
+            NBTTagCompound compound = event.getItemStack().getTagCompound();
+            StringBuilder builder = new StringBuilder();
+            int count = 0;
+            int cCount = 0;
+            while (compound.hasKey("color" + count)) {
+                int color = compound.getInteger("color" + count);
+                if (color >= 0) {
+                    if (cCount > 0) {
+                        builder.append(", ");
+                    }
+                    builder.append(getColorDyed(color));
+                    cCount++;
+                }
+
+                count++;
+            }
+
+            if (cCount > 0) {
+                event.getToolTip().add(builder.toString());
             }
         }
     }

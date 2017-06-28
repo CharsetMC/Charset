@@ -1,0 +1,99 @@
+{
+    "forge_marker": 1,
+    "variants": {
+        "inventory": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_0"
+            }
+        },
+        "inventory_1": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_1",
+                "layer1": "charset:items/keyring_1_color"
+            }
+        },
+        "inventory_2": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_2",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color"
+            }
+        },
+        "inventory_3": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_3",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color",
+                "layer3": "charset:items/keyring_3_color"
+            }
+        },
+        "inventory_4": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_3",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color",
+                "layer3": "charset:items/keyring_3_color"
+            }
+        },
+        "inventory_5": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_3",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color",
+                "layer3": "charset:items/keyring_3_color"
+            }
+        },
+        "inventory_6": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_3",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color",
+                "layer3": "charset:items/keyring_3_color"
+            }
+        },
+        "inventory_7": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_3",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color",
+                "layer3": "charset:items/keyring_3_color"
+            }
+        },
+        "inventory_8": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_3",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color",
+                "layer3": "charset:items/keyring_3_color"
+            }
+        },
+        "inventory_9": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/keyring_3",
+                "layer1": "charset:items/keyring_1_color",
+                "layer2": "charset:items/keyring_2_color",
+                "layer3": "charset:items/keyring_3_color"
+            }
+        }
+    }
+}

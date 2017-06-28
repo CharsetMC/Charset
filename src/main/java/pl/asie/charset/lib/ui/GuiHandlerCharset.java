@@ -29,6 +29,9 @@ public class GuiHandlerCharset implements IGuiHandler {
 		}
 	}
 
+	public static final int POCKET_TABLE = 0x100;
+	public static final int KEYRING = 0x101;
+
 	public static final GuiHandlerCharset INSTANCE = new GuiHandlerCharset();
 	private static final TIntObjectMap<Function<Request, Object>> map = new TIntObjectHashMap<>();
 

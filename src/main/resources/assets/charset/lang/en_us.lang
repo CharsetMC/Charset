@@ -66,6 +66,8 @@ charset.color.orange=Orange
 charset.color.white=White
 charset.point.toofar=You can't point that far!
 
+gui.charset.crafting.name=Crafting
+
 itemGroup.charset=The Charset Project
 
 # CharsetPipes
@@ -75,10 +77,12 @@ tile.charset.pipe.name=Pipe
 tile.charset.shifter.name=Shifter
 
 # CharsetStorage
+gui.charset.keyring.name=Keyring
 key.charset.backpackOpen=Open Backpack
 item.charset.barrelCart.name=Barrel Cart
 item.charset.barrelCart.known.name=Barrel Cart: %s
 item.charset.key.name=Key
+item.charset.keyring.name=Keyring
 item.charset.lock.name=Lock
 item.charset.masterKey.name=Master Key
 notice.charset.backpack.chestplate=Chestplate slot occupied!

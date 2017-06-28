@@ -39,8 +39,6 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 		description = "Adds a Pocket Crafting Table"
 )
 public class CharsetMiscPocketcraft {
-	public static final int GUI_ID = 0x100;
-
 	@CharsetModule.Instance
 	public static CharsetMiscPocketcraft instance;
 
@@ -68,13 +66,13 @@ public class CharsetMiscPocketcraft {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		packet.registerPacket(0x01, PacketPTAction.class);
-		GuiHandlerCharset.INSTANCE.register(GUI_ID, Side.SERVER, (r) -> new ContainerPocketTable(r.player));
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.POCKET_TABLE, Side.SERVER, (r) -> new ContainerPocketTable(r.player));
 	}
 
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		GuiHandlerCharset.INSTANCE.register(GUI_ID, Side.CLIENT, (r) -> new GuiPocketTable(new ContainerPocketTable(r.player)));
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.POCKET_TABLE, Side.CLIENT, (r) -> new GuiPocketTable(new ContainerPocketTable(r.player)));
 	}
 
 	@Mod.EventHandler

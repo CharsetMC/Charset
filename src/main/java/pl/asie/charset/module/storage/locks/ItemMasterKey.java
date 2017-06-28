@@ -25,6 +25,7 @@ import pl.asie.charset.lib.item.ItemBase;
 public class ItemMasterKey extends ItemBase implements IKeyItem {
     public ItemMasterKey() {
         super();
+        setMaxStackSize(1);
         setUnlocalizedName("charset.masterKey");
     }
 

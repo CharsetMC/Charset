@@ -1,0 +1,19 @@
+{
+  "type": "charset:shaped",
+  "group": "keyring",
+  "pattern": [
+    "xxx",
+    "x x",
+    "xxx"
+  ],
+  "key": {
+    "x": {
+      "type": "forge:ore_dict",
+      "ore": "nuggetGold"
+    }
+  },
+  "result": {
+    "item": "charset:keyring",
+    "count": 1
+  }
+}
