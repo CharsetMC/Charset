@@ -16,6 +16,8 @@
 
 package pl.asie.charset.module.storage.locks;
 
+import baubles.api.cap.IBaublesItemHandler;
+import baubles.api.inv.BaublesInventoryWrapper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,6 +33,8 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -40,6 +44,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IKeyItem;
@@ -50,9 +55,14 @@ import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.ThreeState;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 public class LockEventHandler {
+    @CapabilityInject(IBaublesItemHandler.class)
+    public static Capability baublesItemHandler;
+
     public static CapabilityProviderFactory<Lockable> PROVIDER;
 
     public static Lockable getLock(TileEntity tile) {
@@ -82,24 +92,37 @@ public class LockEventHandler {
         return null;
     }
 
+    // TODO: Add event for this so other mods can add their own crazy locations and whatnot
+    @SuppressWarnings("unchecked")
+    private static Collection<ItemStack> getPotentialKeys(EntityPlayer player) {
+        Collection<ItemStack> stacks = new ArrayList<>();
+        stacks.add(player.getHeldItemMainhand());
+        stacks.add(player.getHeldItemOffhand());
+
+        if (baublesItemHandler != null && player.hasCapability(baublesItemHandler, null)) {
+            IItemHandler handler = (IItemHandler) player.getCapability(baublesItemHandler, null);
+            for (int i = 0; i < handler.getSlots(); i++) {
+                stacks.add(handler.getStackInSlot(i));
+            }
+        }
+
+        return stacks;
+    }
+
+
     public static boolean unlockOrRaiseError(EntityPlayer player, TileEntity tile, Lockable lock) {
         if (player.getEntityWorld().isRemote) {
             return true;
         }
 
-        ItemStack stack = player.getHeldItemMainhand();
-
         boolean canUnlock = false;
-        if (!stack.isEmpty() && stack.getItem() instanceof IKeyItem) {
-            IKeyItem key = (IKeyItem) stack.getItem();
-            canUnlock = key.canUnlock(lock.getLock().getLockKey(), stack);
-        }
-
-        if (!canUnlock) {
-            stack = player.getHeldItemOffhand();
+        for (ItemStack stack : getPotentialKeys(player)) {
             if (!stack.isEmpty() && stack.getItem() instanceof IKeyItem) {
                 IKeyItem key = (IKeyItem) stack.getItem();
                 canUnlock = key.canUnlock(lock.getLock().getLockKey(), stack);
+                if (canUnlock) {
+                    break;
+                }
             }
         }
 
