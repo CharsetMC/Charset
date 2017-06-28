@@ -25,6 +25,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketChat;
 import net.minecraft.network.play.server.SPacketSoundEffect;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -37,14 +39,17 @@ import net.minecraft.world.LockCode;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IKeyItem;
+import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
+import pl.asie.charset.lib.utils.ThreeState;
 import pl.asie.charset.module.tweaks.carry.CarryHandler;
 
 import java.util.Iterator;
@@ -54,23 +59,24 @@ public class LockEventHandler {
 
     public static Lockable getLock(TileEntity tile) {
         if (tile != null) {
+            if (tile.hasCapability(Capabilities.LOCKABLE, null)) {
+                Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
+                if (lock.hasLock() && lock.getLock().isLockValid(tile) && lock.getLock().isLocked()) {
+                    return lock;
+                }
+            }
+
             if (tile.hasCapability(Capabilities.MULTIBLOCK_STRUCTURE, null)) {
                 IMultiblockStructure structure = tile.getCapability(Capabilities.MULTIBLOCK_STRUCTURE, null);
                 Iterator<BlockPos> iterator = structure.iterator();
                 while (iterator.hasNext()) {
-                    BlockPos pos = iterator.next();
-                    TileEntity tile2 = pos.equals(tile.getPos()) ? tile : tile.getWorld().getTileEntity(pos);
+                    TileEntity tile2 = tile.getWorld().getTileEntity(iterator.next());
                     if (tile2.hasCapability(Capabilities.LOCKABLE, null)) {
-                        Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
-                        if (lock.hasLock()) {
+                        Lockable lock = tile2.getCapability(Capabilities.LOCKABLE, null);
+                        if (lock.hasLock() && lock.getLock().isLockValid(tile2) && lock.getLock().isLocked()) {
                             return lock;
                         }
                     }
-                }
-            } else if (tile.hasCapability(Capabilities.LOCKABLE, null)) {
-                Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
-                if (lock.hasLock()) {
-                    return lock;
                 }
             }
         }
@@ -102,7 +108,7 @@ public class LockEventHandler {
         if (!canUnlock) {
             ITextComponent displayName = tile.getDisplayName();
             if (displayName == null) {
-                displayName = new TextComponentTranslation(tile.getBlockType().getUnlocalizedName());
+                displayName = new TextComponentTranslation(tile.getBlockType().getUnlocalizedName() + ".name");
             }
             player.sendStatusMessage(new TextComponentTranslation("container.isLocked", displayName), true);
             player.getEntityWorld().playSound(player, tile.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0f, 1.0f);
@@ -116,14 +122,19 @@ public class LockEventHandler {
     @SubscribeEvent
     public void onAttachCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
         TileEntity tile = event.getObject();
-        boolean hasCap = tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        if (!hasCap)
-            for (EnumFacing facing : EnumFacing.VALUES) {
-                if (tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)) {
-                    hasCap = true;
-                    break;
-                }
+        ResourceLocation location = TileEntity.getKey(tile.getClass());
+        ThreeState state = CharsetIMC.INSTANCE.allows("lock", location);
+        boolean hasCap = state == ThreeState.YES;
+
+        if (state == ThreeState.MAYBE) {
+            if (tile instanceof TileEntityChest) {
+                hasCap = true;
             }
+
+            if ("minecraft".equals(location.getResourceDomain()) && tile instanceof TileEntityLockable) {
+                hasCap = true;
+            }
+        }
 
         if (hasCap) {
             if (PROVIDER == null) {
@@ -138,7 +149,7 @@ public class LockEventHandler {
         TileEntity tile = event.getWorld().getTileEntity(event.getPos());
         Lockable lockable = getLock(tile);
         if (lockable != null && !unlockOrRaiseError(event.getEntityPlayer(), tile, lockable)) {
-            event.setCanceled(true);
+            event.setUseBlock(Event.Result.DENY);
         }
     }
 

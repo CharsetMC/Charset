@@ -2,4 +2,5 @@
 * Major improvements to Just Enough Items support.
 * [lib] Improve wire occlusion logic.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
+* [storage.locks] Major rewrite! They work much more reliably now and can be placed on tanks!
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.

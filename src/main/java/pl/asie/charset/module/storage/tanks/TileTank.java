@@ -360,7 +360,7 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public Iterator<BlockPos> iterator() {
-        return new BlockPosIterator(this);
+        return new BlockPosIterator(getBottomTank());
     }
 
     @Override

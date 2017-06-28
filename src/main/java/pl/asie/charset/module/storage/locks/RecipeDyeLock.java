@@ -32,7 +32,8 @@ public class RecipeDyeLock extends DyeableItemRecipeFactory.Recipe {
     private int layer = 0;
 
     public RecipeDyeLock(String group) {
-        super(group, Ingredient.fromItems(CharsetStorageLocks.lockItem));
+        // TODO: The input ingredient here should be marked as permutable...
+        super(group, Ingredient.fromItems(CharsetStorageLocks.keyItem, CharsetStorageLocks.lockItem));
     }
 
     @Override
@@ -82,7 +83,6 @@ public class RecipeDyeLock extends DyeableItemRecipeFactory.Recipe {
     @Override
     public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
         // Nothing shall remain, for it is the key itself! We don't want to clone it.
-
         return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
 }

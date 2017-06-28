@@ -30,7 +30,7 @@ import pl.asie.charset.lib.item.ItemBase;
 
 import java.util.List;
 
-public class ItemKey extends ItemBase implements IKeyItem {
+public class ItemKey extends ItemLockingDyeable implements IKeyItem {
     static final boolean DEBUG_KEY_ID = false;
 
     public ItemKey() {

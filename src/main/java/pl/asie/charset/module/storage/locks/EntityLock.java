@@ -43,7 +43,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import pl.asie.charset.api.locks.ILockingEntity;
 import pl.asie.charset.api.locks.Lockable;
-import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.lib.capability.Capabilities;
 
 public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnData, ILockingEntity {
@@ -310,8 +309,15 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     }
 
     @Override
-    public boolean isLockValid() {
-        return isEntityAlive();
+    public boolean isLockValid(TileEntity tile) {
+        if (!isEntityAlive()) {
+            return false;
+        }
+
+        if (tile == null) return true;
+        if (getAttachedTile().getPos().equals(tile.getPos())) return true;
+
+        return false;
     }
 
     @Override

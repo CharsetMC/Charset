@@ -18,7 +18,7 @@ public final class Lockable implements INBTSerializable<NBTTagCompound> {
     }
 
     public ILockingEntity getLock() {
-        if (lock != null && !lock.isLockValid()) {
+        if (lock != null && !lock.isLockValid(null)) {
             lock = null;
         }
         return lock;

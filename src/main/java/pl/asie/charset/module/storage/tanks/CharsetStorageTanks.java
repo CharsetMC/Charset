@@ -3,6 +3,7 @@ package pl.asie.charset.module.storage.tanks;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -30,6 +31,8 @@ public class CharsetStorageTanks {
     public void preInit(FMLPreInitializationEvent event) {
         tankBlock = new BlockTank();
         tankItem = new ItemBlock(tankBlock);
+
+        FMLInterModComms.sendMessage("charset", "addLock", new ResourceLocation("charset:fluidTank"));
     }
 
     @SubscribeEvent
