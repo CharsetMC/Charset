@@ -1,0 +1,8 @@
+{
+  "type": "charset:dyeable_item",
+  "input": [
+    {
+      "item": "charset:key"
+    }
+  ]
+}

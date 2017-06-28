@@ -208,14 +208,10 @@ public class LockEventHandler {
             String name = event.getToolTip().get(0);
             NBTTagCompound compound = event.getItemStack().getTagCompound();
             if (compound != null) {
-                if (compound.hasKey("color1") && compound.hasKey("color0")) {
-                    name = getColorDyed(compound.getInteger("color1")) + "/" + getColorDyed(compound.getInteger("color0")) + " " + name;
-                } else if (compound.hasKey("color1")) {
-                    name = getColorDyed(compound.getInteger("color1")) + " " + name;
-                } else if (compound.hasKey("color0")) {
-                    name = getColorDyed(compound.getInteger("color0")) + " " + name;
+                if (compound.hasKey("color")) {
+                    name = getColorDyed(compound.getInteger("color")) + " " + name;
+                    event.getToolTip().set(0, name);
                 }
-                event.getToolTip().set(0, name);
             }
         }
     }

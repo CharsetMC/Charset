@@ -57,7 +57,7 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     };
 
     private String lockKey = null;
-    protected int[] colors = new int[] { -1, -1 };
+    protected int color = -1;
     private TileEntity tileCached;
     private boolean locked = true;
 
@@ -74,11 +74,9 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
 
     private void setColors(NBTTagCompound compound) {
         if (compound != null) {
-            colors[0] = compound.hasKey("color0") ? compound.getInteger("color0") : -1;
-            colors[1] = compound.hasKey("color1") ? compound.getInteger("color1") : -1;
+            color = compound.hasKey("color") ? compound.getInteger("color") : -1;
         } else {
-            colors[0] = -1;
-            colors[1] = -1;
+            color = -1;
         }
     }
 
@@ -108,11 +106,8 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
         if (lockKey != null) {
             compound.setString("key", lockKey);
         }
-        if (colors[0] != -1) {
-            compound.setInteger("color0", colors[0]);
-        }
-        if (colors[1] != -1) {
-            compound.setInteger("color1", colors[1]);
+        if (color != -1) {
+            compound.setInteger("color1", color);
         }
     }
 
@@ -256,11 +251,8 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
         if (lockKey != null) {
             lock.getTagCompound().setString("key", lockKey);
         }
-        if (colors[0] != -1) {
-            lock.getTagCompound().setInteger("color0", colors[0]);
-        }
-        if (colors[1] != -1) {
-            lock.getTagCompound().setInteger("color1", colors[1]);
+        if (color != -1) {
+            lock.getTagCompound().setInteger("color", color);
         }
         return lock;
     }
@@ -292,15 +284,13 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     @Override
     public void writeSpawnData(ByteBuf buffer) {
         buffer.writeByte(facingDirection.ordinal());
-        buffer.writeInt(colors[0]);
-        buffer.writeInt(colors[1]);
+        buffer.writeInt(color);
     }
 
     @Override
     public void readSpawnData(ByteBuf buffer) {
         this.updateFacingWithBoundingBox(EnumFacing.getFront(buffer.readUnsignedByte()));
-        colors[0] = buffer.readInt();
-        colors[1] = buffer.readInt();
+        color = buffer.readInt();
     }
 
     @Override

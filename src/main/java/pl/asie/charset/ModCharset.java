@@ -46,6 +46,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.asie.charset.upgrade.CharsetLockKeyTagChange;
 import pl.asie.charset.upgrade.CharsetUnifiedModIdFixer;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.loader.ModuleLoader;
@@ -106,8 +107,9 @@ public class ModCharset {
 		RegistryUtils.loadConfigIds(configIds);
 
 		logger = LogManager.getLogger();
-		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 1);
+		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 2);
 		dataFixes.registerFix(FixTypes.ENTITY, new CharsetUnifiedModIdFixer.Entity(oldPrefixes));
+		dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new CharsetLockKeyTagChange());
 
 		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 

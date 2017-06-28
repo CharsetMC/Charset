@@ -60,12 +60,8 @@ public class RenderLock extends Render<EntityLock> {
         ItemStack stack = new ItemStack(CharsetStorageLocks.lockItem);
         stack.setTagCompound(new NBTTagCompound());
 
-        if (entity.colors[0] != -1) {
-            stack.getTagCompound().setInteger("color0", entity.colors[0]);
-        }
-
-        if (entity.colors[1] != -1) {
-            stack.getTagCompound().setInteger("color1", entity.colors[1]);
+        if (entity.color != -1) {
+            stack.getTagCompound().setInteger("color", entity.color);
         }
 
         mc.getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.FIXED);

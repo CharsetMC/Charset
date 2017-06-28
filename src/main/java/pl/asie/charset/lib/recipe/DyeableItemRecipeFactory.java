@@ -71,7 +71,6 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			this.input = ingredient;
 		}
 
-
 		protected int[] getColor(ItemStack stack) {
 			if (!stack.isEmpty()) {
 				if (stack.getItem() instanceof IDyeableItem) {
@@ -194,6 +193,12 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			}
 
 			return null;
+		}
+
+		@Override
+		public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+			// Nothing shall remain, for it is the key itself! We don't want to clone it.
+			return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 		}
 
 		@Override

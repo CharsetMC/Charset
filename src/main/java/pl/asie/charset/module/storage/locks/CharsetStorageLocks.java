@@ -140,7 +140,6 @@ public class CharsetStorageLocks {
 		event.getRegistry().register(recipeNewKey.setRegistryName(new ResourceLocation(recipeNewKey.getGroup())));
 		event.getRegistry().register(recipeDuplicateKey.setRegistryName(new ResourceLocation(recipeDuplicateKey.getGroup())));
 		event.getRegistry().register(recipeLock.setRegistryName(new ResourceLocation(recipeLock.getGroup())));
-		event.getRegistry().register(new RecipeDyeLock("charset:dyeLock").setRegistryName("charset:dyeLock"));
 	}
 
 	@Mod.EventHandler
