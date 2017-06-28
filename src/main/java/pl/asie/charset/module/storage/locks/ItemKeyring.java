@@ -40,6 +40,7 @@ import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.ui.ItemHandlerCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nonnull;
@@ -50,7 +51,7 @@ public class ItemKeyring extends ItemBase implements IKeyItem {
     private static class CapabilityProvider implements ICapabilitySerializable<NBTTagCompound> {
         private final ItemStack stack;
 
-        private final ItemStackHandler handler = new ItemStackHandler(9) {
+        private final ItemStackHandler handler = new ItemHandlerCharset(9) {
             @Override
             protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
                 return (stack.getItem() instanceof IKeyItem) ? 1 : 0;

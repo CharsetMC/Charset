@@ -21,10 +21,11 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.JsonUtils;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import pl.asie.charset.lib.utils.ThreeState;
 
 public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
 	private final String group;
-	private final boolean hidden;
+	private final ThreeState hidden;
 
 	public RecipeBase(JsonContext context, JsonObject object) {
 		if (object != null && context != null) {
@@ -35,24 +36,24 @@ public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> imple
 			}
 
 			if (object.has("hidden")) {
-				hidden = JsonUtils.getBoolean(object, "hidden");
+				hidden = JsonUtils.getBoolean(object, "hidden") ? ThreeState.YES : ThreeState.NO;
 			} else {
-				hidden = false;
+				hidden = ThreeState.MAYBE;
 			}
 		} else {
 			group = "";
-			hidden = false;
+			hidden = ThreeState.MAYBE;
 		}
 	}
 
 	public RecipeBase(String group) {
 		this.group = group;
-		this.hidden = false;
+		this.hidden = ThreeState.MAYBE;
 	}
 
 	public RecipeBase(String group, boolean hidden) {
 		this.group = group;
-		this.hidden = hidden;
+		this.hidden = hidden ? ThreeState.YES : ThreeState.NO;
 	}
 
 	@Override
@@ -62,6 +63,10 @@ public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> imple
 
 	@Override
 	public boolean isHidden() {
-		return hidden;
+		if (hidden == ThreeState.MAYBE) {
+			return !getRecipeOutput().isEmpty();
+		} else {
+			return hidden == ThreeState.YES;
+		}
 	}
 }

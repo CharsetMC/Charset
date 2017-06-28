@@ -16,6 +16,7 @@ import pl.asie.charset.lib.ui.SlotBlocked;
 public class ContainerKeyring extends ContainerBase {
     private final InventoryPlayer inventoryPlayer;
     private final int heldPos;
+    private Slot heldSlot;
     private ItemStack held;
 
     public ContainerKeyring(InventoryPlayer inventoryPlayer) {
@@ -37,8 +38,8 @@ public class ContainerKeyring extends ContainerBase {
     @Override
     protected Slot addSlotToContainer(Slot slotIn) {
         if (slotIn.isHere(inventoryPlayer, heldPos)) {
-            Slot newSlot = new SlotBlocked(inventoryPlayer, slotIn.getSlotIndex(), slotIn.xPos, slotIn.yPos);
-            return super.addSlotToContainer(newSlot);
+            heldSlot = new SlotBlocked(inventoryPlayer, slotIn.getSlotIndex(), slotIn.xPos, slotIn.yPos);
+            return super.addSlotToContainer(heldSlot);
         } else {
             return super.addSlotToContainer(slotIn);
         }
@@ -48,18 +49,12 @@ public class ContainerKeyring extends ContainerBase {
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
 
-        for (Slot slot : this.SLOTS_PLAYER) {
-            if (slot.isHere(inventoryPlayer, heldPos)) {
-                ItemStack newHeld = slot.getStack();
-                if (ItemStack.areItemStacksEqual(held, newHeld)) return;
+        ItemStack newHeld = heldSlot.getStack();
+        if (ItemStack.areItemStacksEqual(held, newHeld)) return;
 
-                System.out.println("a");
-
-                held = newHeld;
-                for (int j = 0; j < this.listeners.size(); ++j) {
-                    this.listeners.get(j).sendSlotContents(this, slot.slotNumber, held);
-                }
-            }
+        held = newHeld.copy();
+        for (int j = 0; j < this.listeners.size(); ++j) {
+            this.listeners.get(j).sendSlotContents(this, heldSlot.slotNumber, held);
         }
     }
 }

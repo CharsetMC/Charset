@@ -154,10 +154,6 @@ public final class SpaceUtils {
                 (ab.minZ + ab.maxZ) / 2);
     }
 
-    public static AxisAlignedBB contractBox(AxisAlignedBB box, double dx, double dy, double dz) {
-        return box.expand(-dx, -dy, -dz);
-    }
-
     public static Vec3d fromDirection(EnumFacing dir) {
         return new Vec3d(dir.getDirectionVec());
     }

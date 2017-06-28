@@ -22,8 +22,6 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
-import pl.asie.charset.lib.utils.ColorUtils;
-import pl.asie.charset.lib.utils.ColorspaceUtils;
 
 import javax.annotation.Nullable;
 
