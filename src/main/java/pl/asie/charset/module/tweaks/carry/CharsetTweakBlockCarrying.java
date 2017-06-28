@@ -28,6 +28,7 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -58,24 +59,11 @@ public class CharsetTweakBlockCarrying {
     @CapabilityInject(CarryHandler.class)
     public static Capability<CarryHandler> CAPABILITY;
 
-    private static Set<String> whitelist = new HashSet<>();
-    private static Set<String> blacklist = new HashSet<>();
-
     @CharsetModule.PacketRegistry
     public static PacketRegistry packet;
 
     @CharsetModule.Configuration
     public static Configuration config;
-
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        whitelist.clear();
-        blacklist.clear();
-        for (String s : config.get("blockCarry", "whitelist", new String[]{}, "Accepts block/tile entity registry names and classes.").getStringList())
-            whitelist.add(s);
-        for (String s : config.get("blockCarry", "blacklist", new String[]{}, "Accepts block/tile entity registry names and classes.").getStringList())
-            blacklist.add(s);
-    }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
@@ -142,9 +130,9 @@ public class CharsetTweakBlockCarrying {
 
         ThreeState allowedIMC = CharsetIMC.INSTANCE.allows("carry", locs);
 
-        if (!Collections.disjoint(blacklist, names) || allowedIMC == ThreeState.NO) {
+        if (allowedIMC == ThreeState.NO) {
             return false;
-        } else if (!Collections.disjoint(whitelist, names) || allowedIMC == ThreeState.YES) {
+        } else if (allowedIMC == ThreeState.YES) {
             return true;
         }
 
@@ -170,10 +158,20 @@ public class CharsetTweakBlockCarrying {
 
     protected static boolean canCarry(Entity entity) {
         Class<? extends Entity> entityClass = entity.getClass();
-        String name = EntityRegistry.getEntry(entityClass).getName();
-        String clsName = entityClass.getName();
+        EntityEntry entry = EntityRegistry.getEntry(entityClass);
+        if (entry == null) {
+            ModCharset.logger.warn(entityClass.getName() + " has no EntityEntry!");
+        } else {
+            ThreeState allowedIMC = CharsetIMC.INSTANCE.allows("carry", entry.getRegistryName());
 
-        return !blacklist.contains(name) && !blacklist.contains(clsName);
+            if (allowedIMC == ThreeState.NO) {
+                return false;
+            } else if (allowedIMC == ThreeState.YES) {
+                return true;
+            }
+        }
+
+        return true;
     }
 
     public static void grabBlock(EntityPlayer player, World world, BlockPos pos) {

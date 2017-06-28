@@ -1,8 +1,11 @@
 package pl.asie.charset.lib;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ThreeState;
 
 import java.util.ArrayList;
@@ -15,12 +18,31 @@ import java.util.Map;
 import java.util.Set;
 
 public final class CharsetIMC {
-
     public static CharsetIMC INSTANCE = new CharsetIMC();
-    private static final Map<String, Set<ResourceLocation>> registryLocs = new HashMap<>();
+    private final Map<String, Set<ResourceLocation>> registryLocs = new HashMap<>();
 
     private CharsetIMC() {
 
+    }
+
+    public void loadConfig(Configuration config) {
+        for (String s : config.getStringList("whitelist", "functionalityRegistry", new String[]{}, "Functionality registry whitelist (example entry: carry:minecraft:bedrock)")) {
+            String[] sSplit = s.split(":", 2);
+            if (sSplit.length >= 2) {
+                add("w:" + sSplit[0], new ResourceLocation(sSplit[1]));
+            } else {
+                ModCharset.logger.warn("Invalid functionality registry config entry: " + s);
+            }
+        }
+        for (String s : config.getStringList("blacklist", "functionalityRegistry", new String[]{}, "Functionality registry blacklist (example entry: carry:minecraft:bedrock)")) {
+            String[] sSplit = s.split(":", 2);
+            if (sSplit.length >= 2) {
+                add("b:" + sSplit[0], new ResourceLocation(sSplit[1]));
+            } else {
+                ModCharset.logger.warn("Invalid functionality registry config entry: " + s);
+            }
+        }
+        config.get("functionalityRegistry", "whitelist", new String[]{});
     }
 
     public Collection<ResourceLocation> getResourceLocationEntries(String key) {
@@ -49,10 +71,15 @@ public final class CharsetIMC {
 
     private void add(Collection<String> entryKeys, ResourceLocation entry) {
         for (String entryKey : entryKeys) {
-            if (!registryLocs.containsKey(entryKey))
-                registryLocs.put(entryKey, new HashSet<>());
-            registryLocs.get(entryKey).add(entry);
+            add(entryKey, entry);
         }
+    }
+
+    private void add(String entryKey, ResourceLocation entry) {
+        if (!registryLocs.containsKey(entryKey))
+            registryLocs.put(entryKey, Sets.newHashSet(entry));
+        else
+            registryLocs.get(entryKey).add(entry);
     }
 
     private String toEntryKey(String entryKey, String prefix) {

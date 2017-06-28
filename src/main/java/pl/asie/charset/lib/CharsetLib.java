@@ -119,6 +119,7 @@ public class CharsetLib {
 		Capabilities.preInit();
 		NotifyImplementation.init();
 		ItemMaterialHeuristics.init(false);
+		CharsetIMC.INSTANCE.loadConfig(config);
 
 		config.save();
 	}
