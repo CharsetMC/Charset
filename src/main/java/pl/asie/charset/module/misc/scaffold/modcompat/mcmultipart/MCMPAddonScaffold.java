@@ -1,6 +1,5 @@
 package pl.asie.charset.module.misc.scaffold.modcompat.mcmultipart;
 
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import mcmultipart.api.slot.IPartSlot;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
