@@ -18,6 +18,7 @@ package pl.asie.charset.module.transport.color;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelMinecart;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.entity.Entity;
@@ -37,13 +38,18 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.utils.ColorUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -82,6 +88,59 @@ public class CharsetTransportDyeableMinecarts {
 	@CapabilityInject(MinecartDyeable.class)
 	public static Capability<MinecartDyeable> MINECART_DYEABLE;
 	public static ResourceLocation MINECART_DYEABLE_KEY = new ResourceLocation("charsettweaks:minecart_dyeable");
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void preInitClient(FMLPreInitializationEvent event) {
+		CharsetFakeResourcePack.INSTANCE.registerEntry(ModelMinecartWrapped.DYEABLE_MINECART, (stream) -> {
+			try {
+				BufferedImage image = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(ModelMinecartWrapped.MINECART).getInputStream());
+				float scale = (float) image.getWidth() / 64;
+				int maxValue = 0;
+
+				for (int y = 0; y < 28*scale; y++) {
+					for (int x = 0; x < 44*scale; x++) {
+						int rgb = image.getRGB(x, y);
+						if (((rgb >> 24) & 0xFF) != 0) {
+							for (int i = 0; i < 3; i++, rgb >>= 8) {
+								if ((rgb & 0xFF) > maxValue) {
+									maxValue = (rgb & 0xFF);
+									if (maxValue == 255) break;
+								}
+							}
+						}
+						if (maxValue == 255) break;
+					}
+					if (maxValue == 255) break;
+				}
+
+				maxValue = maxValue * 8 / 9;
+
+				if (maxValue < 255) {
+					for (int y = 0; y < 28 * scale; y++) {
+						for (int x = 0; x < 44 * scale; x++) {
+							int rgb = image.getRGB(x, y);
+							if (((rgb >> 24) & 0xFF) != 0) {
+								for (int i = 0; i < 3; i++) {
+									int mask = 0xFF << (i * 8);
+									int v = (rgb >> (i * 8)) & 0xFF;
+									v = v * 255 / maxValue;
+									if (v > 255) v = 255;
+
+									rgb = (rgb & (~mask)) | (v << (i * 8));
+								}
+								image.setRGB(x, y, rgb);
+							}
+						}
+					}
+				}
+
+				ImageIO.write(image, "png", stream);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {

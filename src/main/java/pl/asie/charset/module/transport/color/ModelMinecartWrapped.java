@@ -25,6 +25,8 @@ import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.util.ResourceLocation;
 
 public class ModelMinecartWrapped extends ModelBase {
+	public static final ResourceLocation DYEABLE_MINECART = new ResourceLocation("charset_generated:textures/entity/minecart.png");
+	public static final ResourceLocation MINECART = new ResourceLocation("textures/entity/minecart.png");
 	private final ModelBase parent;
 
 	public ModelMinecartWrapped(ModelBase parent) {
@@ -36,7 +38,7 @@ public class ModelMinecartWrapped extends ModelBase {
 			EntityMinecart minecart = (EntityMinecart) entityIn;
 			MinecartDyeable dyeable = MinecartDyeable.get(minecart);
 			if (dyeable != null && dyeable.getColor() != null) {
-				Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("charset:textures/entity/minecart.png"));
+				Minecraft.getMinecraft().renderEngine.bindTexture(DYEABLE_MINECART);
 				float[] color = EntitySheep.getDyeRgb(dyeable.getColor());
 
 				GlStateManager.color(color[0], color[1], color[2]);

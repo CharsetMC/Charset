@@ -20,6 +20,8 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.client.util.SearchTree;
 import net.minecraft.client.util.SearchTreeManager;
 import net.minecraft.item.crafting.IRecipe;
@@ -65,11 +67,14 @@ import pl.asie.charset.lib.notify.PacketPoint;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
 import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
 import pl.asie.charset.lib.utils.DataSerializersCharset;
 import pl.asie.charset.lib.utils.UtilProxyCommon;
 
+import java.lang.reflect.Field;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @CharsetModule(
@@ -105,6 +110,23 @@ public class CharsetLib {
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		ModelFactory.clearCaches();
 		ColorLookupHandler.INSTANCE.clear();
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	@SuppressWarnings("unchecked")
+	public void preInitClient(FMLPreInitializationEvent event) {
+		try {
+			Field field = ReflectionHelper.findField(Minecraft.class, "defaultResourcePacks", "field_110449_ao");
+			((List) field.get(Minecraft.getMinecraft())).add(CharsetFakeResourcePack.INSTANCE);
+
+			((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(CharsetFakeResourcePack.INSTANCE);
+
+			// TODO: Can we get rid of this to save a bit of loading time?c
+			Minecraft.getMinecraft().refreshResources();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Mod.EventHandler
