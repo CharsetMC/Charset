@@ -144,6 +144,9 @@ public class LockEventHandler {
     public void onAttachCapabilities(AttachCapabilitiesEvent<TileEntity> event) {
         TileEntity tile = event.getObject();
         ResourceLocation location = TileEntity.getKey(tile.getClass());
+        if (location == null) // f.e. IC2 energy net internals
+            return;
+
         ThreeState state = CharsetIMC.INSTANCE.allows("lock", location);
         boolean hasCap = state == ThreeState.YES;
 
