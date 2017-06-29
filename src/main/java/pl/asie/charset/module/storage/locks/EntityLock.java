@@ -146,17 +146,11 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
     public boolean hitByEntity(Entity entityIn) {
         if (entityIn instanceof EntityPlayer && entityIn.isSneaking()) {
             if (!this.world.isRemote) {
-                ItemStack stack = ((EntityPlayer) entityIn).getHeldItemMainhand();
-                if (stack.isEmpty() || !(stack.getItem() instanceof ItemKey) || !(((ItemKey) stack.getItem()).canUnlock(lockKey, stack))) {
-                    stack = ((EntityPlayer) entityIn).getHeldItemOffhand();
-                    if (stack.isEmpty() || !(stack.getItem() instanceof ItemKey) || !(((ItemKey) stack.getItem()).canUnlock(lockKey, stack))) {
-                        return super.hitByEntity(entityIn);
+                if (LockEventHandler.unlockOrRaiseError((EntityPlayer) entityIn, getAttachedTile(), getAttachedLock())) {
+                    if (!this.isDead) {
+                        this.setDead();
+                        this.onBroken(entityIn);
                     }
-                }
-
-                if (!this.isDead) {
-                    this.setDead();
-                    this.onBroken(entityIn);
                 }
 
                 return true;

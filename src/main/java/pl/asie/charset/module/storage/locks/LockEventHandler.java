@@ -20,6 +20,7 @@ import baubles.api.cap.IBaublesItemHandler;
 import baubles.api.inv.BaublesInventoryWrapper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumDyeColor;
@@ -33,6 +34,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -45,6 +47,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
+import pl.asie.charset.api.lib.EntityGatherItemsEvent;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IKeyItem;
@@ -60,9 +63,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class LockEventHandler {
-    @CapabilityInject(IBaublesItemHandler.class)
-    public static Capability baublesItemHandler;
-
     public static CapabilityProviderFactory<Lockable> PROVIDER;
 
     public static Lockable getLock(TileEntity tile) {
@@ -92,20 +92,9 @@ public class LockEventHandler {
         return null;
     }
 
-    // TODO: Add event for this so other mods can add their own crazy locations and whatnot
-    @SuppressWarnings("unchecked")
-    private static Collection<ItemStack> getPotentialKeys(EntityPlayer player) {
+    public static Collection<ItemStack> getPotentialKeys(Entity player) {
         Collection<ItemStack> stacks = new ArrayList<>();
-        stacks.add(player.getHeldItemMainhand());
-        stacks.add(player.getHeldItemOffhand());
-
-        if (baublesItemHandler != null && player.hasCapability(baublesItemHandler, null)) {
-            IItemHandler handler = (IItemHandler) player.getCapability(baublesItemHandler, null);
-            for (int i = 0; i < handler.getSlots(); i++) {
-                stacks.add(handler.getStackInSlot(i));
-            }
-        }
-
+        MinecraftForge.EVENT_BUS.post(new EntityGatherItemsEvent(player, stacks, true, true));
         return stacks;
     }
 

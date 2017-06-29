@@ -121,6 +121,8 @@ public class CharsetLib {
 		ItemMaterialHeuristics.init(false);
 		CharsetIMC.INSTANCE.loadConfig(config);
 
+		MinecraftForge.EVENT_BUS.register(new CharsetLibEventHandler());
+
 		config.save();
 	}
 
