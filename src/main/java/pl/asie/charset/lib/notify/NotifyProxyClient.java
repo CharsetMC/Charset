@@ -324,8 +324,7 @@ public class NotifyProxyClient extends NotifyProxy {
             targs[i] = net.minecraft.util.text.translation.I18n.translateToLocal(formatArgs[i]);
         }
         String msg = I18n.format(message, targs);
-        // TODO 1.11 check
-        mc.ingameGUI.setRecordPlayingMessage(msg);
+        mc.ingameGUI.setOverlayMessage(msg, false);
     }
     
     @Override

@@ -55,6 +55,8 @@ import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.item.FontRendererFancy;
+import pl.asie.charset.lib.notify.NotifyImplementation;
+import pl.asie.charset.lib.notify.NotifyProxy;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.ThreeState;
 
@@ -158,7 +160,7 @@ public class LockEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onRightClick(PlayerInteractEvent.LeftClickBlock event) {
+    public void onLeftClick(PlayerInteractEvent.LeftClickBlock event) {
         TileEntity tile = event.getWorld().getTileEntity(event.getPos());
         Lockable lockable = getLock(tile);
         if (lockable != null && !unlockOrRaiseError(event.getEntityPlayer(), tile, lockable)) {

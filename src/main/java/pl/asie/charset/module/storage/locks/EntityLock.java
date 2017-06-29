@@ -22,6 +22,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,6 +34,7 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -127,9 +129,13 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
         }
     }
 
+    public BlockPos getAttachmentPos() {
+        return this.hangingPosition.offset(this.facingDirection.getOpposite());
+    }
+
     public TileEntity getAttachedTile() {
         if (tileCached == null || tileCached.isInvalid()) {
-            BlockPos pos = this.hangingPosition.offset(this.facingDirection.getOpposite());
+            BlockPos pos = getAttachmentPos();
             tileCached = world.getTileEntity(pos);
         }
 
@@ -267,12 +273,13 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
 
     @Override
     public void onBroken(Entity brokenEntity) {
+        world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_ARMORSTAND_BREAK, SoundCategory.BLOCKS, 1.0f, 1.0f);
         drop();
     }
 
     @Override
     public void playPlaceSound() {
-        // TODO
+        world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_ARMORSTAND_HIT, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override

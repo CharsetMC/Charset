@@ -16,6 +16,10 @@
 
 package pl.asie.charset.lib.utils;
 
+import mcmultipart.api.container.IMultipartContainer;
+import mcmultipart.api.multipart.MultipartHelper;
+import mcmultipart.api.multipart.MultipartRedstoneHelper;
+import mcmultipart.api.slot.EnumEdgeSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBasePressurePlate;
 import net.minecraft.block.BlockButton;
@@ -28,6 +32,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
+
+import java.util.Optional;
 
 /**
  * Created by asie on 1/6/16.
@@ -63,12 +70,20 @@ public final class RedstoneUtils {
 			return false;
 		}
 
-		//TODO 1.11
-//		IMultipartContainer ui = MultipartHelper.getPartContainer(world, pos);
-//		if (ui != null) {
-//			return MultipartRedstoneHelper.canConnectRedstone(ui, side, face);
-//		} else {
+		if (Loader.isModLoaded("mcmultipart")) {
+			return canConnectRedstoneMultipart(state, block, world, pos, side, face);
+		} else {
 			return block.canConnectRedstone(state, world, pos, side);
-//		}
+		}
+	}
+
+	@net.minecraftforge.fml.common.Optional.Method(modid = "mcmultipart")
+	private static boolean canConnectRedstoneMultipart(IBlockState state, Block block, IBlockAccess world, BlockPos pos, EnumFacing side, EnumFacing face) {
+		Optional<IMultipartContainer> ui = MultipartHelper.getContainer(world, pos);
+		if (ui.isPresent()) {
+			return MultipartRedstoneHelper.canConnectRedstone(ui.get(), EnumEdgeSlot.fromFaces(side, face), side);
+		} else {
+			return block.canConnectRedstone(state, world, pos, side);
+		}
 	}
 }

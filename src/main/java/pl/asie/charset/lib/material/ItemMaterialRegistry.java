@@ -31,7 +31,7 @@ public class ItemMaterialRegistry {
 			if (nameTag instanceof NBTTagString) {
 				result = getMaterial(((NBTTagString) nameTag).getString());
 			} else if (nameTag instanceof NBTTagCompound) {
-				// TODO: Compatibility code! Remove in 1.12+
+				// TODO: Compatibility code! Remove in 1.13+
 				ItemStack stack = new ItemStack((NBTTagCompound) nameTag);
 				if (!stack.isEmpty()) {
 					result = getOrCreateMaterial(stack);
