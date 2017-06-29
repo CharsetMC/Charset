@@ -36,6 +36,7 @@
 
 package pl.asie.charset.module.tweaks.remove;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -67,6 +68,8 @@ public class CharsetTweakRemoveRecipeBookButton {
 	@SubscribeEvent
 	public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
 		if (event.getGui() instanceof GuiInventory || event.getGui() instanceof GuiCrafting) {
+			Minecraft.getMinecraft().player.getRecipeBook().setGuiOpen(false);
+
 			for (GuiButton button : event.getButtonList()) {
 				if (button.id == 10) {
 					event.getButtonList().remove(button);

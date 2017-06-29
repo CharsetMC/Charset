@@ -113,7 +113,7 @@ public class CommandPoint extends CommandBase {
         pointedEntity = null;
         Vec3d vec33 = null;
         float f1 = 1.0F;
-        List list = player.world.getEntitiesWithinAABBExcludingEntity(
+        List<Entity> list = player.world.getEntitiesWithinAABBExcludingEntity(
                 player,
                 player.getEntityBoundingBox().offset(vec31.x * d0,
                         vec31.y * d0, vec31.z * d0).expand(
@@ -121,7 +121,7 @@ public class CommandPoint extends CommandBase {
         double d2 = d1;
 
         for (int i = 0; i < list.size(); ++i) {
-            Entity entity = (Entity) list.get(i);
+            Entity entity = list.get(i);
 
             if (entity.canBeCollidedWith()) {
                 float f2 = entity.getCollisionBorderSize();

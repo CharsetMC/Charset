@@ -67,7 +67,7 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 		}
 
 		public Recipe(String group, Ingredient ingredient) {
-			super(group, true);
+			super(group);
 			this.input = ingredient;
 		}
 

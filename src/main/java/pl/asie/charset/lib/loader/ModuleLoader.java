@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.event.FMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
+import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 import java.lang.invoke.MethodHandle;
@@ -150,6 +151,10 @@ public class ModuleLoader {
 					dependencies.putAll(name, deps);
 				}
 			}
+		}
+
+		if (ModCharset.configModules.hasChanged()) {
+			ModCharset.configModules.save();
 		}
 
 		for (String name : enabledModules) {
@@ -316,8 +321,11 @@ public class ModuleLoader {
 		}
 
 		addClassNames(table, CharsetJEIPlugin.class, "jei");
-		// TODO: MCMultiPart
-		// addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
+		addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
+
+		if (ModCharset.configModules.hasChanged()) {
+			ModCharset.configModules.save();
+		}
 	}
 
 	public void passEvent(FMLEvent o) {
@@ -336,10 +344,6 @@ public class ModuleLoader {
 
 	public void preInit(ASMDataTable table) {
 		readDataTable(table);
-
-		if (ModCharset.configModules.hasChanged()) {
-			ModCharset.configModules.save();
-		}
 	}
 
 	public void init() {

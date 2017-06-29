@@ -70,7 +70,7 @@ public abstract class ContainerBase extends Container {
 
 				if (amount > 0) {
 					to.putStack(fromStack.splitStack(amount));
-					to.onSlotChanged();
+					to.putStack(to.getStack());
 
 					return true;
 				}
@@ -80,7 +80,7 @@ public abstract class ContainerBase extends Container {
 				if (amount > 0) {
 					fromStack.shrink(amount);
 					toStack.grow(amount);
-					to.onSlotChanged();
+					to.putStack(to.getStack());
 
 					return true;
 				}
@@ -124,7 +124,10 @@ public abstract class ContainerBase extends Container {
 		}
 
 		if (dirty) {
-			from.onSlotChanged();
+			// Using putStack instead of onSlotChanged here,
+			// as putStack calls the latter + IItemHandler's
+			// onContentsChanged.
+			from.putStack(from.getStack());
 		}
 
 		return fromStack;

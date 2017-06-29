@@ -18,6 +18,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -40,7 +41,7 @@ import java.util.List;
 public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	private static final int MAX_OVERHANG = 8;
 	private static final AxisAlignedBB COLLISION_BOX = new AxisAlignedBB(0.01, 0, 0.01, 0.99, 1, 0.99);
-	private static final AxisAlignedBB COLLISION_BOX_HACKY_SIDES = new AxisAlignedBB(0, 0, 0, 1, 1, 1).expand(-0.3125, 0, -0.3125);
+	private static final AxisAlignedBB COLLISION_BOX_HACKY_SIDES = new AxisAlignedBB(0.3125, 0, 0.3125, 1 - 0.3125, 1, 1 - 0.3125);
 	private static final AxisAlignedBB COLLISION_BOX_HACKY_TOP = new AxisAlignedBB(-0.0625, 1 - 0.0625, -0.0625, 1 + 0.0625, 1, 1 + 0.0625);
 
 	public BlockScaffold() {
@@ -102,8 +103,9 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 				collidingBoxes.add(COLLISION_BOX.offset(pos));
 		} else {
 			// Hack!
-			if (entityBox.intersects(COLLISION_BOX_HACKY_SIDES.offset(pos)))
+			if (entityBox.intersects(COLLISION_BOX_HACKY_SIDES.offset(pos))) {
 				collidingBoxes.add(COLLISION_BOX_HACKY_SIDES.offset(pos));
+			}
 
 			if (!(entityIn instanceof EntityLivingBase) || !((EntityLivingBase) entityIn).isOnLadder()) {
 				if (pos.getY() + 0.9 <= entityBox.minY) {

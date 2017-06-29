@@ -44,6 +44,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -161,7 +162,7 @@ public class ContainerPocketTable extends ContainerBase {
         } 
         updateMatrix();
         ItemStack result = ItemStack.EMPTY;
-        IRecipe match = RecipeUtils.findMatchingRecipe(craftMatrix, player.getEntityWorld());
+        IRecipe match = CraftingManager.findMatchingRecipe(craftMatrix, player.getEntityWorld());
         if (match != null) {
             result = match.getCraftingResult(craftMatrix);
         }

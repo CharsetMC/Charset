@@ -16,6 +16,8 @@
 
 package pl.asie.charset.module.storage.locks;
 
+import baubles.api.BaubleType;
+import baubles.api.IBauble;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,6 +32,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -40,17 +43,19 @@ import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.ui.ItemHandlerCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemKeyring extends ItemBase implements IKeyItem {
+@Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles")
+public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
     private static class CapabilityProvider implements ICapabilitySerializable<NBTTagCompound> {
         private final ItemStack stack;
 
-        private final ItemStackHandler handler = new ItemStackHandler(9) {
+        private final ItemStackHandler handler = new ItemHandlerCharset(9) {
             @Override
             protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
                 return (stack.getItem() instanceof IKeyItem) ? 1 : 0;
@@ -162,7 +167,7 @@ public class ItemKeyring extends ItemBase implements IKeyItem {
         for (int i = 0; i < handler.getSlots(); i++) {
             ItemStack inStack = handler.getStackInSlot(i);
             if (!inStack.isEmpty() && inStack.getItem() instanceof IKeyItem) {
-                if (((IKeyItem) inStack.getItem()).canUnlock(lock, stack)) {
+                if (((IKeyItem) inStack.getItem()).canUnlock(lock, inStack)) {
                     return true;
                 }
             }
@@ -184,5 +189,11 @@ public class ItemKeyring extends ItemBase implements IKeyItem {
 
             return CharsetStorageLocks.DEFAULT_LOCKING_COLOR;
         }
+    }
+
+    @Override
+    @Optional.Method(modid = "baubles")
+    public BaubleType getBaubleType(ItemStack stack) {
+        return BaubleType.TRINKET;
     }
 }
