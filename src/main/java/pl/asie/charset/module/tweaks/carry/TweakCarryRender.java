@@ -75,9 +75,11 @@ public class TweakCarryRender {
 				yaw += 360.0f;
 			yaw = yaw - (yaw % 90);
 
+			GlStateManager.color(1, 1, 1,1);
+			GlStateManager.disableLighting();
+			GlStateManager.enableBlend();
 			GlStateManager.translate(0, player.isSneaking() ? -0.65 : -0.75, -1);
 			GlStateManager.enableRescaleNormal();
-			GlStateManager.enableBlend();
 			GlStateManager.rotate(yaw - 180, 0, 1, 0);
 			GlStateManager.translate(-0.5, -0.5, -0.5);
 

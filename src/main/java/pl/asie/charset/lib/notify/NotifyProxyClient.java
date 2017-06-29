@@ -312,8 +312,8 @@ public class NotifyProxyClient extends NotifyProxy {
                 renderItem.zLevel += 100;
             }
         }
-        GlStateManager.popMatrix();
 
+        GlStateManager.popMatrix();
     }
     
     @Override

@@ -21,7 +21,9 @@ import net.minecraft.item.ItemStack;
 public interface IDyeableItem {
 	int getColor(ItemStack stack);
 
-	boolean hasColor(ItemStack stack);
+	default boolean hasColor(ItemStack stack) {
+		return getColor(stack) >= 0;
+	}
 
 	void setColor(ItemStack stack, int color);
 }

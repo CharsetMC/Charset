@@ -6,8 +6,9 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
+import pl.asie.charset.lib.item.ItemBlockBase;
 
-public class ItemShelf extends ItemBlock {
+public class ItemShelf extends ItemBlockBase {
 	public ItemShelf(Block block) {
 		super(block);
 		setHasSubtypes(true);

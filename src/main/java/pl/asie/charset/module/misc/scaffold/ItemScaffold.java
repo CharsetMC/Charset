@@ -6,14 +6,14 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.item.ItemBlockBase;
 
 import java.util.Objects;
 
-public class ItemScaffold extends ItemBlock {
+public class ItemScaffold extends ItemBlockBase {
 	public ItemScaffold(Block block) {
 		super(block);
 		setUnlocalizedName("charset.scaffold");
-		setCreativeTab(ModCharset.CREATIVE_TAB);
 	}
 
 	@Override

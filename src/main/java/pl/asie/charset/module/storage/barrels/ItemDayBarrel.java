@@ -48,10 +48,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.FontRendererFancy;
+import pl.asie.charset.lib.item.ItemBlockBase;
 
 import java.util.List;
 
-public class ItemDayBarrel extends ItemBlock {
+public class ItemDayBarrel extends ItemBlockBase {
     public ItemDayBarrel(Block block) {
         super(block);
         setUnlocalizedName("charset.barrel");

@@ -190,7 +190,7 @@ public class LockEventHandler {
     }
 
     @SideOnly(Side.CLIENT)
-    private String getColorDyed(int color) {
+    public static String getColorDyed(int color) {
         color &= 0xFFFFFF;
 
         double maxDistance = Double.MAX_VALUE;
@@ -213,47 +213,5 @@ public class LockEventHandler {
         return FontRendererFancy.getColorFormat(color)
             + I18n.format(ColorUtils.getLangEntry("charset.color.", closestColor))
             + FontRendererFancy.getColorResetFormat();
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    @SideOnly(Side.CLIENT)
-    public void onItemTooltip(ItemTooltipEvent event) {
-        if (event.getItemStack().getItem() instanceof ItemLockingDyeable) {
-            String name = event.getToolTip().get(0);
-            NBTTagCompound compound = event.getItemStack().getTagCompound();
-            if (compound != null) {
-                if (compound.hasKey("color")) {
-                    name = getColorDyed(compound.getInteger("color")) + " " + name;
-                    event.getToolTip().set(0, name);
-                }
-            }
-        } else if (event.getItemStack().getItem() instanceof ItemKeyring && event.getItemStack().hasTagCompound()) {
-            NBTTagCompound compound = event.getItemStack().getTagCompound();
-            StringBuilder builder = new StringBuilder();
-            int count = 0;
-            int cCount = 0;
-            while (compound.hasKey("color" + count)) {
-                int color = compound.getInteger("color" + count);
-                if (color >= 0) {
-                    if (cCount > 0) {
-                        if ((cCount % 5) == 0) {
-                            builder.append(',');
-                            event.getToolTip().add(builder.toString());
-                            builder = new StringBuilder();
-                        } else {
-                            builder.append(", ");
-                        }
-                    }
-                    builder.append(getColorDyed(color));
-                    cCount++;
-                }
-
-                count++;
-            }
-
-            if (cCount > 0) {
-                event.getToolTip().add(builder.toString());
-            }
-        }
     }
 }

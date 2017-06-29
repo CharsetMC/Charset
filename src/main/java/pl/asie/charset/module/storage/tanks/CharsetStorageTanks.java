@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
@@ -30,7 +31,7 @@ public class CharsetStorageTanks {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         tankBlock = new BlockTank();
-        tankItem = new ItemBlock(tankBlock);
+        tankItem = new ItemBlockBase(tankBlock);
 
         FMLInterModComms.sendMessage("charset", "addLock", new ResourceLocation("charset:fluidTank"));
     }

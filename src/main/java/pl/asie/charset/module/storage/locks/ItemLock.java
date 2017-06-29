@@ -80,6 +80,7 @@ public class ItemLock extends ItemLockingDyeable {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
+        super.addInformation(stack, world, tooltip, flag);
         if (ItemKey.DEBUG_KEY_ID) {
             tooltip.add(getKey(stack));
         }

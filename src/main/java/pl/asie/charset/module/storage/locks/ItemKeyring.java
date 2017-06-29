@@ -144,6 +144,37 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
+        super.addInformation(stack, world, tooltip, flag);
+
+        if (stack.hasTagCompound()) {
+            NBTTagCompound compound = stack.getTagCompound();
+            StringBuilder builder = new StringBuilder();
+            int count = 0;
+            int cCount = 0;
+            while (compound.hasKey("color" + count)) {
+                int color = compound.getInteger("color" + count);
+                if (color >= 0) {
+                    if (cCount > 0) {
+                        if ((cCount % 5) == 0) {
+                            builder.append(',');
+                            tooltip.add(builder.toString());
+                            builder = new StringBuilder();
+                        } else {
+                            builder.append(", ");
+                        }
+                    }
+                    builder.append(LockEventHandler.getColorDyed(color));
+                    cCount++;
+                }
+
+                count++;
+            }
+
+            if (cCount > 0) {
+                tooltip.add(builder.toString());
+            }
+        }
+
         if (ItemKey.DEBUG_KEY_ID) {
             IItemHandler handler = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
             for (int i = 0; i < handler.getSlots(); i++) {

@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
@@ -26,7 +27,7 @@ public class CharsetTransportRails {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         blockRailCross = new BlockRailCharset();
-        itemRailCross = new ItemBlock(blockRailCross);
+        itemRailCross = new ItemBlockBase(blockRailCross);
     }
 
     @SubscribeEvent
