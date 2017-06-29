@@ -74,8 +74,8 @@ dependencies {
 sourceSets {
 	main {
 		resources {
-			srcDirs += 'docs'
 			srcDirs += 'lang'
+			srcDirs += 'docs'
 		}
 	}
 }
@@ -88,7 +88,7 @@ processResources {
 	// replace stuff in mcmod.info, nothing else
 	from(sourceSets.main.resources.srcDirs) {
 		include 'mcmod.info'
-		
+
 		// replace version and mcversion
 		expand 'version':project.version, 'mcversion':project.minecraft.version
 	}
@@ -113,12 +113,14 @@ reobfJar {
 }
 reobfJar.dependsOn shadowJar
 
-//task deobfJar(type: Jar) {
-//	from(sourceSets.main.output) {
-//		classifier = "deobf"
-//	}
-//}
+task apiJar(type: Jar) {
+	classifier = "api"
+	from(sourceSets.main.output) {
+		include "pl/asie/charset/api/**"
+		include "licenses/**"
+	}
+}
 
-//artifacts {
-//	archives deobfJar
-//}
+artifacts {
+	archives apiJar
+}
