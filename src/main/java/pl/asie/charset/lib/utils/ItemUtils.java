@@ -125,6 +125,10 @@ public final class ItemUtils {
 	}
 
 	public static boolean equals(ItemStack source, ItemStack target, boolean matchStackSize, boolean matchDamage, boolean matchNBT) {
+		return equals(source, target, matchStackSize, matchDamage, matchNBT, matchNBT);
+	}
+
+	public static boolean equals(ItemStack source, ItemStack target, boolean matchStackSize, boolean matchDamage, boolean matchNBT, boolean matchCaps) {
 		if (source == target) {
 			return true;
 		} else if (source.isEmpty()) {
@@ -143,7 +147,15 @@ public final class ItemUtils {
 			}
 
 			if (matchNBT) {
-				if (!ItemStack.areItemStackTagsEqual(source, target)) {
+				if (source.hasTagCompound() != target.hasTagCompound()) {
+					return false;
+				} else if (source.hasTagCompound() && !source.getTagCompound().equals(target.getTagCompound())) {
+					return false;
+				}
+			}
+
+			if (matchCaps) {
+				if (!source.areCapsCompatible(target)) {
 					return false;
 				}
 			}

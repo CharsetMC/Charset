@@ -39,6 +39,7 @@ package pl.asie.charset.module.storage.barrels;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
@@ -104,8 +105,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
 
     static boolean isMetal(ItemStack it) {
         if (it == null) return true;
-        IBlockState state = ItemUtils.getBlockState(it);
-        return !state.getMaterial().getCanBurn();
+        return !ItemMaterialRegistry.INSTANCE.matches(it, "wood");
     }
 
     @Override

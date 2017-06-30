@@ -11,6 +11,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -27,14 +28,16 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.item.ISubItemProvider;
+import pl.asie.charset.lib.item.SubItemProviderCache;
+import pl.asie.charset.lib.item.SubItemProviderRecipes;
+import pl.asie.charset.lib.item.SubItemProviderSets;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.RayTraceUtils;
+import pl.asie.charset.module.misc.scaffold.BlockScaffold;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class BlockShelf extends BlockBase implements ITileEntityProvider {
     public static final Collection<ItemMaterial> PLANKS = new HashSet<>();
@@ -104,17 +107,13 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    protected Collection<ItemStack> getCreativeItems() {
-        return ImmutableList.of();
-    }
-
-    @Override
-    protected List<Collection<ItemStack>> getCreativeItemSets() {
-        List<Collection<ItemStack>> list = new ArrayList<>();
-        for (ItemMaterial s : PLANKS) {
-            list.add(ImmutableList.of(createStack(s, 1)));
-        }
-        return list;
+    protected ISubItemProvider createSubItemProvider() {
+        return new SubItemProviderCache(new SubItemProviderRecipes() {
+            @Override
+            protected Item getItem() {
+                return Item.getItemFromBlock(BlockShelf.this);
+            }
+        });
     }
 
     @Override

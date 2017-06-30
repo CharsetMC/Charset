@@ -1,5 +1,6 @@
 package pl.asie.charset.lib.recipe;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -21,6 +22,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
+import pl.asie.charset.lib.utils.ItemStackHashSet;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -52,20 +54,21 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
     protected boolean mirrored = false;
     protected boolean shapeless = false;
 
-    public List<ItemStack> getExampleOutputs() {
+    public List<ItemStack> getAllRecipeOutputs() {
         InventoryCraftingIterator inventoryCrafting = new InventoryCraftingIterator(this, true);
-        List<ItemStack> exampleOutputs = new ArrayList<>();
+        ItemStackHashSet stackSet = new ItemStackHashSet(true, true, true);
+        List<ItemStack> stacks = new ArrayList<>();
 
         InventoryCraftingIterator it = inventoryCrafting;
         while (it.hasNext()) {
             InventoryCrafting ic = it.next();
             ItemStack stack = getCraftingResult(ic);
-            if (!stack.isEmpty()) {
-                exampleOutputs.add(stack);
+            if (!stack.isEmpty() && stackSet.add(stack)) {
+                stacks.add(stack);
             }
         }
 
-        return exampleOutputs;
+        return stacks;
     }
 
     @Override

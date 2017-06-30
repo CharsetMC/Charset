@@ -48,6 +48,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.item.ISubItemProvider;
+import pl.asie.charset.lib.item.SubItemProviderSimple;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
@@ -59,11 +61,13 @@ import java.util.*;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider = this instanceof ITileEntityProvider;
+	private final ISubItemProvider subItemProvider;
 	private boolean fullCube = true, opaqueCube = true;
 	private ImmutableList<ItemStack> items;
 
 	public BlockBase(Material materialIn) {
 		super(materialIn);
+		subItemProvider = createSubItemProvider();
 	}
 
 	protected BlockBase setFullCube(boolean value) {
@@ -74,6 +78,10 @@ public abstract class BlockBase extends Block {
 	protected BlockBase setOpaqueCube(boolean value) {
 		opaqueCube = value;
 		return this;
+	}
+
+	protected ISubItemProvider createSubItemProvider() {
+		return null;
 	}
 
 	@Override
@@ -112,45 +120,12 @@ public abstract class BlockBase extends Block {
 		return new ItemStack(this);
 	}
 
-	protected Collection<ItemStack> getCreativeItems() {
-		return ImmutableList.of(new ItemStack(this));
-	}
-
-	protected List<Collection<ItemStack>> getCreativeItemSets() {
-		return Collections.EMPTY_LIST;
-	}
-
-	protected int getCreativeItemSetAmount() {
-		return 1;
-	}
-
 	@Override
 	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> itemList) {
-		if (items == null) {
-			ImmutableList.Builder<ItemStack> builder = ImmutableList.builder();
-			builder.addAll(getCreativeItems());
-			List<Collection<ItemStack>> sets = getCreativeItemSets();
-
-			if (sets.size() > 0) {
-				if (ModCharset.INDEV) {
-					for (Collection<ItemStack> set : sets)
-						builder.addAll(set);
-				} else {
-					Calendar cal = CharsetLib.calendar.get();
-					int doy = cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
-					Collections.shuffle(sets, new Random(doy));
-					for (int i = 0; i < Math.min(getCreativeItemSetAmount(), sets.size()); i++)
-						builder.addAll(sets.get(i));
-				}
-			}
-
-			items = builder.build();
-		}
-
-		itemList.addAll(items);
-
-		if (!ItemMaterialHeuristics.isFullyInitialized()) {
-			items = null;
+		if (subItemProvider != null) {
+			itemList.addAll(subItemProvider.getItems());
+		} else {
+			super.getSubBlocks(tab, itemList);
 		}
 	}
 

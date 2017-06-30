@@ -66,7 +66,7 @@ public class RecipeWireConversion extends RecipeCharset {
     }
 
     @Override
-    public List<ItemStack> getExampleOutputs() {
+    public List<ItemStack> getAllRecipeOutputs() {
         return getMatchingStacks(outputOffset);
     }
 

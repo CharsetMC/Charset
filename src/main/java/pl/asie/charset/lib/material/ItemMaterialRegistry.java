@@ -168,7 +168,7 @@ public class ItemMaterialRegistry {
 		return ItemUtils.canMerge(mat.getStack(), stack);
 	}
 
-    public boolean matches(ItemStack stack, String[] mats) {
+    public boolean matches(ItemStack stack, String... mats) {
 		for (String mat : mats) {
 			boolean valid = true;
 			if (mat.startsWith("!")) {

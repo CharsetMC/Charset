@@ -2,11 +2,13 @@
 * Major improvements to Just Enough Items support.
 * [lib] Improve wire occlusion logic.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
+* [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
+* [storage.barrels] Fix the barrel cap texture being incorrect for certain block types.
 * [storage.locks] Added keyrings! They store keys in style!
 * [storage.locks] Locks now play a sound when attached or removed.
 * [storage.locks] Locks, when crafted, now copy the color of the key.
 * [storage.locks] Major rewrite! They work much more reliably now and can be placed on tanks!
-* [transport.color] Dyeing minecarts now uses your resource pack's minecart texture.
+* [transport.color] Dyed minecarts now use your resource pack's minecart texture.
 * [tweak.carry] Fix rendering bug caused by carrying a block with a notification visible.
 * [tweak.carry] Prevent the player from picking up blocks they can't break.
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.

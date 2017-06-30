@@ -44,6 +44,6 @@ public class JEIRecipeCharset implements IRecipeWrapper {
     @Override
     public void getIngredients(IIngredients ingredients) {
         ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(recipe.getIngredients()));
-        ingredients.setOutputLists(ItemStack.class, Collections.singletonList(recipe.getExampleOutputs()));
+        ingredients.setOutputLists(ItemStack.class, Collections.singletonList(recipe.getAllRecipeOutputs()));
     }
 }

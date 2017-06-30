@@ -132,7 +132,7 @@ public class BarrelUpgradeRecipes {
         }
 
         @Override
-        public List<ItemStack> getExampleOutputs() {
+        public List<ItemStack> getAllRecipeOutputs() {
             return BarrelRegistry.INSTANCE.getBarrels(upgradeType);
         }
 

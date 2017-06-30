@@ -39,6 +39,7 @@ import pl.asie.charset.lib.audio.types.AudioDataGameSound;
 import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.command.CommandCharset;
+import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
@@ -161,6 +162,7 @@ public class CharsetLib {
 	public void postInit(FMLPostInitializationEvent event) {
 		Capabilities.registerVanillaWrappers();
 		ItemMaterialHeuristics.init(true);
+		SubItemProviderCache.clear();
 
 		if (deathHandler.hasPredicate()) {
 			MinecraftForge.EVENT_BUS.register(deathHandler);

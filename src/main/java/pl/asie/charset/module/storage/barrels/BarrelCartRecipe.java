@@ -78,7 +78,7 @@ public class BarrelCartRecipe extends RecipeCharset {
     };
 
     @Override
-    public List<ItemStack> getExampleOutputs() {
+    public List<ItemStack> getAllRecipeOutputs() {
         Collection<ItemStack> stacks = new ArrayList<>();
         List<ItemStack> stacks2 = new ArrayList<>();
         stacks.addAll(BarrelRegistry.INSTANCE.getBarrels());

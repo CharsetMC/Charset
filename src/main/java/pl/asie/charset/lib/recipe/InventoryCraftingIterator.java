@@ -23,7 +23,7 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
             }
 
             if (iterator.permutations == 1) {
-                output = iterator.recipe.getExampleOutputs();
+                output = iterator.recipe.getAllRecipeOutputs();
             } else {
                 output = Collections.singletonList(iterator.recipe.getCraftingResult(iterator));
             }
