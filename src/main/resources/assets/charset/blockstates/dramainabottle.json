@@ -5,7 +5,8 @@
       "model": "forge:item-layer",
       "transform": "forge:default-item",
       "textures": {
-        "layer0": "charset:items/drama_in_a_bottle"
+        "layer0": "minecraft:items/potion_bottle_empty",
+        "layer1": "minecraft:items/potion_overlay"
       }
     }
   }
