@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+// TODO: Turn into JSON
 public class BarrelCartRecipe extends RecipeCharset {
     private static final Ingredient MINECART = CraftingHelper.getIngredient(Items.MINECART);
     private static final Ingredient BARREL = new IngredientCharset(0) {

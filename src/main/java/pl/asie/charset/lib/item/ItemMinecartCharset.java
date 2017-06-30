@@ -11,6 +11,7 @@ import net.minecraft.dispenser.IBehaviorDispenseItem;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -47,6 +48,7 @@ public abstract class ItemMinecartCharset extends ItemMinecart implements IMinec
         }
     };
 
+    private static final ItemStack MINECART = new ItemStack(Items.MINECART);
     private final ISubItemProvider subItemProvider;
 
     public ItemMinecartCharset() {
@@ -63,6 +65,11 @@ public abstract class ItemMinecartCharset extends ItemMinecart implements IMinec
 
     protected ISubItemProvider createSubItemProvider() {
         return new SubItemProviderSimple(this);
+    }
+
+    @Override
+    public int getItemStackLimit() {
+        return MINECART.getMaxStackSize();
     }
 
     @Override

@@ -19,13 +19,13 @@ public class PacketBarrelCountUpdate extends PacketTile {
 	@Override
 	public void writeData(ByteBuf buf) {
 		super.writeData(buf);
-		buf.writeMedium(count);
+		buf.writeInt(count);
 	}
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
 		super.readData(handler, buf);
-		count = buf.readMedium();
+		count = buf.readInt();
 	}
 
 	@Override

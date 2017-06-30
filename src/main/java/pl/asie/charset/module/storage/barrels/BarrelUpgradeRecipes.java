@@ -56,6 +56,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
+// TODO: Turn into JSONs
 public class BarrelUpgradeRecipes {
     private static final Ingredient hopper = CraftingHelper.getIngredient(Blocks.HOPPER);
     private static final Ingredient slime_ball = CraftingHelper.getIngredient("slimeball");

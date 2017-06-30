@@ -67,6 +67,7 @@ public class CharsetStorageBarrels {
 
 	public static boolean renderBarrelText, renderBarrelItem, renderBarrelItem3D;
 	public static boolean enableSilkyBarrels, enableHoppingBarrels;
+	public static int maxDroppedStacks;
 
 	public static boolean isEnabled(TileEntityDayBarrel.Type type) {
 		if (type == TileEntityDayBarrel.Type.SILKY) {
@@ -93,6 +94,7 @@ public class CharsetStorageBarrels {
 		renderBarrelText = config.getBoolean("renderText", "render", true, "Should text be rendered on barrels?");
 		enableSilkyBarrels = config.getBoolean("enableSilkyBarrels", "features", !ModCharset.isModuleLoaded("tweak.blockCarrying"), "Enable silky barrels. On by default unless tweak.blockCarrying is also present.");
 		enableHoppingBarrels = config.getBoolean("enableHoppingBarrels", "features", true, "Enable hopping barrels. On by default.");
+		maxDroppedStacks = config.getInt("maxDroppedStacks", "general", 1024, 0, (Integer.MAX_VALUE / 64), "The maximum amount of stacks to be dropped when a barrel is broken.");
 	}
 
 	@SubscribeEvent
@@ -147,7 +149,10 @@ public class CharsetStorageBarrels {
 
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
+		populateBarrelStackLists();
+	}
+
+	private void populateBarrelStackLists() {
 		BARRELS = barrelBlock.getSubItemProvider().getAllItems();
 
 		BARRELS_TYPE.clear();

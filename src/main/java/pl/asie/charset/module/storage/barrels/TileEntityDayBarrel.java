@@ -82,7 +82,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public Type type = Type.NORMAL;
     Object notice_target = this;
 
-    private static final int maxStackDrop = 64*64*2;
     protected final InsertionHandler insertionView = new InsertionHandler();
     protected final ExtractionHandler extractionView = new ExtractionHandler();
     protected final ReadableItemHandler readOnlyView = new ReadableItemHandler();
@@ -95,7 +94,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
 
         @Override
         public int getSlotLimit(int slot) {
-            return Math.min(64, getMaxSize());
+            return 64;
         }
 
         @Override
@@ -156,7 +155,10 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public class ReadableItemHandler extends BaseItemHandler {
         @Override
         public ItemStack getStackInSlot(int slot) {
-            int count = item.getCount() - (slot * 64);
+            if (item.isEmpty())
+                return ItemStack.EMPTY;
+
+            int count = item.getCount() - (slot * item.getMaxStackSize());
             if (count <= 0)
                 return ItemStack.EMPTY;
             else if (count > 64)
@@ -169,7 +171,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
 
         @Override
         public int getSlots() {
-            return 64;
+            return getMaxStacks();
         }
 
         @Override
@@ -412,7 +414,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         if (item.isEmpty()) {
             return 0;
         } else if (type == Type.CREATIVE) {
-            return 32*item.getMaxStackSize();
+            return ((getMaxStacks() + 1) / 2) * item.getMaxStackSize();
         } else {
             return item.getCount();
         }
@@ -430,12 +432,20 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         }
     }
 
+    public int getMaxStacks() {
+        return 64;
+    }
+
+    public int getMaxDropAmount() {
+        return CharsetStorageBarrels.maxDroppedStacks * item.getMaxStackSize();
+    }
+
     public int getMaxSize() {
-        int size = 64*64;
         if (!item.isEmpty()) {
-            size = item.getMaxStackSize()*64;
+            return item.getMaxStackSize() * getMaxStacks();
+        } else {
+            return 64 * getMaxStacks();
         }
-        return size;
     }
 
     public boolean itemMatch(ItemStack is) {
@@ -520,7 +530,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     void updateCountClients() {
-        CharsetStorageBarrels.instance.packet.sendToWatching(new PacketBarrelCountUpdate(this), this);
+        CharsetStorageBarrels.packet.sendToWatching(new PacketBarrelCountUpdate(this), this);
     }
 
     protected void onCountUpdate(PacketBarrelCountUpdate packet) {
@@ -673,23 +683,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         }
     }
 
-    static boolean isStairish(World w, BlockPos pos) {
-        IBlockState b = w.getBlockState(pos);
-        // TODO
-        /* if (b.getBlock() instanceof BlockRailBase) {
-            return true;
-        } */
-        AxisAlignedBB ab = b.getCollisionBoundingBox(w, pos);
-        ArrayList<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
-        b.addCollisionBoxToList(w, pos, ab, list, null, false);
-        for (AxisAlignedBB bb : list) {
-            if (bb.maxY - pos.getY() <= 0.51) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void click(EntityPlayer player) {
         EnumHand hand = EnumHand.MAIN_HAND;
 
@@ -740,25 +733,22 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     void info(final EntityPlayer entityplayer) {
-        new Notice(notice_target, new INoticeUpdater() {
-            @Override
-            public void update(Notice msg) {
-                if (item.isEmpty()) {
-                    msg.setMessage("notice.charset.barrel.empty");
+        new Notice(notice_target, msg -> {
+            if (item.isEmpty()) {
+                msg.setMessage("notice.charset.barrel.empty");
+            } else {
+                String countMsg = null;
+                if (type == Type.CREATIVE) {
+                    countMsg = "notice.charset.barrel.infinite";
                 } else {
-                    String countMsg = null;
-                    if (type == Type.CREATIVE) {
-                        countMsg = "notice.charset.barrel.infinite";
+                    int count = getItemCount();
+                    if (count >= getMaxSize()) {
+                        countMsg = "notice.charset.barrel.full";
                     } else {
-                        int count = getItemCount();
-                        if (count >= getMaxSize()) {
-                            countMsg = "notice.charset.barrel.full";
-                        } else {
-                            countMsg = "" + count;
-                        }
+                        countMsg = "" + count;
                     }
-                    msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", countMsg);
                 }
+                msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", countMsg);
             }
         }).sendTo(entityplayer);
     }
@@ -772,7 +762,6 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         assert ret.getCount() > 0 && ret.getCount() <= item.getMaxStackSize();
         return ret;
     }
-
 
     //Misc junk
     @Override
@@ -795,18 +784,24 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         if (type == Type.CREATIVE || (type == Type.SILKY && silkTouch)) {
             return stacks;
         }
-        if (item.isEmpty() || getItemCount() <= 0) {
+
+        if (item.isEmpty()) {
             return stacks;
         }
-        int count = getItemCount();
-        for (int i = 0; i < maxStackDrop; i++) {
-            int to_drop;
-            to_drop = Math.min(item.getMaxStackSize(), count);
-            count -= to_drop;
-            stacks.add(makeStack(to_drop));
-            if (count <= 0) {
-                break;
-            }
+
+        int count = Math.min(getItemCount(), getMaxDropAmount());
+        if (count <= 0) {
+            return stacks;
+        }
+
+        int prev_count = 0;
+        while (prev_count != count && count > 0) {
+            int toDrop = Math.min(item.getMaxStackSize(), count);
+            ItemStack dropStack = item.copy();
+            dropStack.setCount(toDrop);
+            stacks.add(dropStack);
+            prev_count = count;
+            count -= toDrop;
         }
 
         return stacks;
@@ -820,7 +815,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public boolean canLose() {
-        return item != null && getItemCount() > maxStackDrop * item.getMaxStackSize();
+        return !item.isEmpty() && type != Type.CREATIVE && getItemCount() > getMaxDropAmount();
     }
 
     public static ItemStack makeDefaultBarrel(Type type) {
