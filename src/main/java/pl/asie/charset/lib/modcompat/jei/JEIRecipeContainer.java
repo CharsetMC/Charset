@@ -5,7 +5,6 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.recipe.InventoryCraftingIterator;
-import pl.asie.charset.lib.recipe.InventoryCraftingIterator.Container;
 
 import java.util.Collections;
 

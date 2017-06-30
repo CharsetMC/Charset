@@ -2,7 +2,9 @@ package pl.asie.charset.module.misc.scaffold.modcompat.mcmultipart;
 
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipart;
-import mcmultipart.api.slot.*;
+import mcmultipart.api.slot.EnumEdgeSlot;
+import mcmultipart.api.slot.EnumSlotAccess;
+import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;

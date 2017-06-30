@@ -36,9 +36,7 @@
 
 package pl.asie.charset.module.misc.pocketcraft;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ui.GuiContainerCharset;

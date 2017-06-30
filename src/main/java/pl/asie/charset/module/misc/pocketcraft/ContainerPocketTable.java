@@ -38,11 +38,7 @@ package pl.asie.charset.module.misc.pocketcraft;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCraftResult;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotCrafting;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
@@ -51,7 +47,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.ui.ContainerBase;
 import pl.asie.charset.lib.ui.SlotBlocked;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.utils.RecipeUtils;
 
 import java.util.ArrayList;
 import java.util.List;

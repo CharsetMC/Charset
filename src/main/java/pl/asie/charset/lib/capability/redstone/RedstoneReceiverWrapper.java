@@ -16,10 +16,7 @@
 
 package pl.asie.charset.lib.capability.redstone;
 
-import net.minecraftforge.common.capabilities.Capability;
-import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
-import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
 import java.util.List;

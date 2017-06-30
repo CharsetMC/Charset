@@ -7,8 +7,6 @@ import net.minecraft.network.datasync.DataSerializer;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 
-import java.io.IOException;
-
 public final class DataSerializersCharset {
     private DataSerializersCharset() {
 

@@ -166,7 +166,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
         TileShelf bookshelf = (TileShelf) world.getTileEntity(pos);
         IExtendedBlockState extendedBS = (IExtendedBlockState) super.getExtendedState(state, world, pos);
         if (bookshelf != null) {
-            return extendedBS.withProperty(TileShelf.PROPERTY, CacheInfoShelf.from(extendedBS, bookshelf));
+            return extendedBS.withProperty(TileShelf.PROPERTY, ShelfCacheInfo.from(extendedBS, bookshelf));
         } else {
             return extendedBS;
         }

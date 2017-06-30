@@ -3,7 +3,6 @@ package pl.asie.charset.lib.modcompat.jei;
 import com.google.common.collect.Lists;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
-import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.item.IDyeableItem;
@@ -11,7 +10,6 @@ import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
 import pl.asie.charset.lib.utils.ColorUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class JEIRecipeDyeableItem implements IRecipeWrapper {

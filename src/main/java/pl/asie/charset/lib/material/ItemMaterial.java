@@ -2,7 +2,6 @@ package pl.asie.charset.lib.material;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.Collection;
 

@@ -2,7 +2,6 @@ package pl.asie.charset.api.locks;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public final class Lockable implements INBTSerializable<NBTTagCompound> {

@@ -8,29 +8,29 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-public class CacheInfoShelf implements IRenderComparable<CacheInfoShelf> {
+class ShelfCacheInfo implements IRenderComparable<ShelfCacheInfo> {
 	public final TextureAtlasSprite plank;
 	public final EnumFacing facing;
 	public final boolean back;
 
-	private CacheInfoShelf(TextureAtlasSprite plank, EnumFacing facing, boolean back) {
+	private ShelfCacheInfo(TextureAtlasSprite plank, EnumFacing facing, boolean back) {
 		this.plank = plank;
 		this.facing = facing;
 		this.back = back;
 	}
 
-	public static CacheInfoShelf from(IBlockState state, TileShelf tile) {
-		return new CacheInfoShelf(RenderUtils.getItemSprite(tile.getPlank().getStack()), state.getValue(Properties.FACING4), state.getValue(BlockShelf.BACK));
+	public static ShelfCacheInfo from(IBlockState state, TileShelf tile) {
+		return new ShelfCacheInfo(RenderUtils.getItemSprite(tile.getPlank().getStack()), state.getValue(Properties.FACING4), state.getValue(BlockShelf.BACK));
 	}
 
-	public static CacheInfoShelf from(ItemStack stack) {
+	public static ShelfCacheInfo from(ItemStack stack) {
 		TileShelf tile = new TileShelf();
 		tile.loadFromStack(stack);
-		return new CacheInfoShelf(RenderUtils.getItemSprite(tile.getPlank().getStack()), EnumFacing.SOUTH, true);
+		return new ShelfCacheInfo(RenderUtils.getItemSprite(tile.getPlank().getStack()), EnumFacing.SOUTH, true);
 	}
 
 	@Override
-	public boolean renderEquals(CacheInfoShelf other) {
+	public boolean renderEquals(ShelfCacheInfo other) {
 		return other.plank == plank && other.facing == facing && other.back == back;
 	}
 

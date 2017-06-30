@@ -21,7 +21,6 @@ import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.MultipartHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -32,7 +31,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 

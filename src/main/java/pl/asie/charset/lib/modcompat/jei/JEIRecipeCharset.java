@@ -1,16 +1,12 @@
 package pl.asie.charset.lib.modcompat.jei;
 
 import mezz.jei.api.ingredients.IIngredients;
-import mezz.jei.api.recipe.*;
+import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class JEIRecipeCharset implements IRecipeWrapper {
     public static class Shapeless extends JEIRecipeCharset {

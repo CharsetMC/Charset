@@ -32,9 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
-import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.lib.utils.ThreeState;
 
 @CharsetModule(
 	name = "lib.wires",

@@ -1,8 +1,6 @@
 package pl.asie.charset.lib.wires;
 
 import mcmultipart.api.container.IMultipartContainer;
-import mcmultipart.api.container.IPartInfo;
-import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.multipart.IMultipartTile;
 import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import mcmultipart.api.multipart.MultipartHelper;
@@ -17,14 +15,11 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 public final class WireUtils {

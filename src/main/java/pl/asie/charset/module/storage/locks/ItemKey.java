@@ -17,17 +17,12 @@
 package pl.asie.charset.module.storage.locks;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.storage.IKeyItem;
-import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.item.FontRendererFancy;
-import pl.asie.charset.lib.item.ItemBase;
 
 import java.util.List;
 

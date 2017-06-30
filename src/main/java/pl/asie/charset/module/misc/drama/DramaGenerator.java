@@ -16,12 +16,7 @@
 
 package pl.asie.charset.module.misc.drama;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class DramaGenerator {
 	public static final DramaGenerator INSTANCE = new DramaGenerator();

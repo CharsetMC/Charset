@@ -2,13 +2,9 @@ package pl.asie.charset.module.misc.scaffold;
 
 import com.google.common.base.MoreObjects;
 import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBlockBase;
-
-import java.util.Objects;
 
 public class ItemScaffold extends ItemBlockBase {
 	public ItemScaffold(Block block) {

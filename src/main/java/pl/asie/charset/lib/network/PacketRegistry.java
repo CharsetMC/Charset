@@ -36,7 +36,6 @@ import pl.asie.charset.ModCharset;
 
 import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.StringJoiner;
 
 public class PacketRegistry {
 	private static final HashSet<String> usedChannelNames = new HashSet<>();

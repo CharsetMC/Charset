@@ -3,11 +3,8 @@ package pl.asie.charset.upgrade;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.IFixableData;
 import pl.asie.charset.module.storage.locks.ItemLockingDyeable;
-
-import java.util.Set;
 
 public class CharsetLockKeyTagChange implements IFixableData {
     @Override

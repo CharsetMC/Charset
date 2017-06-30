@@ -1,9 +1,7 @@
 package pl.asie.charset.lib.capability.lib;
 
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
-import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
 import java.util.List;

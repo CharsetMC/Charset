@@ -17,12 +17,13 @@
 package pl.asie.charset.module.storage.barrels;
 
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.material.ItemMaterial;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
 
 public final class BarrelRegistry {
     public static final BarrelRegistry INSTANCE = new BarrelRegistry();

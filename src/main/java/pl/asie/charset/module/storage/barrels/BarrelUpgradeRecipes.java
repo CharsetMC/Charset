@@ -43,14 +43,10 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.registries.IForgeRegistry;
 import pl.asie.charset.lib.recipe.IngredientCharset;
 import pl.asie.charset.lib.recipe.IngredientMatcher;
 import pl.asie.charset.lib.recipe.RecipeCharset;
-import pl.asie.charset.module.storage.locks.CharsetStorageLocks;
 
 import javax.annotation.Nullable;
 import java.util.Collection;

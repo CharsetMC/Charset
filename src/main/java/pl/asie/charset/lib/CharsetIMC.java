@@ -8,14 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ThreeState;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class CharsetIMC {
     public static CharsetIMC INSTANCE = new CharsetIMC();

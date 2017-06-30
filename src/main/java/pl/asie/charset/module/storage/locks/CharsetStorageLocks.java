@@ -31,7 +31,6 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -41,7 +40,6 @@ import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.module.misc.pocketcraft.ContainerPocketTable;
 
 import javax.annotation.Nullable;
 import java.util.Random;

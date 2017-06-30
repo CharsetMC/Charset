@@ -51,7 +51,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     final boolean isMetal;
 
     // Used as a cache field only
-    final ItemStack logStack;
+    final transient ItemStack logStack;
 
     @Override
     public boolean equals(Object o) {

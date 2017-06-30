@@ -23,7 +23,7 @@ import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 import javax.annotation.Nullable;
 
 public class TileShelf extends TileBase {
-	public static final UnlistedPropertyGeneric<CacheInfoShelf> PROPERTY = new UnlistedPropertyGeneric<>("tile", CacheInfoShelf.class);
+	public static final UnlistedPropertyGeneric<ShelfCacheInfo> PROPERTY = new UnlistedPropertyGeneric<>("tile", ShelfCacheInfo.class);
 	protected ItemStackHandler handler = new ItemHandlerCharset(18);
 	private ItemMaterial plank;
 

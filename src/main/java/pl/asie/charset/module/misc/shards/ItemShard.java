@@ -18,15 +18,12 @@ package pl.asie.charset.module.misc.shards;
 
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.utils.ColorUtils;
 

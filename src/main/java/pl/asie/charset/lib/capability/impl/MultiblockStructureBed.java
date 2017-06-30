@@ -1,19 +1,15 @@
 package pl.asie.charset.lib.capability.impl;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntityBed;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 public class MultiblockStructureBed implements IMultiblockStructure {
     private final TileEntityBed bed;

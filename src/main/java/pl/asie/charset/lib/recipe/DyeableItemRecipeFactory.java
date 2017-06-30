@@ -18,7 +18,6 @@ package pl.asie.charset.lib.recipe;
 
 import com.google.gson.JsonObject;
 import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;

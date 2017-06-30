@@ -16,9 +16,6 @@
 
 package pl.asie.charset.module.tweaks.remove;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import pl.asie.charset.lib.loader.CharsetModule;

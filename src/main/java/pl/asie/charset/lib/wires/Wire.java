@@ -12,7 +12,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;

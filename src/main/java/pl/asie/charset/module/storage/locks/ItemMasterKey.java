@@ -16,10 +16,8 @@
 
 package pl.asie.charset.module.storage.locks;
 
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.api.storage.IKeyItem;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBase;
 
 public class ItemMasterKey extends ItemBase implements IKeyItem {

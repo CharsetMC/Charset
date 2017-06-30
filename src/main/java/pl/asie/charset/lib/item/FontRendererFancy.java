@@ -4,9 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import pl.asie.charset.lib.utils.MethodHandleHelper;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.regex.Matcher;

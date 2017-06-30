@@ -32,7 +32,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
@@ -47,22 +46,16 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
-import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.utils.Utils;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider = this instanceof ITileEntityProvider;

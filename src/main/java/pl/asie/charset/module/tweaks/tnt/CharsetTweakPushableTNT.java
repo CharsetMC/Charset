@@ -17,7 +17,6 @@
 package pl.asie.charset.module.tweaks.tnt;
 
 import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;

@@ -1,11 +1,9 @@
 package pl.asie.charset.lib.utils.nbt;
 
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagByte;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class NBTSerializer {

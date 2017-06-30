@@ -1,13 +1,9 @@
 package pl.asie.charset.lib.modcompat.jei;
 
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.IJeiRuntime;
-import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.ISubtypeRegistry;
-import mezz.jei.api.JEIPlugin;
+import mezz.jei.api.*;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
-import mezz.jei.api.recipe.*;
+import mezz.jei.api.recipe.IStackHelper;
+import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -18,7 +14,6 @@ import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
-import java.util.List;
 
 @JEIPlugin
 public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> implements IModPlugin {

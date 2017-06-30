@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-public class ScaffoldCacheInfo implements IRenderComparable<ScaffoldCacheInfo> {
+class ScaffoldCacheInfo implements IRenderComparable<ScaffoldCacheInfo> {
 	public final TextureAtlasSprite plank;
 
 	private ScaffoldCacheInfo(TextureAtlasSprite plank) {

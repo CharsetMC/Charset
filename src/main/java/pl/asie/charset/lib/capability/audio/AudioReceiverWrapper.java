@@ -16,10 +16,8 @@
 
 package pl.asie.charset.lib.capability.audio;
 
-import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IAudioReceiver;
-import pl.asie.charset.lib.capability.Capabilities;
 
 import java.util.Collection;
 import java.util.List;

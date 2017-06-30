@@ -1,16 +1,11 @@
 package pl.asie.charset.lib.wires;
 
-import mcmultipart.MCMultiPart;
-import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.item.ItemBlockMultipart;
 import mcmultipart.api.multipart.IMultipart;
-import mcmultipart.api.multipart.MultipartHelper;
-import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
@@ -20,8 +15,6 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
 
 public class ItemWire extends ItemBlockMultipart {

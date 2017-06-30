@@ -2,14 +2,9 @@ package pl.asie.charset.lib.wires;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
 import pl.asie.charset.lib.recipe.IngredientCharset;
-import pl.asie.charset.lib.recipe.RecipeBase;
 import pl.asie.charset.lib.recipe.RecipeCharset;
-import pl.asie.charset.module.storage.barrels.BarrelRegistry;
-import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

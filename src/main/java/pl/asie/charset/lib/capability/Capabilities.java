@@ -52,10 +52,10 @@ import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
 import pl.asie.charset.lib.capability.lib.*;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
+import pl.asie.charset.lib.capability.redstone.*;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInventory;
-import pl.asie.charset.lib.capability.redstone.*;
 
 import javax.annotation.Nullable;
 

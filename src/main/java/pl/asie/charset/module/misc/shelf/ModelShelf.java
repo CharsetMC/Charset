@@ -17,7 +17,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.vecmath.Vector3f;
 
-public class ModelShelf extends ModelFactory<CacheInfoShelf> {
+public class ModelShelf extends ModelFactory<ShelfCacheInfo> {
 	public static final ModelShelf INSTANCE = new ModelShelf();
 	public static final TRSRTransformation STATE_BACK = new TRSRTransformation(
 			new Vector3f(0, 0, 0.5F),
@@ -32,7 +32,7 @@ public class ModelShelf extends ModelFactory<CacheInfoShelf> {
 	}
 
 	@Override
-	public IBakedModel bake(CacheInfoShelf info, boolean isItem, BlockRenderLayer layer) {
+	public IBakedModel bake(ShelfCacheInfo info, boolean isItem, BlockRenderLayer layer) {
 		IModel retexturedModel = (shelfModel.retexture(ImmutableMap.of("plank", info.plank.getIconName()))).uvlock(false);
 		IModelState state = ModelRotation.getModelRotation(0, (int) info.facing.getHorizontalAngle());
 		if (info.back) {
@@ -42,7 +42,7 @@ public class ModelShelf extends ModelFactory<CacheInfoShelf> {
 	}
 
 	@Override
-	public CacheInfoShelf fromItemStack(ItemStack stack) {
-		return CacheInfoShelf.from(stack);
+	public ShelfCacheInfo fromItemStack(ItemStack stack) {
+		return ShelfCacheInfo.from(stack);
 	}
 }

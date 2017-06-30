@@ -10,7 +10,6 @@ import gnu.trove.map.hash.TCharObjectHashMap;
 import gnu.trove.map.hash.TObjectCharHashMap;
 import gnu.trove.set.TCharSet;
 import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TCharHashSet;
 import gnu.trove.set.hash.TIntHashSet;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;

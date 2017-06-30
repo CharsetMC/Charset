@@ -39,15 +39,12 @@ package pl.asie.charset.module.storage.barrels;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.item.ItemBlockBase;
 
 import java.util.List;
