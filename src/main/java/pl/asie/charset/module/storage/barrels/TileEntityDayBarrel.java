@@ -465,7 +465,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public void loadFromStack(ItemStack is) {
         woodLog = getLog(is.getTagCompound());
         woodSlab = getSlab(is.getTagCompound());
-        type = getUpgrade(is);
+        type = getType(is);
         if (type == Type.SILKY && is.hasTagCompound()) {
             NBTTagCompound tag = is.getTagCompound();
             int loadCount = tag.getInteger("SilkCount");
@@ -811,7 +811,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         return barrel_item;
     }
 
-    public static Type getUpgrade(ItemStack is) {
+    public static Type getType(ItemStack is) {
         if (is == null) {
             return Type.NORMAL;
         }

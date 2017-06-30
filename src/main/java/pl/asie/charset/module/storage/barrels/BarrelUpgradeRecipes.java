@@ -38,12 +38,16 @@ package pl.asie.charset.module.storage.barrels;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.IForgeRegistry;
+import pl.asie.charset.lib.item.ISubItemProvider;
+import pl.asie.charset.lib.item.SubItemProviderCache;
+import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.recipe.IngredientCharset;
 import pl.asie.charset.lib.recipe.IngredientMatcher;
 import pl.asie.charset.lib.recipe.RecipeCharset;
@@ -64,7 +68,7 @@ public class BarrelUpgradeRecipes {
 
         @Override
         public ItemStack[] getMatchingStacks() {
-            Collection<ItemStack> stacks = BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.NORMAL);
+            Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS_TYPE.get(TileEntityDayBarrel.Type.NORMAL);
             return stacks.toArray(new ItemStack[stacks.size()]);
         }
 
@@ -132,8 +136,8 @@ public class BarrelUpgradeRecipes {
         }
 
         @Override
-        public List<ItemStack> getAllRecipeOutputs() {
-            return BarrelRegistry.INSTANCE.getBarrels(upgradeType);
+        public Collection<ItemStack> getAllRecipeOutputs() {
+            return CharsetStorageBarrels.BARRELS_TYPE.get(upgradeType);
         }
 
         @Nullable

@@ -6,4 +6,8 @@ import java.util.Collection;
 @FunctionalInterface
 public interface ISubItemProvider {
      Collection<ItemStack> getItems();
+
+     default Collection<ItemStack> getAllItems() {
+          return getItems();
+     }
 }

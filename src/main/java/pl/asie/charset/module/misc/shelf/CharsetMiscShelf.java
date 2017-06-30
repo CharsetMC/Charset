@@ -47,8 +47,8 @@ public class CharsetMiscShelf {
 	@CharsetModule.Instance
 	public static CharsetMiscShelf instance;
 
-	public static Block shelfBlock;
-	public static Item shelfItem;
+	public static BlockShelf shelfBlock;
+	public static ItemShelf shelfItem;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

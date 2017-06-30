@@ -5,6 +5,7 @@ import mods.railcraft.api.core.items.IMinecartItem;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
 import net.minecraft.dispenser.IBlockSource;
@@ -15,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
@@ -45,11 +47,29 @@ public abstract class ItemMinecartCharset extends ItemMinecart implements IMinec
         }
     };
 
+    private final ISubItemProvider subItemProvider;
+
     public ItemMinecartCharset() {
         super(EntityMinecart.Type.RIDEABLE); // yeah, right
         setCreativeTab(ModCharset.CREATIVE_TAB);
         setHasSubtypes(true);
         BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(this, MINECART_DISPENSER_BEHAVIOR);
+        subItemProvider = createSubItemProvider();
+    }
+
+    public final ISubItemProvider getSubItemProvider() {
+        return subItemProvider;
+    }
+
+    protected ISubItemProvider createSubItemProvider() {
+        return new SubItemProviderSimple(this);
+    }
+
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (isInCreativeTab(tab)) {
+            items.addAll(subItemProvider.getItems());
+        }
     }
 
     @Override
@@ -89,4 +109,6 @@ public abstract class ItemMinecartCharset extends ItemMinecart implements IMinec
         world.spawnEntity(minecart);
         return minecart;
     }
+
+
 }

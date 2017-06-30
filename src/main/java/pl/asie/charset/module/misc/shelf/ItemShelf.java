@@ -4,10 +4,11 @@ import com.google.common.base.MoreObjects;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
+import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ItemBlockBase;
 
 public class ItemShelf extends ItemBlockBase {
-	public ItemShelf(Block block) {
+	public ItemShelf(BlockBase block) {
 		super(block);
 		setHasSubtypes(true);
 		setUnlocalizedName("charset.shelf");

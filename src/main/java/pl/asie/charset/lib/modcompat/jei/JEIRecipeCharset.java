@@ -1,5 +1,6 @@
 package pl.asie.charset.lib.modcompat.jei;
 
+import com.google.common.collect.Lists;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
@@ -44,6 +45,6 @@ public class JEIRecipeCharset implements IRecipeWrapper {
     @Override
     public void getIngredients(IIngredients ingredients) {
         ingredients.setInputLists(ItemStack.class, JEIPluginCharset.STACKS.expandRecipeItemStackInputs(recipe.getIngredients()));
-        ingredients.setOutputLists(ItemStack.class, Collections.singletonList(recipe.getAllRecipeOutputs()));
+        ingredients.setOutputLists(ItemStack.class, Collections.singletonList(Lists.newArrayList(recipe.getAllRecipeOutputs())));
     }
 }

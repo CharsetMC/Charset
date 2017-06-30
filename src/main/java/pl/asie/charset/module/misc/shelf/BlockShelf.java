@@ -111,7 +111,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
         return new SubItemProviderCache(new SubItemProviderRecipes() {
             @Override
             protected Item getItem() {
-                return Item.getItemFromBlock(BlockShelf.this);
+                return CharsetMiscShelf.shelfItem;
             }
         });
     }

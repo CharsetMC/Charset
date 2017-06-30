@@ -20,14 +20,13 @@ public class SubItemProviderSets implements ISubItemProvider {
         return 1;
     }
 
-    @Override
-    public Collection<ItemStack> getItems() {
+    private Collection<ItemStack> getItems(boolean all) {
         ImmutableList.Builder<ItemStack> builder = ImmutableList.builder();
         builder.addAll(createForcedItems());
         List<Collection<ItemStack>> sets = createItemSets();
 
         if (sets.size() > 0) {
-            if (ModCharset.INDEV) {
+            if (all || ModCharset.INDEV || getVisibleSetAmount() >= sets.size()) {
                 for (Collection<ItemStack> set : sets)
                     builder.addAll(set);
             } else {
@@ -40,5 +39,15 @@ public class SubItemProviderSets implements ISubItemProvider {
         }
 
         return builder.build();
+    }
+
+    @Override
+    public Collection<ItemStack> getItems() {
+        return getItems(false);
+    }
+
+    @Override
+    public Collection<ItemStack> getAllItems() {
+        return getItems(true);
     }
 }

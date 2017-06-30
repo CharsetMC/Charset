@@ -1,15 +1,12 @@
 package pl.asie.charset.lib.item;
 
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
-import pl.asie.charset.module.storage.barrels.BarrelRegistry;
-import pl.asie.charset.module.storage.barrels.BlockBarrel;
-import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -30,7 +27,7 @@ public abstract class SubItemProviderRecipes extends SubItemProviderSets {
         Item item = getItem();
         ItemStackHashSet stackSet = new ItemStackHashSet(false, true, true);
 
-        for (IRecipe recipe : GameRegistry.findRegistry(IRecipe.class)) {
+        for (IRecipe recipe : ForgeRegistries.RECIPES) {
             if (!recipe.getRecipeOutput().isEmpty() && recipe.getRecipeOutput().getItem() == item) {
                 if (recipe instanceof RecipeCharset) {
                     for (ItemStack s : ((RecipeCharset) recipe).getAllRecipeOutputs()) {

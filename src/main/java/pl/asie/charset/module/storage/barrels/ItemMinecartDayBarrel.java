@@ -48,11 +48,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.ItemMinecartCharset;
+import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ItemMinecartDayBarrel extends ItemMinecartCharset {
@@ -96,29 +99,36 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
         return super.getItemStackDisplayName(is);
     }
 
-    List<ItemStack> todaysCarts = null;
-
     @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
-        if (isInCreativeTab(tab)) {
-            if (todaysCarts == null) {
-                todaysCarts = new ArrayList<>();
-                NonNullList<ItemStack> stacks = NonNullList.create();
-                CharsetStorageBarrels.barrelBlock.getSubBlocks(ModCharset.CREATIVE_TAB, stacks);
-                for (ItemStack barrel : stacks) {
-                    TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
+    protected ISubItemProvider createSubItemProvider() {
+        return new SubItemProviderCache(new ISubItemProvider() {
+            private Collection<ItemStack> convert(Collection<ItemStack> items) {
+                List<ItemStack> itemsOut = new ArrayList<>();
+
+                for (ItemStack barrel : items) {
+                    TileEntityDayBarrel.Type type = TileEntityDayBarrel.getType(barrel);
                     if (type == TileEntityDayBarrel.Type.NORMAL || type == TileEntityDayBarrel.Type.CREATIVE) {
-                        ItemStack barrelCart = makeBarrel(barrel);
-                        todaysCarts.add(barrelCart);
+                        ItemStack barrelCart = makeBarrelCart(barrel);
+                        itemsOut.add(barrelCart);
                     }
                 }
+
+                return itemsOut;
             }
 
-            list.addAll(todaysCarts);
-        }
+            @Override
+            public Collection<ItemStack> getItems() {
+                return convert(CharsetStorageBarrels.barrelBlock.getSubItemProvider().getItems());
+            }
+
+            @Override
+            public Collection<ItemStack> getAllItems() {
+                return convert(CharsetStorageBarrels.barrelBlock.getSubItemProvider().getAllItems());
+            }
+        });
     }
 
-    public ItemStack makeBarrel(ItemStack barrelItem) {
+    public ItemStack makeBarrelCart(ItemStack barrelItem) {
         ItemStack ret = new ItemStack(this, 1, barrelItem.getItemDamage());
         ret.setTagCompound(barrelItem.getTagCompound().copy());
         return ret;

@@ -45,12 +45,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ItemBlockBase;
 
 import java.util.List;
 
 public class ItemDayBarrel extends ItemBlockBase {
-    public ItemDayBarrel(Block block) {
+    public ItemDayBarrel(BlockBase block) {
         super(block);
         setUnlocalizedName("charset.barrel");
         setCreativeTab(ModCharset.CREATIVE_TAB);
@@ -67,7 +68,7 @@ public class ItemDayBarrel extends ItemBlockBase {
 
     @Override
     public String getItemStackDisplayName(ItemStack is) {
-        TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getUpgrade(is);
+        TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getType(is);
         String lookup = "tile.charset.barrel.format";
         if (upgrade != TileEntityDayBarrel.Type.NORMAL) {
             lookup = "tile.charset.barrel.format2";
@@ -84,7 +85,7 @@ public class ItemDayBarrel extends ItemBlockBase {
 
     @SideOnly(Side.CLIENT) // Invokes a client-only function getTooltip
     protected void addExtraInformation(ItemStack is, World world, List<String> list, ITooltipFlag verbose) {
-        TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getUpgrade(is);
+        TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getType(is);
         if (upgrade == TileEntityDayBarrel.Type.SILKY) {
             list.add(I18n.translateToLocal("tile.charset.barrel.SILKY.silkhint"));
             TileEntityDayBarrel db = new TileEntityDayBarrel();

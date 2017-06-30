@@ -32,4 +32,9 @@ public class SubItemProviderCache implements ISubItemProvider {
         items = genItems;
         return items;
     }
+
+    @Override
+    public Collection<ItemStack> getAllItems() {
+        return parent.getAllItems();
+    }
 }

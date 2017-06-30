@@ -2,7 +2,9 @@ package pl.asie.charset.lib.utils;
 
 import gnu.trove.set.hash.TCustomHashSet;
 import gnu.trove.strategy.HashingStrategy;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ItemStackHashSet extends TCustomHashSet<ItemStack> {
     public static class Strategy implements HashingStrategy<ItemStack> {
@@ -16,7 +18,12 @@ public class ItemStackHashSet extends TCustomHashSet<ItemStack> {
 
         @Override
         public int computeHashCode(ItemStack object) {
-            return object.hashCode();
+            int i = Item.getIdFromItem(object.getItem());
+            i = 31 * i + object.getItemDamage();
+            if (object.hasTagCompound()) {
+                i = 7 * i + object.getTagCompound().hashCode();
+            }
+            return i;
         }
 
         @Override

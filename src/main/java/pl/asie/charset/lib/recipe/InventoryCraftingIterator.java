@@ -11,7 +11,8 @@ import java.util.*;
 
 public class InventoryCraftingIterator extends InventoryCrafting implements Iterator<InventoryCrafting> {
     public static class Container {
-        private final List stacks, output;
+        private final List stacks;
+        private final Collection<ItemStack> output;
         private final RecipeCharset base;
 
         private Container(InventoryCraftingIterator iterator) {
@@ -33,7 +34,7 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
             return stacks;
         }
 
-        public List<ItemStack> getOutput() {
+        public Collection<ItemStack> getOutput() {
             return output;
         }
 

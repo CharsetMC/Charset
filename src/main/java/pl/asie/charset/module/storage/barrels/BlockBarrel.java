@@ -47,7 +47,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -58,19 +57,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
-import pl.asie.charset.lib.item.SubItemProviderSets;
-import pl.asie.charset.lib.recipe.RecipeCharset;
-import pl.asie.charset.lib.utils.ItemStackHashSet;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -110,16 +104,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         return new SubItemProviderCache(new SubItemProviderRecipes() {
             @Override
             protected Collection<ItemStack> createForcedItems() {
-                ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
-
-                for (ItemStack barrel : BarrelRegistry.INSTANCE.getBarrels()) {
-                    TileEntityDayBarrel.Type type = TileEntityDayBarrel.getUpgrade(barrel);
-                    if (type == TileEntityDayBarrel.Type.CREATIVE) {
-                        builder.add(barrel);
-                    }
-                }
-
-                return builder.build();
+                return CharsetStorageBarrels.CREATIVE_BARRELS;
             }
 
             @Nullable
@@ -130,7 +115,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
             @Override
             protected Item getItem() {
-                return Item.getItemFromBlock(BlockBarrel.this);
+                return CharsetStorageBarrels.barrelItem;
             }
         });
     }

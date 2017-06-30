@@ -54,7 +54,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
     protected boolean mirrored = false;
     protected boolean shapeless = false;
 
-    public List<ItemStack> getAllRecipeOutputs() {
+    public Collection<ItemStack> getAllRecipeOutputs() {
         InventoryCraftingIterator inventoryCrafting = new InventoryCraftingIterator(this, true);
         ItemStackHashSet stackSet = new ItemStackHashSet(true, true, true);
         List<ItemStack> stacks = new ArrayList<>();

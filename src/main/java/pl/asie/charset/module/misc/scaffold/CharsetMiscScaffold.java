@@ -44,8 +44,8 @@ public class CharsetMiscScaffold {
 	@CharsetModule.Instance
 	public static CharsetMiscScaffold instance;
 
-	public static Block scaffoldBlock;
-	public static Item scaffoldItem;
+	public static BlockScaffold scaffoldBlock;
+	public static ItemScaffold scaffoldItem;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

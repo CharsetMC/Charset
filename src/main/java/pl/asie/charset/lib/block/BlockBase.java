@@ -70,6 +70,10 @@ public abstract class BlockBase extends Block {
 		subItemProvider = createSubItemProvider();
 	}
 
+	public final ISubItemProvider getSubItemProvider() {
+		return subItemProvider;
+	}
+
 	protected BlockBase setFullCube(boolean value) {
 		fullCube = value;
 		return this;

@@ -22,15 +22,12 @@ public class ItemBase extends Item {
 		subItemProvider = createSubItemProvider();
 	}
 
-	protected ISubItemProvider createSubItemProvider() {
-		return new SubItemProviderSimple(this);
+	public final ISubItemProvider getSubItemProvider() {
+		return subItemProvider;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	@Nullable
-	public FontRenderer getFontRenderer(ItemStack stack) {
-		return UtilProxyClient.FONT_RENDERER_FANCY;
+	protected ISubItemProvider createSubItemProvider() {
+		return new SubItemProviderSimple(this);
 	}
 
 	@Override
@@ -38,5 +35,12 @@ public class ItemBase extends Item {
 		if (isInCreativeTab(tab)) {
 			items.addAll(subItemProvider.getItems());
 		}
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	@Nullable
+	public FontRenderer getFontRenderer(ItemStack stack) {
+		return UtilProxyClient.FONT_RENDERER_FANCY;
 	}
 }

@@ -59,9 +59,7 @@ public class BarrelCartRecipe extends RecipeCharset {
 
         @Override
         public ItemStack[] getMatchingStacks() {
-            Collection<ItemStack> stacks = new ArrayList<>();
-            stacks.addAll(BarrelRegistry.INSTANCE.getBarrels());
-            stacks.removeAll(BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.SILKY));
+            Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS;
             return stacks.toArray(new ItemStack[stacks.size()]);
         }
 
@@ -79,12 +77,10 @@ public class BarrelCartRecipe extends RecipeCharset {
 
     @Override
     public List<ItemStack> getAllRecipeOutputs() {
-        Collection<ItemStack> stacks = new ArrayList<>();
+        Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS;
         List<ItemStack> stacks2 = new ArrayList<>();
-        stacks.addAll(BarrelRegistry.INSTANCE.getBarrels());
-        stacks.removeAll(BarrelRegistry.INSTANCE.getBarrels(TileEntityDayBarrel.Type.SILKY));
         for (ItemStack stack : stacks) {
-            stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrel(stack));
+            stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrelCart(stack));
         }
         return stacks2;
     }
@@ -105,7 +101,7 @@ public class BarrelCartRecipe extends RecipeCharset {
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack is = inv.getStackInSlot(i);
             if (is.getItem() == CharsetStorageBarrels.barrelItem) {
-                return CharsetStorageBarrels.barrelCartItem.makeBarrel(is);
+                return CharsetStorageBarrels.barrelCartItem.makeBarrelCart(is);
             }
         }
         return new ItemStack(CharsetStorageBarrels.barrelCartItem);

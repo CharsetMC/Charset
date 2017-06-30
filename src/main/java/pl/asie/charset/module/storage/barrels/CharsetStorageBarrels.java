@@ -1,5 +1,7 @@
 package pl.asie.charset.module.storage.barrels;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -22,11 +24,13 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.item.SubItemProviderSets;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -34,11 +38,19 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 @CharsetModule(
 		name = "storage.barrels",
 		description = "Simple barrels"
 )
 public class CharsetStorageBarrels {
+	public static final Collection<ItemStack> CREATIVE_BARRELS = new ArrayList<>();
+	public static Collection<ItemStack> BARRELS = Collections.emptyList();
+	public static Multimap<TileEntityDayBarrel.Type, ItemStack> BARRELS_TYPE = HashMultimap.create();
+
 	@CharsetModule.Instance
 	public static CharsetStorageBarrels instance;
 
@@ -110,10 +122,11 @@ public class CharsetStorageBarrels {
 
 	@SubscribeEvent
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-		BarrelRegistry.INSTANCE.register(TileEntityDayBarrel.Type.CREATIVE,
+		CREATIVE_BARRELS.add(TileEntityDayBarrel.makeBarrel(
+				TileEntityDayBarrel.Type.CREATIVE,
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)),
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.DIAMOND_BLOCK))
-		);
+		));
 
 		event.getRegistry().register(new BarrelCartRecipe("barrel_cart").setRegistryName("barrel_cart"));
 		BarrelUpgradeRecipes.addUpgradeRecipes(event.getRegistry());
@@ -122,17 +135,11 @@ public class CharsetStorageBarrels {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		barrelCartItem.setMaxStackSize(new ItemStack(Items.CHEST_MINECART).getMaxStackSize()); // Railcraft compat
+		BARRELS = barrelBlock.getSubItemProvider().getAllItems();
 
-		for (ItemMaterial log : ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("log", "block")) {
-			ItemMaterial plank = log.getRelated("plank");
-			if (plank != null) {
-				ItemMaterial slab = plank.getRelated("slab");
-				if (slab == null) {
-					slab = plank;
-				}
-				BarrelRegistry.INSTANCE.registerCraftable(log, slab);
-			}
-		}
+		BARRELS_TYPE.clear();
+		for (ItemStack is : BARRELS)
+			BARRELS_TYPE.put(TileEntityDayBarrel.getType(is), is);
 	}
 
 	@Mod.EventHandler

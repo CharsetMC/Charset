@@ -73,7 +73,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 		return new SubItemProviderCache(new SubItemProviderRecipes() {
 			@Override
 			protected Item getItem() {
-				return Item.getItemFromBlock(BlockScaffold.this);
+				return CharsetMiscScaffold.scaffoldItem;
 			}
 		});
 	}
