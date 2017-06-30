@@ -55,6 +55,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.ModCharset;
@@ -155,10 +156,25 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public class ReadableItemHandler extends BaseItemHandler {
         @Override
         public ItemStack getStackInSlot(int slot) {
+            int count = item.getCount() - (slot * 64);
+            if (count <= 0)
+                return ItemStack.EMPTY;
+            else if (count > 64)
+                count = 64;
+
             ItemStack stack = item.copy();
-            if (stack.getCount() > 64)
-                stack.setCount(64);
+            stack.setCount(count);
             return stack;
+        }
+
+        @Override
+        public int getSlots() {
+            return 64;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return !item.isEmpty() ? item.getMaxStackSize() : 64;
         }
     }
 
@@ -193,7 +209,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public enum Type {
-        NORMAL, SILKY, HOPPING, @Deprecated LARGER, STICKY, CREATIVE;
+        NORMAL, SILKY, HOPPING, STICKY, CREATIVE;
 
         public static final Type[] VALUES = values();
 
@@ -201,6 +217,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return this == HOPPING || this == CREATIVE;
         }
     }
+
+    // TODO: Remove in 1.13
+    private static final Type[] OLD_TYPE_ORDER = new Type[] {
+            Type.NORMAL, Type.SILKY, Type.HOPPING, Type.NORMAL, Type.STICKY, Type.CREATIVE
+    };
 
     private boolean updateRedstoneLevels;
     private int redstoneLevel;
@@ -222,7 +243,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         item = new ItemStack(compound.getCompoundTag("item"));
         item.setCount(compound.getInteger("count"));
         orientation = Orientation.getOrientation(compound.getByte("dir"));
-        type = Type.VALUES[compound.getByte("type")];
+        if (compound.hasKey("type", Constants.NBT.TAG_STRING)) {
+            type = Type.valueOf(compound.getString("type"));
+        } else {
+            type = OLD_TYPE_ORDER[compound.getByte("type")];
+        }
         woodLog = getLog(compound);
         woodSlab = getSlab(compound);
         last_mentioned_count = getItemCount();
@@ -280,7 +305,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         woodLog.writeToNBT(compound, "log");
         woodSlab.writeToNBT(compound, "slab");
         compound.setByte("dir", (byte) orientation.ordinal());
-        compound.setByte("type", (byte) type.ordinal());
+        compound.setString("type", type.name());
         compound.setInteger("count", item.getCount());
         return compound;
     }
@@ -847,7 +872,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         }
         barrel = barrel.copy();
         NBTTagCompound tag = ItemUtils.getTagCompound(barrel, true);
-        tag.setString("type", upgrade.toString());
+        tag.setString("type", upgrade.name());
         return barrel;
     }
 

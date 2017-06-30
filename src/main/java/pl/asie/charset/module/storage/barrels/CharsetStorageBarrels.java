@@ -73,8 +73,6 @@ public class CharsetStorageBarrels {
 			return enableSilkyBarrels;
 		} else if (type == TileEntityDayBarrel.Type.HOPPING) {
 			return enableHoppingBarrels;
-		} else if (type == TileEntityDayBarrel.Type.LARGER) {
-			return false;
 		} else {
 			return true;
 		}
