@@ -3,6 +3,7 @@
 * [lib] Improve wire occlusion logic.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
 * [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
+* [storage.barrels] Fix barrels made out of non-burnable materials being burnable.
 * [storage.barrels] Fix the barrel cap texture being incorrect for certain block types.
 * [storage.locks] Added keyrings! They store keys in style!
 * [storage.locks] Locks now play a sound when attached or removed.

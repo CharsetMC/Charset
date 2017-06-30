@@ -40,6 +40,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
@@ -72,7 +73,7 @@ import java.util.List;
 public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     public BlockBarrel() {
         // TODO: Adventure mode support (the Material trick doesn't work)
-        super(Material.WOOD);
+        super(new Material(MapColor.WOOD));
         setCreativeTab(ModCharset.CREATIVE_TAB);
         setHardness(2.5F);
         setHarvestLevel("axe", 0);

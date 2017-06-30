@@ -10,6 +10,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -85,6 +86,8 @@ public class CharsetStorageBarrels {
 		barrelItem = new ItemDayBarrel(barrelBlock);
 		barrelCartItem = new ItemMinecartDayBarrel();
 
+		barrelBlock.setHarvestLevel("axe", 0);
+
 		MinecraftForge.EVENT_BUS.register(new BarrelEventListener());
 
 		renderBarrelItem3D = config.getBoolean("renderItem3D", "render", false, "Should items use fancy 3D rendering?");
@@ -109,6 +112,18 @@ public class CharsetStorageBarrels {
 	public void registerItems(RegistryEvent.Register<Item> event) {
 		RegistryUtils.register(event.getRegistry(), barrelItem, "barrel");
 		RegistryUtils.register(event.getRegistry(), barrelCartItem, "barrelCart");
+
+		GameRegistry.registerFuelHandler((stack) -> {
+			if (stack.getItem() == barrelItem) {
+				ItemStack burnStack = new ItemStack(Blocks.PLANKS);
+				if (stack.hasTagCompound()) {
+					burnStack = TileEntityDayBarrel.getLog(stack.getTagCompound()).getStack();
+				}
+				return TileEntityFurnace.getItemBurnTime(burnStack);
+			} else {
+				return 0;
+			}
+		});
 	}
 
 	@Mod.EventHandler
