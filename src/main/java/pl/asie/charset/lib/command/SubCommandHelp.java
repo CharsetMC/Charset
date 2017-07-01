@@ -51,8 +51,8 @@ public class SubCommandHelp extends SubCommand {
                     String[] usage = command.getUsage().split("\n");
                     if (usage.length > 0) {
                         String name = TextFormatting.BOLD + command.getName() + TextFormatting.RESET;
-                        if (getAliases().size() > 0) {
-                            name += " (" + CommandCharset.COMMAS.join(getAliases()) + ")";
+                        if (command.getAliases().size() > 0) {
+                            name += " (" + CommandCharset.COMMAS.join(command.getAliases()) + ")";
                         }
 
                         sender.sendMessage(new TextComponentString("- " + name + ": " + usage[0]));

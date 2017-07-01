@@ -141,8 +141,7 @@ public class CharsetLib {
 		CommandCharset.register(new SubCommandClientCmdList("day", "Makes it day", "/time set 1200"));
 		CommandCharset.register(new SubCommandClientCmdList("night", "Makes it night", "/time set 18000"));
 		CommandCharset.register(new SubCommandClientCmdList("nice", "Makes it a sunny morning", "/time set 1200", "/weather clear"));
-		CommandCharset.register(new SubCommandClearChat().alias("cl"));
-		CommandCharset.register(new SubCommandFog().alias("f"));
+		CommandCharset.register(new SubCommandFog());
 		CommandCharset.register(new SubCommandSetupTestWorld());
 	}
 
