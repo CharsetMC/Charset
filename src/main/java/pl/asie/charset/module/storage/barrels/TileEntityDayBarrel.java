@@ -700,7 +700,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         if (removeCount <= 0)
             return;
 
-        if (player.isSneaking() && player.isCreative()) {
+        if (player.isSneaking()) {
             removeCount = 1;
         } else if (removeCount == getItemCount() && removeCount > 1) {
             removeCount--;
@@ -737,7 +737,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             if (item.isEmpty()) {
                 msg.setMessage("notice.charset.barrel.empty");
             } else {
-                String countMsg = null;
+                String countMsg;
                 if (type == Type.CREATIVE) {
                     countMsg = "notice.charset.barrel.infinite";
                 } else {

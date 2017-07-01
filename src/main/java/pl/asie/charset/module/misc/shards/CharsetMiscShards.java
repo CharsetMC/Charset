@@ -37,6 +37,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
@@ -76,11 +77,21 @@ public class CharsetMiscShards {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		ItemMaterialRegistry imr = ItemMaterialRegistry.INSTANCE;
+		ItemStack shard = new ItemStack(shardItem, 1, 0);
+
 		OreDictionary.registerOre("shardGlass", new ItemStack(shardItem, 1, OreDictionary.WILDCARD_VALUE));
-		OreDictionary.registerOre("shardGlassColorless", new ItemStack(shardItem, 1, 0));
+		OreDictionary.registerOre("shardGlassColorless", shard);
+
+		imr.registerRelation(imr.getOrCreateMaterial(new ItemStack(Blocks.GLASS)),
+				imr.getOrCreateMaterial(shard), "shard", "block");
 
 		for (int i = 0; i < 16; i++) {
-			OreDictionary.registerOre(ColorUtils.getOreDictEntry("shardGlass", EnumDyeColor.byMetadata(i)), new ItemStack(shardItem, 1, i + 1));
+			ItemStack shardColored = new ItemStack(shardItem, 1, i + 1);
+			imr.registerRelation(imr.getOrCreateMaterial(new ItemStack(Blocks.STAINED_GLASS, 1, i)),
+				imr.getOrCreateMaterial(shardColored), "shard", "block");
+
+			OreDictionary.registerOre(ColorUtils.getOreDictEntry("shardGlass", EnumDyeColor.byMetadata(i)), shardColored);
 		}
 	}
 

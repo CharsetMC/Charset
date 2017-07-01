@@ -282,6 +282,7 @@ public final class ItemMaterialHeuristics {
             }
 
         bar.step("Stones");
+
         if (modded)
             for (String oreName : OreDictionary.getOreNames()) {
                 if (oreName.startsWith("stone")) {
@@ -318,7 +319,7 @@ public final class ItemMaterialHeuristics {
                     writer.println(material.getId());
                     writer.println("- Types: " + commaJoiner.join(material.getTypes()));
                     for (Map.Entry<String, ItemMaterial> entry : ItemMaterialRegistry.INSTANCE.materialRelations.row(material).entrySet()) {
-                        writer.println("- Relation: " + entry.getKey() + " -> " + material.getId());
+                        writer.println("- Relation: " + entry.getKey() + " -> " + entry.getValue().getId());
                     }
                 }
 

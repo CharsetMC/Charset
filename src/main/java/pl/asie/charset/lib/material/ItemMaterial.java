@@ -4,6 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.Collection;
+import java.util.Map;
 
 public final class ItemMaterial {
 	private final String id;
@@ -16,6 +17,10 @@ public final class ItemMaterial {
 
 	public Collection<String> getTypes() {
 		return ItemMaterialRegistry.INSTANCE.getMaterialTypes(this);
+	}
+
+	public Map<String, ItemMaterial> getRelations() {
+		return ItemMaterialRegistry.INSTANCE.materialRelations.row(this);
 	}
 
 	public ItemMaterial getRelated(String relation) {
