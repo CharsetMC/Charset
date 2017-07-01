@@ -198,7 +198,6 @@ public class ModuleLoader {
 				ASMDataTable.ASMData data = moduleData.get(name);
 				try {
 					Object o = getClass(data).newInstance();
-					MinecraftForge.EVENT_BUS.register(o);
 					loadedModules.put(name, o);
 					loadedModulesByClass.put(data.getClassName(), o);
 				} catch (Exception e) {
@@ -224,6 +223,10 @@ public class ModuleLoader {
 				depStrings.add(depMod + "<-[" + joinerComma.join(unmetDependencies.get(depMod)) + "]");
 			}
 			throw new RuntimeException("The following mandatory dependencies were not met: " + joinerComma.join(depStrings));
+		}
+
+		for (Object o : loadedModules.values()) {
+			MinecraftForge.EVENT_BUS.register(o);
 		}
 
 		iterateModules(table, Mod.EventHandler.class.getName(), (data, instance) -> {
