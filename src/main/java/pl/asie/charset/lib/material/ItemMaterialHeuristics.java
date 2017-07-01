@@ -8,6 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.oredict.OreDictionary;
@@ -23,6 +24,7 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public final class ItemMaterialHeuristics {
     private static int initPhase = 0;
@@ -94,7 +96,7 @@ public final class ItemMaterialHeuristics {
         // We look for the plank first to ensure only valid logs
         // get registered.
 
-        ItemStack plank = RecipeUtils.getCraftingResult(null, 3, 3, log);
+        ItemStack plank = RecipeUtils.getCraftingResult(null, 1, 1, log);
         if (isBlock(plank) && ItemUtils.isOreType(plank, "plankWood")) {
             ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
             if (reg.registerTypes(logMaterial, "log", "wood", "block")) {
@@ -103,7 +105,7 @@ public final class ItemMaterialHeuristics {
                 if (reg.registerTypes(plankMaterial, "plank", "wood", "block")) {
                     reg.registerRelation(logMaterial, plankMaterial, "plank", "log");
 
-                    ItemStack stick = RecipeUtils.getCraftingResult(null, 2, 2,
+                    ItemStack stick = RecipeUtils.getCraftingResult(null, 1, 1,
                             plank, null,
                             plank, null);
                     if (stick.isEmpty()) {
@@ -149,7 +151,7 @@ public final class ItemMaterialHeuristics {
         if (reg.registerTypes(ingotMat, prefix, suffix, "item")) {
             // Try crafting a nugget
             if (prefix.equals("ingot")) {
-                ItemStack nugget = RecipeUtils.getCraftingResult(null, 1, 1,
+                ItemStack nugget = RecipeUtils.getCraftingResult(null, 2, 2,
                         stack);
                 if (!nugget.isEmpty() && containsOreDict(nugget, "nugget" + suffixU)) {
                     ItemMaterial nuggetMat = reg.getOrCreateMaterial(nugget);

@@ -60,24 +60,22 @@ public class LockEventHandler {
 
     public static Lockable getLock(TileEntity tile) {
         if (tile != null) {
-            if (tile.hasCapability(Capabilities.LOCKABLE, null)) {
-                Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
-                if (lock.hasLock() && lock.getLock().isLockValid(tile) && lock.getLock().isLocked()) {
-                    return lock;
-                }
-            }
-
             if (tile.hasCapability(Capabilities.MULTIBLOCK_STRUCTURE, null)) {
                 IMultiblockStructure structure = tile.getCapability(Capabilities.MULTIBLOCK_STRUCTURE, null);
                 Iterator<BlockPos> iterator = structure.iterator();
                 while (iterator.hasNext()) {
                     TileEntity tile2 = tile.getWorld().getTileEntity(iterator.next());
-                    if (tile2.hasCapability(Capabilities.LOCKABLE, null)) {
+                    if (tile2 != null && tile2.hasCapability(Capabilities.LOCKABLE, null)) {
                         Lockable lock = tile2.getCapability(Capabilities.LOCKABLE, null);
                         if (lock.hasLock() && lock.getLock().isLockValid(tile2) && lock.getLock().isLocked()) {
                             return lock;
                         }
                     }
+                }
+            } else if (tile.hasCapability(Capabilities.LOCKABLE, null)) {
+                Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
+                if (lock.hasLock() && lock.getLock().isLockValid(tile) && lock.getLock().isLocked()) {
+                    return lock;
                 }
             }
         }

@@ -928,7 +928,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return true;
         }
 
-        if (player == null || !player.capabilities.isCreativeMode) {
+        if (player == null || !player.isCreative()) {
             return true;
         }
 

@@ -7,6 +7,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
+
+import java.util.function.Predicate;
 
 public final class RecipeUtils {
     private RecipeUtils() {
@@ -35,11 +39,23 @@ public final class RecipeUtils {
     }
 
     public static ItemStack getCraftingResult(World world, InventoryCrafting crafting) {
-        IRecipe recipe = CraftingManager.findMatchingRecipe(crafting, world);
+        IRecipe recipe = findMatchingRecipe(crafting, world);
         if (recipe != null) {
             return recipe.getCraftingResult(crafting);
         }
 
         return ItemStack.EMPTY;
+    }
+
+    public static IRecipe findMatchingRecipe(InventoryCrafting craftMatrix, World worldIn) {
+        int width = craftMatrix.getWidth();
+        int height = craftMatrix.getHeight();
+        for (IRecipe irecipe : ForgeRegistries.RECIPES) {
+            if (irecipe.canFit(width, height) && irecipe.matches(craftMatrix, worldIn)) {
+                return irecipe;
+            }
+        }
+
+        return null;
     }
 }
