@@ -20,6 +20,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -38,7 +39,7 @@ import pl.asie.charset.lib.audio.types.AudioDataDFPWM;
 import pl.asie.charset.lib.audio.types.AudioDataGameSound;
 import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.command.CommandCharset;
+import pl.asie.charset.lib.command.*;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.material.ColorLookupHandler;
@@ -136,6 +137,13 @@ public class CharsetLib {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new SplashTextHandler());
+
+		CommandCharset.register(new SubCommandClientCmdList("day", "Makes it day", "/time set 1200"));
+		CommandCharset.register(new SubCommandClientCmdList("night", "Makes it night", "/time set 18000"));
+		CommandCharset.register(new SubCommandClientCmdList("nice", "Makes it a sunny morning", "/time set 1200", "/weather clear"));
+		CommandCharset.register(new SubCommandClearChat().alias("cl"));
+		CommandCharset.register(new SubCommandFog().alias("f"));
+		CommandCharset.register(new SubCommandSetupTestWorld());
 	}
 
 	@Mod.EventHandler
@@ -156,6 +164,11 @@ public class CharsetLib {
 		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class, AudioDataDFPWM::new);
 		AudioAPI.DATA_REGISTRY.register(AudioDataGameSound.class, AudioDataGameSound::new);
 		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class, AudioSinkBlock::new);
+
+		MinecraftForge.EVENT_BUS.register(CommandCharset.INSTANCE);
+
+		CommandCharset.register(new SubCommandHelp());
+		CommandCharset.register(new SubCommandHand());
 	}
 
 	@Mod.EventHandler
@@ -171,7 +184,7 @@ public class CharsetLib {
 
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
-		event.registerServerCommand(new CommandCharset());
+		event.registerServerCommand(CommandCharset.INSTANCE);
 		NotifyImplementation.instance.registerServerCommands(event);
 	}
 

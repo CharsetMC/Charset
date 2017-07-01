@@ -1,6 +1,6 @@
 * Minecraft 1.12 port.
 * Major improvements to Just Enough Items support.
-* [lib] Added useful commands: /charset hand, /charset hand material, /charset hand ore
+* [lib] Added many useful commands!
 * [lib] Improve wire occlusion logic.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
 * [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
