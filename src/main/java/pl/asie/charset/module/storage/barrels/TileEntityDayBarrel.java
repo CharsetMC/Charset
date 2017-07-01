@@ -707,7 +707,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         if (removeCount <= 0)
             return;
 
-        if (player.isSneaking() && player.isCreative()) {
+        if (player.isSneaking()) {
             removeCount = 1;
         } else if (removeCount == getItemCount() && removeCount > 1) {
             removeCount--;
@@ -933,7 +933,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return true;
         }
 
-        if (player == null || !player.capabilities.isCreativeMode) {
+        if (player == null || !player.isCreative()) {
             return true;
         }
 

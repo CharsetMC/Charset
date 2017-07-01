@@ -96,7 +96,7 @@ public final class ItemMaterialHeuristics {
         // We look for the plank first to ensure only valid logs
         // get registered.
 
-        ItemStack plank = RecipeUtils.getCraftingResult(null, 2, 2, log);
+        ItemStack plank = RecipeUtils.getCraftingResult(null, 1, 1, log);
         if (isBlock(plank) && ItemUtils.isOreType(plank, "plankWood")) {
             ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
             if (reg.registerTypes(logMaterial, "log", "wood", "block")) {
@@ -105,7 +105,7 @@ public final class ItemMaterialHeuristics {
                 if (reg.registerTypes(plankMaterial, "plank", "wood", "block")) {
                     reg.registerRelation(logMaterial, plankMaterial, "plank", "log");
 
-                    ItemStack stick = RecipeUtils.getCraftingResult(null, 2, 2,
+                    ItemStack stick = RecipeUtils.getCraftingResult(null, 1, 1,
                             plank, null,
                             plank, null);
                     if (stick.isEmpty()) {

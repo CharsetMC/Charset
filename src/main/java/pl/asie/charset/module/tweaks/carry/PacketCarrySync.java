@@ -12,6 +12,7 @@ import pl.asie.charset.lib.utils.Utils;
 public class PacketCarrySync extends Packet {
 	private Entity player;
 	private NBTTagCompound tag;
+	private int playerId, dimension;
 
 	public PacketCarrySync() {
 
@@ -24,19 +25,22 @@ public class PacketCarrySync extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		int dimension = buf.readInt();
-		World world = Utils.getLocalWorld(dimension);
-		int playerId = buf.readInt();
-		if (world != null) {
-			player = world.getEntityByID(playerId);
-		}
+		dimension = buf.readInt();
+		playerId = buf.readInt();
 		tag = ByteBufUtils.readTag(buf);
 	}
 
 	@Override
 	public void apply(INetHandler handler) {
+		World world = Utils.getLocalWorld(dimension);
+		if (world != null) {
+			player = world.getEntityByID(playerId);
+		}
 		if (player == null) {
 			player = getPlayer(handler);
+			if (player.getEntityId() != playerId) {
+				player = null;
+			}
 		}
 		if (player != null && player.hasCapability(CharsetTweakBlockCarrying.CAPABILITY, null)) {
 			CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
