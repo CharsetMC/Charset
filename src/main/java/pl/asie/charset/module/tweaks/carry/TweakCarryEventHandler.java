@@ -24,6 +24,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -118,37 +119,56 @@ public class TweakCarryEventHandler {
         }
     }
 
+    private boolean startCarry(boolean allowCreative) {
+        boolean result = false;
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
+        if (!player.isCreative()) {
+            result = true;
+        } else if (!allowCreative) {
+            return false;
+        }
+
+        if (player.getHeldItem(EnumHand.MAIN_HAND).isEmpty()
+                && player.getHeldItem(EnumHand.OFF_HAND).isEmpty()
+                && !player.isPlayerSleeping()
+                && !player.isRiding()
+                && Minecraft.getMinecraft().currentScreen == null
+                && carryHandler != null) {
+
+            if (player.isCreative()) {
+                result = true;
+            }
+
+            RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
+            if (mouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
+                CharsetTweakBlockCarrying.grabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
+            } else if (mouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
+                Entity entity = mouseOver.entityHit;
+                CharsetTweakBlockCarrying.grabEntity(player, player.getEntityWorld(), entity);
+            }
+        }
+
+        return result;
+    }
+
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void onMouse(MouseEvent event) {
-        if (event.isButtonstate() && event.getButton() == 2
+        if (event.isButtonstate() && Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isActiveAndMatches(-100 + event.getButton())
                 && Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown()) {
-
-            EntityPlayer player = Minecraft.getMinecraft().player;
-            CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
-            if (!player.isCreative()) {
+            if (startCarry(true)) {
                 event.setCanceled(true);
             }
+        }
+    }
 
-            if (player.getHeldItem(EnumHand.MAIN_HAND).isEmpty()
-                    && player.getHeldItem(EnumHand.OFF_HAND).isEmpty()
-                    && !player.isPlayerSleeping()
-                    && !player.isRiding()
-                    && Minecraft.getMinecraft().currentScreen == null
-                    && carryHandler != null) {
-
-                if (player.isCreative()) {
-                    event.setCanceled(true);
-                }
-
-                RayTraceResult mouseOver = Minecraft.getMinecraft().objectMouseOver;
-                if (mouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    CharsetTweakBlockCarrying.grabBlock(player, player.getEntityWorld(), mouseOver.getBlockPos());
-                } else if (mouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
-                    Entity entity = mouseOver.entityHit;
-                    CharsetTweakBlockCarrying.grabEntity(player, player.getEntityWorld(), entity);
-                }
-            }
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onKey(InputEvent.KeyInputEvent event) {
+        if (Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown()
+                && Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown()) {
+            startCarry(false);
         }
     }
 
