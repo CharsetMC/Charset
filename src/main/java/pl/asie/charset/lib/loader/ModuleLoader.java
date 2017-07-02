@@ -183,7 +183,11 @@ public class ModuleLoader {
 					Property prop = ModCharset.configModules.get("overrides", name, "DEFAULT");
 
 					if (desc.length() > 0) desc += " ";
-					desc += "[Profile: " + modProfile.name().toUpperCase() + "]";
+					desc += "[Profile: " + modProfile.name().toUpperCase() + "";
+					if (!isDefault) {
+						desc += ", off by default!";
+					}
+					desc += "]";
 
 					if (!desc.equals(prop.getComment())) {
 						prop.setComment(desc);
