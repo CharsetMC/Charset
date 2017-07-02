@@ -131,11 +131,18 @@ public class ContainerPocketTable extends ContainerBase {
             super.onCrafting(stack);
             int i = 0;
             for (Slot slot : craftingSlots) {
-                ItemStack repl = craftMatrix.getStackInSlot(i++);
+                ItemStack repl = craftMatrix.getStackInSlot(i);
                 playerInv.setInventorySlotContents(slot.getSlotIndex(), repl);
             }
             isCrafting = false;
+            craftResult.setInventorySlotContents(0, faker);
+        }
+
+        @Override
+        public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
+            ItemStack stackOut = super.onTake(thePlayer, stack);
             updateCraft();
+            return stackOut;
         }
     }
     
