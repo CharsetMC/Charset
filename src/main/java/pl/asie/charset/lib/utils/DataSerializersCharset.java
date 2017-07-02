@@ -42,34 +42,11 @@ public final class DataSerializersCharset {
         }
     };
 
-    public static final DataSerializer<NBTTagCompound> NBT_TAG_COMPOUND = new DataSerializer<NBTTagCompound>() {
-        @Override
-        public void write(PacketBuffer buf, NBTTagCompound value) {
-            ByteBufUtils.writeTag(buf, value);
-        }
-
-        @Override
-        public NBTTagCompound read(PacketBuffer buf) {
-            return ByteBufUtils.readTag(buf);
-        }
-
-        @Override
-        public DataParameter<NBTTagCompound> createKey(int id) {
-            return new DataParameter(id, this);
-        }
-
-        @Override
-        public NBTTagCompound copyValue(NBTTagCompound value) {
-            return value.copy();
-        }
-    };
-
     private static boolean initialized = false;
 
     public static void init() {
         if (!initialized) {
             DataSerializers.registerSerializer(OUATERNION);
-            DataSerializers.registerSerializer(NBT_TAG_COMPOUND);
             initialized = true;
         }
     }

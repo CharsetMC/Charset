@@ -67,9 +67,7 @@ public class BarrelCartRecipe extends RecipeCharset {
         @Override
         public boolean apply(ItemStack stack) {
             if (!stack.isEmpty() && stack.getItem() == CharsetStorageBarrels.barrelItem) {
-                TileEntityDayBarrel rep = new TileEntityDayBarrel();
-                rep.loadFromStack(stack);
-                return rep.type != TileEntityDayBarrel.Type.SILKY;
+                return true;
             } else {
                 return false;
             }

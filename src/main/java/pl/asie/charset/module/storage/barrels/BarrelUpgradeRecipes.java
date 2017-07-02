@@ -36,25 +36,23 @@
 
 package pl.asie.charset.module.storage.barrels;
 
+import com.google.common.collect.Lists;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.IForgeRegistry;
-import pl.asie.charset.lib.item.ISubItemProvider;
-import pl.asie.charset.lib.item.SubItemProviderCache;
-import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.recipe.IngredientCharset;
 import pl.asie.charset.lib.recipe.IngredientMatcher;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 // TODO: Turn into JSONs
 public class BarrelUpgradeRecipes {
@@ -69,16 +67,19 @@ public class BarrelUpgradeRecipes {
 
         @Override
         public ItemStack[] getMatchingStacks() {
-            Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS_TYPE.get(TileEntityDayBarrel.Type.NORMAL);
+            Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS_NORMAL;
+            Collection<ItemStack> stacks2 = Lists.newArrayList();
+            for (ItemStack s : stacks) {
+                stacks2.add(s);
+                stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrelCart(s));
+            }
             return stacks.toArray(new ItemStack[stacks.size()]);
         }
 
         @Override
         public boolean apply(ItemStack stack) {
-            if (!stack.isEmpty() && stack.getItem() == CharsetStorageBarrels.barrelItem) {
-                TileEntityDayBarrel rep = new TileEntityDayBarrel();
-                rep.loadFromStack(stack);
-                return rep.type == TileEntityDayBarrel.Type.NORMAL;
+            if (!stack.isEmpty() && (stack.getItem() == CharsetStorageBarrels.barrelItem || stack.getItem() == CharsetStorageBarrels.barrelCartItem)) {
+                return true;
             } else {
                 return false;
             }
@@ -86,24 +87,24 @@ public class BarrelUpgradeRecipes {
     };
 
     public static void addUpgradeRecipes(IForgeRegistry<IRecipe> registry) {
-        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Type.SILKY)) {
-            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Type.SILKY, 3, 3, new Ingredient[]{
+        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Upgrade.SILKY)) {
+            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Upgrade.SILKY, 3, 3, new Ingredient[]{
                     web, web, web,
                     web, barrel, web,
                     web, web, web
             }).setRegistryName("charset:barrel_upgrade_silky"));
         }
 
-        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Type.HOPPING)) {
-            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Type.HOPPING, 1, 3, new Ingredient[]{
+        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Upgrade.HOPPING)) {
+            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Upgrade.HOPPING, 1, 3, new Ingredient[]{
                     hopper,
                     barrel,
                     hopper
             }).setRegistryName("charset:barrel_upgrade_hopping"));
         }
 
-        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Type.STICKY)) {
-            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Type.STICKY, 1, 3, new Ingredient[]{
+        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Upgrade.STICKY)) {
+            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Upgrade.STICKY, 1, 3, new Ingredient[]{
                     slime_ball,
                     barrel,
                     slime_ball
@@ -112,9 +113,9 @@ public class BarrelUpgradeRecipes {
     }
 
     public static class BarrelUpgrade extends RecipeCharset {
-        final TileEntityDayBarrel.Type upgradeType;
+        final TileEntityDayBarrel.Upgrade upgradeType;
 
-        public BarrelUpgrade(String group, TileEntityDayBarrel.Type upgrade, int width, int height, Ingredient[] inputs) {
+        public BarrelUpgrade(String group, TileEntityDayBarrel.Upgrade upgrade, int width, int height, Ingredient[] inputs) {
             super(group);
             super.width = width;
             super.height = height;
@@ -128,7 +129,7 @@ public class BarrelUpgradeRecipes {
         ItemStack grabBarrel(InventoryCrafting container) {
             for (int i = 0; i < container.getSizeInventory(); i++) {
                 ItemStack is = container.getStackInSlot(i);
-                if (is.getItem() != CharsetStorageBarrels.barrelItem) {
+                if (is.getItem() != CharsetStorageBarrels.barrelItem && is.getItem() != CharsetStorageBarrels.barrelCartItem) {
                     continue;
                 }
                 return is;
@@ -138,7 +139,12 @@ public class BarrelUpgradeRecipes {
 
         @Override
         public Collection<ItemStack> getAllRecipeOutputs() {
-            return CharsetStorageBarrels.BARRELS_TYPE.get(upgradeType);
+            Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS_NORMAL;
+            Collection<ItemStack> stacks2 = new ArrayList<>();
+            for (ItemStack s : stacks) {
+                stacks2.add(TileEntityDayBarrel.addUpgrade(s, upgradeType));
+            }
+            return stacks2;
         }
 
         @Nullable
@@ -148,10 +154,7 @@ public class BarrelUpgradeRecipes {
             if (matcher != null) {
                 ItemStack is = grabBarrel(input);
                 if (is.isEmpty()) return ItemStack.EMPTY; // Shouldn't happen?
-                TileEntityDayBarrel rep = new TileEntityDayBarrel();
-                rep.loadFromStack(is);
-                rep.type = upgradeType;
-                return rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState());
+                return TileEntityDayBarrel.addUpgrade(is, upgradeType);
             } else {
                 return ItemStack.EMPTY;
             }

@@ -98,9 +98,8 @@ tile.charset.barrel.format2=%1$s %2$s Barrel
 tile.charset.barrel.SILKY.name=Silky
 tile.charset.barrel.SILKY.silkhint=Use a silk touch axe
 tile.charset.barrel.HOPPING.name=Hopping
-tile.charset.barrel.LARGER.name=Larger
 tile.charset.barrel.STICKY.name=Sticky
-tile.charset.barrel.CREATIVE.name=Creative
+tile.charset.barrel.INFINITE.name=Infinite
 
 # CharsetTweaks
 item.charset.graphite.name=Graphite

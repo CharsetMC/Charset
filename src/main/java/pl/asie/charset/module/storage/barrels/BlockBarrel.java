@@ -85,16 +85,18 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     private ImmutableSet<ItemStack> generateTypeSet(ItemStack barrel) {
         TileEntityDayBarrel rep = new TileEntityDayBarrel();
         rep.loadFromStack(barrel);
-        if (rep.type != TileEntityDayBarrel.Type.NORMAL) {
+        if (rep.upgrades.size() > 0) {
             return null;
         }
         ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
+        builder.add(rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState())); // No upgrade barrel
 
-        for (TileEntityDayBarrel.Type type : TileEntityDayBarrel.Type.values()) {
-            if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
-            if (!CharsetStorageBarrels.isEnabled(type)) continue;
-            rep.type = type;
+        for (TileEntityDayBarrel.Upgrade upgrade : TileEntityDayBarrel.Upgrade.values()) {
+            if (upgrade == TileEntityDayBarrel.Upgrade.INFINITE) continue;
+            if (!CharsetStorageBarrels.isEnabled(upgrade)) continue;
+            rep.upgrades.add(upgrade);
             builder.add(rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState()));
+            rep.upgrades.clear();
         }
 
         return builder.build();
@@ -133,7 +135,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {
-            if (((TileEntityDayBarrel) tile).type == TileEntityDayBarrel.Type.CREATIVE) {
+            if (((TileEntityDayBarrel) tile).upgrades.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
                 return -1.0F;
             }
         }

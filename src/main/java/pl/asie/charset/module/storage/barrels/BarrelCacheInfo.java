@@ -36,18 +36,18 @@
 
 package pl.asie.charset.module.storage.barrels;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.IRenderComparable;
-import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import java.util.Set;
+
 class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     final TextureAtlasSprite log, plank;
-    final TileEntityDayBarrel.Type type;
+    final Set<TileEntityDayBarrel.Upgrade> upgrades;
     final Orientation orientation;
     final boolean isMetal;
 
@@ -64,7 +64,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         if (isMetal != cacheInfo.isMetal) return false;
         if (!log.equals(cacheInfo.log)) return false;
         if (!plank.equals(cacheInfo.plank)) return false;
-        if (type != cacheInfo.type) return false;
+        if (!upgrades.equals(cacheInfo.upgrades)) return false;
         return orientation == cacheInfo.orientation;
     }
 
@@ -73,17 +73,17 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         // log & plank don't have hashCode(), but they're unique.
         int result = log.hashCode();
         result = 31 * result + plank.hashCode();
-        result = 31 * result + type.hashCode();
+        // result = 31 * result + upgrades.hashCode();
         result = 31 * result + orientation.hashCode();
         result = 31 * result + (isMetal ? 1 : 0);
         return result;
     }
 
-    private BarrelCacheInfo(TextureAtlasSprite log, ItemStack logStack, TextureAtlasSprite plank, TileEntityDayBarrel.Type type, Orientation orientation, boolean isMetal) {
+    private BarrelCacheInfo(TextureAtlasSprite log, ItemStack logStack, TextureAtlasSprite plank, Set<TileEntityDayBarrel.Upgrade> upgrade, Orientation orientation, boolean isMetal) {
         this.log = log;
         this.logStack = logStack;
         this.plank = plank;
-        this.type = type;
+        this.upgrades = upgrade;
         this.orientation = orientation;
         this.isMetal = isMetal;
     }
@@ -91,9 +91,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     public static BarrelCacheInfo from(TileEntityDayBarrel barrel) {
         TextureAtlasSprite log = RenderUtils.getItemSprite(barrel.woodLog.getStack());
         TextureAtlasSprite slab = RenderUtils.getItemSprite(barrel.woodSlab.getStack());
-        Orientation fzo = barrel.orientation;
-        TileEntityDayBarrel.Type type = barrel.type;
-        return new BarrelCacheInfo(log, barrel.woodLog.getStack(), slab, type, fzo, isMetal(barrel.woodLog.getStack()));
+        return new BarrelCacheInfo(log, barrel.woodLog.getStack(), slab, barrel.upgrades, barrel.orientation, isMetal(barrel.woodLog.getStack()));
     }
 
     public static BarrelCacheInfo from(ItemStack is) {

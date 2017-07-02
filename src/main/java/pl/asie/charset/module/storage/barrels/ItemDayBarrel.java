@@ -36,7 +36,6 @@
 
 package pl.asie.charset.module.storage.barrels;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
@@ -48,7 +47,9 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ItemBlockBase;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public class ItemDayBarrel extends ItemBlockBase {
     public ItemDayBarrel(BlockBase block) {
@@ -68,13 +69,25 @@ public class ItemDayBarrel extends ItemBlockBase {
 
     @Override
     public String getItemStackDisplayName(ItemStack is) {
-        TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getType(is);
+        Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+        if (is.hasTagCompound()) {
+            TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());
+        }
+
         String lookup = "tile.charset.barrel.format";
-        if (upgrade != TileEntityDayBarrel.Type.NORMAL) {
+        if (!upgradeSet.isEmpty()) {
             lookup = "tile.charset.barrel.format2";
         }
-        String type = I18n.translateToLocal("tile.charset.barrel." + upgrade + ".name");
-        return I18n.translateToLocalFormatted(lookup, type, TileEntityDayBarrel.getLog(is.getTagCompound()).getStack().getDisplayName());
+
+        StringBuilder type = new StringBuilder();
+        for (TileEntityDayBarrel.Upgrade upgrade : upgradeSet) {
+            if (type.length() > 0) {
+                type.append(" ");
+            }
+            type.append(I18n.translateToLocal("tile.charset.barrel." + upgrade + ".name"));
+        }
+
+        return I18n.translateToLocalFormatted(lookup, type.toString(), TileEntityDayBarrel.getLog(is.getTagCompound()).getStack().getDisplayName());
     }
 
     @Override
@@ -85,8 +98,11 @@ public class ItemDayBarrel extends ItemBlockBase {
 
     @SideOnly(Side.CLIENT) // Invokes a client-only function getTooltip
     protected void addExtraInformation(ItemStack is, World world, List<String> list, ITooltipFlag verbose) {
-        TileEntityDayBarrel.Type upgrade = TileEntityDayBarrel.getType(is);
-        if (upgrade == TileEntityDayBarrel.Type.SILKY) {
+        Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+        if (is.hasTagCompound()) {
+            TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());
+        }
+        if (upgradeSet.contains(TileEntityDayBarrel.Upgrade.SILKY)) {
             list.add(I18n.translateToLocal("tile.charset.barrel.SILKY.silkhint"));
             TileEntityDayBarrel db = new TileEntityDayBarrel();
             db.loadFromStack(is);

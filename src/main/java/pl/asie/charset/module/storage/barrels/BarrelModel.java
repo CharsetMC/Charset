@@ -53,8 +53,7 @@ import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.WrappedBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-import java.util.EnumMap;
-import java.util.HashMap;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
@@ -63,7 +62,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
     public final ModelColorHandler<BarrelCacheInfo> colorizer = new ModelColorHandler<BarrelCacheInfo>(this) {
         @Override
         public int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
-            if (!info.isMetal && !info.type.isHopping()) {
+            if (!info.isMetal && !info.upgrades.contains(TileEntityDayBarrel.Upgrade.HOPPING)) {
                 return ColorLookupHandler.INSTANCE.getColor(info.logStack, RenderUtils.AveragingMode.V_EDGES_ONLY);
             }
             return -1;
@@ -75,46 +74,20 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         addDefaultBlockTransforms();
     }
 
-    public static class BarrelGroup {
-        public TextureAtlasSprite front, top, side, top_metal;
+    public TextureAtlasSprite font = null, front = null, front_silky = null, front_silky_sticky = null, front_sticky = null;
+    public TextureAtlasSprite side = null, side_hopping = null, side_sticky = null, top = null, top_hopping = null, top_metal = null;
 
-        public BarrelGroup(String type, TextureMap map) {
-            front = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/front"));
-            side = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/side"));
-            top = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/top"));
-            top_metal = map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + type + "/top_metal"));
-        }
-
-        public static void add(Map<TileEntityDayBarrel.Type, BarrelGroup> map, TileEntityDayBarrel.Type type, TextureMap tMap) {
-            map.put(type, new BarrelGroup(type.name().toLowerCase(), tMap));
-        }
-    }
-
-    public final Map<TileEntityDayBarrel.Type, BarrelGroup> TEXTURE_MAP = Maps.newEnumMap(TileEntityDayBarrel.Type.class);
-    public TextureAtlasSprite font;
     public IModel template;
 
     public void onTextureLoad(TextureMap map) {
-        TEXTURE_MAP.clear();
-        BarrelGroup.add(TEXTURE_MAP, TileEntityDayBarrel.Type.HOPPING, map);
-        BarrelGroup.add(TEXTURE_MAP, TileEntityDayBarrel.Type.STICKY, map);
-        BarrelGroup.add(TEXTURE_MAP, TileEntityDayBarrel.Type.SILKY, map);
-        BarrelGroup.add(TEXTURE_MAP, TileEntityDayBarrel.Type.NORMAL, map);
-        font = map.registerSprite(new ResourceLocation("charset:blocks/barrel/font"));
-    }
-
-    private TileEntityDayBarrel.Type getTextureMapType(TileEntityDayBarrel.Type type) {
-        if (type.isHopping()) {
-            return TileEntityDayBarrel.Type.HOPPING;
-        } else {
-            switch (type) {
-                case SILKY:
-                    return TileEntityDayBarrel.Type.SILKY;
-                case STICKY:
-                    return TileEntityDayBarrel.Type.STICKY;
-                default:
-                    return TileEntityDayBarrel.Type.NORMAL;
+        try {
+            for (Field f : BarrelModel.class.getFields()) {
+                if (f.getType() == TextureAtlasSprite.class) {
+                    f.set(this, map.registerSprite(new ResourceLocation("charset:blocks/barrel/" + f.getName())));
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -122,10 +95,17 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
     public IBakedModel bake(BarrelCacheInfo info, boolean isItem, BlockRenderLayer layer) {
         TextureAtlasSprite log = info.log;
         TextureAtlasSprite plank = info.plank;
-        BarrelGroup group = TEXTURE_MAP.get(getTextureMapType(info.type));
-        TextureAtlasSprite top = info.isMetal ? group.top_metal : group.top;
-        TextureAtlasSprite front = group.front;
-        TextureAtlasSprite side = group.side;
+        TextureAtlasSprite top = info.isMetal ? this.top_metal : this.top;
+        TextureAtlasSprite front = this.front;
+        TextureAtlasSprite side = this.side;
+
+        if (info.upgrades.contains(TileEntityDayBarrel.Upgrade.STICKY)) {
+            side = this.side_sticky;
+            front = info.upgrades.contains(TileEntityDayBarrel.Upgrade.SILKY) ? this.front_silky_sticky : this.front_sticky;
+        } else if (info.upgrades.contains(TileEntityDayBarrel.Upgrade.SILKY)) {
+            front = this.front_silky;
+        }
+
         ImmutableMap.Builder<String, String> textures = new ImmutableMap.Builder<>();
         if (isItem || layer == BlockRenderLayer.SOLID) {
             textures.put("log", log.getIconName());
@@ -136,6 +116,13 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         }
 
         if (isItem || layer == BlockRenderLayer.TRANSLUCENT) {
+            if (info.upgrades.contains(TileEntityDayBarrel.Upgrade.HOPPING)) {
+                top = this.top_hopping;
+                textures.put("hopping", side_hopping.getIconName());
+            } else {
+                textures.put("#hopping", ""); textures.put("hopping", "");
+            }
+
             textures.put("top", top.getIconName());
             textures.put("front", front.getIconName());
             textures.put("side", side.getIconName());
@@ -143,6 +130,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
             textures.put("#top", ""); textures.put("top", "");
             textures.put("#front", ""); textures.put("front", "");
             textures.put("#side", ""); textures.put("side", "");
+            textures.put("#hopping", ""); textures.put("hopping", "");
         }
 
         IModelState state = info.orientation.toTransformation();

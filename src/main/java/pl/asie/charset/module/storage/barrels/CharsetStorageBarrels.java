@@ -1,7 +1,6 @@
 package pl.asie.charset.module.storage.barrels;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -36,9 +35,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 @CharsetModule(
 		name = "storage.barrels",
@@ -48,7 +45,7 @@ import java.util.Collections;
 public class CharsetStorageBarrels {
 	public static final Collection<ItemStack> CREATIVE_BARRELS = new ArrayList<>();
 	public static Collection<ItemStack> BARRELS = Collections.emptyList();
-	public static Multimap<TileEntityDayBarrel.Type, ItemStack> BARRELS_TYPE = HashMultimap.create();
+	public static Collection<ItemStack> BARRELS_NORMAL = Lists.newArrayList();
 
 	@CharsetModule.Instance
 	public static CharsetStorageBarrels instance;
@@ -67,10 +64,10 @@ public class CharsetStorageBarrels {
 	public static boolean enableSilkyBarrels, enableHoppingBarrels;
 	public static int maxDroppedStacks;
 
-	public static boolean isEnabled(TileEntityDayBarrel.Type type) {
-		if (type == TileEntityDayBarrel.Type.SILKY) {
+	public static boolean isEnabled(TileEntityDayBarrel.Upgrade upgrade) {
+		if (upgrade == TileEntityDayBarrel.Upgrade.SILKY) {
 			return enableSilkyBarrels;
-		} else if (type == TileEntityDayBarrel.Type.HOPPING) {
+		} else if (upgrade == TileEntityDayBarrel.Upgrade.HOPPING) {
 			return enableHoppingBarrels;
 		} else {
 			return true;
@@ -136,7 +133,7 @@ public class CharsetStorageBarrels {
 	@SubscribeEvent
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
 		CREATIVE_BARRELS.add(TileEntityDayBarrel.makeBarrel(
-				TileEntityDayBarrel.Type.CREATIVE,
+				EnumSet.of(TileEntityDayBarrel.Upgrade.HOPPING, TileEntityDayBarrel.Upgrade.INFINITE),
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)),
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.DIAMOND_BLOCK))
 		));
@@ -153,9 +150,14 @@ public class CharsetStorageBarrels {
 	private void populateBarrelStackLists() {
 		BARRELS = barrelBlock.getSubItemProvider().getAllItems();
 
-		BARRELS_TYPE.clear();
-		for (ItemStack is : BARRELS)
-			BARRELS_TYPE.put(TileEntityDayBarrel.getType(is), is);
+		BARRELS_NORMAL.clear();
+		for (ItemStack is : BARRELS) {
+			Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+			TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());
+			if (upgradeSet.isEmpty()) {
+				BARRELS_NORMAL.add(is);
+			}
+		}
 	}
 
 	@Mod.EventHandler

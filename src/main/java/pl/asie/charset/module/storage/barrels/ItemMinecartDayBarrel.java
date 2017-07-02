@@ -39,25 +39,19 @@ package pl.asie.charset.module.storage.barrels;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.ItemMinecartCharset;
 import pl.asie.charset.lib.item.SubItemProviderCache;
-import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.utils.RenderUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     @SideOnly(Side.CLIENT)
@@ -107,8 +101,10 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
                 List<ItemStack> itemsOut = new ArrayList<>();
 
                 for (ItemStack barrel : items) {
-                    TileEntityDayBarrel.Type type = TileEntityDayBarrel.getType(barrel);
-                    if (type == TileEntityDayBarrel.Type.NORMAL || type == TileEntityDayBarrel.Type.CREATIVE) {
+                    Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+                    TileEntityDayBarrel.populateUpgrades(upgradeSet, barrel.getTagCompound());
+
+                    if (upgradeSet.size() == 0 || upgradeSet.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
                         ItemStack barrelCart = makeBarrelCart(barrel);
                         itemsOut.add(barrelCart);
                     }
@@ -134,7 +130,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
         ret.setTagCompound(barrelItem.getTagCompound().copy());
         return ret;
     }
-
+/*
     @Override
     public boolean hasContainerItem(ItemStack stack) {
         return true;
@@ -147,4 +143,5 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
         barrel.loadFromStack(stack);
         return barrel.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState());
     }
+*/
 }

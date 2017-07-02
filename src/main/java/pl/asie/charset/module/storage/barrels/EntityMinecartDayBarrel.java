@@ -41,6 +41,8 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -63,7 +65,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     private static final DataParameter<String> BARREL_LOG = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
     private static final DataParameter<String> BARREL_SLAB = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
     private static final DataParameter<Byte> BARREL_ORIENTATION = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
-    private static final DataParameter<Byte> BARREL_TYPE = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
+    private static final DataParameter<NBTTagCompound> BARREL_UPGRADES = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.COMPOUND_TAG);
     private static final DataParameter<Integer> BARREL_ITEM_COUNT = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.VARINT);
 
     protected TileEntityDayBarrel barrel;
@@ -183,6 +185,15 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         barrel.writeNBTData(tag, false);
     }
 
+    protected NBTTagCompound getUpgradesNBT() {
+        NBTTagCompound compound = new NBTTagCompound();
+        NBTTagList list = new NBTTagList();
+        for (TileEntityDayBarrel.Upgrade u : barrel.upgrades)
+            list.appendTag(new NBTTagString(u.name()));
+        compound.setTag("upgrades", list);
+        return compound;
+    }
+
     @Override
     protected void entityInit() {
         super.entityInit();
@@ -193,7 +204,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         dataManager.register(BARREL_LOG, barrel.woodLog.getId());
         dataManager.register(BARREL_SLAB, barrel.woodSlab.getId());
         dataManager.register(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
-        dataManager.register(BARREL_TYPE, (byte) barrel.type.ordinal());
+        dataManager.register(BARREL_UPGRADES, getUpgradesNBT());
     }
 
     private void updateDataWatcher(boolean full) {
@@ -204,7 +215,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
                 dataManager.set(BARREL_LOG, barrel.woodLog.getId());
                 dataManager.set(BARREL_SLAB, barrel.woodSlab.getId());
                 dataManager.set(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
-                dataManager.set(BARREL_TYPE, (byte) barrel.type.ordinal());
+                dataManager.set(BARREL_UPGRADES, getUpgradesNBT());
             }
         }
     }
@@ -226,7 +237,8 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             barrel.woodLog = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_LOG));
             barrel.woodSlab = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_SLAB));
             barrel.orientation = Orientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
-            barrel.type = TileEntityDayBarrel.Type.values()[dataManager.get(BARREL_TYPE)];
+            barrel.upgrades.clear();
+            TileEntityDayBarrel.populateUpgrades(barrel.upgrades, dataManager.get(BARREL_UPGRADES));
         }
 
         if (!world.isRemote) {
@@ -265,7 +277,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             if (world.isRemote) {
                 return true;
             }
-            if (barrel.type == TileEntityDayBarrel.Type.CREATIVE) {
+            if (barrel.upgrades.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
                 return false;
             }
             if (barrel.getItemCount() != oldItemCount) {

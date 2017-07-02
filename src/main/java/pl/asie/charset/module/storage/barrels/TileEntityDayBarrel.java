@@ -44,42 +44,38 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
-import pl.asie.charset.lib.notify.INoticeUpdater;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.*;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRotatable {
     public ItemStack item = ItemStack.EMPTY;
     public ItemMaterial woodLog, woodSlab;
     public ProxiedBlockAccess woodLogAccess;
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
-    public Type type = Type.NORMAL;
+    public Set<Upgrade> upgrades = EnumSet.noneOf(Upgrade.class);
     Object notice_target = this;
 
     protected final InsertionHandler insertionView = new InsertionHandler();
@@ -125,7 +121,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
                 return is;
             }
 
-            if (type == Type.CREATIVE && !item.isEmpty()) {
+            if (upgrades.contains(Upgrade.INFINITE) && !item.isEmpty()) {
                 return is;
             }
 
@@ -184,7 +180,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         @Override
         public ItemStack getStackInSlot(int slot) {
             ItemStack stack = item.copy();
-            if (type == Type.STICKY)
+            if (upgrades.contains(Upgrade.STICKY))
                 stack.shrink(1);
             if (stack.getCount() > 64)
                 stack.setCount(64);
@@ -198,7 +194,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
                 if (amt > 0) {
                     ItemStack stack = item.copy();
                     stack.setCount(amt);
-                    if (!simulate && type != Type.CREATIVE) {
+                    if (!simulate && !upgrades.contains(Upgrade.INFINITE)) {
                         item.shrink(amt);
                         onItemChange(item.isEmpty());
                     }
@@ -210,19 +206,20 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         }
     }
 
-    public enum Type {
-        NORMAL, SILKY, HOPPING, STICKY, CREATIVE;
+    public enum Upgrade {
+        SILKY, HOPPING, STICKY, INFINITE;
 
-        public static final Type[] VALUES = values();
-
-        public boolean isHopping() {
-            return this == HOPPING || this == CREATIVE;
-        }
+        public static final Upgrade[] VALUES = values();
     }
 
     // TODO: Remove in 1.13
-    private static final Type[] OLD_TYPE_ORDER = new Type[] {
-            Type.NORMAL, Type.SILKY, Type.HOPPING, Type.NORMAL, Type.STICKY, Type.CREATIVE
+    private static final Upgrade[][] OLD_TYPE_ORDER = new Upgrade[][] {
+            { },
+            { Upgrade.SILKY },
+            { Upgrade.HOPPING },
+            { },
+            { Upgrade.STICKY },
+            { Upgrade.INFINITE, Upgrade.HOPPING }
     };
 
     private boolean updateRedstoneLevels;
@@ -238,6 +235,37 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         world.markChunkDirty(pos, this);
     }
 
+    public static void populateUpgrades(Set<Upgrade> upgrades, NBTTagCompound compound) {
+        if (compound.hasKey("upgrades", Constants.NBT.TAG_LIST)) {
+            NBTTagList upgradeNBT = compound.getTagList("upgrades", Constants.NBT.TAG_STRING);
+            for (int i = 0; i < upgradeNBT.tagCount(); i++) {
+                try {
+                    Upgrade type = Upgrade.valueOf(upgradeNBT.getStringTagAt(i));
+                    upgrades.add(type);
+                } catch (IllegalArgumentException e) {
+
+                }
+            }
+        } else if (compound.hasKey("type", Constants.NBT.TAG_STRING)) {
+            String s = compound.getString("type").toUpperCase();
+            Upgrade type = null;
+            try {
+                type = Upgrade.valueOf(s);
+            } catch (IllegalArgumentException e) {
+
+            }
+
+            if (s.equals("CREATIVE")) {
+                upgrades.add(Upgrade.HOPPING);
+                upgrades.add(Upgrade.INFINITE);
+            } else if (type != null) {
+                upgrades.add(type);
+            }
+        } else if (compound.hasKey("type")) {
+            upgrades.addAll(Arrays.asList(OLD_TYPE_ORDER[compound.getByte("type")]));
+        }
+    }
+
     @Override
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
         Orientation oldOrientation = orientation;
@@ -245,11 +273,10 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         item = new ItemStack(compound.getCompoundTag("item"));
         item.setCount(compound.getInteger("count"));
         orientation = Orientation.getOrientation(compound.getByte("dir"));
-        if (compound.hasKey("type", Constants.NBT.TAG_STRING)) {
-            type = Type.valueOf(compound.getString("type"));
-        } else {
-            type = OLD_TYPE_ORDER[compound.getByte("type")];
-        }
+
+        upgrades.clear();
+        populateUpgrades(upgrades, compound);
+
         woodLog = getLog(compound);
         woodSlab = getSlab(compound);
         last_mentioned_count = getItemCount();
@@ -307,7 +334,12 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         woodLog.writeToNBT(compound, "log");
         woodSlab.writeToNBT(compound, "slab");
         compound.setByte("dir", (byte) orientation.ordinal());
-        compound.setString("type", type.name());
+
+        NBTTagList upgradeNBT = new NBTTagList();
+        for (Upgrade u : upgrades) {
+            upgradeNBT.appendTag(new NBTTagString(u.name()));
+        }
+        compound.setTag("upgrades", upgradeNBT);
         compound.setInteger("count", item.getCount());
         return compound;
     }
@@ -342,7 +374,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     void tick() {
-        if (!type.isHopping() || orientation == null) {
+        if (!upgrades.contains(Upgrade.HOPPING) || orientation == null) {
             return;
         }
         if (notice_target == this && world.getStrongPower(pos) > 0) {
@@ -381,7 +413,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack got = handler.insertItem(i, toPush, false);
                     if (got.isEmpty()) {
-                        if (type != Type.CREATIVE) {
+                        if (!upgrades.contains(Upgrade.INFINITE)) {
                             item.shrink(1);
                         }
                         itemChanged = true;
@@ -401,7 +433,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public void neighborChanged(BlockPos pos, BlockPos fromPos) {
-        if (type.isHopping()) {
+        if (!upgrades.contains(Upgrade.HOPPING)) {
             updateRedstoneLevel();
             // X/Z can be equal, as we only care about top/bottom neighbors for this
             if (pos.getX() == fromPos.getX() && pos.getZ() == fromPos.getZ()) {
@@ -413,7 +445,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public int getItemCount() {
         if (item.isEmpty()) {
             return 0;
-        } else if (type == Type.CREATIVE) {
+        } else if (upgrades.contains(Upgrade.INFINITE)) {
             return ((getMaxStacks() + 1) / 2) * item.getMaxStackSize();
         } else {
             return item.getCount();
@@ -423,9 +455,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public int getExtractableItemCount() {
         if (item.isEmpty()) {
             return 0;
-        } else if (type == Type.CREATIVE) {
+        } else if (upgrades.contains(Upgrade.INFINITE)) {
             return item.getMaxStackSize();
-        } else if (type == Type.STICKY) {
+        } else if (upgrades.contains(Upgrade.STICKY)) {
             return Math.min(item.getCount() - 1, item.getMaxStackSize());
         } else {
             return Math.min(item.getCount(), item.getMaxStackSize());
@@ -500,8 +532,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public void loadFromStack(ItemStack is) {
         woodLog = getLog(is.getTagCompound());
         woodSlab = getSlab(is.getTagCompound());
-        type = getType(is);
-        if (type == Type.SILKY && is.hasTagCompound()) {
+        upgrades.clear();
+        if (is.hasTagCompound()) {
+            populateUpgrades(upgrades, is.getTagCompound());
+        }
+        if (upgrades.contains(Upgrade.SILKY) && is.hasTagCompound()) {
             NBTTagCompound tag = is.getTagCompound();
             int loadCount = tag.getInteger("SilkCount");
             if (loadCount > 0) {
@@ -543,7 +578,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public void markDirty() {
         super.markDirty();
         sync();
-        if (type.isHopping()) {
+        if (upgrades.contains(Upgrade.HOPPING)) {
             needLogic();
         }
     }
@@ -714,7 +749,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             dropPos = dropPos.offset(orientation.facing);
         }
 
-        if (type == Type.CREATIVE) {
+        if (upgrades.contains(Upgrade.INFINITE)) {
             if (player.isSneaking()) {
                 item = ItemStack.EMPTY;
                 onItemChange(true);
@@ -738,7 +773,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
                 msg.setMessage("notice.charset.barrel.empty");
             } else {
                 String countMsg;
-                if (type == Type.CREATIVE) {
+                if (upgrades.contains(Upgrade.INFINITE)) {
                     countMsg = "notice.charset.barrel.infinite";
                 } else {
                     int count = getItemCount();
@@ -781,7 +816,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     public List<ItemStack> getContentDrops(boolean silkTouch) {
         List<ItemStack> stacks = new ArrayList<>();
 
-        if (type == Type.CREATIVE || (type == Type.SILKY && silkTouch)) {
+        if (upgrades.contains(Upgrade.INFINITE) || (upgrades.contains(Upgrade.SILKY) && silkTouch)) {
             return stacks;
         }
 
@@ -815,42 +850,23 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public boolean canLose() {
-        return !item.isEmpty() && type != Type.CREATIVE && getItemCount() > getMaxDropAmount();
+        return !item.isEmpty() && !upgrades.contains(Upgrade.INFINITE) && getItemCount() > getMaxDropAmount();
     }
 
-    public static ItemStack makeDefaultBarrel(Type type) {
-        return makeBarrel(type, ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("log"), ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("slab"));
+    public static ItemStack makeDefaultBarrel(Set<Upgrade> upgrades) {
+        return makeBarrel(upgrades, ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("log"), ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("slab"));
     }
 
-    public static ItemStack makeBarrel(Type type, ItemMaterial log, ItemMaterial slab) {
-        ItemStack barrel_item = new ItemStack(CharsetStorageBarrels.barrelItem);
-        barrel_item = addUpgrade(barrel_item, type);
-        NBTTagCompound compound = ItemUtils.getTagCompound(barrel_item, true);
+    public static ItemStack makeBarrel(Set<Upgrade> upgrades, ItemMaterial log, ItemMaterial slab) {
+        ItemStack stack = new ItemStack(CharsetStorageBarrels.barrelItem);
+        NBTTagCompound compound = ItemUtils.getTagCompound(stack, true);
         compound.setString("log", log.getId());
         compound.setString("slab", slab.getId());
-        return barrel_item;
-    }
-
-    public static Type getType(ItemStack is) {
-        if (is == null) {
-            return Type.NORMAL;
-        }
-        NBTTagCompound tag = is.getTagCompound();
-        if (tag == null) {
-            return Type.NORMAL;
-        }
-        String name = tag.getString("type");
-        if (name == null || name.equals("")) {
-            return Type.NORMAL;
-        }
-        try {
-            return Type.valueOf(name);
-        } catch (IllegalArgumentException e) {
-            ModCharset.logger.warn("%s has invalid barrels Type %s. Resetting it.", is, name);
-            e.printStackTrace();
-            tag.removeTag("type");
-            return Type.NORMAL;
-        }
+        NBTTagList list = new NBTTagList();
+        for (Upgrade u : upgrades)
+            list.appendTag(new NBTTagString(u.name()));
+        compound.setTag("upgrades", list);
+        return stack;
     }
 
     public static ItemMaterial getLog(NBTTagCompound tag) {
@@ -861,13 +877,18 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         return ItemMaterialRegistry.INSTANCE.getMaterial(tag, "slab", "slab");
     }
 
-    static ItemStack addUpgrade(ItemStack barrel, Type upgrade) {
-        if (upgrade == Type.NORMAL) {
-            return barrel;
-        }
+    // TODO: Handle invalid combinations somewhere?
+    static ItemStack addUpgrade(ItemStack barrel, Upgrade upgrade) {
         barrel = barrel.copy();
         NBTTagCompound tag = ItemUtils.getTagCompound(barrel, true);
-        tag.setString("type", upgrade.name());
+        NBTTagList list = tag.getTagList("upgrades", Constants.NBT.TAG_STRING);
+        for (int i = 0; i < list.tagCount(); i++) {
+            if (list.getStringTagAt(i).equals(upgrade.name())) {
+                return barrel;
+            }
+        }
+
+        list.appendTag(new NBTTagString(upgrade.name()));
         return barrel;
     }
 
@@ -908,8 +929,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     public ItemStack getDroppedBlock(boolean silkTouch) {
-        ItemStack is = makeBarrel(type, woodLog, woodSlab);
-        if (type == Type.SILKY && !item.isEmpty() && silkTouch) {
+        ItemStack is = makeBarrel(upgrades, woodLog, woodSlab);
+        if (upgrades.contains(Upgrade.SILKY) && !item.isEmpty() && silkTouch) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag == null) {
                 tag = new NBTTagCompound();
