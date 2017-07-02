@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 // TODO: Add option to replace with OreIngredients
-// TODO: Add support for IngredientNBTs?
+// TODO: Add support for IngredientNBTs? Smelting? Brewing?
 public class RecipeReplacement {
     public static final RecipeReplacement PRIMARY = new RecipeReplacement();
 

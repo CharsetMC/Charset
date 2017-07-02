@@ -12,6 +12,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.terraingen.InitMapGenEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,7 +22,6 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.module.storage.tanks.CharsetStorageTanks;
 
 @CharsetModule(
         name = "overhaul.oneDimension",
@@ -52,6 +52,12 @@ public class CharsetOverhaulOneDimension {
 
     @SubscribeEvent
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+        RecipeReplacement.PRIMARY.add(Item.getItemFromBlock(Blocks.SOUL_SAND), Item.getItemFromBlock(Blocks.SAND));
+    }
+
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
+        OreDictionary.registerOre("oreQuartz", quartzOreBlock);
     }
 
     @Mod.EventHandler

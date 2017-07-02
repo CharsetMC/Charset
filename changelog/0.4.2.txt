@@ -16,6 +16,7 @@
 * [storage.locks] Major rewrite! They work much more reliably now and can be placed on tanks!
 * [storage.tanks] [#141] Fix tanks not dropping item when broken.
 * [storage.tanks] [#142] Tanks no longer consume fluids from buckets in creative mode.
+* [storage.tanks] Tanks with liquid in them are now harder to break than empty tanks to avoid fluid loss by accident.
 * [transport.color] Dyed minecarts now use your resource pack's minecart texture
 * [tweak.carry] [#140] Carrying will now respect your pickblock key mapping.
     * However, mapping it to a key as opposed to a mouse button will prevent carrying from working in Creative Mode.

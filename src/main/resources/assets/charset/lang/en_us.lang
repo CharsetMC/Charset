@@ -70,6 +70,9 @@ gui.charset.crafting.name=Crafting
 
 itemGroup.charset=The Charset Project
 
+item.charset.gemQuartz.name=Quartz
+tile.charset.oreQuartz.name=Quartz Ore
+
 # CharsetPipes
 item.charset.pipe.name=Pipe
 tile.charset.pipe.format=%s Pipe

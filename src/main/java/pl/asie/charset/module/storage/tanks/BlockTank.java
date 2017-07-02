@@ -28,9 +28,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 
-/**
- * Created by asie on 2/11/17.
- */
 public class BlockTank extends BlockBase implements ITileEntityProvider {
     private static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.05f, 0, 0.05f, 0.95f, 1, 0.95f);
     private static final PropertyInteger CONNECTIONS = PropertyInteger.create("connections", 0, 3);
@@ -38,9 +35,26 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     public BlockTank() {
         super(Material.GLASS);
         setHardness(0.6F);
+        setHarvestLevel("pickaxe", 0);
         setUnlocalizedName("charset.tank");
         setFullCube(false);
         setOpaqueCube(false);
+    }
+
+    @Override
+    public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos) {
+        TileEntity tankEntity = worldIn.getTileEntity(pos);
+        if (tankEntity instanceof TileTank) {
+            TileTank tank = (TileTank) tankEntity;
+            FluidStack contents = tank.getContents();
+            if (contents != null) {
+                return this.blockHardness * (2.5f + (contents.amount * 5.0f / ((TileTank) tankEntity).getCapacity()));
+            } else {
+                return this.blockHardness;
+            }
+        } else {
+            return this.blockHardness;
+        }
     }
 
     @Override
