@@ -22,11 +22,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
 		name = "tweak.pushableTnt",
-		description = "Allows players to push TNT around by hand or projectile"
+		description = "Allows players to push TNT around by hand or projectile",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTweakPushableTNT {
 	@Mod.EventHandler

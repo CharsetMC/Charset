@@ -43,9 +43,11 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 @CharsetModule(
 		name = "tweak.remove.recipeBookButton",
+		profile = ModuleProfile.STABLE,
 		isDefault = false,
 		isClientOnly = true
 )

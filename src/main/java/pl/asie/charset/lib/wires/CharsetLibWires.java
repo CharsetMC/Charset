@@ -32,12 +32,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
 	name = "lib.wires",
 	description = "Wire support module",
-	dependencies = {"mod:mcmultipart"}
+	dependencies = {"mod:mcmultipart"},
+	profile = ModuleProfile.STABLE
 )
 public class CharsetLibWires {
 	@CharsetModule.Instance

@@ -10,11 +10,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.EntityGatherItemsEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 @CharsetModule(
 	name = "baubles:lib",
-	isModCompat = true,
-	dependencies = {"mod:baubles"}
+	dependencies = {"mod:baubles"},
+	profile = ModuleProfile.COMPAT
 )
 public class CharsetBaublesCompat {
 	@CapabilityInject(IBaublesItemHandler.class)

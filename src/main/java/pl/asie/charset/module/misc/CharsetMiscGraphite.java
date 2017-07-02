@@ -23,11 +23,13 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
 		name = "misc.graphite",
-		description= "Adds a black dye replacement created from charcoal"
+		description= "Adds a black dye replacement created from charcoal",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetMiscGraphite {
 	private Item graphite = new Item().setUnlocalizedName("charset.graphite");

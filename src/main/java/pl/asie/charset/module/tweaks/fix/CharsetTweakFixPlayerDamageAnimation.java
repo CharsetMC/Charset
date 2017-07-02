@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 
 import java.util.ArrayDeque;
@@ -17,7 +18,8 @@ import java.util.Queue;
 
 @CharsetModule(
 		name = "tweak.fixplayerdamageanimation",
-		description = "Fixes player directional damage animation."
+		description = "Fixes player directional damage animation.",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTweakFixPlayerDamageAnimation {
 	@CharsetModule.PacketRegistry("fixPlyrDmgAnim")

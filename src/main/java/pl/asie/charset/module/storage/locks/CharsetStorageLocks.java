@@ -38,6 +38,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
@@ -47,7 +48,8 @@ import java.util.UUID;
 
 @CharsetModule(
 		name = "storage.locks",
-		description = "Player interaction-preventing locks and keys"
+		description = "Player interaction-preventing locks and keys",
+		profile = ModuleProfile.TESTING
 )
 public class CharsetStorageLocks {
 	@CharsetModule.Instance

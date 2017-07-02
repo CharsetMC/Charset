@@ -30,6 +30,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.transport.carts.link.Linkable;
 import pl.asie.charset.module.transport.carts.link.TrainLinker;
@@ -41,7 +42,8 @@ import java.util.Map;
 
 @CharsetModule(
         name = "transport.carts",
-        description = "Minecart rework. WIP"
+        description = "Minecart rework. WIP",
+        profile = ModuleProfile.TESTING
 )
 public class CharsetTransportCarts {
     public static final Map<Class<? extends Entity>, Class<? extends EntityMinecart>> REPLACEMENT_MAP = new HashMap<>();

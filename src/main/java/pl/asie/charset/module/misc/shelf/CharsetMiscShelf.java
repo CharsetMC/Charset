@@ -34,6 +34,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.render.ShadingTintColorHandler;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -41,7 +42,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 @CharsetModule(
 		name = "misc.shelf",
 		description = "Reworks impl shelf and adds fancy bookshelves.",
-		isDevOnly = true
+		profile = ModuleProfile.VERY_UNSTABLE
 )
 public class CharsetMiscShelf {
 	@CharsetModule.Instance

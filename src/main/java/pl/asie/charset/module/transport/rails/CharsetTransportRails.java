@@ -10,11 +10,13 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
         name = "transport.rails",
-        description = "A small assortment of useful rails"
+        description = "A small assortment of useful rails",
+        profile = ModuleProfile.STABLE
 )
 public class CharsetTransportRails {
     public static BlockRailCharset blockRailCross;

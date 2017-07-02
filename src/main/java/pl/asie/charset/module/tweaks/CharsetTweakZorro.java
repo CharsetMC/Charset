@@ -50,11 +50,13 @@ import net.minecraft.util.EnumHand;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 import java.util.Set;
 
 @CharsetModule(
-		name = "tweak.zorro"
+		name = "tweak.zorro",
+		profile = ModuleProfile.TESTING
 )
 public class CharsetTweakZorro {
 	@SubscribeEvent

@@ -53,6 +53,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -60,7 +61,8 @@ import java.util.Set;
 
 @CharsetModule(
 		name = "tweak.doubledoors",
-		description = "Makes double doors open at the same time upon right-clicking just one"
+		description = "Makes double doors open at the same time upon right-clicking just one",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTweakDoubleDoors {
 	private final Set<BlockDoor> allowedDoors = new HashSet<BlockDoor>();

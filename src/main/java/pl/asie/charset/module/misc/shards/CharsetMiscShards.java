@@ -37,13 +37,15 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
 		name = "misc.shards",
-		description = "Adds glowstone-esque shards to glass"
+		description = "Adds glowstone-esque shards to glass",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetMiscShards {
 	public static ItemShard shardItem;

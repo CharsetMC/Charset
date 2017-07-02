@@ -49,6 +49,7 @@ import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.ArrayList;
@@ -56,7 +57,8 @@ import java.util.List;
 
 @CharsetModule(
 		name = "tweak.equalizeMobChances",
-		description = "Allows a mob wearing armor comparable to yours to rarely spawn"
+		description = "Allows a mob wearing armor comparable to yours to rarely spawn",
+		profile = ModuleProfile.TESTING
 )
 public class CharsetTweakMobEqualizer {
 	@SubscribeEvent(priority = EventPriority.LOW)

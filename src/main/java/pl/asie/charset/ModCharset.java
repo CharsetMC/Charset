@@ -87,8 +87,6 @@ public class ModCharset {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(this);
-
 		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");
 		if (!configurationDirectory.exists()) {
 			configurationDirectory.mkdir();
@@ -98,16 +96,19 @@ public class ModCharset {
 		RegistryUtils.loadConfigIds(configIds);
 
 		logger = LogManager.getLogger();
+
+		ModuleLoader.INSTANCE.preInit(event.getAsmData());
+
 		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 2);
 		dataFixes.registerFix(FixTypes.ENTITY, new CharsetUnifiedModIdFixer.Entity(oldPrefixes));
 		dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new CharsetLockKeyTagChange());
-
-		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 
 		charsetIconItem = new IconCharset();
 		charsetIconStack = new ItemStack(charsetIconItem);
 
 		ModuleLoader.INSTANCE.passEvent(event);
+
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent

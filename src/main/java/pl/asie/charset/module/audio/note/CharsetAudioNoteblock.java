@@ -27,6 +27,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.FunctionalUtils;
 
@@ -36,7 +37,8 @@ import java.util.function.Supplier;
 
 @CharsetModule(
         name = "audio.noteblock",
-        description = "Noteblock rework. WIP"
+        description = "Noteblock rework. WIP",
+        profile = ModuleProfile.TESTING
 )
 public class CharsetAudioNoteblock {
     private static final Supplier<CapabilityProviderFactory<IAudioSource>> PROVIDER = FunctionalUtils.lazySupplier(() -> new CapabilityProviderFactory<>(Capabilities.AUDIO_SOURCE));

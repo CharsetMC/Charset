@@ -31,13 +31,15 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @CharsetModule(
 		name = "tweak.mobControl",
-		description = "Allow type-based control of mob spawning."
+		description = "Allow type-based control of mob spawning.",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTweakMobControl {
 	@CharsetModule.Configuration

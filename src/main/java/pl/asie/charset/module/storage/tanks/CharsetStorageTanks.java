@@ -15,11 +15,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
         name = "storage.tanks",
-        description = "Simple BuildCraft-style vertical tanks"
+        description = "Simple BuildCraft-style vertical tanks",
+        profile = ModuleProfile.STABLE
 )
 public class CharsetStorageTanks {
     public static Block tankBlock;

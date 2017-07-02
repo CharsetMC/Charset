@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,6 +32,7 @@ import java.util.Set;
 
 @CharsetModule(
 		name = "tweak.remove.vanillaStyleTools",
+		profile = ModuleProfile.STABLE,
 		isDefault = false
 )
 public class CharsetTweakRemoveVanillaTools {

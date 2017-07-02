@@ -20,7 +20,6 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -42,6 +41,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.command.*;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
 import pl.asie.charset.lib.misc.DebugInfoProvider;
@@ -65,6 +65,7 @@ import java.util.concurrent.TimeUnit;
 @CharsetModule(
 	name = "lib",
 	description = "Library module",
+	profile = ModuleProfile.STABLE,
 	isVisible = false
 )
 public class CharsetLib {

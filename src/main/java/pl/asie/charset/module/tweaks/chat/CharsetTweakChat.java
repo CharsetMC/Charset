@@ -8,11 +8,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.PlayerUtils;
 
 @CharsetModule(
         name = "tweak.chat",
         description = "Various chat tweaks",
+        profile = ModuleProfile.STABLE,
         isDefault = false
 )
 public class CharsetTweakChat {

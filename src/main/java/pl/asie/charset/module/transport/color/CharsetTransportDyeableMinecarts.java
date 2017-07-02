@@ -41,6 +41,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.utils.ColorUtils;
@@ -53,7 +54,8 @@ import java.util.Map;
 
 @CharsetModule(
 		name = "transport.dyeableMinecarts",
-		description = "Use dyes on Minecarts to make them colorful"
+		description = "Use dyes on Minecarts to make them colorful",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTransportDyeableMinecarts {
 	public static class CapabilityProvider implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {

@@ -12,10 +12,11 @@ import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 @CharsetModule(
 	name = "commoncapabilities:lib.slotlessInsertion",
-	isModCompat = true,
+	profile = ModuleProfile.COMPAT,
 	dependencies = {"mod:commoncapabilities"}
 )
 public class CapabilityWrapperSlotlessInsertion implements CapabilityHelper.Wrapper<IItemInsertionHandler> {

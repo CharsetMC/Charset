@@ -31,6 +31,7 @@ import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.ThreeState;
 import pl.asie.charset.module.tweaks.carry.transforms.CarryTransformerEntityMinecart;
@@ -42,7 +43,8 @@ import java.util.Set;
 
 @CharsetModule(
     name = "tweak.blockCarrying",
-    description = "Allow players to carry blocks via shift-pickblock"
+    description = "Allow players to carry blocks via shift-pickblock",
+    profile = ModuleProfile.STABLE
 )
 public class CharsetTweakBlockCarrying {
     public static final ResourceLocation CAP_IDENTIFIER = new ResourceLocation("charsettweaks:carry");

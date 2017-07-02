@@ -34,7 +34,11 @@ public class ColorLookupHandler {
         public Key(ItemStack stack, RenderUtils.AveragingMode mode) {
             this.stack = stack;
             this.averagingMode = mode;
-            this.hash = Item.getIdFromItem(stack.getItem()) * 21 + stack.getMetadata() * 3 + mode.ordinal();
+            this.hash =
+                    Item.getIdFromItem(stack.getItem()) * 57
+                    + stack.getMetadata() * 17
+                    + (stack.hasTagCompound() ? stack.getTagCompound().hashCode() * 3 : 0)
+                    + mode.ordinal();
         }
 
         @Override

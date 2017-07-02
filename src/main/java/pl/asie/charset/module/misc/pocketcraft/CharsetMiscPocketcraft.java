@@ -27,13 +27,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
 		name = "misc.pocketcraft",
-		description = "Adds a Pocket Crafting Table"
+		description = "Adds a Pocket Crafting Table",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetMiscPocketcraft {
 	@CharsetModule.Instance

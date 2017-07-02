@@ -3,18 +3,21 @@ package pl.asie.charset.lib.loader;
 import com.google.common.base.Joiner;
 import com.google.common.collect.*;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import net.minecraftforge.fml.common.discovery.asm.ModAnnotation;
 import net.minecraftforge.fml.common.event.FMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
 import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.utils.ThreeState;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -24,6 +27,32 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 public class ModuleLoader {
+	private static class EnableInformation {
+		public boolean isDefault;
+		public ThreeState override;
+		public boolean dependenciesMet;
+
+		public EnableInformation(boolean isDefault, ThreeState override) {
+			this.isDefault = isDefault;
+			this.override = override;
+			this.dependenciesMet = true; // assume true
+		}
+
+		public boolean isEnabled() {
+			if (override == ThreeState.YES) {
+				return true;
+			} else if (override == ThreeState.NO) {
+				return false;
+			} else {
+				return isDefault && dependenciesMet;
+			}
+		}
+
+		public boolean canBeEnabled() {
+			return dependenciesMet;
+		}
+	}
+
 	public static final ModuleLoader INSTANCE = new ModuleLoader();
 	public static final Multimap<Class, String> classNames = HashMultimap.create();
 
@@ -32,7 +61,11 @@ public class ModuleLoader {
 
 	private static final BiMap<String, Object> loadedModules = HashBiMap.create();
 	private static final Map<String, Object> loadedModulesByClass = new HashMap<>();
+	private static final Map<String, EnableInformation> enableInfoMap = new HashMap<>();
 	private static final Set<Configuration> moduleConfigs = new HashSet<>();
+
+	private static final Joiner joinerComma = Joiner.on(", ");
+
 	private final ClassLoader classLoader = getClass().getClassLoader();
 
 	private ModuleLoader() {
@@ -84,7 +117,7 @@ public class ModuleLoader {
 		for (ASMDataTable.ASMData data : table.getAll(annotationClass.getName())) {
 			String id = (String) data.getAnnotationInfo().get("value");
 			Property prop = ModCharset.configModules.get(
-					"modules.compat",
+					"compat",
 					confType + ":" + id,
 					true
 			);
@@ -99,36 +132,71 @@ public class ModuleLoader {
 	@SuppressWarnings("unchecked")
 	private void readDataTable(ASMDataTable table) {
 		Multimap<String, String> unmetDependencies = HashMultimap.create();
-		Set<String> lazyModuleNames = new HashSet<>();
 		Set<String> enabledModules = new HashSet<>();
 		Set<String> compatModules = new HashSet<>();
 		Map<String, ASMDataTable.ASMData> moduleData = new HashMap<>();
+
+		Property baseProfileProp = ModCharset.configModules.get(
+				"general",
+				"profile",
+				"STABLE"
+		);
+		baseProfileProp.setComment("Set the base profile for Charset.\nThis will decide whether or not certain modules are accessible.\nAllowed values: STABLE, TESTING, UNSTABLE");
+
+		ModuleProfile profile;
+		if (ModCharset.INDEV) {
+			profile = ModuleProfile.VERY_UNSTABLE;
+		} else if ("STABLE".equals(baseProfileProp.getString().toUpperCase())) {
+			profile = ModuleProfile.STABLE;
+		} else if ("TESTING".equals(baseProfileProp.getString().toUpperCase())) {
+			profile = ModuleProfile.TESTING;
+		} else if ("UNSTABLE".equals(baseProfileProp.getString().toUpperCase())) {
+			profile = ModuleProfile.UNSTABLE;
+		} else {
+			throw new RuntimeException("Invalid Charset modules.cfg general.profile setting '" + baseProfileProp.getString() + "'!");
+		}
+
+		ConfigCategory category = ModCharset.configModules.getCategory("overrides");
+		category.setComment("Overrides can have one of three values: DEFAULT, ENABLE, DISABLE\nDEFAULT will enable the module based on your profile settings and dependency availability.");
+
+		boolean configDirty = false;
 
 		for (ASMDataTable.ASMData data : table.getAll(CharsetModule.class.getName())) {
 			Map<String, Object> info = data.getAnnotationInfo();
 			String name = (String) info.get("name");
 			String desc = (String) info.get("description");
-			Boolean enabled = (Boolean) info.getOrDefault("isDefault", true);
-			Boolean lazy = (Boolean) info.getOrDefault("isLazy", false);
-			Boolean compat = (Boolean) info.getOrDefault("isModCompat", false);
-			Boolean devOnly = (Boolean) info.getOrDefault("isDevOnly", false);
+			if (desc == null) desc = "";
+			ModuleProfile modProfile = ModuleProfile.valueOf(((ModAnnotation.EnumHolder) info.get("profile")).getValue());
+			Boolean isDefault = (Boolean) info.getOrDefault("isDefault", true);
+			Boolean compat = modProfile == ModuleProfile.COMPAT;
 			Boolean clientOnly = (Boolean) info.getOrDefault("isClientOnly", false);
 			Boolean serverOnly = (Boolean) info.getOrDefault("isServerOnly", false);
-			if (devOnly && !ModCharset.INDEV) {
-				continue;
-			}
 
-			if (lazy) lazyModuleNames.add(name);
 			moduleData.put(name, data);
 
+			ThreeState override = ThreeState.MAYBE;
 			if ((Boolean) info.getOrDefault("isVisible", true)) {
-				Property prop = ModCharset.configModules.get(
-						compat ? "modules.compat" : "modules",
-						name,
-						enabled
-				);
-				if (desc != null && desc.length() > 0) prop.setComment(desc);
-				enabled = prop.getBoolean();
+				if (compat) {
+					Property prop = ModCharset.configModules.get("compat", name, isDefault);
+					if (!prop.getBoolean()) override = ThreeState.NO;
+				} else {
+					Property prop = ModCharset.configModules.get("overrides", name, "DEFAULT");
+
+					if (desc.length() > 0) desc += " ";
+					desc += "[Profile: " + modProfile.name().toUpperCase() + "]";
+
+					if (!desc.equals(prop.getComment())) {
+						prop.setComment(desc);
+						configDirty = true;
+					}
+
+					if ("ENABLE".equals(prop.getString().toUpperCase())) {
+						override = ThreeState.YES;
+					} else if ("DISABLE".equals(prop.getString().toUpperCase())) {
+						override = ThreeState.NO;
+					}
+				}
+
 			}
 
 			if (clientOnly && !FMLCommonHandler.instance().getSide().isClient()) {
@@ -139,12 +207,19 @@ public class ModuleLoader {
 				continue;
 			}
 
+			if (!compat && modProfile.ordinal() > profile.ordinal()) {
+				continue;
+			}
+
 			if (compat) {
 				compatModules.add(name);
 			}
 
-			if (enabled) {
+			EnableInformation enableInfo = new EnableInformation(isDefault, override);
+			if (enableInfo.isEnabled()) {
 				enabledModules.add(name);
+				enableInfoMap.put(name, enableInfo);
+
 				if (!"lib".equals(name)) dependencies.put(name, "lib");
 				List<String> deps = (List<String>) info.get("dependencies");
 				if (deps != null) {
@@ -153,67 +228,78 @@ public class ModuleLoader {
 			}
 		}
 
-		if (ModCharset.configModules.hasChanged()) {
+		if (ModCharset.configModules.hasChanged() || configDirty) {
 			ModCharset.configModules.save();
+			configDirty = false;
 		}
 
-		for (String name : enabledModules) {
-			boolean canLoad = true;
-			boolean compat = compatModules.contains(name);
+		int removedCount = 1;
+		while (removedCount > 0) {
+			removedCount = 0;
 
-			if (dependencies.containsKey(name)) {
-				for (String dep : dependencies.get(name)) {
-					boolean optional = false;
-					if (dep.startsWith("optional:")) {
-						optional = true;
-						dep = dep.substring("optional:".length());
-					}
+			for (String name : enabledModules) {
+				boolean canLoad = true;
 
-					boolean met = true;
-					if (!optional) {
-						if (dep.startsWith("mod:")) {
-							if (!Loader.isModLoaded(dep.substring("mod:".length()))) {
-								met = false;
-							}
-						} else {
-							if (!enabledModules.contains(dep)) {
-								met = false;
+				if (dependencies.containsKey(name)) {
+					for (String dep : dependencies.get(name)) {
+						boolean optional = false;
+						if (dep.startsWith("optional:")) {
+							optional = true;
+							dep = dep.substring("optional:".length());
+						}
+
+						boolean met = true;
+						if (!optional) {
+							if (dep.startsWith("mod:")) {
+								if (!Loader.isModLoaded(dep.substring("mod:".length()))) {
+									met = false;
+								}
+							} else {
+								if (!enabledModules.contains(dep)) {
+									met = false;
+								}
 							}
 						}
-					}
 
-					if (!met) {
-						canLoad = false;
-						if (!compat) {
+						if (!met) {
+							canLoad = false;
+							enableInfoMap.get(name).dependenciesMet = false;
 							unmetDependencies.put(name, dep);
 						}
 					}
 				}
+
+				if (canLoad) {
+				}
 			}
 
-			if (canLoad) {
-				if (ModCharset.INDEV) {
-					ModCharset.logger.debug("Instantiating module " + name);
-				}
-				ASMDataTable.ASMData data = moduleData.get(name);
-				try {
-					Object o = getClass(data).newInstance();
-					loadedModules.put(name, o);
-					loadedModulesByClass.put(data.getClassName(), o);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
+			Iterator<String> unmetDepKey = unmetDependencies.keySet().iterator();
+			while (unmetDepKey.hasNext()) {
+				String depMod = unmetDepKey.next();
+				EnableInformation enableInfo = enableInfoMap.get(depMod);
+				if (!enableInfo.isEnabled()) {
+					if (!compatModules.contains(depMod)) {
+						ModCharset.logger.info("Module " + depMod + " requires " + joinerComma.join(unmetDependencies.get(depMod)) + ", but is not force-enabled. You can ignore this - it is not an error, just information.");
+					}
+
+					removedCount++;
+					enabledModules.remove(depMod);
+					unmetDepKey.remove();
 				}
 			}
 		}
 
-		Joiner joinerComma = Joiner.on(", ");
-
-		Iterator<String> unmetDepKey = unmetDependencies.keySet().iterator();
-		while (unmetDepKey.hasNext()) {
-			String depMod = unmetDepKey.next();
-			if (lazyModuleNames.contains(depMod)) {
-				ModCharset.logger.warn("Lazy module " + depMod + " requires " + joinerComma.join(unmetDependencies.get(depMod)));
-				unmetDepKey.remove();
+		for (String name : enabledModules) {
+			if (ModCharset.INDEV) {
+				ModCharset.logger.debug("Instantiating module " + name);
+			}
+			ASMDataTable.ASMData data = moduleData.get(name);
+			try {
+				Object o = getClass(data).newInstance();
+				loadedModules.put(name, o);
+				loadedModulesByClass.put(data.getClassName(), o);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
 
@@ -326,8 +412,9 @@ public class ModuleLoader {
 		addClassNames(table, CharsetJEIPlugin.class, "jei");
 		addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
 
-		if (ModCharset.configModules.hasChanged()) {
+		if (ModCharset.configModules.hasChanged() || configDirty) {
 			ModCharset.configModules.save();
+			configDirty = false;
 		}
 	}
 

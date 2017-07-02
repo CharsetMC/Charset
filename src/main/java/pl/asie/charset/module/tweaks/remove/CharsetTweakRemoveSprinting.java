@@ -19,9 +19,11 @@ package pl.asie.charset.module.tweaks.remove;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 
 @CharsetModule(
 		name = "tweak.remove.sprinting",
+		profile = ModuleProfile.STABLE,
 		isDefault = false
 )
 public class CharsetTweakRemoveSprinting {
