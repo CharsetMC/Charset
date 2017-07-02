@@ -176,31 +176,34 @@ public class ModuleLoader {
 
 			ThreeState override = ThreeState.MAYBE;
 			if ((Boolean) info.getOrDefault("isVisible", true)) {
-				if (compat) {
-					Property prop = ModCharset.configModules.get("compat", name, isDefault);
-					if (!prop.getBoolean()) override = ThreeState.NO;
+				if (modProfile == ModuleProfile.VERY_UNSTABLE && profile != ModuleProfile.VERY_UNSTABLE) {
+					override = ThreeState.NO;
 				} else {
-					Property prop = ModCharset.configModules.get("overrides", name, "DEFAULT");
+					if (compat) {
+						Property prop = ModCharset.configModules.get("compat", name, isDefault);
+						if (!prop.getBoolean()) override = ThreeState.NO;
+					} else {
+						Property prop = ModCharset.configModules.get("overrides", name, "DEFAULT");
 
-					if (desc.length() > 0) desc += " ";
-					desc += "[Profile: " + modProfile.name().toUpperCase() + "";
-					if (!isDefault) {
-						desc += ", off by default!";
-					}
-					desc += "]";
+						if (desc.length() > 0) desc += " ";
+						desc += "[Profile: " + modProfile.name().toUpperCase() + "";
+						if (!isDefault) {
+							desc += ", off by default!";
+						}
+						desc += "]";
 
-					if (!desc.equals(prop.getComment())) {
-						prop.setComment(desc);
-						configDirty = true;
-					}
+						if (!desc.equals(prop.getComment())) {
+							prop.setComment(desc);
+							configDirty = true;
+						}
 
-					if ("ENABLE".equals(prop.getString().toUpperCase())) {
-						override = ThreeState.YES;
-					} else if ("DISABLE".equals(prop.getString().toUpperCase())) {
-						override = ThreeState.NO;
+						if ("ENABLE".equals(prop.getString().toUpperCase())) {
+							override = ThreeState.YES;
+						} else if ("DISABLE".equals(prop.getString().toUpperCase())) {
+							override = ThreeState.NO;
+						}
 					}
 				}
-
 			}
 
 			if (clientOnly && !FMLCommonHandler.instance().getSide().isClient()) {

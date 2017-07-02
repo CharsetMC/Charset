@@ -3,6 +3,7 @@ package pl.asie.charset.lib.wires;
 import mcmultipart.api.multipart.IMultipartTile;
 import mcmultipart.api.ref.MCMPCapabilities;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -50,7 +51,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     }
 
     @Override
-    public ItemStack getDroppedBlock() {
+    public ItemStack getDroppedBlock(IBlockState state) {
         if (wire != null) {
             return CharsetLibWires.itemWire.toStack(wire.getFactory(), wire.getLocation() == WireFace.CENTER, 1);
         } else {
@@ -92,7 +93,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
 
     @Override
     public void dropWire() {
-        Block.spawnAsEntity(world, pos, getDroppedBlock());
+        Block.spawnAsEntity(world, pos, getDroppedBlock(world.getBlockState(pos)));
         world.setBlockToAir(pos);
     }
 

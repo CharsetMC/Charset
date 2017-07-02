@@ -19,6 +19,7 @@ package pl.asie.charset.lib.block;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
@@ -70,6 +71,11 @@ public abstract class BlockBase extends Block {
 		subItemProvider = createSubItemProvider();
 	}
 
+	public BlockBase(Material materialIn, MapColor color) {
+		super(materialIn, color);
+		subItemProvider = createSubItemProvider();
+	}
+
 	public final ISubItemProvider getSubItemProvider() {
 		return subItemProvider;
 	}
@@ -117,7 +123,7 @@ public abstract class BlockBase extends Block {
 		if (isTileProvider) {
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile instanceof TileBase) {
-				return ((TileBase) tile).getPickedBlock();
+				return ((TileBase) tile).getPickedBlock(state);
 			}
 		}
 
@@ -215,7 +221,7 @@ public abstract class BlockBase extends Block {
 	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
 		if (te instanceof TileBase) {
 			List<ItemStack> stacks = new ArrayList<ItemStack>();
-			stacks.add(((TileBase) te).getDroppedBlock());
+			stacks.add(((TileBase) te).getDroppedBlock(state));
 			return stacks;
 		}
 

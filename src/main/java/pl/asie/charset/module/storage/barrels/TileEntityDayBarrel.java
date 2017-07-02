@@ -903,7 +903,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     }
 
     @Override
-    public ItemStack getDroppedBlock() {
+    public ItemStack getDroppedBlock(IBlockState state) {
         return getDroppedBlock(false);
     }
 

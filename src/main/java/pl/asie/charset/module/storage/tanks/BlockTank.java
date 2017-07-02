@@ -137,7 +137,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
                         int amount = tank.fill(fluidExtracted, false);
                         if (amount > 0) {
                             fluidExtracted.amount = amount;
-                            fluidExtracted = handler.drain(fluidExtracted, true);
+                            fluidExtracted = handler.drain(fluidExtracted, !playerIn.isCreative());
                             if (fluidExtracted != null) {
                                 tank.fill(fluidExtracted, true);
                                 changed = true;

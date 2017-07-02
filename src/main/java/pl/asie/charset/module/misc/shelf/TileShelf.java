@@ -1,5 +1,6 @@
 package pl.asie.charset.module.misc.shelf;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -156,8 +157,8 @@ public class TileShelf extends TileBase {
 	}
 
 	@Override
-	public ItemStack getDroppedBlock() {
-		ItemStack stack = new ItemStack(CharsetMiscShelf.shelfBlock);
+	public ItemStack getDroppedBlock(IBlockState state) {
+		ItemStack stack = new ItemStack(state.getBlock());
 		stack.setTagCompound(writeNBTData(new NBTTagCompound(), false));
 		return stack;
 	}

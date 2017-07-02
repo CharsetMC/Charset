@@ -128,7 +128,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
     @Override
     public ItemStack getCartItem() {
-        ItemStack stack = barrel.getDroppedBlock();
+        ItemStack stack = barrel.getDroppedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState());
         ItemStack realStack = new ItemStack(CharsetStorageBarrels.barrelCartItem, 1);
         realStack.setTagCompound(stack.getTagCompound());
         return realStack;

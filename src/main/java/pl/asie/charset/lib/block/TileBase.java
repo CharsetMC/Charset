@@ -27,12 +27,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 public class TileBase extends TileEntity {
-	public ItemStack getPickedBlock() {
-		return getDroppedBlock();
+	public ItemStack getPickedBlock(IBlockState state) {
+		return getDroppedBlock(state);
 	}
 
-	public ItemStack getDroppedBlock() {
-		return new ItemStack(getBlockType());
+	public ItemStack getDroppedBlock(IBlockState state) {
+		return new ItemStack(state.getBlock());
 	}
 
 	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {

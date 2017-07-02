@@ -94,7 +94,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
             if (type == TileEntityDayBarrel.Type.CREATIVE) continue;
             if (!CharsetStorageBarrels.isEnabled(type)) continue;
             rep.type = type;
-            builder.add(rep.getPickedBlock());
+            builder.add(rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState()));
         }
 
         return builder.build();

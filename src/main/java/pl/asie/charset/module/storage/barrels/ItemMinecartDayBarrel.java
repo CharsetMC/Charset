@@ -51,6 +51,7 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.ItemMinecartCharset;
 import pl.asie.charset.lib.item.SubItemProviderCache;
+import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.utils.RenderUtils;
 
@@ -144,6 +145,6 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
         if (stack.isEmpty()) return ItemStack.EMPTY;
         TileEntityDayBarrel barrel = new TileEntityDayBarrel();
         barrel.loadFromStack(stack);
-        return barrel.getPickedBlock();
+        return barrel.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState());
     }
 }

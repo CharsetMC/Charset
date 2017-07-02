@@ -1,5 +1,6 @@
 package pl.asie.charset.module.misc.scaffold;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -45,8 +46,8 @@ public class TileScaffold extends TileBase {
 	}
 
 	@Override
-	public ItemStack getDroppedBlock() {
-		ItemStack stack = new ItemStack(CharsetMiscScaffold.scaffoldBlock);
+	public ItemStack getDroppedBlock(IBlockState state) {
+		ItemStack stack = new ItemStack(state.getBlock());
 		stack.setTagCompound(writeNBTData(new NBTTagCompound(), false));
 		return stack;
 	}

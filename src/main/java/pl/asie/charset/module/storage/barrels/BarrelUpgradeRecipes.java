@@ -151,7 +151,7 @@ public class BarrelUpgradeRecipes {
                 TileEntityDayBarrel rep = new TileEntityDayBarrel();
                 rep.loadFromStack(is);
                 rep.type = upgradeType;
-                return rep.getPickedBlock();
+                return rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState());
             } else {
                 return ItemStack.EMPTY;
             }

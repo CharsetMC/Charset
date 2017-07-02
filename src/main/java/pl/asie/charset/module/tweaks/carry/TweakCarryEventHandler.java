@@ -119,6 +119,7 @@ public class TweakCarryEventHandler {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     private boolean startCarry(boolean allowCreative) {
         boolean result = false;
         EntityPlayer player = Minecraft.getMinecraft().player;
