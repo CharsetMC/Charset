@@ -1,11 +1,14 @@
 package pl.asie.charset.module.tweaks.carry;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.MobSpawnerBaseLogic;
@@ -59,6 +62,8 @@ public class CarryHandler {
     private void setTile(TileEntity tile) {
         if (tile != null) {
             this.tile = tile.writeToNBT(new NBTTagCompound());
+
+            // Rendering position
             this.tile.setInteger("x", 0);
             this.tile.setInteger("y", 64);
             this.tile.setInteger("z", 0);
@@ -150,7 +155,7 @@ public class CarryHandler {
     }
 
 
-    public boolean place(World world, BlockPos pos, EnumFacing facing) {
+    public boolean place(World world, BlockPos pos, EnumFacing facing, EntityLivingBase player) {
         if (block != null) {
             if (hasTileEntity()) {
                 IMovable movable = CapabilityHelper.get(Capabilities.MOVABLE, getTileEntity(), null);
@@ -159,8 +164,14 @@ public class CarryHandler {
                 }
             }
 
-            if (world.mayPlace(block.getBlock(), pos, false, facing, null)) {
-                world.setBlockState(pos, block);
+            if (world.mayPlace(block.getBlock(), pos, false, facing, player)) {
+                if (block.getBlock() instanceof BlockChest) {
+                    // FIXME: Double chests need this (#137)
+                    world.setBlockState(pos, block);
+                    block.getBlock().onBlockPlacedBy(world, pos, block, player, ItemStack.EMPTY);
+                } else {
+                    world.setBlockState(pos, block);
+                }
                 IBlockState oldBlock = block;
                 block = null;
 

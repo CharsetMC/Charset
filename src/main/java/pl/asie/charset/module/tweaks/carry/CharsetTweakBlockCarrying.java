@@ -247,7 +247,7 @@ public class CharsetTweakBlockCarrying {
                                 && (method > 1 || !world.isAirBlock(pos.down()))
                                 && (method > 0 || world.isSideSolid(pos.down(), EnumFacing.UP))
                                 ) {
-                            carryHandler.place(world, pos.toImmutable(), EnumFacing.UP);
+                            carryHandler.place(world, pos.toImmutable(), EnumFacing.UP, entity);
                         }
                         if (!carryHandler.isCarrying()) break;
                     }

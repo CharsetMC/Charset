@@ -189,7 +189,7 @@ public class TweakCarryEventHandler {
                 pos = pos.offset(facing);
             }
 
-            carryHandler.place(world, pos, facing);
+            carryHandler.place(world, pos, facing, player);
         }
     }
 
