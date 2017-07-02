@@ -1,4 +1,7 @@
 {
+  "conditions": {
+    "module_loaded": "pl.asie.charset.lib.recipe.ConditionModuleLoadedFactory"
+  },
   "ingredients": {
     "material": "pl.asie.charset.lib.recipe.IngredientMaterialFactory"
   },

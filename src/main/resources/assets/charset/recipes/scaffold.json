@@ -1,4 +1,10 @@
 {
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "misc.scaffold"
+    }
+  ],
   "type": "charset:shaped",
   "group": "scaffold",
   "pattern": [

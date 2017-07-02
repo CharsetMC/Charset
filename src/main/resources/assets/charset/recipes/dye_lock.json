@@ -1,4 +1,10 @@
 {
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.locks"
+    }
+  ],
   "type": "charset:dyeable_item",
   "input": [
     {

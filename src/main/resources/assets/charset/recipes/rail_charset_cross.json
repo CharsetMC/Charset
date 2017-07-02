@@ -1,4 +1,10 @@
 {
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "transport.rails"
+    }
+  ],
   "type": "charset:shaped",
   "group": "railCharsetCross",
   "pattern": [

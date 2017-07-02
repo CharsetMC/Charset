@@ -1,4 +1,10 @@
 {
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "misc.pocketcraft"
+    }
+  ],
   "type": "charset:shaped",
   "group": "pocket_crafting_table",
   "pattern": [

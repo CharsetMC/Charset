@@ -1,4 +1,10 @@
 {
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.barrels"
+    }
+  ],
   "type": "charset:shaped",
   "group": "barrel",
   "pattern": [

@@ -1,4 +1,10 @@
 {
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "tools.wrench"
+    }
+  ],
   "type": "charset:shaped",
   "group": "wrench",
   "pattern": [
