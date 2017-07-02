@@ -5,7 +5,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
@@ -42,7 +44,7 @@ public class SubCommandHelp extends SubCommand {
                     sender.sendMessage(new TextComponentString(usage[i]));
                 }
             } else {
-                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Command not found!"));
+                sender.sendMessage(new TextComponentTranslation("commands.generic.parameter.invalid", args[0]).setStyle(new Style().setColor(TextFormatting.RED)));
             }
         } else {
             for (SubCommand command : CommandCharset.SUB_COMMANDS) {

@@ -1,10 +1,12 @@
 package pl.asie.charset.module.overhaul;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.RegistryEvent;
@@ -17,7 +19,9 @@ import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.module.storage.tanks.CharsetStorageTanks;
 
 @CharsetModule(
         name = "overhaul.oneDimension",
@@ -44,6 +48,10 @@ public class CharsetOverhaulOneDimension {
     public void registerItems(RegistryEvent.Register<Item> event) {
         Items.QUARTZ.setUnlocalizedName("charset.gemQuartz");
         RegistryUtils.register(event.getRegistry(), quartzOreItem, "oreQuartz");
+    }
+
+    @SubscribeEvent
+    public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
     }
 
     @Mod.EventHandler

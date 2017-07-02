@@ -20,11 +20,14 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -51,6 +54,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.notify.PacketNotification;
 import pl.asie.charset.lib.notify.PacketPoint;
+import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
@@ -89,7 +93,7 @@ public class CharsetLib {
 
 	public static boolean alwaysDropDroppablesGivenToPlayer;
 	public static boolean enableDebugInfo;
-	// public static boolean showAllItemTypes;
+	public static boolean showAllItemTypes;
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
@@ -122,7 +126,7 @@ public class CharsetLib {
 
 		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).");
 		enableDebugInfo = config.getBoolean("enableDebugInfo", "expert", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.");
-		// showAllItemTypes = config.getBoolean("showAllItemTypes", "general", true, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
+		showAllItemTypes = config.getBoolean("showAllItemTypes", "general", ModCharset.INDEV, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
 
 		Capabilities.preInit();
 		NotifyImplementation.init();
@@ -132,6 +136,11 @@ public class CharsetLib {
 		MinecraftForge.EVENT_BUS.register(new CharsetLibEventHandler());
 
 		config.save();
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+		RecipeReplacement.PRIMARY.process(event.getRegistry().getValues());
 	}
 
 	@Mod.EventHandler

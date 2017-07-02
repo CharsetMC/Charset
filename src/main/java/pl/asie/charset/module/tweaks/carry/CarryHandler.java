@@ -218,7 +218,12 @@ public class CarryHandler {
     }
 
     public TileEntity getTileEntity() {
-        return tileInstance != null ? tileInstance : (tile != null ? (tileInstance = TileEntity.create(player.world, tile)) : null);
+        if (tileInstance != null) {
+            tileInstance.setWorld(player.world);
+            return tileInstance;
+        } else {
+            return tile != null ? (tileInstance = TileEntity.create(player.world, tile)) : null;
+        }
     }
 
     public static void register() {

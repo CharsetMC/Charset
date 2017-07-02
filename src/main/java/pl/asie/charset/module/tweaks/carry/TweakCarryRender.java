@@ -23,9 +23,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.ModCharset;
+
+import java.util.HashSet;
 
 public class TweakCarryRender {
 	private static final Minecraft mc = Minecraft.getMinecraft();
+	private static final HashSet<Class> caughtExceptionTileRenderers = new HashSet<>();
 
 	/* @SubscribeEvent(priority = EventPriority.HIGH)
 	@SideOnly(Side.CLIENT)
@@ -135,6 +139,11 @@ public class TweakCarryRender {
 						try {
 							TileEntityRendererDispatcher.instance.render(tile, 0, 0, 0, partialTicks);
 						} catch (Exception e) {
+							if (!caughtExceptionTileRenderers.contains(tile.getClass())) {
+								e.printStackTrace();
+								ModCharset.logger.warn("Future exceptions from this tile entity will be hidden.");
+								caughtExceptionTileRenderers.add(tile.getClass());
+							}
 							// Hack of the Year award for the Least Graceful Recovery
 							buffer.setTranslation(0, 0, 0);
 							boolean caught = false;

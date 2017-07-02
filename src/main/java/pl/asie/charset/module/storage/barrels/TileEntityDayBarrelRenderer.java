@@ -50,6 +50,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -109,20 +110,25 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             return;
         }
 
-        EnumFacing facing = barrel.orientation.facing;
-        BlockPos facingPos = barrel.getPos().offset(facing);
-        if (barrel.getWorld().isSideSolid(facingPos, facing.getOpposite())) {
-            return;
+        // Detect "non-world" TESR rendering
+        TileEntity standingTile = barrel.getWorld().getTileEntity(barrel.getPos());
+
+        if (standingTile == barrel) {
+            EnumFacing facing = barrel.orientation.facing;
+            BlockPos facingPos = barrel.getPos().offset(facing);
+            if (barrel.getWorld().isSideSolid(facingPos, facing.getOpposite())) {
+                return;
+            }
+
+            int l = barrel.getWorld().getCombinedLight(facingPos, barrel.getWorld().getSkylightSubtracted());
+            int j = l % 65536;
+            int k = l / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
         }
 
         Minecraft.getMinecraft().mcProfiler.startSection("barrels");
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
-
-        int l = barrel.getWorld().getCombinedLight(facingPos, barrel.getWorld().getSkylightSubtracted());
-        int j = l % 65536;
-        int k = l / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
 
         doDraw(barrel, is, partialTicks);
 

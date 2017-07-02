@@ -19,14 +19,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class IngredientMaterialFactory implements IIngredientFactory {
-    public static class Ingredient extends IngredientCharset {
+    public static class IngredientMaterial extends IngredientCharset {
         private final String[] chain;
         private final TCharSet dependencies;
         private final String[] types;
         private final String nbtTag;
         private net.minecraft.item.crafting.Ingredient dependency;
 
-        protected Ingredient(String nbtTag, String... types) {
+        protected IngredientMaterial(String nbtTag, String... types) {
             super(0);
             this.types = types;
             this.nbtTag = nbtTag;
@@ -34,7 +34,7 @@ public class IngredientMaterialFactory implements IIngredientFactory {
             this.dependencies = null;
         }
 
-        protected Ingredient(String nbtTag, String chain, boolean dummy, String... types) {
+        protected IngredientMaterial(String nbtTag, String chain, boolean dummy, String... types) {
             super(0);
             this.types = types;
             this.nbtTag = nbtTag;
@@ -132,7 +132,7 @@ public class IngredientMaterialFactory implements IIngredientFactory {
 
     @Nonnull
     @Override
-    public Ingredient parse(JsonContext jsonContext, JsonObject jsonObject) {
+    public IngredientMaterial parse(JsonContext jsonContext, JsonObject jsonObject) {
         String tag = JsonUtils.getString(jsonObject, "nbtKey");
         String[] material;
 
@@ -147,9 +147,9 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         }
 
         if (jsonObject.has("chain")) {
-            return new Ingredient(tag, JsonUtils.getString(jsonObject, "chain"), false, material);
+            return new IngredientMaterial(tag, JsonUtils.getString(jsonObject, "chain"), false, material);
         } else {
-            return new Ingredient(tag, material);
+            return new IngredientMaterial(tag, material);
         }
     }
 }

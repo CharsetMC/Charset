@@ -172,7 +172,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                     BlockPos cPos = container.pos().offset(connFaces[i]);
                     AxisAlignedBB cornerMask = factory.getCornerBox(location, i ^ 1);
                     if (cornerMask != null) {
-                        if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(cornerMask), container.world(), cPos)) {
+                        if (OcclusionUtils.PRIMARY.intersects(Collections.singletonList(cornerMask), container.world(), cPos)) {
                             cornerOccludedSides |= 1 << connFaces[i].ordinal();
                             invalidCornerSides.add(face);
                         }

@@ -11,7 +11,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -72,10 +74,10 @@ public class CommandCharset extends CommandBase {
                 if (sender.canUseCommand(command.getPermissionLevel(), "charset")) {
                     command.execute(server, sender, args2);
                 } else {
-                    sender.sendMessage(new TextComponentString(TextFormatting.RED + "You are not allowed to use this command!"));
+                    sender.sendMessage(new TextComponentTranslation("commands.generic.permission").setStyle(new Style().setColor(TextFormatting.RED)));
                 }
             } else {
-                sender.sendMessage(new TextComponentString(TextFormatting.RED + "Command not found!"));
+                sender.sendMessage(new TextComponentTranslation("commands.generic.parameter.invalid", args[0]).setStyle(new Style().setColor(TextFormatting.RED)));
             }
         } else {
             sender.sendMessage(new TextComponentString(getUsage(sender)));
@@ -102,7 +104,7 @@ public class CommandCharset extends CommandBase {
                         event.setCanceled(true);
                         command.execute(Minecraft.getMinecraft().getIntegratedServer(), sender, args2);
                     } else {
-                        sender.sendMessage(new TextComponentString(TextFormatting.RED + "You are not allowed to use this command!"));
+                        sender.sendMessage(new TextComponentTranslation("commands.generic.permission").setStyle(new Style().setColor(TextFormatting.RED)));
                     }
                 }
             } else {

@@ -26,7 +26,7 @@ public class SubItemProviderSets implements ISubItemProvider {
         List<Collection<ItemStack>> sets = createItemSets();
 
         if (sets.size() > 0) {
-            if (all || ModCharset.INDEV || getVisibleSetAmount() >= sets.size()) {
+            if (all || getVisibleSetAmount() >= sets.size()) {
                 for (Collection<ItemStack> set : sets)
                     builder.addAll(set);
             } else {
@@ -43,7 +43,7 @@ public class SubItemProviderSets implements ISubItemProvider {
 
     @Override
     public Collection<ItemStack> getItems() {
-        return getItems(false);
+        return getItems(CharsetLib.showAllItemTypes);
     }
 
     @Override

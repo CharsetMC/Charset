@@ -235,7 +235,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                         if (x < s.length()) {
                             Ingredient i = recipe.charToIngredient.get(s.charAt(x));
                             if (i == null) {
-                                throw new RuntimeException("Ingredient not found: '" + s.charAt(x) + "'!");
+                                throw new RuntimeException("IngredientMaterial not found: '" + s.charAt(x) + "'!");
                             }
                             recipe.input.add(i);
                         } else {
