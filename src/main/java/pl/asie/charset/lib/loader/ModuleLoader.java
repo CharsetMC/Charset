@@ -197,10 +197,12 @@ public class ModuleLoader {
 							configDirty = true;
 						}
 
-						if ("ENABLE".equals(prop.getString().toUpperCase())) {
+						if (prop.getString().toUpperCase().startsWith("ENABLE")) {
 							override = ThreeState.YES;
-						} else if ("DISABLE".equals(prop.getString().toUpperCase())) {
+						} else if (prop.getString().toUpperCase().startsWith("DISABLE")) {
 							override = ThreeState.NO;
+						} else if (!"DEFAULT".equals(prop.getString().toUpperCase())) {
+							ModCharset.logger.warn("Invalid value for '" + name + "' override: '" + prop.getString() + ";");
 						}
 					}
 				}

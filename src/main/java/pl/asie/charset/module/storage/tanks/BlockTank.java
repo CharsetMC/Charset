@@ -2,6 +2,7 @@ package pl.asie.charset.module.storage.tanks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -39,6 +40,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         setUnlocalizedName("charset.tank");
         setFullCube(false);
         setOpaqueCube(false);
+        setSoundType(SoundType.GLASS);
     }
 
     @Override

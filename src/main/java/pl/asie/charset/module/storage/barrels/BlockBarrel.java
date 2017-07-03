@@ -36,7 +36,9 @@
 
 package pl.asie.charset.module.storage.barrels;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -45,6 +47,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -66,11 +69,17 @@ import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class BlockBarrel extends BlockBase implements ITileEntityProvider {
+    private static final List<Set<TileEntityDayBarrel.Upgrade>> CREATIVE_TAB_UPGRADE_SETS = ImmutableList.of(
+            EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class),
+            EnumSet.of(TileEntityDayBarrel.Upgrade.STICKY),
+            EnumSet.of(TileEntityDayBarrel.Upgrade.HOPPING),
+            EnumSet.of(TileEntityDayBarrel.Upgrade.HOPPING, TileEntityDayBarrel.Upgrade.STICKY),
+            EnumSet.of(TileEntityDayBarrel.Upgrade.SILKY)
+    );
+
     public BlockBarrel() {
         // TODO: Adventure mode support (the Material trick doesn't work)
         super(new Material(MapColor.WOOD));
@@ -88,15 +97,23 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         if (rep.upgrades.size() > 0) {
             return null;
         }
-        ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
-        builder.add(rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState())); // No upgrade barrel
 
-        for (TileEntityDayBarrel.Upgrade upgrade : TileEntityDayBarrel.Upgrade.values()) {
-            if (upgrade == TileEntityDayBarrel.Upgrade.INFINITE) continue;
-            if (!CharsetStorageBarrels.isEnabled(upgrade)) continue;
-            rep.upgrades.add(upgrade);
-            builder.add(rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState()));
-            rep.upgrades.clear();
+        ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
+
+        for (Set<TileEntityDayBarrel.Upgrade> upgrades : CREATIVE_TAB_UPGRADE_SETS) {
+            boolean allowed = true;
+            for (TileEntityDayBarrel.Upgrade upgrade : upgrades) {
+                if (!CharsetStorageBarrels.isEnabled(upgrade)) {
+                    allowed = false;
+                    break;
+                }
+            }
+
+            if (allowed) {
+                rep.upgrades.addAll(upgrades);
+                builder.add(rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState()));
+                rep.upgrades.clear();
+            }
         }
 
         return builder.build();
@@ -275,5 +292,15 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
         return layer == BlockRenderLayer.TRANSLUCENT || layer == BlockRenderLayer.SOLID;
+    }
+
+    @Override
+    public SoundType getSoundType(IBlockState state, World world, BlockPos pos, @Nullable Entity entity) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityDayBarrel) {
+            return ((TileEntityDayBarrel) tile).getSoundType();
+        } else {
+            return SoundType.WOOD;
+        }
     }
 }

@@ -37,8 +37,10 @@
 package pl.asie.charset.module.storage.barrels;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -963,10 +965,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         return false;
     }
 
-    // TODO: Use the ItemMaterial system better!
     public boolean isWooden() {
         try {
-            return ItemUtils.getBlockState(woodLog.getStack()).getMaterial() == Material.WOOD;
+            return woodLog.getTypes().contains("wood");
         } catch (Exception e) {
             return false;
         }
@@ -993,6 +994,18 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             return ItemUtils.getBlockState(woodLog.getStack()).getBlock().getFireSpreadSpeed(woodLogAccess, getPos(), face);
         } catch (Exception e) {
             return isWooden() ? 5 : 0;
+        }
+    }
+
+    public SoundType getSoundType() {
+        try {
+            if (isTop(EnumFacing.UP) || isBottom(EnumFacing.UP)) {
+                return ItemUtils.getBlockState(woodSlab.getStack()).getBlock().getSoundType();
+            } else {
+                return ItemUtils.getBlockState(woodLog.getStack()).getBlock().getSoundType();
+            }
+        } catch (Exception e) {
+            return SoundType.WOOD;
         }
     }
 }

@@ -61,7 +61,7 @@ public class CharsetStorageBarrels {
 	public static ItemMinecartDayBarrel barrelCartItem;
 
 	public static boolean renderBarrelText, renderBarrelItem, renderBarrelItem3D;
-	public static boolean enableSilkyBarrels, enableHoppingBarrels;
+	public static boolean enableSilkyBarrels, enableStickyBarrels, enableHoppingBarrels;
 	public static int maxDroppedStacks;
 
 	public static boolean isEnabled(TileEntityDayBarrel.Upgrade upgrade) {
@@ -69,6 +69,8 @@ public class CharsetStorageBarrels {
 			return enableSilkyBarrels;
 		} else if (upgrade == TileEntityDayBarrel.Upgrade.HOPPING) {
 			return enableHoppingBarrels;
+		} else if (upgrade == TileEntityDayBarrel.Upgrade.STICKY) {
+			return enableStickyBarrels;
 		} else {
 			return true;
 		}
@@ -89,6 +91,7 @@ public class CharsetStorageBarrels {
 		renderBarrelText = config.getBoolean("renderText", "render", true, "Should text be rendered on barrels?");
 		enableSilkyBarrels = config.getBoolean("enableSilkyBarrels", "features", !ModCharset.isModuleLoaded("tweak.blockCarrying"), "Enable silky barrels. On by default unless tweak.blockCarrying is also present.");
 		enableHoppingBarrels = config.getBoolean("enableHoppingBarrels", "features", true, "Enable hopping barrels. On by default.");
+		enableStickyBarrels = config.getBoolean("enableStickyBarrels", "features", true, "Enable sticky barrels. On by default.");
 		maxDroppedStacks = config.getInt("maxDroppedStacks", "general", 1024, 0, (Integer.MAX_VALUE / 64), "The maximum amount of stacks to be dropped when a barrel is broken.");
 	}
 
