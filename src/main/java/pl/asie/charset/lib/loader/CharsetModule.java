@@ -18,6 +18,7 @@ public @interface CharsetModule {
 	boolean isClientOnly() default false;
 	boolean isServerOnly() default false;
 	String[] dependencies() default {};
+	String[] antidependencies() default {};
 
 	@Retention(value = RUNTIME)
 	@Target(value = FIELD)

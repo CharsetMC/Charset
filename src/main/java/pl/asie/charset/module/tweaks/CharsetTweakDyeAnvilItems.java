@@ -69,6 +69,7 @@ import java.util.Set;
 @CharsetModule(
 		name = "tweak.anvilDyeItems",
 		description = "Allows dyeing item names in an anvil",
+		antidependencies = "mod:quark",
 		profile = ModuleProfile.UNSTABLE
 )
 // TODO: Override GuiIngame.highlightingItemStack?
@@ -79,7 +80,7 @@ public class CharsetTweakDyeAnvilItems {
 				&& event.getLeft().getCount() == event.getRight().getCount()) {
 			EnumDyeColor color = ColorUtils.getDyeColor(event.getRight());
 			if (color != null) {
-				event.setCost(event.getLeft().getCount() * 5);
+				event.setCost(event.getLeft().getCount() * 3);
 
 				if (event.getOutput().isEmpty()) {
 					event.setOutput(event.getLeft().copy());

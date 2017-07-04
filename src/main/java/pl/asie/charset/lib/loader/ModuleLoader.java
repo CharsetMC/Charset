@@ -129,6 +129,14 @@ public class ModuleLoader {
 		}
 	}
 
+	private boolean isDepPresent(String dep, Collection<String> enabledModules) {
+		if (dep.startsWith("mod:")) {
+			return Loader.isModLoaded(dep.substring("mod:".length()));
+		} else {
+			return enabledModules.contains(dep);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private void readDataTable(ASMDataTable table) {
 		Multimap<String, String> unmetDependencies = HashMultimap.create();
@@ -224,6 +232,19 @@ public class ModuleLoader {
 				compatModules.add(name);
 			}
 
+			if (override == ThreeState.MAYBE && isDefault) {
+				List<String> antideps = (List<String>) info.get("antidependencies");
+				if (antideps != null) {
+					for (String dep : antideps) {
+						if (isDepPresent(dep, enabledModules)) {
+							ModCharset.logger.info("Antidependency " + dep + " is present - disabling otherwise not forced module " + name + ".");
+							isDefault = false;
+							break;
+						}
+					}
+				}
+			}
+
 			EnableInformation enableInfo = new EnableInformation(isDefault, override);
 			if (enableInfo.isEnabled()) {
 				enabledModules.add(name);
@@ -247,8 +268,6 @@ public class ModuleLoader {
 			removedCount = 0;
 
 			for (String name : enabledModules) {
-				boolean canLoad = true;
-
 				if (dependencies.containsKey(name)) {
 					for (String dep : dependencies.get(name)) {
 						boolean optional = false;
@@ -257,28 +276,14 @@ public class ModuleLoader {
 							dep = dep.substring("optional:".length());
 						}
 
-						boolean met = true;
-						if (!optional) {
-							if (dep.startsWith("mod:")) {
-								if (!Loader.isModLoaded(dep.substring("mod:".length()))) {
-									met = false;
-								}
-							} else {
-								if (!enabledModules.contains(dep)) {
-									met = false;
-								}
-							}
-						}
+						boolean met = optional || isDepPresent(dep, enabledModules);
 
 						if (!met) {
-							canLoad = false;
 							enableInfoMap.get(name).dependenciesMet = false;
 							unmetDependencies.put(name, dep);
+							break;
 						}
 					}
-				}
-
-				if (canLoad) {
 				}
 			}
 
