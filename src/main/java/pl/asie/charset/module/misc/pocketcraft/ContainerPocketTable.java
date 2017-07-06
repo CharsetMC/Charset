@@ -52,6 +52,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContainerPocketTable extends ContainerBase {
+    //InventoryPlayer Slots:
+    //09 10 11 12 13 14 15 16 17
+    //18 19 20 21 22 23 24 25 26
+    //27 28 29 30 31 32 33 34 35
+    //00 01 02 03 04 05 06 07 08
+    private static final int slotCycleOrder[] = {
+            15, 16, 17,
+            26,
+            35, 34, 33,
+            24,
+    };
+    private static final int slotPlayerOrder[] = {
+            15, 16, 17,
+            24, 25, 26,
+            33, 34, 35
+    };
+
     private final EntityPlayer player;
     private final InventoryPlayer playerInv;
     private final int heldPos;
@@ -74,8 +91,39 @@ public class ContainerPocketTable extends ContainerBase {
         heldPos = this.playerInv.currentItem;
         craftResultSlot = (RedirectedSlotCrafting) addSlotToContainer(new RedirectedSlotCrafting(player, craftMatrix, craftResult, 207, 28));
         bindPlayerInventory(player.inventory, 8, 8);
-        detectAndSendChanges();
         updateCraft();
+    }
+
+    void movePlayerToMatrix() {
+        for (int i = 0; i < 9; i++) {
+            craftMatrix.setInventorySlotContents(i, playerInv.getStackInSlot(slotPlayerOrder[i]));
+            playerInv.setInventorySlotContents(slotPlayerOrder[i], ItemStack.EMPTY);
+        }
+    }
+
+    void copyMatrixToPlayer() {
+        for (int i = 0; i < 9; i++) {
+            playerInv.setInventorySlotContents(slotPlayerOrder[i], craftMatrix.getStackInSlot(i).copy());
+        }
+    }
+
+    boolean isWorking = false;
+
+    public void updateCraft() {
+        if (isWorking) {
+            dirty = true;
+            return;
+        }
+        movePlayerToMatrix();
+        ItemStack result = ItemStack.EMPTY;
+        IRecipe match = CraftingManager.findMatchingRecipe(craftMatrix, player.getEntityWorld());
+        if (match != null) {
+            result = match.getCraftingResult(craftMatrix);
+        }
+        craftResult.setInventorySlotContents(0, result);
+        copyMatrixToPlayer();
+        dirty = false;
+        detectAndSendChanges();
     }
 
     @Override
@@ -123,55 +171,31 @@ public class ContainerPocketTable extends ContainerBase {
 
         @Override
         public void onCrafting(ItemStack stack) {
-            isCrafting = true;
-            ItemStack faker = ItemStack.EMPTY;
-            for (Slot slot : craftingSlots) {
-                playerInv.setInventorySlotContents(slot.getSlotIndex(), faker);
+            if (!isCrafting) {
+                isCrafting = true;
+                movePlayerToMatrix();
+                super.onCrafting(stack);
+                copyMatrixToPlayer();
+                isCrafting = false;
+                detectAndSendChanges();
+            } else {
+                super.onCrafting(stack);
             }
-            super.onCrafting(stack);
-            int i = 0;
-            for (Slot slot : craftingSlots) {
-                ItemStack repl = craftMatrix.getStackInSlot(i);
-                playerInv.setInventorySlotContents(slot.getSlotIndex(), repl);
-            }
-            isCrafting = false;
-            craftResult.setInventorySlotContents(0, faker);
         }
 
         @Override
         public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
+            isCrafting = true;
+            movePlayerToMatrix();
             ItemStack stackOut = super.onTake(thePlayer, stack);
+            copyMatrixToPlayer();
             updateCraft();
+            isCrafting = false;
+            detectAndSendChanges();
             return stackOut;
         }
     }
-    
-    boolean isWorking = false;
-    
-    void updateMatrix() {
-        isWorking = true;
-        int i = 0;
-        for (Slot slot : craftingSlots) {
-            craftMatrix.setInventorySlotContents(i++, slot.getStack());
-        }
-        isWorking = false;
-    }
 
-    public void updateCraft() {
-        if (isWorking) {
-            dirty = true;
-            return;
-        } 
-        updateMatrix();
-        ItemStack result = ItemStack.EMPTY;
-        IRecipe match = CraftingManager.findMatchingRecipe(craftMatrix, player.getEntityWorld());
-        if (match != null) {
-            result = match.getCraftingResult(craftMatrix);
-        }
-        craftResult.setInventorySlotContents(0, result);
-        dirty = false;
-    }
-    
     @Override
     @SideOnly(Side.CLIENT)
     public void setAll(List<ItemStack> p_190896_1_) {
@@ -179,12 +203,12 @@ public class ContainerPocketTable extends ContainerBase {
         super.setAll(p_190896_1_);
         isWorking = false;
     }
-    
+
     @Override
     public void onCraftMatrixChanged(IInventory inv) {
         super.onCraftMatrixChanged(inv);
     }
-    
+
     @Override
     public void detectAndSendChanges() {
         if (!isCrafting) {
@@ -227,7 +251,7 @@ public class ContainerPocketTable extends ContainerBase {
                 res = res.copy();
             }
 
-            for (int count = getCraftCount(res); count > 0; count--) {
+            for (int count = getMaxCraftingAttempts(res); count > 0; count--) {
                 ItemStack craftedStack = craftResultSlot.getStack().copy();
                 held = tryTransferStackInSlot(player, craftResultSlot, nonCraftingInventorySlots);
                 craftResultSlot.onTake(player, craftedStack);
@@ -236,7 +260,7 @@ public class ContainerPocketTable extends ContainerBase {
                 }
                 updateCraft();
                 ItemStack newRes = craftResultSlot.getStack();
-                if (newRes.isEmpty() || !ItemUtils.canMerge(res, newRes) || getCraftCount(newRes) <= 0) {
+                if (newRes.isEmpty() || !ItemUtils.canMerge(res, newRes) || getMaxCraftingAttempts(newRes, newRes.getCount()) <= 0) {
                     break;
                 }
             }
@@ -249,28 +273,29 @@ public class ContainerPocketTable extends ContainerBase {
         detectAndSendChanges();
         return ItemStack.EMPTY;
     }
-    
-    int getCraftCount(ItemStack res) {
+
+    int getMaxCraftingAttempts(ItemStack res) {
+        return getMaxCraftingAttempts(res, res.getMaxStackSize());
+    }
+
+    int getMaxCraftingAttempts(ItemStack res, int maxSize) {
         boolean hasEmpty = false;
-        int space_to_fill = 0;
+        int nonEmptyAmount = 0;
         for (Slot slot : nonCraftingInventorySlots) {
             ItemStack is = slot.getStack();
             if (is.isEmpty()) {
                 hasEmpty = true;
-                continue;
+            } else if (ItemUtils.canMerge(res, is)) {
+                nonEmptyAmount += is.getMaxStackSize() - is.getCount();
+                if (nonEmptyAmount >= maxSize) {
+                    break;
+                }
             }
-            if (ItemUtils.canMerge(res, is)) {
-                space_to_fill += is.getMaxStackSize() - is.getCount();
-            }
         }
-        if (space_to_fill > 64) {
-            space_to_fill = 64;
+        if (nonEmptyAmount > maxSize || nonEmptyAmount == 0 && hasEmpty) {
+            nonEmptyAmount = maxSize;
         }
-        int ret = space_to_fill / res.getCount();
-        if (ret == 0 && hasEmpty) {
-            return 64 / res.getCount();
-        }
-        return ret;
+        return nonEmptyAmount / res.getCount();
     }
 
     void craftClear() {
@@ -280,24 +305,7 @@ public class ContainerPocketTable extends ContainerBase {
                 tryTransferStackInSlot(player, slot, hotbarSlots);
             }
         }
-        updateMatrix();
     }
-    
-    //InventoryPlayer Slots:
-    //09 10 11 12 13 14 15 16 17
-    //18 19 20 21 22 23 24 25 26
-    //27 28 29 30 31 32 33 34 35
-    //00 01 02 03 04 05 06 07 08
-    private static final int slots[] = {
-        15, 16, 17,
-        26,
-        35, 34, 33,
-        24,
-    };
-    private static final int slotsTwice[] = {
-        15, 16, 17, 26, 35, 34, 33, 24,
-        15, 16, 17, 26, 35, 34, 33, 24,
-    };
 
     void craftSwirl() {
         boolean anyAction = false;
@@ -306,17 +314,17 @@ public class ContainerPocketTable extends ContainerBase {
             //2. find an empty slot
             //3. move 1 item from former into latter
             boolean any = false;
-            for (int slotIndexIndex = 0; slotIndexIndex < slots.length; slotIndexIndex++) {
-                ItemStack is = playerInv.getStackInSlot(slots[slotIndexIndex]);
+            for (int slotIndexIndex = 0; slotIndexIndex < slotCycleOrder.length; slotIndexIndex++) {
+                ItemStack is = playerInv.getStackInSlot(slotCycleOrder[slotIndexIndex]);
                 if (is.isEmpty() || is.getCount() <= 1) {
                     continue;
                 }
-                for (int probidex = slotIndexIndex; probidex < slotsTwice.length && probidex < slotIndexIndex + slots.length; probidex++) {
-                    ItemStack empty = playerInv.getStackInSlot(slotsTwice[probidex]);
+                for (int probidex = slotIndexIndex; probidex < slotIndexIndex + slotCycleOrder.length; probidex++) {
+                    ItemStack empty = playerInv.getStackInSlot(slotCycleOrder[probidex % slotCycleOrder.length]);
                     if (!empty.isEmpty()) {
                         continue;
                     }
-                    playerInv.setInventorySlotContents(slotsTwice[probidex], is.splitStack(1));
+                    playerInv.setInventorySlotContents(slotCycleOrder[probidex % slotCycleOrder.length], is.splitStack(1));
                     any = true;
                     break;
                 }
@@ -329,15 +337,14 @@ public class ContainerPocketTable extends ContainerBase {
         }
         if (!anyAction) {
             //Did nothing. Shift the item around.
-            ItemStack swapeh = playerInv.getStackInSlot(slots[slots.length - 1]);
-            for (int i = 0; i < slots.length; i++) {
-                ItemStack here = playerInv.getStackInSlot(slotsTwice[i]);
-                playerInv.setInventorySlotContents(slotsTwice[i], swapeh);
+            ItemStack swapeh = playerInv.getStackInSlot(slotCycleOrder[slotCycleOrder.length - 1]);
+            for (int i = 0; i < slotCycleOrder.length; i++) {
+                ItemStack here = playerInv.getStackInSlot(slotCycleOrder[i]);
+                playerInv.setInventorySlotContents(slotCycleOrder[i], swapeh);
                 swapeh = here;
             }
-            playerInv.setInventorySlotContents(slots[0], swapeh);
+            playerInv.setInventorySlotContents(slotCycleOrder[0], swapeh);
         }
-        updateMatrix();
     }
     
     void craftBalance() {
@@ -404,8 +411,6 @@ public class ContainerPocketTable extends ContainerBase {
                 }
             }
         }
-
-        updateMatrix();
     }
 
     void craftFill(int slot) {
@@ -419,6 +424,5 @@ public class ContainerPocketTable extends ContainerBase {
             }
         }
         playerInv.setInventorySlotContents(slot, toMove.isEmpty() ? ItemStack.EMPTY : toMove);
-        updateMatrix();
     }
 }

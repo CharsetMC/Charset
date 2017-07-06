@@ -5,6 +5,7 @@
     * Also fixes #138 and #129
 * [lib] Added many useful commands!
 * [lib] Improve wire occlusion logic.
+* [misc.pocketcraft] [#146] Fixed item loss bug.
 * [misc.pocketcraft] [#139] Fixed item duplication bug.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
 * [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
@@ -21,6 +22,7 @@
 * [storage.tanks] Tanks with liquid in them are now harder to break than empty tanks to avoid fluid loss by accident.
 * [transport.color] Dyed minecarts now use your resource pack's minecart texture
 * [tweak.anvilDyeItems] New tweak - improved over the 1.6.4 AsieLib version.
+* [tweak.carry] Carried blocks now render in third person! \o/
 * [tweak.carry] [#140] Carrying will now respect your pickblock key mapping.
     * However, mapping it to a key as opposed to a mouse button will prevent carrying from working in Creative Mode.
 * [tweak.carry] Fix carried blocks sometimes appearing on other players.
