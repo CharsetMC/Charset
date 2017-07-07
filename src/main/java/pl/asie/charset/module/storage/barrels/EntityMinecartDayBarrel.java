@@ -57,6 +57,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.Orientation;
 
@@ -72,7 +73,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     private IItemHandler itemHandler = new MinecartItemHandler();
     private int activatorRailTicks = 0;
 
-    public class MinecartItemHandler implements IItemHandler {
+    public class MinecartItemHandler implements ICacheable, IItemHandler {
         @Override
         public int getSlots() {
             return 1;

@@ -3,8 +3,9 @@ package pl.asie.charset.api.locks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.INBTSerializable;
+import pl.asie.charset.api.lib.ICacheable;
 
-public final class Lockable implements INBTSerializable<NBTTagCompound> {
+public final class Lockable implements ICacheable, INBTSerializable<NBTTagCompound> {
     private final TileEntity owner;
     private ILockingEntity lock;
 

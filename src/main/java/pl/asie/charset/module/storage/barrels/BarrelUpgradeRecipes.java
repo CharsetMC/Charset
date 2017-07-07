@@ -154,6 +154,8 @@ public class BarrelUpgradeRecipes {
             if (matcher != null) {
                 ItemStack is = grabBarrel(input);
                 if (is.isEmpty()) return ItemStack.EMPTY; // Shouldn't happen?
+                is = is.copy();
+                is.setCount(1);
                 return TileEntityDayBarrel.addUpgrade(is, upgradeType);
             } else {
                 return ItemStack.EMPTY;

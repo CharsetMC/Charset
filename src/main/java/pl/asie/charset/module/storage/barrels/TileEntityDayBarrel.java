@@ -61,6 +61,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.IAxisRotatable;
+import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
@@ -84,7 +85,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     protected final ExtractionHandler extractionView = new ExtractionHandler();
     protected final ReadableItemHandler readOnlyView = new ReadableItemHandler();
 
-    public abstract class BaseItemHandler implements IItemHandler {
+    public abstract class BaseItemHandler implements ICacheable, IItemHandler {
         @Override
         public int getSlots() {
             return 1;
@@ -883,14 +884,22 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     static ItemStack addUpgrade(ItemStack barrel, Upgrade upgrade) {
         barrel = barrel.copy();
         NBTTagCompound tag = ItemUtils.getTagCompound(barrel, true);
-        NBTTagList list = tag.getTagList("upgrades", Constants.NBT.TAG_STRING);
-        for (int i = 0; i < list.tagCount(); i++) {
-            if (list.getStringTagAt(i).equals(upgrade.name())) {
-                return barrel;
+        NBTTagList list;
+        if (!tag.hasKey("upgrades")) {
+            list = new NBTTagList();
+        } else {
+            list = tag.getTagList("upgrades", Constants.NBT.TAG_STRING);
+            for (int i = 0; i < list.tagCount(); i++) {
+                if (list.getStringTagAt(i).equals(upgrade.name())) {
+                    return barrel;
+                }
             }
         }
 
         list.appendTag(new NBTTagString(upgrade.name()));
+        if (list.tagCount() > 0) {
+            tag.setTag("upgrades", list);
+        }
         return barrel;
     }
 

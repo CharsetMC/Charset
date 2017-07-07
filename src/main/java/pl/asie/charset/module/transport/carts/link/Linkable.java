@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 public final class Linkable {
 	public static final Storage STORAGE = new Storage();
-	public static final Supplier<CapabilityProviderFactory<Linkable>> PROVIDER = FunctionalUtils.lazySupplier(() -> new CapabilityProviderFactory<Linkable>(
+	public static final Supplier<CapabilityProviderFactory<Linkable>> PROVIDER = FunctionalUtils.lazySupplier(() -> new CapabilityProviderFactory<>(
 			CharsetTransportCarts.LINKABLE, STORAGE
 	));
 	public static final ResourceLocation ID = new ResourceLocation("charsetcarts", "linkable");

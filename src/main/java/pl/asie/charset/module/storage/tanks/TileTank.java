@@ -14,6 +14,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.api.lib.IMultiblockStructure;
@@ -25,7 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-public class TileTank extends TileBase implements IFluidHandler, IFluidTankProperties, IMovable, IDebuggable, IMultiblockStructure {
+public class TileTank extends TileBase implements IFluidHandler, IFluidTankProperties, IMovable, IDebuggable, IMultiblockStructure, ICacheable {
     public static class TankIterator implements Iterator<TileTank> {
         private TileTank currTank;
 

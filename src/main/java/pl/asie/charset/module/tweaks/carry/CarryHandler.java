@@ -22,6 +22,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
@@ -30,7 +31,7 @@ import pl.asie.charset.lib.utils.RotationUtils;
 
 import javax.annotation.Nullable;
 
-public class CarryHandler {
+public class CarryHandler implements ICacheable {
     public static CapabilityProviderFactory<CarryHandler> PROVIDER;
     public static final BlockPos ACCESS_POS = new BlockPos(0, 64, 0);
 
