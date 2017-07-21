@@ -22,10 +22,12 @@
 * [storage.tanks] Tanks with liquid in them are now harder to break than empty tanks to avoid fluid loss by accident.
 * [transport.color] Dyed minecarts now use your resource pack's minecart texture
 * [tweak.anvilDyeItems] New tweak - improved over the 1.6.4 AsieLib version.
+* [tweak.carry] [#148] Add placement sound for placing carried blocks.
 * [tweak.carry] Carried blocks now render in third person! \o/
 * [tweak.carry] [#140] Carrying will now respect your pickblock key mapping.
-    * However, mapping it to a key as opposed to a mouse button will prevent carrying from working in Creative Mode.
+* However, mapping it to a key as opposed to a mouse button will prevent carrying from working in Creative Mode.
 * [tweak.carry] Fix carried blocks sometimes appearing on other players.
+* [tweak.carry] [#149] Fix doors being carryable.
 * [tweak.carry] [#137] Fix placing double chests potentially causing a rendering glitch.
 * [tweak.carry] Fix rendering bug caused by carrying a block with a notification visible.
 * [tweak.carry] Prevent the player from picking up blocks they can't break.

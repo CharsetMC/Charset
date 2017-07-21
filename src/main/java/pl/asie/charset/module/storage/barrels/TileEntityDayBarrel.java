@@ -390,7 +390,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             BlockPos upPos = getPos().offset(orientation.top);
             IItemHandler handler = CapabilityHelper.get(getWorld(), upPos,
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top.getOpposite(),
-                    true, true);
+                    false, true, true);
 
             if (handler != null) {
                 for (int i = 0; i < handler.getSlots(); i++) {
@@ -408,7 +408,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             BlockPos downPos = getPos().offset(orientation.top.getOpposite());
             IItemHandler handler = CapabilityHelper.get(getWorld(), downPos,
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top,
-                    true, true);
+                    false, true, true);
 
             if (handler != null) {
                 ItemStack toPush = item.copy();

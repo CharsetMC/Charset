@@ -3,6 +3,7 @@ package pl.asie.charset.module.tweaks.carry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockMobSpawner;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
@@ -166,12 +168,15 @@ public class CarryHandler implements ICacheable {
             }
 
             if (world.mayPlace(block.getBlock(), pos, false, facing, player)) {
+                world.setBlockState(pos, block);
                 if (block.getBlock() instanceof BlockChest) {
-                    // FIXME: Double chests need this (#137)
-                    world.setBlockState(pos, block);
-                    block.getBlock().onBlockPlacedBy(world, pos, block, player, ItemStack.EMPTY);
-                } else {
-                    world.setBlockState(pos, block);
+                    for (EnumFacing facing1 : EnumFacing.HORIZONTALS) {
+                        if (world.getBlockState(pos.offset(facing1)).getBlock() instanceof BlockChest) {
+                            // FIXME: Double chests need this (#137)
+                            block.getBlock().onBlockPlacedBy(world, pos, block, player, ItemStack.EMPTY);
+                            break;
+                        }
+                    }
                 }
                 IBlockState oldBlock = block;
                 block = null;
@@ -193,8 +198,15 @@ public class CarryHandler implements ICacheable {
                     RotationUtils.rotateAround(world, pos, EnumFacing.UP, rotCycles);
                 }
 
+                IBlockState newState = world.getBlockState(pos);
+
+                if (player instanceof EntityPlayer) {
+                    SoundType soundtype = newState.getBlock().getSoundType(newState, world, pos, player);
+                    world.playSound((EntityPlayer) player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                }
+
                 // TODO: Check if I break something
-                world.getBlockState(pos).neighborChanged(world, pos, oldBlock.getBlock(), pos);
+                newState.neighborChanged(world, pos, oldBlock.getBlock(), pos);
 
                 return true;
             } else {

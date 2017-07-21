@@ -17,6 +17,8 @@
 package pl.asie.charset.lib.capability;
 
 import mcmultipart.api.multipart.MultipartCapabilityHelper;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoor;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -48,6 +50,7 @@ import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.capability.impl.MultiblockStructureBed;
 import pl.asie.charset.lib.capability.impl.MultiblockStructureChest;
+import pl.asie.charset.lib.capability.impl.MultiblockStructureDoor;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
 import pl.asie.charset.lib.capability.lib.*;
@@ -137,6 +140,13 @@ public class Capabilities {
  	public static void init() {
 		if (Loader.isModLoaded("mcmultipart")) {
 			initMultiplePants();
+		}
+
+		for (Block block : Block.REGISTRY) {
+			if (block instanceof BlockDoor
+					&& block.getBlockState().getProperties().contains(BlockDoor.HALF)) {
+				CapabilityHelper.registerBlockProvider(Capabilities.MULTIBLOCK_STRUCTURE, block, MultiblockStructureDoor::new);
+			}
 		}
 	}
 

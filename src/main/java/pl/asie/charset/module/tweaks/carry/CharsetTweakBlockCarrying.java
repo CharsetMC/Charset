@@ -30,6 +30,7 @@ import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -96,26 +97,28 @@ public class CharsetTweakBlockCarrying {
             TileEntity tile = world.getTileEntity(pos);
 
             if (tile != null) {
-                // Check IMultiblockStructure
-                IMultiblockStructure structure = tile.getCapability(Capabilities.MULTIBLOCK_STRUCTURE, null);
-                if (structure != null && !structure.isSeparable()) {
-                    int count = 0;
-                    Iterator<BlockPos> it = structure.iterator();
-                    while (it.hasNext()) {
-                        if (++count >= 2) return false;
-                    }
-                }
-
-                // Check IMovable
-                IMovable movable = tile.getCapability(Capabilities.MOVABLE, null);
-                if (movable != null && !movable.canMoveFrom()) {
-                    return false;
-                }
-
                 Class<? extends TileEntity> tileClass = tile.getClass();
                 locs.add(TileEntity.getKey(tileClass));
                 names.add(tileClass.getName());
             }
+        }
+
+        // Check IMultiblockStructure
+        IMultiblockStructure structure = CapabilityHelper.get(world, pos, Capabilities.MULTIBLOCK_STRUCTURE, null,
+                true, true, false);
+        if (structure != null && !structure.isSeparable()) {
+            int count = 0;
+            Iterator<BlockPos> it = structure.iterator();
+            while (it.hasNext()) {
+                if (++count >= 2) return false;
+            }
+        }
+
+        // Check IMovable
+        IMovable movable = CapabilityHelper.get(world, pos, Capabilities.MOVABLE, null,
+                true, true, false);
+        if (movable != null && !movable.canMoveFrom()) {
+            return false;
         }
 
         for (ResourceLocation r : locs)
