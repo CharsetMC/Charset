@@ -50,6 +50,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -65,6 +67,7 @@ import java.util.Map;
 		name = "tweak.dynamicLights",
 		description = "Dynamic lights, based on Albedo!",
 		dependencies = {"mod:albedo"},
+		isClientOnly = true,
 		profile = ModuleProfile.TESTING
 )
 public class CharsetTweakDynamicLights {

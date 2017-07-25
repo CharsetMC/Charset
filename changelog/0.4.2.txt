@@ -3,6 +3,7 @@
 * Major improvements to Just Enough Items support.
 * Redesigned module configuration system! Should be easier to understand by users.
     * Also fixes #138 and #129
+* [audio.noteblock] Fix 1.12 compatibility, improve mod compatibility.
 * [lib] Added many useful commands!
 * [lib] Improve wire occlusion logic.
 * [misc.pocketcraft] [#146] Fixed item loss bug.
@@ -31,6 +32,7 @@
 * [tweak.carry] [#137] Fix placing double chests potentially causing a rendering glitch.
 * [tweak.carry] Fix rendering bug caused by carrying a block with a notification visible.
 * [tweak.carry] Prevent the player from picking up blocks they can't break.
+* [tweak.dynamicLights] New tweak - requires Albedo! Client-side only! Fun!
 * [tweak.remove.netherPortals] New tweak!
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.
 * [tweak.unifyColors] Temporarily removed - awaiting redesign.

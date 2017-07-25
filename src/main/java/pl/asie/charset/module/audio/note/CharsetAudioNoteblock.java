@@ -1,6 +1,7 @@
 package pl.asie.charset.module.audio.note;
 
 import com.google.common.base.Predicate;
+import net.minecraft.block.BlockNote;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.lib.audio.types.AudioDataGameSound;
@@ -30,7 +32,9 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.FunctionalUtils;
+import pl.asie.charset.lib.utils.MethodHandleHelper;
 
+import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -41,31 +45,24 @@ import java.util.function.Supplier;
         profile = ModuleProfile.TESTING
 )
 public class CharsetAudioNoteblock {
+    private static final MethodHandle GET_INSTRUMENT = MethodHandleHelper.findMethod(BlockNote.class, "getInstrument", "func_185576_e", int.class);
     private static final Supplier<CapabilityProviderFactory<IAudioSource>> PROVIDER = FunctionalUtils.lazySupplier(() -> new CapabilityProviderFactory<>(Capabilities.AUDIO_SOURCE));
-    private static final List<Pair<Predicate<IBlockState>, SoundEvent>> INSTRUMENTS = new ArrayList<>();
-    private static final SoundEvent DEFAULT_INSTRUMENT;
     private static final ResourceLocation NOTE_SOURCE_KEY = new ResourceLocation("charsetaudio:noteSource");
 
     @CharsetModule.PacketRegistry
     public PacketRegistry packet;
 
-    static {
-        DEFAULT_INSTRUMENT = SoundEvents.BLOCK_NOTE_HARP;
-
-        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.ROCK, SoundEvents.BLOCK_NOTE_BASEDRUM));
-        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.SAND, SoundEvents.BLOCK_NOTE_SNARE));
-        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.GLASS, SoundEvents.BLOCK_NOTE_HAT));
-        INSTRUMENTS.add(Pair.of(input -> input.getMaterial() == Material.WOOD, SoundEvents.BLOCK_NOTE_BASS));
-    }
-
-    public static SoundEvent getSound(IBlockState state) {
-        for (Pair<Predicate<IBlockState>, SoundEvent> predicate : INSTRUMENTS) {
-            if (predicate.getKey().apply(state)) {
-                return predicate.getValue();
-            }
+    public static SoundEvent getSound(World world, BlockPos pos, int id) {
+        if (GET_INSTRUMENT == null) {
+            ModCharset.logger.error("BlockNote.getInstrument not found! This is bad!");
         }
 
-        return DEFAULT_INSTRUMENT;
+        try {
+            return (GET_INSTRUMENT != null ? (SoundEvent) GET_INSTRUMENT.invokeExact((BlockNote) Blocks.NOTEBLOCK, (int) id) : SoundEvents.BLOCK_NOTE_HARP);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return SoundEvents.BLOCK_NOTE_HARP;
+        }
     }
 
     @Mod.EventHandler
@@ -77,8 +74,8 @@ public class CharsetAudioNoteblock {
     public void onNoteEvent(NoteBlockEvent.Play event) {
         World worldIn = event.getWorld();
         BlockPos pos = event.getPos();
-        SoundEvent sound = getSound(worldIn.getBlockState(pos.offset(EnumFacing.DOWN)));
         int param = event.getVanillaNoteId();
+        SoundEvent sound = getSound(event.getWorld(), event.getPos(), event.getInstrument().ordinal());
         float pitch = (float)Math.pow(2.0D, (double)(param - 12) / 12.0D);
 
         if (!worldIn.isRemote) {
