@@ -56,9 +56,6 @@ public class CharsetTweakBlockCarrying {
     @CharsetModule.PacketRegistry
     public static PacketRegistry packet;
 
-    @CharsetModule.Configuration
-    public static Configuration config;
-
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         packet.registerPacket(0x01, PacketCarryGrab.class);

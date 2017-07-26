@@ -52,8 +52,11 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.utils.ThreeState;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -72,14 +75,25 @@ public class CharsetTweakDoubleDoors {
 		for (Block block : GameRegistry.findRegistry(Block.class)) {
 			try {
 				if (block != null && block instanceof BlockDoor) {
-					Class c = block.getClass();
-					Method m = ReflectionHelper.findMethod(c, "onBlockActivated", "func_180639_a",
-							World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
-							EnumHand.class, EnumFacing.class,
-							float.class, float.class, float.class);
-					if (m != null && m.getDeclaringClass() == BlockDoor.class) {
+					ThreeState state = CharsetIMC.INSTANCE.allows("doubleDoor", block.getRegistryName());
+					boolean allowed = false;
+
+					if (state == ThreeState.MAYBE && !(block.getRegistryName().getResourceDomain().equals("malisisdoors"))) {
+						Class c = block.getClass();
+						Method m = ReflectionHelper.findMethod(c, "onBlockActivated", "func_180639_a",
+								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
+								EnumHand.class, EnumFacing.class,
+								float.class, float.class, float.class);
+						if (m != null && m.getDeclaringClass() == BlockDoor.class) {
+							allowed = true;
+						}
+					} else if (state == ThreeState.YES) {
+						allowed = true;
+					}
+
+					if (allowed) {
 						allowedDoors.add((BlockDoor) block);
-						System.out.println("Allowing " + block.getRegistryName().toString());
+						ModCharset.logger.info("[tweak.doubledoors] Allowing " + block.getRegistryName().toString());
 					}
 				}
 			} catch (ReflectionHelper.UnableToFindMethodException e) {

@@ -1,6 +1,8 @@
 package pl.asie.charset.lib;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
@@ -12,7 +14,8 @@ import java.util.*;
 
 public final class CharsetIMC {
     public static CharsetIMC INSTANCE = new CharsetIMC();
-    private final Map<String, Set<ResourceLocation>> registryLocs = new HashMap<>();
+    private final Multimap<String, ResourceLocation> registryLocs = HashMultimap.create();
+    private final Multimap<String, String> registryDomainLocs = HashMultimap.create();
 
     private CharsetIMC() {
 
@@ -38,14 +41,21 @@ public final class CharsetIMC {
         config.get("functionalityRegistry", "whitelist", new String[]{});
     }
 
-    public Collection<ResourceLocation> getResourceLocationEntries(String key) {
-        return registryLocs.getOrDefault(key, Collections.emptySet());
-    }
-
     public ThreeState allows(String key, ResourceLocation location) {
-        return getResourceLocationEntries("b:" + key).contains(location) ? ThreeState.NO
-                : getResourceLocationEntries("w:" + key).contains(location) ? ThreeState.YES
-                : ThreeState.MAYBE;
+        String bKey = "b:" + key;
+        String wKey = "w:" + key;
+
+        if (registryLocs.get(bKey).contains(location)) {
+            return ThreeState.NO;
+        } else if (registryLocs.get(wKey).contains(location)) {
+            return ThreeState.YES;
+        } else if (registryDomainLocs.get(bKey).contains(location.getResourceDomain())) {
+            return ThreeState.NO;
+        } else if (registryDomainLocs.get(wKey).contains(location.getResourceDomain())) {
+            return ThreeState.YES;
+        } else {
+            return ThreeState.MAYBE;
+        }
     }
 
     public ThreeState allows(String key, Set<ResourceLocation> locations) {
@@ -69,10 +79,11 @@ public final class CharsetIMC {
     }
 
     private void add(String entryKey, ResourceLocation entry) {
-        if (!registryLocs.containsKey(entryKey))
-            registryLocs.put(entryKey, Sets.newHashSet(entry));
-        else
-            registryLocs.get(entryKey).add(entry);
+        if (entry.getResourcePath().equals("*")) {
+            registryDomainLocs.put(entryKey, entry.getResourceDomain());
+        } else {
+            registryLocs.put(entryKey, entry);
+        }
     }
 
     private String toEntryKey(String entryKey, String prefix) {
