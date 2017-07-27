@@ -56,7 +56,7 @@ public class SubCommandHand extends SubCommand {
                     }
                 }
             } else {
-                sender.sendMessage(new TextComponentString(TextFormatting.YELLOW + stack.toString()));
+                sender.sendMessage(new TextComponentString(TextFormatting.YELLOW + stack.toString() + " " + TextFormatting.GRAY + "(" + stack.getItem().getRegistryName() + ")"));
                 if (stack.hasTagCompound()) {
                     sender.sendMessage(new TextComponentString(stack.getTagCompound().toString()));
                 }

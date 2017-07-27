@@ -16,6 +16,7 @@
 
 package pl.asie.charset.module.tools.wrench;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -26,13 +27,30 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @CharsetModule(
 		name = "tools.wrench",
 		description = "Simple block-rotating wrench",
 		profile = ModuleProfile.STABLE
 )
 public class CharsetToolsWrench {
+	private static Map<Block, ICustomRotateBlock> customRotationHandlers = new HashMap<>();
+
 	public static ItemWrench wrench;
+
+	public static ICustomRotateBlock getRotationHandler(Block block) {
+		return customRotationHandlers.get(block);
+	}
+
+	public static void registerRotationHandler(Block block, ICustomRotateBlock rotateBlock) {
+		if (customRotationHandlers.containsKey(block)) {
+			throw new RuntimeException("Duplicate rotation handlers for " + block.getRegistryName() + "! " + rotateBlock.getClass().getName() + ", " + customRotationHandlers.get(block).getClass().getName());
+		}
+
+		customRotationHandlers.put(block, rotateBlock);
+	}
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

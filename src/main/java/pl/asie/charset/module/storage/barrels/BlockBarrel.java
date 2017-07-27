@@ -195,7 +195,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         if (axis != null) {
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof TileEntityDayBarrel) {
-                ((TileEntityDayBarrel) tile).rotateWrench(axis);
+                ((TileEntityDayBarrel) tile).rotateWrench(axis.getOpposite());
                 return true;
             }
         }

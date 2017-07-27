@@ -61,9 +61,7 @@ public final class ItemMaterialHeuristics {
         if (!base.getTypes().contains("block") || base.getRelated("slab") != null)
             return;
 
-        ItemStack slab = RecipeUtils.getCraftingResult(null, 3, 3,
-                null, null, null,
-                null, null, null,
+        ItemStack slab = RecipeUtils.getCraftingResult(null, 3, 1,
                 base.getStack(), base.getStack(), base.getStack());
         if (isBlock(slab)) {
             addResultingBlock(base, slab, "block", "slab");
@@ -148,6 +146,29 @@ public final class ItemMaterialHeuristics {
         String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
         ItemMaterial ingotMat = reg.getOrCreateMaterial(stack);
 
+        if (prefix.equals("ingot") && suffix.startsWith("brick")) {
+            if (reg.registerTypes(ingotMat, "brick", "item")) {
+                int splitPoint2 = indexOfUpper(suffix, 1);
+                if (splitPoint2 >= 0) {
+                    String suffixU2 = suffix.substring(splitPoint2);
+                    String suffix2 = suffixU2.substring(0, 1).toLowerCase() + suffixU2.substring(1);
+                    reg.registerType(ingotMat, suffix2);
+                }
+
+                // Try crafting a block
+                ItemStack block = RecipeUtils.getCraftingResult(null, 2, 2,
+                        stack, stack,
+                        stack, stack);
+                if (!block.isEmpty() && block.getItem() instanceof ItemBlock) {
+                    ItemMaterial blockMat = reg.getOrCreateMaterial(block);
+                    reg.registerTypes(blockMat, suffix, "block");
+                    reg.registerRelation(ingotMat, blockMat, "block", prefix);
+                }
+            }
+
+            return;
+        }
+
         if (reg.registerTypes(ingotMat, prefix, suffix, "item")) {
             // Try crafting a nugget
             if (prefix.equals("ingot")) {
@@ -181,7 +202,8 @@ public final class ItemMaterialHeuristics {
         // Create ore materials for each ore
         supplyExpandedStacks(OreDictionary.getOres(oreName), (stack -> {
             if (isBlock(stack)) {
-                reg.registerTypes(reg.getOrCreateMaterial(stack), prefix, suffix, "block");
+                ItemMaterial oreMaterial = reg.getOrCreateMaterial(stack);
+                reg.registerTypes(oreMaterial, prefix, suffix, "block");
             }
         }));
     }

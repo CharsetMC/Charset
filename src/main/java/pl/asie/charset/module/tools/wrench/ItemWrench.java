@@ -97,8 +97,13 @@ public class ItemWrench extends ItemBase {
             }
 
             IBlockState state = worldIn.getBlockState(pos);
-            if (state != null) {
-                return state.getBlock().rotateBlock(worldIn, pos, targetFacing) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+            if (!state.getBlock().isAir(state, worldIn, pos)) {
+                ICustomRotateBlock customRotateBlock = CharsetToolsWrench.getRotationHandler(state.getBlock());
+                if (customRotateBlock != null) {
+                    return customRotateBlock.rotateBlock(worldIn, pos, state, targetFacing.getOpposite()) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+                } else {
+                    return state.getBlock().rotateBlock(worldIn, pos, targetFacing.getOpposite()) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+                }
             }
         }
         return EnumActionResult.SUCCESS;
