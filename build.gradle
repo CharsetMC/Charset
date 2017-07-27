@@ -31,7 +31,7 @@ configurations {
 }
 
 dependencies {
-	deploy 'org.apache.maven.wagon.wagon-ssh:2.10'
+	deploy 'org.apache.maven.wagon:wagon-ssh:2.10'
 }
 
 minecraft {
