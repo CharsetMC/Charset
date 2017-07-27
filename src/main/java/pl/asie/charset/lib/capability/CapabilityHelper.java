@@ -16,7 +16,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pl.asie.charset.api.lib.IBlockCapabilityProvider;
 
-import java.util.Hashtable;
 import java.util.List;
 
 public final class CapabilityHelper {

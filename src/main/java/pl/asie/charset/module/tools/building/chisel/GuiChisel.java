@@ -16,19 +16,13 @@
 
 package pl.asie.charset.module.tools.building.chisel;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ui.GuiContainerCharset;
-import pl.asie.charset.module.misc.pocketcraft.CharsetMiscPocketcraft;
-import pl.asie.charset.module.misc.pocketcraft.ContainerPocketTable;
-import pl.asie.charset.module.misc.pocketcraft.PacketPTAction;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Locale;
 
 public class GuiChisel extends GuiContainerCharset {
     private static final ResourceLocation CHISEL_GUI = new ResourceLocation("charset:textures/gui/chiselgui.png");

@@ -1,6 +1,5 @@
 package pl.asie.charset.module.misc.scaffold;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -13,7 +12,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -27,22 +25,15 @@ import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
-import pl.asie.charset.lib.item.SubItemProviderSets;
 import pl.asie.charset.lib.material.ItemMaterial;
-import pl.asie.charset.lib.recipe.RecipeCharset;
-import pl.asie.charset.lib.utils.ItemStackHashSet;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class BlockScaffold extends BlockBase implements ITileEntityProvider {

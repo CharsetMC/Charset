@@ -1,13 +1,8 @@
 package pl.asie.charset.lib.command;
 
-import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class SubCommandClientCmdList extends SubCommand {

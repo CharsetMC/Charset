@@ -1,11 +1,9 @@
 package pl.asie.charset.lib.utils;
 
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializer;
 import net.minecraft.network.datasync.DataSerializers;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 public final class DataSerializersCharset {
     private DataSerializersCharset() {

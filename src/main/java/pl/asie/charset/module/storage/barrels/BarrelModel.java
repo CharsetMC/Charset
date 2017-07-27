@@ -37,7 +37,6 @@
 package pl.asie.charset.module.storage.barrels;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -54,7 +53,6 @@ import pl.asie.charset.lib.render.model.WrappedBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
     public static final BarrelModel INSTANCE = new BarrelModel();

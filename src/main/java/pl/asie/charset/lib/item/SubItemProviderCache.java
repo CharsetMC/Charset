@@ -1,7 +1,6 @@
 package pl.asie.charset.lib.item;
 
 import net.minecraft.item.ItemStack;
-import pl.asie.charset.lib.material.ItemMaterialHeuristics;
 
 import java.util.Collection;
 import java.util.HashSet;

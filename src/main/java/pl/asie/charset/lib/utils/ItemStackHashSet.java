@@ -4,7 +4,6 @@ import gnu.trove.set.hash.TCustomHashSet;
 import gnu.trove.strategy.HashingStrategy;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ItemStackHashSet extends TCustomHashSet<ItemStack> {
     public static class Strategy implements HashingStrategy<ItemStack> {

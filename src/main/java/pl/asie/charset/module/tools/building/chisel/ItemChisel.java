@@ -16,10 +16,15 @@
 
 package pl.asie.charset.module.tools.building.chisel;
 
+import net.minecraft.block.BlockButton;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -81,7 +86,7 @@ public class ItemChisel extends ItemBase {
             IBlockState state = worldIn.getBlockState(pos);
             if (!state.getBlock().isAir(state, worldIn, pos)) {
                 ItemStack inputStack = state.getBlock().getPickBlock(state, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), worldIn, pos, playerIn);
-                if (inputStack.getCount() == 1) {
+                if (!inputStack.isEmpty() && inputStack.getCount() == 1) {
                     ItemStack heldItem = playerIn.getHeldItem(EnumHand.MAIN_HAND);
                     ItemStack[] inputStacks = new ItemStack[9];
                     int inputMask = getBlockMask(heldItem);
@@ -94,7 +99,8 @@ public class ItemChisel extends ItemBase {
                     }
 
                     ItemStack result = RecipeUtils.getCraftingResult(worldIn, 3, 3, inputStacks);
-                    if (result != null && !result.isEmpty() && result.getCount() == inputCount) {
+                    if (result != null && !result.isEmpty() && result.getCount() == inputCount
+                            && !(result.getItem() instanceof ItemBlock && ((ItemBlock) result.getItem()).getBlock() instanceof BlockButton)) {
                         ItemStack resultCopy = result.copy();
                         resultCopy.setCount(1);
                         ToolsUtils.placeBlockOrRollback(resultCopy, playerIn, worldIn, pos);

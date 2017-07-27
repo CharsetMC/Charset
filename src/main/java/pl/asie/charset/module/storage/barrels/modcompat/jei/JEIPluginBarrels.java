@@ -13,7 +13,8 @@ import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 @CharsetJEIPlugin("storage.barrels")
 public class JEIPluginBarrels implements IModPlugin {

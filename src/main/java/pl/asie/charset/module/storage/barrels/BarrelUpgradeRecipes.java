@@ -52,7 +52,6 @@ import pl.asie.charset.lib.recipe.RecipeCharset;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 // TODO: Turn into JSONs
 public class BarrelUpgradeRecipes {

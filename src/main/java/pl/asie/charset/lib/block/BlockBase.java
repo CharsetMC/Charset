@@ -47,18 +47,15 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.item.ISubItemProvider;
-import pl.asie.charset.lib.item.SubItemProviderSimple;
-import pl.asie.charset.lib.material.ItemMaterialHeuristics;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.utils.Utils;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider = this instanceof ITileEntityProvider;

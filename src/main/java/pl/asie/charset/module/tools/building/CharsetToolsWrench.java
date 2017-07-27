@@ -16,31 +16,16 @@
 
 package pl.asie.charset.module.tools.building;
 
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
-import pl.asie.charset.lib.network.PacketRegistry;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.module.tools.building.chisel.ContainerChisel;
-import pl.asie.charset.module.tools.building.chisel.GuiChisel;
-import pl.asie.charset.module.tools.building.chisel.ItemChisel;
-import pl.asie.charset.module.tools.building.chisel.PacketSetBlockMask;
-import pl.asie.charset.module.tools.building.trowel.ItemTrowel;
-import pl.asie.charset.module.tools.building.wrench.ICustomRotateBlock;
 import pl.asie.charset.module.tools.building.wrench.ItemWrench;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @CharsetModule(
 		name = "tools.wrench",

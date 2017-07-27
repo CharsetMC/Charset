@@ -4,12 +4,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class SubItemProviderRecipes extends SubItemProviderSets {
     @Nullable

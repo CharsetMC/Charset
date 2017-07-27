@@ -2,7 +2,6 @@ package pl.asie.charset.lib.item;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
 
 import java.util.*;

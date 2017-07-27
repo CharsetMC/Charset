@@ -18,20 +18,7 @@ package pl.asie.charset.module.tools.building.chisel;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.ui.ContainerBase;
-import pl.asie.charset.lib.ui.SlotBlocked;
-import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.module.misc.pocketcraft.CharsetMiscPocketcraft;
-import pl.asie.charset.module.misc.pocketcraft.PacketPTAction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ContainerChisel extends ContainerBase {
     public final EntityPlayer player;

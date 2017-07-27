@@ -5,7 +5,6 @@ import net.minecraft.util.JsonUtils;
 import net.minecraftforge.common.crafting.IConditionFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.loader.ModuleLoader;
 
 import java.util.function.BooleanSupplier;
 

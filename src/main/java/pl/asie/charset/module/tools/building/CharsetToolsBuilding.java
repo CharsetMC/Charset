@@ -17,7 +17,10 @@
 package pl.asie.charset.module.tools.building;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -31,15 +34,9 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.module.misc.pocketcraft.ContainerPocketTable;
-import pl.asie.charset.module.misc.pocketcraft.GuiPocketTable;
-import pl.asie.charset.module.tools.building.chisel.ContainerChisel;
-import pl.asie.charset.module.tools.building.chisel.GuiChisel;
-import pl.asie.charset.module.tools.building.chisel.ItemChisel;
-import pl.asie.charset.module.tools.building.chisel.PacketSetBlockMask;
+import pl.asie.charset.module.tools.building.chisel.*;
 import pl.asie.charset.module.tools.building.trowel.ItemTrowel;
 import pl.asie.charset.module.tools.building.wrench.ICustomRotateBlock;
-import pl.asie.charset.module.tools.building.wrench.ItemWrench;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,6 +89,16 @@ public class CharsetToolsBuilding {
 	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(chisel,0, "charset:chisel");
 		// RegistryUtils.registerModel(trowel,0, "charset:trowel");
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void bakeModels(ModelBakeEvent event) {
+		ModelResourceLocation location = new ModelResourceLocation("charset:chisel", "inventory");
+		IBakedModel model = event.getModelRegistry().getObject(location);
+		if (model != null) {
+			event.getModelRegistry().putObject(location, new ChiselBakedModel(model));
+		}
 	}
 
 	@SubscribeEvent

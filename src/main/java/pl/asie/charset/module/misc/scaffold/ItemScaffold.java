@@ -1,7 +1,6 @@
 package pl.asie.charset.module.misc.scaffold;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
 import pl.asie.charset.lib.block.BlockBase;

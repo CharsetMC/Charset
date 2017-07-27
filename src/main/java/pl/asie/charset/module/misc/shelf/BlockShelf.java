@@ -1,6 +1,5 @@
 package pl.asie.charset.module.misc.shelf;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -31,13 +30,12 @@ import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
-import pl.asie.charset.lib.item.SubItemProviderSets;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.RayTraceUtils;
-import pl.asie.charset.module.misc.scaffold.BlockScaffold;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class BlockShelf extends BlockBase implements ITileEntityProvider {
     public static final Collection<ItemMaterial> PLANKS = new HashSet<>();

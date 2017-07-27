@@ -29,6 +29,12 @@ public class WrappedBakedModel extends BaseBakedModel {
     private final IBakedModel parent;
     private final TextureAtlasSprite particleSprite;
 
+    public WrappedBakedModel(IBakedModel parent) {
+        super();
+        this.parent = parent;
+        this.particleSprite = null;
+    }
+
     public WrappedBakedModel(IBakedModel parent, TextureAtlasSprite particleSprite) {
         super();
         this.parent = parent;
@@ -42,7 +48,7 @@ public class WrappedBakedModel extends BaseBakedModel {
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return particleSprite;
+        return particleSprite != null ? particleSprite : parent.getParticleTexture();
     }
 
     @Override

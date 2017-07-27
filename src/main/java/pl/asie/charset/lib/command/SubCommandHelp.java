@@ -1,22 +1,12 @@
 package pl.asie.charset.lib.command;
 
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.oredict.OreDictionary;
-import pl.asie.charset.lib.material.ItemMaterial;
-import pl.asie.charset.lib.material.ItemMaterialRegistry;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
 public class SubCommandHelp extends SubCommand {
     public SubCommandHelp() {

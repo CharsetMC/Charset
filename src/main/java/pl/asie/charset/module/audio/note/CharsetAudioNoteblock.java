@@ -1,9 +1,6 @@
 package pl.asie.charset.module.audio.note;
 
-import com.google.common.base.Predicate;
 import net.minecraft.block.BlockNote;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.tileentity.TileEntity;
@@ -20,7 +17,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.audio.AudioPacket;
 import pl.asie.charset.api.audio.IAudioSource;
@@ -35,8 +31,6 @@ import pl.asie.charset.lib.utils.FunctionalUtils;
 import pl.asie.charset.lib.utils.MethodHandleHelper;
 
 import java.lang.invoke.MethodHandle;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 @CharsetModule(

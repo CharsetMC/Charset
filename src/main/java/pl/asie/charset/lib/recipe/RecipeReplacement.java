@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.recipe;
 
-import com.google.common.collect.Sets;
 import gnu.trove.iterator.TCharIterator;
 import gnu.trove.map.TCharObjectMap;
 import gnu.trove.map.hash.TCustomHashMap;
@@ -12,14 +11,14 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.crafting.IngredientNBT;
 import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.registries.IForgeRegistry;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 // TODO: Add option to replace with OreIngredients
 // TODO: Add support for IngredientNBTs? Smelting? Brewing?

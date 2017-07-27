@@ -3,14 +3,16 @@ package pl.asie.charset.lib;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ThreeState;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public final class CharsetIMC {
     public static CharsetIMC INSTANCE = new CharsetIMC();
