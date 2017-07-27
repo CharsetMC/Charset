@@ -178,6 +178,7 @@ public class CharsetLib {
 
 		CommandCharset.register(new SubCommandHelp());
 		CommandCharset.register(new SubCommandHand());
+		CommandCharset.register(new SubCommandAt());
 	}
 
 	@Mod.EventHandler

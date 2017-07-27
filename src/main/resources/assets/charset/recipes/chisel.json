@@ -1,0 +1,29 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "tools.building"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "chisel",
+  "pattern": [
+    "  i",
+    " s ",
+    "s  "
+  ],
+  "key": {
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    }
+  },
+  "result": {
+    "item": "charset:chisel",
+    "count": 1
+  }
+}

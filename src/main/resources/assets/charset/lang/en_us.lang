@@ -107,6 +107,7 @@ item.charset.shard.colored.name=%s Glass Shard
 item.charset.shard.name=Glass Shard
 
 # CharsetWrench
+item.charset.chisel.name=Chisel
 item.charset.wrench.name=Wrench
 
 tile.charset.tank.name=Tank

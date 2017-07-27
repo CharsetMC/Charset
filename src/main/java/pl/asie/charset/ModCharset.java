@@ -39,6 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.loader.ModuleLoader;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -61,8 +62,9 @@ public class ModCharset {
 	@Mod.Instance(value = ModCharset.MODID)
 	public static ModCharset instance;
 
-	public static Item charsetIconItem;
-	public static ItemStack charsetIconStack;
+	private static Item charsetIconItem;
+	private static ItemStack charsetIconStack;
+	public static ModuleProfile profile;
 
 	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs("charset") {
 		@Override

@@ -1,4 +1,4 @@
-package pl.asie.charset.module.tools.wrench;
+package pl.asie.charset.module.tools.building.wrench;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.asie.charset.module.tools.wrench;
+package pl.asie.charset.module.tools.building.wrench;
 
 import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.utils.RayTraceUtils;
+import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 
 import java.util.Optional;
 
@@ -98,7 +99,7 @@ public class ItemWrench extends ItemBase {
 
             IBlockState state = worldIn.getBlockState(pos);
             if (!state.getBlock().isAir(state, worldIn, pos)) {
-                ICustomRotateBlock customRotateBlock = CharsetToolsWrench.getRotationHandler(state.getBlock());
+                ICustomRotateBlock customRotateBlock = CharsetToolsBuilding.getRotationHandler(state.getBlock());
                 if (customRotateBlock != null) {
                     return customRotateBlock.rotateBlock(worldIn, pos, state, targetFacing.getOpposite()) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
                 } else {
