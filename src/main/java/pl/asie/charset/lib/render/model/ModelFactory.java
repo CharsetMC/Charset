@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseBakedModel implements IStateParticleBakedModel {
-    private static final boolean DISABLE_CACHE = ModCharset.INDEV;
+    public static final boolean DISABLE_CACHE = ModCharset.INDEV;
     private static final Set<ModelFactory> FACTORIES = new HashSet<>();
 
     private static class MFItemOverride extends ItemOverrideList {

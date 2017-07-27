@@ -163,6 +163,7 @@ public class ModuleLoader {
 		} else {
 			throw new RuntimeException("Invalid Charset modules.cfg general.profile setting '" + baseProfileProp.getString() + "'!");
 		}
+		ModCharset.profile = profile;
 
 		ConfigCategory category = ModCharset.configModules.getCategory("overrides");
 		category.setComment("Overrides can have one of three values: DEFAULT, ENABLE, DISABLE\nDEFAULT will enable the module based on your profile settings and dependency availability.");
@@ -305,7 +306,7 @@ public class ModuleLoader {
 
 		for (String name : enabledModules) {
 			if (ModCharset.INDEV) {
-				ModCharset.logger.debug("Instantiating module " + name);
+				ModCharset.logger.info("Instantiating module " + name);
 			}
 			ASMDataTable.ASMData data = moduleData.get(name);
 			try {
@@ -323,10 +324,6 @@ public class ModuleLoader {
 				depStrings.add(depMod + "<-[" + joinerComma.join(unmetDependencies.get(depMod)) + "]");
 			}
 			throw new RuntimeException("The following mandatory dependencies were not met: " + joinerComma.join(depStrings));
-		}
-
-		for (Object o : loadedModules.values()) {
-			MinecraftForge.EVENT_BUS.register(o);
 		}
 
 		iterateModules(table, Mod.EventHandler.class.getName(), (data, instance) -> {
@@ -421,6 +418,10 @@ public class ModuleLoader {
 
 		for (List<Pair<String, MethodHandle>> list : loaderHandles.values()) {
 			list.sort(Comparator.comparingInt(a -> sortedModules.indexOf(a.getKey())));
+		}
+
+		for (String s : sortedModules) {
+			MinecraftForge.EVENT_BUS.register(loadedModules.get(s));
 		}
 
 		addClassNames(table, CharsetJEIPlugin.class, "jei");

@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedModel {
-    private static final boolean DEBUG = ModCharset.INDEV;
     private static final boolean RENDER_INNER_FACES = true;
     private static final boolean RENDER_OUTER_FACES = true;
 
@@ -71,7 +70,7 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
 
     private List<BakedQuad> getPipeQuads(int i, BlockRenderLayer layer) {
         if (layer == null) {
-            if (DEBUG || lists[256] == null) {
+            if (ModelFactory.DISABLE_CACHE || lists[256] == null) {
                 boolean[] connections = new boolean[6];
                 lists[256] = new ArrayList<>();
 
@@ -87,7 +86,7 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
             i += 64 * layer.ordinal();
         }
 
-        if (DEBUG || lists[i] == null) {
+        if (ModelFactory.DISABLE_CACHE || lists[i] == null) {
             if (block.canRenderInLayer(block.getDefaultState(), layer)) {
                 boolean[] connections = new boolean[6];
                 for (int j = 0; j < 6; j++) {

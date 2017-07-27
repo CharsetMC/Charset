@@ -1,6 +1,10 @@
 package pl.asie.charset.module.tools.building.chisel;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import gnu.trove.map.TIntObjectMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -20,6 +24,8 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.lib.render.model.BaseBakedModel;
+import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.render.model.ModelKey;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 
 import javax.annotation.Nullable;
@@ -27,6 +33,7 @@ import javax.vecmath.Matrix4f;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class ChiselBakedModel extends BaseBakedModel {
     private BakedQuad buildQuad(EnumFacing side, TextureAtlasSprite sprite,
@@ -72,25 +79,93 @@ public class ChiselBakedModel extends BaseBakedModel {
         }
     }
 
+    private final Cache<Integer, IBakedModel> cache;
     private final IBakedModel parent;
     private final ItemOverrideList list;
-    private final int mask;
+    private final List<BakedQuad> quads;
 
     public ChiselBakedModel(IBakedModel parent) {
         this.parent = parent;
-        this.mask = 0x1FF;
+        this.cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
         this.list = new ItemOverrideList(Collections.emptyList()) {
             @Override
             public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {
-                return new ChiselBakedModel(parent, stack);
+                if (ModelFactory.DISABLE_CACHE) {
+                    return new ChiselBakedModel(parent, cache, CharsetToolsBuilding.chisel.getBlockMask(stack));
+                }
+
+                int mask = CharsetToolsBuilding.chisel.getBlockMask(stack);
+                IBakedModel model = cache.getIfPresent(mask);
+                if (model == null) {
+                    model = new ChiselBakedModel(parent, cache, mask);
+                    cache.put(mask, model);
+                }
+                return model;
             }
         };
+        this.quads = null;
     }
 
-    public ChiselBakedModel(IBakedModel parent, ItemStack stack) {
+    public ChiselBakedModel(IBakedModel parent, Cache<Integer, IBakedModel> cache, int mask) {
         this.parent = parent;
-        this.mask = CharsetToolsBuilding.chisel.getBlockMask(stack);
+        this.cache = cache;
         this.list = ItemOverrideList.NONE;
+
+        List<BakedQuad> quads = parent.getQuads(null, null, 0);
+        if (mask != 0x1FF) {
+            ImmutableList.Builder<BakedQuad> quads2 = ImmutableList.builder();
+            quads2.addAll(quads);
+            TextureAtlasSprite sprite = parent.getParticleTexture();
+            int blockMask = mask;
+            outer: for (int y = 0; y < 3; y++) {
+                for (int x = 0; x < 3; x++) {
+                    if ((blockMask & (1 << (y*3+x))) == 0) {
+                        int width = 1;
+                        int height = 1;
+
+                        blockMask |= (1 << (y*3+x));
+                        for (int x0 = x + 1; x0 < 3; x0++) {
+                            if ((blockMask & (1 << (y*3+x0))) == 0) {
+                                blockMask |= (1 << (y*3+x0));
+                                width++;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        for (int y0 = y + 1; y0 < 3; y0++) {
+                            boolean match = true;
+
+                            for (int x0 = x; x0 < x+width; x0++) {
+                                if ((blockMask & (1 << (y0 * 3 + x0))) != 0) {
+                                    match = false;
+                                    break;
+                                }
+                            }
+
+                            if (match) {
+                                for (int x0 = x; x0 < x+width; x0++) {
+                                    blockMask |= (1 << (y0*3+x0));
+                                }
+                                height++;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        quads2.add(buildQuad(EnumFacing.NORTH, sprite, 4+x, 9+y, width, height, 7.49f, 0.6f));
+                        quads2.add(buildQuad(EnumFacing.SOUTH, sprite, 4+x, 9+y, width, height, 8.51f, 0.6f));
+                        if (blockMask == 0x1FF) {
+                            break outer;
+                        }
+                    }
+                }
+            }
+
+            this.quads = quads2.build();
+        } else {
+            this.quads = quads;
+        }
     }
 
     @Override
@@ -101,23 +176,6 @@ public class ChiselBakedModel extends BaseBakedModel {
 
     @Override
     public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
-        List<BakedQuad> quads = parent.getQuads(state, side, rand);
-        if (mask != 0x1FF && side == null) {
-            List<BakedQuad> quads2 = Lists.newArrayList(quads);
-            TextureAtlasSprite sprite = parent.getParticleTexture();
-            int blockMask = mask;
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    if ((blockMask & 1) == 0) {
-                        quads2.add(buildQuad(EnumFacing.NORTH, sprite, 4+x, 9+y, 1, 1, 7.49f, 0.6f));
-                        quads2.add(buildQuad(EnumFacing.SOUTH, sprite, 4+x, 9+y, 1, 1, 8.51f, 0.6f));
-                    }
-                    blockMask >>= 1;
-                }
-            }
-
-            return quads2;
-        }
         return quads;
     }
 
