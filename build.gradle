@@ -14,6 +14,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -25,8 +26,16 @@ archivesBaseName = "Charset"
 if (System.getenv("BUILD_NUMBER") != null)
 	version += ".${System.getenv("BUILD_NUMBER")}"
 
+configurations {
+	deploy
+}
+
+dependencies {
+	deploy 'org.apache.maven.wagon.wagon-ssh:2.10'
+}
+
 minecraft {
-	version = "1.12-14.21.1.2424"
+	version = "1.12-14.21.1.2426"
 
 	runDir = "run"
 	useDepAts = true
@@ -127,4 +136,8 @@ task apiJar(type: Jar) {
 
 artifacts {
 	archives apiJar
+}
+
+if (file('private.gradle').exists()) {
+	apply from: 'private.gradle'
 }
