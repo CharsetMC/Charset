@@ -381,4 +381,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
         return false;
     }
+
+    @Override
+    public boolean isCacheValid() {
+        return !isInvalid();
+    }
 }

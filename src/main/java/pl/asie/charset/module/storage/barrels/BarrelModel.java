@@ -37,6 +37,7 @@
 package pl.asie.charset.module.storage.barrels;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;

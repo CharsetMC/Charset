@@ -245,6 +245,11 @@ public class CarryHandler implements ICacheable {
         CarryHandler.PROVIDER = new CapabilityProviderFactory<>(CharsetTweakBlockCarrying.CAPABILITY, storage);
     }
 
+    @Override
+    public boolean isCacheValid() {
+        return !player.isDead;
+    }
+
     public static class Storage implements Capability.IStorage<CarryHandler> {
         @Override
         public NBTBase writeNBT(Capability<CarryHandler> capability, CarryHandler instance, EnumFacing side) {

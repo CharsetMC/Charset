@@ -61,8 +61,8 @@ import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.lib.capability.CapabilityCache;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.notify.Notice;
@@ -74,7 +74,6 @@ import java.util.*;
 public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRotatable {
     public ItemStack item = ItemStack.EMPTY;
     public ItemMaterial woodLog, woodSlab;
-    public ProxiedBlockAccess woodLogAccess;
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
     public Set<Upgrade> upgrades = EnumSet.noneOf(Upgrade.class);
     Object notice_target = this;
@@ -82,6 +81,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
     protected final InsertionHandler insertionView = new InsertionHandler();
     protected final ExtractionHandler extractionView = new ExtractionHandler();
     protected final ReadableItemHandler readOnlyView = new ReadableItemHandler();
+
+    private CapabilityCache.Single<IItemHandler> helperTop, helperBottom;
+    private ProxiedBlockAccess woodLogAccess;
 
     public abstract class BaseItemHandler implements ICacheable, IItemHandler {
         @Override
@@ -102,6 +104,11 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             return ItemStack.EMPTY;
+        }
+
+        @Override
+        public boolean isCacheValid() {
+            return !isInvalid();
         }
     }
 
@@ -274,6 +281,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         item = new ItemStack(compound.getCompoundTag("item"));
         item.setCount(compound.getInteger("count"));
         orientation = Orientation.getOrientation(compound.getByte("dir"));
+        helperTop = null;
+        helperBottom = null;
 
         upgrades.clear();
         populateUpgrades(upgrades, compound);
@@ -284,6 +293,14 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
 
         if (isClient && orientation != oldOrientation)
             markBlockForRenderUpdate();
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        woodLogAccess = null;
+        helperTop = null;
+        helperBottom = null;
     }
 
     @Override
@@ -384,11 +401,13 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
 
         boolean itemChanged = false;
 
+        if (helperTop == null) {
+            helperTop = new CapabilityCache.Single<>(world, getPos().offset(orientation.top), false, true, true, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top.getOpposite());
+            helperBottom = new CapabilityCache.Single<>(world, getPos().offset(orientation.top.getOpposite()), false, true, true, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top);
+        }
+
         if (getItemCount() < getMaxSize()) {
-            BlockPos upPos = getPos().offset(orientation.top);
-            IItemHandler handler = CapabilityHelper.get(getWorld(), upPos,
-                    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top.getOpposite(),
-                    false, true, true);
+            IItemHandler handler = helperTop.get();
 
             if (handler != null) {
                 for (int i = 0; i < handler.getSlots(); i++) {
@@ -403,10 +422,7 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         }
 
         if (getExtractableItemCount() > 0) {
-            BlockPos downPos = getPos().offset(orientation.top.getOpposite());
-            IItemHandler handler = CapabilityHelper.get(getWorld(), downPos,
-                    CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top,
-                    false, true, true);
+            IItemHandler handler = helperBottom.get();
 
             if (handler != null) {
                 ItemStack toPush = item.copy();
@@ -440,6 +456,9 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
             if (pos.getX() == fromPos.getX() && pos.getZ() == fromPos.getZ()) {
                 needLogic();
             }
+        } else if (helperTop != null) {
+            helperTop.neighborChanged(fromPos);
+            helperBottom.neighborChanged(fromPos);
         }
     }
 
@@ -908,6 +927,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         if (orientation != newOrientation) {
             if (!simulate) {
                 orientation = newOrientation;
+                helperTop = null;
+                helperBottom = null;
                 markBlockForUpdate();
                 getWorld().notifyNeighborsRespectDebug(pos, getBlockType(), true);
             }
@@ -927,6 +948,8 @@ public class TileEntityDayBarrel extends TileBase implements ITickable, IAxisRot
         }
 
         if (orientation != oldOrientation) {
+            helperTop = null;
+            helperBottom = null;
             markBlockForUpdate();
             getWorld().notifyNeighborsRespectDebug(pos, getBlockType(), true);
         }

@@ -253,16 +253,11 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.translate(0.25, -0.25 - labelD, 0);
 
         if (CharsetStorageBarrels.renderBarrelItem3D) {
-            boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null).isGui3d();
-            boolean isFullBlock = false;
-            Block block = Block.getBlockFromItem(is.getItem());
-            if (block != null) {
-                isFullBlock = block.getDefaultState().isFullCube();
-            }
-
+            boolean isBlock = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, barrel.getWorld(), null).isGui3d();
             if (isBlock) {
+                Block block = Block.getBlockFromItem(is.getItem());
                 GlStateManager.scale(0.75F, 0.75F, 0.75F);
-                if (isFullBlock) {
+                if (block.getDefaultState().isFullCube()) {
                     GlStateManager.translate(0, 0, -0.1);
                 }
             } else {
@@ -282,7 +277,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
 
             GlStateManager.scale(0.5F, 0.5F, 0.02F);
 
-            IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, null, null);
+            IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, barrel.getWorld(), null);
             model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GUI, false);
 
             // TODO: This might be the ugliest hack in all of barrels. FIXME

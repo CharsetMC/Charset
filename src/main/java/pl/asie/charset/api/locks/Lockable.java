@@ -63,4 +63,9 @@ public final class Lockable implements ICacheable, INBTSerializable<NBTTagCompou
             lock = null;
         }
     }
+
+    @Override
+    public boolean isCacheValid() {
+        return !owner.isInvalid();
+    }
 }

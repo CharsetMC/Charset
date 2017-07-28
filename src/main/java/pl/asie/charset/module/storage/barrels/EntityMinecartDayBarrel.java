@@ -73,7 +73,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     private IItemHandler itemHandler = new MinecartItemHandler();
     private int activatorRailTicks = 0;
 
-    public class MinecartItemHandler implements ICacheable, IItemHandler {
+    public class MinecartItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
             return 1;

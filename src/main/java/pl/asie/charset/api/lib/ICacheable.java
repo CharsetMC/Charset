@@ -12,16 +12,9 @@ public interface ICacheable {
      * is, if the tile entity is invalid, all the capabilities provided
      * by said tile entity are also considered invalid.
      *
-     * The default implementation always returns true to make life
-     * easier for the most common use-case of capabilities - objects
-     * created at the beginning of the object's lifetime and valid
-     * throughout the duration of said lifetime.
-     *
      * @return Whether the cached object is valid.
      */
-    default boolean isCacheValid() {
-        return true;
-    }
+    boolean isCacheValid();
 }
 
 

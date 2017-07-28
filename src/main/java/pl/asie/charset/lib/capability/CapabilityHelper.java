@@ -23,8 +23,8 @@ public final class CapabilityHelper {
         T get(ICapabilityProvider provider, EnumFacing side);
     }
 
+    protected static final Table<Block, Capability, IBlockCapabilityProvider> blockProviders = HashBasedTable.create();
     private static final Multimap<Capability, Wrapper<?>> wrappers = LinkedListMultimap.create();
-    private static final Table<Block, Capability, IBlockCapabilityProvider> blockProviders = HashBasedTable.create();
 
     private CapabilityHelper() {
 
