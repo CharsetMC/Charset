@@ -38,7 +38,9 @@ package pl.asie.charset.module.storage.barrels;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -102,6 +104,7 @@ public class ItemDayBarrel extends ItemBlockBase {
         if (is.hasTagCompound()) {
             TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());
         }
+
         if (upgradeSet.contains(TileEntityDayBarrel.Upgrade.SILKY)) {
             list.add(I18n.translateToLocal("tile.charset.barrel.SILKY.silkhint"));
             TileEntityDayBarrel db = new TileEntityDayBarrel();
@@ -121,5 +124,15 @@ public class ItemDayBarrel extends ItemBlockBase {
                 }
             }
         }
+    }
+
+    @Override
+    public int getItemBurnTime(ItemStack stack) {
+        if (stack.hasTagCompound()) {
+            ItemStack burnStack = TileEntityDayBarrel.getLog(stack.getTagCompound()).getStack();
+            return TileEntityFurnace.getItemBurnTime(burnStack);
+        }
+
+        return -1;
     }
 }

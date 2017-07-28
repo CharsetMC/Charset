@@ -16,10 +16,16 @@
 
 package pl.asie.charset.module.tools.building;
 
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -38,6 +44,24 @@ public class CharsetToolsWrench {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		wrench = new ItemWrench();
+	}
+
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		/* CharsetToolsBuilding.registerRotationHandler(Blocks.CHEST, ((world, pos, state, axis) -> {
+			for (EnumFacing facing : EnumFacing.Plane.HORIZONTAL) {
+				BlockPos pos2 = pos.offset(facing);
+				IBlockState state2 = world.getBlockState(pos2);
+				if (state2.getBlock() == state.getBlock()) {
+					EnumFacing newDir = state.getValue(BlockChest.FACING).getOpposite();
+					world.setBlockState(pos, state.withProperty(BlockChest.FACING, newDir));
+					world.setBlockState(pos2, state2.withProperty(BlockChest.FACING, newDir));
+					return true;
+				}
+			}
+
+			return state.getBlock().rotateBlock(world, pos, axis);
+		})); */
 	}
 
 	@SubscribeEvent

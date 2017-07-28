@@ -72,12 +72,7 @@ public class TileShelf extends TileBase {
 
 			if (!handler.getStackInSlot(slotId).isEmpty()) {
 				final int sentSlotId = slotId;
-				new Notice(new Vec3d(pos).addVector(hitX, hitY, hitZ), new INoticeUpdater() {
-					@Override
-					public void update(Notice msg) {
-						msg.withItem(handler.getStackInSlot(sentSlotId)).setMessage("{ITEM_NAME}{ITEM_INFOS_NEWLINE}");
-					}
-				}).sendTo(player);
+				new Notice(new Vec3d(pos).addVector(hitX, hitY, hitZ), msg -> msg.withItem(handler.getStackInSlot(sentSlotId)).setMessage("{ITEM_NAME}{ITEM_INFOS_NEWLINE}")).sendTo(player);
 
 				return true;
 			} else {
