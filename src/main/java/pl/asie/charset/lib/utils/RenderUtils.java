@@ -89,16 +89,16 @@ public final class RenderUtils {
 	public static int getAverageColor(TextureAtlasSprite sprite, AveragingMode mode) {
 		int pixelCount = 0;
 		int[] data = sprite.getFrameTextureData(0)[0];
-		int[] avgColor = new int[3];
+		long[] avgColor = new long[3];
 		switch (mode) {
 			case FULL:
 				for (int j = 0; j < sprite.getIconHeight(); j++) {
 					for (int i = 0; i < sprite.getIconWidth(); i++) {
 						int c = data[j * sprite.getIconWidth() + i];
 						if (((c >> 24) & 0xFF) > 0x00) {
-							avgColor[0] += (c & 0xFF);
-							avgColor[1] += ((c >> 8) & 0xFF);
-							avgColor[2] += ((c >> 16) & 0xFF);
+							avgColor[0] += (c & 0xFF)*(c & 0xFF);
+							avgColor[1] += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
+							avgColor[2] += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
 							pixelCount++;
 						}
 					}
@@ -109,9 +109,9 @@ public final class RenderUtils {
 					for (int i = 0; i < sprite.getIconHeight(); i++) {
 						int c = data[i * sprite.getIconWidth() + (j > 0 ? sprite.getIconWidth() - 1 : 0)];
 						if (((c >> 24) & 0xFF) > 0x00) {
-							avgColor[0] += (c & 0xFF);
-							avgColor[1] += ((c >> 8) & 0xFF);
-							avgColor[2] += ((c >> 16) & 0xFF);
+							avgColor[0] += (c & 0xFF)*(c & 0xFF);
+							avgColor[1] += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
+							avgColor[2] += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
 							pixelCount++;
 						}
 					}
@@ -122,19 +122,20 @@ public final class RenderUtils {
 					for (int i = 0; i < sprite.getIconWidth(); i++) {
 						int c = data[j > 0 ? (data.length - 1 - i) : i];
 						if (((c >> 24) & 0xFF) > 0x00) {
-							avgColor[0] += (c & 0xFF);
-							avgColor[1] += ((c >> 8) & 0xFF);
-							avgColor[2] += ((c >> 16) & 0xFF);
+							avgColor[0] += (c & 0xFF)*(c & 0xFF);
+							avgColor[1] += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
+							avgColor[2] += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
 							pixelCount++;
 						}
 					}
 				}
 				break;
 		}
+		int col = 0xFF000000;
 		for (int i = 0; i < 3; i++) {
-			avgColor[i] = (avgColor[i] / pixelCount) & 0xFF;
+			col |= ((int) Math.min(255, Math.round(Math.sqrt(avgColor[i] / pixelCount))) & 0xFF) << (i*8);
 		}
-		return 0xFF000000 | avgColor[0] | (avgColor[1] << 8) | (avgColor[2] << 16);
+		return col;
 	}
 
 	public static BufferedImage getTextureImage(ResourceLocation location) {

@@ -10,12 +10,14 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.concurrent.TimeUnit;
 
 public class ColorLookupHandler {
+    public static final boolean DISABLE_CACHES = ModCharset.INDEV;
     public static final ColorLookupHandler INSTANCE = new ColorLookupHandler();
     private final Cache<Key, Integer> COLOR_MAP = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
@@ -78,9 +80,8 @@ public class ColorLookupHandler {
 
     public int getColor(ItemStack stack, RenderUtils.AveragingMode mode) {
         Key key = new Key(stack, mode);
-        //Integer result = COLOR_MAP.getIfPresent(key);
-        Integer result = null;
-        if (result == null) {
+        Integer result = COLOR_MAP.getIfPresent(key);
+        if (DISABLE_CACHES || result == null) {
             TextureAtlasSprite sprite = RenderUtils.getItemSprite(stack);
             int out;
             if (sprite.getIconName().endsWith("missingno")) {
