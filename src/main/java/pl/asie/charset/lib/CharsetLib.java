@@ -40,6 +40,7 @@ import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.types.AudioDataDFPWM;
 import pl.asie.charset.lib.audio.types.AudioDataGameSound;
 import pl.asie.charset.lib.audio.types.AudioSinkBlock;
+import pl.asie.charset.lib.block.PacketCustomBlockDust;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.command.*;
 import pl.asie.charset.lib.item.SubItemProviderCache;
@@ -162,6 +163,8 @@ public class CharsetLib {
 
 		packet.registerPacket(0x10, PacketNotification.class);
 		packet.registerPacket(0x11, PacketPoint.class);
+
+		packet.registerPacket(0x20, PacketCustomBlockDust.class);
 
 		Capabilities.init();
 		DataSerializersCharset.init();

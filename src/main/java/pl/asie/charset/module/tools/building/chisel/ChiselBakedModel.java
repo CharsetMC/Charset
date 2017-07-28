@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import gnu.trove.map.TIntObjectMap;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -80,24 +81,26 @@ public class ChiselBakedModel extends BaseBakedModel {
     }
 
     private final Cache<Integer, IBakedModel> cache;
+    private final TextureAtlasSprite sprite;
     private final IBakedModel parent;
     private final ItemOverrideList list;
     private final List<BakedQuad> quads;
 
     public ChiselBakedModel(IBakedModel parent) {
         this.parent = parent;
+        this.sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("charset:items/chisel_pattern");
         this.cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
         this.list = new ItemOverrideList(Collections.emptyList()) {
             @Override
             public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {
                 if (ModelFactory.DISABLE_CACHE) {
-                    return new ChiselBakedModel(parent, cache, CharsetToolsBuilding.chisel.getBlockMask(stack));
+                    return new ChiselBakedModel(parent, sprite, cache, CharsetToolsBuilding.chisel.getBlockMask(stack));
                 }
 
                 int mask = CharsetToolsBuilding.chisel.getBlockMask(stack);
                 IBakedModel model = cache.getIfPresent(mask);
                 if (model == null) {
-                    model = new ChiselBakedModel(parent, cache, mask);
+                    model = new ChiselBakedModel(parent, sprite, cache, mask);
                     cache.put(mask, model);
                 }
                 return model;
@@ -106,8 +109,9 @@ public class ChiselBakedModel extends BaseBakedModel {
         this.quads = null;
     }
 
-    public ChiselBakedModel(IBakedModel parent, Cache<Integer, IBakedModel> cache, int mask) {
+    public ChiselBakedModel(IBakedModel parent, TextureAtlasSprite sprite, Cache<Integer, IBakedModel> cache, int mask) {
         this.parent = parent;
+        this.sprite = sprite;
         this.cache = cache;
         this.list = ItemOverrideList.NONE;
 
@@ -115,7 +119,6 @@ public class ChiselBakedModel extends BaseBakedModel {
         if (mask != 0x1FF) {
             ImmutableList.Builder<BakedQuad> quads2 = ImmutableList.builder();
             quads2.addAll(quads);
-            TextureAtlasSprite sprite = parent.getParticleTexture();
             int blockMask = mask;
             outer: for (int y = 0; y < 3; y++) {
                 for (int x = 0; x < 3; x++) {

@@ -78,7 +78,8 @@ public class ColorLookupHandler {
 
     public int getColor(ItemStack stack, RenderUtils.AveragingMode mode) {
         Key key = new Key(stack, mode);
-        Integer result = COLOR_MAP.getIfPresent(key);
+        //Integer result = COLOR_MAP.getIfPresent(key);
+        Integer result = null;
         if (result == null) {
             TextureAtlasSprite sprite = RenderUtils.getItemSprite(stack);
             int out;

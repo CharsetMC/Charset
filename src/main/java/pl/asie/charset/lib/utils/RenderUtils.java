@@ -45,6 +45,9 @@ import pl.asie.charset.lib.render.CharsetFaceBakery;
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 public final class RenderUtils {
@@ -89,35 +92,41 @@ public final class RenderUtils {
 		int[] avgColor = new int[3];
 		switch (mode) {
 			case FULL:
-				pixelCount = sprite.getIconHeight() * sprite.getIconWidth();
 				for (int j = 0; j < sprite.getIconHeight(); j++) {
 					for (int i = 0; i < sprite.getIconWidth(); i++) {
 						int c = data[j * sprite.getIconWidth() + i];
-						avgColor[0] += (c & 0xFF);
-						avgColor[1] += ((c >> 8) & 0xFF);
-						avgColor[2] += ((c >> 16) & 0xFF);
+						if (((c >> 24) & 0xFF) > 0x00) {
+							avgColor[0] += (c & 0xFF);
+							avgColor[1] += ((c >> 8) & 0xFF);
+							avgColor[2] += ((c >> 16) & 0xFF);
+							pixelCount++;
+						}
 					}
 				}
 				break;
 			case H_EDGES_ONLY:
-				pixelCount = sprite.getIconHeight() * 2;
 				for (int j = 0; j < 2; j++) {
 					for (int i = 0; i < sprite.getIconHeight(); i++) {
 						int c = data[i * sprite.getIconWidth() + (j > 0 ? sprite.getIconWidth() - 1 : 0)];
-						avgColor[0] += (c & 0xFF);
-						avgColor[1] += ((c >> 8) & 0xFF);
-						avgColor[2] += ((c >> 16) & 0xFF);
+						if (((c >> 24) & 0xFF) > 0x00) {
+							avgColor[0] += (c & 0xFF);
+							avgColor[1] += ((c >> 8) & 0xFF);
+							avgColor[2] += ((c >> 16) & 0xFF);
+							pixelCount++;
+						}
 					}
 				}
 				break;
 			case V_EDGES_ONLY:
-				pixelCount = sprite.getIconWidth() * 2;
 				for (int j = 0; j < 2; j++) {
 					for (int i = 0; i < sprite.getIconWidth(); i++) {
 						int c = data[j > 0 ? (data.length - 1 - i) : i];
-						avgColor[0] += (c & 0xFF);
-						avgColor[1] += ((c >> 8) & 0xFF);
-						avgColor[2] += ((c >> 16) & 0xFF);
+						if (((c >> 24) & 0xFF) > 0x00) {
+							avgColor[0] += (c & 0xFF);
+							avgColor[1] += ((c >> 8) & 0xFF);
+							avgColor[2] += ((c >> 16) & 0xFF);
+							pixelCount++;
+						}
 					}
 				}
 				break;

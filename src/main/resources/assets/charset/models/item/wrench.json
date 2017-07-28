@@ -1,6 +1,7 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "charset:items/wrench"
+    "layer0": "charset:items/wrench",
+    "layer1": "charset:items/wrench"
   }
 }

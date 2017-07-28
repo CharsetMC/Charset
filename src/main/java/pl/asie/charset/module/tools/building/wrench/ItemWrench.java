@@ -34,15 +34,15 @@ import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
+import pl.asie.charset.module.tools.building.ItemCharsetTool;
 
 import java.util.Optional;
 
-public class ItemWrench extends ItemBase {
+public class ItemWrench extends ItemCharsetTool {
     public ItemWrench() {
         super();
         setUnlocalizedName("charset.wrench");
         setHarvestLevel("wrench", 2);
-        setMaxStackSize(1);
     }
 
     @Override

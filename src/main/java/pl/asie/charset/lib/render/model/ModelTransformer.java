@@ -45,7 +45,7 @@ public final class ModelTransformer {
          return out;
      }
 
-     private static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) {
+     public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) {
          VertexFormat format = quad.getFormat();
          UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
          LightUtil.putBakedQuad(new VertexTransformerWrapper(builder, quad, transformer), quad);

@@ -11,6 +11,8 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -23,6 +25,7 @@ import java.util.Map;
 
 /* @CharsetModule(
 		name = "tweak.unifyColors",
+		profile = ModuleProfile.UNSTABLE,
 		description = "Unifies various colored block and item colors. Works with resource packs!",
 		isClientOnly = true
 ) */
@@ -95,7 +98,7 @@ public class CharsetTweakUnifyColors {
 
 	private void recolorTextures(TextureMap map, String prefix) {
 		ResourceLocation source = new ResourceLocation(prefix + "white");
-		for (int i = 0; i < 16; i++) { // skip white
+		for (int i = 0; i < 16; i++) {
 			String s = ColorUtils.getUnderscoredSuffix(EnumDyeColor.byMetadata(i));
 			ResourceLocation target = new ResourceLocation(prefix + s);
 			if (prefix.contains("hardened_clay")) {
@@ -124,7 +127,7 @@ public class CharsetTweakUnifyColors {
 						return out;
 					}
 				});
-			} else if (i > 0) {
+			} else if (i > 0) { // skip white for non-clay
 				map.setTextureEntry(new PixelOperationSprite.Multiply(target.toString(), source, colorMultiplier(prefix, EnumDyeColor.byMetadata(i))));
 			}
 		}
@@ -159,5 +162,8 @@ public class CharsetTweakUnifyColors {
 		recolorTextures(event.getMap(), "minecraft:blocks/glass_");
 		recolorTextures(event.getMap(), "minecraft:blocks/glass_pane_top_");
 		recolorTextures(event.getMap(), "minecraft:blocks/hardened_clay_stained_");
+		recolorTextures(event.getMap(), "minecraft:blocks/concrete_");
+		recolorTextures(event.getMap(), "minecraft:blocks/concrete_powder_");
+		recolorTextures(event.getMap(), "minecraft:blocks/shulker_top_");
 	}
 }

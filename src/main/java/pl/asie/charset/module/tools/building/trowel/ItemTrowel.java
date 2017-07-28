@@ -27,12 +27,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.item.ItemBase;
+import pl.asie.charset.module.tools.building.ItemCharsetTool;
 import pl.asie.charset.module.tools.building.ToolsUtils;
 
-public class ItemTrowel extends ItemBase {
+public class ItemTrowel extends ItemCharsetTool {
     public ItemTrowel() {
         super();
-        setUnlocalizedName("charset.trowel");
         setMaxStackSize(1);
     }
 

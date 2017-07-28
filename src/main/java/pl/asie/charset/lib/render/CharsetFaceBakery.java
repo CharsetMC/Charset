@@ -24,6 +24,14 @@ import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 public class CharsetFaceBakery extends FaceBakery {
+    private static final float[] faceBrightness = new float[] {
+            0.5f, 1.0f, 0.8f, 0.8f, 0.6f, 0.6f
+    };
+
+    public static float getFaceBrightness(EnumFacing facing) {
+        return facing == null ? 1.0f : faceBrightness[facing.ordinal()];
+    }
+
     public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex,
                                    TextureAtlasSprite icon, EnumFacing facing, ModelRotation rot, boolean uvLocked) {
         return makeBakedQuad(min, max, tintIndex, RenderUtils.calculateUV(min, max, facing), icon, facing, rot, uvLocked);

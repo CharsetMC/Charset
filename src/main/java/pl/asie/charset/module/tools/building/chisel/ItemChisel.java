@@ -36,13 +36,13 @@ import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
+import pl.asie.charset.module.tools.building.ItemCharsetTool;
 import pl.asie.charset.module.tools.building.ToolsUtils;
 
-public class ItemChisel extends ItemBase {
+public class ItemChisel extends ItemCharsetTool {
     public ItemChisel() {
         super();
         setUnlocalizedName("charset.chisel");
-        setMaxStackSize(1);
     }
 
     @Override

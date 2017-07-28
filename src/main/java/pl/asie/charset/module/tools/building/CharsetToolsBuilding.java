@@ -17,6 +17,7 @@
 package pl.asie.charset.module.tools.building;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -82,6 +83,7 @@ public class CharsetToolsBuilding {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
+		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ToolItemColor.INSTANCE, chisel);
 		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHISEL, Side.CLIENT, (r) -> new GuiChisel(new ContainerChisel(r.player)));
 	}
 

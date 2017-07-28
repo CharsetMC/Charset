@@ -1,6 +1,8 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "charset:items/chisel"
+    "layer0": "charset:items/chisel_handle",
+    "layer1": "charset:items/chisel_head",
+    "layer2": "charset:items/chisel_pattern"
   }
 }

@@ -37,6 +37,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -47,6 +48,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
@@ -226,17 +228,11 @@ public abstract class BlockBase extends Block {
 	}
 
 	@Override
-	public boolean addLandingEffects(IBlockState state, WorldServer world, BlockPos pos, IBlockState iblockstate, EntityLivingBase entity, int numberOfParticles) {
-		// TODO
-		return false;
-	}
-
-	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
 		IBlockState state = world.getBlockState(pos);
 		IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
-		if (model instanceof ModelFactory) {
+		if (model instanceof IStateParticleBakedModel) {
 			state = getExtendedState(state.getActualState(world, pos), world, pos);
 			TextureAtlasSprite sprite = ((IStateParticleBakedModel) model).getParticleTexture(state);
 			if (sprite != null) {
@@ -317,5 +313,12 @@ public abstract class BlockBase extends Block {
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean addLandingEffects(IBlockState state, WorldServer world, BlockPos pos, IBlockState stateAgain, EntityLivingBase entity, int numberOfParticles) {
+		PacketCustomBlockDust packet = new PacketCustomBlockDust(world, pos, entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.15f);
+		CharsetLib.packet.sendToDimension(packet, world.provider.getDimension());
+		return true;
 	}
 }
