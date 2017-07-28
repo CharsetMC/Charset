@@ -1,6 +1,7 @@
 package pl.asie.charset.lib.wires;
 
 import mcmultipart.api.container.IMultipartContainer;
+import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
 import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import mcmultipart.api.multipart.MultipartHelper;
@@ -19,6 +20,8 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -165,6 +168,28 @@ public final class WireUtils {
             return tileWire.wire;
         } else {
             return getAnyWire(access.getTileEntity(pos));
+        }
+    }
+
+    public static Collection<Wire> getAllWires(IBlockAccess access, BlockPos pos) {
+        Optional<IMultipartContainer> containerOpt = MultipartHelper.getContainer(access, pos);
+        if (containerOpt.isPresent()) {
+            IMultipartContainer container = containerOpt.get();
+            Collection<Wire> wires = new ArrayList<>();
+            for (IPartInfo partInfo : container.getParts().values()) {
+                if (partInfo.getTile() instanceof TileWire) {
+                    wires.add(((TileWire) partInfo.getTile()).wire);
+                }
+            }
+
+            return wires;
+        } else {
+            TileEntity tile = access.getTileEntity(pos);
+            if (tile instanceof TileWire) {
+                return Collections.singleton(((TileWire) tile).wire);
+            } else {
+                return Collections.emptySet();
+            }
         }
     }
 

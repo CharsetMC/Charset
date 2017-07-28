@@ -36,7 +36,12 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
                 markBlockForRenderUpdate();
             }
         } else {
-            wire = null;
+            if (wire != null) {
+                wire = null;
+                if (isClient) {
+                    markBlockForRenderUpdate();
+                }
+            }
         }
     }
 

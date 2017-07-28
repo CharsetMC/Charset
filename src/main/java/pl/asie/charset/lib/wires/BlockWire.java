@@ -154,10 +154,18 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
             // TODO: figure out bug
             // if (location != WireFace.CENTER && (connectionMask & (1 << (facing.ordinal() + 16))) != 0) {
 
-            if ((connectionMask & (1 << (facing.ordinal() + 8))) != 0) {
-                world.neighborChanged(pos.offset(facing), this, pos);
-            } else if (location != WireFace.CENTER && location.facing.getAxis() != facing.getAxis()) {
-                world.neighborChanged(pos.offset(facing).offset(location.facing), this, pos);
+            if (world.isRemote) {
+                if ((connectionMask & (1 << (facing.ordinal() + 8))) != 0) {
+                    WireUtils.getAllWires(world, pos.offset(facing)).forEach((wire) -> wire.onChanged(true));
+                } else if (location != WireFace.CENTER && location.facing.getAxis() != facing.getAxis()) {
+                    WireUtils.getAllWires(world, pos.offset(facing).offset(location.facing)).forEach((wire) -> wire.onChanged(true));
+                }
+            } else {
+                if ((connectionMask & (1 << (facing.ordinal() + 8))) != 0) {
+                    world.neighborChanged(pos.offset(facing), this, pos);
+                } else if (location != WireFace.CENTER && location.facing.getAxis() != facing.getAxis()) {
+                    world.neighborChanged(pos.offset(facing).offset(location.facing), this, pos);
+                }
             }
         }
     }

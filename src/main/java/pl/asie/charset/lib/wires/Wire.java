@@ -60,25 +60,33 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
     }
 
     public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
+        if (isClient) {
+            updateConnections();
+        } else {
+            nbt.setByte("oS", occludedSides);
+            nbt.setByte("coS", cornerOccludedSides);
+        }
         nbt.setByte("iC", internalConnections);
         nbt.setByte("eC", externalConnections);
         if (location != WireFace.CENTER) {
             nbt.setByte("cC", cornerConnections);
         }
-        if (!isClient) {
-            nbt.setByte("oS", occludedSides);
-            nbt.setByte("coS", cornerOccludedSides);
-        }
         return nbt;
     }
 
     public void onChanged(boolean external) {
-        if (external) {
+        boolean remote = getContainer().world().isRemote;
+
+        if (external && !remote) {
             if (!factory.canPlace(getContainer().world(), getContainer().pos(), location)) {
                 getContainer().dropWire();
             }
         }
+
         connectionCheckDirty = true;
+        if (remote && getContainer().pos() != null) {
+            updateConnections();
+        }
     }
 
     public int getRenderColor() {
@@ -122,10 +130,6 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
     }
 
     public final boolean isCornerOccluded(EnumFacing face) {
-        if (connectionCheckDirty) {
-            connectionCheckDirty = false;
-            updateConnections();
-        }
         return isOccluded(face) || (cornerOccludedSides & (1 << face.ordinal())) != 0;
     }
 
