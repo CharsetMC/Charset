@@ -27,7 +27,6 @@ public class TileCache {
     }
 
     public void reload() {
-        System.out.println("invalidated");
         state = world.getBlockState(pos);
         hasTile = state.getBlock().hasTileEntity(state);
         tile = null;
