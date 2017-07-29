@@ -5,16 +5,20 @@
       "module": "storage.barrels"
     }
   ],
-  "type": "charset:barrel_cart_shapeless",
+  "type": "charset:shapeless",
   "group": "barrel_cart",
   "ingredients": [
     {
-      "item": "charset:barrel"
+      "type": "charset:barrel",
+      "carts": false
     },
     {
       "item": "minecraft:minecart"
     }
-  ]
+  ],
+  "result": {
+    "supplier": "charset:barrel_cart"
+  }
 }
 
 

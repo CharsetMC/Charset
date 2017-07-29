@@ -21,10 +21,15 @@
       "item": "minecraft:web"
     },
     "b": {
-      "item": "charset:barrel"
+      "type": "charset:barrel",
+      "carts": true,
+      "upgradeBlacklist": ["SILKY"]
     }
   },
-  "upgrade": "SILKY"
+  "result": {
+    "supplier": "charset:barrel_upgrade",
+    "upgrade": "SILKY"
+  }
 }
 
 

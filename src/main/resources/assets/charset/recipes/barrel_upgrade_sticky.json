@@ -9,7 +9,7 @@
       "upgrade": "STICKY"
     }
   ],
-  "type": "charset:barrel_upgrade_shaped",
+  "type": "charset:shaped",
   "group": "barrel_upgrade",
   "pattern": [
     "h",
@@ -22,10 +22,15 @@
       "ore": "slimeball"
     },
     "b": {
-      "item": "charset:barrel"
+      "type": "charset:barrel",
+      "carts": true,
+      "upgradeBlacklist": ["STICKY"]
     }
   },
-  "upgrade": "STICKY"
+  "result": {
+    "supplier": "charset:barrel_upgrade",
+    "upgrade": "STICKY"
+  }
 }
 
 

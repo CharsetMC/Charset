@@ -936,7 +936,6 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     // TODO: Handle invalid combinations somewhere?
     static ItemStack addUpgrade(ItemStack barrel, Upgrade upgrade) {
-        barrel = barrel.copy();
         NBTTagCompound tag = ItemUtils.getTagCompound(barrel, true);
         NBTTagList list;
         if (!tag.hasKey("upgrades")) {

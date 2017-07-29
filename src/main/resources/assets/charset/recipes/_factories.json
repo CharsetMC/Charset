@@ -1,21 +1,20 @@
 {
   "conditions": {
     "module_loaded": "pl.asie.charset.lib.recipe.ConditionModuleLoadedFactory",
-    "barrel_upgrade_enabled": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$ConditionFactory"
+    "barrel_upgrade_enabled": "pl.asie.charset.module.storage.barrels.ConditionBarrelUpgradeEnabledFactory"
   },
   "ingredients": {
+    "barrel": "pl.asie.charset.module.storage.barrels.IngredientBarrel$Factory",
     "material": "pl.asie.charset.lib.recipe.IngredientMaterialFactory"
   },
   "recipes": {
     "dyeable_item": "pl.asie.charset.lib.recipe.DyeableItemRecipeFactory",
     "shaped": "pl.asie.charset.lib.recipe.RecipeCharset$Factory",
-    "shapeless": "pl.asie.charset.lib.recipe.RecipeCharset$Factory",
-    "barrel_cart_shaped": "pl.asie.charset.module.storage.barrels.BarrelCartRecipe$Factory",
-    "barrel_cart_shapeless": "pl.asie.charset.module.storage.barrels.BarrelCartRecipe$Factory",
-    "barrel_upgrade_shaped": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$Factory",
-    "barrel_upgrade_shapeless": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$Factory"
+    "shapeless": "pl.asie.charset.lib.recipe.RecipeCharset$Factory"
   },
   "charset:output_suppliers": {
+    "barrel_cart": "pl.asie.charset.module.storage.barrels.BarrelCartOutputSupplier",
+    "barrel_upgrade": "pl.asie.charset.module.storage.barrels.BarrelUpgradeOutputSupplier$Factory",
     "key": "pl.asie.charset.module.storage.locks.KeyOutputSupplier$Factory",
     "lock": "pl.asie.charset.module.storage.locks.LockOutputSupplier$Factory"
   }
