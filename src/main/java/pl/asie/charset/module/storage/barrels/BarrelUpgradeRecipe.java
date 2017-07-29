@@ -53,6 +53,7 @@ import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import pl.asie.charset.lib.recipe.IngredientCharset;
 import pl.asie.charset.lib.recipe.IngredientMatcher;
+import pl.asie.charset.lib.recipe.OutputSupplier;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nullable;
@@ -128,7 +129,7 @@ public class BarrelUpgradeRecipe extends RecipeCharset {
             }
 
             recipe.upgradeType = TileEntityDayBarrel.Upgrade.valueOf(JsonUtils.getString(json, "upgrade"));
-            recipe.output = new ItemStack(CharsetStorageBarrels.barrelItem);
+            recipe.output = OutputSupplier.createStackOutputSupplier(new ItemStack(CharsetStorageBarrels.barrelItem));
             return recipe;
         }
     }

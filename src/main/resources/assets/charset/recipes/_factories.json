@@ -14,5 +14,7 @@
     "barrel_cart_shapeless": "pl.asie.charset.module.storage.barrels.BarrelCartRecipe$Factory",
     "barrel_upgrade_shaped": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$Factory",
     "barrel_upgrade_shapeless": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$Factory"
+  },
+  "charset:output_suppliers": {
   }
 }

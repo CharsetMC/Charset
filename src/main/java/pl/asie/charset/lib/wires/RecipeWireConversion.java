@@ -4,6 +4,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import pl.asie.charset.lib.recipe.IngredientCharset;
+import pl.asie.charset.lib.recipe.OutputSupplier;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import javax.annotation.Nullable;
@@ -58,7 +59,7 @@ public class RecipeWireConversion extends RecipeCharset {
         super("charset:wire_convert", true);
         super.input = NonNullList.create();
         super.input.add(new IngredientWires(freestanding));
-        super.output = ItemStack.EMPTY;
+        super.output = OutputSupplier.createStackOutputSupplier(ItemStack.EMPTY);
         super.width = 1;
         super.height = 1;
         super.shapeless = true;

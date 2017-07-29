@@ -44,7 +44,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
         super(group, hidden);
     }
 
-    protected ItemStack output;
+    protected IOutputSupplier output;
     protected final TCharObjectMap<Ingredient> charToIngredient = new TCharObjectHashMap<>();
     protected int[] shapedOrdering;
     protected NonNullList<Ingredient> input = null;
@@ -161,7 +161,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
     public ItemStack getCraftingResult(InventoryCrafting inv) {
         IngredientMatcher matcher = matchedOrNull(inv);
         if (matcher != null) {
-            return matcher.apply(output.copy());
+            return output.getCraftingResult(this, matcher, inv);
         } else {
             return ItemStack.EMPTY;
         }
@@ -174,7 +174,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
 
     @Override
     public ItemStack getRecipeOutput() {
-        return output;
+        return output.getDefaultOutput();
     }
 
     @Override
@@ -306,7 +306,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                 throw new RuntimeException("Unknown type: " + type);
             }
 
-            recipe.output = CraftingHelper.getItemStack(json.getAsJsonObject("result"), context);
+            recipe.output = OutputSupplier.createOutputSupplier(context, json.getAsJsonObject("result"));
             return recipe;
         }
     }

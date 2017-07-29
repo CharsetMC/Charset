@@ -48,6 +48,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.recipe.IngredientCharset;
+import pl.asie.charset.lib.recipe.OutputSupplier;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import java.util.ArrayList;
@@ -106,7 +107,7 @@ public class BarrelCartRecipe extends RecipeCharset {
                 throw new RuntimeException("Unknown type: " + type);
             }
 
-            recipe.output = new ItemStack(CharsetStorageBarrels.barrelCartItem);
+            recipe.output = OutputSupplier.createStackOutputSupplier(new ItemStack(CharsetStorageBarrels.barrelCartItem));
             return recipe;
         }
     }
