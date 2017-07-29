@@ -1,22 +1,11 @@
 package pl.asie.charset.lib.block;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.INetHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.network.Packet;
-import pl.asie.charset.lib.render.ParticleBlockDustCharset;
-import pl.asie.charset.lib.render.ParticleDiggingCharset;
-import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
-import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.lib.utils.Utils;
 
 import java.util.Random;
@@ -62,37 +51,7 @@ public class PacketCustomBlockDust extends Packet {
 
     @Override
     public void apply(INetHandler handler) {
-        TextureAtlasSprite sprite;
-        int tintIndex = -1;
-
-        IBlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof BlockBase) {
-            tintIndex = ((BlockBase) state.getBlock()).getParticleTintIndex();
-        }
-
-        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
-        if (model instanceof IStateParticleBakedModel) {
-            state = state.getBlock().getExtendedState(state.getActualState(world, pos), world, pos);
-            sprite = ((IStateParticleBakedModel) model).getParticleTexture(state);
-        } else {
-            sprite = model.getParticleTexture();
-        }
-
-        ParticleManager manager = Minecraft.getMinecraft().effectRenderer;
-
-        for (int i = 0; i < numberOfParticles; i++) {
-            double xSpeed = rand.nextGaussian() * particleSpeed;
-            double ySpeed = rand.nextGaussian() * particleSpeed;
-            double zSpeed = rand.nextGaussian() * particleSpeed;
-
-            try {
-                Particle particle = new ParticleBlockDustCharset(world, posX, posY, posZ, xSpeed, ySpeed, zSpeed, state, pos, sprite, tintIndex);
-                manager.addEffect(particle);
-            } catch (Throwable var16) {
-                ModCharset.logger.warn("Could not spawn block particle!");
-                return;
-            }
-        }
+        UtilProxyCommon.proxy.spawnBlockDustClient(world, pos, rand, posX, posY, posZ, numberOfParticles, particleSpeed);
     }
 
     @Override
@@ -110,6 +69,6 @@ public class PacketCustomBlockDust extends Packet {
 
     @Override
     public boolean isAsynchronous() {
-        return true;
+        return false;
     }
 }

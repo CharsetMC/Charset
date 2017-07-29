@@ -17,6 +17,12 @@
 package pl.asie.charset.lib.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -25,12 +31,18 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.render.ParticleBlockDustCharset;
+import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
+
+import java.util.Random;
 
 public class UtilProxyCommon implements IThreadListener {
 	@SidedProxy(clientSide = "pl.asie.charset.lib.utils.UtilProxyClient", serverSide = "pl.asie.charset.lib.utils.UtilProxyCommon", modId = ModCharset.MODID)
@@ -79,6 +91,10 @@ public class UtilProxyCommon implements IThreadListener {
 	}
 
 	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
+
+	}
+
+	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed) {
 
 	}
 }

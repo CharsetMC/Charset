@@ -18,9 +18,14 @@ package pl.asie.charset.lib.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -28,13 +33,20 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.network.login.INetHandlerLoginClient;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.FontRendererFancy;
+import pl.asie.charset.lib.render.ParticleBlockDustCharset;
+import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
+
+import java.util.Random;
 
 public class UtilProxyClient extends UtilProxyCommon {
 	public static FontRenderer FONT_RENDERER_FANCY;
@@ -114,6 +126,7 @@ public class UtilProxyClient extends UtilProxyCommon {
 		return true;
 	}
 
+	@Override
 	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
 		if (entry instanceof Block) {
 			Block block = (Block) entry;
@@ -124,6 +137,41 @@ public class UtilProxyClient extends UtilProxyCommon {
 			Item item = (Item) entry;
 			if (item.getCreativeTab() == null) {
 				item.setCreativeTab(tab);
+			}
+		}
+	}
+
+	@Override
+	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed) {
+		TextureAtlasSprite sprite;
+		int tintIndex = -1;
+
+		IBlockState state = world.getBlockState(pos);
+		if (state.getBlock() instanceof BlockBase) {
+			tintIndex = ((BlockBase) state.getBlock()).getParticleTintIndex();
+		}
+
+		IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+		if (model instanceof IStateParticleBakedModel) {
+			state = state.getBlock().getExtendedState(state.getActualState(world, pos), world, pos);
+			sprite = ((IStateParticleBakedModel) model).getParticleTexture(state);
+		} else {
+			sprite = model.getParticleTexture();
+		}
+
+		ParticleManager manager = Minecraft.getMinecraft().effectRenderer;
+
+		for (int i = 0; i < numberOfParticles; i++) {
+			double xSpeed = rand.nextGaussian() * particleSpeed;
+			double ySpeed = rand.nextGaussian() * particleSpeed;
+			double zSpeed = rand.nextGaussian() * particleSpeed;
+
+			try {
+				Particle particle = new ParticleBlockDustCharset(world, posX, posY, posZ, xSpeed, ySpeed, zSpeed, state, pos, sprite, tintIndex);
+				manager.addEffect(particle);
+			} catch (Throwable var16) {
+				ModCharset.logger.warn("Could not spawn block particle!");
+				return;
 			}
 		}
 	}
