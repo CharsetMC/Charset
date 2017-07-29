@@ -41,6 +41,7 @@ import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.lib.*;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.pipes.IPipeView;
+import pl.asie.charset.api.storage.IBarrel;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -56,6 +57,7 @@ import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
 import pl.asie.charset.lib.capability.lib.*;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.redstone.*;
+import pl.asie.charset.lib.capability.storage.DummyBarrel;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInventory;
@@ -89,6 +91,8 @@ public class Capabilities {
 	@CapabilityInject(IRedstoneReceiver.class)
 	public static Capability<IRedstoneReceiver> REDSTONE_RECEIVER;
 
+	@CapabilityInject(IBarrel.class)
+	public static Capability<IBarrel> BARREL;
 	@CapabilityInject(Lockable.class)
 	public static Capability<Lockable> LOCKABLE;
 
@@ -129,6 +133,7 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IBundledReceiver.class, DummyCapabilityStorage.get(), DummyRedstoneReceiver::new);
 		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, DummyCapabilityStorage.get(), DummyRedstoneReceiver::new);
 
+		CapabilityManager.INSTANCE.register(IBarrel.class, DummyCapabilityStorage.get(), DummyBarrel::new);
 		CapabilityManager.INSTANCE.register(Lockable.class, LOCKABLE_STORAGE, Lockable::new);
 		CapabilityManager.INSTANCE.register(IMultiblockStructure.class, DummyCapabilityStorage.get(), DefaultMultiblockStructure::new);
 

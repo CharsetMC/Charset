@@ -273,26 +273,30 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             GlStateManager.enableRescaleNormal();
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            RenderHelper.enableStandardItemLighting();
-
-            GlStateManager.scale(0.5F, 0.5F, 0.02F);
 
             IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, barrel.getWorld(), null);
-            model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GUI, false);
 
             // TODO: This might be the ugliest hack in all of barrels. FIXME
-            if (model.isGui3d() && !model.isBuiltInRenderer()) {
-                model = ModelTransformer.transform(model, null, 0, new ModelTransformer.IVertexTransformer() {
-                    @Override
-                    public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
-                        if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
-                            data[0] /= 1.5f;
-                            data[2] *= 1.7f;
+            if (model.isGui3d()) {
+                RenderHelper.enableStandardItemLighting();
+                if (!model.isBuiltInRenderer()) {
+                    model = ModelTransformer.transform(model, null, 0, new ModelTransformer.IVertexTransformer() {
+                        @Override
+                        public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
+                            if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
+                                data[0] /= 1.5f;
+                                data[2] *= 1.7f;
+                            }
+                            return data;
                         }
-                        return data;
-                    }
-                });
+                    });
+                }
+            } else {
+                GlStateManager.disableLighting();
             }
+
+            GlStateManager.scale(0.5F, 0.5F, 0.025F);
+            model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GUI, false);
 
             Minecraft.getMinecraft().getRenderItem().renderItem(is, model);
             GlStateManager.disableRescaleNormal();
