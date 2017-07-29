@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shapeless",
-  "group": "barrel_cart",
+  "group": "charset:barrel_cart",
   "ingredients": [
     {
       "type": "charset:barrel",

@@ -60,13 +60,20 @@ public class IngredientMatcher {
         }
     }
 
-    public ItemStack apply(ItemStack copy) {
+    public ItemStack apply(ItemStack stack) {
+        boolean applied = false;
+
         for (Map.Entry<Ingredient, ItemStack> entry : matchedStacks.entrySet()) {
             if (entry.getKey() instanceof IngredientCharset) {
-                ((IngredientCharset) entry.getKey()).applyToStack(copy, entry.getValue());
+                if (!applied) {
+                    applied = true;
+                    stack = stack.copy();
+                }
+
+                ((IngredientCharset) entry.getKey()).applyToStack(stack, entry.getValue());
             }
         }
 
-        return copy;
+        return stack;
     }
 }

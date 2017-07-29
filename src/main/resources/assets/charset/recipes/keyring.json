@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "keyring",
+  "group": "charset:keyring",
   "pattern": [
     "xxx",
     "x x",

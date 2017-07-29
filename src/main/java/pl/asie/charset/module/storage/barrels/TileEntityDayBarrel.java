@@ -696,54 +696,53 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     //* Shift:      Remove 1 item      Use item
     //* Double:                        Add all but 1 item
 
-    public boolean activate(EntityPlayer entityplayer, EnumFacing side, EnumHand hand) {
-        // right click: put an item
-        Long lastClick = lastClickMap.get(entityplayer);
+    public boolean activate(EntityPlayer player, EnumFacing side, EnumHand hand) {
+        Long lastClick = lastClickMap.get(player);
         if (lastClick != null && world.getTotalWorldTime() - lastClick < 10 && !item.isEmpty()) {
-            addAllItems(entityplayer, hand);
+            addAllItems(player, hand);
             return true;
         }
-        lastClickMap.put(entityplayer, world.getTotalWorldTime());
+        lastClickMap.put(player, world.getTotalWorldTime());
 
-        ItemStack held = entityplayer.getHeldItem(hand);
+        // right click: put an item
+        ItemStack held = player.getHeldItem(hand);
         if (held.isEmpty()) {
-            info(entityplayer);
+            info(player);
             return true;
         }
 
         if (!world.isRemote && isNested(held) && (item.isEmpty() || itemMatch(held))) {
-            new Notice(notice_target, "notice.charset.barrel.no").sendTo(entityplayer);
+            new Notice(notice_target, "notice.charset.barrel.no").sendTo(player);
             return true;
-        }
-
-        NBTTagCompound tag = held.getTagCompound();
-        if (tag != null && tag.hasKey("noFzBarrel")) {
-            return false;
         }
 
         if (!canInsert(held)) {
-            info(entityplayer);
+            info(player);
             return true;
         }
 
-        boolean veryNew = item.isEmpty();
+        boolean hadNoItem = item.isEmpty();
 
         int free = getMaxItemCount() - getItemCount();
         if (free <= 0) {
-            info(entityplayer);
+            info(player);
             return true;
         }
 
         int take = Math.min(free, held.getCount());
-        ItemStack leftover = insertionView.insertItem(0, held.splitStack(take), false);
-        take -= leftover.getCount();
         if (take > 0) {
-            held.shrink(take);
-            if (veryNew) {
-                markBlockForUpdate();
+            ItemStack toInsert = held.copy();
+            toInsert.setCount(take);
+            ItemStack leftover = insertionView.insertItem(0, toInsert, false);
+            take -= leftover.getCount();
+            if (take > 0) {
+                held.shrink(take);
+                if (hadNoItem) {
+                    markBlockForUpdate();
+                }
+            } else {
+                info(player);
             }
-        } else {
-            info(entityplayer);
         }
         return true;
     }
@@ -768,6 +767,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             total_delta += toAdd;
             is.shrink(toAdd);
         }
+
         if (total_delta > 0) {
             item.grow(total_delta);
             onItemChange(false);

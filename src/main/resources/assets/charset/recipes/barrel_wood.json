@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "barrel",
+  "group": "charset:barrel",
   "pattern": [
     "W-W",
     "W W",

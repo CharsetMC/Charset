@@ -10,7 +10,7 @@
     }
   ],
   "type": "charset:barrel_upgrade_shaped",
-  "group": "barrel_upgrade",
+  "group": "charset:barrel_upgrade",
   "pattern": [
     "hhh",
     "hbh",

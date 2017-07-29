@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "fluidTank",
+  "group": "charset:fluidtank",
   "pattern": [
     "xxx",
     "x x",

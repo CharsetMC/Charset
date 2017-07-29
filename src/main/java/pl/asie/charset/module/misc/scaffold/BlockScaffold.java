@@ -61,7 +61,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	protected ISubItemProvider createSubItemProvider() {
-		return new SubItemProviderCache(new SubItemProviderRecipes() {
+		return new SubItemProviderCache(new SubItemProviderRecipes("charset:scaffold") {
 			@Override
 			protected Item getItem() {
 				return CharsetMiscScaffold.scaffoldItem;

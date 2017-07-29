@@ -14,6 +14,12 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class SubItemProviderRecipes extends SubItemProviderSets {
+    private final String group;
+
+    public SubItemProviderRecipes(String group) {
+        this.group = group;
+    }
+
     @Nullable
     protected Collection<ItemStack> createSetFor(ItemStack stack) {
         ItemStack newStack = stack.copy();
@@ -30,7 +36,7 @@ public abstract class SubItemProviderRecipes extends SubItemProviderSets {
         ItemStackHashSet stackSet = new ItemStackHashSet(false, true, true);
 
         for (IRecipe recipe : ForgeRegistries.RECIPES) {
-            if (!recipe.getRecipeOutput().isEmpty() && recipe.getRecipeOutput().getItem() == item) {
+            if ((group == null || group.equals(recipe.getGroup())) && !recipe.getRecipeOutput().isEmpty() && recipe.getRecipeOutput().getItem() == item) {
                 if (recipe instanceof RecipeCharset) {
                     for (ItemStack s : ((RecipeCharset) recipe).getAllRecipeOutputs()) {
                         if (stackSet.add(s)) {

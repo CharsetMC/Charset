@@ -120,7 +120,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
     @Override
     protected ISubItemProvider createSubItemProvider() {
-        return new SubItemProviderCache(new SubItemProviderRecipes() {
+        return new SubItemProviderCache(new SubItemProviderRecipes("charset:barrel") {
             @Override
             protected Collection<ItemStack> createForcedItems() {
                 return CharsetStorageBarrels.CREATIVE_BARRELS;

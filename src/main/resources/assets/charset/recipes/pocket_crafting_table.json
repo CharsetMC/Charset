@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "pocket_crafting_table",
+  "group": "charset:pocket_crafting_table",
   "pattern": [
     " c",
     "s "

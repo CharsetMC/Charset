@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "key",
+  "group": "charset:key",
   "pattern": [
     "ng",
     "ng",

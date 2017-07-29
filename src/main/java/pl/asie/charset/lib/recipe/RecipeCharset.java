@@ -163,7 +163,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
     public ItemStack getCraftingResult(InventoryCrafting inv) {
         IngredientMatcher matcher = matchedOrNull(inv);
         if (matcher != null) {
-            return output.getCraftingResult(this, matcher, inv);
+            return matcher.apply(output.getCraftingResult(this, matcher, inv));
         } else {
             return ItemStack.EMPTY;
         }

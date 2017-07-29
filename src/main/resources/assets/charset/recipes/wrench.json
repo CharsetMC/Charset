@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "wrench",
+  "group": "charset:wrench",
   "pattern": [
     " i ",
     " si",

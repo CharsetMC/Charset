@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "railCharsetCross",
+  "group": "charset:rail_cross",
   "pattern": [
     " r ",
     "r r",

@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "lock",
+  "group": "charset:lock",
   "pattern": [
     " g ",
     "gkg",

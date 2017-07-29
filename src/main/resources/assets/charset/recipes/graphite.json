@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shapeless",
-  "group": "graphite",
+  "group": "charset:graphite",
   "ingredients": [
     {
       "item": "minecraft:coal",

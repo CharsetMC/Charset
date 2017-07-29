@@ -6,7 +6,7 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "scaffold",
+  "group": "charset:scaffold",
   "pattern": [
     "ppp",
     " s ",
