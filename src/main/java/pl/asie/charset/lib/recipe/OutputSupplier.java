@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.JsonUtils;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.fml.common.Loader;
@@ -65,9 +66,16 @@ public class OutputSupplier {
             if (json != null && json.has("charset:output_suppliers")) {
                 JsonObject object = JsonUtils.getJsonObject(json, "charset:output_suppliers");
                 for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-                    String key = entry.getKey();
+                    String key = new ResourceLocation(container.getModId(), entry.getKey()).toString();
                     String value = entry.getValue().getAsString();
-                    outputSuppliers.put(key, (IOutputSupplierFactory) Class.forName(value).newInstance());
+                    Object o = Class.forName(value).newInstance();
+                    if (o instanceof IOutputSupplierFactory) {
+                        outputSuppliers.put(key, (IOutputSupplierFactory) o);
+                    } else if (o instanceof IOutputSupplier) {
+                        outputSuppliers.put(key, (a, b) -> (IOutputSupplier) o);
+                    } else {
+                        throw new Exception("Invalid OutputSupplier object type: " + (o != null ? o.getClass().getName() : "null"));
+                    }
                 }
             }
         } catch (NoSuchFileException | FileSystemNotFoundException e) {
@@ -85,12 +93,12 @@ public class OutputSupplier {
         initialized = true;
     }
 
-    public static IOutputSupplier createOutputSupplier(JsonContext context, JsonElement json) {
+    public static IOutputSupplier createOutputSupplier(JsonContext context, JsonObject json) {
         initialize();
-        if (json.isJsonObject() && ((JsonObject) json).has("supplier")) {
+        if (json.has("supplier")) {
             return outputSuppliers.get(JsonUtils.getString(json, "supplier")).parse(context, (JsonObject) json);
         } else {
-            return new Stack(CraftingHelper.getItemStack((JsonObject) json, context));
+            return new Stack(CraftingHelper.getItemStack(json, context));
         }
     }
 

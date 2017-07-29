@@ -16,5 +16,7 @@
     "barrel_upgrade_shapeless": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$Factory"
   },
   "charset:output_suppliers": {
+    "key": "pl.asie.charset.module.storage.locks.KeyOutputSupplier$Factory",
+    "lock": "pl.asie.charset.module.storage.locks.LockOutputSupplier$Factory"
   }
 }

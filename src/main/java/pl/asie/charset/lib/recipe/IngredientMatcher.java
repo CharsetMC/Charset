@@ -3,6 +3,7 @@ package pl.asie.charset.lib.recipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,10 @@ public class IngredientMatcher {
 
     public IngredientMatcher(Container container) {
         this.container = container;
+    }
+
+    public Collection<Ingredient> getMatchedIngredients() {
+        return matchedStacks.keySet();
     }
 
     public Ingredient getIngredient(char c) {

@@ -91,6 +91,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
         if (shapeless) {
             Set<Ingredient> objectSet = new HashSet<>();
             objectSet.addAll(input);
+            IngredientMatcher matcher = new IngredientMatcher(this);
 
             for (int y = 0; y < inv.getHeight(); y++) {
                 for (int x = 0; x < inv.getWidth(); x++) {
@@ -101,6 +102,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                         for (Ingredient o : objectSet) {
                             if (o.apply(stack)) {
                                 matches = true;
+                                matcher.add(stack, o);
                                 objectSet.remove(o);
                                 break;
                             }
@@ -113,7 +115,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                 }
             }
 
-            return objectSet.size() == 0 ? new IngredientMatcher(this) : null;
+            return objectSet.size() == 0 ? matcher : null;
         } else {
             for (int yo = 0; yo <= inv.getHeight() - height; yo++) {
                 for (int xo = 0; xo <= inv.getWidth() - width; xo++) {
@@ -306,7 +308,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                 throw new RuntimeException("Unknown type: " + type);
             }
 
-            recipe.output = OutputSupplier.createOutputSupplier(context, json.getAsJsonObject("result"));
+            recipe.output = OutputSupplier.createOutputSupplier(context, JsonUtils.getJsonObject(json, "result"));
             return recipe;
         }
     }

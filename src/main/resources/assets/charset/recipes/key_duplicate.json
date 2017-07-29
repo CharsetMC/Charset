@@ -1,0 +1,40 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.locks"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "key",
+  "pattern": [
+    "ng",
+    "ng",
+    "kg"
+  ],
+  "key": {
+    "n": {
+      "type": "forge:ore_dict",
+      "ore": "nuggetGold"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    },
+    "k": {
+      "item": "charset:key"
+    }
+  },
+  "result": {
+    "supplier": "charset:key",
+    "duplicate": true,
+    "item": {
+      "item": "charset:key",
+      "count": 1
+    }
+  }
+}
+
+
+
+

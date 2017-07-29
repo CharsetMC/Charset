@@ -58,7 +58,6 @@ public class CharsetStorageLocks {
 	@CharsetModule.Configuration
 	public static Configuration config;
 
-	public static final Random rand = new Random();
 	public static final int DEFAULT_LOCKING_COLOR = 0xFBDB6A;
 
 	public static ItemMasterKey masterKeyItem;
@@ -96,64 +95,6 @@ public class CharsetStorageLocks {
 		event.getRegistry().register(keyItem.setRegistryName("key"));
 		event.getRegistry().register(keyringItem.setRegistryName("keyring"));
 		event.getRegistry().register(lockItem.setRegistryName("lock"));
-	}
-
-	@SubscribeEvent
-	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-		IRecipe recipeNewKey = new ShapedOreRecipe(new ResourceLocation("charset:newKey"), new ItemStack(keyItem), "ng", "ng", " g", 'n', "nuggetGold", 'g', "ingotGold") {
-			@Override
-			public ItemStack getCraftingResult(InventoryCrafting inv) {
-				ItemStack result = output.copy();
-				result.setTagCompound(new NBTTagCompound());
-				result.getTagCompound().setString("key", new UUID(rand.nextLong(), rand.nextLong()).toString());
-				return result;
-			}
-		};
-
-		IRecipe recipeDuplicateKey = new ShapedOreRecipe(new ResourceLocation("charset:duplicateKey"), new ItemStack(keyItem), "ng", "ng", "kg", 'n', "nuggetGold", 'g', "ingotGold", 'k', new ItemStack(keyItem, 1, 0)) {
-			@Override
-			public ItemStack getCraftingResult(InventoryCrafting inv) {
-				ItemStack key = inv.getStackInRowAndColumn(0, 2);
-				if (key.isEmpty()) {
-					key = inv.getStackInRowAndColumn(1, 2);
-				}
-
-				if (!key.isEmpty() && key.getItem() instanceof ItemKey) {
-					ItemStack result = output.copy();
-					result.setTagCompound(new NBTTagCompound());
-					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getKey(key));
-					return result;
-				}
-				return null;
-			}
-
-			@Override
-			public boolean isHidden() {
-				return true;
-			}
-		};
-
-		IRecipe recipeLock = new ShapedOreRecipe(new ResourceLocation("charset:lock"), new ItemStack(lockItem), " g ", "gkg", "gig", 'i', "ingotIron", 'g', "ingotGold", 'k', keyItem) {
-			@Override
-			public ItemStack getCraftingResult(InventoryCrafting inv) {
-				ItemStack key = inv.getStackInRowAndColumn(1, 1);
-				if (!key.isEmpty() && key.getItem() instanceof ItemKey) {
-					ItemStack result = output.copy();
-					result.setTagCompound(new NBTTagCompound());
-					if (key.hasTagCompound() && key.getTagCompound().hasKey("color")) {
-						result.getTagCompound().setTag("color", key.getTagCompound().getTag("color"));
-					}
-
-					result.getTagCompound().setString("key", ((ItemKey) key.getItem()).getKey(key));
-					return result;
-				}
-				return null;
-			}
-		};
-
-		event.getRegistry().register(recipeNewKey.setRegistryName(new ResourceLocation(recipeNewKey.getGroup())));
-		event.getRegistry().register(recipeDuplicateKey.setRegistryName(new ResourceLocation(recipeDuplicateKey.getGroup())));
-		event.getRegistry().register(recipeLock.setRegistryName(new ResourceLocation(recipeLock.getGroup())));
 	}
 
 	@Mod.EventHandler

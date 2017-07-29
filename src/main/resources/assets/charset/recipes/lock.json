@@ -1,0 +1,39 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.locks"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "lock",
+  "pattern": [
+    " g ",
+    "gkg",
+    "gig"
+  ],
+  "key": {
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    },
+    "k": {
+      "item": "charset:key"
+    }
+  },
+  "result": {
+    "supplier": "charset:lock",
+    "item": {
+      "item": "charset:lock",
+      "count": 1
+    }
+  }
+}
+
+
+
+
