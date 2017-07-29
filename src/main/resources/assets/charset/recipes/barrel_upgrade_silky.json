@@ -1,0 +1,32 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.barrels"
+    },
+    {
+      "type": "charset:barrel_upgrade_enabled",
+      "upgrade": "SILKY"
+    }
+  ],
+  "type": "charset:barrel_upgrade_shaped",
+  "group": "barrel_upgrade",
+  "pattern": [
+    "hhh",
+    "hbh",
+    "hhh"
+  ],
+  "key": {
+    "h": {
+      "item": "minecraft:web"
+    },
+    "b": {
+      "item": "charset:barrel"
+    }
+  },
+  "upgrade": "SILKY"
+}
+
+
+
+

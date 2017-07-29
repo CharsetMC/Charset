@@ -58,6 +58,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.ICacheable;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.Orientation;
 
@@ -155,6 +156,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         barrel.validate();
         barrel.orientation = Orientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
+        barrel.isEntity = true;
         updateDataWatcher(true);
         return this;
     }
@@ -169,6 +171,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         barrel.setWorld(world);
         barrel.setPos(BlockPos.ORIGIN);
         barrel.validate();
+        barrel.isEntity = true;
         barrel.orientation = Orientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
     }
@@ -308,12 +311,17 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+                || capability == Capabilities.BARREL
                 || super.hasCapability(capability, facing);
     }
 
     public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing) {
-        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
-                ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(itemHandler)
-                : super.getCapability(capability, facing);
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(itemHandler);
+        } else if (capability == Capabilities.BARREL) {
+            return Capabilities.BARREL.cast(barrel);
+        } else {
+            return super.getCapability(capability, facing);
+        }
     }
 }

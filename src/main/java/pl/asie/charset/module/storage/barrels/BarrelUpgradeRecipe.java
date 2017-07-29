@@ -37,13 +37,19 @@
 package pl.asie.charset.module.storage.barrels;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.IConditionFactory;
+import net.minecraftforge.common.crafting.IRecipeFactory;
+import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import pl.asie.charset.lib.recipe.IngredientCharset;
 import pl.asie.charset.lib.recipe.IngredientMatcher;
@@ -52,12 +58,9 @@ import pl.asie.charset.lib.recipe.RecipeCharset;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.BooleanSupplier;
 
-// TODO: Turn into JSONs
-public class BarrelUpgradeRecipes {
-    private static final Ingredient hopper = CraftingHelper.getIngredient(Blocks.HOPPER);
-    private static final Ingredient slime_ball = CraftingHelper.getIngredient("slimeball");
-    private static final Ingredient web = CraftingHelper.getIngredient(Blocks.WEB);
+public class BarrelUpgradeRecipe extends RecipeCharset {
     private static final Ingredient barrel = new IngredientCharset(0) {
         @Override
         public boolean mustIteratePermutations() {
@@ -85,81 +88,90 @@ public class BarrelUpgradeRecipes {
         }
     };
 
-    public static void addUpgradeRecipes(IForgeRegistry<IRecipe> registry) {
-        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Upgrade.SILKY)) {
-            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Upgrade.SILKY, 3, 3, new Ingredient[]{
-                    web, web, web,
-                    web, barrel, web,
-                    web, web, web
-            }).setRegistryName("charset:barrel_upgrade_silky"));
-        }
 
-        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Upgrade.HOPPING)) {
-            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Upgrade.HOPPING, 1, 3, new Ingredient[]{
-                    hopper,
-                    barrel,
-                    hopper
-            }).setRegistryName("charset:barrel_upgrade_hopping"));
-        }
-
-        if (CharsetStorageBarrels.isEnabled(TileEntityDayBarrel.Upgrade.STICKY)) {
-            registry.register(new BarrelUpgrade("barrel_upgrade", TileEntityDayBarrel.Upgrade.STICKY, 1, 3, new Ingredient[]{
-                    slime_ball,
-                    barrel,
-                    slime_ball
-            }).setRegistryName("charset:barrel_upgrade_sticky"));
+    public static class ConditionFactory implements IConditionFactory {
+        @Override
+        public BooleanSupplier parse(JsonContext context, JsonObject json) {
+            String upgrade = JsonUtils.getString(json, "upgrade");
+            TileEntityDayBarrel.Upgrade upgradeEnum = TileEntityDayBarrel.Upgrade.valueOf(upgrade);
+            return () -> CharsetStorageBarrels.isEnabled(upgradeEnum);
         }
     }
 
-    public static class BarrelUpgrade extends RecipeCharset {
-        final TileEntityDayBarrel.Upgrade upgradeType;
-
-        public BarrelUpgrade(String group, TileEntityDayBarrel.Upgrade upgrade, int width, int height, Ingredient[] inputs) {
-            super(group);
-            super.width = width;
-            super.height = height;
-            super.input = NonNullList.create();
-            for (int i = 0; i < inputs.length; i++)
-                super.input.add(inputs[i]);
-            super.output = new ItemStack(CharsetStorageBarrels.barrelItem);
-            this.upgradeType = upgrade;
+    public static class Factory extends RecipeCharset.Factory {
+        @Override
+        protected String getType(JsonContext context, JsonObject json) {
+            return JsonUtils.getString(json, "type");
         }
 
-        ItemStack grabBarrel(InventoryCrafting container) {
-            for (int i = 0; i < container.getSizeInventory(); i++) {
-                ItemStack is = container.getStackInSlot(i);
-                if (is.getItem() != CharsetStorageBarrels.barrelItem && is.getItem() != CharsetStorageBarrels.barrelCartItem) {
-                    continue;
-                }
-                return is;
+        @Override
+        protected Ingredient parseIngredient(JsonElement json, JsonContext context) {
+            Ingredient ingredient = CraftingHelper.getIngredient(json, context);
+            if (ingredient.apply(new ItemStack(CharsetStorageBarrels.barrelItem))) {
+                return barrel;
+            } else {
+                return ingredient;
             }
+        }
+
+        @Override
+        public IRecipe parse(JsonContext context, JsonObject json) {
+            BarrelUpgradeRecipe recipe = new BarrelUpgradeRecipe(context, json);
+            String type = getType(context, json);
+
+            if (type.endsWith("shapeless")) {
+                parseInputShapeless(recipe, context, json);
+            } else if (type.endsWith("shaped")) {
+                parseInputShaped(recipe, context, json);
+            } else {
+                throw new RuntimeException("Unknown type: " + type);
+            }
+
+            recipe.upgradeType = TileEntityDayBarrel.Upgrade.valueOf(JsonUtils.getString(json, "upgrade"));
+            recipe.output = new ItemStack(CharsetStorageBarrels.barrelItem);
+            return recipe;
+        }
+    }
+
+    TileEntityDayBarrel.Upgrade upgradeType;
+
+    public BarrelUpgradeRecipe(JsonContext context, JsonObject json) {
+        super(context, json);
+    }
+
+    ItemStack grabBarrel(InventoryCrafting container) {
+        for (int i = 0; i < container.getSizeInventory(); i++) {
+            ItemStack is = container.getStackInSlot(i);
+            if (is.getItem() != CharsetStorageBarrels.barrelItem && is.getItem() != CharsetStorageBarrels.barrelCartItem) {
+                continue;
+            }
+            return is;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public Collection<ItemStack> getAllRecipeOutputs() {
+        Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS_NORMAL;
+        Collection<ItemStack> stacks2 = new ArrayList<>();
+        for (ItemStack s : stacks) {
+            stacks2.add(TileEntityDayBarrel.addUpgrade(s, upgradeType));
+        }
+        return stacks2;
+    }
+
+    @Nullable
+    @Override
+    public ItemStack getCraftingResult(@Nullable InventoryCrafting input) {
+        IngredientMatcher matcher = super.matchedOrNull(input);
+        if (matcher != null) {
+            ItemStack is = grabBarrel(input);
+            if (is.isEmpty()) return ItemStack.EMPTY; // Shouldn't happen?
+            is = is.copy();
+            is.setCount(1);
+            return TileEntityDayBarrel.addUpgrade(is, upgradeType);
+        } else {
             return ItemStack.EMPTY;
         }
-
-        @Override
-        public Collection<ItemStack> getAllRecipeOutputs() {
-            Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS_NORMAL;
-            Collection<ItemStack> stacks2 = new ArrayList<>();
-            for (ItemStack s : stacks) {
-                stacks2.add(TileEntityDayBarrel.addUpgrade(s, upgradeType));
-            }
-            return stacks2;
-        }
-
-        @Nullable
-        @Override
-        public ItemStack getCraftingResult(@Nullable InventoryCrafting input) {
-            IngredientMatcher matcher = super.matchedOrNull(input);
-            if (matcher != null) {
-                ItemStack is = grabBarrel(input);
-                if (is.isEmpty()) return ItemStack.EMPTY; // Shouldn't happen?
-                is = is.copy();
-                is.setCount(1);
-                return TileEntityDayBarrel.addUpgrade(is, upgradeType);
-            } else {
-                return ItemStack.EMPTY;
-            }
-        }
     }
-
 }

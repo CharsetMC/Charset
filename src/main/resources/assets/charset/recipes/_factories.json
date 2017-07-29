@@ -1,6 +1,7 @@
 {
   "conditions": {
-    "module_loaded": "pl.asie.charset.lib.recipe.ConditionModuleLoadedFactory"
+    "module_loaded": "pl.asie.charset.lib.recipe.ConditionModuleLoadedFactory",
+    "barrel_upgrade_enabled": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$ConditionFactory"
   },
   "ingredients": {
     "material": "pl.asie.charset.lib.recipe.IngredientMaterialFactory"
@@ -8,6 +9,10 @@
   "recipes": {
     "dyeable_item": "pl.asie.charset.lib.recipe.DyeableItemRecipeFactory",
     "shaped": "pl.asie.charset.lib.recipe.RecipeCharset$Factory",
-    "shapeless": "pl.asie.charset.lib.recipe.RecipeCharset$Factory"
+    "shapeless": "pl.asie.charset.lib.recipe.RecipeCharset$Factory",
+    "barrel_cart_shaped": "pl.asie.charset.module.storage.barrels.BarrelCartRecipe$Factory",
+    "barrel_cart_shapeless": "pl.asie.charset.module.storage.barrels.BarrelCartRecipe$Factory",
+    "barrel_upgrade_shaped": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$Factory",
+    "barrel_upgrade_shapeless": "pl.asie.charset.module.storage.barrels.BarrelUpgradeRecipe$Factory"
   }
 }

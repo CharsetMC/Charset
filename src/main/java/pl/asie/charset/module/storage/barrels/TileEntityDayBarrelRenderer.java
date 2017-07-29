@@ -292,7 +292,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
                     });
                 }
             } else {
-                GlStateManager.disableLighting();
+                RenderHelper.enableStandardItemLighting();
             }
 
             GlStateManager.scale(0.5F, 0.5F, 0.025F);

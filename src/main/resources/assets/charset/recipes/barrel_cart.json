@@ -1,0 +1,22 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.barrels"
+    }
+  ],
+  "type": "charset:barrel_cart_shapeless",
+  "group": "barrel_cart",
+  "ingredients": [
+    {
+      "item": "charset:barrel"
+    },
+    {
+      "item": "minecraft:minecart"
+    }
+  ]
+}
+
+
+
+

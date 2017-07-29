@@ -72,7 +72,7 @@ import pl.asie.charset.lib.utils.*;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class TileEntityDayBarrel extends TileBase implements IBarrel, ITickable, IAxisRotatable {
+public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable, ITickable, IAxisRotatable {
     public ItemStack item = ItemStack.EMPTY;
     public ItemMaterial woodLog, woodSlab;
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
@@ -82,9 +82,15 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ITickable,
     protected final InsertionHandler insertionView = new InsertionHandler();
     protected final ExtractionHandler extractionView = new ExtractionHandler();
     protected final ReadableItemHandler readOnlyView = new ReadableItemHandler();
+    protected boolean isEntity;
 
     private CapabilityCache.Single<IItemHandler> helperTop, helperBottom;
     private ProxiedBlockAccess woodLogAccess;
+
+    @Override
+    public boolean isCacheValid() {
+        return !isEntity && !isInvalid();
+    }
 
     public abstract class BaseItemHandler implements ICacheable, IItemHandler {
         @Override
@@ -119,7 +125,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ITickable,
 
         @Override
         public boolean isCacheValid() {
-            return !isInvalid();
+            return TileEntityDayBarrel.this.isCacheValid();
         }
     }
 

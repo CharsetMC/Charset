@@ -36,12 +36,17 @@
 
 package pl.asie.charset.module.storage.barrels;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.recipe.IngredientCharset;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
@@ -49,10 +54,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-// TODO: Turn into JSON
 public class BarrelCartRecipe extends RecipeCharset {
-    private static final Ingredient MINECART = CraftingHelper.getIngredient(Items.MINECART);
-    private static final Ingredient BARREL = new IngredientCharset(0) {
+    private static final Ingredient barrel = new IngredientCharset(0) {
         @Override
         public boolean mustIteratePermutations() {
             return false;
@@ -74,6 +77,40 @@ public class BarrelCartRecipe extends RecipeCharset {
         }
     };
 
+    public static class Factory extends RecipeCharset.Factory {
+        @Override
+        protected String getType(JsonContext context, JsonObject json) {
+            return JsonUtils.getString(json, "type");
+        }
+
+        @Override
+        protected Ingredient parseIngredient(JsonElement json, JsonContext context) {
+            Ingredient ingredient = CraftingHelper.getIngredient(json, context);
+            if (ingredient.apply(new ItemStack(CharsetStorageBarrels.barrelItem))) {
+                return barrel;
+            } else {
+                return ingredient;
+            }
+        }
+
+        @Override
+        public IRecipe parse(JsonContext context, JsonObject json) {
+            BarrelCartRecipe recipe = new BarrelCartRecipe(context, json);
+            String type = getType(context, json);
+
+            if (type.endsWith("shapeless")) {
+                parseInputShapeless(recipe, context, json);
+            } else if (type.endsWith("shaped")) {
+                parseInputShaped(recipe, context, json);
+            } else {
+                throw new RuntimeException("Unknown type: " + type);
+            }
+
+            recipe.output = new ItemStack(CharsetStorageBarrels.barrelCartItem);
+            return recipe;
+        }
+    }
+
     @Override
     public List<ItemStack> getAllRecipeOutputs() {
         Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS;
@@ -84,15 +121,8 @@ public class BarrelCartRecipe extends RecipeCharset {
         return stacks2;
     }
 
-    public BarrelCartRecipe(String group) {
-        super(group);
-        this.width = 2;
-        this.height = 1;
-        this.shapeless = true;
-        this.input = NonNullList.create();
-        input.add(BARREL);
-        input.add(MINECART);
-        this.output = new ItemStack(CharsetStorageBarrels.barrelCartItem);
+    public BarrelCartRecipe(JsonContext context, JsonObject json) {
+        super(context, json);
     }
 
     @Override

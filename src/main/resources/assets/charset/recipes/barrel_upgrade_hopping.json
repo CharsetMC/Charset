@@ -1,0 +1,32 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.barrels"
+    },
+    {
+      "type": "charset:barrel_upgrade_enabled",
+      "upgrade": "HOPPING"
+    }
+  ],
+  "type": "charset:barrel_upgrade_shaped",
+  "group": "barrel_upgrade",
+  "pattern": [
+    "h",
+    "b",
+    "h"
+  ],
+  "key": {
+    "h": {
+      "item": "minecraft:hopper"
+    },
+    "b": {
+      "item": "charset:barrel"
+    }
+  },
+  "upgrade": "HOPPING"
+}
+
+
+
+

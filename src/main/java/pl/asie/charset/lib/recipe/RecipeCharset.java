@@ -44,10 +44,10 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
         super(group, hidden);
     }
 
+    protected ItemStack output;
     protected final TCharObjectMap<Ingredient> charToIngredient = new TCharObjectHashMap<>();
     protected int[] shapedOrdering;
     protected NonNullList<Ingredient> input = null;
-    protected ItemStack output;
     protected int width = 0;
     protected int height = 0;
     protected boolean mirrored = false;
@@ -183,109 +183,125 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
     }
 
     public static class Factory implements IRecipeFactory {
+        protected String getType(JsonContext context, JsonObject json) {
+            return JsonUtils.getString(json, "type");
+        }
+
+        protected Ingredient parseIngredient(JsonElement json, JsonContext context) {
+            return CraftingHelper.getIngredient(json, context);
+        }
+
+        protected void parseInputShapeless(RecipeCharset recipe, JsonContext context, JsonObject json) {
+            recipe.shapeless = true;
+            JsonArray array = JsonUtils.getJsonArray(json, "ingredients");
+            recipe.input = NonNullList.create();
+            for (int i = 0; i < array.size(); i++) {
+                recipe.input.add(parseIngredient(array.get(i), context));
+            }
+            recipe.width = recipe.input.size();
+            recipe.height = 1;
+        }
+
+        protected void parseInputShaped(RecipeCharset recipe, JsonContext context, JsonObject json) {
+            recipe.shapeless = false;
+            recipe.mirrored = JsonUtils.getBoolean(json, "mirrored", false);
+
+            List<String> shape = new ArrayList<>();
+
+            JsonArray pattern = JsonUtils.getJsonArray(json, "pattern");
+            for (int idx = 0; idx < pattern.size(); idx++) {
+                String s = pattern.get(idx).getAsString();
+                shape.add(s);
+                recipe.width = Math.max(recipe.width, s.length());
+            }
+            recipe.height = pattern.size();
+
+            recipe.charToIngredient.put(' ', Ingredient.EMPTY);
+            TObjectCharMap<Ingredient> ingredientToChar = new TObjectCharHashMap<>();
+
+            JsonObject key = JsonUtils.getJsonObject(json, "key");
+            for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
+                if (entry.getKey().length() > 1) {
+                    throw new RuntimeException("Invalid recipe key: '" + entry.getKey() + "'!");
+                }
+                char c = entry.getKey().charAt(0);
+                recipe.charToIngredient.put(c, parseIngredient(entry.getValue(), context));
+                ingredientToChar.put(recipe.charToIngredient.get(c), c);
+            }
+
+            recipe.shapedOrdering = new int[recipe.width * recipe.height];
+
+            recipe.input = NonNullList.create();
+
+            for (int y = 0; y < recipe.height; y++) {
+                String s = shape.get(y);
+                for (int x = 0; x < recipe.width; x++) {
+                    if (x < s.length()) {
+                        Ingredient i = recipe.charToIngredient.get(s.charAt(x));
+                        if (i == null) {
+                            throw new RuntimeException("IngredientMaterial not found: '" + s.charAt(x) + "'!");
+                        }
+                        recipe.input.add(i);
+                    } else {
+                        recipe.input.add(Ingredient.EMPTY);
+                    }
+                }
+            }
+
+            Set<Ingredient> addedIngredients = new HashSet<>();
+            TIntSet addedPositions = new TIntHashSet();
+
+            int prevIdx;
+            int idx = 0;
+            while (idx < recipe.shapedOrdering.length) {
+                prevIdx = idx;
+
+                for (int i = 0; i < recipe.input.size(); i++) {
+                    if (!addedPositions.contains(i)) {
+                        Ingredient ingredient = recipe.input.get(i);
+                        TCharSet deps = ingredient instanceof IngredientCharset ? ((IngredientCharset) ingredient).getDependencies() : null;
+                        if (deps != null && deps.size() > 0) {
+                            boolean match = true;
+                            TCharIterator it = deps.iterator();
+                            while (it.hasNext()) {
+                                if (!addedIngredients.contains(recipe.charToIngredient.get(it.next()))) {
+                                    match = false;
+                                    break;
+                                }
+                            }
+
+                            if (!match) {
+                                continue;
+                            }
+                        }
+
+                        if (!addedIngredients.contains(ingredient) && ingredient instanceof IngredientCharset) {
+                            for (Ingredient ing : addedIngredients) {
+                                ((IngredientCharset) ingredient).addDependency(ingredientToChar.get(ing), ing);
+                            }
+                        }
+
+                        recipe.shapedOrdering[idx++] = i;
+                        addedIngredients.add(ingredient);
+                        addedPositions.add(i);
+                    }
+                }
+
+                if (prevIdx == idx) {
+                    throw new RuntimeException("Cyclic dependency detected!");
+                }
+            }
+        }
+
         @Override
         public IRecipe parse(JsonContext context, JsonObject json) {
             RecipeCharset recipe = new RecipeCharset(context, json);
-            String type = JsonUtils.getString(json, "type");
+            String type = getType(context, json);
 
-            if (type.equals("charset:shapeless")) {
-                recipe.shapeless = true;
-                JsonArray array = JsonUtils.getJsonArray(json, "ingredients");
-                recipe.input = NonNullList.create();
-                for (int i = 0; i < array.size(); i++) {
-                    recipe.input.add(CraftingHelper.getIngredient(array.get(i), context));
-                }
-                recipe.width = recipe.input.size();
-                recipe.height = 1;
-            } else if (type.equals("charset:shaped")) {
-                recipe.shapeless = false;
-                recipe.mirrored = JsonUtils.getBoolean(json, "mirrored", false);
-
-                List<String> shape = new ArrayList<>();
-
-                JsonArray pattern = JsonUtils.getJsonArray(json, "pattern");
-                for (int idx = 0; idx < pattern.size(); idx++) {
-                    String s = pattern.get(idx).getAsString();
-                    shape.add(s);
-                    recipe.width = Math.max(recipe.width, s.length());
-                }
-                recipe.height = pattern.size();
-
-                recipe.charToIngredient.put(' ', Ingredient.EMPTY);
-                TObjectCharMap<Ingredient> ingredientToChar = new TObjectCharHashMap<>();
-
-                JsonObject key = JsonUtils.getJsonObject(json, "key");
-                for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
-                    if (entry.getKey().length() > 1) {
-                        throw new RuntimeException("Invalid recipe key: '" + entry.getKey() + "'!");
-                    }
-                    char c = entry.getKey().charAt(0);
-                    recipe.charToIngredient.put(c, CraftingHelper.getIngredient(entry.getValue(), context));
-                    ingredientToChar.put(recipe.charToIngredient.get(c), c);
-                }
-
-                recipe.shapedOrdering = new int[recipe.width * recipe.height];
-
-                recipe.input = NonNullList.create();
-
-                for (int y = 0; y < recipe.height; y++) {
-                    String s = shape.get(y);
-                    for (int x = 0; x < recipe.width; x++) {
-                        if (x < s.length()) {
-                            Ingredient i = recipe.charToIngredient.get(s.charAt(x));
-                            if (i == null) {
-                                throw new RuntimeException("IngredientMaterial not found: '" + s.charAt(x) + "'!");
-                            }
-                            recipe.input.add(i);
-                        } else {
-                            recipe.input.add(Ingredient.EMPTY);
-                        }
-                    }
-                }
-
-                Set<Ingredient> addedIngredients = new HashSet<>();
-                TIntSet addedPositions = new TIntHashSet();
-
-                int prevIdx;
-                int idx = 0;
-                while (idx < recipe.shapedOrdering.length) {
-                    prevIdx = idx;
-
-                    for (int i = 0; i < recipe.input.size(); i++) {
-                        if (!addedPositions.contains(i)) {
-                            Ingredient ingredient = recipe.input.get(i);
-                            TCharSet deps = ingredient instanceof IngredientCharset ? ((IngredientCharset) ingredient).getDependencies() : null;
-                            if (deps != null && deps.size() > 0) {
-                                boolean match = true;
-                                TCharIterator it = deps.iterator();
-                                while (it.hasNext()) {
-                                    if (!addedIngredients.contains(recipe.charToIngredient.get(it.next()))) {
-                                        match = false;
-                                        break;
-                                    }
-                                }
-
-                                if (!match) {
-                                    continue;
-                                }
-                            }
-
-                            if (!addedIngredients.contains(ingredient) && ingredient instanceof IngredientCharset) {
-                                for (Ingredient ing : addedIngredients) {
-                                    ((IngredientCharset) ingredient).addDependency(ingredientToChar.get(ing), ing);
-                                }
-                            }
-
-                            recipe.shapedOrdering[idx++] = i;
-                            addedIngredients.add(ingredient);
-                            addedPositions.add(i);
-                        }
-                    }
-
-                    if (prevIdx == idx) {
-                        throw new RuntimeException("Cyclic dependency detected!");
-                    }
-                }
+            if (type.endsWith("shapeless")) {
+                parseInputShapeless(recipe, context, json);
+            } else if (type.endsWith("shaped")) {
+                parseInputShaped(recipe, context, json);
             } else {
                 throw new RuntimeException("Unknown type: " + type);
             }

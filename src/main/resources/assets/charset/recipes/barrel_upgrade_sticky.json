@@ -1,0 +1,33 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.barrels"
+    },
+    {
+      "type": "charset:barrel_upgrade_enabled",
+      "upgrade": "STICKY"
+    }
+  ],
+  "type": "charset:barrel_upgrade_shaped",
+  "group": "barrel_upgrade",
+  "pattern": [
+    "h",
+    "b",
+    "h"
+  ],
+  "key": {
+    "h": {
+      "type": "forge:ore_dict",
+      "ore": "slimeball"
+    },
+    "b": {
+      "item": "charset:barrel"
+    }
+  },
+  "upgrade": "STICKY"
+}
+
+
+
+

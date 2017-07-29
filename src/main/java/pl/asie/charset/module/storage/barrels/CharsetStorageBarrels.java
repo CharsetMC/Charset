@@ -140,9 +140,6 @@ public class CharsetStorageBarrels {
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)),
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.DIAMOND_BLOCK))
 		));
-
-		event.getRegistry().register(new BarrelCartRecipe("barrel_cart").setRegistryName("barrel_cart"));
-		BarrelUpgradeRecipes.addUpgradeRecipes(event.getRegistry());
 	}
 
 	@Mod.EventHandler
