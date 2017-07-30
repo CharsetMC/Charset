@@ -2,6 +2,7 @@ package pl.asie.charset.module.tools.building;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -14,7 +15,14 @@ public class ItemCharsetTool extends ItemBase {
         setMaxStackSize(1);
     }
 
-    public ItemMaterial getMaterial(MaterialSlot slot) {
+    public ItemMaterial getMaterial(ItemStack stack, MaterialSlot slot) {
+        if (stack.hasTagCompound()) {
+            NBTTagCompound cpd = stack.getTagCompound();
+            if (cpd.hasKey(slot.nbtKey)) {
+                return ItemMaterialRegistry.INSTANCE.getMaterial(cpd, slot.nbtKey);
+            }
+        }
+
         return getDefaultMaterial(slot);
     }
 
@@ -22,7 +30,7 @@ public class ItemCharsetTool extends ItemBase {
         if (slot == MaterialSlot.HANDLE) {
             return ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Items.STICK));
         } else {
-            Collection<ItemMaterial> materials = ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("block", "iron");
+            Collection<ItemMaterial> materials = ItemMaterialRegistry.INSTANCE.getMaterialsByTypes("ingot", "iron");
             if (materials.size() > 0) {
                 return materials.iterator().next();
             } else {
@@ -38,6 +46,12 @@ public class ItemCharsetTool extends ItemBase {
 
     public enum MaterialSlot {
         HANDLE,
-        HEAD
+        HEAD;
+
+        public final String nbtKey;
+
+        MaterialSlot() {
+            this.nbtKey = "m" + name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase();
+        }
     }
 }

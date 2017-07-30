@@ -20,8 +20,15 @@ public class ToolItemColor implements IItemColor {
     public int getColorFromItemstack(ItemStack stack, int tintIndex) {
         ItemCharsetTool.MaterialSlot slot = tintIndex == 1 ? ItemCharsetTool.MaterialSlot.HEAD : (tintIndex == 0 ? ItemCharsetTool.MaterialSlot.HANDLE : null);
         if (slot != null && stack.getItem() instanceof ItemCharsetTool) {
-            ItemMaterial material = ((ItemCharsetTool) stack.getItem()).getMaterial(slot);
-            return ColorLookupHandler.INSTANCE.getColor(material.getStack(), RenderUtils.AveragingMode.FULL);
+            ItemMaterial material = ((ItemCharsetTool) stack.getItem()).getMaterial(stack, slot);
+            ItemMaterial renderMaterial = material.getRelated("block");
+            if (renderMaterial == null) {
+                renderMaterial = material.getRelated("log");
+                if (renderMaterial == null) {
+                    renderMaterial = material;
+                }
+            }
+            return ColorLookupHandler.INSTANCE.getColor(renderMaterial.getStack(), RenderUtils.AveragingMode.FULL);
         }
         return -1;
     }

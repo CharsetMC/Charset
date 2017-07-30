@@ -112,8 +112,13 @@ public final class ItemMaterialHeuristics {
 
                     ItemMaterial stickMaterial = reg.getOrCreateMaterial(stick);
                     if (reg.registerTypes(stickMaterial, "stick", "wood", "item")) {
-                        reg.registerRelation(plankMaterial, stickMaterial, "stick", "plank");
-                        reg.registerRelation(stickMaterial, logMaterial, "log", "stick");
+                        if (stick.getItem() != Items.STICK) {
+                            reg.registerRelation(plankMaterial, stickMaterial, "stick", "plank");
+                            reg.registerRelation(logMaterial, stickMaterial, "stick", "log");
+                        } else {
+                            reg.registerRelation(plankMaterial, stickMaterial, "stick");
+                            reg.registerRelation(logMaterial, stickMaterial, "stick");
+                        }
                     }
                 }
             }
@@ -269,7 +274,7 @@ public final class ItemMaterialHeuristics {
 
         bar.step("Wood");
         // Pre-initialize impl woods
-        if (!modded)
+        if (!modded) {
             for (int i = 0; i < 6; i++) {
                 ItemMaterial log = reg.getOrCreateMaterial(new ItemStack(i >= 4 ? Blocks.LOG2 : Blocks.LOG, 1, i % 4));
                 ItemMaterial plank = reg.getOrCreateMaterial(new ItemStack(Blocks.PLANKS, 1, i));
@@ -278,52 +283,60 @@ public final class ItemMaterialHeuristics {
                 reg.registerTypes(plank, "plank", "block", "wood");
                 reg.registerTypes(stick, "stick", "item", "wood");
                 reg.registerRelation(log, plank, "plank", "log");
-                reg.registerRelation(plank, stick, "stick", "plank");
-                reg.registerRelation(stick, log, "log", "stick");
+                if (i == 0) {
+                    reg.registerRelation(plank, stick, "stick", "plank");
+                    reg.registerRelation(log, stick, "stick", "log");
+                } else {
+                    reg.registerRelation(plank, stick, "stick");
+                    reg.registerRelation(log, stick, "stick");
+                }
             }
-
-        if (modded)
+        } else {
             supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
+        }
 
         bar.step("Ores");
 
-        if (modded)
+        if (modded) {
             for (String oreName : OreDictionary.getOreNames()) {
                 if (oreName.startsWith("ore")) {
                     initOreMaterial(oreName);
                 }
             }
+        }
 
         bar.step("Ingots/Dusts/Gems");
 
-        if (modded)
+        if (modded) {
             for (String oreName : OreDictionary.getOreNames()) {
                 if (oreName.startsWith("ingot") || oreName.startsWith("dust") || oreName.startsWith("gem")) {
                     supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initIngotLikeMaterial(oreName, s)));
                 }
             }
+        }
 
         bar.step("Stones");
 
-        if (modded)
+        if (modded) {
             for (String oreName : OreDictionary.getOreNames()) {
                 if (oreName.startsWith("stone")) {
                     supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initStoneMaterial(oreName, s)));
                 }
             }
 
-        if (modded)
             for (String oreName : OreDictionary.getOreNames()) {
                 if (oreName.startsWith("cobblestone")) {
                     supplyExpandedStacks(OreDictionary.getOres(oreName, false), (s -> ItemMaterialHeuristics.initCobblestoneMaterial(oreName, s)));
                 }
             }
+        }
 
         bar.step("Misc");
         if (modded)
             reg.registerTypes(reg.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)), "block", "bedrock");
 
         bar.step("Slabs/Stairs");
+
         for (ItemMaterial material : reg.getMaterialsByType("block")) {
             findSlab(material);
             findStair(material);

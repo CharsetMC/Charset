@@ -14,12 +14,14 @@
   ],
   "key": {
     "s": {
-      "type": "forge:ore_dict",
-      "ore": "stickWood"
+      "type": "charset:material",
+      "material": ["item", "wood", "stick"],
+      "nbtKey": "mHandle"
     },
     "i": {
-      "type": "forge:ore_dict",
-      "ore": "ingotIron"
+      "type": "charset:material",
+      "material": ["item", "ingot"],
+      "nbtKey": "mHead"
     }
   },
   "result": {
