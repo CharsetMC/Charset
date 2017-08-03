@@ -919,10 +919,12 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         NBTTagCompound compound = ItemUtils.getTagCompound(stack, true);
         compound.setString("log", log.getId());
         compound.setString("slab", slab.getId());
-        NBTTagList list = new NBTTagList();
-        for (Upgrade u : upgrades)
-            list.appendTag(new NBTTagString(u.name()));
-        compound.setTag("upgrades", list);
+        if (upgrades.size() > 0) {
+            NBTTagList list = new NBTTagList();
+            for (Upgrade u : upgrades)
+                list.appendTag(new NBTTagString(u.name()));
+            compound.setTag("upgrades", list);
+        }
         return stack;
     }
 

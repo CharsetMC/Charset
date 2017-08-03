@@ -43,6 +43,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.upgrade.CharsetFixEmptyUpgradeTagBarrels;
 import pl.asie.charset.upgrade.CharsetLockKeyTagChange;
 import pl.asie.charset.upgrade.CharsetUnifiedModIdFixer;
 
@@ -101,9 +102,10 @@ public class ModCharset {
 
 		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 
-		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 2);
+		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 3);
 		dataFixes.registerFix(FixTypes.ENTITY, new CharsetUnifiedModIdFixer.Entity(oldPrefixes));
 		dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new CharsetLockKeyTagChange());
+		dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new CharsetFixEmptyUpgradeTagBarrels());
 
 		charsetIconItem = new IconCharset();
 		charsetIconStack = new ItemStack(charsetIconItem);
