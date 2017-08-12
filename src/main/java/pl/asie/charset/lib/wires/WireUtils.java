@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 
 import javax.annotation.Nullable;
@@ -61,21 +62,20 @@ public final class WireUtils {
         return result;
     }
 
-    public static <T> T getCapability(Wire wire, BlockPos pos, Capability<T> capability, EnumFacing face) {
+    public static <T> T getCapability(Wire searcher, BlockPos pos, Capability<T> capability, EnumFacing face) {
         TileWire.isWireCheckingForCaps = true;
 
         // for non-center wires, use multiparts to check for potential edge connections
-        if (wire.getLocation() != WireFace.CENTER) {
-            Optional<IMultipartContainer> container = MultipartHelper.getContainer(wire.getContainer().world(), pos);
+        if (searcher.getLocation() != WireFace.CENTER) {
+            Optional<IMultipartContainer> container = MultipartHelper.getContainer(searcher.getContainer().world(), pos);
             if (container.isPresent()) {
-                T result = MultipartCapabilityHelper.getCapability(container.get(), capability, EnumEdgeSlot.fromFaces(wire.getLocation().facing, face), face);
+                T result = MultipartCapabilityHelper.getCapability(container.get(), capability, EnumEdgeSlot.fromFaces(searcher.getLocation().facing, face), face);
                 TileWire.isWireCheckingForCaps = false;
                 return result;
             }
         }
 
-        TileEntity tile = wire.getContainer().world().getTileEntity(pos);
-        T result = tile != null ? tile.getCapability(capability, face) : null;
+        T result = CapabilityHelper.get(searcher.getContainer().world(), pos, capability, face, true, true, false);
         TileWire.isWireCheckingForCaps = false;
         return result;
     }

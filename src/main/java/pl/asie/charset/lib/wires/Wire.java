@@ -18,10 +18,7 @@ import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Wire implements ITickable, ICapabilityProvider, IRenderComparable<Wire> {
     public static final IUnlistedProperty<Wire> PROPERTY = new UnlistedPropertyGeneric<>("wire", Wire.class);
@@ -42,6 +39,94 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         AttachCapabilitiesEvent<Wire> event = new AttachCapabilitiesEvent<Wire>(Wire.class,this);
         MinecraftForge.EVENT_BUS.register(event);
         this.capabilities = event.getCapabilities().size() > 0 ? new CapabilityDispatcher(event.getCapabilities()) : null;
+    }
+
+    private <T> T getCapabilityRemoteBlock(BlockPos pos, EnumFacing facing, Capability<T> capability) {
+        return WireUtils.getCapability(this, pos, capability, facing);
+    }
+
+    private <T> T getCapabilityRemote(BlockPos pos, WireFace face, EnumFacing facing, boolean blocks, Capability<T> capability) {
+        Wire wire = WireUtils.getWire(getContainer().world(), pos, face);
+        if (wire != null && wire.hasCapability(capability, facing)) {
+            return wire.getCapability(capability, facing);
+        } else {
+            if (blocks) {
+                return getCapabilityRemoteBlock(pos, facing, capability);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    protected final <T> Iterable<T> connectedIterator(Capability<T> capability, boolean connectsBelowWire) {
+        return () -> new Iterator<T>() {
+            private final BlockPos pos = getContainer().pos();
+            private final WireFace loc = getLocation();
+            private T queued = find();
+            private int i = 0;
+
+            private T find() {
+                T result = null;
+                while (result == null && i < 20) {
+                    switch (i) {
+                        case 0: {
+                            if (getLocation() != WireFace.CENTER && connectsBelowWire) {
+                                result = getCapabilityRemoteBlock(pos.offset(loc.facing), loc.facing.getOpposite(), capability);
+                            }
+                        } break;
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7: {
+                            WireFace face = WireFace.VALUES[i - 1];
+                            if (face != loc && connectsInternal(face)) {
+                                result = getCapabilityRemote(pos, face, getLocation().facing, false, capability);
+                            }
+                        } break;
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 11:
+                        case 12:
+                        case 13: {
+                            EnumFacing facing = EnumFacing.getFront(i - 8);
+                            if (connectsExternal(facing)) {
+                                result = getCapabilityRemote(pos.offset(facing), loc, facing.getOpposite(), true, capability);
+                            }
+                        } break;
+                        case 14:
+                        case 15:
+                        case 16:
+                        case 17:
+                        case 18:
+                        case 19: {
+                            EnumFacing facing = EnumFacing.getFront(i - 14);
+                            if (connectsCorner(facing)) {
+                                result = getCapabilityRemote(pos.offset(facing).offset(loc.facing), WireFace.get(facing.getOpposite()), loc.facing.getOpposite(), false, capability);
+                            }
+                        } break;
+                    }
+
+                    i++;
+                }
+                return result;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return queued != null;
+            }
+
+            @Override
+            public T next() {
+                T current = queued;
+                queued = find();
+                return current;
+            }
+        };
     }
 
     @Override

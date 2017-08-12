@@ -20,6 +20,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -31,6 +32,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -53,9 +56,14 @@ public class CharsetLibWires {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		WireManager.REGISTRY.toString(); // Poke REGISTRY <- this is a hack to initialize it
 		blockWire = new BlockWire();
 		itemWire = new ItemWire(blockWire);
+
+		WireManager.REGISTRY = (ForgeRegistry<WireProvider>) new RegistryBuilder<WireProvider>()
+				.setName(new ResourceLocation("charset:wire"))
+				.setIDRange(1, WireManager.MAX_ID)
+				.setType(WireProvider.class)
+				.create();
 	}
 
 	@SubscribeEvent
@@ -95,6 +103,8 @@ public class CharsetLibWires {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+		WireManager.REGISTRY.unfreeze();
+
 		for (WireProvider provider : WireManager.REGISTRY) {
 			rendererWire.registerSheet(event.getMap(), provider);
 		}

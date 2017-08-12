@@ -38,6 +38,31 @@ public final class CapabilityHelper {
         wrappers.put(capability, provider);
     }
 
+    public static <T> boolean has(Capability<T> capability, ICapabilityProvider provider, EnumFacing facing) {
+        return has(capability, provider, facing, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> boolean has(Capability<T> capability, ICapabilityProvider provider, EnumFacing facing, boolean withWrappers) {
+        if (provider != null) {
+            if (provider.hasCapability(capability, facing)) {
+                return true;
+            }
+
+            if (withWrappers && wrappers.containsKey(capability)) {
+                for (Wrapper helper : wrappers.get(capability)) {
+                    T result = (T) helper.get(provider, facing);
+                    if (result != null) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+
     public static <T> T get(Capability<T> capability, ICapabilityProvider provider, EnumFacing facing) {
         return get(capability, provider, facing, true);
     }
@@ -60,6 +85,34 @@ public final class CapabilityHelper {
         }
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> boolean has(World world, BlockPos pos, Capability<T> capability, EnumFacing facing, boolean blocks, boolean tiles, boolean entities) {
+        IBlockState state = world.getBlockState(pos);
+
+        if (tiles && state.getBlock().hasTileEntity(state)) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (has(capability, tile, facing))
+                return true;
+        }
+
+        if (blocks) {
+            IBlockCapabilityProvider provider = blockProviders.get(state.getBlock(), capability);
+            if (provider != null) {
+                return true;
+            }
+        }
+
+        if (entities && !world.isSideSolid(pos, facing, false)) {
+            List<Entity> entityList = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos));
+            for (Entity entity : entityList) {
+                if (has(capability, entity, facing))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     @SuppressWarnings("unchecked")

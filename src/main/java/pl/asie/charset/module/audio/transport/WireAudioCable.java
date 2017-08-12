@@ -29,24 +29,6 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
                 || WireUtils.hasCapability(this, pos, Capabilities.AUDIO_RECEIVER, direction);
     }
 
-    private boolean receive(BlockPos pos, EnumFacing facing, AudioPacket packet) {
-        IAudioReceiver receiver = WireUtils.getCapability(this, pos, Capabilities.AUDIO_RECEIVER, facing);
-        if (receiver != null) {
-            return receiver.receive(packet);
-        }
-
-        return false;
-    }
-
-    private boolean receive(BlockPos pos, WireFace face, EnumFacing facing, AudioPacket packet) {
-        Wire wire = WireUtils.getWire(getContainer().world(), pos, face);
-        if (wire != null && wire.hasCapability(Capabilities.AUDIO_RECEIVER, facing)) {
-            return wire.getCapability(Capabilities.AUDIO_RECEIVER, facing).receive(packet);
-        } else {
-            return false;
-        }
-    }
-
     @Override
     public boolean receive(AudioPacket packet) {
         if (lastReceivedTime != getContainer().world().getTotalWorldTime()) {
@@ -59,22 +41,10 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
         }
 
         receivedPackets.add(packet);
+
         boolean received = false;
-
-        if (getLocation() != WireFace.CENTER) {
-            received |= receive(getContainer().pos().offset(getLocation().facing), getLocation().facing.getOpposite(), packet);
-        }
-
-        for (WireFace face : WireFace.VALUES) {
-            if (connectsInternal(face)) {
-                received |= receive(getContainer().pos(), face, getLocation().facing, packet);
-            } else if (face != WireFace.CENTER) {
-                if (connectsExternal(face.facing)) {
-                    received |= receive(getContainer().pos().offset(face.facing), getLocation(), face.facing.getOpposite(), packet);
-                } else if (connectsCorner(face.facing)) {
-                    received |= receive(getContainer().pos().offset(face.facing).offset(getLocation().facing), WireFace.get(face.facing.getOpposite()), getLocation().facing.getOpposite(), packet);
-                }
-            }
+        for (IAudioReceiver receiver : connectedIterator(Capabilities.AUDIO_RECEIVER, true)) {
+            received |= receiver.receive(packet);
         }
 
         return received;
