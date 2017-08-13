@@ -36,8 +36,8 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         this.factory = factory;
         this.location = location;
 
-        AttachCapabilitiesEvent<Wire> event = new AttachCapabilitiesEvent<Wire>(Wire.class,this);
-        MinecraftForge.EVENT_BUS.register(event);
+        AttachCapabilitiesEvent<Wire> event = new AttachCapabilitiesEvent<>(Wire.class, this);
+        MinecraftForge.EVENT_BUS.post(event);
         this.capabilities = event.getCapabilities().size() > 0 ? new CapabilityDispatcher(event.getCapabilities()) : null;
     }
 

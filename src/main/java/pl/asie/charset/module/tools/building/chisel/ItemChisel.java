@@ -16,7 +16,9 @@
 
 package pl.asie.charset.module.tools.building.chisel;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockButton;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -31,6 +33,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
@@ -42,7 +45,11 @@ import pl.asie.charset.module.tools.building.ToolsUtils;
 public class ItemChisel extends ItemCharsetTool {
     public ItemChisel() {
         super();
-        setUnlocalizedName("charset.chisel");
+        if (Loader.isModLoaded("chiselsandbits")) {
+            setUnlocalizedName("charset.chisel.large");
+        } else {
+            setUnlocalizedName("charset.chisel");
+        }
     }
 
     @Override
@@ -99,11 +106,28 @@ public class ItemChisel extends ItemCharsetTool {
                     }
 
                     ItemStack result = RecipeUtils.getCraftingResult(worldIn, 3, 3, inputStacks);
-                    if (result != null && !result.isEmpty() && result.getCount() == inputCount
-                            && !(result.getItem() instanceof ItemBlock && ((ItemBlock) result.getItem()).getBlock() instanceof BlockButton)) {
-                        ItemStack resultCopy = result.copy();
-                        resultCopy.setCount(1);
-                        ToolsUtils.placeBlockOrRollback(resultCopy, playerIn, worldIn, pos);
+                    if (result != null && !result.isEmpty() && !(result.getItem() instanceof ItemBlock && ((ItemBlock) result.getItem()).getBlock() instanceof BlockButton)) {
+                        if (result.getItem() instanceof ItemBlock) {
+                            Block block = ((ItemBlock) result.getItem()).getBlock();
+                            if (block instanceof BlockButton) {
+                                return EnumActionResult.FAIL;
+                            }
+
+                            if (block instanceof BlockStairs && (inputCount == 6 && result.getCount() >= 4 && result.getCount() <= 8)) {
+                                result.setCount(inputCount);
+                            }
+                        }
+
+                        if ((result.getCount() % inputCount) == 0) {
+                            ItemStack resultCopy = result.copy();
+                            resultCopy.setCount(1);
+                            ToolsUtils.placeBlockOrRollback(resultCopy, playerIn, worldIn, pos);
+                            if (result.getCount() > inputCount) {
+                                ItemStack resultCopyRemainder = result.copy();
+                                resultCopyRemainder.setCount((result.getCount() / inputCount) - 1);
+                                Block.spawnAsEntity(worldIn, pos, resultCopyRemainder);
+                            }
+                        }
                     }
                 }
             }
