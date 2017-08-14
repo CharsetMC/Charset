@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -110,18 +111,6 @@ public class CharsetStorageBarrels {
 	public void registerItems(RegistryEvent.Register<Item> event) {
 		RegistryUtils.register(event.getRegistry(), barrelItem, "barrel");
 		RegistryUtils.register(event.getRegistry(), barrelCartItem, "barrelCart");
-
-		GameRegistry.registerFuelHandler((stack) -> {
-			if (stack.getItem() == barrelItem) {
-				ItemStack burnStack = new ItemStack(Blocks.PLANKS);
-				if (stack.hasTagCompound()) {
-					burnStack = TileEntityDayBarrel.getLog(stack.getTagCompound()).getStack();
-				}
-				return TileEntityFurnace.getItemBurnTime(burnStack);
-			} else {
-				return 0;
-			}
-		});
 	}
 
 	@Mod.EventHandler

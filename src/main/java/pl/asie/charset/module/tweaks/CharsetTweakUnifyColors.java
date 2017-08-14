@@ -36,7 +36,7 @@ public class CharsetTweakUnifyColors {
 	private Map<String, float[]> colorPalette;
 
 	private int colorMultiplier(String prefix, EnumDyeColor color) {
-		float[] d = EntitySheep.getDyeRgb(color);
+		float[] d = ColorUtils.getDyeRgb(color);
 
 		if (prefix.contains("hardened_clay")) {
 			float[] dOrig = d;
@@ -148,7 +148,7 @@ public class CharsetTweakUnifyColors {
 				String key = ColorUtils.getUnderscoredSuffix(color);
 				if (colorPalette.containsKey(key)) {
 					float[] src = colorPalette.get(key);
-					float[] dst = EntitySheep.getDyeRgb(color);
+					float[] dst = ColorUtils.getDyeRgb(color);
 					dst[0] = src[0];
 					dst[1] = src[1];
 					dst[2] = src[2];

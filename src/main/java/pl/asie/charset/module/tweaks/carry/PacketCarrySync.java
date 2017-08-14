@@ -12,34 +12,37 @@ import pl.asie.charset.lib.utils.Utils;
 public class PacketCarrySync extends Packet {
 	private Entity player;
 	private NBTTagCompound tag;
+	private boolean isSelf;
 	private int playerId, dimension;
 
 	public PacketCarrySync() {
 
 	}
 
-	public PacketCarrySync(Entity player) {
+	public PacketCarrySync(Entity player, boolean isSelf) {
 		this.player = player;
+		this.isSelf = isSelf;
 		this.tag = (NBTTagCompound) CarryHandler.PROVIDER.getStorage().writeNBT(CharsetTweakBlockCarrying.CAPABILITY, player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null), null);
 	}
 
 	@Override
 	public void readData(INetHandler handler, ByteBuf buf) {
-		dimension = buf.readInt();
-		playerId = buf.readInt();
+		isSelf = buf.readBoolean();
+		if (!isSelf) {
+			dimension = buf.readInt();
+			playerId = buf.readInt();
+		}
 		tag = ByteBufUtils.readTag(buf);
 	}
 
 	@Override
 	public void apply(INetHandler handler) {
-		World world = Utils.getLocalWorld(dimension);
-		if (world != null) {
-			player = world.getEntityByID(playerId);
-		}
-		if (player == null) {
+		if (isSelf) {
 			player = getPlayer(handler);
-			if (player.getEntityId() != playerId) {
-				player = null;
+		} else {
+			World world = Utils.getLocalWorld(dimension);
+			if (world != null) {
+				player = world.getEntityByID(playerId);
 			}
 		}
 		if (player != null && player.hasCapability(CharsetTweakBlockCarrying.CAPABILITY, null)) {
@@ -51,8 +54,11 @@ public class PacketCarrySync extends Packet {
 
 	@Override
 	public void writeData(ByteBuf buf) {
-		buf.writeInt(player.getEntityWorld().provider.getDimension());
-		buf.writeInt(player.getEntityId());
+		buf.writeBoolean(isSelf);
+		if (!isSelf) {
+			buf.writeInt(player.getEntityWorld().provider.getDimension());
+			buf.writeInt(player.getEntityId());
+		}
 		ByteBufUtils.writeTag(buf, tag);
 	}
 

@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -34,14 +35,16 @@ public final class RegistryUtils {
 	}
 
 	public static void register(Class<? extends Entity> entity, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates) {
-		int autoAssignedId = 1;
-		while (takenEntityIds.containsKey(autoAssignedId)) autoAssignedId++;
+		int id;
 
-		Property prop = ModCharset.configIds.get("entity", name, autoAssignedId);
-		int id = prop.getInt(0);
-		if (id == 0 || takenEntityIds.containsKey(id)) {
-			id = autoAssignedId;
-			prop.set(id);
+		ConfigCategory category = ModCharset.configIds.getCategory("entity");
+		if (category.containsKey(name)) {
+			Property prop = category.get(name);
+			id = prop.getInt();
+		} else {
+			id = 1;
+			while (takenEntityIds.containsKey(id)) id++;
+			ModCharset.configIds.get("entity", name, id);
 		}
 
 		ResourceLocation nameLoc = new ResourceLocation("charset", name);

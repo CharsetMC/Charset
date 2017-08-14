@@ -53,7 +53,7 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (capability == Capabilities.AUDIO_RECEIVER) {
-            return connects(facing);
+            return connects(facing) || (getLocation().facing != null && getLocation().facing == facing);
         }
 
         return super.hasCapability(capability, facing);
@@ -61,7 +61,7 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == Capabilities.AUDIO_RECEIVER && connects(facing)) {
+        if (capability == Capabilities.AUDIO_RECEIVER && (connects(facing) || (getLocation().facing != null && getLocation().facing == facing))) {
             return Capabilities.AUDIO_RECEIVER.cast(this);
         }
 

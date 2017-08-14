@@ -131,11 +131,12 @@ public class TweakCarryRender {
 		EntityPlayer player = event.getEntityPlayer();
 		CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
 		if (carryHandler != null && carryHandler.isCarrying()) {
+
 			float partialTicks = event.getPartialRenderTick();
 			Minecraft.getMinecraft().entityRenderer.enableLightmap();
 
 			GlStateManager.pushMatrix();
-
+			GlStateManager.translate(event.getX(), event.getY(), event.getZ());
 			/* GlStateManager.pushMatrix();
 			GlStateManager.rotate(rotX, 1.0F, 0.0F, 0.0F);
 			GlStateManager.rotate(rotY, 0.0F, 1.0F, 0.0F);

@@ -194,7 +194,7 @@ public class CharsetTweakBlockCarrying {
 
             if (canCarry) {
                 carryHandler.grab(world, pos);
-                syncCarryWithClient(player, player);
+                syncCarryWithAllClients(player);
             } else {
                 // Sync in case the client said "yes".
                 syncCarryWithClient(player, player);
@@ -214,6 +214,7 @@ public class CharsetTweakBlockCarrying {
                     if (transformer.extract(entity, true) != null) {
                         Pair<IBlockState, TileEntity> pair = transformer.extract(entity, false);
                         carryHandler.put(pair.getLeft(), pair.getRight());
+                        syncCarryWithAllClients(player);
                         return;
                     }
                 }
@@ -262,7 +263,7 @@ public class CharsetTweakBlockCarrying {
                 return false;
             } else {
                 if (entity instanceof EntityPlayer) {
-                    CharsetTweakBlockCarrying.syncCarryWithClient(entity, (EntityPlayer) entity);
+                    CharsetTweakBlockCarrying.syncCarryWithAllClients(entity);
                 }
                 return true;
             }
@@ -273,7 +274,14 @@ public class CharsetTweakBlockCarrying {
 
     protected static void syncCarryWithClient(Entity who, EntityPlayer target) {
         if (who instanceof EntityPlayerMP && who.hasCapability(CAPABILITY, null)) {
-            packet.sendTo(new PacketCarrySync(who), target);
+            packet.sendTo(new PacketCarrySync(who, true), target);
+        }
+    }
+
+    protected static void syncCarryWithAllClients(Entity who) {
+        if (who instanceof EntityPlayerMP && who.hasCapability(CAPABILITY, null)) {
+            packet.sendTo(new PacketCarrySync(who, true), (EntityPlayer) who);
+            packet.sendToWatching(new PacketCarrySync(who, false), who, who);
         }
     }
 }

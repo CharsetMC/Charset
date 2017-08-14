@@ -82,17 +82,17 @@ public class TweakCarryEventHandler {
 
     @SubscribeEvent
     public void onPlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
-        CharsetTweakBlockCarrying.syncCarryWithClient(event.player, event.player);
+        CharsetTweakBlockCarrying.syncCarryWithAllClients(event.player);
     }
 
     @SubscribeEvent
     public void onPlayerRespawnEvent(PlayerEvent.PlayerRespawnEvent event) {
-        CharsetTweakBlockCarrying.syncCarryWithClient(event.player, event.player);
+        CharsetTweakBlockCarrying.syncCarryWithAllClients(event.player);
     }
 
     @SubscribeEvent
     public void onPlayerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
-        CharsetTweakBlockCarrying.syncCarryWithClient(event.player, event.player);
+        CharsetTweakBlockCarrying.syncCarryWithAllClients(event.player);
     }
 
     @SubscribeEvent

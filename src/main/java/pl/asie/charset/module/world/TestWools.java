@@ -32,7 +32,7 @@ import java.util.Arrays;
 
 public class TestWools {
 	private float[] colorMultiplier(String prefix, EnumDyeColor color) {
-		float[] dOrig = EntitySheep.getDyeRgb(color);
+		float[] dOrig = ColorUtils.getDyeRgb(color);
 		float[] d = Arrays.copyOf(dOrig, 3);
 
 		if (color == EnumDyeColor.BLUE) {

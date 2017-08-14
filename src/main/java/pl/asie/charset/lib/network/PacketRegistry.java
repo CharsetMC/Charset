@@ -77,10 +77,10 @@ public class PacketRegistry {
 		channels.get(Side.SERVER).writeOutbound(message);
 	}
 
-	public void sendToWatching(Packet message, World world, BlockPos pos) {
+	public void sendToWatching(Packet message, World world, BlockPos pos, Entity except) {
 		WorldServer worldServer = (WorldServer) world;
 		for (EntityPlayerMP player : worldServer.getMinecraftServer().getPlayerList().getPlayers()) {
-			if (player.world.provider.getDimension() == world.provider.getDimension()) {
+			if (player != except && player.world.provider.getDimension() == world.provider.getDimension()) {
 				if (worldServer.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
@@ -91,7 +91,20 @@ public class PacketRegistry {
 	}
 
 	public void sendToWatching(Packet message, TileEntity tile) {
-		sendToWatching(message, tile.getWorld(), tile.getPos());
+		sendToWatching(message, tile.getWorld(), tile.getPos(), null);
+	}
+
+	public void sendToWatching(Packet message, Entity entity) {
+		sendToWatching(message, entity.getEntityWorld(), entity.getPosition(), null);
+	}
+
+	// TODO: Slightly ugly.
+	public void sendToWatching(Packet message, TileEntity tile, Entity except) {
+		sendToWatching(message, tile.getWorld(), tile.getPos(), except);
+	}
+
+	public void sendToWatching(Packet message, Entity entity, Entity except) {
+		sendToWatching(message, entity.getEntityWorld(), entity.getPosition(), except);
 	}
 
 	public void sendTo(Packet message, EntityPlayer player) {

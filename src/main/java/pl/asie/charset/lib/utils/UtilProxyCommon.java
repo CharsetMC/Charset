@@ -24,8 +24,10 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -42,6 +44,8 @@ import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.render.ParticleBlockDustCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 
+import java.lang.invoke.MethodHandle;
+import java.util.Map;
 import java.util.Random;
 
 public class UtilProxyCommon implements IThreadListener {

@@ -93,11 +93,11 @@ public class ChiselBakedModel extends BaseBakedModel {
         this.list = new ItemOverrideList(Collections.emptyList()) {
             @Override
             public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {
+                int mask = CharsetToolsBuilding.chisel.getBlockMask(stack);
                 if (ModelFactory.DISABLE_CACHE) {
-                    return new ChiselBakedModel(parent, sprite, cache, CharsetToolsBuilding.chisel.getBlockMask(stack));
+                    return new ChiselBakedModel(parent, sprite, cache, mask);
                 }
 
-                int mask = CharsetToolsBuilding.chisel.getBlockMask(stack);
                 IBakedModel model = cache.getIfPresent(mask);
                 if (model == null) {
                     model = new ChiselBakedModel(parent, sprite, cache, mask);
@@ -179,7 +179,7 @@ public class ChiselBakedModel extends BaseBakedModel {
 
     @Override
     public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
-        return quads;
+        return side == null ? quads : ImmutableList.of();
     }
 
     @Override

@@ -31,6 +31,7 @@ import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,7 +83,7 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 				} else {
 					EnumDyeColor dyeId = ColorUtils.getDyeColor(stack);
 					if (dyeId != null) {
-						float[] col = EntitySheep.getDyeRgb(dyeId);
+						float[] col = ColorUtils.getDyeRgb(dyeId);
 						return new int[]{
 								(int) (col[0] * 255.0F),
 								(int) (col[1] * 255.0F),

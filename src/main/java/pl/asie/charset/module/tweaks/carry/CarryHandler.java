@@ -208,6 +208,8 @@ public class CarryHandler implements ICacheable {
                 // TODO: Check if I break something
                 newState.neighborChanged(world, pos, oldBlock.getBlock(), pos);
 
+                CharsetTweakBlockCarrying.syncCarryWithAllClients(player);
+
                 return true;
             } else {
                 return false;
