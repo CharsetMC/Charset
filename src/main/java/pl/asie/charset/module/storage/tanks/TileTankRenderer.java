@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -63,6 +64,9 @@ public class TileTankRenderer extends FastTESR<TileTank> {
 
     // TODO: Rewrite this to render per-tank-block?
     public static void renderModel(IBlockAccess access, BlockPos pos, BufferBuilder buffer, FluidStack contents, int tankCount) {
+        if (contents == null || contents.getFluid() == null || contents.amount <= 0)
+            return;
+
         TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
         TextureAtlasSprite sprite = map.getTextureExtry(contents.getFluid().getStill().toString());
         if (sprite == null) {
@@ -92,7 +96,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
             model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
         }
 
-        renderer.renderModel(tankAccess, model, contents.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
+        renderer.renderModel(tankAccess, model, contents.getFluid().getBlock() == null ? null : contents.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
 
         for (int i = 0; i < to.y; i += 16) {
             BlockPos pos1 = pos.offset(EnumFacing.UP, i / 16);
@@ -116,15 +120,14 @@ public class TileTankRenderer extends FastTESR<TileTank> {
 
     @Override
     public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, float todo_figure_me_out, @Nonnull BufferBuilder vertexBuffer) {
-        boolean isCarrying = te.getWorld() == null;
-        if (te.fluidStack == null || (!isCarrying && te.getBottomTank() != te))
+        if (te.fluidStack == null || te.getBottomTank() != te)
             return;
 
         BlockPos pos = te.getPos();
         vertexBuffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
-        FluidStack contents = !isCarrying ? te.getContents() : te.fluidStack;
-        int tankCount = !isCarrying ? (te.getCapacity() / TileTank.CAPACITY) : 1;
+        FluidStack contents = te.getContents();
+        int tankCount = te.getCapacity() / TileTank.CAPACITY;
         renderModel(getWorld(), pos, vertexBuffer, contents, tankCount);
 
         vertexBuffer.setTranslation(0, 0, 0);

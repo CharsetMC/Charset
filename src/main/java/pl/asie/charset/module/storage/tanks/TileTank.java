@@ -173,6 +173,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     }
 
     public TileTank getBottomTank() {
+        if (getWorld() == null)
+            return this;
+
         if (bottomTank == null || bottomTank.isInvalid()) {
             findBottomTank();
         }
@@ -180,6 +183,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     }
 
     public TileTank getAboveTank() {
+        if (getWorld() == null)
+            return this;
+
         if (aboveTank == null || aboveTank.isInvalid()) {
             updateAboveTank();
         }
@@ -264,6 +270,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     @Nullable
     @Override
     public FluidStack getContents() {
+        if (getWorld() == null)
+            return fluidStack;
+
         Iterator<TileTank> i = getAllTanks();
         FluidStack contents = i.next().fluidStack;
         if (contents != null) {
@@ -282,6 +291,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public int getCapacity() {
+        if (getWorld() == null)
+            return CAPACITY;
+
         int c = 0;
         Iterator<TileTank> i = getAllTanks();
         while (i.hasNext()) {
