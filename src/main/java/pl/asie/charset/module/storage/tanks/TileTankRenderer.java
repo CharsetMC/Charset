@@ -96,7 +96,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
             model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
         }
 
-        renderer.renderModel(tankAccess, model, contents.getFluid().getBlock() == null ? null : contents.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
+        renderer.renderModel(tankAccess, model, contents.getFluid().getBlock() == null ? Blocks.AIR.getDefaultState() : contents.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
 
         for (int i = 0; i < to.y; i += 16) {
             BlockPos pos1 = pos.offset(EnumFacing.UP, i / 16);
