@@ -1,0 +1,7 @@
+* [Audio] New module; Iron Note Block only for now.
+* [Gates] Add RS latch.
+* [Gates] Fix handling gate I/O from multipart containers.
+* [Pipes] [#21] Fix shifters stopping an item when only one is turned on in an opposites configuration. 
+* [Wires] Fix "null" as face not working according to API documentation.
+* [Wires] Fix handling wires in compact situations.
+* [Wires] Fix wires connecting weirdly when multiple sides are blocked with microblocks.

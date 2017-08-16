@@ -1,0 +1,5 @@
+* Added BuildCraft wrench support to Shifters via rotateBlock.
+* Added proper analog wiring.
+* [#22, #19] Fixed certain wiring inconsistencies with vanilla redstone.
+* Fixed some potential crashes with wire loops. (Not all, however - be careful! We're still in alpha!)
+* Fixed bundled emitters from other mods not functioning correctly.

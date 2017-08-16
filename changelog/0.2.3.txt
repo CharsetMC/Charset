@@ -1,0 +1,5 @@
+* [Audio] Make Minecraft drop from fullscreen when Record button is pressed - helps with #49 (asie)
+* [Gates] Fix incorrect capability code - fixes #53, #52 (asie)
+* [Pipes] IShifter is now a Capability! (rubensworks)
+* [Tweaks] Make glass shards only drop when no other drops are present - may fix #50 (asie)
+* [Wires] Fix wires connecting to multiparts in the wrong places (asie)

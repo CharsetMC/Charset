@@ -1,0 +1,2 @@
+* [Pipes] Fix BuildCraft recipe incompatibility (asie)
+* [Pipes] Fix rare NPE with Shifters (asie)

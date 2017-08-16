@@ -1,0 +1,5 @@
+* [Pipes] Added a non-BuildCraft-conflicting variant of the temporary pipe recipe.
+* [Tweaks] Added "mobControl" tweak allowing control of which mob types are spawnable.
+* [Tweaks] Added "noSprinting" tweak. (off by default)
+* [Wires] [#32] Fixed wires dropping from sides of pistons.
+* [Wires] Fixed occlusion tests (invalid blocked side checking) for corner wire connections.

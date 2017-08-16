@@ -1,0 +1,3 @@
+* [#31] Fixed launch crash when MCMP's JAR loaded after Charset's
+* [#18] Fixed not transmitting power to wire/shifters on dust corner connections
+* Added logic to only connect to vanilla redstone blocks on the proper faces

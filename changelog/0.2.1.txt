@@ -1,0 +1,2 @@
+* [Pipes] Restored backwards compatibility with IInventory/ISidedInventory
+* [Pipes] Fixed rare Shifter client-side NPE (a lot of these to go through, you may blame 1.8)

@@ -1,0 +1,1 @@
+* [Tweaks] How did I forget to make disableVanillaTools not default!? Also renamed config key for the unaware. (asie)

@@ -1,0 +1,4 @@
+* [Audio] Add missing langfile entry for Iron Note Block (asie)
+* [Pipes] [#34] Fix Shifter crash (asie)
+* [Storage] New module, adds BetterStorage-esque backpacks (asie, thanks to copygirl for model)
+* [Wires] Fix corner propagation not working at all (asie)

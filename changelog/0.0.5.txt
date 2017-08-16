@@ -1,0 +1,6 @@
+* Add wire corner rendering
+* Change wire transmission logic
+* Optimize bundled cable propagation logic
+* Fix bundled cables connecting to redstone providers visually
+* Fix bundled cable propagation logic for multiple inputs [#20] 
+* Fix shifters not stopping pipe items in the "opposite, equal distance" configuration

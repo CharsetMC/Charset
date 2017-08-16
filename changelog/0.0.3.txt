@@ -1,0 +1,10 @@
+* Add item detection API for Pipes
+* New module: CharsetTweaks
+  * AutoReplace (replaces broken items in inventory)
+  * DoubleDoors (automatically opens double doors when opening just one)
+  * DyeableMinecarts (lets you dye minecarts!)
+  * Graphite (adds graphite, a charcoal-derived replacement for ink sacs)
+* New module: CharsetWires (experimental)
+  * Redstone cabling, insulated cabling and bundled cabling!
+  * Supports freestanding wires, too.
+  * Digital only for now - analog signal support commented out as it requires further work

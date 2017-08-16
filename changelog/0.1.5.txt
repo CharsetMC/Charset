@@ -1,0 +1,8 @@
+* [Pipes] Changed shifters - only per-item extraction allowed for now (asie)
+* [Pipes] Fix pipe connection render desync (asie)
+* [Pipes] Fix pipe item dropping on an only-available-destination-is-blocked-but-prioritized scenario (asie)
+* [Storage] Fix backpack hardness step sound, rendering and being unequippable without sneaking (asie)
+* [Tweaks] New tweak: disableVanillaTools, for the TCon fanatic in you (asie)
+* [Tweaks] New tweak: glassShards, a slightly different spin on glass shards (asie)
+
+

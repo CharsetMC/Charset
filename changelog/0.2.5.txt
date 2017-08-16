@@ -1,0 +1,3 @@
+* [Gates] Fix gate state not updating on block break (asie)
+* [Wires] Improved wire prefix/suffix localization (asie)
+

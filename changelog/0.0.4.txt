@@ -1,0 +1,5 @@
+* Fix insulated wires not having collision boxes
+* Fix Z-fighting between freestanding and non-freestanding wires
+* Fix dropping wires not working correctly
+* Fix certain aspects of redstone propagation not working right
+* Improve redstone dust with wire behaviour (a full fix will only come with the analog wire rewrite)

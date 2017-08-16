@@ -1,0 +1,2 @@
+* Shifters now act as prioritizers instead of path enforcers (you can still create item queues in other ways, though!)
+* Fixed a lot of pipe-related bugs

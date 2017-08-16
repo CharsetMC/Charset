@@ -1,0 +1,4 @@
+* Ported to Minecraft 1.8.9.
+* Ported Pipes and Wires to MCMultiPart.
+* Added Gates module, in early alpha and somewhat unfinished. (The RedLogic gate textures are used temporaily)
+* Bugfixes and improvements in most of the mod.

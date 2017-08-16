@@ -1,0 +1,8 @@
+* [Audio] Added Tape Drives! They play songs! You can put songs on them via a fancy Record button! And craft tapes, too! JEI will tell you how to do that last one
+* [Gates] Fixed bugs in redstone wire handling in gates
+* [Pipes] Added support for IItemHandler
+* [Pipes] [#41] Fixed client-side Shifter crash
+* [Storage] Minor improvements to backpacks
+* [Storage] [#38] Fix chestplate getting stuck issues with the backpack module
+* [Wires] Moved wire API to Capabilities (TIS-3D users: update to 0.8.3 or you will crash)
+* [Wires] [#40] Fixed rare client-side NPE
