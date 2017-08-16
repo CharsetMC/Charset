@@ -38,6 +38,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import pl.asie.charset.ModCharset;
@@ -45,7 +46,10 @@ import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.render.ParticleBlockDustCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
+import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Random;
 
 public class UtilProxyClient extends UtilProxyCommon {

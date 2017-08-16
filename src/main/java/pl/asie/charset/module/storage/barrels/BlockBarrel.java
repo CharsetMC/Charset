@@ -83,6 +83,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         // TODO: Adventure mode support (the Material trick doesn't work)
         super(Material.WOOD);
         setCreativeTab(ModCharset.CREATIVE_TAB);
+        setComparatorInputOverride(true);
         setHardness(2.5F);
         setHarvestLevel("axe", 0);
         setSoundType(SoundType.WOOD);
@@ -90,14 +91,14 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Nullable
-    private ImmutableSet<ItemStack> generateTypeSet(ItemStack barrel) {
+    private ImmutableList<ItemStack> generateTypeSet(ItemStack barrel) {
         TileEntityDayBarrel rep = new TileEntityDayBarrel();
         rep.loadFromStack(barrel);
         if (rep.upgrades.size() > 0) {
             return null;
         }
 
-        ImmutableSet.Builder<ItemStack> builder = ImmutableSet.builder();
+        ImmutableList.Builder<ItemStack> builder = ImmutableList.builder();
 
         for (Set<TileEntityDayBarrel.Upgrade> upgrades : CREATIVE_TAB_UPGRADE_SETS) {
             boolean allowed = true;
@@ -120,21 +121,16 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
     @Override
     protected ISubItemProvider createSubItemProvider() {
-        return new SubItemProviderCache(new SubItemProviderRecipes("charset:barrel") {
+        return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetStorageBarrels.barrelItem) {
             @Override
-            protected Collection<ItemStack> createForcedItems() {
+            protected List<ItemStack> createForcedItems() {
                 return CharsetStorageBarrels.CREATIVE_BARRELS;
             }
 
             @Nullable
             @Override
-            protected Collection<ItemStack> createSetFor(ItemStack stack) {
+            protected List<ItemStack> createSetFor(ItemStack stack) {
                 return generateTypeSet(stack);
-            }
-
-            @Override
-            protected Item getItem() {
-                return CharsetStorageBarrels.barrelItem;
             }
         });
     }
@@ -256,12 +252,6 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
             return ((TileEntityDayBarrel) tile).activate(player, side, hand);
         }
 
-        return false;
-    }
-
-    @Override
-    public boolean hasComparatorInputOverride(IBlockState state)
-    {
         return false;
     }
 

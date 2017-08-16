@@ -7,11 +7,11 @@ import pl.asie.charset.lib.CharsetLib;
 import java.util.*;
 
 public class SubItemProviderSets implements ISubItemProvider {
-    protected Collection<ItemStack> createForcedItems() {
+    protected List<ItemStack> createForcedItems() {
         return Collections.emptyList();
     }
 
-    protected List<Collection<ItemStack>> createItemSets() {
+    protected List<List<ItemStack>> createItemSets() {
         return Collections.emptyList();
     }
 
@@ -19,10 +19,10 @@ public class SubItemProviderSets implements ISubItemProvider {
         return 1;
     }
 
-    private Collection<ItemStack> getItems(boolean all) {
+    private List<ItemStack> getItems(boolean all) {
         ImmutableList.Builder<ItemStack> builder = ImmutableList.builder();
         builder.addAll(createForcedItems());
-        List<Collection<ItemStack>> sets = createItemSets();
+        List<List<ItemStack>> sets = createItemSets();
 
         if (sets.size() > 0) {
             if (all || getVisibleSetAmount() >= sets.size()) {
@@ -41,12 +41,12 @@ public class SubItemProviderSets implements ISubItemProvider {
     }
 
     @Override
-    public Collection<ItemStack> getItems() {
+    public List<ItemStack> getItems() {
         return getItems(CharsetLib.showAllItemTypes);
     }
 
     @Override
-    public Collection<ItemStack> getAllItems() {
+    public List<ItemStack> getAllItems() {
         return getItems(true);
     }
 }

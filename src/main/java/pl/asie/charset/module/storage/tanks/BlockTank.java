@@ -30,7 +30,7 @@ import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 
 public class BlockTank extends BlockBase implements ITileEntityProvider {
-    private static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.05f, 0, 0.05f, 0.95f, 1, 0.95f);
+    protected static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.05f, 0, 0.05f, 0.95f, 1, 0.95f);
     private static final PropertyInteger CONNECTIONS = PropertyInteger.create("connections", 0, 3);
 
     public BlockTank() {
@@ -40,6 +40,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         setUnlocalizedName("charset.tank");
         setFullCube(false);
         setOpaqueCube(false);
+        setComparatorInputOverride(true);
         setSoundType(SoundType.GLASS);
     }
 
@@ -186,12 +187,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
             BlockPos tankPos = pos;
             TileEntity tankEntity = worldIn.getTileEntity(tankPos);
             if (tankEntity instanceof TileTank) {
-                ((TileTank) tankEntity).updateAboveTank();
-                while (tankEntity instanceof TileTank) {
-                    ((TileTank) tankEntity).findBottomTank();
-                    tankPos = tankPos.up();
-                    tankEntity = worldIn.getTileEntity(tankPos);
-                }
+                ((TileTank) tankEntity).onTankStructureChanged();
             }
         }
     }

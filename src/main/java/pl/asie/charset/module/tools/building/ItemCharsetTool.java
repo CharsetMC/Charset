@@ -50,6 +50,12 @@ public class ItemCharsetTool extends ItemBase {
         }
     }
 
+
+    @Override
+    protected ISubItemProvider createSubItemProvider() {
+        return new SubItemProviderCache(new SubItemProviderRecipes(() -> this));
+    }
+
     public enum MaterialSlot {
         HANDLE,
         HEAD;

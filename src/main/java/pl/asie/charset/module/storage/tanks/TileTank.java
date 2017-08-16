@@ -1,8 +1,12 @@
 package pl.asie.charset.module.storage.tanks;
 
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -13,13 +17,16 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.api.lib.IMultiblockStructure;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.scheduler.Scheduler;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -81,6 +88,25 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     protected static final int CAPACITY = 16000;
     protected FluidStack fluidStack;
 
+    protected void onTankStructureChanged() {
+        updateAboveTank();
+        BlockPos tankPos = getPos();
+        TileEntity tankEntity = this;
+
+        while (tankEntity instanceof TileTank) {
+            ((TileTank) tankEntity).findBottomTank();
+            tankPos = tankPos.up();
+            tankEntity =  getWorld().getTileEntity(tankPos);
+        }
+
+        onStackModified();
+        BlockPos below = getPos().down();
+        TileEntity belowEntity = world.getTileEntity(below);
+        if (belowEntity instanceof TileTank) {
+            ((TileTank) belowEntity).getBottomTank().onStackModified();
+        }
+    }
+
     protected void onStackModified() {
         if (fluidStack != null) {
             if (fluidStack.amount < 0)
@@ -88,6 +114,11 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
             if (fluidStack.amount <= 0)
                 fluidStack = null;
+        }
+
+        Iterator<TileTank> tankIterator = getAllTanks();
+        while (tankIterator.hasNext()) {
+            tankIterator.next().updateComparators();
         }
         // TODO: Maybe send less often than every *change*?
         markBlockForUpdate();
@@ -97,6 +128,12 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     public void invalidate() {
         super.invalidate();
         world.notifyNeighborsRespectDebug(getPos(), CharsetStorageTanks.tankBlock, false);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
+        Scheduler.INSTANCE.in(getWorld(), 1, this::updateComparators);
     }
 
     @Override
@@ -184,7 +221,7 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     public TileTank getAboveTank() {
         if (getWorld() == null)
-            return this;
+            return null;
 
         if (aboveTank == null || aboveTank.isInvalid()) {
             updateAboveTank();
@@ -304,6 +341,21 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     }
 
     @Override
+    public int getComparatorValue() {
+        if (getWorld() == null)
+            return 0;
+
+        if (getBottomTank() != this)
+            return getBottomTank().getComparatorValue();
+
+        FluidStack contents = getContents();
+        if (contents == null || contents.amount <= 0)
+            return 0;
+
+        return Math.max(1, contents.amount * 15 / getCapacity());
+    }
+
+    @Override
     public boolean canFill() {
         return getBottomTank().fluidStack == null;
     }
@@ -397,5 +449,25 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     @Override
     public boolean isCacheValid() {
         return !isInvalid();
+    }
+
+    @Override
+    public net.minecraft.util.math.AxisAlignedBB getRenderBoundingBox() {
+        TileTank bottomTank = getBottomTank();
+        if (bottomTank != this) {
+            return new AxisAlignedBB(getPos());
+        } else {
+            BlockPos bottomPos = getBottomTank().getPos();
+            int height = getCapacity() / TileTank.CAPACITY;
+
+            return new AxisAlignedBB(
+                    bottomPos.getX(),
+                    bottomPos.getY(),
+                    bottomPos.getZ(),
+                    bottomPos.getX() + 1,
+                    bottomPos.getY() + height + 1,
+                    bottomPos.getZ() + 1
+            );
+        }
     }
 }

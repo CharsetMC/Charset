@@ -37,7 +37,7 @@ public class TileTankRenderer extends FastTESR<TileTank> {
         public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
             if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
                 for (int i = 0; i < Math.min(data.length, 4); i++) {
-                    data[i] = data[i] * ((color >> (i * 8)) & 0xFF) / 255.0f;
+                    data[i] = data[i] * ((color >> ((i < 3 ? (2 - i) : i) * 8)) & 0xFF) / 255.0f;
                 }
             }
             return data;
@@ -63,9 +63,9 @@ public class TileTankRenderer extends FastTESR<TileTank> {
     }
 
     // TODO: Rewrite this to render per-tank-block?
-    public static void renderModel(IBlockAccess access, BlockPos pos, BufferBuilder buffer, FluidStack contents, int tankCount) {
-        if (contents == null || contents.getFluid() == null || contents.amount <= 0)
-            return;
+    public static void renderModel(IBlockAccess access, BlockPos pos, BufferBuilder buffer, TileTank tank, FluidStack contents, int tankCount) {
+        IBlockState state = getFluidState(contents, Blocks.AIR.getDefaultState());
+        IBakedModel model;
 
         TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
         TextureAtlasSprite sprite = map.getTextureExtry(contents.getFluid().getStill().toString());
@@ -78,17 +78,21 @@ public class TileTankRenderer extends FastTESR<TileTank> {
         SimpleBakedModel smodel = new SimpleBakedModel();
 
         int color = contents.getFluid().getColor(contents);
-        int light = contents.getFluid().getLuminosity();
 
         Vector3f from = new Vector3f(1.025f, 0.025f, 1.025f);
         Vector3f to = new Vector3f(14.975f, Math.min(16 * tankCount - 0.025f, height * 16), 14.975f);
-        IBlockAccess tankAccess = new TankBlockAccess(access, light);
 
         smodel.addQuad(null, RenderUtils.createQuad(from, to, EnumFacing.DOWN, sprite, -1));
         smodel.addQuad(null, RenderUtils.createQuad(from, to, EnumFacing.UP, sprite, -1));
 
-        IBakedModel model;
-        IBlockState state = getFluidState(contents, CharsetStorageTanks.tankBlock.getDefaultState());
+        for (int i = 0; i < to.y; i += 16) {
+            Vector3f fromL = new Vector3f(from.x, (from.y > i ? from.y : i), from.z);
+            Vector3f toL = new Vector3f(to.x, (to.y < (i + 16) ? to.y : i + 16), to.z);
+
+            for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+                smodel.addQuad(null, RenderUtils.createQuad(fromL, toL, facing, sprite, -1));
+            }
+        }
 
         if (color == -1) {
             model = smodel;
@@ -96,39 +100,33 @@ public class TileTankRenderer extends FastTESR<TileTank> {
             model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
         }
 
-        renderer.renderModel(tankAccess, model, contents.getFluid().getBlock() == null ? Blocks.AIR.getDefaultState() : contents.getFluid().getBlock().getDefaultState(), pos, buffer, false, 0L);
+        int light = contents.getFluid().getLuminosity();
+        IBlockAccess tankAccess = new TankBlockAccess(access, light);
 
-        for (int i = 0; i < to.y; i += 16) {
-            BlockPos pos1 = pos.offset(EnumFacing.UP, i / 16);
-            Vector3f fromL = new Vector3f(from.x, (from.y > i ? from.y : i) - i, from.z);
-            Vector3f toL = new Vector3f(to.x, (to.y < (i + 16) ? to.y : i + 16) - i, to.z);
-            smodel = new SimpleBakedModel();
-
-            for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-                smodel.addQuad(null, RenderUtils.createQuad(fromL, toL, facing, sprite, -1));
-            }
-
-            if (color == -1) {
-                model = smodel;
-            } else {
-                model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
-            }
-
-            renderer.renderModel(tankAccess, model, state, pos1, buffer, false, 0L);
-        }
+        renderer.renderModel(tankAccess, model, state, pos, buffer, false, 0L);
     }
 
     @Override
     public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, float todo_figure_me_out, @Nonnull BufferBuilder vertexBuffer) {
-        if (te.fluidStack == null || te.getBottomTank() != te)
-            return;
-
         BlockPos pos = te.getPos();
-        vertexBuffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
+        if (te.getWorld() != null && te.getWorld().getBlockState(pos.down()).getBlock() instanceof BlockTank) {
+            return;
+        }
+
+        if (te.getWorld() != null) {
+            // TODO: Hack - tank caching does not properly update on client
+            te.findBottomTank();
+        }
         FluidStack contents = te.getContents();
         int tankCount = te.getCapacity() / TileTank.CAPACITY;
-        renderModel(getWorld(), pos, vertexBuffer, contents, tankCount);
+
+        if (contents == null || contents.getFluid() == null || contents.amount <= 0)
+            return;
+
+        vertexBuffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+
+        renderModel(getWorld(), pos, vertexBuffer, te, contents, tankCount);
 
         vertexBuffer.setTranslation(0, 0, 0);
     }

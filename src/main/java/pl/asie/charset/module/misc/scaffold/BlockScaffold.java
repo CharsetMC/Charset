@@ -32,6 +32,7 @@ import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.module.misc.shelf.CharsetMiscShelf;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -61,12 +62,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	protected ISubItemProvider createSubItemProvider() {
-		return new SubItemProviderCache(new SubItemProviderRecipes("charset:scaffold") {
-			@Override
-			protected Item getItem() {
-				return CharsetMiscScaffold.scaffoldItem;
-			}
-		});
+		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetMiscScaffold.scaffoldItem));
 	}
 
 	private boolean canStay(IBlockAccess world, BlockPos pos) {

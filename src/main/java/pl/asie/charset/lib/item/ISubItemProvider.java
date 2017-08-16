@@ -3,12 +3,13 @@ package pl.asie.charset.lib.item;
 import net.minecraft.item.ItemStack;
 
 import java.util.Collection;
+import java.util.List;
 
 @FunctionalInterface
 public interface ISubItemProvider {
-     Collection<ItemStack> getItems();
+     List<ItemStack> getItems();
 
-     default Collection<ItemStack> getAllItems() {
+     default List<ItemStack> getAllItems() {
           return getItems();
      }
 }

@@ -67,6 +67,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
 
 import javax.annotation.Nullable;
@@ -189,7 +190,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     private boolean updateRedstoneLevels;
     private int redstoneLevel;
-    private int last_mentioned_count = -1;
+    private int lastMentionedCount = -1;
 
     public TileEntityDayBarrel() {
         woodLog = getLog(null);
@@ -246,10 +247,11 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
         woodLog = getLog(compound);
         woodSlab = getSlab(compound);
-        last_mentioned_count = getItemCount();
+        lastMentionedCount = getItemCount();
 
-        if (isClient && orientation != oldOrientation)
+        if (isClient && orientation != oldOrientation) {
             markBlockForRenderUpdate();
+        }
     }
 
     @Override
@@ -291,6 +293,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                 return getPos().equals(pos) ? getBlockState(pos).isSideSolid(this, pos, side) : access.isSideSolid(pos, side, _default);
             }
         };
+
+        Scheduler.INSTANCE.in(getWorld(), 1, this::updateComparators);
     }
 
     public void updateRedstoneLevel() {
@@ -345,6 +349,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     private void onItemChange(boolean typeChanged) {
         sync();
+        updateComparators();
         markChunkDirty();
     }
 
@@ -630,14 +635,14 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     void sync() {
         int c = getItemCount();
-        if (c != last_mentioned_count) {
-            if (last_mentioned_count*c <= 0) {
+        if (c != lastMentionedCount) {
+            if (lastMentionedCount*c <= 0) {
                 //One of them was 0
                 markBlockForUpdate();
             } else {
                 updateCountClients();
             }
-            last_mentioned_count = c;
+            lastMentionedCount = c;
         }
     }
 
@@ -859,11 +864,11 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     @Override
     public int getComparatorValue() {
         int count = getItemCount();
-        if (count == 0) {
+        if (count <= 0) {
             return 0;
         }
         int max = getMaxItemCount();
-        if (count == max) {
+        if (count >= max) {
             return 15;
         }
         float v = count/(float)max;

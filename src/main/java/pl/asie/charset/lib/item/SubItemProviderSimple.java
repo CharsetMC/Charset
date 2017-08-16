@@ -5,11 +5,12 @@ import net.minecraft.item.ItemStack;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class SubItemProviderSimple implements ISubItemProvider {
-    private final Collection<ItemStack> items;
+    private final List<ItemStack> items;
 
-    public SubItemProviderSimple(Collection<ItemStack> items) {
+    public SubItemProviderSimple(List<ItemStack> items) {
         this.items = items;
     }
 
@@ -18,7 +19,7 @@ public class SubItemProviderSimple implements ISubItemProvider {
     }
 
     @Override
-    public Collection<ItemStack> getItems() {
+    public List<ItemStack> getItems() {
         return items;
     }
 }

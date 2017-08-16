@@ -106,12 +106,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
 
     @Override
     protected ISubItemProvider createSubItemProvider() {
-        return new SubItemProviderCache(new SubItemProviderRecipes("charset:shelf") {
-            @Override
-            protected Item getItem() {
-                return CharsetMiscShelf.shelfItem;
-            }
-        });
+        return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetMiscShelf.shelfItem));
     }
 
     @Override

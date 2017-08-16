@@ -58,6 +58,7 @@ import pl.asie.charset.lib.notify.PacketPoint;
 import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
+import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
 import pl.asie.charset.lib.utils.DataSerializersCharset;
 import pl.asie.charset.lib.utils.UtilProxyCommon;
@@ -113,7 +114,9 @@ public class CharsetLib {
 
 			((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(CharsetFakeResourcePack.INSTANCE);
 
-			// TODO: Can we get rid of this to save a bit of loading time?c
+			// TODO: Can we get rid of this to save a bit of loading time?
+			// (We can, but it involves loading Minecraft.<init> a bit early.
+			// Hmm.)
 			Minecraft.getMinecraft().refreshResources();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -135,6 +138,7 @@ public class CharsetLib {
 		CharsetIMC.INSTANCE.loadConfig(config);
 
 		MinecraftForge.EVENT_BUS.register(new CharsetLibEventHandler());
+		MinecraftForge.EVENT_BUS.register(Scheduler.INSTANCE);
 
 		config.save();
 	}

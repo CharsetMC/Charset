@@ -44,9 +44,9 @@ import java.util.*;
 		profile = ModuleProfile.STABLE
 )
 public class CharsetStorageBarrels {
-	public static final Collection<ItemStack> CREATIVE_BARRELS = new ArrayList<>();
-	public static Collection<ItemStack> BARRELS = Collections.emptyList();
-	public static Collection<ItemStack> BARRELS_NORMAL = Lists.newArrayList();
+	public static final List<ItemStack> CREATIVE_BARRELS = Lists.newArrayList();
+	public static List<ItemStack> BARRELS = Collections.emptyList();
+	public static List<ItemStack> BARRELS_NORMAL = Lists.newArrayList();
 
 	@CharsetModule.Instance
 	public static CharsetStorageBarrels instance;

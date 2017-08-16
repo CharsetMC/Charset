@@ -43,6 +43,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.upgrade.CharsetFixEmptyUpgradeTagBarrels;
 import pl.asie.charset.upgrade.CharsetLockKeyTagChange;
 import pl.asie.charset.upgrade.CharsetUnifiedModIdFixer;

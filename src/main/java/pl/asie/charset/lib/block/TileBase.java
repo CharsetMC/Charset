@@ -27,6 +27,19 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 public class TileBase extends TileEntity {
+	private int lastComparatorValue = -1;
+
+	protected final boolean updateComparators() {
+		int cc = getComparatorValue();
+		if (cc != lastComparatorValue) {
+			world.updateComparatorOutputLevel(getPos(), getBlockType());
+			lastComparatorValue = cc;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public ItemStack getPickedBlock(IBlockState state) {
 		return getDroppedBlock(state);
 	}

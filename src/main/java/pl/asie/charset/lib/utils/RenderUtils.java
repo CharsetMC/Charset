@@ -183,6 +183,15 @@ public final class RenderUtils {
 	}
 
 	public static float[] calculateUV(Vector3f from, Vector3f to, EnumFacing facing1) {
+		if (to.y > 16) {
+			from = new Vector3f(from);
+			to = new Vector3f(to);
+			while (to.y > 16) {
+				from.y -= 16;
+				to.y -= 16;
+			}
+		}
+
 		EnumFacing facing = facing1;
 		if (facing == null) {
 			if (from.y == to.y) {

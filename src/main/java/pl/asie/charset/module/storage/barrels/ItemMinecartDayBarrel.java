@@ -97,7 +97,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     @Override
     protected ISubItemProvider createSubItemProvider() {
         return new SubItemProviderCache(new ISubItemProvider() {
-            private Collection<ItemStack> convert(Collection<ItemStack> items) {
+            private List<ItemStack> convert(Collection<ItemStack> items) {
                 List<ItemStack> itemsOut = new ArrayList<>();
 
                 for (ItemStack barrel : items) {
@@ -114,12 +114,12 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
             }
 
             @Override
-            public Collection<ItemStack> getItems() {
+            public List<ItemStack> getItems() {
                 return convert(CharsetStorageBarrels.barrelBlock.getSubItemProvider().getItems());
             }
 
             @Override
-            public Collection<ItemStack> getAllItems() {
+            public List<ItemStack> getAllItems() {
                 return convert(CharsetStorageBarrels.barrelBlock.getSubItemProvider().getAllItems());
             }
         });

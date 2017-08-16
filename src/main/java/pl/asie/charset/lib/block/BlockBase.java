@@ -62,7 +62,7 @@ import java.util.List;
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider = this instanceof ITileEntityProvider;
 	private final ISubItemProvider subItemProvider;
-	private boolean fullCube = true, opaqueCube = true;
+	private boolean fullCube = true, opaqueCube = true, comparatorInputOverride = false;
 	private ImmutableList<ItemStack> items;
 
 	public BlockBase(Material materialIn) {
@@ -79,6 +79,11 @@ public abstract class BlockBase extends Block {
 		return subItemProvider;
 	}
 
+	protected BlockBase setComparatorInputOverride(boolean value) {
+		comparatorInputOverride = value;
+		return this;
+	}
+
 	protected BlockBase setFullCube(boolean value) {
 		fullCube = value;
 		return this;
@@ -91,6 +96,11 @@ public abstract class BlockBase extends Block {
 
 	protected ISubItemProvider createSubItemProvider() {
 		return null;
+	}
+
+	@Override
+	public boolean hasComparatorInputOverride(IBlockState state) {
+		return comparatorInputOverride;
 	}
 
 	@Override

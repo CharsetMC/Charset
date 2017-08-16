@@ -4,12 +4,13 @@ import net.minecraft.item.ItemStack;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SubItemProviderCache implements ISubItemProvider {
     private static final Set<SubItemProviderCache> CACHES = new HashSet<>();
     private final ISubItemProvider parent;
-    private Collection<ItemStack> items;
+    private List<ItemStack> items;
 
     public SubItemProviderCache(ISubItemProvider parent) {
         CACHES.add(this);
@@ -23,17 +24,17 @@ public class SubItemProviderCache implements ISubItemProvider {
     }
 
     @Override
-    public Collection<ItemStack> getItems() {
+    public List<ItemStack> getItems() {
         if (items != null)
             return items;
 
-        Collection<ItemStack> genItems = parent.getItems();
+        List<ItemStack> genItems = parent.getItems();
         items = genItems;
         return items;
     }
 
     @Override
-    public Collection<ItemStack> getAllItems() {
+    public List<ItemStack> getAllItems() {
         return parent.getAllItems();
     }
 }
