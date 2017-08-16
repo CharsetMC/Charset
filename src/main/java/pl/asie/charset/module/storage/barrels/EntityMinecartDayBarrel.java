@@ -153,10 +153,10 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         this.barrel = barrel;
         barrel.setWorld(world);
         barrel.setPos(BlockPos.ORIGIN);
-        barrel.validate();
+        barrel.isEntity = true;
         barrel.orientation = Orientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
-        barrel.isEntity = true;
+        barrel.validate();
         updateDataWatcher(true);
         return this;
     }
@@ -170,10 +170,10 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         barrel = new TileEntityDayBarrel();
         barrel.setWorld(world);
         barrel.setPos(BlockPos.ORIGIN);
-        barrel.validate();
         barrel.isEntity = true;
         barrel.orientation = Orientation.fromDirection(EnumFacing.WEST).pointTopTo(EnumFacing.UP);
         barrel.notice_target = this;
+        barrel.validate();
     }
 
     @Override
@@ -309,12 +309,19 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         }
     }
 
+    @Override
+    public int getComparatorLevel() {
+        return barrel.getComparatorValue();
+    }
+
+    @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
                 || capability == Capabilities.BARREL
                 || super.hasCapability(capability, facing);
     }
 
+    @Override
     public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(itemHandler);

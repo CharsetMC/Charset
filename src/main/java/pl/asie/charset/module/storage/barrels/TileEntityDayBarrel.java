@@ -294,7 +294,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             }
         };
 
-        Scheduler.INSTANCE.in(getWorld(), 1, this::updateComparators);
+        if (!isEntity)
+            Scheduler.INSTANCE.in(getWorld(), 1, this::updateComparators);
     }
 
     public void updateRedstoneLevel() {
@@ -349,7 +350,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     private void onItemChange(boolean typeChanged) {
         sync();
-        updateComparators();
+        if (!isEntity)
+            updateComparators();
         markChunkDirty();
     }
 
