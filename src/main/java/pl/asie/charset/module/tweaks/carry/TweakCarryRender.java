@@ -56,26 +56,28 @@ public class TweakCarryRender {
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder buffer = tessellator.getBuffer();
 
-			if (carryHandler.getState().getRenderType() == EnumBlockRenderType.MODEL) {
-				buffer.setTranslation(0, -64, 0);
-				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+			if (carryHandler.customCarryHandler == null || !carryHandler.customCarryHandler.renderBlockCustom(partialTicks)) {
+				if (carryHandler.getState().getRenderType() == EnumBlockRenderType.MODEL) {
+					buffer.setTranslation(0, -64, 0);
+					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
-				try {
-					IBlockState renderState = carryHandler.getState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
-					IBlockState renderStateExt = carryHandler.getState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+					try {
+						IBlockState renderState = carryHandler.getState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+						IBlockState renderStateExt = carryHandler.getState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
 
-					BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
-					IBakedModel model = brd.getModelForState(renderState);
-					brd.getBlockModelRenderer().renderModelFlat(carryHandler.getBlockAccess(),
-							model, renderStateExt,
-							CarryHandler.ACCESS_POS, buffer, false, 0L
-					);
-				} catch (Exception e) {
-					e.printStackTrace();
+						BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
+						IBakedModel model = brd.getModelForState(renderState);
+						brd.getBlockModelRenderer().renderModelFlat(carryHandler.getBlockAccess(),
+								model, renderStateExt,
+								CarryHandler.ACCESS_POS, buffer, false, 0L
+						);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					tessellator.draw();
+					buffer.setTranslation(0, 0, 0);
 				}
-
-				tessellator.draw();
-				buffer.setTranslation(0, 0, 0);
 			}
 
 			TileEntity tile = carryHandler.getBlockAccess().getTileEntity(CarryHandler.ACCESS_POS);

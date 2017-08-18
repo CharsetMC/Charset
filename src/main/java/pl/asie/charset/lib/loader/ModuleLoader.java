@@ -168,7 +168,23 @@ public class ModuleLoader {
 		ConfigCategory category = ModCharset.configModules.getCategory("overrides");
 		category.setComment("Overrides can have one of three values: DEFAULT, ENABLE, DISABLE\nDEFAULT will enable the module based on your profile settings and dependency availability.");
 
+		category = ModCharset.configModules.getCategory("categories");
+		category.setComment("This section allows you to disable certain categories of content, based on a tag system.");
+
 		boolean configDirty = false;
+
+		Map<String, Boolean> categoryMap = new HashMap<>();
+
+		// Initialize categories
+		for (ASMDataTable.ASMData data : table.getAll(CharsetModule.class.getName())) {
+			Map<String, Object> info = data.getAnnotationInfo();
+			List<String> tags = (List<String>) info.getOrDefault("categories", Collections.emptyList());
+			for (String s : tags) {
+				if (!categoryMap.containsKey(s)) {
+					categoryMap.put(s, ModCharset.configModules.getBoolean(s, "categories", !"overhaul".equals(s), ""));
+				}
+			}
+		}
 
 		for (ASMDataTable.ASMData data : table.getAll(CharsetModule.class.getName())) {
 			Map<String, Object> info = data.getAnnotationInfo();
@@ -180,6 +196,7 @@ public class ModuleLoader {
 			Boolean compat = modProfile == ModuleProfile.COMPAT;
 			Boolean clientOnly = (Boolean) info.getOrDefault("isClientOnly", false);
 			Boolean serverOnly = (Boolean) info.getOrDefault("isServerOnly", false);
+			List<String> tags = (List<String>) info.getOrDefault("categories", Collections.emptyList());
 
 			moduleData.put(name, data);
 
@@ -242,6 +259,13 @@ public class ModuleLoader {
 							isDefault = false;
 							break;
 						}
+					}
+				}
+
+				for (String s : tags) {
+					if (!categoryMap.get(s)) {
+						ModCharset.logger.info("Category " + s + " is disabled - disabling otherwise not forced module " + name + ".");
+						isDefault = false;
 					}
 				}
 			}

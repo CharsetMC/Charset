@@ -17,6 +17,7 @@ public @interface CharsetModule {
 	boolean isDefault() default true;
 	boolean isClientOnly() default false;
 	boolean isServerOnly() default false;
+	String[] categories() default {};
 	String[] dependencies() default {};
 	String[] antidependencies() default {};
 

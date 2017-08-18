@@ -20,6 +20,11 @@ public class CustomCarryHandler {
     }
 
     @SideOnly(Side.CLIENT)
+    public boolean renderBlockCustom(float partialTicks) {
+        return false;
+    }
+
+    @SideOnly(Side.CLIENT)
     public boolean renderTileCustom(float partialTicks) {
         return false;
     }
