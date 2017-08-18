@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.lib.scheduler.Scheduler;
 
 public class TileWire extends TileBase implements IMultipartTile, ITickable, IWireContainer {
     protected Wire wire;
@@ -22,6 +23,10 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
         super.update();
         if (wire != null) {
             wire.update();
+        } else {
+            // Modifying it instantly will cause a CME in MCMultiPart.
+            // We only get here upon module removal anyway, so...
+            Scheduler.INSTANCE.in(world, 1, () -> world.setBlockToAir(getPos()));
         }
     }
 
@@ -29,9 +34,11 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     public void readNBTData(NBTTagCompound nbt, boolean isClient) {
         if (nbt.hasKey("f")) {
             WireProvider factory = WireManager.REGISTRY.getValue(nbt.getByte("f"));
-            WireFace location = WireFace.VALUES[nbt.getByte("l")];
-            wire = factory.create(this, location);
-            wire.readNBTData(nbt, isClient);
+            if (factory != null) {
+                WireFace location = WireFace.VALUES[nbt.getByte("l")];
+                wire = factory.create(this, location);
+                wire.readNBTData(nbt, isClient);
+            }
             if (isClient) {
                 markBlockForRenderUpdate();
             }

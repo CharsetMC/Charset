@@ -1,5 +1,6 @@
 package pl.asie.charset.lib.wires;
 
+import com.sun.org.apache.regexp.internal.RE;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.slot.EnumCenterSlot;
@@ -10,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,16 +32,54 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
 public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvider {
+    protected static final PropertyBool REDSTONE = PropertyBool.create("redstone");
+
     public BlockWire() {
         super(Material.CIRCUITS);
         setOpaqueCube(false);
         setFullCube(false);
+    }
+
+    @Override
+    public boolean canProvidePower(IBlockState state) {
+        return state.getValue(REDSTONE);
+    }
+
+    @Override
+    public boolean canConnectRedstone(IBlockState blockState, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side) {
+        if (blockState.getValue(REDSTONE)) {
+            Wire wire = WireUtils.getAnyWire(world, pos);
+            return wire.canConnectRedstone(side);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        if (blockState.getValue(REDSTONE)) {
+            Wire wire = WireUtils.getAnyWire(blockAccess, pos);
+            return wire.getStrongPower(side);
+        } else {
+            return super.getStrongPower(blockState, blockAccess, pos, side);
+        }
+    }
+
+    @Override
+    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        if (blockState.getValue(REDSTONE)) {
+            Wire wire = WireUtils.getAnyWire(blockAccess, pos);
+            return wire.getWeakPower(side);
+        } else {
+            return super.getWeakPower(blockState, blockAccess, pos, side);
+        }
     }
 
     @Nullable
@@ -49,17 +89,31 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
     }
 
     @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(REDSTONE) ? 1 : 0;
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(REDSTONE, meta > 0);
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
-        return new ExtendedBlockState(this, new IProperty[0], new IUnlistedProperty[]{Wire.PROPERTY});
+        return new ExtendedBlockState(this, new IProperty[] { REDSTONE }, new IUnlistedProperty[]{Wire.PROPERTY});
     }
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         Wire wire = WireUtils.getAnyWire(worldIn, pos);
-        int connMask = wire.getConnectionMask();
+        if (wire != null) {
+            int connMask = wire.getConnectionMask();
 
-        super.breakBlock(worldIn, pos, state);
-        requestNeighborUpdate(worldIn, pos, wire.getLocation(), connMask);
+            super.breakBlock(worldIn, pos, state);
+            requestNeighborUpdate(worldIn, pos, wire.getLocation(), connMask);
+        } else {
+            super.breakBlock(worldIn, pos, state);
+        }
     }
 
     @Override
@@ -85,9 +139,28 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
 
     @Override
     public RayTraceResult collisionRayTrace(IPartInfo part, Vec3d start, Vec3d end) {
-        RayTraceResult result = part.getState().collisionRayTrace(part.getPartWorld(), part.getPartPos(), start, end);
-        if (result != null) result.hitInfo = part;
-        return result;
+        Wire wire = WireUtils.getAnyWire(part.getTile().getTileEntity());
+        if (wire != null) {
+            RayTraceResult result = rayTrace(part.getPartPos(), start, end, wire.getFactory().getSelectionBox(wire.getLocation(), 0));
+            if (result != null) {
+                result.hitInfo = part;
+                return result;
+            }
+
+            EnumFacing[] faces = WireUtils.getConnectionsForRender(wire.getLocation());
+            for (int i = 0; i < faces.length; i++) {
+                EnumFacing face = faces[i];
+                if (wire.connectsAny(face)) {
+                    result = rayTrace(part.getPartPos(), start, end, wire.getFactory().getSelectionBox(wire.getLocation(), i + 1));
+                    if (result != null) {
+                        result.hitInfo = part;
+                        return result;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override

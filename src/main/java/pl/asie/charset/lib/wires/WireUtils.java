@@ -45,8 +45,8 @@ public final class WireUtils {
         return CONNECTION_DIRS[face.ordinal()];
     }
 
-    public static boolean hasCapability(Wire wire, BlockPos pos, Capability<?> capability, EnumFacing face) {
-        TileWire.isWireCheckingForCaps = true;
+    public static boolean hasCapability(Wire wire, BlockPos pos, Capability<?> capability, EnumFacing face, boolean ignoreWires) {
+        TileWire.isWireCheckingForCaps = ignoreWires;
         if (wire.getLocation() != WireFace.CENTER) {
             Optional<IMultipartContainer> container = MultipartHelper.getContainer(wire.getContainer().world(), pos);
             if (container.isPresent()) {
@@ -62,8 +62,8 @@ public final class WireUtils {
         return result;
     }
 
-    public static <T> T getCapability(Wire searcher, BlockPos pos, Capability<T> capability, EnumFacing face) {
-        TileWire.isWireCheckingForCaps = true;
+    public static <T> T getCapability(Wire searcher, BlockPos pos, Capability<T> capability, EnumFacing face, boolean ignoreWires) {
+        TileWire.isWireCheckingForCaps = ignoreWires;
 
         // for non-center wires, use multiparts to check for potential edge connections
         if (searcher.getLocation() != WireFace.CENTER) {

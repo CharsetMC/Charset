@@ -41,8 +41,12 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         this.capabilities = event.getCapabilities().size() > 0 ? new CapabilityDispatcher(event.getCapabilities()) : null;
     }
 
+    protected final void scheduleConnectionUpdate() {
+        connectionCheckDirty = true;
+    }
+
     private <T> T getCapabilityRemoteBlock(BlockPos pos, EnumFacing facing, Capability<T> capability) {
-        return WireUtils.getCapability(this, pos, capability, facing);
+        return WireUtils.getCapability(this, pos, capability, facing, true);
     }
 
     private <T> T getCapabilityRemote(BlockPos pos, WireFace face, EnumFacing facing, boolean blocks, Capability<T> capability) {
@@ -218,7 +222,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         return isOccluded(face) || (cornerOccludedSides & (1 << face.ordinal())) != 0;
     }
 
-    protected final void updateConnections() {
+    protected void updateConnections() {
         if (!connectionCheckDirty) {
             return;
         }
@@ -303,12 +307,24 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         connectionCheckDirty = false;
     }
 
+    protected int getWeakPower(EnumFacing side) {
+        return 0;
+    }
+
+    protected int getStrongPower(EnumFacing side) {
+        return 0;
+    }
+
     protected int getConnectionMask() {
         return internalConnections | externalConnections << 8 | cornerConnections << 16;
     }
 
     protected boolean canConnectWire(Wire wire) {
         return wire.getFactory() == getFactory();
+    }
+
+    public boolean canConnectRedstone(EnumFacing side) {
+        return false;
     }
 
     protected boolean canConnectBlock(BlockPos pos, EnumFacing direction) {

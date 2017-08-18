@@ -15,6 +15,9 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     private ResourceLocation name;
 
     public WireProvider() {
+    }
+
+    protected final void generateBoxes() {
         // Generate boxes
         float xMin = 0.5f - getWidth() / 2;
         float xMax = 0.5f + getWidth() / 2;
@@ -50,6 +53,10 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     }
 
     public abstract Wire create(IWireContainer container, WireFace location);
+
+    public boolean canProvidePower() {
+        return false;
+    }
 
     public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
         if (face == WireFace.CENTER) {

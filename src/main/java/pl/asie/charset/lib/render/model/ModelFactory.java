@@ -20,6 +20,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
@@ -92,7 +93,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     public IBakedModel getModel(T object, BlockRenderLayer layer) {
         if (object == null) {
-            return null;
+            return this;
         }
 
         ModelKey<T> key = new ModelKey<>(object, layer);
@@ -118,7 +119,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         if (state instanceof IExtendedBlockState) {
             return getModel(((IExtendedBlockState) state).getValue(property), layer);
         } else {
-            return null;
+            return this;
         }
     }
 

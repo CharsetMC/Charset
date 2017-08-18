@@ -75,6 +75,10 @@ public class ItemWire extends ItemBlockMultipart {
             return false;
         }
 
+        if (factory.canProvidePower()) {
+            newState = newState.withProperty(BlockWire.REDSTONE, true);
+        }
+
         if (super.placeBlockAtTested(stack, player, world, pos, facing, hitX, hitY, hitZ, newState)) {
             TileEntity tileEntity = world.getTileEntity(pos);
             if (tileEntity instanceof TileWire) {

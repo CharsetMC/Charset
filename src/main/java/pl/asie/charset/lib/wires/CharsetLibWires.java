@@ -91,6 +91,10 @@ public class CharsetLibWires {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		for (WireProvider provider : WireManager.REGISTRY) {
+			provider.generateBoxes();
+		}
+
 		RegistryUtils.register(TileWire.class, "wire");
 	}
 
@@ -113,7 +117,8 @@ public class CharsetLibWires {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
-		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "normal"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=false"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=true"), rendererWire);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "inventory"), rendererWire);
 	}
 

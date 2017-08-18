@@ -25,8 +25,8 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
 
     @Override
     public boolean canConnectBlock(BlockPos pos, EnumFacing direction) {
-        return WireUtils.hasCapability(this, pos, Capabilities.AUDIO_SOURCE, direction)
-                || WireUtils.hasCapability(this, pos, Capabilities.AUDIO_RECEIVER, direction);
+        return WireUtils.hasCapability(this, pos, Capabilities.AUDIO_SOURCE, direction, true)
+                || WireUtils.hasCapability(this, pos, Capabilities.AUDIO_RECEIVER, direction, true);
     }
 
     @Override
