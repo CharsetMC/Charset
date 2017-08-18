@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -81,6 +82,19 @@ public final class CapabilityHelper {
                         return result;
                     }
                 }
+            }
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getBlockCapability(IBlockAccess world, BlockPos pos, IBlockState state, Capability<T> capability) {
+        IBlockCapabilityProvider provider = blockProviders.get(state.getBlock(), capability);
+        if (provider != null) {
+            T result = (T) provider.create(world, pos, state);
+            if (result != null) {
+                return result;
             }
         }
 

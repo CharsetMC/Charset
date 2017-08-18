@@ -63,7 +63,9 @@ public class TweakCarryEventHandler {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingHurt(LivingHurtEvent event) {
         CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying() && event.getSource() != DamageSource.FALL) {
+        if (carryHandler != null && carryHandler.isCarrying() && event.getSource() != DamageSource.FALL
+                && event.getSource() != DamageSource.CACTUS) {
+            /* TODO: Do something about cactus damage etc, to not whitelist it unnecessarily */
             CharsetTweakBlockCarrying.dropCarriedBlock(event.getEntityLiving(), false);
         }
     }
@@ -204,8 +206,8 @@ public class TweakCarryEventHandler {
             Entity entity = event.getTarget();
 
             for (ICarryTransformer<Entity> transformer : CarryTransformerRegistry.INSTANCE.getEntityTransformers()) {
-                IBlockState state = carryHandler.getBlockState();
-                TileEntity tile = carryHandler.getTileEntity();
+                IBlockState state = carryHandler.getState();
+                TileEntity tile = carryHandler.getTile();
 
                 if (transformer.insert(entity, state, tile, true)) {
                     carryHandler.empty();

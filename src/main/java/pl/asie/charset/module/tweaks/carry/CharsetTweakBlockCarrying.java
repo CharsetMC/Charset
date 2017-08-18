@@ -99,24 +99,6 @@ public class CharsetTweakBlockCarrying {
             }
         }
 
-        // Check IMultiblockStructure
-        IMultiblockStructure structure = CapabilityHelper.get(world, pos, Capabilities.MULTIBLOCK_STRUCTURE, null,
-                true, true, false);
-        if (structure != null && !structure.isSeparable()) {
-            int count = 0;
-            Iterator<BlockPos> it = structure.iterator();
-            while (it.hasNext()) {
-                if (++count >= 2) return false;
-            }
-        }
-
-        // Check IMovable
-        IMovable movable = CapabilityHelper.get(world, pos, Capabilities.MOVABLE, null,
-                true, true, false);
-        if (movable != null && !movable.canMoveFrom()) {
-            return false;
-        }
-
         for (ResourceLocation r : locs)
             names.add(r.toString());
 
@@ -128,7 +110,7 @@ public class CharsetTweakBlockCarrying {
             return true;
         }
 
-        // We support all impl tile entities.
+        // We support all vanilla tile entities.
         if (!isVanilla && hasTileEntity) return false;
 
         // Class-based bans

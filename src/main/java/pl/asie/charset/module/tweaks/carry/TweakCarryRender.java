@@ -56,13 +56,13 @@ public class TweakCarryRender {
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder buffer = tessellator.getBuffer();
 
-			if (carryHandler.getBlockState().getRenderType() == EnumBlockRenderType.MODEL) {
+			if (carryHandler.getState().getRenderType() == EnumBlockRenderType.MODEL) {
 				buffer.setTranslation(0, -64, 0);
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
 				try {
-					IBlockState renderState = carryHandler.getBlockState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
-					IBlockState renderStateExt = carryHandler.getBlockState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+					IBlockState renderState = carryHandler.getState().getActualState(carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
+					IBlockState renderStateExt = carryHandler.getState().getBlock().getExtendedState(renderState, carryHandler.getBlockAccess(), CarryHandler.ACCESS_POS);
 
 					BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
 					IBakedModel model = brd.getModelForState(renderState);
@@ -87,15 +87,7 @@ public class TweakCarryRender {
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j, (float)k);
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-				if (tile instanceof TileEntityMobSpawner) {
-					// TODO: Refactor into ICustomCarryHandler
-					if (carryHandler.spawnerLogic != null) {
-						GlStateManager.pushMatrix();
-						GlStateManager.translate(0.5F, 0, 0.5F);
-						TileEntityMobSpawnerRenderer.renderMob(carryHandler.spawnerLogic, 0, 0, 0, partialTicks);
-						GlStateManager.popMatrix();
-					}
-				} else {
+				if (carryHandler.customCarryHandler == null || !carryHandler.customCarryHandler.renderTileCustom(partialTicks)) {
 					try {
 						TileEntityRendererDispatcher.instance.render(tile, 0, 0, 0, partialTicks);
 					} catch (Exception e) {

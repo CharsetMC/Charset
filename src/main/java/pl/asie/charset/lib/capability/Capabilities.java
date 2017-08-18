@@ -18,7 +18,10 @@ package pl.asie.charset.lib.capability;
 
 import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCactus;
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockDoor;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -38,6 +41,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
+import pl.asie.charset.api.carry.CustomCarryHandler;
+import pl.asie.charset.api.carry.ICarryHandler;
 import pl.asie.charset.api.lib.*;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.pipes.IPipeView;
@@ -49,9 +54,7 @@ import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
-import pl.asie.charset.lib.capability.impl.MultiblockStructureBed;
-import pl.asie.charset.lib.capability.impl.MultiblockStructureChest;
-import pl.asie.charset.lib.capability.impl.MultiblockStructureDoor;
+import pl.asie.charset.lib.capability.impl.*;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
 import pl.asie.charset.lib.capability.lib.*;
@@ -98,6 +101,8 @@ public class Capabilities {
 
 	@CapabilityInject(IMultiblockStructure.class)
 	public static Capability<IMultiblockStructure> MULTIBLOCK_STRUCTURE;
+	@CapabilityInject(CustomCarryHandler.Provider.class)
+	public static Capability<CustomCarryHandler.Provider> CUSTOM_CARRY_PROVIDER;
 
 	public static Capability.IStorage<Lockable> LOCKABLE_STORAGE = new Capability.IStorage<Lockable>() {
 		@Nullable
@@ -137,6 +142,8 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(Lockable.class, LOCKABLE_STORAGE, Lockable::new);
 		CapabilityManager.INSTANCE.register(IMultiblockStructure.class, DummyCapabilityStorage.get(), DefaultMultiblockStructure::new);
 
+		CapabilityManager.INSTANCE.register(CustomCarryHandler.Provider.class, DummyCapabilityStorage.get(), () -> handler -> new CustomCarryHandler(handler));
+
 		MinecraftForge.EVENT_BUS.register(new Capabilities());
 
 		multiblockStructureFactory = new CapabilityProviderFactory<>(Capabilities.MULTIBLOCK_STRUCTURE, DummyCapabilityStorage.get());
@@ -147,10 +154,20 @@ public class Capabilities {
 			initMultiplePants();
 		}
 
+		CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, Blocks.MOB_SPAWNER, (a, b, c) -> handler -> new CustomCarryHandlerMobSpawner(handler));
+
 		for (Block block : Block.REGISTRY) {
 			if (block instanceof BlockDoor
 					&& block.getBlockState().getProperties().contains(BlockDoor.HALF)) {
 				CapabilityHelper.registerBlockProvider(Capabilities.MULTIBLOCK_STRUCTURE, block, MultiblockStructureDoor::new);
+			}
+
+			if (block instanceof BlockCactus) {
+				CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, block, (a, b, c) -> handler -> new CustomCarryHandlerCactus(handler));
+			}
+
+			if (block instanceof BlockChest) {
+				CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, block, (a, b, c) -> handler -> new CustomCarryHandlerChest(handler));
 			}
 		}
 	}

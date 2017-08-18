@@ -4,17 +4,18 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.api.lib.IMultiblockStructure;
 
 import java.util.Iterator;
 
 public class MultiblockStructureDoor implements IMultiblockStructure {
-    private final World world;
+    private final IBlockAccess world;
     private final BlockPos pos;
     private final IBlockState state;
 
-    public MultiblockStructureDoor(World world, BlockPos pos, IBlockState state) {
+    public MultiblockStructureDoor(IBlockAccess world, BlockPos pos, IBlockState state) {
         this.world = world;
         this.pos = pos;
         this.state = state;

@@ -2,7 +2,6 @@ package pl.asie.charset.module.tweaks.carry;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockMobSpawner;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -12,7 +11,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
@@ -24,16 +22,20 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import pl.asie.charset.api.carry.CustomCarryHandler;
+import pl.asie.charset.api.carry.ICarryHandler;
 import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.lib.IMovable;
+import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 
-public class CarryHandler implements ICacheable {
+public class CarryHandler implements ICacheable, ICarryHandler {
     public static CapabilityProviderFactory<CarryHandler> PROVIDER;
     public static final BlockPos ACCESS_POS = new BlockPos(0, 64, 0);
 
@@ -44,8 +46,7 @@ public class CarryHandler implements ICacheable {
     private TileEntity tileInstance;
     private float grabbedYaw;
 
-    // TODO: Refactor into ICustomCarryHandler
-    protected MobSpawnerBaseLogic spawnerLogic;
+    protected CustomCarryHandler customCarryHandler;
 
     public CarryHandler() {
         this.access = new Access();
@@ -57,8 +58,8 @@ public class CarryHandler implements ICacheable {
     }
 
     public void update() {
-        if (spawnerLogic != null) {
-            spawnerLogic.updateSpawner();
+        if (customCarryHandler != null) {
+            customCarryHandler.tick();
         }
     }
 
@@ -73,31 +74,24 @@ public class CarryHandler implements ICacheable {
         } else {
             this.tile = null;
         }
-        onSetTile(tile == null);
         this.tileInstance = null;
     }
 
-    private void onSetTile(boolean emptied) {
-        if (!emptied && block != null && block.getBlock() instanceof BlockMobSpawner) {
-            spawnerLogic = new MobSpawnerBaseLogic() {
-                @Override
-                public void broadcastEvent(int id) {
-
+    protected void setCustomCarryHandler(boolean emptied) {
+        if (!emptied && block != null) {
+            CustomCarryHandler.Provider provider = CapabilityHelper.getBlockCapability(access, ACCESS_POS, block, Capabilities.CUSTOM_CARRY_PROVIDER);
+            if (provider != null) {
+                customCarryHandler = provider.create(this);
+            } else {
+                TileEntity tile = getTile();
+                if (tile.hasCapability(Capabilities.CUSTOM_CARRY_PROVIDER, null)) {
+                    customCarryHandler = tile.getCapability(Capabilities.CUSTOM_CARRY_PROVIDER, null).create(this);
+                } else {
+                    customCarryHandler = null;
                 }
-
-                @Override
-                public World getSpawnerWorld() {
-                    return player.getEntityWorld();
-                }
-
-                @Override
-                public BlockPos getSpawnerPosition() {
-                    return player.getPosition();
-                }
-            };
-            spawnerLogic.readFromNBT(tile);
+            }
         } else {
-            spawnerLogic = null;
+            customCarryHandler = null;
         }
     }
 
@@ -115,6 +109,7 @@ public class CarryHandler implements ICacheable {
         grabbedYaw = player != null ? player.rotationYaw : 0.0F;
         this.block = state;
         setTile(tile);
+        setCustomCarryHandler(false);
     }
 
     public boolean grab(World world, BlockPos pos) {
@@ -131,8 +126,11 @@ public class CarryHandler implements ICacheable {
             if (block.getBlock().hasTileEntity(block)) {
                 setTile(world.getTileEntity(pos));
                 world.removeTileEntity(pos);
+            } else {
+                setTile(null);
             }
 
+            setCustomCarryHandler(false);
             world.setBlockToAir(pos);
 
             return true;
@@ -144,6 +142,24 @@ public class CarryHandler implements ICacheable {
     private boolean canPickUp(World world, BlockPos pos, IBlockState block) {
         if (player instanceof EntityPlayer && ((EntityPlayer) player).isCreative()) {
             return true;
+        }
+
+        // Check IMultiblockStructure
+        IMultiblockStructure structure = CapabilityHelper.get(world, pos, Capabilities.MULTIBLOCK_STRUCTURE, null,
+                true, true, false);
+        if (structure != null && !structure.isSeparable()) {
+            int count = 0;
+            Iterator<BlockPos> it = structure.iterator();
+            while (it.hasNext()) {
+                if (++count >= 2) return false;
+            }
+        }
+
+        // Check IMovable
+        IMovable movable = CapabilityHelper.get(world, pos, Capabilities.MOVABLE, null,
+                true, true, false);
+        if (movable != null && !movable.canMoveFrom()) {
+            return false;
         }
 
         float hardness = player instanceof EntityPlayer
@@ -161,7 +177,7 @@ public class CarryHandler implements ICacheable {
     public boolean place(World world, BlockPos pos, EnumFacing facing, EntityLivingBase player) {
         if (block != null) {
             if (hasTileEntity()) {
-                IMovable movable = CapabilityHelper.get(Capabilities.MOVABLE, getTileEntity(), null);
+                IMovable movable = CapabilityHelper.get(Capabilities.MOVABLE, getTile(), null);
                 if (movable != null && !movable.canMoveTo(world, pos)) {
                     return false;
                 }
@@ -169,15 +185,6 @@ public class CarryHandler implements ICacheable {
 
             if (world.mayPlace(block.getBlock(), pos, false, facing, player)) {
                 world.setBlockState(pos, block);
-                if (block.getBlock() instanceof BlockChest) {
-                    for (EnumFacing facing1 : EnumFacing.HORIZONTALS) {
-                        if (world.getBlockState(pos.offset(facing1)).getBlock() instanceof BlockChest) {
-                            // FIXME: Double chests need this (#137)
-                            block.getBlock().onBlockPlacedBy(world, pos, block, player, ItemStack.EMPTY);
-                            break;
-                        }
-                    }
-                }
                 IBlockState oldBlock = block;
                 block = null;
 
@@ -187,6 +194,10 @@ public class CarryHandler implements ICacheable {
                     tile.setInteger("z", pos.getZ());
                     world.setTileEntity(pos, TileEntity.create(world, tile));
                     setTile(null);
+                }
+
+                if (customCarryHandler != null) {
+                    customCarryHandler.onPlace(world, pos);
                 }
 
                 float yawDiff = player != null ? grabbedYaw - player.rotationYaw : 0.0F;
@@ -206,9 +217,14 @@ public class CarryHandler implements ICacheable {
                 }
 
                 // TODO: Check if I break something
-                newState.neighborChanged(world, pos, oldBlock.getBlock(), pos);
+                try {
+                    newState.neighborChanged(world, pos, oldBlock.getBlock(), pos);
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
 
                 CharsetTweakBlockCarrying.syncCarryWithAllClients(player);
+                setCustomCarryHandler(true);
 
                 return true;
             } else {
@@ -226,19 +242,32 @@ public class CarryHandler implements ICacheable {
     public void empty() {
         block = null;
         setTile(null);
+        setCustomCarryHandler(true);
     }
 
-    public IBlockState getBlockState() {
+    @Override
+    public IBlockState getState() {
         return block;
     }
 
-    public TileEntity getTileEntity() {
+    @Override
+    public NBTTagCompound getTileNBT() {
+        return tile;
+    }
+
+    @Override
+    public TileEntity getTile() {
         if (tileInstance != null) {
             tileInstance.setWorld(player.world);
             return tileInstance;
         } else {
             return tile != null ? (tileInstance = TileEntity.create(player.world, tile)) : null;
         }
+    }
+
+    @Override
+    public Entity getCarrier() {
+        return player;
     }
 
     public static void register() {
@@ -281,7 +310,7 @@ public class CarryHandler implements ICacheable {
 
                     if (compound.hasKey("b:tile")) {
                         instance.tile = compound.getCompoundTag("b:tile");
-                        instance.onSetTile(false);
+                        instance.setCustomCarryHandler(false);
                     }
                 }
             }
@@ -296,7 +325,7 @@ public class CarryHandler implements ICacheable {
         @Nullable
         @Override
         public TileEntity getTileEntity(BlockPos pos) {
-            return pos.equals(ACCESS_POS) ? CarryHandler.this.getTileEntity() : null;
+            return pos.equals(ACCESS_POS) ? CarryHandler.this.getTile() : null;
         }
 
         @Override

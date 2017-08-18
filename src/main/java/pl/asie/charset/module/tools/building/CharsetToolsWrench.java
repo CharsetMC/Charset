@@ -61,7 +61,7 @@ public class CharsetToolsWrench {
 		/* CharsetToolsBuilding.registerRotationHandler(Blocks.CHEST, ((world, pos, state, axis) -> {
 			for (EnumFacing facing : EnumFacing.Plane.HORIZONTAL) {
 				BlockPos pos2 = pos.offset(facing);
-				IBlockState state2 = world.getBlockState(pos2);
+				IBlockState state2 = world.getState(pos2);
 				if (state2.getBlock() == state.getBlock()) {
 					EnumFacing newDir = state.getValue(BlockChest.FACING).getOpposite();
 					world.setBlockState(pos, state.withProperty(BlockChest.FACING, newDir));
