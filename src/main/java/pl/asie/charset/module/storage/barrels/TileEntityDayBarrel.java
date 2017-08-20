@@ -60,6 +60,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.ICacheable;
+import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IBarrel;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.CapabilityCache;
@@ -80,6 +81,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     public Set<Upgrade> upgrades = EnumSet.noneOf(Upgrade.class);
     Object notice_target = this;
 
+    protected final Lockable lockable = new Lockable(this);
     protected final InsertionHandler insertionView = new InsertionHandler();
     protected final ExtractionHandler extractionView = new ExtractionHandler();
     protected final ReadableItemHandler readOnlyView = new ReadableItemHandler();
@@ -245,6 +247,10 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         upgrades.clear();
         populateUpgrades(upgrades, compound);
 
+        if (!isClient && compound.hasKey("lock", Constants.NBT.TAG_COMPOUND)) {
+            lockable.deserializeNBT(compound.getCompoundTag("lock"));
+        }
+
         woodLog = getLog(compound);
         woodSlab = getSlab(compound);
         lastMentionedCount = getItemCount();
@@ -311,6 +317,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     @Override
     public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
         ItemUtils.writeToNBT(item, compound, "item");
+        compound.setInteger("count", item.getCount());
+
         woodLog.writeToNBT(compound, "log");
         woodSlab.writeToNBT(compound, "slab");
         compound.setByte("dir", (byte) orientation.ordinal());
@@ -320,7 +328,10 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             upgradeNBT.appendTag(new NBTTagString(u.name()));
         }
         compound.setTag("upgrades", upgradeNBT);
-        compound.setInteger("count", item.getCount());
+
+        if (!isClient) {
+            compound.setTag("lock", lockable.serializeNBT());
+        }
         return compound;
     }
 
@@ -654,6 +665,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             if (isTop(facing) || isBottom(facing) || facing == null) {
                 return true;
             }
+        } else if (capability == Capabilities.BARREL || capability == Capabilities.LOCKABLE) {
+            return true;
         } else if (capability == Capabilities.AXIS_ROTATABLE) {
             return facing != null;
         }
@@ -681,6 +694,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             } else if (facing == null) {
                 return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(readOnlyView);
             }
+        } else if (capability == Capabilities.LOCKABLE) {
+            return Capabilities.LOCKABLE.cast(lockable);
         } else if (capability == Capabilities.BARREL) {
             return Capabilities.BARREL.cast(this);
         } else if (capability == Capabilities.AXIS_ROTATABLE) {
@@ -704,6 +719,9 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     //* Double:                        Add all but 1 item
 
     public boolean activate(EntityPlayer player, EnumFacing side, EnumHand hand) {
+        if (lockable.hasLock())
+            return false;
+
         Long lastClick = lastClickMap.get(player);
         if (lastClick != null && world.getTotalWorldTime() - lastClick < 10 && !item.isEmpty()) {
             addAllItems(player, hand);
@@ -783,6 +801,9 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     public void click(EntityPlayer player) {
+        if (lockable.hasLock())
+            return;
+
         EnumHand hand = EnumHand.MAIN_HAND;
 
         if (item.isEmpty()) {
