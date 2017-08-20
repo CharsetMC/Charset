@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +28,7 @@ import pl.asie.charset.api.carry.ICarryHandler;
 import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.lib.IMovable;
 import pl.asie.charset.api.lib.IMultiblockStructure;
+import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
@@ -144,6 +146,12 @@ public class CarryHandler implements ICacheable, ICarryHandler {
             return true;
         }
 
+        // Check TileEntityLockable
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityLockable && ((TileEntityLockable) tile).isLocked()) {
+            return false;
+        }
+
         // Check IMultiblockStructure
         IMultiblockStructure structure = CapabilityHelper.get(world, pos, Capabilities.MULTIBLOCK_STRUCTURE, null,
                 true, true, false);
@@ -159,6 +167,13 @@ public class CarryHandler implements ICacheable, ICarryHandler {
         IMovable movable = CapabilityHelper.get(world, pos, Capabilities.MOVABLE, null,
                 true, true, false);
         if (movable != null && !movable.canMoveFrom()) {
+            return false;
+        }
+
+        // Check Lock
+        Lockable lockable = CapabilityHelper.get(world, pos, Capabilities.LOCKABLE, null,
+                true, true, false);
+        if (lockable != null && lockable.hasLock()) {
             return false;
         }
 
