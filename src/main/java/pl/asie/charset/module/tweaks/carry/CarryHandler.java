@@ -86,7 +86,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
                 customCarryHandler = provider.create(this);
             } else {
                 TileEntity tile = getTile();
-                if (tile.hasCapability(Capabilities.CUSTOM_CARRY_PROVIDER, null)) {
+                if (tile != null && tile.hasCapability(Capabilities.CUSTOM_CARRY_PROVIDER, null)) {
                     customCarryHandler = tile.getCapability(Capabilities.CUSTOM_CARRY_PROVIDER, null).create(this);
                 } else {
                     customCarryHandler = null;

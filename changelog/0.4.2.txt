@@ -12,6 +12,7 @@
 * [misc.pocketcraft] [#139] Fixed item duplication bug.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
 * [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
+* [storage.barrels] Barrles can now be locked!
 * [storage.barrels] Barrels can now have multiple upgrade types at the same time!
 * [storage.barrels] Fix barrels made out of non-burnable materials being burnable.
 * [storage.barrels] Fix extracting only one item at a time only working in creative mode.
@@ -24,6 +25,7 @@
 * [storage.tanks] [#142] Tanks no longer consume fluids from buckets in creative mode.
 * [storage.tanks] Tanks with liquid in them are now harder to break than empty tanks to avoid fluid loss by accident.
 * [tools.building] New module! Adds the Chisel.
+* [tools.wrench] Add modded metal ingot support.
 * [tools.wrench] Add special integration for Quark vertical planks and Iron Chests
 * [transport.color] Dyed minecarts now use your resource pack's minecart texture
 * [tweak.anvilDyeItems] New tweak - improved over the 1.6.4 AsieLib version.
