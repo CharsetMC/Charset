@@ -37,6 +37,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,14 +55,18 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         }
 
         @Override
-        public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity) {
+        @SuppressWarnings("unchecked")
+        public @Nonnull IBakedModel handleItemState(@Nonnull IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity) {
             if (originalModel instanceof ModelFactory) {
                 ModelFactory factory = (ModelFactory) originalModel;
                 IRenderComparable o = factory.fromItemStack(stack);
-                return factory.getModel(o, null);
-            } else {
-                return originalModel;
+                IBakedModel model = factory.getModel(o, null);
+                if (model != null) {
+                    return model;
+                }
             }
+
+            return originalModel;
         }
     }
 
@@ -91,9 +96,9 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
     public abstract IBakedModel bake(T object, boolean isItem, BlockRenderLayer layer);
     public abstract T fromItemStack(ItemStack stack);
 
-    public IBakedModel getModel(T object, BlockRenderLayer layer) {
+    private IBakedModel getModel(T object, BlockRenderLayer layer) {
         if (object == null) {
-            return this;
+            return null;
         }
 
         ModelKey<T> key = new ModelKey<>(object, layer);
@@ -111,15 +116,15 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         }
     }
 
-    public IBakedModel getModel(IBlockState state) {
+    private IBakedModel getModel(IBlockState state) {
         return getModel(state, null);
     }
 
-    public IBakedModel getModel(IBlockState state, BlockRenderLayer layer) {
+    private IBakedModel getModel(IBlockState state, BlockRenderLayer layer) {
         if (state instanceof IExtendedBlockState) {
             return getModel(((IExtendedBlockState) state).getValue(property), layer);
         } else {
-            return this;
+            return null;
         }
     }
 
