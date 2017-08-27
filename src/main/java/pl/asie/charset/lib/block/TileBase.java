@@ -17,7 +17,6 @@
 package pl.asie.charset.lib.block;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -94,7 +93,7 @@ public class TileBase extends TileEntity {
 	@Override
 	public final void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		readNBTData(compound, (world instanceof WorldClient));
+		readNBTData(compound, world.isRemote);
 	}
 
 	@Override
