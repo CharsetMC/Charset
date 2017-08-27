@@ -21,9 +21,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.toasts.GuiToast;
 import net.minecraft.client.gui.toasts.RecipeToast;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -37,21 +34,22 @@ import java.lang.invoke.MethodHandle;
 import java.util.Deque;
 import java.util.List;
 
-@CharsetModule(
-		name = "tweak.remove.recipeUnlocks",
-		description = "Removes recipe unlocks and the associated popups.",
-		profile = ModuleProfile.STABLE,
-		isDefault = false
-)
-public class CharsetTweakRemoveRecipeUnlocks {
-	@SubscribeEvent
-	public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-		event.player.unlockRecipes(Lists.newArrayList(CraftingManager.REGISTRY));
-	}
+public class CharsetTweakRemoveRecipeUnlocksClient {
+	private final MethodHandle TOASTS_QUEUE = MethodHandleHelper.findFieldGetter(GuiToast.class, "toastsQueue", "field_191792_h");
+	private final MethodHandle RECIPES_OUTPUTS = MethodHandleHelper.findFieldGetter(RecipeToast.class, "recipesOutputs", "field_193666_c");
 
-	@Mod.EventHandler
+	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(new CharsetTweakRemoveRecipeUnlocksClient());
+	public void onRenderTickPre(TickEvent.RenderTickEvent event) {
+		try {
+			Deque deque = (Deque) TOASTS_QUEUE.invoke(Minecraft.getMinecraft().getToastGui());
+			for (Object o : deque) {
+				if (o instanceof RecipeToast) {
+					((List) RECIPES_OUTPUTS.invoke(o)).clear();
+				}
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 	}
 }
