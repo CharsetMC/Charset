@@ -43,5 +43,7 @@
 * [tweak.dynamicLights] New tweak - requires Albedo! Client-side only! Fun!
 * [tweak.remove.netherPortals] New tweak!
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.
+* [tweak.remove.recipeUnlocks] New tweak! Beats Quark's version in that it also hides the pop-up.
+* [tweak.remove.tutorial] New tweak!
 * [tweak.unifyColors] Temporarily removed - awaiting redesign.
 
