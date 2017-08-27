@@ -88,56 +88,57 @@ public final class RotationUtils {
 			return true;
 		}
 
-		if (state.getBlock().hasTileEntity(state)) {
-			TileEntity tile = world.getTileEntity(pos);
-			IAxisRotatable rotatable = CapabilityHelper.get(Capabilities.AXIS_ROTATABLE, tile, axis);
-			if (rotatable != null) {
-				for (int i = 0; i < count; i++)
-					if (!rotatable.rotateAround(axis, false))
-						return false;
+		IAxisRotatable rotatable = CapabilityHelper.get(world, pos, Capabilities.AXIS_ROTATABLE, axis,
+				true, true, false);
+		if (rotatable != null) {
+			for (int i = 0; i < count; i++)
+				if (!rotatable.rotateAround(axis, false))
+					return false;
 
-				return true;
-			}
+			return true;
 		}
 
 		if (axis.getAxis() == EnumFacing.Axis.Y) {
+			boolean rotatedPreviously = false;
 			int rotCount = (axis == EnumFacing.UP ? (4 - count) : count);
-			if (overridesWithRotation(state)) {
-				switch (rotCount) {
-					case 1:
-						state = state.withRotation(Rotation.CLOCKWISE_90);
-						break;
-					case 2:
-						state = state.withRotation(Rotation.CLOCKWISE_180);
-						break;
-					case 3:
-						state = state.withRotation(Rotation.COUNTERCLOCKWISE_90);
-						break;
-					default:
-						// skip setBlockState
-						return true;
-				}
-
-				world.setBlockState(pos, state);
-				return true;
+			Rotation rotation = Rotation.NONE;
+			switch (rotCount) {
+				case 1:
+					rotation = Rotation.CLOCKWISE_90;
+					break;
+				case 2:
+					rotation = Rotation.CLOCKWISE_180;
+					break;
+				case 3:
+					rotation = Rotation.COUNTERCLOCKWISE_90;
+					break;
 			}
 
-			for (IProperty<?> prop : state.getProperties().keySet()) {
-				if (prop.getName().equals("facing") || prop.getName().equals("rotation")) {
-					Object facing = state.getValue(prop);
-					if (facing instanceof EnumFacing) {
-						for (int i = 0; i < rotCount; i++) {
-							facing = ((EnumFacing) facing).rotateAround(EnumFacing.Axis.Y);
-						}
+			if (overridesWithRotation(state) && rotation != Rotation.NONE) {
+				world.setBlockState(pos, state.withRotation(rotation));
+				rotatedPreviously = true;
+			}
 
-						if (prop.getAllowedValues().contains(facing)) {
-							world.setBlockState(pos, state.withProperty((IProperty<EnumFacing>) prop, (EnumFacing) facing));
-							return true;
+			// TODO: Add TileEntity.rotate
+
+			if (!rotatedPreviously) {
+				for (IProperty<?> prop : state.getProperties().keySet()) {
+					if (prop.getName().equals("facing") || prop.getName().equals("rotation")) {
+						Object facing = state.getValue(prop);
+						if (facing instanceof EnumFacing) {
+							for (int i = 0; i < rotCount; i++) {
+								facing = ((EnumFacing) facing).rotateAround(EnumFacing.Axis.Y);
+							}
+
+							if (prop.getAllowedValues().contains(facing)) {
+								world.setBlockState(pos, state.withProperty((IProperty<EnumFacing>) prop, (EnumFacing) facing));
+								return true;
+							}
 						}
-					} else {
-						continue;
 					}
 				}
+			} else {
+				return true;
 			}
 		}
 

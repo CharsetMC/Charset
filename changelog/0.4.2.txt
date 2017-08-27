@@ -12,7 +12,8 @@
 * [misc.pocketcraft] [#139] Fixed item duplication bug.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
 * [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
-* [storage.barrels] Barrles can now be locked!
+* [storage.barrels] Add support for Structure Block rotations and mirroring.
+* [storage.barrels] Barrels can now be locked!
 * [storage.barrels] Barrels can now have multiple upgrade types at the same time!
 * [storage.barrels] Fix barrels made out of non-burnable materials being burnable.
 * [storage.barrels] Fix extracting only one item at a time only working in creative mode.

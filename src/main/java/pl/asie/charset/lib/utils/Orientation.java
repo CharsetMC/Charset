@@ -37,6 +37,7 @@
 package pl.asie.charset.lib.utils;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Mirror;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -274,6 +275,29 @@ public enum Orientation {
             fzo = fzo.getNextRotationOnFace();
         }
         return null;
+    }
+
+    // TODO: Cache you, cache me!
+    public Orientation mirror(@Nonnull Mirror mirror) {
+        EnumFacing.Axis axis = null;
+        switch (mirror) {
+            case NONE:
+                return this;
+            case FRONT_BACK:
+                axis = EnumFacing.Axis.X;
+                break;
+            case LEFT_RIGHT:
+                axis = EnumFacing.Axis.Z;
+                break;
+        }
+
+        if (facing.getAxis() == axis) {
+            return find(facing.getOpposite(), top);
+        } else if (top.getAxis() == axis) {
+            return find(facing, top.getOpposite());
+        } else {
+            return this;
+        }
     }
     
     public Orientation rotateAround(@Nonnull EnumFacing axis) {

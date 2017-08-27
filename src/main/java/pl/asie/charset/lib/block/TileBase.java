@@ -25,6 +25,10 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Rotation;
+import net.minecraft.world.World;
+import pl.asie.charset.api.lib.IAxisRotatable;
+import pl.asie.charset.lib.capability.Capabilities;
 
 public class TileBase extends TileEntity {
 	private int lastComparatorValue = -1;
@@ -97,6 +101,35 @@ public class TileBase extends TileEntity {
 	public final NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		compound = super.writeToNBT(compound);
 		return writeNBTData(compound, false);
+	}
+
+	@Override
+	protected void setWorldCreate(World worldIn) {
+		// MCP mappings are sometimes really silly.
+		setWorld(worldIn);
+	}
+
+	@Override
+	public void rotate(Rotation rotationIn) {
+		if (this.hasCapability(Capabilities.AXIS_ROTATABLE, null)) {
+			IAxisRotatable rotatable = this.getCapability(Capabilities.AXIS_ROTATABLE, null);
+			int count = 0;
+			switch (rotationIn) {
+				case CLOCKWISE_90:
+					count = 1;
+					break;
+				case CLOCKWISE_180:
+					count = 2;
+					break;
+				case COUNTERCLOCKWISE_90:
+					count = 3;
+					break;
+			}
+
+			for (int i = 0; i < count; i++) {
+				rotatable.rotateAround(EnumFacing.UP, false);
+			}
+		}
 	}
 
 	public void update() {

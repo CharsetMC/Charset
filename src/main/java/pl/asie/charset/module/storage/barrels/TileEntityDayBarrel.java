@@ -47,9 +47,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -986,10 +984,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         return barrel;
     }
 
-    @Override
-    public boolean rotateAround(EnumFacing axis, boolean simulate) {
-        Orientation newOrientation = orientation.rotateAround(axis);
-
+    private boolean changeOrientation(Orientation newOrientation, boolean simulate) {
         if (orientation != newOrientation) {
             if (!simulate) {
                 orientation = newOrientation;
@@ -1004,21 +999,25 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
     }
 
+    @Override
+    public void mirror(Mirror mirror) {
+        changeOrientation(orientation.mirror(mirror), false);
+    }
+
+    @Override
+    public boolean rotateAround(EnumFacing axis, boolean simulate) {
+        return changeOrientation(orientation.rotateAround(axis), simulate);
+    }
+
     public void rotateWrench(EnumFacing axis) {
-        Orientation oldOrientation = orientation;
-
+        Orientation newOrientation;
         if (axis == orientation.facing.getOpposite()) {
-            orientation = orientation.getNextRotationOnFace();
+            newOrientation = orientation.getNextRotationOnFace();
         } else {
-            orientation = Orientation.getOrientation(Orientation.fromDirection(axis.getOpposite()).ordinal() & (~3) | (orientation.ordinal() & 3));
+            newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis.getOpposite()).ordinal() & (~3) | (orientation.ordinal() & 3));
         }
 
-        if (orientation != oldOrientation) {
-            helperTop = null;
-            helperBottom = null;
-            markBlockForUpdate();
-            getWorld().notifyNeighborsRespectDebug(pos, getBlockType(), true);
-        }
+        changeOrientation(newOrientation, false);
     }
 
     @Override
