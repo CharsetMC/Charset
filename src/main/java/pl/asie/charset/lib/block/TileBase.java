@@ -93,7 +93,7 @@ public class TileBase extends TileEntity {
 	@Override
 	public final void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		readNBTData(compound, world.isRemote);
+		readNBTData(compound, world != null && world.isRemote);
 	}
 
 	@Override
