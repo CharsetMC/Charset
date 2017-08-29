@@ -5,12 +5,20 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.NonNullList;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ProgressManager;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 import org.apache.commons.lang3.ArrayUtils;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
@@ -55,11 +63,54 @@ public final class ItemMaterialHeuristics {
         }
     }
 
+    public static ItemStack getCraftingResultQuickly(boolean noShapeless, World world, int width, int height, ItemStack... stacks) {
+        InventoryCrafting crafting = RecipeUtils.getCraftingInventory(width, height, stacks);
+        IRecipe recipe = findMatchingRecipeQuickly(noShapeless, crafting, world);
+        if (recipe != null) {
+            return recipe.getCraftingResult(crafting);
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    public static IRecipe findMatchingRecipeQuickly(boolean noShapeless, InventoryCrafting craftMatrix, World worldIn) {
+        int width = craftMatrix.getWidth();
+        int height = craftMatrix.getHeight();
+        for (IRecipe irecipe : ForgeRegistries.RECIPES) {
+            Class c = irecipe.getClass();
+
+            // These cut the search time significantly.
+            if (c == ShapedRecipes.class) {
+                if (((ShapedRecipes) irecipe).getWidth() != width || ((ShapedRecipes) irecipe).getHeight() != height) {
+                    continue;
+                }
+            } else if (c == ShapedOreRecipe.class) {
+                if (((ShapedOreRecipe) irecipe).getWidth() != width || ((ShapedOreRecipe) irecipe).getHeight() != height) {
+                    continue;
+                }
+            } else {
+                if (noShapeless && (irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe)) {
+                    continue;
+                }
+            }
+
+            if (!irecipe.canFit(width, height)) {
+                continue;
+            }
+
+            if (irecipe.matches(craftMatrix, worldIn)) {
+                return irecipe;
+            }
+        }
+
+        return null;
+    }
+
     private static void findSlab(ItemMaterial base) {
         if (!base.getTypes().contains("block") || base.getRelated("slab") != null)
             return;
 
-        ItemStack slab = RecipeUtils.getCraftingResult(null, 3, 1,
+        ItemStack slab = getCraftingResultQuickly(true, null, 3, 1,
                 base.getStack(), base.getStack(), base.getStack());
         if (isBlock(slab)) {
             addResultingBlock(base, slab, "block", "slab");
@@ -70,12 +121,12 @@ public final class ItemMaterialHeuristics {
         if (!base.getTypes().contains("block") || base.getRelated("stairs") != null)
             return;
 
-        ItemStack slab = RecipeUtils.getCraftingResult(null, 3, 3,
+        ItemStack stair = getCraftingResultQuickly(true, null, 3, 3,
                 null, null, base.getStack(),
                 null, base.getStack(), base.getStack(),
                 base.getStack(), base.getStack(), base.getStack());
-        if (isBlock(slab)) {
-            addResultingBlock(base, slab, "block", "stairs");
+        if (isBlock(stair)) {
+            addResultingBlock(base, stair, "block", "stairs");
         }
     }
 
@@ -92,7 +143,7 @@ public final class ItemMaterialHeuristics {
         // We look for the plank first to ensure only valid logs
         // get registered.
 
-        ItemStack plank = RecipeUtils.getCraftingResult(null, 1, 1, log);
+        ItemStack plank = getCraftingResultQuickly(false, null, 1, 1, log);
         if (isBlock(plank) && ItemUtils.isOreType(plank, "plankWood")) {
             ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
             if (reg.registerTypes(logMaterial, "log", "wood", "block")) {
@@ -101,7 +152,7 @@ public final class ItemMaterialHeuristics {
                 if (reg.registerTypes(plankMaterial, "plank", "wood", "block")) {
                     reg.registerRelation(logMaterial, plankMaterial, "plank", "log");
 
-                    ItemStack stick = RecipeUtils.getCraftingResult(null, 1, 1,
+                    ItemStack stick = getCraftingResultQuickly(true, null, 2, 2,
                             plank, null,
                             plank, null);
                     if (stick.isEmpty()) {
@@ -159,7 +210,7 @@ public final class ItemMaterialHeuristics {
                 }
 
                 // Try crafting a block
-                ItemStack block = RecipeUtils.getCraftingResult(null, 2, 2,
+                ItemStack block = getCraftingResultQuickly(true, null, 2, 2,
                         stack, stack,
                         stack, stack);
                 if (!block.isEmpty() && block.getItem() instanceof ItemBlock) {
@@ -175,7 +226,7 @@ public final class ItemMaterialHeuristics {
         if (reg.registerTypes(ingotMat, prefix, suffix, "item")) {
             // Try crafting a nugget
             if (prefix.equals("ingot")) {
-                ItemStack nugget = RecipeUtils.getCraftingResult(null, 2, 2,
+                ItemStack nugget = getCraftingResultQuickly(false, null, 1, 1,
                         stack);
                 if (!nugget.isEmpty() && containsOreDict(nugget, "nugget" + suffixU)) {
                     ItemMaterial nuggetMat = reg.getOrCreateMaterial(nugget);
@@ -185,7 +236,7 @@ public final class ItemMaterialHeuristics {
             }
 
             // Try crafting a block
-            ItemStack block = RecipeUtils.getCraftingResult(null, 3, 3,
+            ItemStack block = getCraftingResultQuickly(false, null, 3, 3,
                     stack, stack, stack,
                     stack, stack, stack,
                     stack, stack, stack);
@@ -221,7 +272,7 @@ public final class ItemMaterialHeuristics {
         ItemMaterial stoneMat = reg.getOrCreateMaterial(stack);
         if (reg.registerTypes(stoneMat, "stone", suffix, "block")) {
             // Try crafting a brick
-            ItemStack block = RecipeUtils.getCraftingResult(null, 2, 2,
+            ItemStack block = getCraftingResultQuickly(true, null, 2, 2,
                     stack, stack,
                     stack, stack);
             if (!block.isEmpty()) {

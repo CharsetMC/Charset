@@ -37,7 +37,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.lib.CharsetIMC;
+import pl.asie.charset.lib.CharsetImplAPI;
 import pl.asie.charset.lib.loader.ModuleLoader;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
@@ -87,6 +89,10 @@ public class ModCharset {
 
 	public static File getModuleConfigFile(String id) {
 		return new File(new File(configurationDirectory, "module"), id + ".cfg");
+	}
+
+	public ModCharset() {
+		CharsetAPI.INSTANCE = new CharsetImplAPI();
 	}
 
 	@Mod.EventHandler

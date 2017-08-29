@@ -1,6 +1,7 @@
 package pl.asie.charset.api.audio;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public abstract class AudioData {
     public abstract int getTime();

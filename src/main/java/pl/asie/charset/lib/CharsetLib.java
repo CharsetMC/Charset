@@ -33,7 +33,10 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.api.audio.AudioAPI;
+import pl.asie.charset.api.audio.AudioData;
+import pl.asie.charset.api.audio.AudioSink;
 import pl.asie.charset.lib.audio.PacketAudioData;
 import pl.asie.charset.lib.audio.PacketAudioStop;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
@@ -177,9 +180,9 @@ public class CharsetLib {
 		if (ModCharset.INDEV || enableDebugInfo)
 			MinecraftForge.EVENT_BUS.register(new DebugInfoProvider());
 
-		AudioAPI.DATA_REGISTRY.register(AudioDataDFPWM.class, AudioDataDFPWM::new);
-		AudioAPI.DATA_REGISTRY.register(AudioDataGameSound.class, AudioDataGameSound::new);
-		AudioAPI.SINK_REGISTRY.register(AudioSinkBlock.class, AudioSinkBlock::new);
+		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioData.class).register(AudioDataDFPWM.class, AudioDataDFPWM::new);
+		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioData.class).register(AudioDataGameSound.class, AudioDataGameSound::new);
+		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioSink.class).register(AudioSinkBlock.class, AudioSinkBlock::new);
 
 		MinecraftForge.EVENT_BUS.register(CommandCharset.INSTANCE);
 

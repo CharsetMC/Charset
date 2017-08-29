@@ -1,6 +1,5 @@
 package pl.asie.charset.lib.wires;
 
-import com.sun.org.apache.regexp.internal.RE;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.slot.EnumCenterSlot;
@@ -32,7 +31,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.block.BlockBase;
-import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collections;

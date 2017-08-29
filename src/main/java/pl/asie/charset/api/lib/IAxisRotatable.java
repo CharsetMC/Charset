@@ -16,6 +16,7 @@ import net.minecraft.world.World;
  * is not defined - do not make two incompatible implementations!
  */
 public interface IAxisRotatable {
+	@Deprecated /* Please use IBlockCapabilityProvider + IAxisRotatable instead. */
 	interface IAxisRotatableBlock {
 		/**
 		 * Rotate clockwise around the given axis.

@@ -18,6 +18,7 @@ package pl.asie.charset.api.audio;
 
 import com.google.common.collect.ImmutableSet;
 import io.netty.buffer.ByteBuf;
+import pl.asie.charset.api.CharsetAPI;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -72,7 +73,7 @@ public final class AudioPacket {
 
     public void writeData(ByteBuf buffer) {
         buffer.writeFloat(volume);
-        buffer.writeShort(AudioAPI.DATA_REGISTRY.getId(data));
+        buffer.writeShort(CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioData.class).getId(data));
         data.writeData(buffer);
         buffer.writeShort(sinks.size());
         for (AudioSink sink : sinks) {
@@ -82,7 +83,7 @@ public final class AudioPacket {
 
     public void readData(ByteBuf buffer) {
         volume = buffer.readFloat();
-        data = AudioAPI.DATA_REGISTRY.create(buffer.readUnsignedShort());
+        data = CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioData.class).create(buffer.readUnsignedShort());
         data.readData(buffer);
         int sinkLen = buffer.readUnsignedShort();
         sinks.clear();

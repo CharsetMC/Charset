@@ -19,8 +19,10 @@ package pl.asie.charset.api.audio;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.registries.IForgeRegistryEntry;
+import pl.asie.charset.api.CharsetAPI;
 
-public abstract class AudioSink implements IAudioReceiver {
+public abstract class AudioSink extends IForgeRegistryEntry.Impl<AudioSink> implements IAudioReceiver {
     public abstract World getWorld();
     public abstract Vec3d getPos();
     public abstract float getDistance();
@@ -32,7 +34,7 @@ public abstract class AudioSink implements IAudioReceiver {
     }
 
     public void writeData(ByteBuf buffer) {
-        buffer.writeShort(AudioAPI.SINK_REGISTRY.getId(this));
+        buffer.writeShort(CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioSink.class).getId(this));
     }
 
     public void readData(ByteBuf buffer) {
@@ -41,7 +43,7 @@ public abstract class AudioSink implements IAudioReceiver {
 
     public static AudioSink create(ByteBuf buffer) {
         try {
-            AudioSink sink = AudioAPI.SINK_REGISTRY.create(buffer.readUnsignedShort());
+            AudioSink sink = CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioSink.class).create(buffer.readUnsignedShort());
             sink.readData(buffer);
             return sink;
         } catch (Exception e) {

@@ -21,6 +21,7 @@ package pl.asie.charset.api.wires;
  * emit a redstone cable signal. Keep in mind, however,
  * that this does not replace impl redstone APIs.
  */
+@Deprecated
 public interface IRedstoneEmitter {
 	/**
 	 * Get the signal values of a redstone signal emitter.
