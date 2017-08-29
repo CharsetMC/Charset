@@ -22,6 +22,7 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import org.apache.commons.lang3.ArrayUtils;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
@@ -88,8 +89,13 @@ public final class ItemMaterialHeuristics {
                 if (((ShapedOreRecipe) irecipe).getWidth() != width || ((ShapedOreRecipe) irecipe).getHeight() != height) {
                     continue;
                 }
+            } else if (irecipe instanceof RecipeCharset && ((RecipeCharset) irecipe).getType() == RecipeCharset.Type.SHAPED) {
+                if (((RecipeCharset) irecipe).getWidth() != width || ((RecipeCharset) irecipe).getHeight() != height) {
+                    continue;
+                }
             } else {
-                if (noShapeless && (irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe)) {
+                if (noShapeless && (irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe
+                    || (irecipe instanceof RecipeCharset && ((RecipeCharset) irecipe).getType() == RecipeCharset.Type.SHAPELESS))) {
                     continue;
                 }
             }
