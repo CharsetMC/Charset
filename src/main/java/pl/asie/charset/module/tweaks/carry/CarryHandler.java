@@ -201,7 +201,6 @@ public class CarryHandler implements ICacheable, ICarryHandler {
             if (world.mayPlace(block.getBlock(), pos, false, facing, player)) {
                 world.setBlockState(pos, block);
                 IBlockState oldBlock = block;
-                block = null;
 
                 if (tile != null) {
                     tile.setInteger("x", pos.getX());
@@ -224,6 +223,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
                     RotationUtils.rotateAround(world, pos, EnumFacing.UP, rotCycles);
                 }
 
+                block = null;
                 IBlockState newState = world.getBlockState(pos);
 
                 if (player instanceof EntityPlayer) {
