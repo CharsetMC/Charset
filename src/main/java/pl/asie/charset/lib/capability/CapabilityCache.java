@@ -24,6 +24,12 @@ public class CapabilityCache extends TileCache {
             this.facing = facing;
         }
 
+        @Override
+        public void reload() {
+            super.reload();
+            hasBlockCaps = CapabilityHelper.blockProviders.contains(state.getBlock(), capability);
+        }
+
         @SuppressWarnings("unchecked")
         public T get() {
             if (state == null) {
@@ -45,7 +51,7 @@ public class CapabilityCache extends TileCache {
     }
 
     protected final boolean blocks, tiles, entities;
-    private boolean hasBlockCaps, hasEntityCaps;
+    protected boolean hasBlockCaps, hasEntityCaps;
 
     public CapabilityCache(World world, BlockPos pos, boolean blocks, boolean tiles, boolean entities) {
         super(world, pos);
@@ -77,7 +83,7 @@ public class CapabilityCache extends TileCache {
         if (blocks && hasBlockCaps) {
             IBlockCapabilityProvider provider = CapabilityHelper.blockProviders.get(state.getBlock(), capability);
             if (provider != null) {
-                T result = (T) provider.create(world, pos, state);
+                T result = (T) provider.create(world, pos, state, facing);
                 if (result != null) {
                     return result;
                 }

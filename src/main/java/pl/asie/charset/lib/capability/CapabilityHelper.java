@@ -92,11 +92,15 @@ public final class CapabilityHelper {
         return null;
     }
 
+    public static <T> boolean hasBlockCapability(Capability<T> capability, IBlockState state) {
+        return blockProviders.contains(state.getBlock(), capability);
+    }
+
     @SuppressWarnings("unchecked")
-    public static <T> T getBlockCapability(IBlockAccess world, BlockPos pos, IBlockState state, Capability<T> capability) {
+    public static <T> T getBlockCapability(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing facing, Capability<T> capability) {
         IBlockCapabilityProvider provider = blockProviders.get(state.getBlock(), capability);
         if (provider != null) {
-            T result = (T) provider.create(world, pos, state);
+            T result = (T) provider.create(world, pos, state, facing);
             if (result != null) {
                 return result;
             }
@@ -147,7 +151,7 @@ public final class CapabilityHelper {
         if (blocks) {
             IBlockCapabilityProvider provider = blockProviders.get(state.getBlock(), capability);
             if (provider != null) {
-                T result = (T) provider.create(world, pos, state);
+                T result = (T) provider.create(world, pos, state, facing);
                 if (result != null) {
                     return result;
                 }

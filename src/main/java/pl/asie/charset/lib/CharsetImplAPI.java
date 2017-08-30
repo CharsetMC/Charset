@@ -1,6 +1,10 @@
 package pl.asie.charset.lib;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.api.audio.AudioAPI;
@@ -12,10 +16,21 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 
 import javax.annotation.Nullable;
 
-public class CharsetImplAPI extends CharsetAPI {
+public final class CharsetImplAPI extends CharsetAPI {
 	@Override
 	public boolean isPresent() {
 		return true;
+	}
+
+	@Override
+	public <T> boolean mayHaveBlockCapability(Capability<T> capability, IBlockState state) {
+		return CapabilityHelper.hasBlockCapability(capability, state);
+	}
+
+	@Override
+	@Nullable
+	public <T> T getBlockCapability(Capability<T> capability, IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing facing) {
+		return CapabilityHelper.getBlockCapability(world, pos, state, facing, capability);
 	}
 
 	@Override

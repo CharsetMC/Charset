@@ -154,7 +154,7 @@ public class Capabilities {
 			initMultiplePants();
 		}
 
-		CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, Blocks.MOB_SPAWNER, (a, b, c) -> handler -> new CustomCarryHandlerMobSpawner(handler));
+		CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, Blocks.MOB_SPAWNER, (a, b, c, d) -> CustomCarryHandlerMobSpawner::new);
 
 		for (Block block : Block.REGISTRY) {
 			if (block instanceof BlockDoor
@@ -163,11 +163,11 @@ public class Capabilities {
 			}
 
 			if (block instanceof BlockCactus) {
-				CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, block, (a, b, c) -> handler -> new CustomCarryHandlerCactus(handler));
+				CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, block, (a, b, c, d) -> CustomCarryHandlerCactus::new);
 			}
 
 			if (block instanceof BlockChest) {
-				CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, block, (a, b, c) -> handler -> new CustomCarryHandlerChest(handler));
+				CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, block, (a, b, c, d) -> CustomCarryHandlerChest::new);
 			}
 		}
 	}

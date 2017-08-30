@@ -81,7 +81,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
 
     protected void setCustomCarryHandler(boolean emptied) {
         if (!emptied && block != null) {
-            CustomCarryHandler.Provider provider = CapabilityHelper.getBlockCapability(access, ACCESS_POS, block, Capabilities.CUSTOM_CARRY_PROVIDER);
+            CustomCarryHandler.Provider provider = CapabilityHelper.getBlockCapability(access, ACCESS_POS, block, null, Capabilities.CUSTOM_CARRY_PROVIDER);
             if (provider != null) {
                 customCarryHandler = provider.create(this);
             } else {
