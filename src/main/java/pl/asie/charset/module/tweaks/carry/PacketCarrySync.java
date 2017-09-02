@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.lib.network.Packet;
@@ -26,7 +27,7 @@ public class PacketCarrySync extends Packet {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		isSelf = buf.readBoolean();
 		if (!isSelf) {
 			dimension = buf.readInt();
@@ -53,7 +54,7 @@ public class PacketCarrySync extends Packet {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		buf.writeBoolean(isSelf);
 		if (!isSelf) {
 			buf.writeInt(player.getEntityWorld().provider.getDimension());

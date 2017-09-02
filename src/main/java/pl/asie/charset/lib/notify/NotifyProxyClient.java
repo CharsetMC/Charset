@@ -54,34 +54,35 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class NotifyProxyClient extends NotifyProxy {
     static final List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<ClientMessage>());
-    
-    {
+
+    @Override
+    public void init() {
+        super.init();
         MinecraftForge.EVENT_BUS.register(this);
         ClientCommandHandler.instance.registerCommand(new CommandPoint());
     }
 
     @Override
-    public void addMessage(Object locus, ItemStack item, String format, String... args) {
+    public void addMessage(Object locus, ItemStack item, Collection<NoticeStyle> style, ITextComponent msg) {
         synchronized (messages) {
-            addMessage0(locus, item, format, args);
+            addMessage0(locus, item, style, msg);
         }
     }
 
-    private void addMessage0(Object locus, ItemStack item, String format, String... args) {
+    private void addMessage0(Object locus, ItemStack item, Collection<NoticeStyle> style, ITextComponent cmsg) {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player == null || player.world == null) {
             return;
         }
-        ClientMessage msg = new ClientMessage(player.world, locus, item, format, args);
+        ClientMessage msg = new ClientMessage(player.world, locus, item, style, cmsg);
         if (msg.style.contains(NoticeStyle.CLEAR)) {
             messages.clear();
             if (msg.msg == null || msg.msg.equals("")) return;
@@ -105,7 +106,7 @@ public class NotifyProxyClient extends NotifyProxy {
                 m.creationTime = 0;
             }
         }
-        if (msg.msg == null || msg.msg.trim().length() == 0) {
+        if (msg.msg == null || msg.msgRendered.trim().length() == 0) {
             if (!(msg.show_item && msg.item != null)) {
                 return;
             }
@@ -210,7 +211,7 @@ public class NotifyProxyClient extends NotifyProxy {
 
     private void renderMessage(ClientMessage m, float partial, float opacity, double cx, double cy, double cz) {
         int width = 0;
-        String[] lines = m.msg.split("\n");
+        String[] lines = m.msgRendered.split("\n");
         FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
         for (String line : lines) {
             width = Math.max(width, fr.getStringWidth(line));
@@ -315,21 +316,11 @@ public class NotifyProxyClient extends NotifyProxy {
 
         GlStateManager.popMatrix();
     }
-    
+
     @Override
-    public void onscreen(String message, String[] formatArgs) {
+    public void onscreen(Collection<NoticeStyle> style, ITextComponent msg) {
         Minecraft mc = Minecraft.getMinecraft();
-        Object targs[] = new Object[formatArgs.length];
-        for (int i = 0; i < formatArgs.length; i++) {
-            targs[i] = net.minecraft.util.text.translation.I18n.translateToLocal(formatArgs[i]);
-        }
-        String msg = I18n.format(message, targs);
         mc.ingameGUI.setOverlayMessage(msg, false);
-    }
-    
-    @Override
-    public void replaceable(ITextComponent msg, int msgKey) {
-        Minecraft mc = Minecraft.getMinecraft();
-        mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(msg, msgKey);
+        // TODO: Implement some NoticeStyles (such as LONG)
     }
 }

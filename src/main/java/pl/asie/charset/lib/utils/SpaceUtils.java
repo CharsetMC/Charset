@@ -68,7 +68,6 @@ public final class SpaceUtils {
 
     // TODO: Rename?
     public static EnumFacing determineFlatOrientation(EntityLivingBase player) {
-        //stolen from BlockPistonBase.determineOrientation. It was reversed, & we handle the y-axis differently
         int var7 = MathHelper.floor((double) ((180 + player.rotationYaw) * 4.0F / 360.0F) + 0.5D) & 3;
         int r = var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
         return EnumFacing.VALUES[r];

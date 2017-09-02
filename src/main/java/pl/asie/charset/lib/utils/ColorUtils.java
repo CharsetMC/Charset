@@ -142,7 +142,6 @@ public final class ColorUtils {
 		return UNDERSCORE_DYE_SUFFIXES[color.getMetadata()];
 	}
 
-
 	public static float[] getYIQ(int c1) {
 		float r1 = ((c1 >> 16) & 0xFF) / 255.0f;
 		float g1 = ((c1 >> 8) & 0xFF) / 255.0f;

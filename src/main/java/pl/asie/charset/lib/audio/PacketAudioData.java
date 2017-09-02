@@ -20,6 +20,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -51,7 +52,7 @@ public class PacketAudioData extends Packet {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		buf.writeInt(id);
 		packet.writeData(buf);
 	}
@@ -73,8 +74,8 @@ public class PacketAudioData extends Packet {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
-		int id = buf.readInt();
+	public void readData(INetHandler handler, PacketBuffer buf) {
+		id = buf.readInt();
 		AudioPacket packet = new AudioPacket();
 		packet.readData(buf);
 	}

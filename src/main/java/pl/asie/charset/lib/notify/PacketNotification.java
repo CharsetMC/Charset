@@ -5,12 +5,18 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.lib.network.Packet;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.EnumSet;
 
 public class PacketNotification extends Packet {
 	enum Type {
@@ -18,8 +24,7 @@ public class PacketNotification extends Packet {
 		VEC3,
 		ENTITY,
 		TILEENTITY,
-		ONSCREEN,
-		REPLACEABLE;
+		ONSCREEN;
 
 		static Type[] VALUES = values();
 	}
@@ -28,10 +33,8 @@ public class PacketNotification extends Packet {
 	private BlockPos pos;
 	private Object target;
 	private ItemStack item;
-	private String msg;
-	private String[] args;
-	private ITextComponent msgComponent;
-	private int msgKey;
+	private Collection<NoticeStyle> style;
+	private ITextComponent msg;
 
 	private EntityPlayer me;
 
@@ -39,23 +42,15 @@ public class PacketNotification extends Packet {
 
 	}
 
-	public static PacketNotification createOnscreen(String message, String[] args) {
+	public static PacketNotification createOnscreen(Collection<NoticeStyle> style, ITextComponent message) {
 		PacketNotification n = new PacketNotification();
 		n.type = Type.ONSCREEN;
+		n.style = style;
 		n.msg = message;
-		n.args = args;
 		return n;
 	}
 
-	public static PacketNotification createReplaceable(ITextComponent msg, int msgKey) {
-		PacketNotification n = new PacketNotification();
-		n.type = Type.REPLACEABLE;
-		n.msgComponent = msg;
-		n.msgKey = msgKey;
-		return n;
-	}
-
-	public static PacketNotification createNotify(Object where, ItemStack item, String format, String ...args) {
+	public static PacketNotification createNotify(Object where, ItemStack item, Collection<NoticeStyle> style, ITextComponent message) {
 		PacketNotification n = new PacketNotification();
 
 		if (where instanceof NotificationCoord) {
@@ -77,13 +72,37 @@ public class PacketNotification extends Packet {
 		}
 
 		n.item = item;
-		n.msg = format;
-		n.args = args;
+		n.style = style;
+		n.msg = message;
 		return n;
 	}
 
+	private void writeStyles(PacketBuffer output) {
+		output.writeByte(style.size());
+		for (NoticeStyle s : style) {
+			output.writeByte(s.ordinal());
+		}
+	}
+
+	private void readStyles(PacketBuffer input) {
+		style = EnumSet.noneOf(NoticeStyle.class);
+		int size = input.readUnsignedByte();
+		for (int i = 0; i < size; i++) {
+			style.add(NoticeStyle.values()[input.readUnsignedByte()]);
+		}
+	}
+
+	private void readMsg(PacketBuffer input) {
+		try {
+			msg = input.readTextComponent();
+		} catch (IOException e) {
+			e.printStackTrace();
+			msg = new TextComponentString("#ERR");
+		}
+	}
+
 	@Override
-	public void readData(INetHandler handler, ByteBuf input) {
+	public void readData(INetHandler handler, PacketBuffer input) {
 		me = getPlayer(handler);
 		type = Type.VALUES[input.readByte()];
 
@@ -111,13 +130,8 @@ public class PacketNotification extends Packet {
 				target = new Vec3d(input.readDouble(), input.readDouble(), input.readDouble());
 				break;
 			case ONSCREEN:
-				msg = ByteBufUtils.readUTF8String(input);
-				args = readStrings(input);
-				return;
-			case REPLACEABLE:
-				String str = ByteBufUtils.readUTF8String(input);
-				msgKey = input.readInt();
-				msgComponent = ITextComponent.Serializer.jsonToComponent(str);
+				readStyles(input);
+				readMsg(input);
 				return;
 			default: return;
 		}
@@ -127,27 +141,24 @@ public class PacketNotification extends Packet {
 		}
 
 		item = ByteBufUtils.readItemStack(input);
-		msg = ByteBufUtils.readUTF8String(input);
-		args = readStrings(input);
+		readStyles(input);
+		readMsg(input);
 	}
 
 	@Override
 	public void apply(INetHandler handler) {
 		switch (type) {
 			case ONSCREEN:
-				NotifyImplementation.proxy.onscreen(msg, args);
-				break;
-			case REPLACEABLE:
-				NotifyImplementation.proxy.replaceable(msgComponent, msgKey);
+				NotifyImplementation.proxy.onscreen(style, msg);
 				break;
 			default:
-				NotifyImplementation.recieve(me, target, item, msg, args);
+				NotifyImplementation.recieve(me, target, item, style, msg);
 				break;
 		}
 	}
 
 	@Override
-	public void writeData(ByteBuf output) {
+	public void writeData(PacketBuffer output) {
 		output.writeByte(type.ordinal());
 
 		switch (type) {
@@ -174,39 +185,18 @@ public class PacketNotification extends Packet {
 				output.writeInt(te.getPos().getZ());
 				break;
 			case ONSCREEN:
-				ByteBufUtils.writeUTF8String(output, msg);
-				writeStrings(output, args);
-				return;
-			case REPLACEABLE:
-				String str = ITextComponent.Serializer.componentToJson(msgComponent);
-				ByteBufUtils.writeUTF8String(output, str);
-				output.writeInt(msgKey);
+				writeStyles(output);
+				output.writeTextComponent(msg);
 				return;
 		}
 
 		ByteBufUtils.writeItemStack(output, item);
-		ByteBufUtils.writeUTF8String(output, msg);
-		writeStrings(output, args);
+		writeStyles(output);
+		output.writeTextComponent(msg);
 	}
 
 	@Override
 	public boolean isAsynchronous() {
 		return true;
-	}
-
-	private static void writeStrings(ByteBuf output, String[] args) {
-		output.writeByte((byte) args.length);
-		for (String s : args) {
-			if (s == null) s = "null";
-			ByteBufUtils.writeUTF8String(output, s);
-		}
-	}
-
-	private static String[] readStrings(ByteBuf input) {
-		String[] ret = new String[input.readByte()];
-		for (int i = 0; i < ret.length; i++) {
-			ret[i] = ByteBufUtils.readUTF8String(input);
-		}
-		return ret;
 	}
 }

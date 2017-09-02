@@ -51,6 +51,8 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
@@ -735,7 +737,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         if (!world.isRemote && isNested(held) && (item.isEmpty() || itemMatch(held))) {
-            new Notice(notice_target, "notice.charset.barrel.no").sendTo(player);
+            new Notice(notice_target, new TextComponentTranslation("notice.charset.barrel.no")).sendTo(player);
             return true;
         }
 
@@ -853,7 +855,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     void info(final EntityPlayer entityplayer) {
         new Notice(notice_target, msg -> {
             if (item.isEmpty()) {
-                msg.setMessage("notice.charset.barrel.empty");
+                msg.setMessage(new TextComponentTranslation("notice.charset.barrel.empty"));
             } else {
                 String countMsg;
                 if (upgrades.contains(Upgrade.INFINITE)) {
@@ -866,7 +868,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                         countMsg = "" + count;
                     }
                 }
-                msg.withItem(item).setMessage("%s {ITEM_NAME}{ITEM_INFOS_NEWLINE}", countMsg);
+                msg.withItem(item).setMessage(new TextComponentTranslation("%1$s %2$s", new TextComponentTranslation(countMsg), new TextComponentString("{ITEM_NAME}{ITEM_INFOS}")));
             }
         }).sendTo(entityplayer);
     }

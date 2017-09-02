@@ -43,17 +43,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.CheckReturnValue;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 
 public class Notice {
     final Object where;
-    private String message;
-    private String[] messageParameters;
+    private ITextComponent message;
     private ItemStack item = ItemStack.EMPTY;
     private EnumSet<NoticeStyle> style = EnumSet.noneOf(NoticeStyle.class);
     private INoticeUpdater updater;
@@ -81,29 +82,15 @@ public class Notice {
      * </pre></code>
      * 
      * @param where
-     *            An {@link Entity}, {@link TileEntity}, {@link Vec3d},
-     *            {@link IMultipart} or {@link NotificationCoord}
+     *            An {@link Entity}, {@link TileEntity}, {@link Vec3d} or {@link NotificationCoord}
      * @param message
      *            The message to be sent.
-     * 
-     *            <p>
-     *            The message will be translated, and then the translated
-     *            message and the messageParameters will be passed through
-     *            {@link String#format(String, Object...)}. All translations happen client-side.
-     *            </p>
-     *            <p>
-     *            Newlines work as expected.
-     *            </p>
-     * @param messageParameters
-     *            The format parameters.
-     * 
      */
 
     @CheckReturnValue
-    public Notice(Object where, String message, String... messageParameters) {
+    public Notice(Object where, ITextComponent message) {
         this.where = where;
         this.message = message;
-        this.messageParameters = messageParameters;
         if (where instanceof NotificationCoord) {
             world = ((NotificationCoord) where).getWorld();
         } else if (where instanceof Entity) {
@@ -129,8 +116,7 @@ public class Notice {
      * </pre>
      * 
      * @param where
-     *            An {@link Entity}, {@link TileEntity}, {@link Vec3d},
-     *            {@link IMultipart} or {@link NotificationCoord}
+     *            An {@link Entity}, {@link TileEntity}, {@link Vec3d} or {@link NotificationCoord}
      * @param updater
      *             The {@link INoticeUpdater} object.
      * 
@@ -228,24 +214,12 @@ public class Notice {
     /**
      * Changes the message. This goes with the {@link INoticeUpdater} constructor.
      */
-    public void setMessage(String newMessage, String... newMessageParameters) {
+    public Notice setMessage(ITextComponent newMessage) {
         cmp(this.message, newMessage);
-        if (!changed && this.messageParameters != null && newMessageParameters != null) {
-            if (this.messageParameters.length != newMessageParameters.length) {
-                changed = true;
-            } else {
-                for (int i = 0; i < newMessageParameters.length; i++) {
-                    cmp(newMessageParameters[i], this.messageParameters[i]);
-                    if (changed) break;
-                }
-            }
-        } else {
-            cmp(messageParameters, newMessageParameters);
-        }
         this.message = newMessage;
-        this.messageParameters = newMessageParameters;
+        return this;
     }
-    
+
     private void cmp(Object a, Object b) {
         if (a == b) return;
         if (a != null && b != null) {
@@ -310,7 +284,7 @@ public class Notice {
         if (world == null && player != null) {
             world = player.world;
         }
-        NotifyImplementation.instance.doSend(player, where, world, style, item, message, messageParameters);
+        NotifyImplementation.instance.doSend(player, where, world, style, item, message);
         changed = false;
         changedItem = false;
         if (updater != null && !addedToRecurList) {
@@ -333,7 +307,7 @@ public class Notice {
      */
     public static void clear(EntityPlayer player) {
         NotificationCoord at = new NotificationCoord(player.world, new BlockPos(player));
-        NotifyImplementation.instance.doSend(player, at, player.world, EnumSet.of(NoticeStyle.CLEAR), null, "", emptyStringArray);
+        NotifyImplementation.instance.doSend(player, at, player.world, EnumSet.of(NoticeStyle.CLEAR), null, new TextComponentString(""));
     }
 
     /**
@@ -343,42 +317,18 @@ public class Notice {
      * 
      * @param player
      *            The player to be notified
-     * @param message
-     *            A string. The client will localize this message prior to
-     *            displaying it.
-     * @param formatArguments
-     *            Optional string arguments for a format parameter.
      */
-    public static void onscreen(EntityPlayer player, String message, String... formatArguments) {
-        NotifyImplementation.instance.doSendOnscreenMessage(player, message, formatArguments);
+    public static void onscreen(EntityPlayer player, Collection<NoticeStyle> styles, ITextComponent msg) {
+        NotifyImplementation.instance.doSendOnscreenMessage(player, styles, msg);
     }
 
     public static void title(EntityPlayer player, String title, String subtitle) {
         // NORELEASE: Implement. Just needs a little packet?
-        onscreen(player, title + " " + subtitle);
+        onscreen(player, Collections.emptySet(), new TextComponentString(title + "\n" + subtitle));
     }
 
     public static void title(EntityPlayer player, String title) {
-        onscreen(player, title);
-    }
-
-    /**
-     * Sends an updatable chat message to the player. If a message with the same msgKey is sent,
-     * then all other messages with the same key will be removed.
-     * (But it might have a problem with word-wrapping if the message is too long. By the grace of notch.) 
-     * 
-     * <code><pre>
-     * {@link TextComponentTranslation} msg = new {@link TextComponentTranslation}("mymod.currentTime", System.currentTimeMillis());
-     * Notice.chat(player, 914357, msg);
-     * </pre></code>
-     * 
-     * 
-     * @param player Who to send the message to.
-     * @param msgKey A non-zero, arbitrary, and consistent integer.
-     * @param msg The chat message to send, preferably a {@link TextComponentTranslation}
-     */
-    public static void chat(EntityPlayer player, int msgKey, ITextComponent msg) {
-        NotifyImplementation.instance.sendReplacableChatMessage(player, msg, msgKey);
+        onscreen(player, Collections.emptySet(), new TextComponentString(title));
     }
 
     boolean updateNotice() {

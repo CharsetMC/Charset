@@ -2,6 +2,7 @@ package pl.asie.charset.module.storage.barrels;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import pl.asie.charset.lib.network.PacketTile;
 
 public class PacketBarrelCountUpdate extends PacketTile {
@@ -17,13 +18,13 @@ public class PacketBarrelCountUpdate extends PacketTile {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		super.writeData(buf);
 		buf.writeInt(count);
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		super.readData(handler, buf);
 		count = buf.readInt();
 	}

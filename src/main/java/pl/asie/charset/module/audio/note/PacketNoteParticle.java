@@ -18,6 +18,7 @@ package pl.asie.charset.module.audio.note;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +37,7 @@ public class PacketNoteParticle extends PacketTile {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		super.readData(handler, buf);
 		note = buf.readByte();
 	}
@@ -51,7 +52,7 @@ public class PacketNoteParticle extends PacketTile {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		super.writeData(buf);
 		buf.writeByte(note);
 	}

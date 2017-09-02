@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import pl.asie.charset.lib.network.Packet;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 
@@ -20,7 +21,7 @@ public class PacketSetBlockMask extends Packet {
     }
 
     @Override
-    public void readData(INetHandler handler, ByteBuf buf) {
+    public void readData(INetHandler handler, PacketBuffer buf) {
         blockMask = buf.readUnsignedShort();
         heldPos = buf.readInt();
     }
@@ -37,7 +38,7 @@ public class PacketSetBlockMask extends Packet {
     }
 
     @Override
-    public void writeData(ByteBuf buf) {
+    public void writeData(PacketBuffer buf) {
         buf.writeShort(blockMask);
         buf.writeInt(heldPos);
     }

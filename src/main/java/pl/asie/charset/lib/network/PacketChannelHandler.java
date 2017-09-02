@@ -52,7 +52,7 @@ public class PacketChannelHandler extends MessageToMessageCodec<FMLProxyPacket, 
 		INetHandler iNetHandler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
 		Packet newMsg = registry.instantiatePacket(msg.payload().readUnsignedByte());
 		if (newMsg != null) {
-			newMsg.readData(iNetHandler, msg.payload());
+			newMsg.readData(iNetHandler, new PacketBuffer(msg.payload()));
 			if (newMsg.isAsynchronous()) {
 				newMsg.apply(iNetHandler);
 			} else {

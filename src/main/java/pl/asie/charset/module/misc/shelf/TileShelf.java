@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -72,7 +73,7 @@ public class TileShelf extends TileBase {
 
 			if (!handler.getStackInSlot(slotId).isEmpty()) {
 				final int sentSlotId = slotId;
-				new Notice(new Vec3d(pos).addVector(hitX, hitY, hitZ), msg -> msg.withItem(handler.getStackInSlot(sentSlotId)).setMessage("{ITEM_NAME}{ITEM_INFOS_NEWLINE}")).sendTo(player);
+				new Notice(new Vec3d(pos).addVector(hitX, hitY, hitZ), msg -> msg.withItem(handler.getStackInSlot(sentSlotId)).setMessage(new TextComponentString("{ITEM_NAME}{ITEM_INFOS_NEWLINE}"))).sendTo(player);
 
 				return true;
 			} else {

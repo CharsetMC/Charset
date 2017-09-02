@@ -18,6 +18,7 @@ package pl.asie.charset.lib.audio;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.network.Packet;
 
@@ -33,7 +34,7 @@ public class PacketAudioStop extends Packet {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		this.id = buf.readInt();
 	}
 
@@ -43,7 +44,7 @@ public class PacketAudioStop extends Packet {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		buf.writeInt(id);
 	}
 

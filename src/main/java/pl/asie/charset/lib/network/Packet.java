@@ -19,6 +19,7 @@ package pl.asie.charset.lib.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import pl.asie.charset.lib.utils.PacketUtils;
@@ -34,11 +35,11 @@ public abstract class Packet {
 		return PacketUtils.getPlayer(handler);
 	}
 
-	public abstract void readData(INetHandler handler, ByteBuf buf);
+	public abstract void readData(INetHandler handler, PacketBuffer buf);
 
 	public abstract void apply(INetHandler handler);
 
-	public abstract void writeData(ByteBuf buf);
+	public abstract void writeData(PacketBuffer buf);
 
 	public abstract boolean isAsynchronous();
 }

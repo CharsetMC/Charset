@@ -4,7 +4,9 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.lib.network.Packet;
 
@@ -43,7 +45,7 @@ public class PacketPoint extends Packet {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		player = getPlayer(handler);
 		type = Type.VALUES[buf.readByte()];
 		message = buildMessage(player, buf);
@@ -67,10 +69,10 @@ public class PacketPoint extends Packet {
 
 		switch (type) {
 			case COORD:
-				notice = new Notice(new NotificationCoord(player.world, pos), message);
+				notice = new Notice(new NotificationCoord(player.world, pos), new TextComponentString(message));
 				break;
 			case ENTITY:
-				notice = new Notice(entity, message);
+				notice = new Notice(entity, new TextComponentString(message));
 				break;
 		}
 
@@ -83,7 +85,7 @@ public class PacketPoint extends Packet {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		buf.writeByte(type.ordinal());
 		ByteBufUtils.writeUTF8String(buf, message);
 

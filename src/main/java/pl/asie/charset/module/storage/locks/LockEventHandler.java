@@ -30,6 +30,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -48,6 +49,7 @@ import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.item.FontRendererFancy;
+import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.ThreeState;
 
@@ -111,7 +113,7 @@ public class LockEventHandler {
             if (displayName == null) {
                 displayName = new TextComponentTranslation(tile.getBlockType().getUnlocalizedName() + ".name");
             }
-            player.sendStatusMessage(new TextComponentTranslation("container.isLocked", displayName), true);
+            new Notice(tile, new TextComponentTranslation("container.isLocked", displayName)).sendTo(player);
             player.getEntityWorld().playSound(player, tile.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
 

@@ -21,6 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import pl.asie.charset.lib.network.PacketEntity;
 
 public class PacketMinecartUpdate extends PacketEntity {
@@ -46,7 +47,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		super.readData(handler, buf);
 		int intCol = buf.readInt();
 		if (intCol < 0) color = null;
@@ -62,7 +63,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		super.writeData(buf);
 
 		EntityMinecart minecart = (EntityMinecart) entity;

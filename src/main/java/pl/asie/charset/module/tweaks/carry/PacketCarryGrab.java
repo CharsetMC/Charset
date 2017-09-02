@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.network.Packet;
@@ -41,7 +42,7 @@ public class PacketCarryGrab extends Packet {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		int dim = buf.readInt();
 
 		player = getPlayer(handler);
@@ -77,7 +78,7 @@ public class PacketCarryGrab extends Packet {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		buf.writeInt(world.provider.getDimension());
 		switch (type) {
 			case BLOCK:

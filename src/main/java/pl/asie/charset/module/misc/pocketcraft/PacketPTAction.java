@@ -20,6 +20,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.INetHandler;
+import net.minecraft.network.PacketBuffer;
 import pl.asie.charset.lib.network.Packet;
 
 public class PacketPTAction extends Packet {
@@ -45,7 +46,7 @@ public class PacketPTAction extends Packet {
 	}
 
 	@Override
-	public void readData(INetHandler handler, ByteBuf buf) {
+	public void readData(INetHandler handler, PacketBuffer buf) {
 		action = buf.readUnsignedByte();
 		arg = buf.readInt();
 	}
@@ -60,7 +61,7 @@ public class PacketPTAction extends Packet {
 	}
 
 	@Override
-	public void writeData(ByteBuf buf) {
+	public void writeData(PacketBuffer buf) {
 		buf.writeByte(action);
 		buf.writeInt(arg);
 	}

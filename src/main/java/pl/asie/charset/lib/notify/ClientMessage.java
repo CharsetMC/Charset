@@ -45,20 +45,23 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 
 class ClientMessage {
     World world;
     Object locus;
     ItemStack item;
-    String msg;
-    EnumSet<NoticeStyle> style;
+    ITextComponent msg;
+    String msgRendered;
+    Collection<NoticeStyle> style;
     
     long creationTime;
     long lifeTime;
@@ -67,15 +70,12 @@ class ClientMessage {
     
     static final int SHORT_TIME = 6, LONG_TIME = 11, VERY_LONG_TIME = 60;
 
-    public ClientMessage(World world, Object locus, ItemStack item, String format, String... args) {
+    public ClientMessage(World world, Object locus, ItemStack item, Collection<NoticeStyle> styles, ITextComponent msg) {
         this.world = world;
         this.locus = locus;
         this.item = item;
-        this.msg = format;
-        
-        String[] parts = msg.split("\n", 2);
-        style = NotifyImplementation.loadStyle(parts[0]);
-        msg = parts[1];
+        this.msg = msg;
+        this.style = styles;
         
         creationTime = System.currentTimeMillis();
         if (style.contains(NoticeStyle.LONG)) {
@@ -85,14 +85,14 @@ class ClientMessage {
         }
         position_important = style.contains(NoticeStyle.EXACTPOSITION);
         show_item = style.contains(NoticeStyle.DRAWITEM) && !item.isEmpty();
-        translate(args);
+        translate();
     }
     
-    void translate(String... args) {
-        msg = I18n.translateToLocal(msg);
-        msg = msg.replace("\\n", "\n");
+    void translate() {
+        msgRendered = msg.getFormattedText();
+        msgRendered = msgRendered.replace("\\n", "\n");
         
-        String item_name = "null", item_info = "", item_info_newline = "";
+        String item_name = "null";StringBuilder item_info = new StringBuilder();
         if (item != null) {
             item_name = item.getDisplayName();
             EntityPlayer player = Minecraft.getMinecraft().player;
@@ -106,26 +106,16 @@ class ClientMessage {
             boolean tail = false;
             for (String s : bits) {
                 if (tail) {
-                    item_info += "\n";
+                    item_info.append("\n");
+                } else {
+                    tail = true;
                 }
-                tail = true;
-                item_info += s;
+                item_info.append(s);
             }
-            item_info_newline = "\n" + item_info;
         }
 
-        String[] cp = new String[args.length + 3];
-        for (int i = 0; i < args.length; i++) {
-            cp[i] = I18n.translateToLocal(args[i]); // TODO
-        }
-        cp[args.length] = item_name;
-        cp[args.length + 1] = item_info;
-        cp[args.length + 2] = item_info_newline;
-        msg = msg.replace("{ITEM_NAME}", "%" + (args.length + 1) + "$s");
-        msg = msg.replace("{ITEM_INFOS}", "%" + (args.length + 2) + "$s");
-        msg = msg.replace("{ITEM_INFOS_NEWLINE}", "%" + (args.length + 3) + "$s");
-
-        msg = String.format(msg, (Object[]) cp);
+        msgRendered = msgRendered.replace("{ITEM_NAME}", item_name);
+        msgRendered = msgRendered.replace("{ITEM_INFOS}", item_info.toString());
     }
     
     static double interp(double old, double new_, float partial) {

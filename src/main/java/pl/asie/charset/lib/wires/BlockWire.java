@@ -54,30 +54,48 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
     public boolean canConnectRedstone(IBlockState blockState, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side) {
         if (blockState.getValue(REDSTONE)) {
             Wire wire = WireUtils.getAnyWire(world, pos);
-            return wire.canConnectRedstone(side);
-        } else {
-            return false;
+            if (wire != null) {
+                return wire.canConnectRedstone(side);
+            }
         }
+
+        return false;
     }
 
     @Override
     public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         if (blockState.getValue(REDSTONE)) {
             Wire wire = WireUtils.getAnyWire(blockAccess, pos);
-            return wire.getStrongPower(side);
-        } else {
-            return super.getStrongPower(blockState, blockAccess, pos, side);
+            if (wire != null) {
+                return wire.getStrongPower(side);
+            }
         }
+
+        return super.getStrongPower(blockState, blockAccess, pos, side);
     }
 
     @Override
     public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         if (blockState.getValue(REDSTONE)) {
             Wire wire = WireUtils.getAnyWire(blockAccess, pos);
-            return wire.getWeakPower(side);
-        } else {
-            return super.getWeakPower(blockState, blockAccess, pos, side);
+            if (wire != null) {
+                return wire.getWeakPower(side);
+            }
         }
+
+        return super.getWeakPower(blockState, blockAccess, pos, side);
+    }
+
+    @Override
+    public boolean shouldCheckWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        if (blockState.getValue(REDSTONE)) {
+            Wire wire = WireUtils.getAnyWire(blockAccess, pos);
+            if (wire != null) {
+                return wire.shouldCheckWeakPower(side);
+            }
+        }
+
+        return false;
     }
 
     @Nullable

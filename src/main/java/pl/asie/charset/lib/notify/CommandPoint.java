@@ -82,7 +82,7 @@ public class CommandPoint extends CommandBase {
         if (mop == null || mop.typeOfHit == RayTraceResult.Type.MISS) {
             sender.sendMessage(new TextComponentTranslation("charset.point.toofar"));
             return;
-      }
+        }
         switch (mop.typeOfHit) {
             case BLOCK:
                 CharsetLib.packet.sendToServer(PacketPoint.atCoord(mop.getBlockPos(), msg));

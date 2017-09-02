@@ -327,6 +327,10 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         return false;
     }
 
+    public boolean shouldCheckWeakPower(EnumFacing side) {
+        return false;
+    }
+
     protected boolean canConnectBlock(BlockPos pos, EnumFacing direction) {
         return false;
     }

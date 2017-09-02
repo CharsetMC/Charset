@@ -47,6 +47,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
 
 import java.util.EnumSet;
 
@@ -76,7 +77,7 @@ public class CommandMutter extends CommandBase {
         }
         String msg = Joiner.on(" ").skipNulls().join(args);
         msg = msg.replace("\\n", "\n");
-        new Notice(sender, "%s", msg).withStyle(theStyle).withItem(sendItem).sendToAll();
+        new Notice(sender, new TextComponentString(msg)).withStyle(theStyle).withItem(sendItem).sendToAll();
     }
     
     @Override

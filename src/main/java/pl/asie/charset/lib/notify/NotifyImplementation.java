@@ -57,6 +57,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.CharsetLib;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 
@@ -64,26 +65,26 @@ public class NotifyImplementation {
     @SidedProxy(modId = "charset", clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
     public static NotifyProxy proxy;
     public static NotifyImplementation instance;
-    
+
     public static void init() {
         NotifyImplementation.instance = new NotifyImplementation();
         MinecraftForge.EVENT_BUS.register(NotifyImplementation.instance);
+        proxy.init();
     }
 
     public void registerServerCommands(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandMutter());
     }
     
-    void doSend(EntityPlayer player, Object where, World world, EnumSet<NoticeStyle> style, ItemStack item, String format, String[] args) {
+    void doSend(EntityPlayer player, Object where, World world, EnumSet<NoticeStyle> style, ItemStack item, ITextComponent message) {
         if (where == null) {
             return;
         }
         if (player instanceof FakePlayer) {
             return;
         }
-        format = styleMessage(style, format);
         if ((player != null && player.world.isRemote) || FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            proxy.addMessage(where, item, format, args);
+            proxy.addMessage(where, item, style, message);
         } else {
             TargetPoint target = null;
             if (player == null) {
@@ -125,43 +126,19 @@ public class NotifyImplementation {
                     target = new TargetPoint(dimension, x, y, z, range);
                 }
             }
-            if (args == null) args = new String[0];
             if (player != null) {
-                CharsetLib.packet.sendTo(PacketNotification.createNotify(where, item, format, args), player);
+                CharsetLib.packet.sendTo(PacketNotification.createNotify(where, item, style, message), player);
             } else {
-                CharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, format, args), target);
+                CharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, style, message), target);
             }
         }
     }
     
-    public static void recieve(EntityPlayer player, Object where, ItemStack item, String styledFormat, String[] args) {
+    public static void recieve(EntityPlayer player, Object where, ItemStack item, Collection<NoticeStyle> style, ITextComponent msg) {
         if (where == null) {
             return;
         }
-        proxy.addMessage(where, item, styledFormat, args);
-    }
-    
-    String styleMessage(EnumSet<NoticeStyle> style, String format) {
-        if (style == null) {
-            return "\n" + format;
-        }
-        String prefix = "";
-        String sep = "";
-        for (NoticeStyle s : style) {
-            prefix += sep + s.toString();
-            sep = " ";
-        }
-        return prefix + "\n" + format;
-    }
-    
-    static EnumSet<NoticeStyle> loadStyle(String firstLine) {
-        EnumSet<NoticeStyle> ret = EnumSet.noneOf(NoticeStyle.class);
-        for (String s : firstLine.split(" ")) {
-            try {
-                ret.add(NoticeStyle.valueOf(s));
-            } catch (IllegalArgumentException e) {}
-        }
-        return ret;
+        proxy.addMessage(where, item, style, msg);
     }
     
     private static final ArrayList<Notice> recuring_notifications = new ArrayList<Notice>();
@@ -193,19 +170,11 @@ public class NotifyImplementation {
         }
     }
     
-    void doSendOnscreenMessage(EntityPlayer player, String message, String[] formatArgs) {
+    void doSendOnscreenMessage(EntityPlayer player, Collection<NoticeStyle> styles, ITextComponent msg) {
         if (player.world.isRemote) {
-            proxy.onscreen(message, formatArgs);
+            proxy.onscreen(styles, msg);
         } else {
-            CharsetLib.packet.sendTo(PacketNotification.createOnscreen(message, formatArgs), player);
-        }
-    }
-    
-    void sendReplacableChatMessage(EntityPlayer player, ITextComponent msg, int msgKey) {
-        if (player.world.isRemote) {
-            proxy.replaceable(msg, msgKey);
-        } else {
-            CharsetLib.packet.sendTo(PacketNotification.createReplaceable(msg, msgKey), player);
+            CharsetLib.packet.sendTo(PacketNotification.createOnscreen(styles, msg), player);
         }
     }
 }
