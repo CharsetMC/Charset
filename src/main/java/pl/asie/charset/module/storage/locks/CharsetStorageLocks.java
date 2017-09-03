@@ -91,10 +91,10 @@ public class CharsetStorageLocks {
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
-		event.getRegistry().register(masterKeyItem.setRegistryName("masterKey"));
-		event.getRegistry().register(keyItem.setRegistryName("key"));
-		event.getRegistry().register(keyringItem.setRegistryName("keyring"));
-		event.getRegistry().register(lockItem.setRegistryName("lock"));
+		RegistryUtils.register(event.getRegistry(), masterKeyItem, "masterKey");
+		RegistryUtils.register(event.getRegistry(), keyItem, "key");
+		RegistryUtils.register(event.getRegistry(), keyringItem, "keyring");
+		RegistryUtils.register(event.getRegistry(), lockItem, "lock");
 	}
 
 	@Mod.EventHandler

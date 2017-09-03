@@ -44,6 +44,8 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.ColorUtils;
@@ -75,6 +77,7 @@ public class CharsetTweakDyeAnvilItems {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SideOnly(Side.CLIENT)
 	public void onItemTooltip(ItemTooltipEvent event) {
 		NBTTagCompound compound = event.getItemStack().getTagCompound();
 		if (compound != null && compound.hasKey("display", Constants.NBT.TAG_COMPOUND)) {

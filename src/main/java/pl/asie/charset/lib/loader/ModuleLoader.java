@@ -465,6 +465,7 @@ public class ModuleLoader {
 				try {
 					pair.getValue().invoke(loadedModules.get(pair.getKey()), o);
 				} catch (Throwable t) {
+					t.printStackTrace();
 					throw new RuntimeException(t);
 				}
 			}

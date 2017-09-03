@@ -80,6 +80,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack is, World world, List list, ITooltipFlag verbose) {
         super.addInformation(is, world, list, verbose);
         CharsetStorageBarrels.barrelItem.addExtraInformation(is, world, list, verbose);

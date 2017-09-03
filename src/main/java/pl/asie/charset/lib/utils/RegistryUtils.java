@@ -57,6 +57,11 @@ public final class RegistryUtils {
 	}
 
 	public static <T extends IForgeRegistryEntry<T>> void register(IForgeRegistry<T> registry, T object, String name, CreativeTabs tab) {
+		if (object == null) {
+			ModCharset.logger.error("Trying to register null object " + name + "! This usually signifies a worse crash in Charset.");
+			return;
+		}
+
 		object.setRegistryName(new ResourceLocation(ModCharset.MODID, name));
 		registry.register(object);
 		UtilProxyCommon.proxy.setCreativeTabIfNotPresent(object, tab);

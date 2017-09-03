@@ -93,6 +93,7 @@ public class ItemDayBarrel extends ItemBlockBase {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
         super.addInformation(stack, world, tooltip, advanced);
         addExtraInformation(stack, world, tooltip, advanced);

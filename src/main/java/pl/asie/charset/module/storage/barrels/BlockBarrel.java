@@ -82,7 +82,6 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     public BlockBarrel() {
         // TODO: Adventure mode support (the Material trick doesn't work)
         super(Material.WOOD);
-        setCreativeTab(ModCharset.CREATIVE_TAB);
         setComparatorInputOverride(true);
         setHardness(2.5F);
         setHarvestLevel("axe", 0);

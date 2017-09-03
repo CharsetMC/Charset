@@ -129,7 +129,7 @@ public class ModCharset {
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
-		event.getRegistry().register(charsetIconItem.setRegistryName("icon"));
+		RegistryUtils.register(event.getRegistry(), charsetIconItem, "icon");
 	}
 
 	@Mod.EventHandler

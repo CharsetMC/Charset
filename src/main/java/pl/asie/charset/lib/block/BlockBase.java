@@ -48,6 +48,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
@@ -60,19 +61,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BlockBase extends Block {
-	private final boolean isTileProvider = this instanceof ITileEntityProvider;
+	private final boolean isTileProvider;
 	private final ISubItemProvider subItemProvider;
 	private boolean fullCube = true, opaqueCube = true, comparatorInputOverride = false;
-	private ImmutableList<ItemStack> items;
 
 	public BlockBase(Material materialIn) {
 		super(materialIn);
+		isTileProvider = this instanceof ITileEntityProvider;
 		subItemProvider = createSubItemProvider();
+		setCreativeTab(ModCharset.CREATIVE_TAB);
 	}
 
 	public BlockBase(Material materialIn, MapColor color) {
 		super(materialIn, color);
+		isTileProvider = this instanceof ITileEntityProvider;
 		subItemProvider = createSubItemProvider();
+		setCreativeTab(ModCharset.CREATIVE_TAB);
 	}
 
 	public final ISubItemProvider getSubItemProvider() {

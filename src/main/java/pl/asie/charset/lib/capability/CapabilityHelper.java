@@ -96,6 +96,7 @@ public final class CapabilityHelper {
         return blockProviders.contains(state.getBlock(), capability);
     }
 
+
     @SuppressWarnings("unchecked")
     public static <T> T getBlockCapability(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing facing, Capability<T> capability) {
         IBlockCapabilityProvider provider = blockProviders.get(state.getBlock(), capability);
@@ -110,7 +111,7 @@ public final class CapabilityHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> boolean has(World world, BlockPos pos, Capability<T> capability, EnumFacing facing, boolean blocks, boolean tiles, boolean entities) {
+    public static <T> boolean has(IBlockAccess world, BlockPos pos, Capability<T> capability, EnumFacing facing, boolean blocks, boolean tiles, boolean entities) {
         IBlockState state = world.getBlockState(pos);
 
         if (tiles && state.getBlock().hasTileEntity(state)) {
@@ -126,11 +127,13 @@ public final class CapabilityHelper {
             }
         }
 
-        if (entities && !world.isSideSolid(pos, facing, false)) {
-            List<Entity> entityList = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos));
-            for (Entity entity : entityList) {
-                if (has(capability, entity, facing))
-                    return true;
+        if (world instanceof World) {
+            if (entities && !world.isSideSolid(pos, facing, false)) {
+                List<Entity> entityList = ((World) world).getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos));
+                for (Entity entity : entityList) {
+                    if (has(capability, entity, facing))
+                        return true;
+                }
             }
         }
 
@@ -138,7 +141,7 @@ public final class CapabilityHelper {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T get(World world, BlockPos pos, Capability<T> capability, EnumFacing facing, boolean blocks, boolean tiles, boolean entities) {
+    public static <T> T get(IBlockAccess world, BlockPos pos, Capability<T> capability, EnumFacing facing, boolean blocks, boolean tiles, boolean entities) {
         IBlockState state = world.getBlockState(pos);
 
         if (tiles && state.getBlock().hasTileEntity(state)) {
@@ -158,12 +161,14 @@ public final class CapabilityHelper {
             }
         }
 
-        if (entities && !world.isSideSolid(pos, facing, false)) {
-            List<Entity> entityList = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos));
-            for (Entity entity : entityList) {
-                T result = get(capability, entity, facing);
-                if (result != null)
-                    return result;
+        if (world instanceof World) {
+            if (entities && !world.isSideSolid(pos, facing, false)) {
+                List<Entity> entityList = ((World) world).getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos));
+                for (Entity entity : entityList) {
+                    T result = get(capability, entity, facing);
+                    if (result != null)
+                        return result;
+                }
             }
         }
 
