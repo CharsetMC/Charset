@@ -41,7 +41,7 @@ public class JEIPluginBarrels implements IModPlugin {
     private static final ISubtypeRegistry.ISubtypeInterpreter interpreter = new ISubtypeRegistry.ISubtypeInterpreter() {
         @Nullable
         @Override
-        public String getSubtypeInfo(ItemStack itemStack) {
+        public String apply(ItemStack itemStack) {
             TileEntityDayBarrel barrel = new TileEntityDayBarrel();
             barrel.loadFromStack(itemStack);
             List<String> upgradeStringSet = Lists.newArrayList();

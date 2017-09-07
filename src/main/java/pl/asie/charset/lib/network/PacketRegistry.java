@@ -19,13 +19,12 @@
 
 package pl.asie.charset.lib.network;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -44,8 +43,9 @@ public class PacketRegistry {
 	private static final HashSet<String> usedChannelNames = new HashSet<>();
 
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
-	private TIntObjectMap<Class<? extends Packet>> idPacketMap = new TIntObjectHashMap<Class<? extends Packet>>();
-	private TObjectIntMap<Class<? extends Packet>> packetIdMap = new TObjectIntHashMap<Class<? extends Packet>>();
+	@SuppressWarnings("unchecked")
+	private Class<? extends Packet>[] idPacketMap = (Class<? extends Packet>[]) new Class[256];
+	private Object2IntMap<Class<? extends Packet>> packetIdMap = new Object2IntOpenHashMap<>();
 
 	public PacketRegistry(String channelName) {
 		if (channelName.length() > 20) {
@@ -67,7 +67,7 @@ public class PacketRegistry {
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("No empty constructor defined! This is a Charset bug!", e);
 		}
-		idPacketMap.put(id, packet);
+		idPacketMap[id] = packet;
 		packetIdMap.put(packet, id);
 	}
 
@@ -82,9 +82,10 @@ public class PacketRegistry {
 
 	public void sendToWatching(Packet message, World world, BlockPos pos, Entity except) {
 		WorldServer worldServer = (WorldServer) world;
-		for (EntityPlayerMP player : worldServer.getMinecraftServer().getPlayerList().getPlayers()) {
-			if (player != except && player.world.provider.getDimension() == world.provider.getDimension()) {
-				if (worldServer.getPlayerChunkMap().isPlayerWatchingChunk(player, pos.getX() >> 4, pos.getZ() >> 4)) {
+		PlayerChunkMap map = worldServer.getPlayerChunkMap();
+		for (EntityPlayer player : worldServer.playerEntities) {
+			if (player != except) {
+				if (map.isPlayerWatchingChunk((EntityPlayerMP) player, pos.getX() >> 4, pos.getZ() >> 4)) {
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
 					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
 					channels.get(Side.SERVER).writeOutbound(message);
@@ -146,7 +147,7 @@ public class PacketRegistry {
 
 	public Packet instantiatePacket(int i) {
 		try {
-			return idPacketMap.get(i).newInstance();
+			return idPacketMap[i].newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

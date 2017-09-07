@@ -1,0 +1,30 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "charset:light_jar"
+  },
+  "variants": {
+    "normal": [{}],
+    "color": {
+      "none": {},
+      "blue": {},
+      "green": {},
+      "cyan": {},
+      "red": {},
+      "magenta": {},
+      "yellow": {},
+      "white": {}
+    },
+    "facing": {
+      "up": {},
+      "down": {"x": 180},
+      "north": {"x": 90},
+      "south": {"x": 90, "y": 180},
+      "west": {"x": 90, "y": 270},
+      "east": {"x": 90, "y": 90}
+    },
+    "inventory": [{
+      "transform": "forge:default-block"
+    }]
+  }
+}

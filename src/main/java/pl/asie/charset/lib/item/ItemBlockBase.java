@@ -42,6 +42,16 @@ public class ItemBlockBase extends ItemBlock {
 	}
 
 	@Override
+	public int getMetadata(int damage) {
+		int stateCount = block.getBlockState().getValidStates().size();
+		if (stateCount > 1) {
+			return damage;
+		} else {
+			return 0;
+		}
+	}
+
+	@Override
 	@SideOnly(Side.CLIENT)
 	@Nullable
 	public FontRenderer getFontRenderer(ItemStack stack) {

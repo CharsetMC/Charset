@@ -87,10 +87,7 @@ public class CharsetMiscScaffold {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void addCustomModels(TextureStitchEvent.Pre event) {
-		ModelScaffold.scaffoldModel = RenderUtils.getModel(new ResourceLocation("charset:block/scaffold"));
-		for (ResourceLocation location : ModelScaffold.scaffoldModel.getTextures()) {
-			event.getMap().registerSprite(location);
-		}
+		ModelScaffold.scaffoldModel = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/scaffold"), event.getMap());
 	}
 
 	@SubscribeEvent

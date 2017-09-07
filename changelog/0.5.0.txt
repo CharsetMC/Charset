@@ -1,10 +1,13 @@
 * Minecraft 1.12 port.
 * Made sure to set the walking sound on Charset blocks.
 * Major improvements to Just Enough Items support.
+* Many, many bugfixes and improvements throughout the codebase.
 * Redesigned module configuration system! Should be easier to understand by users.
     * Also fixes #138 and #129
 * [audio.noteblock] Fix 1.12 compatibility, improve mod compatibility.
-* [lib] Added many useful commands!
+* [laser] New module! Adds a laser-based logic system.
+    * Please install CharsetPatches for redstone support in said laser system. Otherwise, the use might be somewhat limited for the time being.
+* [lib] Added many useful commands! See /charset (/ch) and /charsetc (/chc).
 * [lib] Blocks should now properly render landing particles.
 * [lib] Improve wire occlusion logic.
 * [lib] Wire connection updates on placement now happen near-instantenously, without the previously visible flicker effect.
@@ -45,5 +48,7 @@
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.
 * [tweak.remove.recipeUnlocks] New tweak! Beats Quark's version in that it also hides the pop-up.
 * [tweak.remove.tutorial] New tweak!
+* [tweak.shiftScroll] New tweak! Allows shift-scrolling between certain items of the same type in vanilla items.
+    * It is also configurable - see config/charset/module/lib.shiftScroll/ if this tweak is enabled!
 * [tweak.unifyColors] Temporarily removed - awaiting redesign.
 

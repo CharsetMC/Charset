@@ -40,14 +40,17 @@ public class ToolItemColor implements IItemColor {
         ItemCharsetTool.MaterialSlot slot = tintIndex == 1 ? ItemCharsetTool.MaterialSlot.HEAD : (tintIndex == 0 ? ItemCharsetTool.MaterialSlot.HANDLE : null);
         if (slot != null && stack.getItem() instanceof ItemCharsetTool) {
             ItemMaterial material = ((ItemCharsetTool) stack.getItem()).getMaterial(stack, slot);
-            ItemMaterial renderMaterial = material.getRelated("block");
-            if (renderMaterial == null) {
-                renderMaterial = material.getRelated("log");
+            // TODO: Handle material disappearance
+            if (material != null) {
+                ItemMaterial renderMaterial = material.getRelated("block");
                 if (renderMaterial == null) {
-                    renderMaterial = material;
+                    renderMaterial = material.getRelated("log");
+                    if (renderMaterial == null) {
+                        renderMaterial = material;
+                    }
                 }
+                return ColorLookupHandler.INSTANCE.getColor(renderMaterial.getStack(), RenderUtils.AveragingMode.FULL);
             }
-            return ColorLookupHandler.INSTANCE.getColor(renderMaterial.getStack(), RenderUtils.AveragingMode.FULL);
         }
         return -1;
     }

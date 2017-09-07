@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResource;
@@ -44,6 +45,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.render.CharsetFaceBakery;
+import pl.asie.charset.module.misc.scaffold.ModelScaffold;
 
 import javax.annotation.Nonnull;
 import java.awt.image.BufferedImage;
@@ -182,7 +184,7 @@ public final class RenderUtils {
 	}
 
 	public static void glColor(int color) {
-		GlStateManager.color((((color >> 16) & 0xFF) / 255.0f), (((color >> 8) & 0xFF) / 255.0f), ((color & 0xFF) / 255.0f));
+		GlStateManager.color((((color >> 16) & 0xFF) / 255.0f), (((color >> 8) & 0xFF) / 255.0f), ((color & 0xFF) / 255.0f), (((color >> 24) & 0xFF) / 255.0f));
 	}
 
 	public static float[] calculateUV(Vector3f from, Vector3f to, EnumFacing facing1) {
@@ -239,6 +241,16 @@ public final class RenderUtils {
 		}
 	}
 
+	public static IModel getModelWithTextures(ResourceLocation location, TextureMap map) {
+		IModel model = getModel(location);
+		if (model != null) {
+			for (ResourceLocation tlocation : model.getTextures()) {
+				map.registerSprite(tlocation);
+			}
+		}
+		return model;
+	}
+
 	private static int getSelectionMask(int y, int x, int z) {
 		return 1 << (y * 4 + x * 2 + z);
 	}
@@ -287,11 +299,11 @@ public final class RenderUtils {
 		EntityPlayer player = Minecraft.getMinecraft().player;
 		float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
 
-		double d0 = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
-		double d1 = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
-		double d2 = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
+		double playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
+		double playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
+		double playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
 
-		AxisAlignedBB boundingBox = box.grow(0.0020000000949949026D).offset(-d0, -d1, -d2);
+		AxisAlignedBB boundingBox = box.grow(0.0020000000949949026D).offset(-playerX, -playerY, -playerZ);
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 		GlStateManager.color(0.0F, 0.0F, 0.0F, 0.4F);

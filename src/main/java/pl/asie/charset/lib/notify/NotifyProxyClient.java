@@ -22,8 +22,11 @@ package pl.asie.charset.lib.notify;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -195,7 +198,11 @@ public class NotifyProxyClient extends NotifyProxy {
     private void renderMessage(ClientMessage m, float partial, float opacity, double cx, double cy, double cz) {
         int width = 0;
         String[] lines = m.msgRendered.split("\n");
+
         FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder worldrenderer = tessellator.getBuffer();
+
         for (String line : lines) {
             width = Math.max(width, fr.getStringWidth(line));
         }
@@ -262,14 +269,16 @@ public class NotifyProxyClient extends NotifyProxy {
             GlStateManager.disableTexture2D();
             GlStateManager.color(c, c, c, Math.min(opacity, 0.2F));
             double Z = 0.001D;
-            // TODO: Why didn't the tessellator work?
             // TODO: Use 2 tessellator + 2 draw calls to do all notice rendering
-            GL11.glBegin(GL11.GL_QUADS);
-            GL11.glVertex3d(-halfWidth - 1, -1, Z);
-            GL11.glVertex3d(-halfWidth - 1, 8 + lineHeight, Z);
-            GL11.glVertex3d(halfWidth + 1 + item_add, 8 + lineHeight, Z);
-            GL11.glVertex3d(halfWidth + 1 + item_add, -1, Z);
-            GL11.glEnd();
+
+            worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+
+            worldrenderer.pos(-halfWidth - 1, -1, Z).endVertex();
+            worldrenderer.pos(-halfWidth - 1, 8 + lineHeight, Z).endVertex();
+            worldrenderer.pos(halfWidth + 1 + item_add, 8 + lineHeight, Z).endVertex();
+            worldrenderer.pos(halfWidth + 1 + item_add, -1, Z).endVertex();
+
+            tessellator.draw();
             GlStateManager.enableTexture2D();
         }
 
@@ -290,9 +299,7 @@ public class NotifyProxyClient extends NotifyProxy {
 
                 GlStateManager.translate((float) (halfWidth + 4), -lineCount/2, 0);
                 renderItem.zLevel -= 100; // Undoes the effects of setupGuiTransform
-                GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
                 renderItem.renderItemIntoGUI(m.item, 0, 0);
-                GL11.glPopAttrib();
                 renderItem.zLevel += 100;
             }
         }

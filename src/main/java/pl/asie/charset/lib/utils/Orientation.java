@@ -20,6 +20,7 @@
 package pl.asie.charset.lib.utils;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -31,7 +32,7 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
-public enum Orientation {
+public enum Orientation implements IStringSerializable {
     FACE_DOWN_POINT_SOUTH(EnumFacing.DOWN, EnumFacing.SOUTH),
     FACE_DOWN_POINT_NORTH(EnumFacing.DOWN, EnumFacing.NORTH),
     FACE_DOWN_POINT_EAST(EnumFacing.DOWN, EnumFacing.EAST),
@@ -78,7 +79,7 @@ public enum Orientation {
     private EnumFacing[] dirRotations = new EnumFacing[EnumFacing.VALUES.length]; // Admitedly we could just use values() here. But that's ugly.
     
     private static Orientation[] valuesCache = values();
-    
+
     Orientation(EnumFacing facing, EnumFacing top) {
         this.facing = facing;
         this.top = top;
@@ -161,6 +162,10 @@ public enum Orientation {
         return null;
     }
 
+    @Override
+    public String getName() {
+        return name().toLowerCase();
+    }
     
     public Orientation rotateOnFace(int count) {
         count = count % 4;

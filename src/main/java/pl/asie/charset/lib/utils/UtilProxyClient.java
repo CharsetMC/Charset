@@ -24,6 +24,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -40,6 +41,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -109,6 +111,14 @@ public class UtilProxyClient extends UtilProxyCommon {
 		} else {
 			return DimensionManager.getWorld(dim);
 		}
+	}
+
+	@Override
+	public World getServerWorldOrDefault(World def) {
+		if (def instanceof WorldClient && Minecraft.getMinecraft().isIntegratedServerRunning()) {
+			return DimensionManager.getWorld(def.provider.getDimension());
+		}
+		return def;
 	}
 
 	@Override

@@ -39,9 +39,7 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -53,6 +51,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
@@ -337,5 +336,27 @@ public abstract class BlockBase extends Block {
 		PacketCustomBlockDust packet = new PacketCustomBlockDust(world, pos, entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.15f);
 		CharsetLib.packet.sendToDimension(packet, world.provider.getDimension());
 		return true;
+	}
+
+	@Override
+	public IBlockState withRotation(IBlockState state, Rotation rot) {
+		if (state.getPropertyKeys().contains(Properties.FACING)) {
+			return state.withProperty(Properties.FACING, rot.rotate(state.getValue(Properties.FACING)));
+		} else if (state.getPropertyKeys().contains(Properties.FACING4)) {
+			return state.withProperty(Properties.FACING4, rot.rotate(state.getValue(Properties.FACING4)));
+		} else {
+			return state;
+		}
+	}
+
+	@Override
+	public IBlockState withMirror(IBlockState state, Mirror mirror) {
+		if (state.getPropertyKeys().contains(Properties.FACING)) {
+			return state.withProperty(Properties.FACING, mirror.mirror(state.getValue(Properties.FACING)));
+		} else if (state.getPropertyKeys().contains(Properties.FACING4)) {
+			return state.withProperty(Properties.FACING4, mirror.mirror(state.getValue(Properties.FACING4)));
+		} else {
+			return state;
+		}
 	}
 }

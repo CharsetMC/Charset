@@ -99,7 +99,7 @@ public class CommandPoint extends CommandBase {
         List<Entity> list = player.world.getEntitiesWithinAABBExcludingEntity(
                 player,
                 player.getEntityBoundingBox().offset(vec31.x * d0,
-                        vec31.y * d0, vec31.z * d0).expand(
+                        vec31.y * d0, vec31.z * d0).grow(
                         (double) f1, (double) f1, (double) f1));
         double d2 = d1;
 
@@ -108,7 +108,7 @@ public class CommandPoint extends CommandBase {
 
             if (entity.canBeCollidedWith()) {
                 float f2 = entity.getCollisionBorderSize();
-                AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand(
+                AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().grow(
                         (double) f2, (double) f2, (double) f2);
                 RayTraceResult RayTraceResult = axisalignedbb
                         .calculateIntercept(vec3, vec32);

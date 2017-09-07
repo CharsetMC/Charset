@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.storage.locks;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
@@ -39,7 +40,7 @@ public class GuiKeyring extends GuiContainerCharset {
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(GENERIC_54);
 
         drawTexturedModalRect(xCenter, yCenter, 0, 0, xSize, 35);

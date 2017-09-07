@@ -19,6 +19,7 @@
 
 package pl.asie.charset;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -62,7 +63,7 @@ public class ModCharset {
 	public static final String MODID = "charset";
 	public static final String NAME = "Charset";
 	public static final String VERSION = "@VERSION@";
-	public static final String DEP_LIB = "before:jei@[4.3.0,);before:betterwithmods;before:mcmultipart";
+	public static final String DEP_LIB = "before:jei@[4.7.8,);before:betterwithmods;before:mcmultipart";
 
 	public static final boolean INDEV = ("@version@".equals(VERSION.toLowerCase()));
 
@@ -85,6 +86,10 @@ public class ModCharset {
 
 	private static File configurationDirectory;
 	private static ModFixs dataFixes;
+
+	public static File getConfigDir() {
+		return configurationDirectory;
+	}
 
 	public static File getConfigFile(String filename) {
 		return new File(configurationDirectory, filename);
@@ -183,7 +188,7 @@ public class ModCharset {
 		}
 	}
 
-	private static final Set<String> oldPrefixes = Sets.newHashSet(
+	private static final Set<String> oldPrefixes = ImmutableSet.of(
 			"charsetlib", "charsetpipes", "charsetstorage",
 			"charsetdecoration", "charsetdrama", "charsetcarts",
 			"charsettweaks", "charsetaudio", "charsetcrafting",

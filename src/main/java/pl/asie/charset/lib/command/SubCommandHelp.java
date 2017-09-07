@@ -28,8 +28,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class SubCommandHelp extends SubCommand {
-    public SubCommandHelp() {
-        super("help", Side.SERVER);
+    public SubCommandHelp(Side side) {
+        super("help", side);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class SubCommandHelp extends SubCommand {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
         if (args.length >= 1) {
-            SubCommand command = CommandCharset.SUB_COMMAND_MAP.get(args[0].toLowerCase());
+            SubCommand command = (getSide() == Side.CLIENT ? CommandCharset.CLIENT : CommandCharset.SERVER).SUB_COMMAND_MAP.get(args[0].toLowerCase());
             if (command != null && sender.canUseCommand(getPermissionLevel(), "charset")
                     && (command.getSide() == Side.SERVER || (sender.getEntityWorld() != null && sender.getEntityWorld().isRemote))) {
                 String[] usage = command.getUsage().split("\n");
@@ -56,7 +56,7 @@ public class SubCommandHelp extends SubCommand {
                 sender.sendMessage(new TextComponentTranslation("commands.generic.parameter.invalid", args[0]).setStyle(new Style().setColor(TextFormatting.RED)));
             }
         } else {
-            for (SubCommand command : CommandCharset.SUB_COMMANDS) {
+            for (SubCommand command : (getSide() == Side.CLIENT ? CommandCharset.CLIENT : CommandCharset.SERVER).SUB_COMMANDS) {
                 if (sender.canUseCommand(getPermissionLevel(), "charset")
                         && (command.getSide() == Side.SERVER || (sender.getEntityWorld() != null && sender.getEntityWorld().isRemote))) {
                     String[] usage = command.getUsage().split("\n");

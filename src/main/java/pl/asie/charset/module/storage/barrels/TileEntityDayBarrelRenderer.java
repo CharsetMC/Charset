@@ -19,6 +19,9 @@
 
 package pl.asie.charset.module.storage.barrels;
 
+import gnu.trove.impl.Constants;
+import gnu.trove.map.TCharIntMap;
+import gnu.trove.map.hash.TCharIntHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -49,6 +52,21 @@ import pl.asie.charset.lib.utils.SpaceUtils;
 import java.util.Calendar;
 
 public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileEntityDayBarrel> {
+    static final TCharIntMap fontMap = new TCharIntHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, (char) 0, -1);
+
+    static {
+        String fontIdx = "0123" +
+                "4567" +
+                "89*+" +
+                "i! c";
+
+        for (int i = 0; i < 16; i++) {
+            if (fontIdx.charAt(i) != ' ') {
+                fontMap.put(fontIdx.charAt(i), i);
+            }
+        }
+    }
+
     void doDraw(TileEntityDayBarrel barrel, ItemStack is, float partialTicks) {
         Orientation bo = barrel.orientation;
         EnumFacing face = bo.facing;
@@ -147,35 +165,35 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
                 t += r;
             }
         }
-        if (barrel.canLose()) {
-            t = "!" + t + "!";
-        }
 
         Calendar cal = CharsetLib.calendar.get();
         if (cal.get(Calendar.MONTH) == 8 && cal.get(Calendar.DAY_OF_MONTH) == 9) {
             IBlockState state = ItemUtils.getBlockState(item);
             if (state != null && (state.getMaterial() == Material.ICE || state.getMaterial() == Material.PACKED_ICE)) {
-                if (t.startsWith("9")) {
+                if (t.startsWith("9*")) {
                     t = "c" + t.substring(1);
                 }
 
-                if (t.endsWith("9")) {
+                if (t.endsWith("+9")) {
                     t = t.substring(0, t.length() - 1) + "c";
+                }
+
+                if (t.equals("9")) {
+                    t = "c";
                 }
             }
         }
+
+        if (barrel.canLose()) {
+            t = "!" + t + "!";
+        }
+
         return t;
     }
     
-    final String[] fontIdx = new String[] {
-        "0123",
-        "4567",
-        "89*+",
-        "i! c" // 'i' stands in for ∞, '!' stands in for '!!', 'c' stands in for U+2468
-    };
-    
     boolean renderItemCount(ItemStack item, TileEntityDayBarrel barrel) {
         if (!CharsetStorageBarrels.renderBarrelText) return false;
+
         final String t = getCountLabel(item, barrel);
         if (t.isEmpty()) {
             return false;
@@ -189,7 +207,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         final int len = t.length();
         final double char_width = 1.0/10.0;
         final double char_height = 1.0/10.0;
-        final Tessellator tessI = Tessellator.getInstance(); //new Tessellator(len * 4);
+        final Tessellator tessI = Tessellator.getInstance();
         BufferBuilder tess = tessI.getBuffer();
         tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F, 0);
         tess.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX); // 3 double vertex positions + 2 double UV positions
@@ -198,25 +216,16 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         double u = font.getMinU();
         double v = font.getMinV();
         for (int i = 0; i < len; i++) {
-            char c = t.charAt(i);
-            int x = 0, y = 0;
-            boolean found = false;
-            foundIdx: for (y = 0; y < fontIdx.length; y++) {
-                String idx = fontIdx[y];
-                for (x = 0; x < idx.length(); x++) {
-                    if (c == idx.charAt(x)) {
-                        found = true;
-                        break foundIdx;
-                    }
-                }
+            int ci = fontMap.get(t.charAt(i));
+            if (ci >= 0) {
+                int x = ci&3, y = ci>>2;
+                double IX = i * char_width;
+                final double dy = 1.0 - (1.0 / 256.0);
+                tess.pos(IX + char_width, 0, 0).tex(u + (x + 1) * du, v + y * dv).endVertex();
+                tess.pos(IX, 0, 0).tex(u + x * du, v + y * dv).endVertex();
+                tess.pos(IX, char_height, 0).tex(u + x * du, v + (y + dy) * dv).endVertex();
+                tess.pos(IX + char_width, char_height, 0).tex(u + (x + 1) * du, v + (y + dy) * dv).endVertex();
             }
-            if (!found) continue;
-            double IX = i*char_width;
-            final double dy = 1.0 - (1.0/256.0);
-            tess.pos(IX + char_width, 0, 0).tex(u + (x + 1) * du, v + y * dv).endVertex();
-            tess.pos(IX, 0, 0).tex(u + x * du, v + y * dv).endVertex();
-            tess.pos(IX, char_height, 0).tex(u + x * du, v + (y + dy) * dv).endVertex();
-            tess.pos(IX + char_width, char_height, 0).tex(u + (x + 1) * du, v + (y + dy) * dv).endVertex();
         }
         tessI.draw();
         tess.setTranslation(0, 0, 0);
@@ -263,15 +272,12 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             if (model.isGui3d()) {
                 RenderHelper.enableStandardItemLighting();
                 if (!model.isBuiltInRenderer()) {
-                    model = ModelTransformer.transform(model, null, 0, new ModelTransformer.IVertexTransformer() {
-                        @Override
-                        public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
-                            if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
-                                data[0] /= 1.5f;
-                                data[2] *= 1.7f;
-                            }
-                            return data;
+                    model = ModelTransformer.transform(model, null, 0, (quad, element, data) -> {
+                        if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
+                            data[0] /= 1.5f;
+                            data[2] *= 1.7f;
                         }
+                        return data;
                     });
                 }
             } else {

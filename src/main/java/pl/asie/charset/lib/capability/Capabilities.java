@@ -45,7 +45,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.carry.CustomCarryHandler;
-import pl.asie.charset.api.carry.ICarryHandler;
+import pl.asie.charset.api.laser.ILaserReceiver;
 import pl.asie.charset.api.lib.*;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.pipes.IPipeView;
@@ -54,12 +54,14 @@ import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
-import pl.asie.charset.lib.capability.audio.AudioReceiverWrapper;
+import pl.asie.charset.lib.capability.audio.AudioReceiverCombiner;
 import pl.asie.charset.lib.capability.audio.DefaultAudioReceiver;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
 import pl.asie.charset.lib.capability.impl.*;
 import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
-import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerWrapper;
+import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerCombiner;
+import pl.asie.charset.lib.capability.laser.DummyLaserReceiver;
+import pl.asie.charset.lib.capability.laser.LaserReceiverCombiner;
 import pl.asie.charset.lib.capability.lib.*;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.redstone.*;
@@ -107,6 +109,9 @@ public class Capabilities {
 	@CapabilityInject(CustomCarryHandler.Provider.class)
 	public static Capability<CustomCarryHandler.Provider> CUSTOM_CARRY_PROVIDER;
 
+	@CapabilityInject(ILaserReceiver.class)
+	public static Capability<ILaserReceiver> LASER_RECEIVER;
+
 	public static Capability.IStorage<Lockable> LOCKABLE_STORAGE = new Capability.IStorage<Lockable>() {
 		@Nullable
 		@Override
@@ -145,6 +150,8 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(Lockable.class, LOCKABLE_STORAGE, Lockable::new);
 		CapabilityManager.INSTANCE.register(IMultiblockStructure.class, DummyCapabilityStorage.get(), DefaultMultiblockStructure::new);
 
+		CapabilityManager.INSTANCE.register(ILaserReceiver.class, DummyCapabilityStorage.get(), DummyLaserReceiver::new);
+
 		CapabilityManager.INSTANCE.register(CustomCarryHandler.Provider.class, DummyCapabilityStorage.get(), () -> handler -> new CustomCarryHandler(handler));
 
 		MinecraftForge.EVENT_BUS.register(new Capabilities());
@@ -177,15 +184,17 @@ public class Capabilities {
 
 	@Optional.Method(modid = "mcmultipart")
 	private static void initMultiplePants() {
-		MultipartCapabilityHelper.registerCapabilityJoiner(AUDIO_RECEIVER, new AudioReceiverWrapper());
-		MultipartCapabilityHelper.registerCapabilityJoiner(BUNDLED_EMITTER, new BundledEmitterWrapper());
-		MultipartCapabilityHelper.registerCapabilityJoiner(REDSTONE_EMITTER, new RedstoneEmitterWrapper());
-		MultipartCapabilityHelper.registerCapabilityJoiner(BUNDLED_RECEIVER, new BundledReceiverWrapper());
-		MultipartCapabilityHelper.registerCapabilityJoiner(REDSTONE_RECEIVER, new RedstoneReceiverWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(AUDIO_RECEIVER, new AudioReceiverCombiner());
+		MultipartCapabilityHelper.registerCapabilityJoiner(BUNDLED_EMITTER, new BundledEmitterCombiner());
+		MultipartCapabilityHelper.registerCapabilityJoiner(REDSTONE_EMITTER, new RedstoneEmitterCombiner());
+		MultipartCapabilityHelper.registerCapabilityJoiner(BUNDLED_RECEIVER, new BundledReceiverCombiner());
+		MultipartCapabilityHelper.registerCapabilityJoiner(REDSTONE_RECEIVER, new RedstoneReceiverCombiner());
 
-		MultipartCapabilityHelper.registerCapabilityJoiner(AXIS_ROTATABLE, new AxisRotatableWrapper());
-		MultipartCapabilityHelper.registerCapabilityJoiner(DEBUGGABLE, new DebuggableWrapper());
-		MultipartCapabilityHelper.registerCapabilityJoiner(ITEM_INSERTION_HANDLER, new ItemInsertionHandlerWrapper());
+		MultipartCapabilityHelper.registerCapabilityJoiner(AXIS_ROTATABLE, new AxisRotatableCombiner());
+		MultipartCapabilityHelper.registerCapabilityJoiner(DEBUGGABLE, new DebuggableCombiner());
+		MultipartCapabilityHelper.registerCapabilityJoiner(ITEM_INSERTION_HANDLER, new ItemInsertionHandlerCombiner());
+
+		MultipartCapabilityHelper.registerCapabilityJoiner(LASER_RECEIVER, new LaserReceiverCombiner());
 	}
 
 	public static void registerVanillaWrappers() {

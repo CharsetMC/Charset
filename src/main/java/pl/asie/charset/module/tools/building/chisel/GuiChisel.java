@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.tools.building.chisel;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -66,13 +67,13 @@ public class GuiChisel extends GuiContainerCharset {
     protected void drawGuiContainerBackgroundLayer(float partial, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(partial, mouseX, mouseY);
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(CHISEL_GUI);
 
         drawTexturedModalRect(xCenter, yCenter, 0, 0, xSize, ySize);
         ItemStack stack = containerChisel.playerInv.getStackInSlot(containerChisel.heldPos);
         if (stack.getItem() == CharsetToolsBuilding.chisel) {
-            GL11.glColor4f(0.5F, 0.5F, 0.5F, 1.0F);
+            GlStateManager.color(0.5F, 0.5F, 0.5F, 1.0F);
             int blockMask = CharsetToolsBuilding.chisel.getBlockMask(stack);
             for (int y = 0; y < 3; y++) {
                 for (int x = 0; x < 3; x++) {
@@ -85,6 +86,6 @@ public class GuiChisel extends GuiContainerCharset {
             }
         }
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 }

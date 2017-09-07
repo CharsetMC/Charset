@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
@@ -58,5 +59,7 @@ public final class Utils {
 		return UtilProxyCommon.proxy.getLocalWorld(dim);
 	}
 
-
+	public static World getServerWorldOrDefault(World def) {
+		return UtilProxyCommon.proxy.getServerWorldOrDefault(def);
+	}
 }

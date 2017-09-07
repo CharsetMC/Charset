@@ -1,0 +1,35 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "all": "charset:blocks/laser_crystal_transparent"
+    },
+    "model": "charset:laser_crystal"
+  },
+  "variants": {
+    "normal": [{}],
+    "color": {
+      "none": {},
+      "blue": {},
+      "green": {},
+      "cyan": {},
+      "red": {},
+      "magenta": {},
+      "yellow": {},
+      "white": {}
+    },
+    "opaque": {
+      "false": {
+
+      },
+      "true": {
+        "textures": {
+          "all": "charset:blocks/laser_crystal_opaque"
+        }
+      }
+    },
+    "inventory": [{
+      "transform": "forge:default-block"
+    }]
+  }
+}

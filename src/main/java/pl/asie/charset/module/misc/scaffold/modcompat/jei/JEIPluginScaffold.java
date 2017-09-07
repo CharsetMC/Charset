@@ -38,7 +38,7 @@ public class JEIPluginScaffold implements IModPlugin {
         subtypeRegistry.registerSubtypeInterpreter(CharsetMiscScaffold.scaffoldItem, new ISubtypeRegistry.ISubtypeInterpreter() {
             @Nullable
             @Override
-            public String getSubtypeInfo(ItemStack itemStack) {
+            public String apply(ItemStack itemStack) {
                 return TileScaffold.getPlankFromNBT(itemStack.getTagCompound()).getId();
             }
         });

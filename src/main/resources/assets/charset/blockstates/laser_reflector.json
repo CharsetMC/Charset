@@ -1,0 +1,45 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "glass": "minecraft:blocks/glass_white"
+    },
+    "model": "charset:laser_reflector"
+  },
+  "variants": {
+    "normal": [{}],
+    "color": {
+      "none": {},
+      "blue": {},
+      "green": {},
+      "cyan": {},
+      "red": {},
+      "magenta": {},
+      "yellow": {},
+      "white": {}
+    },
+    "rotation": {
+      "up": {"y": 90},
+      "down": {},
+      "north": {"x": 90, "y": 180},
+      "south": {"x": 90},
+      "west": {"x": 90, "y": 90},
+      "east": {"x": 270, "y": 90}
+    },
+    "splitter": {
+      "false": {
+
+      },
+      "true": {
+        "model": "charset:laser_splitter"
+      }
+    },
+    "inventory": [{
+      "transform": "forge:default-block"
+    }],
+    "inventory_splitter": [{
+      "transform": "forge:default-block",
+      "model": "charset:laser_splitter"
+    }]
+  }
+}

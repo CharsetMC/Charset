@@ -24,6 +24,7 @@ import com.google.common.base.Suppliers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -49,14 +50,12 @@ import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.block.PacketCustomBlockDust;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.command.*;
+import pl.asie.charset.lib.handlers.*;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
-import pl.asie.charset.lib.misc.DebugInfoProvider;
-import pl.asie.charset.lib.misc.PlayerDeathHandler;
-import pl.asie.charset.lib.misc.SplashTextHandler;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.notify.PacketNotification;
@@ -65,9 +64,7 @@ import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.scheduler.Scheduler;
-import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
-import pl.asie.charset.lib.utils.DataSerializersCharset;
-import pl.asie.charset.lib.utils.UtilProxyCommon;
+import pl.asie.charset.lib.utils.*;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -159,6 +156,8 @@ public class CharsetLib {
 	public void initClient(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new SplashTextHandler());
 
+		ClientCommandHandler.instance.registerCommand(CommandCharset.CLIENT);
+
 		CommandCharset.register(new SubCommandClientCmdList("day", "Makes it day", "/time set 1200"));
 		CommandCharset.register(new SubCommandClientCmdList("night", "Makes it night", "/time set 18000"));
 		CommandCharset.register(new SubCommandClientCmdList("nice", "Makes it a sunny morning", "/time set 1200", "/weather clear"));
@@ -176,6 +175,10 @@ public class CharsetLib {
 
 		packet.registerPacket(0x20, PacketCustomBlockDust.class);
 
+		packet.registerPacket(0x30, PacketRequestScroll.class);
+
+		MinecraftForge.EVENT_BUS.register(ShiftScrollHandler.INSTANCE);
+
 		Capabilities.init();
 		DataSerializersCharset.init();
 		UtilProxyCommon.proxy.init();
@@ -187,9 +190,9 @@ public class CharsetLib {
 		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioData.class).register(AudioDataGameSound.class, AudioDataGameSound::new);
 		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioSink.class).register(AudioSinkBlock.class, AudioSinkBlock::new);
 
-		MinecraftForge.EVENT_BUS.register(CommandCharset.INSTANCE);
+		CommandCharset.register(new SubCommandHelp(Side.CLIENT));
+		CommandCharset.register(new SubCommandHelp(Side.SERVER));
 
-		CommandCharset.register(new SubCommandHelp());
 		CommandCharset.register(new SubCommandHand());
 		CommandCharset.register(new SubCommandAt());
 	}
@@ -207,7 +210,7 @@ public class CharsetLib {
 
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
-		event.registerServerCommand(CommandCharset.INSTANCE);
+		event.registerServerCommand(CommandCharset.SERVER);
 		NotifyImplementation.instance.registerServerCommands(event);
 	}
 

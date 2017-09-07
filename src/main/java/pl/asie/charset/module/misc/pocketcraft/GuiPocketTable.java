@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.misc.pocketcraft;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -91,7 +92,7 @@ public class GuiPocketTable extends GuiContainerCharset {
     protected void drawGuiContainerBackgroundLayer(float partial, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(partial, mouseX, mouseY);
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(POCKET_GUI);
 
         drawTexturedModalRect(xCenter, yCenter, 0, 0, xSize, ySize);

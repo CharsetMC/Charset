@@ -46,6 +46,7 @@ public class SubCommandSetupTestWorld extends SubCommand {
         ((EntityPlayerSP) sender).sendChatMessage("/weather clear 999999");
         ((EntityPlayerSP) sender).sendChatMessage("/time set 1200");
 
+        // TODO: FIXME - this won't work on a dedicated server!
         for (World world : server.worlds) {
             for (Entity entity : world.loadedEntityList) {
                 if (entity instanceof EntityLiving || entity instanceof EntityItem) {

@@ -104,4 +104,8 @@ public class UtilProxyCommon implements IThreadListener {
 	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed) {
 
 	}
+
+	public World getServerWorldOrDefault(World def) {
+		return def;
+	}
 }

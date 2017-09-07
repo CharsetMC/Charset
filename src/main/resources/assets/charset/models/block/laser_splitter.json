@@ -1,0 +1,22 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {
+            "rotation": {"origin": [8, 0, 8], "axis": "y", "angle": 45},
+            "from": [ 6.5, 2, 2 ],
+            "to": [ 9.5, 14, 14 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        }
+    ],
+    "textures": {
+        "particle": "#glass",
+        "glass": "#glass"
+    }
+}

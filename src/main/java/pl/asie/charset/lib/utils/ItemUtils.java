@@ -105,7 +105,16 @@ public final class ItemUtils {
 
 	public static IBlockState getBlockState(ItemStack stack) {
 		if (stack.getItem() instanceof ItemBlock) {
-			return ((ItemBlock) stack.getItem()).getBlock().getDefaultState();
+			int m = stack.getMetadata();
+			if (m >= 0 && m < 16) {
+				try {
+					return ((ItemBlock) stack.getItem()).getBlock().getStateFromMeta(stack.getMetadata());
+				} catch (Exception e) {
+					return ((ItemBlock) stack.getItem()).getBlock().getDefaultState();
+				}
+			} else {
+				return ((ItemBlock) stack.getItem()).getBlock().getDefaultState();
+			}
 		} else {
 			Block block = Block.getBlockFromItem(stack.getItem());
 			if (block == null) {

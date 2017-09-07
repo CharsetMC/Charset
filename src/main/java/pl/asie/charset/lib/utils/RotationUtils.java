@@ -39,6 +39,20 @@ public final class RotationUtils {
 
 	}
 
+	public static int getClockwiseRotationCount(Rotation rotation) {
+		switch (rotation) {
+			case NONE:
+			default:
+				return 0;
+			case CLOCKWISE_90:
+				return 1;
+			case CLOCKWISE_180:
+				return 2;
+			case COUNTERCLOCKWISE_90:
+				return 3;
+		}
+	}
+
 	private static boolean overridesWithRotation(IBlockState state) {
 		// be it X->Z->X->Z or N->E->S->W, a 90-degree rotation will probably
 		// give a result

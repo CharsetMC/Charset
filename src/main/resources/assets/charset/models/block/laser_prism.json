@@ -1,0 +1,97 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ 4, 4, 11 ],
+            "to": [ 12, 12, 12 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 4, 5, 10 ],
+            "to": [ 12, 12, 11 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 4, 6, 9 ],
+            "to": [ 12, 12, 10 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 4, 7, 8 ],
+            "to": [ 12, 12, 9 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 4, 8, 7 ],
+            "to": [ 12, 12, 8 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 4, 9, 6 ],
+            "to": [ 12, 12, 7 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 4, 10, 5 ],
+            "to": [ 12, 12, 6 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 4, 11, 4 ],
+            "to": [ 12, 12, 5 ],
+            "faces": {
+                "down":  { "texture": "#glass", "tintindex": 0 },
+                "up":    { "texture": "#glass", "tintindex": 0 },
+                "north": { "texture": "#glass", "tintindex": 0 },
+                "south": { "texture": "#glass", "tintindex": 0 },
+                "west":  { "texture": "#glass", "tintindex": 0 },
+                "east":  { "texture": "#glass", "tintindex": 0 }
+            }
+        }
+    ],
+    "textures": {
+        "particle": "minecraft:blocks/glass_white",
+        "glass": "minecraft:blocks/glass_white"
+    }
+}

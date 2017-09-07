@@ -24,6 +24,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class SubCommand {
@@ -55,6 +56,10 @@ public abstract class SubCommand {
 
     public int getPermissionLevel() {
         return 4;
+    }
+
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args) {
+        return Collections.emptyList();
     }
 
     public abstract String getUsage();

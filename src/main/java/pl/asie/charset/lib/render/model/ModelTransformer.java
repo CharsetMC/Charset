@@ -30,26 +30,37 @@ import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 
+import javax.annotation.Nullable;
+import java.util.function.Function;
+
 public final class ModelTransformer {
      private ModelTransformer() {
 
      }
 
      public static IBakedModel transform(IBakedModel model, IBlockState state, long rand, IVertexTransformer transformer) {
+         return transform(model, state, rand, transformer, null);
+     }
+
+     public static IBakedModel transform(IBakedModel model, IBlockState state, long rand, IVertexTransformer transformer, @Nullable Function<BakedQuad, VertexFormat> format) {
          SimpleBakedModel out = new SimpleBakedModel(model);
 
          for (int i = 0; i <= 6; i++) {
              EnumFacing side = (i == 6 ? null : EnumFacing.getFront(i));
              for (BakedQuad quad : model.getQuads(state, side, rand)) {
-                 out.addQuad(side, transform(quad, transformer));
+                 out.addQuad(side, transform(quad, transformer, format));
              }
          }
 
          return out;
      }
 
-     public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) {
-         VertexFormat format = quad.getFormat();
+    public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) {
+         return transform(quad, transformer, null);
+    }
+
+     public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer, @Nullable Function<BakedQuad, VertexFormat> format2) {
+         VertexFormat format = format2 != null ? format2.apply(quad) : quad.getFormat();
          UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
          LightUtil.putBakedQuad(new VertexTransformerWrapper(builder, quad, transformer), quad);
          return builder.build();
