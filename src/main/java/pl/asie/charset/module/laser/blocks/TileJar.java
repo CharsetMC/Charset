@@ -44,6 +44,7 @@ public class TileJar extends TileBase /* implements ILightProvider */ {
 	private LaserColor[] colors = new LaserColor[6];
 	private LaserColor outputColor = LaserColor.NONE;
 	private LaserSource source;
+	private EnumFacing jarFacing;
 
 	private void recalculateOutputColor() {
 		LaserColor newOutputColor = LaserColor.NONE;
@@ -94,12 +95,16 @@ public class TileJar extends TileBase /* implements ILightProvider */ {
 	}
 
 	public EnumFacing getJarFacing() {
-		return world.getBlockState(pos).getValue(Properties.FACING);
+		if (jarFacing == null) {
+			jarFacing = world.getBlockState(pos).getValue(Properties.FACING);
+		}
+		return jarFacing;
 	}
 
 	public void updateRotations() {
 		IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() == CharsetLaser.blockJar) {
+			this.jarFacing = null;
 			recalculateOutputColor();
 			CharsetLaser.laserStorage.markLaserForUpdate(TileJar.this, getJarFacing());
 		} else {

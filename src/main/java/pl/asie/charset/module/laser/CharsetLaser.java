@@ -19,7 +19,11 @@
 
 package pl.asie.charset.module.laser;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.BlockPistonExtension;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -34,8 +38,8 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
-import pl.asie.charset.lib.capability.laser.DummyLaserReceiver;
 import pl.asie.charset.lib.command.CommandCharset;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 import pl.asie.charset.lib.item.ItemBlockBase;
@@ -48,6 +52,9 @@ import pl.asie.charset.api.laser.LaserColor;
 import pl.asie.charset.module.laser.blocks.*;
 import pl.asie.charset.module.laser.system.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @CharsetModule(
         name = "laser",
         description = "Lasers!",
@@ -55,11 +62,13 @@ import pl.asie.charset.module.laser.system.*;
 )
 public class CharsetLaser {
     public static final PropertyEnum<LaserColor> LASER_COLOR = PropertyEnum.create("color", LaserColor.class);
+    public static final Set<Block> BLOCKING_BLOCKS = new HashSet<>();
 
     @CapabilityInject(LaserSource.class)
     public static Capability<LaserSource> LASER_SOURCE;
     @CapabilityInject(ILaserReceiver.class)
     public static Capability<ILaserReceiver> LASER_RECEIVER;
+
     public static final int[] LASER_COLORS = {
             0x00000000,
             0xBF0000FF,
@@ -132,6 +141,18 @@ public class CharsetLaser {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        for (Block b : ForgeRegistries.BLOCKS) {
+            if (b instanceof BlockPistonBase || b instanceof BlockPistonExtension) {
+                BLOCKING_BLOCKS.add(b);
+            }
+        }
+
+        // Small optimization - these always block, no need to check the TE
+        BLOCKING_BLOCKS.add(blockCrystal);
+        BLOCKING_BLOCKS.add(blockJar);
+        BLOCKING_BLOCKS.add(blockReflector);
+        BLOCKING_BLOCKS.add(blockPrism);
+
         RegistryUtils.register(TileCrystal.class, "laser_crystal");
         RegistryUtils.register(TileReflector.class, "laser_reflector");
         RegistryUtils.register(TileJar.class, "light_jar");

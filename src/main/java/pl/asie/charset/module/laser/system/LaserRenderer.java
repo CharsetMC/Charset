@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.laser.system;
 
+import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.EnumFaceDirection;
@@ -30,6 +31,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -39,9 +41,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+import pl.asie.charset.lib.utils.MathUtils;
 import pl.asie.charset.module.laser.CharsetLaser;
 
-import java.util.Collection;
+import java.util.*;
 
 public class LaserRenderer {
 	private static final float THICKNESS = 0.5f;
@@ -92,27 +95,54 @@ public class LaserRenderer {
 		worldrenderer.setTranslation(-cameraX, -cameraY, -cameraZ);
 		worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-		for (LaserBeam beam : beams) {
-			Vec3d startVec = new Vec3d(beam.getStart()).addVector(8/16.0, 8/16.0, 8/16.0);
-			Vec3d endVec = beam.calculateEndpoint();
+		Collection<LaserBeam> beamsRender = beams;
+		if (Minecraft.getMinecraft().gameSettings.fancyGraphics) {
+			List<LaserBeam> beamList = new ArrayList<>();
+			for (LaserBeam beam : beams) {
+				beam.vcstart = beam.calculateStartpoint();
+				beam.vcend = beam.calculateEndpoint();
+
+				if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(beam.vcstart.subtract(THICKNESS / 16.0, THICKNESS / 16.0, THICKNESS / 16.0), beam.vcend.addVector(THICKNESS / 16.0, THICKNESS / 16.0, THICKNESS / 16.0)))) {
+					continue;
+				}
+
+				beamList.add(beam);
+			}
+
+			Vec3d vp = new Vec3d(cameraX, cameraY, cameraZ);
+			beamList.sort((first, second) -> -Float.compare(MathUtils.linePointDistance(first.vcstart, first.vcend, vp), MathUtils.linePointDistance(second.vcstart, second.vcend, vp)));
+
+			beamsRender = beamList;
+		}
+
+		for (LaserBeam beam : beamsRender) {
+			if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
+				beam.vcstart = beam.calculateStartpoint();
+				beam.vcend = beam.calculateEndpoint();
+			}
+
+			Vec3d startVec = beam.vcstart;
+			Vec3d endVec = beam.vcend;
 
 			if (beam.getStart().getX() == beam.getEnd().getX()) {
-				startVec = startVec.addVector(-THICKNESS/16.0, 0, 0);
-				endVec = endVec.addVector(THICKNESS/16.0, 0, 0);
+				startVec = startVec.addVector(-THICKNESS / 16.0, 0, 0);
+				endVec = endVec.addVector(THICKNESS / 16.0, 0, 0);
 			}
 
 			if (beam.getStart().getY() == beam.getEnd().getY()) {
-				startVec = startVec.addVector(0, -THICKNESS/16.0, 0);
-				endVec = endVec.addVector(0, THICKNESS/16.0, 0);
+				startVec = startVec.addVector(0, -THICKNESS / 16.0, 0);
+				endVec = endVec.addVector(0, THICKNESS / 16.0, 0);
 			}
 
 			if (beam.getStart().getZ() == beam.getEnd().getZ()) {
-				startVec = startVec.addVector(0, 0, -THICKNESS/16.0);
-				endVec = endVec.addVector(0, 0, THICKNESS/16.0);
+				startVec = startVec.addVector(0, 0, -THICKNESS / 16.0);
+				endVec = endVec.addVector(0, 0, THICKNESS / 16.0);
 			}
 
-			if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(startVec, endVec))) {
-				continue;
+			if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
+				if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(startVec, endVec))) {
+					continue;
+				}
 			}
 
 			renderedLasers++;

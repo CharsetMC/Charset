@@ -20,6 +20,7 @@
 package pl.asie.charset.module.laser.system;
 
 import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -31,6 +32,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.Utils;
 import pl.asie.charset.module.laser.CharsetLaser;
@@ -54,6 +56,7 @@ public final class LaserBeam {
 	private final @Nonnull EnumFacing direction;
 	private int length;
 
+	protected Vec3d vcstart, vcend;
 	private boolean isAdded, isValidated;
 
 	public LaserBeam(@Nonnull TileEntity tile, @Nonnull EnumFacing facing, @Nonnull LaserColor color) {
@@ -108,14 +111,16 @@ public final class LaserBeam {
 		if (updates) {
 			// System.out.println("ADD " + toString());
 
-			TileEntity tile = world.getTileEntity(end);
-			if (tile != null && tile.hasCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite())) {
-				ILaserReceiver receiver = tile.getCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite());
-				if (receiver != null) {
-					receiver.onLaserUpdate(color);
+			if (!start.equals(end)) {
+				TileEntity tile = world.getTileEntity(end);
+				if (tile != null && tile.hasCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite())) {
+					ILaserReceiver receiver = tile.getCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite());
+					if (receiver != null) {
+						receiver.onLaserUpdate(color);
+					}
+				} else if (CharsetPatchwork.LASER_REDSTONE) {
+					world.neighborChanged(end, Blocks.AIR, end.offset(direction.getOpposite()));
 				}
-			} else if (CharsetPatchwork.LASER_REDSTONE) {
-				world.neighborChanged(end, Blocks.AIR, end.offset(direction.getOpposite()));
 			}
 		}
 
@@ -129,20 +134,26 @@ public final class LaserBeam {
 		if (updates) {
 			// System.out.println("DEL " + toString());
 
-			TileEntity tile = world.getTileEntity(end);
-			if (tile != null && tile.hasCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite())) {
-				ILaserReceiver receiver = tile.getCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite());
-				if (receiver != null) {
-					receiver.onLaserUpdate(LaserColor.NONE);
+			if (!start.equals(end)) {
+				TileEntity tile = world.getTileEntity(end);
+				if (tile != null && tile.hasCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite())) {
+					ILaserReceiver receiver = tile.getCapability(CharsetLaser.LASER_RECEIVER, direction.getOpposite());
+					if (receiver != null) {
+						receiver.onLaserUpdate(LaserColor.NONE);
+					}
+				} else if (CharsetPatchwork.LASER_REDSTONE) {
+					world.neighborChanged(end, Blocks.AIR, end.offset(direction.getOpposite()));
 				}
-			} else if (CharsetPatchwork.LASER_REDSTONE) {
-				world.neighborChanged(end, Blocks.AIR, end.offset(direction.getOpposite()));
 			}
 		}
 	}
 
 	public boolean isAddedToWorld() {
 		return isAdded;
+	}
+
+	protected final Vec3d calculateStartpoint() {
+		return new Vec3d(start.getX() + 0.5, start.getY() + 0.5, start.getZ() + 0.5);
 	}
 
 	protected final Vec3d calculateEndpoint() {
@@ -173,6 +184,8 @@ public final class LaserBeam {
 
 	private final boolean isBlocker(Chunk chunk, BlockPos pos) {
 		IBlockState state = chunk.getBlockState(pos);
+
+		// Quickies: air always lets through, opaque cubes never let through. Simple!
 		if (state.getBlock().isAir(state, world, pos)) {
 			return false;
 		}
@@ -181,21 +194,26 @@ public final class LaserBeam {
 			return true;
 		}
 
-		if (state.getBlock() instanceof BlockPistonBase) {
+		// Check the blacklist
+		if (CharsetLaser.BLOCKING_BLOCKS.contains(state.getBlock())) {
 			return true;
 		}
 
-		if (state.getLightOpacity(world, pos) >= 128) {
+		// If block is opaque...
+		if (state.getLightOpacity(world, pos) >= 192 /* out of 255 */) {
+			// ...and a full cube, nope out
 			if (state.isFullCube()) {
 				return true;
 			}
 
+			// ...and has a blocking shape, nope out
 			BlockFaceShape shapeA = state.getBlockFaceShape(world, pos, direction);
 			BlockFaceShape shapeB = state.getBlockFaceShape(world, pos, direction.getOpposite());
 			if ((shapeA != BlockFaceShape.BOWL && shapeA != BlockFaceShape.UNDEFINED)
 					|| (shapeB != BlockFaceShape.BOWL && shapeB != BlockFaceShape.UNDEFINED)) {
 				return true;
 			}
+			return true;
 		}
 
 		if (state.getBlock().hasTileEntity(state)) {

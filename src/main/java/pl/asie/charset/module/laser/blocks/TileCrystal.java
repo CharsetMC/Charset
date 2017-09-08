@@ -22,8 +22,10 @@ package pl.asie.charset.module.laser.blocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.module.laser.CharsetLaser;
@@ -58,10 +60,10 @@ public class TileCrystal extends TileLaserSourceBase {
 		return new LaserSource(this) {
 			@Override
 			public void updateBeam() {
-				LaserColor c = colors[i];
-				if (hitMask != 0) {
-					// c = c.intersection(color);
-					c = LaserColor.NONE;
+				LaserColor c = LaserColor.NONE;
+				if (hitMask == 0) {
+					//c = colors[i].union(colors[i ^ 1]);
+					c = colors[i];
 				}
 
 				if (c == LaserColor.NONE) {
@@ -92,9 +94,6 @@ public class TileCrystal extends TileLaserSourceBase {
 		}
 
 		if (force) {
-			if (facing != null) {
-				newColors[facing.ordinal()] = colorHit;
-			}
 			// System.out.println("queuing update " + pos);
 			if (updateQueued != world.getTotalWorldTime()) {
 				// System.out.println("queued");
@@ -109,6 +108,17 @@ public class TileCrystal extends TileLaserSourceBase {
 						for (EnumFacing facing2 : EnumFacing.VALUES) {
 							colors[facing2.ordinal()] = newColors[facing2.ordinal()];
 							CharsetLaser.laserStorage.markLaserForUpdate(TileCrystal.this, facing2);
+						}
+
+						for (int i = 0; i < 6; i++) {
+							receivers[i].onLaserUpdate(colors[i ^ 1]);
+						}
+
+						// rapid change detection
+						if (hitMask != newHitMask) {
+							((WorldServer) world).spawnParticle(EnumParticleTypes.SMOKE_NORMAL, false,
+									pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+									1, 0.1D, 0.1D, 0.1D, 0.05D);
 						}
 					}
 				});
@@ -130,24 +140,36 @@ public class TileCrystal extends TileLaserSourceBase {
 		for (int i = 0; i < 6; i++) {
 			final int _i = i;
 			newColors[i] = LaserColor.NONE;
-			receivers[i] = new ILaserReceiver() {
-				@Override
-				public void onLaserUpdate(LaserColor colorHit) {
-					IBlockState oldState = world.getBlockState(pos);
-					color = oldState.getValue(CharsetLaser.LASER_COLOR);
+			receivers[i] = colorHit -> {
+				IBlockState oldState = world.getBlockState(pos);
+				color = oldState.getValue(CharsetLaser.LASER_COLOR);
 
+	     		if (hitMask == 0) {
+					if (((colorHit.ordinal() | newColors[_i].ordinal()) & TileCrystal.this.color.ordinal()) == TileCrystal.this.color.ordinal()) {
+						newHitMask |= (3 << (_i & 6));
+					} else {
+						newHitMask &= ~(3 << (_i & 6));
+					}
+				} else {
 					if ((colorHit.ordinal() & TileCrystal.this.color.ordinal()) == TileCrystal.this.color.ordinal()) {
 						newHitMask |= (1 << _i);
 					} else {
 						newHitMask &= ~(1 << _i);
 					}
+		        }
 
-					if (newColors[_i ^ 1] != colorHit) {
-						newColors[_i ^ 1] = colorHit;
-						updateOpacity(EnumFacing.getFront(_i ^ 1), oldState, colorHit, false);
-					} else {
-						updateOpacity(null, oldState, colorHit,false);
+				// Uncomment for combining lasers
+					/* LaserColor combined = LaserColor.NONE;
+					for (int i = 0; i < 6; i++) {
+						combined = combined.union(newColors[i]);
 					}
+					newHitMask = (combined.union(color) == combined) ? 1 : 0; */
+
+				if (newColors[_i ^ 1] != colorHit) {
+					newColors[_i ^ 1] = colorHit;
+					updateOpacity(EnumFacing.getFront(_i ^ 1), oldState, colorHit, false);
+				} else {
+					updateOpacity(null, oldState, colorHit, false);
 				}
 			};
 		}

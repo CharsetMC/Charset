@@ -19,6 +19,9 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+
 public final class MathUtils {
     private MathUtils() {
 
@@ -26,5 +29,12 @@ public final class MathUtils {
 
     public static float interpolate(float a, float b, float amount) {
         return (a * (1.0f - amount) + b * amount);
+    }
+
+    public static float linePointDistance(Vec3d lineStart, Vec3d lineEnd, Vec3d point) {
+        Vec3d first = lineStart.subtract(point);
+        Vec3d second = lineEnd.subtract(point);
+
+        return MathHelper.sqrt(first.crossProduct(second).lengthSquared()) / MathHelper.sqrt(second.lengthSquared());
     }
 }
