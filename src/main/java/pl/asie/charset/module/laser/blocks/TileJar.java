@@ -43,8 +43,8 @@ import pl.asie.charset.module.laser.system.LaserSource;
 
 import javax.annotation.Nullable;
 
-@Optional.Interface(modid = "mirage", iface = "com.elytradev.mirage.lighting.IColoredLight")
-public class TileJar extends TileBase implements IColoredLight {
+// @Optional.Interface(modid = "mirage", iface = "com.elytradev.mirage.lighting.IColoredLight")
+public class TileJar extends TileBase /* implements IColoredLight */ {
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private LaserColor[] colors = new LaserColor[6];
 	private LaserColor outputColor = LaserColor.NONE;
@@ -208,12 +208,12 @@ public class TileJar extends TileBase implements IColoredLight {
 		updateRotations();
 	}
 
-	@Nullable
+	/* @Nullable
 	@Override
 	@Optional.Method(modid = "mirage")
 	@SideOnly(Side.CLIENT)
 	public Light getColoredLight() {
 		int c = CharsetLaser.LASER_COLORS[outputColor.ordinal()];
 		return Light.builder().pos(pos).color(c, false).radius(1.0f).intensity(1.0f).build();
-	}
+	} */
 }

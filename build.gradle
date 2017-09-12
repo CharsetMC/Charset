@@ -40,12 +40,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.1-14.22.0.2474"
+	version = "1.12.1-14.22.1.2478"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20170906"
+	mappings = "snapshot_20170912"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -99,10 +99,10 @@ configurations {
 
 dependencies {
 	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.2.2_38"
-	deobfCompile "mezz.jei:jei_1.12.1:4.7.8.92"
+	deobfCompile "mezz.jei:jei_1.12.1:4.7.8.95"
 	deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.12-1.4.0-143"
 	deobfCompile name: "Baubles", version: "1.12-1.4.5"
-	deobfCompile "elucent:albedo:2.0-SNAPSHOT"
+	deobfCompile "com.elytradev:mirage:2.0.2-SNAPSHOT"
 	deobfCompile "com.elytradev:probedataproviderapi:MC1.12_ver1.1.1"
 	deobfCompile "li.cil.oc:OpenComputers:MC1.12-1.7.+:api"
 	deobfCompile "li.cil.tis3d:TIS-3D:MC1.12-1.2.+:api"
