@@ -41,7 +41,7 @@ public class TileCrystal extends TileLaserSourceBase {
 	private ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private LaserColor color;
 	private long updateQueued = -1;
-	private int hitMask, newHitMask;
+	private int hitMask = 0, newHitMask = 0;
 
 	public TileCrystal() {
 	}

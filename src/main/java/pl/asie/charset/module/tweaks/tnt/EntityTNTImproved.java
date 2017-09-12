@@ -66,7 +66,6 @@ public class EntityTNTImproved extends EntityTNTPrimed {
         if (this.isEntityInvulnerable(source)) {
             return false;
         } else {
-            this.setBeenAttacked();
             Entity entity = source.getImmediateSource(); // TODO: Correct?
 
             if (entity != null) {
@@ -85,6 +84,8 @@ public class EntityTNTImproved extends EntityTNTPrimed {
                 } else {
                     this.knockBack(entity, 0.4F, d1, d0);
                 }
+
+                this.markVelocityChanged();
             }
 
             return true;

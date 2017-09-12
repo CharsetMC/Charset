@@ -21,13 +21,21 @@ package pl.asie.charset.module.misc.scaffold;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -95,5 +103,37 @@ public class CharsetMiscScaffold {
 	public void onPostBake(ModelBakeEvent event) {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:scaffold", "normal"), ModelScaffold.INSTANCE);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:scaffold", "inventory"), ModelScaffold.INSTANCE);
+	}
+
+	@SubscribeEvent
+	public void onBlockRightClick(PlayerInteractEvent.RightClickBlock event) {
+		EnumHand hand = event.getHand();
+		EnumFacing facing = event.getFace();
+		EntityPlayer playerIn = event.getEntityPlayer();
+
+		if (hand != EnumHand.MAIN_HAND) return;
+		if (facing == null || facing.getAxis() == EnumFacing.Axis.Y) return;
+		if (playerIn.isSneaking()) return;
+
+		World worldIn = event.getWorld();
+		BlockPos pos = event.getPos();
+
+		ItemStack stack = playerIn.getHeldItem(hand);
+		if (!stack.isEmpty() && stack.getItem() instanceof ItemScaffold) {
+			if (worldIn.getBlockState(pos).getBlock() instanceof BlockScaffold) {
+				event.setCanceled(true);
+
+				for (int overhang = 1; overhang < BlockScaffold.MAX_OVERHANG; overhang++) {
+					BlockPos targetPos = new BlockPos(pos.getX(), pos.getY() + overhang, pos.getZ());
+					if (worldIn.isValid(targetPos) && stack.getItem().onItemUse(playerIn, worldIn, targetPos, hand, EnumFacing.DOWN, 0.5f, 0.0f, 0.5f) == EnumActionResult.SUCCESS) {
+						return;
+					}
+
+					if (worldIn.isAirBlock(targetPos)) {
+						return;
+					}
+				}
+			}
+		}
 	}
 }

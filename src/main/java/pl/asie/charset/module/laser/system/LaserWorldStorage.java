@@ -22,6 +22,7 @@ package pl.asie.charset.module.laser.system;
 import com.google.common.collect.*;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.map.TLongIntMap;
+import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import gnu.trove.set.hash.TLongHashSet;
 import it.unimi.dsi.fastutil.longs.*;
@@ -190,7 +191,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 		}
 	};
 
-	private final Long2IntMap endpointLocations = new Long2IntOpenHashMap();
+	private final Long2ObjectOpenHashMap<Set<ILaserEndpoint>> endpoints = new Long2ObjectOpenHashMap<>();
 	private final LongSet validatedLasers = new LongOpenHashSet();
 	private final LongSet chunksToRescan = new LongOpenHashSet();
 	private final Queue<BlockPos> newLasersQueue = new ArrayDeque<>();
@@ -222,7 +223,40 @@ public class LaserWorldStorage implements IWorldEventListener {
 			throw new RuntimeException("Endpoint functionality not enabled! Please report to mod author.");
 		}
 
-		return (endpointLocations.get(pos.toLong()) & (1 << facing.ordinal())) != 0;
+		Set<ILaserEndpoint> set = endpoints.get(pos.toLong());
+		if (set != null) {
+			EnumFacing direction = facing;
+			for (ILaserEndpoint endpoint : set) {
+				if (endpoint.getDirection() == direction)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	protected void addEndpoint(ILaserEndpoint endpoint) {
+		if (CharsetPatchwork.LASER_REDSTONE) {
+			long k = endpoint.getPos().toLong();
+			Set<ILaserEndpoint> set = endpoints.get(k);
+			if (set == null) {
+				set = new HashSet<>();
+				endpoints.put(k, set);
+			}
+			set.add(endpoint);
+		}
+	}
+
+	protected void removeEndpoint(ILaserEndpoint endpoint) {
+		if (CharsetPatchwork.LASER_REDSTONE) {
+			long k = endpoint.getPos().toLong();
+			Set<ILaserEndpoint> set = endpoints.get(k);
+			if (set != null && set.remove(endpoint)) {
+				if (set.isEmpty()) {
+					endpoints.remove(k);
+				}
+			}
+		}
 	}
 
 	public Collection<LaserBeam> getLaserBeams() {
@@ -357,13 +391,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 	public boolean add(LaserBeam beam) {
 		if (laserBeamView.add(beam)) {
 			if (updates && (CharsetPatchwork.LASER_REDSTONE)) {
-				long key = beam.getEnd().toLong();
-				int v = endpointLocations.get(key);
-				int nv = v | (1 << beam.getDirection().ordinal());
-				if (v == nv) {
-					ModCharset.logger.warn("Two beams hitting same spot! Weird...");
-				}
-				endpointLocations.put(key, nv);
+				addEndpoint(beam);
 			}
 			beam.onAdd(updates);
 			return true;
@@ -376,13 +404,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 		if (alreadyRemoved || laserBeamView.remove(beam)) {
 			if (updates) {
 				if (CharsetPatchwork.LASER_REDSTONE) {
-					long key = beam.getEnd().toLong();
-					int v = endpointLocations.get(key);
-					int nv = v & (~(1 << beam.getDirection().ordinal()));
-					if (v == nv) {
-						ModCharset.logger.warn("Two beams leaving same spot! Weird...");
-					}
-					endpointLocations.put(key, nv);
+					removeEndpoint(beam);
 				}
 				int cx1 = beam.getStart().getX() >> 4;
 				int cz1 = beam.getStart().getZ() >> 4;

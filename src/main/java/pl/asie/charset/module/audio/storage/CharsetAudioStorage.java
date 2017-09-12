@@ -19,24 +19,34 @@
 
 package pl.asie.charset.module.audio.storage;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.tape.IDataStorage;
+import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.audio.storage.system.DataStorage;
 import pl.asie.charset.module.audio.storage.system.DataStorageCapStorage;
 import pl.asie.charset.module.audio.storage.system.DataStorageManager;
 
+import java.io.IOException;
 import java.util.List;
 
 @CharsetModule(
@@ -48,7 +58,13 @@ public class CharsetAudioStorage {
     @CapabilityInject(IDataStorage.class)
     public static Capability<IDataStorage> DATA_STORAGE;
 
+    @CharsetModule.PacketRegistry
+    public static PacketRegistry packet;
+
     public static DataStorageManager storageManager;
+
+    public static BlockRecordPlayer blockRecordPlayer;
+    public static Item itemRecordPlayer;
     public static ItemQuartzDisc quartzDisc;
 
     public static void addTimeToTooltip(List<String> tooltip, int mins, int secs) {
@@ -61,20 +77,63 @@ public class CharsetAudioStorage {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        storageManager = new DataStorageManager();
         CapabilityManager.INSTANCE.register(IDataStorage.class, new DataStorageCapStorage(), DataStorage.class);
 
+        blockRecordPlayer = new BlockRecordPlayer();
+        itemRecordPlayer = new ItemBlockBase(blockRecordPlayer);
+
         quartzDisc = new ItemQuartzDisc();
+    }
+
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
+    }
+
+    @Mod.EventHandler
+    @SideOnly(Side.CLIENT)
+    public void initClient(FMLInitializationEvent event) {
+        ClientRegistry.bindTileEntitySpecialRenderer(TileRecordPlayer.class, new TileRendererRecordPlayer());
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+    }
+
+    @Mod.EventHandler
+    public void serverStart(FMLServerStartedEvent event) {
+        storageManager = new DataStorageManager();
+        MinecraftForge.EVENT_BUS.register(storageManager);
+    }
+
+    @Mod.EventHandler
+    public void serverStop(FMLServerStoppedEvent event) {
+        if (storageManager != null) {
+            try {
+                storageManager.save();
+            } catch (IOException e) {
+
+            }
+            MinecraftForge.EVENT_BUS.unregister(storageManager);
+        }
+        storageManager = null;
     }
 
     @SubscribeEvent
     public void registerModels(ModelRegistryEvent event) {
         RegistryUtils.registerModel(quartzDisc, 0, "charset:quartz_disc#inventory_blank");
         RegistryUtils.registerModel(quartzDisc, 1, "charset:quartz_disc#inventory");
+
+        RegistryUtils.registerModel(itemRecordPlayer, 0, "charset:record_player#inventory");
+    }
+
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        RegistryUtils.register(event.getRegistry(), blockRecordPlayer, "record_player");
     }
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
+        RegistryUtils.register(event.getRegistry(), itemRecordPlayer, "record_player");
         RegistryUtils.register(event.getRegistry(), quartzDisc, "quartz_disc");
     }
 }

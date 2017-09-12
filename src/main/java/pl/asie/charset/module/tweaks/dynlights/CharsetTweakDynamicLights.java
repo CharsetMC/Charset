@@ -19,8 +19,8 @@
 
 package pl.asie.charset.module.tweaks.dynlights;
 
-import elucent.albedo.event.GatherLightsEvent;
-import elucent.albedo.lighting.Light;
+import com.elytradev.mirage.event.GatherLightsEvent;
+import com.elytradev.mirage.lighting.Light;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;

@@ -17,20 +17,9 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.capability.laser;
+package pl.asie.charset.module.audio.storage;
 
-import pl.asie.charset.api.laser.ILaserReceiver;
+import pl.asie.charset.lib.block.TileBase;
 
-import java.util.List;
-import java.util.function.Function;
-
-public class LaserReceiverCombiner implements Function<List<ILaserReceiver>, ILaserReceiver> {
-	@Override
-	public ILaserReceiver apply(List<ILaserReceiver> receivers) {
-		return colorHit -> {
-			for (ILaserReceiver receiver : receivers) {
-				receiver.onLaserUpdate(colorHit);
-			}
-		};
-	}
+public class TileRecordPlayer extends TileBase {
 }

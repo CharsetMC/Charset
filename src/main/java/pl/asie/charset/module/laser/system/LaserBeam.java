@@ -32,6 +32,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.Utils;
@@ -44,7 +46,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 
 // IDEA: Add lastTileEntity to avoid double world.getTileEntity call with onAdd.
-public final class LaserBeam {
+public final class LaserBeam implements ILaserEndpoint {
 	public static final int MAX_DISTANCE = 64;
 	private static long ID_COUNTER = 1;
 
@@ -56,8 +58,12 @@ public final class LaserBeam {
 	private final @Nonnull EnumFacing direction;
 	private int length;
 
+	private boolean isValidated;
+
+	@SideOnly(Side.CLIENT)
 	protected Vec3d vcstart, vcend;
-	private boolean isAdded, isValidated;
+	@SideOnly(Side.CLIENT)
+	protected float vcdist;
 
 	public LaserBeam(@Nonnull TileEntity tile, @Nonnull EnumFacing facing, @Nonnull LaserColor color) {
 		this(tile.getCapability(CharsetLaser.LASER_SOURCE, facing), tile.getWorld(), tile.getPos(), facing, color);
@@ -123,13 +129,10 @@ public final class LaserBeam {
 				}
 			}
 		}
-
-		isAdded = true;
 	}
 
 	public void onRemove(boolean updates) {
 		invalidate();
-		isAdded = false;
 
 		if (updates) {
 			// System.out.println("DEL " + toString());
@@ -143,13 +146,10 @@ public final class LaserBeam {
 					}
 				} else if (CharsetPatchwork.LASER_REDSTONE) {
 					world.neighborChanged(end, Blocks.AIR, end.offset(direction.getOpposite()));
+					world.notifyNeighborsOfStateChange(end, Blocks.AIR, false);
 				}
 			}
 		}
-	}
-
-	public boolean isAddedToWorld() {
-		return isAdded;
 	}
 
 	protected final Vec3d calculateStartpoint() {
@@ -334,6 +334,11 @@ public final class LaserBeam {
 
 	public World getWorld() {
 		return world;
+	}
+
+	@Override
+	public BlockPos getPos() {
+		return getEnd();
 	}
 
 	public BlockPos getStart() {

@@ -17,20 +17,13 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.capability.laser;
+package pl.asie.charset.module.audio.storage;
 
-import pl.asie.charset.api.laser.ILaserReceiver;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 
-import java.util.List;
-import java.util.function.Function;
-
-public class LaserReceiverCombiner implements Function<List<ILaserReceiver>, ILaserReceiver> {
+public class TileRendererRecordPlayer extends TileEntitySpecialRenderer<TileRecordPlayer> {
 	@Override
-	public ILaserReceiver apply(List<ILaserReceiver> receivers) {
-		return colorHit -> {
-			for (ILaserReceiver receiver : receivers) {
-				receiver.onLaserUpdate(colorHit);
-			}
-		};
+	public void render(TileRecordPlayer tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+
 	}
 }

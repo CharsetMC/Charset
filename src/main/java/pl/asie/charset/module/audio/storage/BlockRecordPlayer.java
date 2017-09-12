@@ -17,20 +17,24 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.capability.laser;
+package pl.asie.charset.module.audio.storage;
 
-import pl.asie.charset.api.laser.ILaserReceiver;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import pl.asie.charset.lib.block.BlockBase;
 
-import java.util.List;
-import java.util.function.Function;
+import javax.annotation.Nullable;
 
-public class LaserReceiverCombiner implements Function<List<ILaserReceiver>, ILaserReceiver> {
+public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider {
+	public BlockRecordPlayer() {
+		super(Material.ROCK);
+	}
+
+	@Nullable
 	@Override
-	public ILaserReceiver apply(List<ILaserReceiver> receivers) {
-		return colorHit -> {
-			for (ILaserReceiver receiver : receivers) {
-				receiver.onLaserUpdate(colorHit);
-			}
-		};
+	public TileEntity createNewTileEntity(World worldIn, int meta) {
+		return new TileRecordPlayer();
 	}
 }

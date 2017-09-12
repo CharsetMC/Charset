@@ -19,6 +19,8 @@
 
 package pl.asie.charset.module.laser.blocks;
 
+import com.elytradev.mirage.lighting.IColoredLight;
+import com.elytradev.mirage.lighting.Light;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -27,6 +29,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.scheduler.Scheduler;
@@ -38,8 +43,8 @@ import pl.asie.charset.module.laser.system.LaserSource;
 
 import javax.annotation.Nullable;
 
-/* @Optional.Interface(modid = "albedo", iface = "elucent.albedo.lighting.ILightProvider") */
-public class TileJar extends TileBase /* implements ILightProvider */ {
+@Optional.Interface(modid = "mirage", iface = "com.elytradev.mirage.lighting.IColoredLight")
+public class TileJar extends TileBase implements IColoredLight {
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private LaserColor[] colors = new LaserColor[6];
 	private LaserColor outputColor = LaserColor.NONE;
@@ -48,15 +53,24 @@ public class TileJar extends TileBase /* implements ILightProvider */ {
 
 	private void recalculateOutputColor() {
 		LaserColor newOutputColor = LaserColor.NONE;
+		boolean set = false;
 
 		EnumFacing jarFacing = getJarFacing();
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (facing.getAxis() != jarFacing.getAxis()) {
 				newOutputColor = newOutputColor.union(colors[facing.ordinal()]);
+				if (colors[facing.ordinal()] != LaserColor.NONE) {
+					set = true;
+				}
 			}
 		}
 
-		if (newOutputColor != LaserColor.NONE) {
+		newOutputColor = newOutputColor.difference(colors[jarFacing.getOpposite().ordinal()]);
+		if (colors[jarFacing.getOpposite().ordinal()] != LaserColor.NONE) {
+			set = true;
+		}
+
+		if (set && outputColor != newOutputColor) {
 			outputColor = newOutputColor;
 			markBlockForUpdate();
 			CharsetLaser.laserStorage.markLaserForUpdate(TileJar.this, getJarFacing());
@@ -193,16 +207,13 @@ public class TileJar extends TileBase /* implements ILightProvider */ {
 		super.updateContainingBlockInfo();
 		updateRotations();
 	}
-/*
+
 	@Nullable
 	@Override
-	@Optional.Method(modid = "albedo")
+	@Optional.Method(modid = "mirage")
 	@SideOnly(Side.CLIENT)
-	public Light provideLight() {
+	public Light getColoredLight() {
 		int c = CharsetLaser.LASER_COLORS[outputColor.ordinal()];
-		return new Light(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f,
-				(((c>>16)&0xFF)/255.0f), (((c>>8)&0xFF)/255.0f), (((c)&0xFF)/255.0f), 1.0f,
-				1.0f);
+		return Light.builder().pos(pos).color(c, false).radius(1.0f).intensity(1.0f).build();
 	}
-*/
 }

@@ -91,9 +91,9 @@ public class LaserRenderer {
 
 		ICamera camera = new Frustum();
 		camera.setPosition(cameraX, cameraY, cameraZ);
+		Vec3d vp = new Vec3d(cameraX, cameraY, cameraZ);
 
-		worldrenderer.setTranslation(-cameraX, -cameraY, -cameraZ);
-		worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+		int maxDist = Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 16 + 1;
 
 		Collection<LaserBeam> beamsRender = beams;
 		if (Minecraft.getMinecraft().gameSettings.fancyGraphics) {
@@ -101,6 +101,11 @@ public class LaserRenderer {
 			for (LaserBeam beam : beams) {
 				beam.vcstart = beam.calculateStartpoint();
 				beam.vcend = beam.calculateEndpoint();
+				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, vp);
+
+				if (beam.vcdist > maxDist) {
+					continue;
+				}
 
 				if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(beam.vcstart.subtract(THICKNESS / 16.0, THICKNESS / 16.0, THICKNESS / 16.0), beam.vcend.addVector(THICKNESS / 16.0, THICKNESS / 16.0, THICKNESS / 16.0)))) {
 					continue;
@@ -109,16 +114,21 @@ public class LaserRenderer {
 				beamList.add(beam);
 			}
 
-			Vec3d vp = new Vec3d(cameraX, cameraY, cameraZ);
-			beamList.sort((first, second) -> -Float.compare(MathUtils.linePointDistance(first.vcstart, first.vcend, vp), MathUtils.linePointDistance(second.vcstart, second.vcend, vp)));
-
-			beamsRender = beamList;
+			beamList.sort((first, second) -> Float.compare(second.vcdist, first.vcdist));
 		}
+
+		worldrenderer.setTranslation(-cameraX, -cameraY, -cameraZ);
+		worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
 		for (LaserBeam beam : beamsRender) {
 			if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
 				beam.vcstart = beam.calculateStartpoint();
 				beam.vcend = beam.calculateEndpoint();
+				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, vp);
+
+				if (beam.vcdist > maxDist) {
+					continue;
+				}
 			}
 
 			Vec3d startVec = beam.vcstart;
