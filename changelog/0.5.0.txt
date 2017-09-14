@@ -1,3 +1,4 @@
+* NOTE: Relicensed to MIT (API) + LGPLv3 (non-API).
 * Minecraft 1.12 port.
 * Made sure to set the walking sound on Charset blocks.
 * Major improvements to Just Enough Items support.
@@ -14,6 +15,7 @@
 * [misc.pocketcraft] [#146] Fixed item loss bug.
 * [misc.pocketcraft] [#139] Fixed item duplication bug.
 * [misc.pocketcraft] Reworked pocket crafting table GUI.
+* [misc.scaffold] Scaffolds can now be stacked up by rightclicking them!
 * [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
 * [storage.barrels] Add support for Structure Block rotations and mirroring.
 * [storage.barrels] Barrels can now be locked!
@@ -43,7 +45,7 @@
 * [tweak.carry] [#137] Fix placing double chests potentially causing a rendering glitch.
 * [tweak.carry] Fix rendering bug caused by carrying a block with a notification visible.
 * [tweak.carry] Prevent the player from picking up blocks they can't break.
-* [tweak.dynamicLights] New tweak - requires Albedo! Client-side only! Fun!
+* [tweak.dynamicLights] New tweak - requires Mirage! Client-side only! Fun!
 * [tweak.remove.netherPortals] New tweak!
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.
 * [tweak.remove.recipeUnlocks] New tweak! Beats Quark's version in that it also hides the pop-up.
@@ -51,4 +53,4 @@
 * [tweak.shiftScroll] New tweak! Allows shift-scrolling between certain items of the same type in vanilla items.
     * It is also configurable - see config/charset/module/lib.shiftScroll/ if this tweak is enabled!
 * [tweak.unifyColors] Temporarily removed - awaiting redesign.
-
+* [tweak.voidGenerator] New tweak! Adds a simple void generator for the overworld. Off by default.
