@@ -59,6 +59,7 @@ public class ItemShard extends ItemBase {
 			return I18n.translateToLocal("item.charset.shard.name");
 		}
 	}
+
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 		return "item.charset.shard.name";

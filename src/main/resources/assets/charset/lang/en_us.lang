@@ -120,3 +120,4 @@ item.charset.chisel.large.name=Large Chisel
 item.charset.wrench.name=Wrench
 
 tile.charset.tank.name=Tank
+tile.charset.tank.colored.name=%s Tank

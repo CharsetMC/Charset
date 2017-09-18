@@ -20,6 +20,7 @@
 package pl.asie.charset.module.storage.tanks;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -43,20 +44,21 @@ import pl.asie.charset.lib.utils.RegistryUtils;
         profile = ModuleProfile.STABLE
 )
 public class CharsetStorageTanks {
-    public static Block tankBlock;
+    public static BlockTank tankBlock;
     public static Item tankItem;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         tankBlock = new BlockTank();
-        tankItem = new ItemBlockBase(tankBlock);
-
-        FMLInterModComms.sendMessage("charset", "addLock", new ResourceLocation("charset:fluidTank"));
+        tankItem = new ItemBlockTank(tankBlock);
     }
 
     @SubscribeEvent
     public void registerModels(ModelRegistryEvent event) {
         RegistryUtils.registerModel(tankItem, 0, "charset:fluidtank");
+        for (int i = 1; i <= 16; i++) {
+            RegistryUtils.registerModel(tankItem, i, "charset:fluidtank#inventory_stained");
+        }
     }
 
     @SubscribeEvent
@@ -72,12 +74,16 @@ public class CharsetStorageTanks {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         RegistryUtils.register(TileTank.class, "fluidTank");
+
+        FMLInterModComms.sendMessage("charset", "addLock", tankBlock.getRegistryName());
         FMLInterModComms.sendMessage("charset", "addCarry", tankBlock.getRegistryName());
     }
 
     @Mod.EventHandler
     @SideOnly(Side.CLIENT)
     public void initClient(FMLInitializationEvent event) {
+        Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(TankTintHandler.INSTANCE, tankBlock);
+        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(TankTintHandler.INSTANCE, tankItem);
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, new TileTankRenderer());
     }
 }

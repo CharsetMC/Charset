@@ -29,6 +29,7 @@
 * [storage.locks] Major rewrite! They work much more reliably now and can be placed on tanks!
 * [storage.tanks] [#141] Fix tanks not dropping item when broken.
 * [storage.tanks] [#142] Tanks no longer consume fluids from buckets in creative mode.
+* [storage.tanks] [#158] Added Stained Glass Tanks.
 * [storage.tanks] Tanks with liquid in them are now harder to break than empty tanks to avoid fluid loss by accident.
 * [tools.building] New module! Adds the Chisel.
 * [tools.wrench] Add modded metal ingot support.

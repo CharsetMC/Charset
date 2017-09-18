@@ -29,6 +29,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -129,8 +130,11 @@ public class TileTankRenderer extends FastTESR<TileTank> {
     public void renderTileEntityFast(@Nonnull TileTank te, double x, double y, double z, float partialTicks, int destroyStage, float todo_figure_me_out, @Nonnull BufferBuilder vertexBuffer) {
         BlockPos pos = te.getPos();
 
-        if (te.getWorld() != null && te.getWorld().getBlockState(pos.down()).getBlock() instanceof BlockTank) {
-            return;
+        if (te.getWorld() != null) {
+            TileEntity lowerTile = te.getWorld().getTileEntity(pos.down());
+            if (lowerTile instanceof TileTank && ((TileTank) lowerTile).connects(te) && te.connects((TileTank) lowerTile)) {
+                return;
+            }
         }
 
         if (te.getWorld() != null) {

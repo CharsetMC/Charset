@@ -15,15 +15,44 @@
     ],
     "inventory": [
       {
+        "transform": "forge:default-block"
+      }
+    ],
+    "inventory_stained": [
+      {
         "transform": "forge:default-block",
-        "submodel": {"down": {"model": "charset:fluidtank_down"}, "up": {"model": "charset:fluidtank_up"}}
+        "textures": {
+          "top": "charset:blocks/fluidtank/tank_top_stained",
+          "particle": "charset:blocks/fluidtank/tank_side_3_stained",
+          "side": "charset:blocks/fluidtank/tank_side_3_stained"
+        }
       }
     ],
     "connections": {
       "0": {"textures": {"side": "charset:blocks/fluidtank/tank_side_0"}},
-      "1": {"textures": {"side": "charset:blocks/fluidtank/tank_side_1"}, "submodel": {"down": {"model": "charset:fluidtank_down"}}},
-      "2": {"textures": {"side": "charset:blocks/fluidtank/tank_side_2"}, "submodel": {"up": {"model": "charset:fluidtank_up"}}},
-      "3": {"submodel": {"down": {"model": "charset:fluidtank_down"}, "up": {"model": "charset:fluidtank_up"}}}
+      "1": {"textures": {"side": "charset:blocks/fluidtank/tank_side_1"}},
+      "2": {"textures": {"side": "charset:blocks/fluidtank/tank_side_2"}},
+      "3": {},
+      "4": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_stained",
+        "particle": "charset:blocks/fluidtank/tank_side_3_stained",
+        "side": "charset:blocks/fluidtank/tank_side_0_stained"
+      }},
+      "5": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_stained",
+        "particle": "charset:blocks/fluidtank/tank_side_3_stained",
+        "side": "charset:blocks/fluidtank/tank_side_1_stained"
+      }},
+      "6": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_stained",
+        "particle": "charset:blocks/fluidtank/tank_side_3_stained",
+        "side": "charset:blocks/fluidtank/tank_side_2_stained"
+      }},
+      "7": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_stained",
+        "particle": "charset:blocks/fluidtank/tank_side_3_stained",
+        "side": "charset:blocks/fluidtank/tank_side_3_stained"
+      }}
     }
   }
 }

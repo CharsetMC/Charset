@@ -26,14 +26,17 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
@@ -50,7 +53,7 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 
 public class BlockTank extends BlockBase implements ITileEntityProvider {
     protected static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.05f, 0, 0.05f, 0.95f, 1, 0.95f);
-    private static final PropertyInteger CONNECTIONS = PropertyInteger.create("connections", 0, 3);
+    private static final PropertyInteger VARIANT = PropertyInteger.create("connections", 0, 7);
 
     public BlockTank() {
         super(Material.GLASS);
@@ -61,6 +64,47 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         setOpaqueCube(false);
         setComparatorInputOverride(true);
         setSoundType(SoundType.GLASS);
+    }
+
+    protected int getVariant(IBlockAccess access, BlockPos pos) {
+        IBlockState state = access.getBlockState(pos);
+        if (!(state.getBlock() instanceof BlockTank)) {
+            return -1;
+        }
+
+        TileEntity tile = access.getTileEntity(pos);
+        if (tile instanceof TileTank) {
+            return ((TileTank) tile).getVariant();
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
+        Item item = Item.getItemFromBlock(this);
+
+        for (int i = 0; i <= 16; i++) {
+            items.add(new ItemStack(item, 1, i));
+        }
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        switch (side) {
+            case DOWN:
+                if (getVariant(blockAccess, pos) == getVariant(blockAccess, pos.down())) {
+                    return false;
+                }
+                return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+            case UP:
+                if (getVariant(blockAccess, pos) == getVariant(blockAccess, pos.up())) {
+                    return false;
+                }
+                return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+            default:
+                return true;
+        }
     }
 
     @Override
@@ -81,10 +125,14 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        return state.withProperty(CONNECTIONS,
-                (((worldIn.getBlockState(pos.up()).getBlock() == this) ? 0 : 2)
-                | (((worldIn.getBlockState(pos.down()).getBlock() == this) ? 0 : 1)))
-            );
+        int variant = getVariant(worldIn, pos);
+        int variantUp = getVariant(worldIn, pos.up());
+        int variantDown = getVariant(worldIn, pos.down());
+
+        return state.withProperty(VARIANT,
+                ((variantUp == variant) ? 0 : 2)
+                | ((variantDown == variant) ? 0 : 1)
+                | (variant > 0 ? 4 : 0));
     }
 
     @Override
@@ -115,7 +163,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, CONNECTIONS);
+        return new BlockStateContainer(this, VARIANT);
     }
 
     @Override

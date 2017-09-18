@@ -20,8 +20,11 @@
 package pl.asie.charset.module.storage.tanks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -106,6 +109,21 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     protected TileTank bottomTank, aboveTank;
     protected static final int CAPACITY = 16000;
     protected FluidStack fluidStack;
+    private int variant;
+
+    public int getVariant() {
+        return variant;
+    }
+
+    @Override
+    public ItemStack getDroppedBlock(IBlockState state) {
+        return new ItemStack(state.getBlock(), 1, variant);
+    }
+
+    @Override
+    public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+        variant = stack.getItemDamage() % 17;
+    }
 
     protected void onTankStructureChanged() {
         updateAboveTank();
@@ -157,6 +175,8 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public void readNBTData(NBTTagCompound compound, boolean isClient) {
+        variant = compound.getByte("variant");
+
         if (compound.hasKey("fluid", Constants.NBT.TAG_COMPOUND)) {
             fluidStack = FluidStack.loadFluidStackFromNBT(compound.getCompoundTag("fluid"));
         } else {
@@ -166,6 +186,7 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
+        compound.setByte("variant", (byte) variant);
         if (fluidStack != null) {
             NBTTagCompound fluidCpd = new NBTTagCompound();
             fluidStack.writeToNBT(fluidCpd);
@@ -175,7 +196,7 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     }
 
     protected boolean connects(TileTank tank) {
-        return true;
+        return tank.getVariant() == getVariant();
     }
 
     protected void updateAboveTank() {
@@ -428,6 +449,10 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public void addDebugInformation(List<String> stringList, Side side) {
+        if (side == Side.SERVER && world != null) {
+            stringList.add("Bottom: " + getBottomTank().getPos());
+        }
+
         stringList.add("Global: " + dbgFluidToString(getContents()) + TextFormatting.RESET + "/" + getCapacity());
         stringList.add("Local: " + dbgFluidToString(fluidStack) + TextFormatting.RESET + "/" + CAPACITY);
     }

@@ -15,12 +15,12 @@
   "key": {
     "x": {
       "type": "forge:ore_dict",
-      "ore": "blockGlassColorless"
+      "ore": "blockGlassMagenta"
     }
   },
   "result": {
     "item": "charset:fluidtank",
-    "data": 0,
+    "data": 3,
     "count": 1
   }
 }
