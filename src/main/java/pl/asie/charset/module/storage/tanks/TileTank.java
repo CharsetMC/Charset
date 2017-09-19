@@ -96,11 +96,13 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
         }
     }
 
-    public static boolean checkPlacementConflict(TileEntity a, TileEntity b) {
+    public static boolean checkPlacementConflict(TileEntity a, TileEntity b, int variant) {
         if (a instanceof TileTank && b instanceof TileTank
-                && ((TileTank) a).fluidStack != null
-                && ((TileTank) b).fluidStack != null) {
-            return !((TileTank) a).fluidStack.isFluidEqual(((TileTank) b).fluidStack);
+                && ((TileTank) a).getBottomTank().fluidStack != null
+                && ((TileTank) b).getBottomTank().fluidStack != null
+                && ((TileTank) a).variant == variant
+                && ((TileTank) a).variant == ((TileTank) b).variant) {
+            return !((TileTank) a).getBottomTank().fluidStack.isFluidEqual(((TileTank) b).getBottomTank().fluidStack);
         } else {
             return false;
         }
@@ -113,6 +115,21 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     public int getVariant() {
         return variant;
+    }
+
+    public boolean setVariant(int variant) {
+        if (variant >= 0 && variant < 17 && this.variant != variant) {
+            TileEntity tUp = world.getTileEntity(pos.up());
+            TileEntity tDown = world.getTileEntity(pos.down());
+            if (!(checkPlacementConflict(this, tUp, variant) || checkPlacementConflict(this, tDown, variant) || checkPlacementConflict(tUp, tDown, variant))) {
+                this.variant = variant;
+                markBlockForUpdate();
+                world.notifyNeighborsRespectDebug(pos, CharsetStorageTanks.tankBlock, false);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -464,7 +481,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public boolean canMoveTo(World world, BlockPos pos) {
-        return !(checkPlacementConflict(this, world.getTileEntity(pos.up())) || checkPlacementConflict(this, world.getTileEntity(pos.down())));
+        TileEntity tUp = world.getTileEntity(pos.up());
+        TileEntity tDown = world.getTileEntity(pos.down());
+        return !(checkPlacementConflict(this, tUp, variant) || checkPlacementConflict(this, tDown, variant) || checkPlacementConflict(tUp, tDown, variant));
     }
 
     @Override

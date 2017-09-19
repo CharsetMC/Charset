@@ -30,6 +30,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -244,7 +245,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     @Override
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
         // People may not place an empty tank between two tanks which differ only in liquid
-        return !TileTank.checkPlacementConflict(worldIn.getTileEntity(pos.down()), worldIn.getTileEntity(pos.up()));
+        return !TileTank.checkPlacementConflict(worldIn.getTileEntity(pos.down()), worldIn.getTileEntity(pos.up()), -1);
     }
 
     @Override
@@ -262,5 +263,17 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileTank();
+    }
+
+    @Override
+    public boolean recolorBlock(World world, BlockPos pos, EnumFacing side, net.minecraft.item.EnumDyeColor color) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileTank) {
+            if (((TileTank) tile).setVariant(color.getMetadata() + 1)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
