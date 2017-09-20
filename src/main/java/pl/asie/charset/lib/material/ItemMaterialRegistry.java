@@ -20,6 +20,7 @@
 package pl.asie.charset.lib.material;
 
 import com.google.common.collect.*;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -187,19 +188,25 @@ public class ItemMaterialRegistry {
 		return ItemUtils.canMerge(mat.getStack(), stack);
 	}
 
-    public boolean matches(ItemStack stack, String... mats) {
-		for (String mat : mats) {
-			boolean valid = true;
-			if (mat.startsWith("!")) {
-				mat = mat.substring(1);
-				valid = false;
-			}
-
-			for (ItemMaterial material : materialsByType.get(mat)) {
-				if (ItemUtils.canMerge(material.getStack(), stack)) {
-					return valid;
+	public boolean matches(ItemMaterial mat, String... mats) {
+		for (String matStr : mats) {
+			if (matStr.startsWith("!")) {
+				matStr = matStr.substring(1);
+				if (mat.getTypes().contains(matStr)) {
+					return false;
 				}
+			} else if (!mat.getTypes().contains(matStr)) {
+				return false;
 			}
+		}
+
+		return true;
+	}
+
+    public boolean matches(ItemStack stack, String... mats) {
+		ItemMaterial material = getMaterialIfPresent(stack);
+		if (material != null) {
+			return matches(material, mats);
 		}
 
 		return false;

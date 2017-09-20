@@ -19,6 +19,8 @@
 
 package pl.asie.charset.module.tweaks;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockGlazedTerracotta;
 import net.minecraft.block.BlockRailBase;
@@ -56,12 +58,12 @@ public class CharsetTweakShiftScroll {
 		/* ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.OreDictionaryGroup("plankWood"));
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.OreDictionaryGroup("logWood")); */
 
-		Collection<Block> glazedTerracottas = new ArrayList<>();
+		Multimap<String, Block> glazedTerracottas = LinkedHashMultimap.create();
 		Collection<Block> rails = new ArrayList<>();
 		Collection<Item> records = new ArrayList<>();
 
 		for (Block b : ForgeRegistries.BLOCKS) {
-			if (b instanceof BlockGlazedTerracotta) glazedTerracottas.add(b);
+			if (b instanceof BlockGlazedTerracotta) glazedTerracottas.put(b.getRegistryName().getResourceDomain(), b);
 			else if (b instanceof BlockRailBase) rails.add(b);
 		}
 
@@ -69,7 +71,9 @@ public class CharsetTweakShiftScroll {
 			if (i instanceof ItemRecord) records.add(i);
 		}
 
-		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(glazedTerracottas));
+		for (String domain : glazedTerracottas.keys()) {
+			ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(glazedTerracottas.get(domain)));
+		}
 		/* ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(rails));
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(records)); */
 	}

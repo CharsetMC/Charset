@@ -142,7 +142,7 @@ public class IngredientMaterialFactory implements IIngredientFactory {
 
         @Override
         public boolean apply(@Nullable ItemStack stack) {
-            if (stack == null)
+            if (stack == null || stack.isEmpty())
                 return false;
 
             return ItemMaterialRegistry.INSTANCE.matches(stack, types);
