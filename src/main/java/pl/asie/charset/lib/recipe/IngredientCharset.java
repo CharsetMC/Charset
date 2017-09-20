@@ -40,8 +40,8 @@ public abstract class IngredientCharset extends Ingredient {
         super(p_i9_1_);
     }
 
-    public IngredientCharset requireMatches() {
-        mustMatch = true;
+    public IngredientCharset setRequireMatches(boolean value) {
+        mustMatch = value;
         return this;
     }
 

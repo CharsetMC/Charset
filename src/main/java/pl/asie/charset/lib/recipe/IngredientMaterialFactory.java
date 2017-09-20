@@ -51,6 +51,7 @@ public class IngredientMaterialFactory implements IIngredientFactory {
             this.nbtTag = nbtTag;
             this.chain = null;
             this.dependencies = null;
+            this.setRequireMatches(nbtTag != null);
         }
 
         protected IngredientMaterial(String nbtTag, String chain, boolean dummy, String... types) {
@@ -59,6 +60,7 @@ public class IngredientMaterialFactory implements IIngredientFactory {
             this.nbtTag = nbtTag;
             this.chain = chain.split("\\.");
             this.dependencies = new TCharHashSet();
+            this.setRequireMatches(nbtTag != null);
             dependencies.add(this.chain[0].charAt(0));
         }
 
@@ -165,10 +167,17 @@ public class IngredientMaterialFactory implements IIngredientFactory {
             material = new String[]{ JsonUtils.getString(jsonObject, "material") };
         }
 
+        IngredientMaterial result;
         if (jsonObject.has("chain")) {
-            return new IngredientMaterial(tag, JsonUtils.getString(jsonObject, "chain"), false, material);
+            result = new IngredientMaterial(tag, JsonUtils.getString(jsonObject, "chain"), false, material);
         } else {
-            return new IngredientMaterial(tag, material);
+            result = new IngredientMaterial(tag, material);
         }
+
+        if (jsonObject.has("matchStack")) {
+            result.setRequireMatches(JsonUtils.getBoolean(jsonObject, "matchStack"));
+        }
+
+        return result;
     }
 }
