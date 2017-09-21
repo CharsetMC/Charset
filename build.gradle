@@ -18,12 +18,12 @@ apply plugin: 'com.github.johnrengelman.shadow'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.3.4"
+version = "0.3.6"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
 minecraft {
-	version = "1.10.2-12.18.2.2151"
+	version = "1.10.2-12.18.3.2488"
 
 	runDir = "run"
 	useDepAts = true

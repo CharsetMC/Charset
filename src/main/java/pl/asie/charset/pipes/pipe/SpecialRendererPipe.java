@@ -74,9 +74,6 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 			new Vector3f(TANK_MAX, TANK_MAX, TANK_MAX)
 	};
 
-	private final BlockModelRenderer renderer = mc.getBlockRendererDispatcher().getBlockModelRenderer();
-	private final RenderItem renderItem = mc.getRenderItem();
-	private final ItemColors itemColors = mc.getItemColors();
 	private final IBlockState DEFAULT_STATE = Blocks.AIR.getDefaultState();
 	private final ItemModelTransformer ITEM_MODEL_TRANSFORMER = new ItemModelTransformer();
 
@@ -99,6 +96,7 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 	}
 
 	private final class ItemModelTransformer implements ModelTransformer.IVertexTransformer {
+		protected ItemColors itemColors;
 		private ItemStack stack;
 		private float scale;
 		private EnumFacing direction;
@@ -238,6 +236,11 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 			return;
 		}
 
+		Minecraft mc = Minecraft.getMinecraft();
+		BlockModelRenderer renderer = mc.getBlockRendererDispatcher().getBlockModelRenderer();
+		RenderItem renderItem = mc.getRenderItem();
+		ITEM_MODEL_TRANSFORMER.itemColors = mc.getItemColors();
+
 		BlockPos pos = part.getPos();
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 
@@ -316,6 +319,10 @@ public class SpecialRendererPipe extends MultipartSpecialRendererBase<PartPipe> 
 		if (part == null) {
 			return;
 		}
+
+		Minecraft mc = Minecraft.getMinecraft();
+		RenderItem renderItem = mc.getRenderItem();
+		ITEM_MODEL_TRANSFORMER.itemColors = mc.getItemColors();
 
 		renderMultipartFastFromSlow(part, x, y, z, partialTicks, destroyStage);
 
