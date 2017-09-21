@@ -20,8 +20,12 @@
 package pl.asie.charset.lib.recipe;
 
 import gnu.trove.iterator.TCharIterator;
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TCharObjectMap;
+import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TCustomHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -30,46 +34,69 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.crafting.IngredientNBT;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.OreIngredient;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
+import pl.asie.charset.lib.utils.MethodHandleHelper;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-// TODO: Add option to replace with OreIngredients
-// TODO: Add support for IngredientNBTs? Smelting? Brewing?
+// TODO: Add support for smelting? Brewing?
 public class RecipeReplacement {
     public static final RecipeReplacement PRIMARY = new RecipeReplacement();
+    private static final MethodHandle ORES_GETTER = MethodHandleHelper.findFieldGetter(OreIngredient.class, "ores");
 
     private final Map<ItemStack, Object> replacements = new TCustomHashMap<>(
             new ItemStackHashSet.Strategy(false, true, true)
     );
     private final Map<Item, Object> replaceableItems = new IdentityHashMap<>();
+    private final TIntObjectMap<Object> replaceableOres = new TIntObjectHashMap<>();
 
     public RecipeReplacement() {
 
     }
 
-    public void add(ItemStack from, ItemStack to) {
+    private void checkTo(Object to) {
+        if (!(to instanceof Item || to instanceof ItemStack || to instanceof String)) {
+            throw new RuntimeException("Invalid RecipeReplacement target type: " + to.getClass().getName() + "!");
+        }
+    }
+
+    public void add(ItemStack from, Object to) {
+        checkTo(to);
         if (from.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-            replaceableItems.put(from.getItem(), to.getItem());
+            replaceableItems.put(from.getItem(), to);
         } else {
             replacements.put(from, to);
         }
     }
 
-    public void add(Item from, Item to) {
+    public void add(Item from, Object to) {
+        checkTo(to);
         replaceableItems.put(from, to);
+    }
+
+    public void add(String from, Object to) {
+        checkTo(to);
+        replaceableOres.put(OreDictionary.getOreID(from), to);
     }
 
     @Nullable
     private Ingredient replaceIngredient(Ingredient ing) {
-        if (ing.getClass() == Ingredient.class) {
+        if (ing.getClass() == Ingredient.class || ing.getClass() == IngredientNBT.class) {
+            boolean checkNBT = ing.getClass() == IngredientNBT.class;
             ItemStack[] matchingStacks = ing.getMatchingStacks();
             ItemStack[] matchingStacksNew = null;
+            int replacementOreMatches = 0;
+            String replacementOre = null;
             boolean dirty = false;
 
             for (int j = 0; j < matchingStacks.length; j++) {
@@ -77,10 +104,19 @@ public class RecipeReplacement {
                 ItemStack newStack = null;
                 Object replacement = null;
 
-                if (replaceableItems.containsKey(stack.getItem())) {
-                    replacement = replaceableItems.get(stack.getItem());
-                } else if (replacements.containsKey(stack)) {
-                    replacement = replacements.get(stack);
+                for (int i : OreDictionary.getOreIDs(stack)) {
+                    if (replaceableOres.containsKey(i)) {
+                        replacement = replaceableOres.get(i);
+                        break;
+                    }
+                }
+
+                if (replacement == null) {
+                    if (replacements.containsKey(stack)) {
+                        replacement = replacements.get(stack);
+                    } else if (!checkNBT && replaceableItems.containsKey(stack.getItem())) {
+                        replacement = replaceableItems.get(stack.getItem());
+                    }
                 }
 
                 if (replacement instanceof Item) {
@@ -90,7 +126,8 @@ public class RecipeReplacement {
                     newStack = ((ItemStack) replacements.get(stack)).copy();
                     newStack.setCount(stack.getCount());
                 } else if (replacement instanceof String) {
-                    // TODO: Handle creating OreIngredients
+                    replacementOreMatches++;
+                    replacementOre = (String) replacement;
                 }
 
                 if (newStack != null) {
@@ -104,8 +141,37 @@ public class RecipeReplacement {
                 }
             }
 
-            if (matchingStacksNew != null) {
-                return Ingredient.fromStacks(matchingStacksNew);
+            if (replacementOre != null && replacementOreMatches == matchingStacks.length)  {
+                return new OreIngredient(replacementOre);
+            } else {
+                if (matchingStacksNew != null) {
+                    return Ingredient.fromStacks(matchingStacksNew);
+                }
+            }
+        } else if (ing.getClass() == OreIngredient.class) {
+            try {
+                NonNullList<ItemStack> list = (NonNullList<ItemStack>) ORES_GETTER.invokeExact((OreIngredient) ing);
+                if (list.isEmpty()) {
+                    return null;
+                }
+
+                TIntIterator it = replaceableOres.keySet().iterator();
+                while (it.hasNext()) {
+                    int oreId = it.next();
+                    NonNullList<ItemStack> oreList = OreDictionary.getOres(OreDictionary.getOreName(oreId));
+                    if (!oreList.isEmpty() && list == oreList) {
+                        Object replacement = replaceableOres.get(oreId);
+                        if (replacement instanceof Item) {
+                            return Ingredient.fromItem((Item) replacement);
+                        } else if (replacement instanceof ItemStack) {
+                            return Ingredient.fromStacks((ItemStack) replacement);
+                        } else if (replacement instanceof String) {
+                            return new OreIngredient((String) replacement);
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
         }
 
@@ -117,7 +183,7 @@ public class RecipeReplacement {
             ResourceLocation recipeName = recipe.getRegistryName();
             boolean dirty = false;
 
-            if (recipe instanceof ShapedRecipes || recipe instanceof ShapelessRecipes) {
+            if (recipe instanceof ShapedRecipes || recipe instanceof ShapelessRecipes || recipe instanceof ShapedOreRecipe || recipe instanceof ShapelessOreRecipe) {
                 NonNullList<Ingredient> ingredients = recipe.getIngredients();
                 for (int i = 0; i < ingredients.size(); i++) {
                     Ingredient ing = ingredients.get(i);

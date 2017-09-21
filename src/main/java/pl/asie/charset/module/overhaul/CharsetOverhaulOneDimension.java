@@ -106,6 +106,7 @@ public class CharsetOverhaulOneDimension {
     @SubscribeEvent
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         RecipeReplacement.PRIMARY.add(Item.getItemFromBlock(Blocks.SOUL_SAND), Item.getItemFromBlock(Blocks.SAND));
+        RecipeReplacement.PRIMARY.add(Item.getItemFromBlock(Blocks.QUARTZ_ORE), "oreQuartz");
     }
 
     @Mod.EventHandler
