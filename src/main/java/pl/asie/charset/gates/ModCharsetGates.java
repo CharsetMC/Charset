@@ -31,6 +31,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -56,14 +57,15 @@ import pl.asie.charset.wires.logic.WireSignalFactory;
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetGates {
 	public static final String MODID = "CharsetGates";
-	public static final String NAME = "&";
+	public static final String NAME = "CharsetGates";
 	public static final String VERSION = "@VERSION@";
 
 	@SidedProxy(clientSide = "pl.asie.charset.gates.ProxyClient", serverSide = "pl.asie.charset.gates.ProxyCommon")
 	public static ProxyCommon proxy;
-	@Instance
+	@Instance(ModCharsetGates.MODID)
 	public static ModCharsetGates INSTANCE;
 
+	public static Configuration config;
 	public static PacketRegistry packet;
 	public static ItemGate itemGate;
 
@@ -77,6 +79,10 @@ public class ModCharsetGates {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if (!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_GATES))
+			return;
+
+		config = new Configuration(ModCharsetLib.instance.getConfigFile("gates.cfg"));
 		itemGate = new ItemGate();
 		GameRegistry.register(itemGate.setRegistryName("gate"));
 
@@ -85,14 +91,21 @@ public class ModCharsetGates {
 		registerGate("xor", PartGateXOR.class, 2);
 		registerGate("pulse_former", PartGatePulseFormer.class, 3);
 		registerGate("multiplexer", PartGateMultiplexer.class, 4);
-		registerGate("rs_latch", PartGateRSLatch.class, 5);
+		// registerGate("rs_latch", PartGateRSLatch.class, 5);
 		registerGate("buffer", PartGateBuffer.class, 6);
 
 		MinecraftForge.EVENT_BUS.register(proxy);
+
+		if (config.hasChanged()) {
+			config.save();
+		}
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		if (!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_GATES))
+			return;
+
 		packet = new PacketRegistry(ModCharsetGates.MODID);
 
 		registerGateStack(ItemGate.getStack(new PartGateNOR().setInvertedSides(0b0001)), "sts", "scs", "sss");
@@ -103,9 +116,13 @@ public class ModCharsetGates {
 		registerGateStack(ItemGate.getStack(new PartGateXOR().setInvertedSides(0b0001)), "wtw", "cwc", "scs");
 		registerGateStack(ItemGate.getStack(new PartGatePulseFormer()), "wcw", "cwc", "wws");
 		registerGateStack(ItemGate.getStack(new PartGateMultiplexer()), "wcw", "csc", "wcw");
-		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs");
+//		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs");
 		registerGateStack(ItemGate.getStack(new PartGateBuffer()));
 		registerGateStack(ItemGate.getStack(new PartGateBuffer().setInvertedSides(0b0001)));
+
+		if (config.hasChanged()) {
+			config.save();
+		}
 	}
 
 	public void registerGateStack(ItemStack stack, Object... recipe) {
@@ -149,7 +166,7 @@ public class ModCharsetGates {
 	}
 
 	public void registerGateStack(ItemStack stack) {
-		if(stack != null && (stack.getItem() instanceof ItemGate))
+		if (stack != null && (stack.getItem() instanceof ItemGate))
 			gateStacks.add(stack);
 	}
 
@@ -159,6 +176,10 @@ public class ModCharsetGates {
 	}
 
 	public void registerGate(String name, Class<? extends PartGate> clazz, int meta, String gdLoc, String unl) {
+		if (!config.getBoolean(name, "gates", true,"Enable/disable gate.")) {
+			return;
+		}
+
 		gateParts.put(name, clazz);
 		gateDefintions.put(name, new ResourceLocation(gdLoc + ".json"));
 		gateMeta[meta] = name;

@@ -1,0 +1,7 @@
+* [All] Restored Gates and Wires modules, based on 0.3.0-pre15
+    * Note that the RS Latch Gate has been removed.
+    * Note that the Wires module is off by default, due to bugginess.
+* [All] Saner mod names for JEI lookup
+* [Decoration] Backported poster lag fix from 0.4.0-pre6
+* [Gates] Added config file to disable gates as necessary
+* [Pipes] [#159] Fix renderer crash which could happen on some configurationsl

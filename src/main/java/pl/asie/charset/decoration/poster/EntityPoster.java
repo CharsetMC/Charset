@@ -151,6 +151,7 @@ public class EntityPoster extends Entity {
         if (worldObj.isRemote) {
             if (dataManager.isDirty()) {
                 readEntityFromNBT(dataManager.get(PARAMETER_TAG));
+                dataManager.setClean();
             }
         }
     }

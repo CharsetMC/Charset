@@ -75,7 +75,7 @@ import java.util.UUID;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetStorage {
 	public static final String MODID = "CharsetStorage";
-	public static final String NAME = "#";
+	public static final String NAME = "CharsetStorage";
 	public static final String VERSION = "@VERSION@";
 	public static final int DEFAULT_LOCKING_COLOR = 0xFBDB6A;
 	private static final Random rand = new Random();

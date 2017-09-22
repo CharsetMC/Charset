@@ -69,7 +69,7 @@ import java.io.IOException;
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetAudio {
 	public static final String MODID = "CharsetAudio";
-	public static final String NAME = "♫";
+	public static final String NAME = "CharsetAudio";
 	public static final String VERSION = "@VERSION@";
 
 	@SidedProxy(clientSide = "pl.asie.charset.audio.ProxyClient", serverSide = "pl.asie.charset.audio.ProxyCommon")

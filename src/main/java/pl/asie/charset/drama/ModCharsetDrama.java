@@ -35,7 +35,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetDrama {
 	public static final String MODID = "CharsetDrama";
-	public static final String NAME = "!";
+	public static final String NAME = "CharsetDrama";
 	public static final String VERSION = "@VERSION@";
 
 	@Mod.Instance(MODID)

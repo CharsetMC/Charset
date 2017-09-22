@@ -47,10 +47,15 @@ public class ItemGate extends ItemMultiPart {
 	}
 
 	public static ItemStack getStack(PartGate gate, boolean silky) {
-		ItemStack stack = new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(gate.getType().toString()));
-		stack.setTagCompound(new NBTTagCompound());
-		gate.writeItemNBT(stack.getTagCompound(), silky);
-		return stack;
+		String typeStr = gate.getType().toString();
+		if (ModCharsetGates.metaGate.containsKey(typeStr)) {
+			ItemStack stack = new ItemStack(ModCharsetGates.itemGate, 1, ModCharsetGates.metaGate.get(typeStr));
+			stack.setTagCompound(new NBTTagCompound());
+			gate.writeItemNBT(stack.getTagCompound(), silky);
+			return stack;
+		} else {
+			return null;
+		}
 	}
 
 	public static PartGate getPartGate(ItemStack stack) {
@@ -65,6 +70,10 @@ public class ItemGate extends ItemMultiPart {
 	public String getItemStackDisplayName(ItemStack stack) {
 		PartGate gate = getPartGate(stack);
 		String name = ModCharsetGates.gateUN[stack.getItemDamage() % ModCharsetGates.gateUN.length];
+		if (name == null) {
+			return "[UNKNOWN GATE]";
+		}
+
 		if (gate.isSideInverted(EnumFacing.NORTH) && I18n.canTranslate(name + ".i")) {
 			name += ".i";
 		}
@@ -90,7 +99,10 @@ public class ItemGate extends ItemMultiPart {
 
 	public static PartGate getPartGate(int meta) {
 		try {
-			return ModCharsetGates.gateParts.get(ModCharsetGates.gateMeta[meta % ModCharsetGates.gateMeta.length]).newInstance();
+			Class<? extends PartGate> c = ModCharsetGates.gateParts.get(ModCharsetGates.gateMeta[meta % ModCharsetGates.gateMeta.length]);
+			if (c != null) {
+				return c.newInstance();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

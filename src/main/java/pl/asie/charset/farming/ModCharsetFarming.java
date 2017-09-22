@@ -36,7 +36,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetFarming {
 	public static final String MODID = "CharsetFarming";
-	public static final String NAME = ";";
+	public static final String NAME = "CharsetFarming";
 	public static final String VERSION = "@VERSION@";
 
 	@SidedProxy(clientSide = "pl.asie.charset.farming.ProxyClient", serverSide = "pl.asie.charset.farming.ProxyCommon")

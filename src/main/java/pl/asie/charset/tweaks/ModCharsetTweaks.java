@@ -43,7 +43,7 @@ import pl.asie.charset.tweaks.tnt.TweakImprovedTNT;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetTweaks {
 	public static final String MODID = "CharsetTweaks";
-	public static final String NAME = "*";
+	public static final String NAME = "CharsetTweaks";
 	public static final String VERSION = "@VERSION@";
 
 	public static PacketRegistry packet;

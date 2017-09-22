@@ -65,11 +65,11 @@ public class ModCharsetLib {
 
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "CharsetLib";
-	public static final String NAME = "‽";
+	public static final String NAME = "CharsetLib";
 	public static final String VERSION = "@VERSION@";
 	public static final String DEP_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";required-after:mcmultipart@[1.3.0,)";
 	public static final String DEP_NO_MCMP = "required-after:Forge@[11.15.0.1715,);required-after:CharsetLib@" + VERSION + ";after:mcmultipart";
-	public static final String ACCEPTABLE_REMOTE_VERSIONS = "[0.3.5,0.3.6]";
+	public static final String ACCEPTABLE_REMOTE_VERSIONS = "@VERSION@";
 
 	public static final String MODULE_PIPES = "pipes";
 	public static final String MODULE_TWEAKS = "tweaks";
@@ -85,15 +85,10 @@ public class ModCharsetLib {
 	public static final String[] MODULES = {
 		MODULE_PIPES, MODULE_TWEAKS, MODULE_WIRES, MODULE_GATES, MODULE_AUDIO, MODULE_STORAGE, MODULE_DECORATION, MODULE_DRAMA, MODULE_WRENCH, MODULE_FARMING
 	};
-	private static final ImmutableSet<String> DISABLED_MODULES_BY_DEFAULT = ImmutableSet.of(MODULE_DRAMA, MODULE_FARMING);
-	private static final HashMap<String, Boolean> moduleStatus = new HashMap();
+	private static final ImmutableSet<String> DISABLED_MODULES_BY_DEFAULT = ImmutableSet.of(MODULE_DRAMA, MODULE_FARMING, MODULE_WIRES);
+	private static final HashMap<String, Boolean> moduleStatus = new HashMap<>();
 	
-	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(new Supplier<Calendar>() {
-		@Override
-		public Calendar get() {
-			return Calendar.getInstance();
-		}
-	}, 1, TimeUnit.MINUTES);
+	public static Supplier<Calendar> calendar = Suppliers.memoizeWithExpiration(Calendar::getInstance, 1, TimeUnit.MINUTES);
 
 	@Mod.Instance(value = ModCharsetLib.MODID)
 	public static ModCharsetLib instance;
@@ -156,7 +151,7 @@ public class ModCharsetLib {
 		Configuration config = new Configuration(getModuleConfigFile());
 		config.load();
 		for(String s : MODULES)
-			moduleStatus.put(s, config.getBoolean(s, config.CATEGORY_GENERAL, !DISABLED_MODULES_BY_DEFAULT.contains(s), ""));
+			moduleStatus.put(s, config.getBoolean(s, Configuration.CATEGORY_GENERAL, !DISABLED_MODULES_BY_DEFAULT.contains(s), ""));
 		if(config.hasChanged())
 			config.save();
 	}

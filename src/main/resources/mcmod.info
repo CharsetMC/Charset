@@ -3,7 +3,7 @@
     "modList": [
         {
             "modid": "CharsetLib",
-            "name": "‽",
+            "name": "CharsetLib",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Base library mod",
@@ -14,7 +14,7 @@
         },
         {
             "modid": "CharsetPipes",
-            "name": "|",
+            "name": "CharsetPipes",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Item transport system",
@@ -25,7 +25,7 @@
         },
         {
             "modid": "CharsetTweaks",
-            "name": "*",
+            "name": "CharsetTweaks",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Gameplay/aesthetic tweaks to vanilla",
@@ -35,8 +35,30 @@
             "url": "http://charset.asie.pl"
         },
         {
+            "modid": "CharsetWires",
+            "name": "CharsetWires",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Redstone cabling with analog support",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
+            "modid": "CharsetGates",
+            "name": "CharsetGates",
+            "version": "${version}",
+            "mcversion": "${mcversion}",
+            "description": "Simple redstone gates",
+            "authorList": [
+                "asiekierka"
+            ],
+            "url": "http://charset.asie.pl"
+        },
+        {
             "modid": "CharsetAudio",
-            "name": "♫",
+            "name": "CharsetAudio",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Tape Drives and various audio transport methods",
@@ -47,7 +69,7 @@
         },
         {
             "modid": "CharsetStorage",
-            "name": "#",
+            "name": "CharsetStorage",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Things useful for storage (Barrels, Locks, etc.)",
@@ -58,7 +80,7 @@
         },
         {
             "modid": "CharsetDecoration",
-            "name": "⚐",
+            "name": "CharsetDecoration",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Various decorative objects",
@@ -69,7 +91,7 @@
         },
         {
             "modid": "CharsetDrama",
-            "name": "!",
+            "name": "CharsetDrama",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "Drama Generator in Minecraft. Joke module",
@@ -80,7 +102,7 @@
         },
         {
             "modid": "CharsetWrench",
-            "name": "/",
+            "name": "CharsetWrench",
             "version": "${version}",
             "mcversion": "${mcversion}",
             "description": "A wrench which happens to rotate multiparts",

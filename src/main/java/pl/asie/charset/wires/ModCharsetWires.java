@@ -46,7 +46,7 @@ import pl.asie.charset.wires.logic.WireSignalFactory;
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL)
 public class ModCharsetWires {
 	public static final String MODID = "CharsetWires";
-	public static final String NAME = "+";
+	public static final String NAME = "CharsetWires";
 	public static final String VERSION = "@VERSION@";
 
 	public static PacketRegistry packet;
@@ -58,6 +58,9 @@ public class ModCharsetWires {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if (!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_WIRES))
+			return;
+
 		wireFactories[0] = new WireSignalFactory(WireType.NORMAL, -1).setRegistryName(new ResourceLocation("charsetwires:rsWireN"));
 		for (int i = 0; i < 16; i++) {
 			wireFactories[i + 1] = new WireSignalFactory(WireType.INSULATED, i).setRegistryName(new ResourceLocation("charsetwires:rsWireI." + i));
@@ -75,6 +78,9 @@ public class ModCharsetWires {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		if (!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_WIRES))
+			return;
+
 		packet = new PacketRegistry(ModCharsetWires.MODID);
 
 		// Temporary recipes

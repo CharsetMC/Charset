@@ -72,7 +72,7 @@ public abstract class PartWireSignalBase extends PartWire implements
 
 	@Override
 	protected void logicUpdate() {
-		if (!getWorld().isRemote) {
+		if (getWorld() != null && !getWorld().isRemote) {
 			onSignalChanged(-1);
 		}
 	}

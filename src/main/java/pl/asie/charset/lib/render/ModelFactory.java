@@ -89,7 +89,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     public IBakedModel getModel(T object, BlockRenderLayer layer) {
         if (object == null) {
-            return null;
+            return this;
         }
 
         ModelKey<T> key = new ModelKey<>(object, layer);

@@ -55,7 +55,7 @@ import pl.asie.charset.pipes.shifter.TileShifter;
 		dependencies = ModCharsetLib.DEP_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetPipes {
 	public static final String MODID = "CharsetPipes";
-	public static final String NAME = "|";
+	public static final String NAME = "CharsetPipes";
 	public static final String VERSION = "@VERSION@";
 	public static final Random RANDOM = new Random();
 

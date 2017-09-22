@@ -37,7 +37,7 @@ import pl.asie.charset.lib.ModCharsetLib;
 		dependencies = ModCharsetLib.DEP_NO_MCMP, updateJSON = ModCharsetLib.UPDATE_URL, acceptableRemoteVersions = ModCharsetLib.ACCEPTABLE_REMOTE_VERSIONS)
 public class ModCharsetDecoration {
 	public static final String MODID = "CharsetDecoration";
-	public static final String NAME = "^";
+	public static final String NAME = "CharsetDecoration";
 	public static final String VERSION = "@VERSION@";
 
 	@SidedProxy(clientSide = "pl.asie.charset.decoration.ProxyClient", serverSide = "pl.asie.charset.decoration.ProxyCommon")
