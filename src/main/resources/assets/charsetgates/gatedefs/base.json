@@ -1,0 +1,13 @@
+{
+    "models": {
+        "base": "charsetgates:block/gate_base",
+        "layer": "charsetgates:block/gate_layer",
+        "torch_off": "charsetgates:block/gate_torch_off",
+        "torch_on": "charsetgates:block/gate_torch_on"
+    },
+    "colors": {
+        "off": "381000",
+        "on": "E03502",
+        "disabled": "707070"
+    }
+}

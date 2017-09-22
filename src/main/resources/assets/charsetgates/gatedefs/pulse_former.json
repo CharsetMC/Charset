@@ -1,0 +1,38 @@
+{
+    "textures": {
+        "top": "charsetgates:blocks/pulse_former/top"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/pulse_former/layer_in"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/pulse_former/layer_1"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/pulse_former/layer_2"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/pulse_former/layer_3"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/pulse_former/layer_4"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [4, 8]
+        },
+        {
+            "pos": [11, 8]
+        },
+        {
+            "pos": [7.5, 1.5]
+        }
+    ]
+}

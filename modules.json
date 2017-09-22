@@ -1,5 +1,5 @@
 {
-	"mcversion": "1.10.2",
+	"mcversion": "1.9.4",
 	"modules": {
 		"lib": {
 			"char": "‽",
@@ -23,6 +23,20 @@
 			"description": "Gameplay/aesthetic tweaks to vanilla",
 			"dependencies": ["lib"],
 			"stability": "stable"
+		},
+		"wires": {
+			"char": "+",
+			"default": false,
+			"description": "Redstone cabling with analog support",
+			"dependencies": ["lib", "mod:MCMultiPart"],
+			"stability": "staging"
+		},
+		"gates": {
+			"char": "&",
+			"default": false,
+			"description": "Simple redstone gates",
+			"dependencies": ["lib", "mod:MCMultiPart"],
+			"stability": "staging"
 		},
 		"audio": {
 			"char": "♫",

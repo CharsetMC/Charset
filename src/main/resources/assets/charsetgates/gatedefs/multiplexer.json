@@ -1,0 +1,45 @@
+{
+    "textures": {
+        "top": "charsetgates:blocks/multiplexer/top"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/multiplexer/layer_bottom_in"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/multiplexer/layer_left_in"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/multiplexer/layer_right_in"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/multiplexer/layer_left_out"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/multiplexer/layer_right_out"
+        },
+        {
+            "type": "color",
+            "texture": "charsetgates:blocks/multiplexer/layer_1"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [4, 12]
+        },
+        {
+            "pos": [4, 7]
+        },
+        {
+            "pos": [11, 7]
+        },
+        {
+            "pos": [7.5, 1.5]
+        }
+    ]
+}
