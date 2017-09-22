@@ -1,0 +1,42 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "charsetstorage:backpack"
+    },
+    "variants": {
+        "normal": [{
+            "submodel": {
+                "lr": {
+                    "model": "charsetstorage:backpack_lr"
+                },
+                "top": {
+                    "model": "charsetstorage:backpack_top"
+                }
+            }
+        }],
+        "facing": {
+            "north": {
+                "y": 0
+            },
+            "south": {
+                "y": 180
+            },
+            "east": {
+                "y": 90
+            },
+            "west": {
+                "y": 270
+            }
+        },
+        "inventory": [{
+            "submodel": {
+                "lr": {
+                    "model": "charsetstorage:backpack_lr"
+                },
+                "top": {
+                    "model": "charsetstorage:backpack_top"
+                }
+            }
+        }]
+    }
+}
