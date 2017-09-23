@@ -48,6 +48,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -73,12 +74,8 @@ public class CharsetTransportCarts {
     @CharsetModule.Instance
     public static CharsetTransportCarts instance;
 
-    @CharsetModule.Configuration
-    public static Configuration config;
-
     public static TrackCombiner combiner;
     public static TrainLinker linker;
-    public static int minecartStackSize;
 
     public static Item itemLinker;
 
@@ -93,7 +90,6 @@ public class CharsetTransportCarts {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        minecartStackSize = config.getInt("minecartStackSize", "tweaks", 4, 1, 64, "Sets the minimum stack size for all minecarts.");
         CapabilityManager.INSTANCE.register(Linkable.class, Linkable.STORAGE, Linkable.class);
 
         if (ModCharset.profile.includes(ModuleProfile.INDEV)) {
@@ -143,11 +139,11 @@ public class CharsetTransportCarts {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        for (Item item : Item.REGISTRY) {
+        /* for (Item item : Item.REGISTRY) {
             if (item instanceof ItemMinecart && item.getItemStackLimit() < minecartStackSize) {
                 item.setMaxStackSize(minecartStackSize);
             }
-        }
+        } */
     }
 
     private final Map<EntityPlayer, EntityMinecart> linkMap = new HashMap<>();

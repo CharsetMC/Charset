@@ -35,6 +35,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.ModFixs;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
@@ -46,6 +47,7 @@ import org.apache.logging.log4j.Logger;
 import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.CharsetImplAPI;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.loader.ModuleLoader;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
@@ -61,7 +63,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
-@Mod(modid = ModCharset.MODID, name = ModCharset.NAME, version = ModCharset.VERSION, updateJSON = ModCharset.UPDATE_URL, dependencies = ModCharset.DEP_LIB)
+@Mod(modid = ModCharset.MODID, name = ModCharset.NAME, version = ModCharset.VERSION, updateJSON = ModCharset.UPDATE_URL, dependencies = ModCharset.DEP_LIB, guiFactory = "pl.asie.charset.lib.config.ConfigGuiFactory")
 public class ModCharset {
 	public static final String UPDATE_URL = "http://charset.asie.pl/update.json";
 	public static final String MODID = "charset";
@@ -242,6 +244,13 @@ public class ModCharset {
 					mapping.warn();
 				}
 			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+		if (ModCharset.MODID.equals(event.getModID())) {
+			ModuleLoader.INSTANCE.passEvent(new CharsetLoadConfigEvent(false));
 		}
 	}
 

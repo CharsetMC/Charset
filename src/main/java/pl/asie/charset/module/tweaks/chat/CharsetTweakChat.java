@@ -26,6 +26,8 @@ import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.PlayerUtils;
@@ -43,8 +45,8 @@ public class CharsetTweakChat {
     public static boolean enableGreentext;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        enableGreentext = config.getBoolean("greentext", "features", true, "Enables >implications, I suppose.");
+    public void loadConfig(CharsetLoadConfigEvent event) {
+        enableGreentext = ConfigUtils.getBoolean(config, "features","greentext", true, "Enables >implications, I suppose.", false);
     }
 
     @SubscribeEvent

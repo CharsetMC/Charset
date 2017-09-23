@@ -36,6 +36,8 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.ItemUtils;
@@ -82,13 +84,17 @@ public class CharsetTweakDynamicLights {
 	public static float blockBrightnessDivider;
 
 	@Mod.EventHandler
+	public void loadConfig(CharsetLoadConfigEvent event) {
+		enableExplosionLights = ConfigUtils.getBoolean(config, "sources", "explosion",  true, "Light sources based on being ready for an explosion.", false);
+		enableFireLights = ConfigUtils.getBoolean(config, "sources", "fire",  true, "Light sources based on being lit on fire.", false);
+		enableItemLights = ConfigUtils.getBoolean(config, "sources", "items", true, "Light sources based on items.", false);
+		enableEntityLights = ConfigUtils.getBoolean(config, "holders", "entities", true, "Light sources held by non-player entities.", false);
+		enablePlayerLights = ConfigUtils.getBoolean(config, "holders", "players", true, "Light sources held by players.", false);
+		blockBrightnessDivider = 1f / ConfigUtils.getFloat(config, "general", "blockBrightnessMultiplier", 0.4f, 0, 1, "The multiplier for block-derived light brightness.", false);
+	}
+
+	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
-		enableExplosionLights = config.getBoolean("explosion", "sources", true, "Light sources based on being ready for an explosion.");
-		enableFireLights = config.getBoolean("fire", "sources", true, "Light sources based on being lit on fire.");
-		enableItemLights = config.getBoolean("items", "sources", true, "Light sources based on items.");
-		enableEntityLights = config.getBoolean("entities", "holders", true, "Light sources held by non-player entities.");
-		enablePlayerLights = config.getBoolean("players", "holders", true, "Light sources held by players.");
-		blockBrightnessDivider = 1f / config.getFloat("blockBrightnessMultiplier", "config", 0.4f, 0, 1, "The multiplier for block-derived light brightness.");
 	}
 
 	private Light getLight(double x, double y, double z, ItemStack s) {

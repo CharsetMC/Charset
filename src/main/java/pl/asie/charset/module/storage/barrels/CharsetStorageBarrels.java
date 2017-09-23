@@ -36,6 +36,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -48,6 +49,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -103,6 +106,17 @@ public class CharsetStorageBarrels {
 	}
 
 	@Mod.EventHandler
+	public void reloadReentrantConfig(CharsetLoadConfigEvent event) {
+		enableSilkyBarrels = ConfigUtils.getBoolean(config, "features", "enableSilkyBarrels", !ModCharset.isModuleLoaded("tweak.blockCarrying"), "Enable silky barrels. On by default unless tweak.blockCarrying is also present.", true);
+		enableHoppingBarrels = ConfigUtils.getBoolean(config, "features", "enableHoppingBarrels", true, "Enable hopping barrels. On by default.", true);
+		enableStickyBarrels = ConfigUtils.getBoolean(config, "features", "enableStickyBarrels", true, "Enable sticky barrels. On by default.", true);
+		maxDroppedStacks = ConfigUtils.getInt(config, "general", "maxDroppedStacks", 1024, 0, (Integer.MAX_VALUE / 64), "The maximum amount of stacks to be dropped when a barrel is broken.", true);
+		renderBarrelItem3D = ConfigUtils.getBoolean(config, "render", "renderItem3D", false, "Should items use fancy 3D rendering?", false);
+		renderBarrelItem = ConfigUtils.getBoolean(config, "render", "renderItem", true, "Should items be rendered on barrels?", false);
+		renderBarrelText = ConfigUtils.getBoolean(config, "render", "renderText", true, "Should text be rendered on barrels?", false);
+	}
+
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		barrelBlock = new BlockBarrel();
 		barrelItem = new ItemDayBarrel(barrelBlock);
@@ -111,14 +125,6 @@ public class CharsetStorageBarrels {
 		barrelBlock.setHarvestLevel("axe", 0);
 
 		MinecraftForge.EVENT_BUS.register(new BarrelEventListener());
-
-		renderBarrelItem3D = config.getBoolean("renderItem3D", "render", false, "Should items use fancy 3D rendering?");
-		renderBarrelItem = config.getBoolean("renderItem", "render", true, "Should items be rendered on barrels?");
-		renderBarrelText = config.getBoolean("renderText", "render", true, "Should text be rendered on barrels?");
-		enableSilkyBarrels = config.getBoolean("enableSilkyBarrels", "features", !ModCharset.isModuleLoaded("tweak.blockCarrying"), "Enable silky barrels. On by default unless tweak.blockCarrying is also present.");
-		enableHoppingBarrels = config.getBoolean("enableHoppingBarrels", "features", true, "Enable hopping barrels. On by default.");
-		enableStickyBarrels = config.getBoolean("enableStickyBarrels", "features", true, "Enable sticky barrels. On by default.");
-		maxDroppedStacks = config.getInt("maxDroppedStacks", "general", 1024, 0, (Integer.MAX_VALUE / 64), "The maximum amount of stacks to be dropped when a barrel is broken.");
 	}
 
 	@SubscribeEvent

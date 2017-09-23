@@ -26,6 +26,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.utils.ThreeState;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public final class CharsetIMC {
     }
 
     public void loadConfig(Configuration config) {
-        for (String s : config.getStringList("whitelist", "functionalityRegistry", new String[]{}, "Functionality registry whitelist (example entry: carry:minecraft:bedrock)")) {
+        for (String s : ConfigUtils.getStringList(config, "functionalityRegistry", "whitelist", new String[]{}, "Functionality registry whitelist (example entry: carry:minecraft:bedrock)", true)) {
             String[] sSplit = s.split(":", 2);
             if (sSplit.length >= 2) {
                 add("w:" + sSplit[0], new ResourceLocation(sSplit[1]));
@@ -51,7 +52,7 @@ public final class CharsetIMC {
                 ModCharset.logger.warn("Invalid functionality registry config entry: " + s);
             }
         }
-        for (String s : config.getStringList("blacklist", "functionalityRegistry", new String[]{}, "Functionality registry blacklist (example entry: carry:minecraft:bedrock)")) {
+        for (String s : ConfigUtils.getStringList(config, "functionalityRegistry", "blacklist", new String[]{}, "Functionality registry blacklist (example entry: carry:minecraft:bedrock)", true)) {
             String[] sSplit = s.split(":", 2);
             if (sSplit.length >= 2) {
                 add("b:" + sSplit[0], new ResourceLocation(sSplit[1]));

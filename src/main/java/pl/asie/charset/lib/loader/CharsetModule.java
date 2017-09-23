@@ -32,6 +32,7 @@ public @interface CharsetModule {
 	String name();
 	ModuleProfile profile();
 	String description() default "";
+	String moduleConfigGui() default "";
 	boolean isVisible() default true;
 	boolean isDefault() default true;
 	boolean isClientOnly() default false;

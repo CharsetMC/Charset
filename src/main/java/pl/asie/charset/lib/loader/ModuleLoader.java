@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.discovery.asm.ModAnnotation;
 import net.minecraftforge.fml.common.event.FMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
 import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -74,6 +75,8 @@ public class ModuleLoader {
 
 	public static final ModuleLoader INSTANCE = new ModuleLoader();
 	public static final Multimap<Class, String> classNames = HashMultimap.create();
+	public static final BiMap<String, Configuration> moduleConfigs = HashBiMap.create();
+	public static final Map<String, String> moduleGuiClasses = new HashMap<>();
 
 	private static final Multimap<String, String> dependencies = HashMultimap.create();
 	private static final Map<Class, List<Pair<String, MethodHandle>>> loaderHandles = new IdentityHashMap<>();
@@ -81,7 +84,6 @@ public class ModuleLoader {
 	private static final BiMap<String, Object> loadedModules = HashBiMap.create();
 	private static final Map<String, Object> loadedModulesByClass = new HashMap<>();
 	private static final Map<String, EnableInformation> enableInfoMap = new HashMap<>();
-	private static final Set<Configuration> moduleConfigs = new HashSet<>();
 
 	private static final Joiner joinerComma = Joiner.on(", ");
 
@@ -182,17 +184,25 @@ public class ModuleLoader {
 				"profile",
 				"DEFAULT"
 		);
-		baseProfileProp.setComment("Set the base profile for Charset.\nThis will decide whether or not certain modules are accessible.\nAllowed values: STABLE, TESTING, EXPERIMENTAL");
+		baseProfileProp.setValidValues(new String[] {
+				"DEFAULT", "STABLE", "TESTING", "EXPERIMENTAL"
+		});
+		baseProfileProp.setLanguageKey("config.charset.profile.name");
+		baseProfileProp.setRequiresMcRestart(true);
 
-		ModuleProfile profile;
+		ModuleProfile profile, defaultProfile;
+		if (ModCharset.INDEV) {
+			defaultProfile = ModuleProfile.INDEV;
+		} else if (ModCharset.defaultOptions.containsKey("profile")) {
+			defaultProfile = getProfileFromString(ModCharset.defaultOptions.get("profile"));
+		} else {
+			defaultProfile = ModuleProfile.STABLE;
+		}
+
+		baseProfileProp.setComment("Set the base profile for Charset.\nThis will decide whether or not certain modules are accessible.\nAllowed values: STABLE, TESTING, EXPERIMENTAL\nDEFAULT is " + defaultProfile.name());
+
 		if ("DEFAULT".equals(baseProfileProp.getString().toUpperCase())) {
-			if (ModCharset.INDEV) {
-				profile = ModuleProfile.INDEV;
-			} else if (ModCharset.defaultOptions.containsKey("profile")) {
-				profile = getProfileFromString(ModCharset.defaultOptions.get("profile"));
-			} else {
-				profile = ModuleProfile.STABLE;
-			}
+			profile = defaultProfile;
 		} else {
 			profile = getProfileFromString(baseProfileProp.getString());
 		}
@@ -215,7 +225,9 @@ public class ModuleLoader {
 			List<String> tags = (List<String>) info.getOrDefault("categories", Collections.emptyList());
 			for (String s : tags) {
 				if (!categoryMap.containsKey(s)) {
-					categoryMap.put(s, ModCharset.configModules.getBoolean(s, "categories", !"overhaul".equals(s), ""));
+					Property prop = ModCharset.configModules.get("categories", s, !"overhaul".equals(s));
+					prop.setRequiresMcRestart(true);
+					categoryMap.put(s, prop.getBoolean());
 				}
 			}
 		}
@@ -232,6 +244,11 @@ public class ModuleLoader {
 			Boolean serverOnly = (Boolean) info.getOrDefault("isServerOnly", false);
 			List<String> tags = (List<String>) info.getOrDefault("categories", Collections.emptyList());
 
+			String moduleGuiClass = (String) info.getOrDefault("moduleConfigGui", "");
+			if (moduleGuiClass.length() > 0) {
+				moduleGuiClasses.put(name, moduleGuiClass);
+			}
+
 			moduleData.put(name, data);
 
 			ThreeState override = ThreeState.MAYBE;
@@ -241,9 +258,14 @@ public class ModuleLoader {
 				} else {
 					if (compat) {
 						Property prop = ModCharset.configModules.get("compat", name, isDefault);
+						prop.setRequiresMcRestart(true);
 						if (!prop.getBoolean()) override = ThreeState.NO;
 					} else {
 						Property prop = ModCharset.configModules.get("overrides", name, "DEFAULT");
+						prop.setValidValues(new String[] {
+								"DEFAULT", "ENABLE", "DISABLE"
+						});
+						prop.setRequiresMcRestart(true);
 
 						if (desc.length() > 0) desc += " ";
 						desc += "[Profile: " + modProfile.name().toUpperCase() + "";
@@ -439,7 +461,7 @@ public class ModuleLoader {
 			try {
 				Configuration config = new Configuration(ModCharset.getModuleConfigFile(id));
 				getField(data).set(instance, config);
-				moduleConfigs.add(config);
+				moduleConfigs.put(id, config);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -485,6 +507,8 @@ public class ModuleLoader {
 		addClassNames(table, CharsetJEIPlugin.class, "jei");
 		addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
 
+		passEvent(new CharsetLoadConfigEvent(true));
+
 		if (ModCharset.configModules.hasChanged() || configDirty) {
 			ModCharset.configModules.save();
 			configDirty = false;
@@ -511,7 +535,7 @@ public class ModuleLoader {
 	}
 
 	public void init() {
-		for (Configuration c : moduleConfigs) {
+		for (Configuration c : moduleConfigs.values()) {
 			if (c.hasChanged()) {
 				c.save();
 			}

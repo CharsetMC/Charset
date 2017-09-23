@@ -40,6 +40,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
@@ -71,13 +73,16 @@ public class CharsetStorageLocks {
 	public static boolean enableKeyKeepInventory;
 
 	@Mod.EventHandler
+	public void loadConfig(CharsetLoadConfigEvent event) {
+		enableKeyKeepInventory = ConfigUtils.getBoolean(config, "general", "keepKeysOnDeath", true, "Should keys be kept in inventory on death?", true);
+	}
+
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		masterKeyItem = new ItemMasterKey();
 		keyItem = new ItemKey();
 		keyringItem = new ItemKeyring();
 		lockItem = new ItemLock();
-
-		enableKeyKeepInventory = config.getBoolean("keepKeysOnDeath", "locks", true, "Should keys be kept in inventory on death?");
 	}
 
 	@SubscribeEvent

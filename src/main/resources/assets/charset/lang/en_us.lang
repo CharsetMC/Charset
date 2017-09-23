@@ -1,3 +1,21 @@
+# Config
+config.charset.title=Charset Configuration
+config.charset.profile.name=Profile
+config.charset.categories.name=Toggle Module Categories
+config.charset.overrides.name=Toggle Individual Modules
+
+config.charset.tweak.blockCarrying.general.name=General
+
+config.charset.storage.locks.general.name=General
+
+config.charset.storage.barrels.features.name=Toggle Features
+config.charset.storage.barrels.general.name=General
+config.charset.storage.barrels.render.name=Client/Rendering
+
+config.charset.lib.expert.name=Expert Settings
+config.charset.lib.functionalityregistry.name=Functionality Registry
+config.charset.lib.general.name=General
+
 # CharsetAudio
 item.charset.tape.name=Tape
 item.charset.tapedrive.name=Tape Drive

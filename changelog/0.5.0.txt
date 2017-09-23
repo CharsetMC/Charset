@@ -4,6 +4,7 @@
 * Major improvements to Just Enough Items support.
 * Many, many bugfixes and improvements throughout the codebase.
 * Redesigned module configuration system! Should be easier to understand by users.
+    * Now with a GUI config!
     * Also fixes #138 and #129
 * [audio.noteblock] Fix 1.12 compatibility, improve mod compatibility.
 * [laser] New module! Adds a laser-based logic system.
@@ -44,7 +45,7 @@
 * [tweak.carry] Carried blocks now render in third person! \o/
 * [tweak.carry] [#154] Carrying a cactus now correctly deals damage to the carrier.
 * [tweak.carry] [#140] Carrying will now respect your pickblock key mapping.
-* However, mapping it to a key as opposed to a mouse button will prevent carrying from working in Creative Mode.
+    * However, mapping it to a key as opposed to a mouse button will prevent carrying from working in Creative Mode.
 * [tweak.carry] Fix carried blocks sometimes appearing on other players.
 * [tweak.carry] [#149] Fix doors being carryable.
 * [tweak.carry] [#137] Fix placing double chests potentially causing a rendering glitch.

@@ -50,6 +50,8 @@ import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -81,9 +83,12 @@ public class CharsetTweakBlockCarrying {
     public static boolean enabledCreative;
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        enabledCreative = config.getBoolean("enabledCreative", "general", true, "Should block carrying be enabled in creative mode?");
+    public void loadConfig(CharsetLoadConfigEvent event) {
+        enabledCreative = ConfigUtils.getBoolean(config, "general", "enabledInCreative", true, "Should block carrying be enabled in creative mode?", true);
+    }
 
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
         packet.registerPacket(0x01, PacketCarryGrab.class);
         packet.registerPacket(0x02, PacketCarrySync.class);
 

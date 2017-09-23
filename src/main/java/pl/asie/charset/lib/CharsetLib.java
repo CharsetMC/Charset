@@ -50,6 +50,8 @@ import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.block.PacketCustomBlockDust;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.command.*;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.handlers.*;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -127,18 +129,29 @@ public class CharsetLib {
 	}
 
 	@Mod.EventHandler
+	public void loadConfig(CharsetLoadConfigEvent event) {
+		alwaysDropDroppablesGivenToPlayer = ConfigUtils.getBoolean(config, "general", "alwaysDropDroppablesGivenToPlayer", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).", true);
+		enableDebugInfo = ConfigUtils.getBoolean(config, "expert","enableDebugInfo", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.", false);
+
+		boolean oldShowAllItemTypes = showAllItemTypes;
+		showAllItemTypes = ConfigUtils.getBoolean(config, "general","showAllItemTypes", ModCharset.INDEV, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.", false);
+		if (!event.isFirstTime() && oldShowAllItemTypes != showAllItemTypes) {
+			SubItemProviderCache.clear();
+		}
+
+		if (event.isFirstTime()) {
+			CharsetIMC.INSTANCE.loadConfig(config);
+		}
+	}
+
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		AudioAPI.DATA_REGISTRY = new CharsetSimpleInstantiatingRegistry<>();
 		AudioAPI.SINK_REGISTRY = new CharsetSimpleInstantiatingRegistry<>();
 
-		alwaysDropDroppablesGivenToPlayer = config.getBoolean("alwaysDropDroppablesGivenToPlayer", "general", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).");
-		enableDebugInfo = config.getBoolean("enableDebugInfo", "expert", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.");
-		showAllItemTypes = config.getBoolean("showAllItemTypes", "general", ModCharset.INDEV, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.");
-
 		Capabilities.preInit();
 		NotifyImplementation.init();
 		ItemMaterialHeuristics.init(false);
-		CharsetIMC.INSTANCE.loadConfig(config);
 
 		MinecraftForge.EVENT_BUS.register(new CharsetLibEventHandler());
 		MinecraftForge.EVENT_BUS.register(Scheduler.INSTANCE);
