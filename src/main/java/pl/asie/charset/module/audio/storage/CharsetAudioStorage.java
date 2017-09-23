@@ -29,13 +29,11 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -52,7 +50,7 @@ import java.util.List;
 @CharsetModule(
         name = "audio.storage",
         description = "Audio storage, recording and playback - Quartz Discs",
-        profile = ModuleProfile.VERY_UNSTABLE
+        profile = ModuleProfile.INDEV
 )
 public class CharsetAudioStorage {
     @CapabilityInject(IDataStorage.class)

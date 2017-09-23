@@ -48,7 +48,7 @@ import java.util.Map;
 @CharsetModule(
 		name = "tools.building",
 		description = "Building tools: chisel.",
-		profile = ModuleProfile.UNSTABLE // TODO: When STABLE, merge tools.wrench
+		profile = ModuleProfile.EXPERIMENTAL // TODO: When STABLE, merge tools.wrench
 )
 public class CharsetToolsBuilding {
 	private static Map<Block, ICustomRotateBlock> customRotationHandlers = new HashMap<>();

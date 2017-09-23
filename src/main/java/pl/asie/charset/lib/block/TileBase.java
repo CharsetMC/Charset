@@ -21,6 +21,7 @@ package pl.asie.charset.lib.block;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -46,7 +47,7 @@ public class TileBase extends TileEntity {
 		}
 	}
 
-	public ItemStack getPickedBlock(IBlockState state) {
+	public ItemStack getPickedBlock(EntityPlayer player, IBlockState state) {
 		return getDroppedBlock(state);
 	}
 

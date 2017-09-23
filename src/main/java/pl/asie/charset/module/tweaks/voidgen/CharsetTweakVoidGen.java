@@ -45,9 +45,9 @@ import java.util.Collection;
 
 @CharsetModule(
 		name = "tweak.voidGenerator",
-		description = "Void overworld.",
+		description = "Forces a void overworld.",
 		isDefault = false,
-		profile = ModuleProfile.TESTING
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTweakVoidGen {
 	@Mod.EventHandler

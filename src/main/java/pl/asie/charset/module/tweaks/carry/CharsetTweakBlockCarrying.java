@@ -34,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.Mod;
@@ -71,11 +72,18 @@ public class CharsetTweakBlockCarrying {
     @CapabilityInject(CarryHandler.class)
     public static Capability<CarryHandler> CAPABILITY;
 
+    @CharsetModule.Configuration
+    public static Configuration config;
+
     @CharsetModule.PacketRegistry
     public static PacketRegistry packet;
 
+    public static boolean enabledCreative;
+
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        enabledCreative = config.getBoolean("enabledCreative", "general", true, "Should block carrying be enabled in creative mode?");
+
         packet.registerPacket(0x01, PacketCarryGrab.class);
         packet.registerPacket(0x02, PacketCarrySync.class);
 

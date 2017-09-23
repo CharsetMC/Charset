@@ -93,7 +93,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
             if (allowed) {
                 rep.upgrades.addAll(upgrades);
-                builder.add(rep.getPickedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState()));
+                builder.add(rep.getDroppedBlock(CharsetStorageBarrels.barrelBlock.getDefaultState()));
                 rep.upgrades.clear();
             }
         }

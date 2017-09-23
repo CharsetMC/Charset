@@ -27,7 +27,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -61,7 +60,7 @@ import java.util.Random;
         description = "Removes the Nether and End, and adapts recipes for Nether/End items to either remove them or add new ways of crafting them.",
         dependencies = {"tweak.remove.netherPortals"},
         categories = {"overhaul"},
-        profile = ModuleProfile.VERY_UNSTABLE
+        profile = ModuleProfile.INDEV
 )
 public class CharsetOverhaulOneDimension {
     public static BlockOreQuartz quartzOreBlock;

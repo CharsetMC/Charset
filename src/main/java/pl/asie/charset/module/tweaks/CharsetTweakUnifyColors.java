@@ -44,7 +44,7 @@ import java.util.Map;
 
 /* @CharsetModule(
 		name = "tweak.unifyColors",
-		profile = ModuleProfile.UNSTABLE,
+		profile = ModuleProfile.EXPERIMENTAL,
 		description = "Unifies various colored block and item colors. Works with resource packs!",
 		isClientOnly = true
 ) */

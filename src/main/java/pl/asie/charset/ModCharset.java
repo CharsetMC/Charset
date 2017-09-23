@@ -19,6 +19,7 @@
 
 package pl.asie.charset;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
@@ -39,6 +40,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.api.CharsetAPI;
@@ -55,6 +57,8 @@ import pl.asie.charset.upgrade.CharsetLockKeyTagChange;
 import pl.asie.charset.upgrade.CharsetUnifiedModIdFixer;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.Map;
 import java.util.Set;
 
 @Mod(modid = ModCharset.MODID, name = ModCharset.NAME, version = ModCharset.VERSION, updateJSON = ModCharset.UPDATE_URL, dependencies = ModCharset.DEP_LIB)
@@ -84,6 +88,7 @@ public class ModCharset {
 	public static Logger logger;
 	public static Configuration configModules, configIds;
 
+	public static Map<String, String> defaultOptions;
 	private static File configurationDirectory;
 	private static ModFixs dataFixes;
 
@@ -105,10 +110,25 @@ public class ModCharset {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		try {
+			InputStream stream = getClass().getResourceAsStream("assets/charset/default.options");
+			if (stream != null) {
+				for (String s : IOUtils.toString(stream, Charsets.UTF_8).split("\n")) {
+					String[] parts = s.split("=", 2);
+					parts[0] = parts[0].trim();
+					parts[1] = parts[1].trim();
+					defaultOptions.put(parts[0].toLowerCase(), parts[1].toLowerCase());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		configurationDirectory = new File(event.getModConfigurationDirectory(), "charset");
 		if (!configurationDirectory.exists()) {
 			configurationDirectory.mkdir();
 		}
+
 		configModules = new Configuration(getConfigFile("modules.cfg"));
 		configIds = new Configuration(getConfigFile("ids.cfg"));
 		RegistryUtils.loadConfigIds(configIds);

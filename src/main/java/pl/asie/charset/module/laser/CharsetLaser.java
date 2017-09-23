@@ -19,11 +19,9 @@
 
 package pl.asie.charset.module.laser;
 
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonExtension;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -58,7 +56,7 @@ import java.util.Set;
 @CharsetModule(
         name = "laser",
         description = "Lasers!",
-        profile = ModuleProfile.UNSTABLE
+        profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetLaser {
     public static final PropertyEnum<LaserColor> LASER_COLOR = PropertyEnum.create("color", LaserColor.class);

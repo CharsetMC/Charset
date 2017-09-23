@@ -41,6 +41,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.locks.Lockable;
@@ -505,7 +506,21 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     public int getMaxStacks() {
-        return 64;
+        int multiplier = 1;
+        if (!item.isEmpty() && CharsetStorageBarrels.stackSizeMultiplierMap.containsKey(item.getItem())) {
+            multiplier = CharsetStorageBarrels.stackSizeMultiplierMap.get(item.getItem());
+        }
+
+        return 64 * multiplier;
+    }
+
+    public int getStackDivisor() {
+        int multiplier = 1;
+        if (!item.isEmpty() && CharsetStorageBarrels.stackDivisorMultiplierMap.containsKey(item.getItem())) {
+            multiplier = CharsetStorageBarrels.stackDivisorMultiplierMap.get(item.getItem());
+        }
+
+        return item.getMaxStackSize() * multiplier;
     }
 
     public int getMaxDropAmount() {
@@ -696,6 +711,53 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     // Interaction
     private final WeakHashMap<EntityPlayer, Long> lastClickMap = new WeakHashMap<>();
 
+    public EnumActionResult insertFromItemHandler(EntityPlayer player, boolean addAll) {
+        boolean hadNoItem = item.isEmpty();
+        int stackCount = addAll ? Integer.MAX_VALUE : 1;
+        int inserted = 0;
+
+        ItemStack heldStack = player.getHeldItemMainhand();
+        if (!heldStack.isEmpty() && heldStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            IItemHandler handler = heldStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            if (handler != null) {
+                for (int i = 0; i < handler.getSlots(); i++) {
+                    ItemStack stack = handler.extractItem(i, handler.getSlotLimit(i), true);
+                    if (canInsert(stack)) {
+                        int free = getMaxItemCount() - getItemCount();
+                        if (free <= 0) {
+                            info(player);
+                            return EnumActionResult.FAIL;
+                        }
+
+                        int take = Math.min(free, stack.getCount());
+                        stack = handler.extractItem(i, take, false);
+                        if (!stack.isEmpty()) {
+                            inserted += stack.getCount();
+                            ItemStack remainder = insertionView.insertItem(0, stack, false);
+                            if (!remainder.isEmpty()) {
+                                remainder.shrink(handler.insertItem(i, remainder, false).getCount());
+                                inserted -= remainder.getCount();
+                            }
+                            stackCount--;
+                        }
+
+                        if (stackCount <= 0) {
+                            break;
+                        }
+                    }
+                }
+
+                if (inserted > 0 && hadNoItem) {
+                    markBlockForUpdate();
+                }
+
+                return inserted > 0 ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+            }
+        }
+
+        return EnumActionResult.PASS;
+    }
+
     //*             Left-Click         Right-Click
     //* No Shift:   Remove stack       Add item
     //* Shift:      Remove 1 item      Use item
@@ -705,6 +767,12 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         if (lockable.hasLock())
             return false;
 
+        ItemStack held = player.getHeldItem(hand);
+        if (!world.isRemote && isNested(held) && (item.isEmpty() || itemMatch(held))) {
+            new Notice(notice_target, new TextComponentTranslation("notice.charset.barrel.no")).sendTo(player);
+            return true;
+        }
+
         Long lastClick = lastClickMap.get(player);
         if (lastClick != null && world.getTotalWorldTime() - lastClick < 10 && !item.isEmpty()) {
             addAllItems(player, hand);
@@ -713,15 +781,19 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         lastClickMap.put(player, world.getTotalWorldTime());
 
         // right click: put an item
-        ItemStack held = player.getHeldItem(hand);
         if (held.isEmpty()) {
             info(player);
             return true;
         }
 
-        if (!world.isRemote && isNested(held) && (item.isEmpty() || itemMatch(held))) {
-            new Notice(notice_target, new TextComponentTranslation("notice.charset.barrel.no")).sendTo(player);
-            return true;
+        switch (insertFromItemHandler(player, false)) {
+            case PASS:
+                break;
+            case SUCCESS:
+                return true;
+            case FAIL:
+                info(player);
+                return true;
         }
 
         if (!canInsert(held)) {
@@ -756,6 +828,16 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     void addAllItems(EntityPlayer entityplayer, EnumHand hand) {
+        switch (insertFromItemHandler(entityplayer, true)) {
+            case PASS:
+                break;
+            case SUCCESS:
+                return;
+            case FAIL:
+                info(entityplayer);
+                return;
+        }
+
         ItemStack held = entityplayer.getHeldItem(hand);
         InventoryPlayer inv = entityplayer.inventory;
         int total_delta = 0;
@@ -832,7 +914,19 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     protected void giveOrSpawnItem(EntityPlayer player, BlockPos dropPos, int removeCount) {
-        ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), makeStack(removeCount), 0.2f, 0.2f, 0.2f, 1);
+        ItemStack stack = makeStack(removeCount);
+
+        ItemStack heldStack = player.getHeldItemMainhand();
+        if (!heldStack.isEmpty() && heldStack.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            IItemHandler handler = heldStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            if (handler != null) {
+                stack = ItemHandlerHelper.insertItem(handler, stack, false);
+            }
+        }
+
+        if (!stack.isEmpty()) {
+            ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), stack, 0.2f, 0.2f, 0.2f, 1);
+        }
     }
 
     void info(final EntityPlayer entityplayer) {
@@ -1003,6 +1097,19 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         changeOrientation(newOrientation, false);
+    }
+
+    @Override
+    public ItemStack getPickedBlock(EntityPlayer player, IBlockState state) {
+        if (!player.isSneaking()) {
+            return getDroppedBlock(state);
+        } else {
+            ItemStack stack = item.copy();
+            if (!stack.isEmpty() && stack.getCount() > stack.getMaxStackSize()) {
+                stack.setCount(stack.getMaxStackSize());
+            }
+            return stack;
+        }
     }
 
     @Override

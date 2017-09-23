@@ -147,7 +147,7 @@ public class TweakCarryEventHandler {
         CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (!player.isCreative()) {
             result = true;
-        } else if (!allowCreative) {
+        } else if (!allowCreative || !CharsetTweakBlockCarrying.enabledCreative) {
             return false;
         }
 

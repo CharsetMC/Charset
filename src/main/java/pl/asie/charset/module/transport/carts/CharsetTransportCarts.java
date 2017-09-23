@@ -96,7 +96,7 @@ public class CharsetTransportCarts {
         minecartStackSize = config.getInt("minecartStackSize", "tweaks", 4, 1, 64, "Sets the minimum stack size for all minecarts.");
         CapabilityManager.INSTANCE.register(Linkable.class, Linkable.STORAGE, Linkable.class);
 
-        if (ModCharset.profile.includes(ModuleProfile.VERY_UNSTABLE)) {
+        if (ModCharset.profile.includes(ModuleProfile.INDEV)) {
             linker = new TrainLinker();
             MinecraftForge.EVENT_BUS.register(linker);
 
@@ -108,7 +108,7 @@ public class CharsetTransportCarts {
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
-        if (ModCharset.profile.includes(ModuleProfile.VERY_UNSTABLE)) {
+        if (ModCharset.profile.includes(ModuleProfile.INDEV)) {
             RegistryUtils.register(event.getRegistry(), itemLinker, "linker");
         }
     }
@@ -125,7 +125,7 @@ public class CharsetTransportCarts {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        if (ModCharset.profile.includes(ModuleProfile.VERY_UNSTABLE)) {
+        if (ModCharset.profile.includes(ModuleProfile.INDEV)) {
             register(EntityMinecartImproved.class, "rminecart", EntityMinecart.class);
         }
 

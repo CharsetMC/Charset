@@ -18,11 +18,14 @@
 * [misc.scaffold] Scaffolds can now be stacked up by rightclicking them!
 * [misc.scaffold, storage.barrels] The items present in creative tabs for these modules are now generated based on available recipes.
 * [storage.barrels] Add support for Structure Block rotations and mirroring.
+* [storage.barrels] Barrels can now be filled and emptied with in-item inventories (Bit Bags).
 * [storage.barrels] Barrels can now be locked!
 * [storage.barrels] Barrels can now have multiple upgrade types at the same time!
+* [storage.barrels] Chisels & Bits block bits now stack up to 512 in barrels, as per Bit Bags.
 * [storage.barrels] Fix barrels made out of non-burnable materials being burnable.
 * [storage.barrels] Fix extracting only one item at a time only working in creative mode.
 * [storage.barrels] Fix the barrel cap texture being incorrect for certain block types.
+* [storage.barrels] Shift-clicking a barrel in creative mode (unless block carrying activates) will now give you the contained item.
 * [storage.locks] Added keyrings! They store keys in style!
 * [storage.locks] Locks now play a sound when attached or removed.
 * [storage.locks] Locks, when crafted, now copy the color of the key.
@@ -37,6 +40,7 @@
 * [transport.color] Dyed minecarts now use your resource pack's minecart texture
 * [tweak.anvilDyeItems] New tweak - improved over the 1.6.4 AsieLib version.
 * [tweak.carry] [#148] Add placement sound for placing carried blocks.
+* [tweak.carry] Block carrying can now be disabled in creative mode.
 * [tweak.carry] Carried blocks now render in third person! \o/
 * [tweak.carry] [#154] Carrying a cactus now correctly deals damage to the carrier.
 * [tweak.carry] [#140] Carrying will now respect your pickblock key mapping.

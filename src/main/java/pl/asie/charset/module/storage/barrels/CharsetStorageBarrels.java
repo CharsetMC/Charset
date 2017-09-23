@@ -20,6 +20,8 @@
 package pl.asie.charset.module.storage.barrels;
 
 import com.google.common.collect.Lists;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -27,7 +29,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -43,7 +44,6 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -66,6 +66,12 @@ public class CharsetStorageBarrels {
 	public static final List<ItemStack> CREATIVE_BARRELS = Lists.newArrayList();
 	public static List<ItemStack> BARRELS = Collections.emptyList();
 	public static List<ItemStack> BARRELS_NORMAL = Lists.newArrayList();
+
+	@GameRegistry.ObjectHolder("chiselsandbits:block_bit")
+	private static Item cb_block_bit;
+
+	protected static TObjectIntMap<Item> stackDivisorMultiplierMap = new TObjectIntHashMap<>();
+	protected static TObjectIntMap<Item> stackSizeMultiplierMap = new TObjectIntHashMap<>();
 
 	@CharsetModule.Instance
 	public static CharsetStorageBarrels instance;
@@ -139,6 +145,11 @@ public class CharsetStorageBarrels {
 
 		packet.registerPacket(0x01, PacketBarrelCountUpdate.class);
 		FMLInterModComms.sendMessage("charset", "addCarry", barrelBlock.getRegistryName());
+
+		if (cb_block_bit != null) {
+			stackDivisorMultiplierMap.put(cb_block_bit, 8);
+			stackSizeMultiplierMap.put(cb_block_bit, 8);
+		}
 	}
 
 	@SubscribeEvent

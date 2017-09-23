@@ -144,7 +144,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         if (barrel.upgrades.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
             return "i";
         }
-        int ms = item.getMaxStackSize();
+        int ms = barrel.getStackDivisor();
         int count = barrel.getItemCount();
         if (count == 1) {
             return "";
@@ -205,11 +205,19 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
 
         final TextureAtlasSprite font = BarrelModel.INSTANCE.font;
         final int len = t.length();
-        final double char_width = 1.0/10.0;
-        final double char_height = 1.0/10.0;
+        double char_width = 1.0/10.0;
+        double char_height = 1.0/10.0;
+        double char_y_offset = 0;
+
+        if (len > 8) {
+            char_width *= 8.0 / (double) len;
+            char_height *= 8.0 / (double) len;
+            char_y_offset = -((1.0/10.0) - char_height);
+        }
+
         final Tessellator tessI = Tessellator.getInstance();
         BufferBuilder tess = tessI.getBuffer();
-        tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F, 0);
+        tess.setTranslation(-char_width * len / 2 + 0.25, -char_height - 1F/32F + char_y_offset, 0);
         tess.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX); // 3 double vertex positions + 2 double UV positions
         double du = (font.getMaxU() - font.getMinU()) / 4;
         double dv = (font.getMaxV() - font.getMinV()) / 4;

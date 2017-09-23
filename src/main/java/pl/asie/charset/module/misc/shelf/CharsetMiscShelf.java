@@ -45,7 +45,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 @CharsetModule(
 		name = "misc.shelf",
 		description = "Reworks impl shelf and adds fancy bookshelves.",
-		profile = ModuleProfile.VERY_UNSTABLE
+		profile = ModuleProfile.INDEV
 )
 public class CharsetMiscShelf {
 	@CharsetModule.Instance

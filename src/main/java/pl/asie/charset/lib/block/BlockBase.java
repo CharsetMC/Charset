@@ -138,7 +138,7 @@ public abstract class BlockBase extends Block {
 		if (isTileProvider) {
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile instanceof TileBase) {
-				return ((TileBase) tile).getPickedBlock(state);
+				return ((TileBase) tile).getPickedBlock(player, state);
 			}
 		}
 

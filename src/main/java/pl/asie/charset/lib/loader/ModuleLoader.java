@@ -156,6 +156,20 @@ public class ModuleLoader {
 		}
 	}
 
+	private ModuleProfile getProfileFromString(String s) {
+		s = s.toUpperCase();
+		if ("STABLE".equals(s)) {
+			return ModuleProfile.STABLE;
+		} else if ("TESTING".equals(s)) {
+			return ModuleProfile.TESTING;
+		} else if ("EXPERIMENTAL".equals(s)
+				|| "UNSTABLE".equals(s)) {
+			return ModuleProfile.EXPERIMENTAL;
+		} else {
+			throw new RuntimeException("Invalid Charset modules.cfg general.profile setting '" + s + "'!");
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private void readDataTable(ASMDataTable table) {
 		Multimap<String, String> unmetDependencies = HashMultimap.create();
@@ -166,23 +180,24 @@ public class ModuleLoader {
 		Property baseProfileProp = ModCharset.configModules.get(
 				"general",
 				"profile",
-				"STABLE"
+				"DEFAULT"
 		);
-		baseProfileProp.setComment("Set the base profile for Charset.\nThis will decide whether or not certain modules are accessible.\nAllowed values: STABLE, TESTING, UNSTABLE");
+		baseProfileProp.setComment("Set the base profile for Charset.\nThis will decide whether or not certain modules are accessible.\nAllowed values: STABLE, TESTING, EXPERIMENTAL");
 
 		ModuleProfile profile;
-		if (ModCharset.INDEV) {
-			profile = ModuleProfile.VERY_UNSTABLE;
-		} else if ("STABLE".equals(baseProfileProp.getString().toUpperCase())) {
-			profile = ModuleProfile.STABLE;
-		} else if ("TESTING".equals(baseProfileProp.getString().toUpperCase())) {
-			profile = ModuleProfile.TESTING;
-		} else if ("UNSTABLE".equals(baseProfileProp.getString().toUpperCase())) {
-			profile = ModuleProfile.UNSTABLE;
+		if ("DEFAULT".equals(baseProfileProp.getString().toUpperCase())) {
+			if (ModCharset.INDEV) {
+				profile = ModuleProfile.INDEV;
+			} else if (ModCharset.defaultOptions.containsKey("profile")) {
+				profile = getProfileFromString(ModCharset.defaultOptions.get("profile"));
+			} else {
+				profile = ModuleProfile.STABLE;
+			}
 		} else {
-			throw new RuntimeException("Invalid Charset modules.cfg general.profile setting '" + baseProfileProp.getString() + "'!");
+			profile = getProfileFromString(baseProfileProp.getString());
 		}
 		ModCharset.profile = profile;
+		ModCharset.logger.info("Charset profile is " + ModCharset.profile);
 
 		ConfigCategory category = ModCharset.configModules.getCategory("overrides");
 		category.setComment("Overrides can have one of three values: DEFAULT, ENABLE, DISABLE\nDEFAULT will enable the module based on your profile settings and dependency availability.");
@@ -221,7 +236,7 @@ public class ModuleLoader {
 
 			ThreeState override = ThreeState.MAYBE;
 			if ((Boolean) info.getOrDefault("isVisible", true)) {
-				if (modProfile == ModuleProfile.VERY_UNSTABLE && profile != ModuleProfile.VERY_UNSTABLE) {
+				if (modProfile == ModuleProfile.INDEV && profile != ModuleProfile.INDEV) {
 					override = ThreeState.NO;
 				} else {
 					if (compat) {
