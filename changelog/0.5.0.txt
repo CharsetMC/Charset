@@ -41,6 +41,7 @@
 * [tools.wrench] Add modded metal ingot support.
 * [tools.wrench] Add special integration for Quark vertical planks and Iron Chests
 * [transport.color] Dyed minecarts now use your resource pack's minecart texture
+* [transport.rails] Fixed crossing rail minecart rendering wonkiness
 * [tweak.anvilDyeItems] New tweak - improved over the 1.6.4 AsieLib version.
 * [tweak.carry] [#148] Add placement sound for placing carried blocks.
 * [tweak.carry] Add support for giving your carried block to another player! Give it a try!

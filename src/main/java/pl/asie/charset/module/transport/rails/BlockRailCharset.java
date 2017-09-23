@@ -31,7 +31,6 @@ import net.minecraft.world.World;
 import pl.asie.charset.ModCharset;
 
 public class BlockRailCharset extends BlockRailBase {
-	// hacks! <3
 	public static final IProperty<EnumRailDirection> DIRECTION = PropertyEnum.create(
 			"direction", EnumRailDirection.class,
 			EnumRailDirection.NORTH_SOUTH, EnumRailDirection.EAST_WEST,
@@ -66,18 +65,13 @@ public class BlockRailCharset extends BlockRailBase {
 		if (cart != null) {
 			float cartYaw = cart.rotationYaw % 180;
 			while (cartYaw < 0) cartYaw += 180;
-			EnumRailDirection value;
 
 			if (cartYaw < 45 || cartYaw > 135)
-				value = EnumRailDirection.EAST_WEST;
+				return EnumRailDirection.EAST_WEST;
 			else
-				value = EnumRailDirection.NORTH_SOUTH;
-
-			if (value != state.getValue(DIRECTION) && world instanceof World)
-				((World) world).setBlockState(pos, state.withProperty(DIRECTION, value), 6);
-			return value;
+				return EnumRailDirection.NORTH_SOUTH;
 		} else {
-			return state.getValue(DIRECTION);
+			return EnumRailDirection.NORTH_SOUTH;
 		}
 	}
 
