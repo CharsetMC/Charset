@@ -60,6 +60,7 @@ import pl.asie.charset.upgrade.CharsetUnifiedModIdFixer;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -90,7 +91,7 @@ public class ModCharset {
 	public static Logger logger;
 	public static Configuration configModules, configIds;
 
-	public static Map<String, String> defaultOptions;
+	public static Map<String, String> defaultOptions = new HashMap<>();
 	private static File configurationDirectory;
 	private static ModFixs dataFixes;
 

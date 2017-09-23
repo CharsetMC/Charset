@@ -16,6 +16,8 @@ config.charset.lib.expert.name=Expert Settings
 config.charset.lib.functionalityregistry.name=Functionality Registry
 config.charset.lib.general.name=General
 
+item.charset.icon.name=a
+
 # CharsetAudio
 item.charset.tape.name=Tape
 item.charset.tapedrive.name=Tape Drive
