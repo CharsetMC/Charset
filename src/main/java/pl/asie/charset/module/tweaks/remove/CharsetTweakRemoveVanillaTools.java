@@ -19,16 +19,27 @@
 
 package pl.asie.charset.module.tweaks.remove;
 
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistryModifiable;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.recipe.RecipeDummy;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -39,8 +50,22 @@ import java.util.Set;
 		isDefault = false
 )
 public class CharsetTweakRemoveVanillaTools {
-	public int getMode() {
-		return 2;
+	@CharsetModule.Configuration
+	public static Configuration config;
+
+	private boolean neutralize, disableRecipes;
+	private Set<String> disabledClasses = new HashSet<>();
+
+	@Mod.EventHandler
+	public void loadConfig(CharsetLoadConfigEvent event) {
+		neutralize = config.getBoolean("neutralizeItems", "features", true, "Set to true to enable neutralizing tool items (setting maximum damage to 1).");
+		disableRecipes = config.getBoolean("disableRecipes", "features", true, "Set to true to enable disabling recipes for tool items.");
+
+		for (String s : new String[] { "pickaxe", "axe", "hoe", "sword", "spade" }) {
+			if (config.getBoolean(s, "disabledClasses", true, "")) {
+				disabledClasses.add(s);
+			}
+		}
 	}
 
 	@Mod.EventHandler
@@ -48,22 +73,33 @@ public class CharsetTweakRemoveVanillaTools {
 		Set<Item> itemSet = new HashSet<Item>();
 		for (ResourceLocation l : Item.REGISTRY.getKeys()) {
 			Item i = Item.REGISTRY.getObject(l);
-			if (i instanceof ItemPickaxe || i instanceof ItemAxe || i instanceof ItemSpade || i instanceof ItemSword) {
-				i.setMaxDamage(1);
+			if ((i instanceof ItemPickaxe && disabledClasses.contains("pickaxe"))
+					|| (i instanceof ItemAxe && disabledClasses.contains("axe"))
+					|| (i instanceof ItemHoe && disabledClasses.contains("hoe"))
+					|| (i instanceof ItemSpade && disabledClasses.contains("spade"))
+					|| (i instanceof ItemSword && disabledClasses.contains("sword"))
+					) {
+				if (neutralize) i.setMaxDamage(1);
 				itemSet.add(i);
 			}
 		}
-		if (getMode() >= 2) {
+
+		if (disableRecipes) {
+			// IForgeRegistryModifiable modRecipeRegistry = (IForgeRegistryModifiable) ForgeRegistries.RECIPES;
+
 			Iterator<IRecipe> iterator = CraftingManager.REGISTRY.iterator();
 			while (iterator.hasNext()) {
-				ItemStack output = iterator.next().getRecipeOutput();
+				IRecipe recipe = iterator.next();
+				ItemStack output = recipe.getRecipeOutput();
 				if (!output.isEmpty() && itemSet.contains(output.getItem())) {
-					iterator.remove();
+					// modRecipeRegistry.remove(recipe.getRegistryName());
+					ForgeRegistries.RECIPES.register(new RecipeDummy(recipe.getGroup()).setRegistryName(recipe.getRegistryName()));
 					itemSet.remove(output.getItem());
 					ModCharset.logger.info("Disabled " + Item.REGISTRY.getNameForObject(output.getItem()).toString() + " (removed recipe)");
 				}
 			}
 		}
+
 		for (Item i : itemSet) {
 			ModCharset.logger.info("Disabled " + Item.REGISTRY.getNameForObject(i).toString());
 		}
