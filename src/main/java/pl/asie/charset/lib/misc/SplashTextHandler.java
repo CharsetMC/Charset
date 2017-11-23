@@ -33,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +47,7 @@ public class SplashTextHandler {
 
 		try {
 			resource = Minecraft.getMinecraft().getResourceManager().getResource(loc);
-			BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(resource.getInputStream(), Charsets.UTF_8));
+			BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
 			String s;
 
 			while ((s = bufferedreader.readLine()) != null) {

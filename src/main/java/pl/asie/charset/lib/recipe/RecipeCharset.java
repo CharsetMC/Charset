@@ -36,9 +36,11 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
+import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
 
@@ -46,6 +48,30 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class RecipeCharset extends RecipeBase implements IngredientMatcher.Container {
+    public static class Shaped extends RecipeCharset implements IShapedRecipe {
+        public Shaped(JsonContext context, JsonObject object) {
+            super(context, object);
+        }
+
+        public Shaped(String group) {
+            super(group);
+        }
+
+        public Shaped(String group, boolean hidden) {
+            super(group, hidden);
+        }
+
+        @Override
+        public int getRecipeWidth() {
+            return getWidth();
+        }
+
+        @Override
+        public int getRecipeHeight() {
+            return getHeight();
+        }
+    }
+
     public enum Type {
         SHAPED,
         SHAPELESS
@@ -63,6 +89,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
         super(group, hidden);
     }
 
+    protected final boolean shapeless = !(this instanceof Shaped);
     protected IOutputSupplier output;
     protected final TCharObjectMap<Ingredient> charToIngredient = new TCharObjectHashMap<>();
     protected int[] shapedOrdering;
@@ -70,7 +97,6 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
     protected int width = 0;
     protected int height = 0;
     protected boolean mirrored = false;
-    protected boolean shapeless = false;
 
     public Collection<ItemStack> getAllRecipeOutputs() {
         InventoryCraftingIterator inventoryCrafting = new InventoryCraftingIterator(this, true);
@@ -213,7 +239,6 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
         }
 
         protected void parseInputShapeless(RecipeCharset recipe, JsonContext context, JsonObject json) {
-            recipe.shapeless = true;
             JsonArray array = JsonUtils.getJsonArray(json, "ingredients");
             recipe.input = NonNullList.create();
             for (int i = 0; i < array.size(); i++) {
@@ -224,7 +249,6 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
         }
 
         protected void parseInputShaped(RecipeCharset recipe, JsonContext context, JsonObject json) {
-            recipe.shapeless = false;
             recipe.mirrored = JsonUtils.getBoolean(json, "mirrored", false);
 
             List<String> shape = new ArrayList<>();
@@ -316,12 +340,14 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
 
         @Override
         public IRecipe parse(JsonContext context, JsonObject json) {
-            RecipeCharset recipe = new RecipeCharset(context, json);
+            RecipeCharset recipe;
             String type = getType(context, json);
 
             if (type.endsWith("shapeless")) {
+                recipe = new RecipeCharset(context, json);
                 parseInputShapeless(recipe, context, json);
             } else if (type.endsWith("shaped")) {
+                recipe = new RecipeCharset.Shaped(context, json);
                 parseInputShaped(recipe, context, json);
             } else {
                 throw new RuntimeException("Unknown type: " + type);

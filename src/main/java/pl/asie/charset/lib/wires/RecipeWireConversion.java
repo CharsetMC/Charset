@@ -81,7 +81,6 @@ public class RecipeWireConversion extends RecipeCharset {
         super.output = OutputSupplier.createStackOutputSupplier(ItemStack.EMPTY);
         super.width = 1;
         super.height = 1;
-        super.shapeless = true;
         this.outputOffset = freestanding ? 0 : 1;
     }
 

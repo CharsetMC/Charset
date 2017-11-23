@@ -33,6 +33,7 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
@@ -97,19 +98,9 @@ public final class ItemMaterialHeuristics {
         int width = craftMatrix.getWidth();
         int height = craftMatrix.getHeight();
         for (IRecipe irecipe : ForgeRegistries.RECIPES) {
-            Class c = irecipe.getClass();
-
             // These cut the search time significantly.
-            if (c == ShapedRecipes.class) {
-                if (((ShapedRecipes) irecipe).getWidth() != width || ((ShapedRecipes) irecipe).getHeight() != height) {
-                    continue;
-                }
-            } else if (c == ShapedOreRecipe.class) {
-                if (((ShapedOreRecipe) irecipe).getWidth() != width || ((ShapedOreRecipe) irecipe).getHeight() != height) {
-                    continue;
-                }
-            } else if (irecipe instanceof RecipeCharset && ((RecipeCharset) irecipe).getType() == RecipeCharset.Type.SHAPED) {
-                if (((RecipeCharset) irecipe).getWidth() != width || ((RecipeCharset) irecipe).getHeight() != height) {
+            if (irecipe instanceof IShapedRecipe) {
+                if (((IShapedRecipe) irecipe).getRecipeWidth() != width || ((IShapedRecipe) irecipe).getRecipeHeight() != height) {
                     continue;
                 }
             } else {
