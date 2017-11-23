@@ -40,7 +40,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
     @SideOnly(Side.CLIENT)
     public static class Color implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             if (tintIndex == 1) {
                 BarrelCacheInfo info = BarrelCacheInfo.from(stack);
                 return ColorLookupHandler.INSTANCE.getColor(info.logStack, RenderUtils.AveragingMode.V_EDGES_ONLY);

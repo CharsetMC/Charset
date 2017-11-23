@@ -34,7 +34,7 @@ public class ItemShard extends ItemBase {
 	@SideOnly(Side.CLIENT)
 	public static class Color implements IItemColor {
 		@Override
-		public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+		public int colorMultiplier(ItemStack stack, int tintIndex) {
 			int md = stack.getItemDamage();
 			if (md == 0 || md > MAX_SHARD) {
 				return 16777215;

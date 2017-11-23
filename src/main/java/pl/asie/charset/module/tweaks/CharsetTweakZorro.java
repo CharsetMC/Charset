@@ -52,8 +52,8 @@ public class CharsetTweakZorro {
 		if (player.fallDistance <= 2) return;
 		if (!horse.isHorseSaddled()) return;
 		if (horse.getLeashed()) {
-			if (!(horse.getLeashedToEntity() instanceof EntityLeashKnot)) return;
-			horse.getLeashedToEntity().processInitialInteract(player, EnumHand.MAIN_HAND);
+			if (!(horse.getLeashHolder() instanceof EntityLeashKnot)) return;
+			horse.getLeashHolder().processInitialInteract(player, EnumHand.MAIN_HAND);
 		}
 		boolean awesome = false;
 		ItemStack heldStack = player.getHeldItem(EnumHand.MAIN_HAND);

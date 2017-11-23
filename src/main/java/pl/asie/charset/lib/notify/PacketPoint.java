@@ -96,9 +96,9 @@ public class PacketPoint extends Packet {
 		}
 
 		notice.withStyle(NoticeStyle.DRAWFAR, NoticeStyle.VERY_LONG, NoticeStyle.SCALE_SIZE, NoticeStyle.EXACTPOSITION);
-		double maxDist = 0xFF * 0xFF;
+		double maxDistSq = 256 * 256;
 		for (EntityPlayer viewer : player.world.playerEntities) {
-			if (player.getDistanceSqToEntity(viewer) > maxDist) continue;
+			if (player.getDistanceSq(viewer) >= maxDistSq) continue;
 			notice.sendTo(viewer);
 		}
 	}

@@ -42,7 +42,7 @@ public class LaserTintHandler implements IBlockColor, IItemColor {
 	}
 
 	@Override
-	public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+	public int colorMultiplier(ItemStack stack, int tintIndex) {
 		return 0xFF000000 | CharsetLaser.LASER_COLORS[stack.getMetadata() & 7];
 	}
 }

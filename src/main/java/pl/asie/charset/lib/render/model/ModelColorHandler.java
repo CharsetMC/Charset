@@ -50,7 +50,7 @@ public abstract class ModelColorHandler<T extends IRenderComparable<T>> implemen
     }
 
     @Override
-    public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+    public int colorMultiplier(ItemStack stack, int tintIndex) {
         T info = parent.fromItemStack(stack);
         if (info != null) {
             return colorMultiplier(info, tintIndex);

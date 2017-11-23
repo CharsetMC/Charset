@@ -45,7 +45,7 @@ public class ItemLockingDyeable extends ItemBase implements IDyeableItem {
     @SideOnly(Side.CLIENT)
     public static class Color implements IItemColor {
         @Override
-        public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+        public int colorMultiplier(ItemStack stack, int tintIndex) {
             if (tintIndex > 0 && stack.hasTagCompound() && stack.getTagCompound().hasKey("color")) {
                 return stack.getTagCompound().getInteger("color");
             }

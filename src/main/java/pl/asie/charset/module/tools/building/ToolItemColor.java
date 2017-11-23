@@ -36,7 +36,7 @@ public class ToolItemColor implements IItemColor {
     }
 
     @Override
-    public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+    public int colorMultiplier(ItemStack stack, int tintIndex) {
         ItemCharsetTool.MaterialSlot slot = tintIndex == 1 ? ItemCharsetTool.MaterialSlot.HEAD : (tintIndex == 0 ? ItemCharsetTool.MaterialSlot.HANDLE : null);
         if (slot != null && stack.getItem() instanceof ItemCharsetTool) {
             ItemMaterial material = ((ItemCharsetTool) stack.getItem()).getMaterial(stack, slot);

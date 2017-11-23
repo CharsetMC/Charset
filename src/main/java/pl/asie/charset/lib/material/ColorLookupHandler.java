@@ -107,7 +107,7 @@ public class ColorLookupHandler {
                 out = getDefaultColor(stack);
             } else {
                 out = RenderUtils.getAverageColor(sprite, mode);
-                int tintColor = Minecraft.getMinecraft().getItemColors().getColorFromItemstack(stack, 0);
+                int tintColor = Minecraft.getMinecraft().getItemColors().colorMultiplier(stack, 0);
                 if (tintColor != -1) {
                     out = RenderUtils.multiplyColor(out, tintColor);
                 }

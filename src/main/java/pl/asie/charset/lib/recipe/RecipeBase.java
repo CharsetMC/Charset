@@ -28,7 +28,7 @@ import pl.asie.charset.lib.utils.ThreeState;
 
 public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
 	private final String group;
-	private final ThreeState hidden;
+	private final ThreeState dynamic;
 
 	public RecipeBase(JsonContext context, JsonObject object) {
 		if (object != null && context != null) {
@@ -38,25 +38,25 @@ public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> imple
 				group = "";
 			}
 
-			if (object.has("hidden")) {
-				hidden = JsonUtils.getBoolean(object, "hidden") ? ThreeState.YES : ThreeState.NO;
+			if (object.has("dynamic")) {
+				dynamic = JsonUtils.getBoolean(object, "dynamic") ? ThreeState.YES : ThreeState.NO;
 			} else {
-				hidden = ThreeState.MAYBE;
+				dynamic = ThreeState.MAYBE;
 			}
 		} else {
 			group = "";
-			hidden = ThreeState.MAYBE;
+			dynamic = ThreeState.MAYBE;
 		}
 	}
 
 	public RecipeBase(String group) {
 		this.group = group;
-		this.hidden = ThreeState.MAYBE;
+		this.dynamic = ThreeState.MAYBE;
 	}
 
-	public RecipeBase(String group, boolean hidden) {
+	public RecipeBase(String group, boolean dynamic) {
 		this.group = group;
-		this.hidden = hidden ? ThreeState.YES : ThreeState.NO;
+		this.dynamic = dynamic ? ThreeState.YES : ThreeState.NO;
 	}
 
 	@Override
@@ -65,11 +65,11 @@ public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> imple
 	}
 
 	@Override
-	public boolean isHidden() {
-		if (hidden == ThreeState.MAYBE) {
+	public boolean isDynamic() {
+		if (dynamic == ThreeState.MAYBE) {
 			return !getRecipeOutput().isEmpty();
 		} else {
-			return hidden == ThreeState.YES;
+			return dynamic == ThreeState.YES;
 		}
 	}
 }

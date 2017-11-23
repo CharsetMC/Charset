@@ -44,7 +44,7 @@ public final class ShadingTintColorHandler implements IBlockColor, IItemColor {
     }
 
     @Override
-    public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+    public int colorMultiplier(ItemStack stack, int tintIndex) {
         return ((tintIndex & 0xFF) * 0x10101) | 0xFF000000;
     }
 }

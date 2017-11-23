@@ -133,7 +133,7 @@ public class CharsetTweakMobEqualizer {
 			if (player.capabilities.isCreativeMode) {
 				continue;
 			}
-			if (event.getEntity().getDistanceSqToEntity(player) > maxDistanceSq) {
+			if (event.getEntity().getDistanceSq(player) > maxDistanceSq) {
 				continue;
 			}
 			interviews++;

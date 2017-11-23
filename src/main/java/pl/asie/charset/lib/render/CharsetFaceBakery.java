@@ -60,7 +60,7 @@ public class CharsetFaceBakery extends FaceBakery {
 
     private BakedQuad recolorQuad(BakedQuad quad, int color) {
         int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
-        int v = DefaultVertexFormats.BLOCK.getNextOffset() / 4;
+        int v = DefaultVertexFormats.BLOCK.getIntegerSize() / 4;
         int[] vertexData = quad.getVertexData();
         for (int i = 0; i < 4; i++) {
             vertexData[v * i + c] = RenderUtils.multiplyColor(vertexData[v * i + c], color);
