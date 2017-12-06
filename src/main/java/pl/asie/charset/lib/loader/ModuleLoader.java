@@ -298,10 +298,6 @@ public class ModuleLoader {
 				continue;
 			}
 
-			if (!compat && modProfile.ordinal() > profile.ordinal()) {
-				continue;
-			}
-
 			if (compat) {
 				compatModules.add(name);
 			}
@@ -324,6 +320,10 @@ public class ModuleLoader {
 						isDefault = false;
 					}
 				}
+			}
+
+			if (!compat && modProfile.ordinal() > profile.ordinal()) {
+				isDefault = false;
 			}
 
 			EnableInformation enableInfo = new EnableInformation(isDefault, override);
