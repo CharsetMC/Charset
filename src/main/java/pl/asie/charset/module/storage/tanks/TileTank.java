@@ -424,12 +424,18 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public boolean canFillFluidType(FluidStack stack) {
+        if (stack == null) {
+            return false;
+        }
         getBottomTank();
         return bottomTank.fluidStack == null || bottomTank.fluidStack.isFluidEqual(stack);
     }
 
     @Override
     public boolean canDrainFluidType(FluidStack stack) {
+        if (stack == null) {
+            return false;
+        }
         getBottomTank();
         return bottomTank.fluidStack != null && bottomTank.fluidStack.isFluidEqual(stack);
     }
