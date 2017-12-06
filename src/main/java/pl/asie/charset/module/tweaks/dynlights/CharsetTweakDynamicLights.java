@@ -48,8 +48,8 @@ import java.util.Map;
 
 @CharsetModule(
 		name = "tweak.dynamicLights",
-		description = "Dynamic lights, based on Albedo!",
-		dependencies = {"mod:albedo"},
+		description = "Dynamic lights, based on Mirage!",
+		dependencies = {"mod:mirage"},
 		isClientOnly = true,
 		profile = ModuleProfile.TESTING
 )
