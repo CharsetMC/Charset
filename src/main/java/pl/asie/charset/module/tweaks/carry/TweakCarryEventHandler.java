@@ -73,25 +73,27 @@ public class TweakCarryEventHandler {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingFall(LivingFallEvent event) {
         CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying() && event.getDistance() >= 4.0f) {
+        if (carryHandler != null && event.getEntityLiving() instanceof EntityPlayer && carryHandler.isCarrying() && event.getDistance() >= 4.0f) {
             // TODO: add distance-based scaling
-            CharsetTweakBlockCarrying.dropCarriedBlock(event.getEntityLiving(), false);
+            CharsetTweakBlockCarrying.dropCarriedBlock((EntityPlayer) event.getEntityLiving(), false);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onLivingHurt(LivingHurtEvent event) {
         CarryHandler carryHandler = event.getEntityLiving().getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
-        if (carryHandler != null && carryHandler.isCarrying() && event.getSource() != DamageSource.FALL
+        if (carryHandler != null && event.getEntityLiving() instanceof EntityPlayer && carryHandler.isCarrying() && event.getSource() != DamageSource.FALL
                 && event.getSource() != DamageSource.CACTUS) {
             /* TODO: Do something about cactus damage etc, to not whitelist it unnecessarily */
-            CharsetTweakBlockCarrying.dropCarriedBlock(event.getEntityLiving(), false);
+            CharsetTweakBlockCarrying.dropCarriedBlock((EntityPlayer) event.getEntityLiving(), false);
         }
     }
 
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
-        CharsetTweakBlockCarrying.dropCarriedBlock(event.getEntityLiving(), true);
+        if (event.getEntityLiving() instanceof EntityPlayer) {
+            CharsetTweakBlockCarrying.dropCarriedBlock((EntityPlayer) event.getEntityLiving(), true);
+        }
     }
 
     @SubscribeEvent

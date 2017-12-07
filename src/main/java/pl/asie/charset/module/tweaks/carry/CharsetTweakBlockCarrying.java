@@ -199,7 +199,14 @@ public class CharsetTweakBlockCarrying {
             }
 
             if (canCarry) {
-                // Can the player /really/ break this block?
+                // Can the player modify this block position? (world border, spawn protection)
+                if (!world.isBlockModifiable(player, pos)) {
+                    canCarry = false;
+                }
+            }
+
+            if (canCarry) {
+                // Can the player /really/ break this block? (last, most expensive)
                 BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, world.getBlockState(pos), player);
                 if (MinecraftForge.EVENT_BUS.post(event)) {
                     canCarry = false;
@@ -239,11 +246,11 @@ public class CharsetTweakBlockCarrying {
         }
     }
 
-    protected static boolean dropCarriedBlock(EntityLivingBase entity, boolean must) {
+    protected static boolean dropCarriedBlock(EntityPlayer entity, boolean must) {
         return dropCarriedBlock(entity, must, (must ? 4 : 2));
     }
 
-    protected static boolean dropCarriedBlock(EntityLivingBase entity, boolean must, int maxRadius) {
+    protected static boolean dropCarriedBlock(EntityPlayer entity, boolean must, int maxRadius) {
         CarryHandler carryHandler = entity.getCapability(CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
             World world = entity.getEntityWorld();

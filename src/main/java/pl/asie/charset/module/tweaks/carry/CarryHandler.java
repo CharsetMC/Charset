@@ -42,6 +42,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.event.world.BlockEvent;
 import pl.asie.charset.api.carry.CustomCarryHandler;
 import pl.asie.charset.api.carry.ICarryHandler;
 import pl.asie.charset.api.lib.ICacheable;
@@ -196,19 +197,11 @@ public class CarryHandler implements ICacheable, ICarryHandler {
             return false;
         }
 
-        float hardness = player instanceof EntityPlayer
-                ? block.getPlayerRelativeBlockHardness((EntityPlayer) player, world, pos)
-                : block.getBlockHardness(world, pos);
-
-        if (hardness <= 0) {
-            return false;
-        }
-
         return true;
     }
 
 
-    public boolean place(World world, BlockPos pos, EnumFacing facing, EntityLivingBase player) {
+    public boolean place(World world, BlockPos pos, EnumFacing facing, EntityPlayer player) {
         if (block != null) {
             if (hasTileEntity()) {
                 IMovable movable = CapabilityHelper.get(Capabilities.MOVABLE, getTile(), null);
@@ -217,7 +210,10 @@ public class CarryHandler implements ICacheable, ICarryHandler {
                 }
             }
 
-            if (world.mayPlace(block.getBlock(), pos, false, facing, player)) {
+            if (world.isBlockModifiable(player, pos) &&
+                    world.mayPlace(block.getBlock(), pos, false, facing, player)) {
+                // TODO: Implement PlaceEvent (ForgeHooks.onPlaceItemIntoWorld)
+
                 world.setBlockState(pos, block);
                 IBlockState oldBlock = block;
 
