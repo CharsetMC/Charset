@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.storage.barrels.modcompat.jei;
+package pl.asie.charset.module.storage.tanks.modcompat.jei;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -30,33 +30,24 @@ import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
 import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
+import pl.asie.charset.module.storage.tanks.CharsetStorageTanks;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-@CharsetJEIPlugin("storage.barrels")
-public class JEIPluginBarrels implements IModPlugin {
-    private static final Joiner JOINER = Joiner.on(';');
+@CharsetJEIPlugin("storage.tanks")
+public class JEIPluginTanks implements IModPlugin {
     private static final ISubtypeRegistry.ISubtypeInterpreter interpreter = new ISubtypeRegistry.ISubtypeInterpreter() {
         @Nullable
         @Override
         public String apply(ItemStack itemStack) {
-            TileEntityDayBarrel barrel = new TileEntityDayBarrel();
-            barrel.loadFromStack(itemStack);
-            List<String> upgradeStringSet = Lists.newArrayList();
-            for (TileEntityDayBarrel.Upgrade u : barrel.upgrades) {
-                upgradeStringSet.add(u.name());
-            }
-            Collections.sort(upgradeStringSet);
-
-            return JOINER.join(upgradeStringSet) + ";" + barrel.woodLog.getId() + ";" + barrel.woodSlab.getId();
+            return "charsetGlassTank:" + (itemStack.hasTagCompound() ? itemStack.getTagCompound().getInteger("color") : "-1");
         }
     };
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
-        subtypeRegistry.registerSubtypeInterpreter(CharsetStorageBarrels.barrelItem, interpreter);
-        subtypeRegistry.registerSubtypeInterpreter(CharsetStorageBarrels.barrelCartItem, interpreter);
+        subtypeRegistry.registerSubtypeInterpreter(CharsetStorageTanks.tankItem, interpreter);
     }
 }

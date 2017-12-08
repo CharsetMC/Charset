@@ -5,6 +5,7 @@
   },
   "ingredients": {
     "barrel": "pl.asie.charset.module.storage.barrels.IngredientBarrel$Factory",
+    "color": "pl.asie.charset.lib.recipe.IngredientColor$Factory",
     "material": "pl.asie.charset.lib.recipe.IngredientMaterial$Factory"
   },
   "recipes": {

@@ -25,8 +25,8 @@ public class ItemBlockTank extends ItemBlockBase {
 
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		if (stack.getItemDamage() > 0 && stack.getItemDamage() <= 16) {
-			return I18n.translateToLocalFormatted("tile.charset.tank.colored.name", I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", EnumDyeColor.byMetadata(stack.getItemDamage() - 1))));
+		if (stack.hasTagCompound() && stack.getTagCompound().getInteger("color") >= 0) {
+			return I18n.translateToLocalFormatted("tile.charset.tank.colored.name", I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", EnumDyeColor.byMetadata(stack.getTagCompound().getInteger("color")))));
 		} else {
 			return I18n.translateToLocal("tile.charset.tank.name");
 		}
@@ -39,7 +39,7 @@ public class ItemBlockTank extends ItemBlockBase {
 
 	@Override
 	public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-		if (TileTank.checkPlacementConflict(worldIn.getTileEntity(pos.down()), worldIn.getTileEntity(pos.up()), stack.getItemDamage() % 17)) {
+		if (TileTank.checkPlacementConflict(worldIn.getTileEntity(pos.down()), worldIn.getTileEntity(pos.up()), (stack.getTagCompound().getInteger("color") + 1) % 17)) {
 			return false;
 		} else {
 			return super.placeBlockAt(stack, player, worldIn, pos, side, hitX, hitY, hitZ, newState);

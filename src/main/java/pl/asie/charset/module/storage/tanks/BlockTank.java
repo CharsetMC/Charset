@@ -51,6 +51,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 public class BlockTank extends BlockBase implements ITileEntityProvider {
     protected static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.05f, 0, 0.05f, 0.95f, 1, 0.95f);
@@ -86,7 +87,9 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         Item item = Item.getItemFromBlock(this);
 
         for (int i = 0; i <= 16; i++) {
-            items.add(new ItemStack(item, 1, i));
+            ItemStack stack = new ItemStack(item);
+            ItemUtils.getTagCompound(stack, true).setInteger("color", i - 1);
+            items.add(stack);
         }
     }
 

@@ -21,9 +21,14 @@ package pl.asie.charset.module.storage.tanks;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -54,11 +59,13 @@ public class CharsetStorageTanks {
     }
 
     @SubscribeEvent
+    @SideOnly(Side.CLIENT)
     public void registerModels(ModelRegistryEvent event) {
-        RegistryUtils.registerModel(tankItem, 0, "charset:fluidtank");
-        for (int i = 1; i <= 16; i++) {
-            RegistryUtils.registerModel(tankItem, i, "charset:fluidtank#inventory_stained");
-        }
+        ModelResourceLocation locationNormal = new ModelResourceLocation("charset:fluidtank", "inventory");
+        ModelResourceLocation locationStained = new ModelResourceLocation("charset:fluidtank", "inventory_stained");
+
+        ModelLoader.setCustomMeshDefinition(tankItem, stack -> stack.hasTagCompound() && stack.getTagCompound().getInteger("color") >= 0 ? locationStained : locationNormal);
+        ModelLoader.registerItemVariants(tankItem, locationNormal, locationStained);
     }
 
     @SubscribeEvent

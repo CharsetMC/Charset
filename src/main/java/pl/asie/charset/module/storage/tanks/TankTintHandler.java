@@ -30,8 +30,8 @@ public final class TankTintHandler implements IBlockColor, IItemColor {
 
 	@Override
 	public int colorMultiplier(ItemStack stack, int tintIndex) {
-		if (stack.getItemDamage() >= 1 && stack.getItemDamage() <= 16) {
-			return ColorUtils.toIntColor(EnumDyeColor.byMetadata(stack.getItemDamage() - 1));
+		if (stack.getTagCompound().hasKey("color") && stack.getTagCompound().getInteger("color") >= 0) {
+			return ColorUtils.toIntColor(EnumDyeColor.byMetadata(stack.getTagCompound().getInteger("color")));
 		} else {
 			return -1;
 		}

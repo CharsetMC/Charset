@@ -49,6 +49,7 @@ import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.scheduler.Scheduler;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -134,12 +135,14 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public ItemStack getDroppedBlock(IBlockState state) {
-        return new ItemStack(state.getBlock(), 1, variant);
+        ItemStack stack = new ItemStack(state.getBlock());
+        ItemUtils.getTagCompound(stack, true).setInteger("color", variant - 1);
+        return stack;
     }
 
     @Override
     public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
-        variant = stack.getItemDamage() % 17;
+        variant = (stack.getTagCompound().getInteger("color") + 1) % 17;
     }
 
     protected void onTankStructureChanged() {

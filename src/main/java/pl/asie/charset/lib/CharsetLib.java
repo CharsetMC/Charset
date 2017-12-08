@@ -62,6 +62,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.notify.PacketNotification;
 import pl.asie.charset.lib.notify.PacketPoint;
+import pl.asie.charset.lib.recipe.IngredientColor;
 import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
@@ -213,6 +214,7 @@ public class CharsetLib {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		Capabilities.registerVanillaWrappers();
+		IngredientColor.registerDefaults();
 		ItemMaterialHeuristics.init(true);
 		SubItemProviderCache.clear();
 
