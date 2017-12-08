@@ -26,19 +26,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.JsonUtils;
 import net.minecraftforge.common.crafting.IIngredientFactory;
 import net.minecraftforge.common.crafting.JsonContext;
-import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
-import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
 public class IngredientBarrel extends IngredientCharset {
     private boolean includeCarts;
@@ -69,16 +64,24 @@ public class IngredientBarrel extends IngredientCharset {
     }
 
     @Override
-    public ItemStack[] getMatchingStacks() {
-        Collection<ItemStack> stacks = CharsetStorageBarrels.BARRELS_NORMAL;
-        Collection<ItemStack> stacks2 = Lists.newArrayList();
-        for (ItemStack s : stacks) {
-            stacks2.add(s);
-            if (includeCarts) {
-                stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrelCart(s));
+    public ItemStack[][] getMatchingStacks() {
+        List<ItemStack> stacks = CharsetStorageBarrels.BARRELS_NORMAL;
+        List<ItemStack> stacks2 = stacks;
+        if (includeCarts) {
+            stacks2 = Lists.newArrayList();
+            for (ItemStack s : stacks) {
+                stacks2.add(s);
+                if (includeCarts) {
+                    stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrelCart(s));
+                }
             }
         }
-        return stacks.toArray(new ItemStack[stacks.size()]);
+
+        ItemStack[][] stackArray = new ItemStack[stacks2.size()][1];
+        for (int i = 0; i < stacks2.size(); i++) {
+            stackArray[i][0] = stacks2.get(i);
+        }
+        return stackArray;
     }
 
     @Override

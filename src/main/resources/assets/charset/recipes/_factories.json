@@ -5,7 +5,7 @@
   },
   "ingredients": {
     "barrel": "pl.asie.charset.module.storage.barrels.IngredientBarrel$Factory",
-    "material": "pl.asie.charset.lib.recipe.IngredientMaterialFactory"
+    "material": "pl.asie.charset.lib.recipe.IngredientMaterial$Factory"
   },
   "recipes": {
     "dyeable_item": "pl.asie.charset.lib.recipe.DyeableItemRecipeFactory",

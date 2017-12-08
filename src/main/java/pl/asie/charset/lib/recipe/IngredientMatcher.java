@@ -21,8 +21,6 @@ package pl.asie.charset.lib.recipe;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
-import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
-import pl.asie.charset.lib.recipe.ingredient.IRecipeView;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
 import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 

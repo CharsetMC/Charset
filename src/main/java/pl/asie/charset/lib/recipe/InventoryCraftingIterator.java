@@ -73,7 +73,7 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
     }
 
     protected final RecipeCharset recipe;
-    protected final Map<Ingredient, ItemStack[]> permutatingIngredients = new LinkedHashMap<>();
+    protected final Map<Ingredient, Object> permutatingIngredients = new LinkedHashMap<>();
     protected final Object[] inputReal;
     protected int i;
     protected int permutations;
@@ -94,23 +94,29 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
         for (int i = 0; i < recipe.input.size(); i++) {
             Ingredient ing = recipe.input.get(i);
             if (!permutatingIngredients.containsKey(ing)) {
-                ItemStack[] stacks = ing.getMatchingStacks();
-                if (stacks.length > 1) {
-                    if (!permutateAll) {
-                        if (ing instanceof IngredientWrapper) {
-                            IngredientCharset charset = ((IngredientWrapper) ing).getIngredientCharset();
-                            if (!charset.arePermutationsDistinct()) {
+                if (ing instanceof IngredientWrapper && !permutateAll) {
+                    IngredientCharset charset = ((IngredientWrapper) ing).getIngredientCharset();
+                    if (!charset.arePermutationsDistinct()) {
+                        continue;
+                    }
+
+                    ItemStack[][] stacks = charset.getMatchingStacks();
+                    if (stacks.length > 1) {
+                        permutatingIngredients.put(ing, stacks);
+                        permutations *= stacks.length;
+                    }
+                } else {
+                    ItemStack[] stacks = ing.getMatchingStacks();
+                    if (stacks.length > 1) {
+                        if (!permutateAll) {
+                            Class c = ing.getClass();
+                            if (c == Ingredient.class || c == IngredientNBT.class || c == OreIngredient.class) {
                                 continue;
                             }
                         }
-
-                        Class c = ing.getClass();
-                        if (c == Ingredient.class || c == IngredientNBT.class || c == OreIngredient.class) {
-                            continue;
-                        }
+                        permutatingIngredients.put(ing, stacks);
+                        permutations *= stacks.length;
                     }
-                    permutatingIngredients.put(ing, stacks);
-                    permutations *= stacks.length;
                 }
             }
         }
@@ -124,19 +130,41 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
     @Override
     public InventoryCrafting next() {
         int permPos = i;
-        Map<Ingredient, ItemStack> stackMap = new HashMap<>();
+        Map<Ingredient, Object> stackMap = new HashMap<>();
 
-        for (Map.Entry<Ingredient, ItemStack[]> entry : permutatingIngredients.entrySet()) {
-            ItemStack[] stacks = entry.getValue();
-            stackMap.put(entry.getKey(), stacks[permPos % stacks.length]);
-            permPos /= stacks.length;
+        for (Map.Entry<Ingredient, Object> entry : permutatingIngredients.entrySet()) {
+            Object stacks = entry.getValue();
+            if (stacks instanceof ItemStack[][]) {
+                int length = ((ItemStack[][]) stacks).length;
+                ItemStack[] stackSet = ((ItemStack[][]) stacks)[permPos % length];
+                if (stackSet.length == 1) {
+                    stackMap.put(entry.getKey(), stackSet[0]);
+                } else {
+                    stackMap.put(entry.getKey(), stackSet);
+                }
+                permPos /= length;
+            } else if (stacks instanceof ItemStack[]) {
+                stackMap.put(entry.getKey(), ((ItemStack[]) stacks)[permPos % ((ItemStack[]) stacks).length]);
+                permPos /= ((ItemStack[]) stacks).length;
+            } else {
+                throw new RuntimeException("Unknown stacks type in InventoryCraftingIterator.next(): " + stacks.getClass().getName());
+            }
         }
 
         for (int i = 0; i < recipe.input.size(); i++) {
             Ingredient ing = recipe.input.get(i);
             if (permutatingIngredients.containsKey(ing)) {
-                setInventorySlotContents(i, stackMap.get(ing));
-                inputReal[i] = stackMap.get(ing);
+                Object o = stackMap.get(ing);
+                if (o instanceof ItemStack[]) {
+                    ItemStack[] stacks = (ItemStack[]) o;
+                    setInventorySlotContents(i, stacks.length > 0 ? stacks[0] : ItemStack.EMPTY);
+                    inputReal[i] = Arrays.asList(stacks);
+                } else if (o instanceof ItemStack) {
+                    setInventorySlotContents(i, (ItemStack) o);
+                    inputReal[i] = stackMap.get(ing);
+                } else {
+                    throw new RuntimeException("Unknown stacks type in InventoryCraftingIterator.next(): " + o.getClass().getName());
+                }
             } else {
                 ItemStack[] stacks = ing.getMatchingStacks();
                 setInventorySlotContents(i, stacks.length > 0 ? stacks[0] : ItemStack.EMPTY);

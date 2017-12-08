@@ -22,13 +22,11 @@ package pl.asie.charset.lib.wires;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
-import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.recipe.OutputSupplier;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,9 +56,13 @@ public class RecipeWireConversion extends RecipeCharset {
         }
 
         @Override
-        public ItemStack[] getMatchingStacks() {
-            Collection<ItemStack> stacks = RecipeWireConversion.getMatchingStacks(offset);
-            return stacks.toArray(new ItemStack[stacks.size()]);
+        public ItemStack[][] getMatchingStacks() {
+            List<ItemStack> stacks = RecipeWireConversion.getMatchingStacks(offset);
+            ItemStack[][] stackArray = new ItemStack[stacks.size()][1];
+            for (int i = 0; i < stacks.size(); i++) {
+                stackArray[i][0] = stacks.get(i);
+            }
+            return stackArray;
         }
 
         @Override

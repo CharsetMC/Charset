@@ -27,14 +27,13 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.item.IDyeableItem;
-import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
-import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.utils.ColorUtils;
 
 import java.util.ArrayList;
@@ -51,9 +50,9 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			}
 
 			@Override
-			public ItemStack[] getMatchingStacks() {
+			public ItemStack[][] getMatchingStacks() {
 				Collection<ItemStack> stacks = OreDictionary.getOres("dye");
-				return stacks.toArray(new ItemStack[stacks.size()]);
+				return new ItemStack[][] { stacks.toArray(new ItemStack[stacks.size()]) };
 			}
 
 			@Override
@@ -200,9 +199,12 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 		}
 
 		@Override
-		public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
-			// Nothing shall remain, for it is the key itself! We don't want to clone it.
-			return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+		protected ItemStack toRemainingItem(ItemStack from) {
+			if (!from.isEmpty() && from.getItem() instanceof IDyeableItem) {
+				return ItemStack.EMPTY;
+			}
+
+			return super.toRemainingItem(from);
 		}
 
 		@Override

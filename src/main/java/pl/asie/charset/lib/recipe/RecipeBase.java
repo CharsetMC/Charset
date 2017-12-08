@@ -20,10 +20,15 @@
 package pl.asie.charset.lib.recipe;
 
 import com.google.gson.JsonObject;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.JsonUtils;
+import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.utils.ThreeState;
 
 public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
@@ -62,6 +67,19 @@ public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> imple
 	@Override
 	public String getGroup() {
 		return group;
+	}
+
+	protected ItemStack toRemainingItem(ItemStack from) {
+		return ForgeHooks.getContainerItem(from);
+	}
+
+	@Override
+	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+		NonNullList<ItemStack> ret = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+		for (int i = 0; i < ret.size(); i++) {
+			ret.set(i, toRemainingItem(inv.getStackInSlot(i)));
+		}
+		return ret;
 	}
 
 	@Override

@@ -61,6 +61,7 @@ public class OutputSupplier {
     private static final Map<String, IOutputSupplierFactory> outputSuppliers = Maps.newHashMap();
     private static boolean initialized;
 
+    // TODO: Allow iterating over mod assets server-side generically (based on this code, no less - but also UCW!)
     private static void loadFactories(ModContainer container) {
         File file = container.getSource();
         try {

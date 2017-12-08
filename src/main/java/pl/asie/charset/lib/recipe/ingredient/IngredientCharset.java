@@ -4,7 +4,11 @@ import gnu.trove.set.TCharSet;
 import gnu.trove.set.hash.TCharHashSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.IRecipeView;
 import pl.asie.charset.lib.utils.ItemUtils;
+
+import java.util.List;
 
 /**
  * Charset's replacement Ingredient class.
@@ -32,7 +36,7 @@ public abstract class IngredientCharset {
     }
 
     /**
-     * Are this recipe's permutations distinct?
+     * Are this ingredient's permutations distinct?
      *
      * This, among others, governs recipe preview behaviour in JEI
      * as well as whether two different stacks in two different recipe
@@ -76,9 +80,11 @@ public abstract class IngredientCharset {
     }
 
     /**
-     * @return An array of matching ItemStacks.
+     * @return An array of arrays of matching ItemStacks, with one entry in the list
+     * per possible permutation. If permutations are not distinct, the outer array
+     * should have a length of 1!
      */
-    public abstract ItemStack[] getMatchingStacks();
+    public abstract ItemStack[][] getMatchingStacks();
 
     /**
      * @return A set of characters which signify Ingredients this ingredient

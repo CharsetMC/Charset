@@ -1,4 +1,4 @@
-package pl.asie.charset.lib.recipe.ingredient;
+package pl.asie.charset.lib.recipe;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;

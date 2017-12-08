@@ -41,7 +41,6 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.JsonContext;
-import pl.asie.charset.lib.recipe.ingredient.IRecipeView;
 import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
 

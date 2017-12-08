@@ -19,7 +19,6 @@
 
 package pl.asie.charset.lib.recipe.ingredient;
 
-import gnu.trove.set.TCharSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntComparators;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -28,9 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
-import pl.asie.charset.lib.recipe.IngredientMatcher;
-import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
 
 import javax.annotation.Nullable;
 
@@ -66,14 +63,27 @@ public final class IngredientWrapper extends Ingredient {
 
     @Override
     public ItemStack[] getMatchingStacks() {
-        return charset.getMatchingStacks();
+        ItemStack[][] stackArrays = charset.getMatchingStacks();
+        int length = 0;
+        for (ItemStack[] array : stackArrays) {
+            length += array.length;
+        }
+
+        int i = 0;
+        ItemStack[] stacks = new ItemStack[length];
+        for (ItemStack[] array : stackArrays) {
+            System.arraycopy(array, 0, stacks, i, array.length);
+            i += array.length;
+        }
+
+        return stacks;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public IntList getValidItemStacksPacked() {
         if(this.matchingStacksPacked == null) {
-            ItemStack[] matchingStacks = charset.getMatchingStacks();
+            ItemStack[] matchingStacks = getMatchingStacks();
             this.matchingStacksPacked = new IntArrayList(matchingStacks.length);
             ItemStack[] var1 = matchingStacks;
             int var2 = var1.length;
