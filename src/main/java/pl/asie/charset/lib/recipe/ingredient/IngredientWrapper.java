@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.recipe;
+package pl.asie.charset.lib.recipe.ingredient;
 
 import gnu.trove.set.TCharSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -28,53 +28,52 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
+import pl.asie.charset.lib.recipe.IngredientMatcher;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
 
-public abstract class IngredientCharset extends Ingredient {
-    protected boolean mustMatch;
+public final class IngredientWrapper extends Ingredient {
+    private static final IRecipeResultBuilder DEFAULT_BUILDER = new IRecipeResultBuilder() {
+        @Override
+        public Ingredient getIngredient(char c) {
+            return null;
+        }
+
+        @Override
+        public ItemStack getStack(Ingredient i) {
+            return ItemStack.EMPTY;
+        }
+    };
+
+    private final IngredientCharset charset;
     private IntList matchingStacksPacked;
 
-    protected IngredientCharset(int p_i9_1_) {
-        super(p_i9_1_);
+    IngredientWrapper(IngredientCharset charset) {
+        super(0);
+        this.charset = charset;
     }
 
-    public IngredientCharset setRequireMatches(boolean value) {
-        mustMatch = value;
-        return this;
+    public final IngredientCharset getIngredientCharset() {
+        return charset;
     }
 
-    @Nullable
-    public TCharSet getDependencies() {
-        return null;
+    @Override
+    public boolean apply(@Nullable ItemStack stack) {
+        return stack == null ? charset.matches(ItemStack.EMPTY, DEFAULT_BUILDER) : charset.matches(stack, DEFAULT_BUILDER);
     }
 
-    public void addDependency(char c, Ingredient i) {
-
-    }
-
-    public boolean mustIteratePermutations() {
-        return getDependencies() != null;
-    }
-
-    public boolean apply(IngredientMatcher matcher, ItemStack stack) {
-        return apply(stack);
-    }
-
-    public void applyToStack(ItemStack stack, ItemStack source) {
-
-    }
-
-    public boolean areItemStacksMatched(ItemStack a, ItemStack b) {
-        return !mustMatch || ItemUtils.canMerge(a, b);
+    @Override
+    public ItemStack[] getMatchingStacks() {
+        return charset.getMatchingStacks();
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public IntList getValidItemStacksPacked() {
         if(this.matchingStacksPacked == null) {
-            ItemStack[] matchingStacks = getMatchingStacks();
+            ItemStack[] matchingStacks = charset.getMatchingStacks();
             this.matchingStacksPacked = new IntArrayList(matchingStacks.length);
             ItemStack[] var1 = matchingStacks;
             int var2 = var1.length;
@@ -88,5 +87,10 @@ public abstract class IngredientCharset extends Ingredient {
         }
 
         return this.matchingStacksPacked;
+    }
+
+    @Override
+    public boolean isSimple() {
+        return false;
     }
 }

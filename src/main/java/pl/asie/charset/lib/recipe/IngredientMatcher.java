@@ -21,31 +21,33 @@ package pl.asie.charset.lib.recipe;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeView;
+import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IngredientMatcher {
-    public interface Container {
-        Ingredient getIngredient(char c);
-    }
-
-    private final Container container;
+public class IngredientMatcher implements IRecipeResultBuilder {
+    private final IRecipeView view;
     private final Map<Ingredient, ItemStack> matchedStacks = new HashMap<>();
 
-    public IngredientMatcher(Container container) {
-        this.container = container;
+    public IngredientMatcher(IRecipeView view) {
+        this.view = view;
     }
 
     public Collection<Ingredient> getMatchedIngredients() {
         return matchedStacks.keySet();
     }
 
+    @Override
     public Ingredient getIngredient(char c) {
-        return container.getIngredient(c);
+        return view.getIngredient(c);
     }
 
+    @Override
     public ItemStack getStack(Ingredient i) {
         return matchedStacks.getOrDefault(i, ItemStack.EMPTY);
     }
@@ -55,11 +57,11 @@ public class IngredientMatcher {
             return stack.isEmpty();
         } else {
             boolean match = false;
-            if (ingredient instanceof IngredientCharset) {
-                IngredientCharset ic = (IngredientCharset) ingredient;
-                if (((IngredientCharset) ingredient).apply(this, stack)) {
+            if (ingredient instanceof IngredientWrapper) {
+                IngredientCharset ic = ((IngredientWrapper) ingredient).getIngredientCharset();
+                if (ic.matches(stack,this)) {
                     if (matchedStacks.containsKey(ingredient)) {
-                        if (!ic.areItemStacksMatched(matchedStacks.get(ingredient), stack)) {
+                        if (!ic.matchSameGrid(matchedStacks.get(ingredient), stack)) {
                             return false;
                         }
                     }
@@ -83,13 +85,14 @@ public class IngredientMatcher {
         boolean applied = false;
 
         for (Map.Entry<Ingredient, ItemStack> entry : matchedStacks.entrySet()) {
-            if (entry.getKey() instanceof IngredientCharset) {
+            if (entry.getKey() instanceof IngredientWrapper) {
                 if (!applied) {
                     applied = true;
                     stack = stack.copy();
                 }
 
-                ((IngredientCharset) entry.getKey()).applyToStack(stack, entry.getValue());
+                // TODO: Implement for non-distinct ingredients.
+                (((IngredientWrapper) entry.getKey()).getIngredientCharset()).transform(stack, entry.getValue(), this);
             }
         }
 

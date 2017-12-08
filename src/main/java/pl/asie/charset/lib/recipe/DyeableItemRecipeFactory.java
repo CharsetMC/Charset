@@ -20,7 +20,6 @@
 package pl.asie.charset.lib.recipe;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
@@ -33,8 +32,10 @@ import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.item.IDyeableItem;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.utils.ColorUtils;
-import pl.asie.charset.lib.utils.UtilProxyCommon;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +47,7 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 	public static class Recipe extends RecipeBase {
 		public class DyeIngredient extends IngredientCharset {
 			private DyeIngredient() {
-				super(0);
+				super();
 			}
 
 			@Override
@@ -56,12 +57,12 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			}
 
 			@Override
-			public boolean apply(ItemStack stack) {
+			public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
 				return getColor(stack) != null;
 			}
 		}
 
-		public final DyeIngredient DYE = new DyeIngredient();
+		public final Ingredient DYE = IngredientCharset.wrap(new DyeIngredient());
 		public final Ingredient input;
 
 		public Recipe(JsonContext context, JsonObject object, Ingredient ingredient) {

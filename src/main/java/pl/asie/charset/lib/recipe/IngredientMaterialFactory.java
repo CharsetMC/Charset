@@ -25,11 +25,16 @@ import com.google.gson.JsonObject;
 import gnu.trove.set.TCharSet;
 import gnu.trove.set.hash.TCharHashSet;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.JsonUtils;
 import net.minecraftforge.common.crafting.IIngredientFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeView;
+import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nonnull;
@@ -43,24 +48,23 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         private final TCharSet dependencies;
         private final String[] types;
         private final String nbtTag;
-        private net.minecraft.item.crafting.Ingredient dependency;
+        private boolean matchStack;
+        private Ingredient dependency;
 
         protected IngredientMaterial(String nbtTag, String... types) {
-            super(0);
+            super();
             this.types = types;
             this.nbtTag = nbtTag;
             this.chain = null;
             this.dependencies = null;
-            this.setRequireMatches(nbtTag != null);
         }
 
         protected IngredientMaterial(String nbtTag, String chain, boolean dummy, String... types) {
-            super(0);
+            super();
             this.types = types;
             this.nbtTag = nbtTag;
             this.chain = chain.split("\\.");
             this.dependencies = new TCharHashSet();
-            this.setRequireMatches(nbtTag != null);
             dependencies.add(this.chain[0].charAt(0));
         }
 
@@ -70,15 +74,16 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         }
 
         @Override
-        public void addDependency(char c, net.minecraft.item.crafting.Ingredient i) {
-            if (chain != null && c == chain[0].charAt(0)) {
-                dependency = i;
+        public void onAdded(IRecipeView view) {
+            if (this.chain != null) {
+                char depChar = this.chain[0].charAt(0);
+                dependency = view.getIngredient(depChar);
             }
         }
 
         @Override
-        public boolean mustIteratePermutations() {
-            return super.mustIteratePermutations() || chain != null || nbtTag != null;
+        public boolean arePermutationsDistinct() {
+            return super.arePermutationsDistinct() || matchStack || chain != null || nbtTag != null;
         }
 
         private ItemMaterial getChainedMaterial(ItemMaterial base) {
@@ -98,25 +103,29 @@ public class IngredientMaterialFactory implements IIngredientFactory {
         }
 
         @Override
-        public boolean apply(IngredientMatcher matcher, ItemStack stack) {
+        public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
             if (chain != null) {
-                ItemStack stackIn = matcher.getStack(dependency);
+                ItemStack stackIn = builder.getStack(dependency);
                 if (!stackIn.isEmpty()) {
                     ItemMaterial base = getChainedMaterial(ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stackIn));
                     return base != null && ItemMaterialRegistry.INSTANCE.matches(stack, base);
+                }
+                return false;
+            } else {
+                if (!stack.isEmpty()) {
+                    return ItemMaterialRegistry.INSTANCE.matches(stack, types);
                 } else {
                     return false;
                 }
-            } else {
-                return apply(stack);
             }
         }
 
         @Override
-        public void applyToStack(ItemStack stack, ItemStack source) {
+        public ItemStack transform(ItemStack stack, ItemStack source, IRecipeResultBuilder builder) {
             if (nbtTag != null) {
                 ItemUtils.getTagCompound(stack, true).setString(nbtTag, ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(source).getId());
             }
+            return stack;
         }
 
         @Override
@@ -142,18 +151,14 @@ public class IngredientMaterialFactory implements IIngredientFactory {
             }
         }
 
-        @Override
-        public boolean apply(@Nullable ItemStack stack) {
-            if (stack == null || stack.isEmpty())
-                return false;
-
-            return ItemMaterialRegistry.INSTANCE.matches(stack, types);
+        public void setRequireMatches(boolean requireMatches) {
+            this.matchStack = requireMatches;
         }
     }
 
     @Nonnull
     @Override
-    public IngredientMaterial parse(JsonContext jsonContext, JsonObject jsonObject) {
+    public Ingredient parse(JsonContext jsonContext, JsonObject jsonObject) {
         String tag = JsonUtils.getString(jsonObject, "nbtKey");
         String[] material;
 
@@ -178,6 +183,6 @@ public class IngredientMaterialFactory implements IIngredientFactory {
             result.setRequireMatches(JsonUtils.getBoolean(jsonObject, "matchStack"));
         }
 
-        return result;
+        return IngredientCharset.wrap(result);
     }
 }

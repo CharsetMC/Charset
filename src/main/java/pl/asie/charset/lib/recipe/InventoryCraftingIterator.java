@@ -25,6 +25,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.common.crafting.IngredientNBT;
 import net.minecraftforge.oredict.OreIngredient;
+import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 
 import java.util.*;
 
@@ -95,8 +97,11 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
                 ItemStack[] stacks = ing.getMatchingStacks();
                 if (stacks.length > 1) {
                     if (!permutateAll) {
-                        if (ing instanceof IngredientCharset && !((IngredientCharset) ing).mustIteratePermutations()) {
-                            continue;
+                        if (ing instanceof IngredientWrapper) {
+                            IngredientCharset charset = ((IngredientWrapper) ing).getIngredientCharset();
+                            if (!charset.arePermutationsDistinct()) {
+                                continue;
+                            }
                         }
 
                         Class c = ing.getClass();

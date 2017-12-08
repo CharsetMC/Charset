@@ -26,10 +26,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.JsonUtils;
 import net.minecraftforge.common.crafting.IIngredientFactory;
 import net.minecraftforge.common.crafting.JsonContext;
-import pl.asie.charset.lib.recipe.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -55,13 +58,13 @@ public class IngredientBarrel extends IngredientCharset {
     }
 
     public IngredientBarrel(JsonContext context, JsonObject json) {
-        super(0);
+        super();
         includeCarts = JsonUtils.getBoolean(json, "carts", false);
         upgradeBlacklist = setFromJson(context, json, "upgradeBlacklist");
     }
 
     @Override
-    public boolean mustIteratePermutations() {
+    public boolean arePermutationsDistinct() {
         return true;
     }
 
@@ -79,11 +82,13 @@ public class IngredientBarrel extends IngredientCharset {
     }
 
     @Override
-    public boolean apply(ItemStack stack) {
+    public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
         if (!stack.isEmpty() && (stack.getItem() == CharsetStorageBarrels.barrelItem || (includeCarts && stack.getItem() == CharsetStorageBarrels.barrelCartItem))) {
             if (!upgradeBlacklist.isEmpty()) {
                 Set<TileEntityDayBarrel.Upgrade> upgrades = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
-                TileEntityDayBarrel.populateUpgrades(upgrades, stack.getTagCompound());
+                if (stack.hasTagCompound()) {
+                    TileEntityDayBarrel.populateUpgrades(upgrades, stack.getTagCompound());
+                }
                 for (TileEntityDayBarrel.Upgrade upgrade : upgradeBlacklist) {
                     if (upgrades.contains(upgrade)) {
                         return false;
@@ -100,7 +105,7 @@ public class IngredientBarrel extends IngredientCharset {
         @Nonnull
         @Override
         public Ingredient parse(JsonContext context, JsonObject json) {
-            return new IngredientBarrel(context, json);
+            return IngredientCharset.wrap(new IngredientBarrel(context, json));
         }
     }
 }

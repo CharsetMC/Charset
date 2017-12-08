@@ -36,18 +36,19 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.JsonContext;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeView;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class RecipeCharset extends RecipeBase implements IngredientMatcher.Container {
+public class RecipeCharset extends RecipeBase implements IRecipeView {
     public static class Shaped extends RecipeCharset implements IShapedRecipe {
         public Shaped(JsonContext context, JsonObject object) {
             super(context, object);
@@ -304,7 +305,7 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
                 for (int i = 0; i < recipe.input.size(); i++) {
                     if (!addedPositions.contains(i)) {
                         Ingredient ingredient = recipe.input.get(i);
-                        TCharSet deps = ingredient instanceof IngredientCharset ? ((IngredientCharset) ingredient).getDependencies() : null;
+                        TCharSet deps = ingredient instanceof IngredientWrapper ? ((IngredientWrapper) ingredient).getIngredientCharset().getDependencies() : null;
                         if (deps != null && deps.size() > 0) {
                             boolean match = true;
                             TCharIterator it = deps.iterator();
@@ -317,12 +318,6 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
 
                             if (!match) {
                                 continue;
-                            }
-                        }
-
-                        if (!addedIngredients.contains(ingredient) && ingredient instanceof IngredientCharset) {
-                            for (Ingredient ing : addedIngredients) {
-                                ((IngredientCharset) ingredient).addDependency(ingredientToChar.get(ing), ing);
                             }
                         }
 
@@ -354,6 +349,12 @@ public class RecipeCharset extends RecipeBase implements IngredientMatcher.Conta
             }
 
             recipe.output = OutputSupplier.createOutputSupplier(context, JsonUtils.getJsonObject(json, "result"));
+
+            for (Ingredient ing : recipe.getIngredients()) {
+                if (ing instanceof IngredientWrapper) {
+                    ((IngredientWrapper) ing).getIngredientCharset().onAdded(recipe);
+                }
+            }
             return recipe;
         }
     }

@@ -22,7 +22,9 @@ package pl.asie.charset.lib.wires;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import pl.asie.charset.lib.recipe.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IRecipeResultBuilder;
+import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.recipe.OutputSupplier;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
@@ -46,12 +48,12 @@ public class RecipeWireConversion extends RecipeCharset {
         private final int offset;
 
         protected IngredientWires(boolean freestanding) {
-            super(0);
+            super();
             offset = freestanding ? 1 : 0;
         }
 
         @Override
-        public boolean mustIteratePermutations() {
+        public boolean arePermutationsDistinct() {
             return true;
         }
 
@@ -62,9 +64,9 @@ public class RecipeWireConversion extends RecipeCharset {
         }
 
         @Override
-        public boolean apply(@Nullable ItemStack p_apply_1_) {
-            if (!p_apply_1_.isEmpty() && p_apply_1_.getItem() == CharsetLibWires.itemWire && ((p_apply_1_.getMetadata() & 1) == offset)) {
-                WireProvider provider = WireManager.REGISTRY.getValue(p_apply_1_.getMetadata() >> 1);
+        public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
+            if (!stack.isEmpty() && stack.getItem() == CharsetLibWires.itemWire && ((stack.getMetadata() & 1) == offset)) {
+                WireProvider provider = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
                 return provider.hasFreestandingWire() && provider.hasSidedWire();
             } else {
                 return false;
@@ -77,7 +79,7 @@ public class RecipeWireConversion extends RecipeCharset {
     public RecipeWireConversion(boolean freestanding) {
         super("charset:wire_convert", true);
         super.input = NonNullList.create();
-        super.input.add(new IngredientWires(freestanding));
+        super.input.add(IngredientCharset.wrap(new IngredientWires(freestanding)));
         super.output = OutputSupplier.createStackOutputSupplier(ItemStack.EMPTY);
         super.width = 1;
         super.height = 1;
