@@ -56,6 +56,8 @@ public final class LaserBeam implements ILaserEndpoint {
 	private final @Nonnull BlockPos start, end;
 	private final @Nonnull LaserColor color;
 	private final @Nonnull EnumFacing direction;
+
+	private boolean endedAtAir;
 	private int length;
 
 	private boolean isValidated;
@@ -90,6 +92,7 @@ public final class LaserBeam implements ILaserEndpoint {
 		int flags = buffer.readUnsignedByte();
 		direction = EnumFacing.getFront(flags & 7);
 		color = LaserColor.VALUES[(flags >> 3) & 7];
+		endedAtAir = (flags & 0x40) != 0;
 
 		source = new DummyLaserSource(world != null ? world.getTileEntity(start) : null);
 		end = start.offset(direction, length);
@@ -102,7 +105,7 @@ public final class LaserBeam implements ILaserEndpoint {
 		buf.writeInt(world.provider.getDimension());
 		buf.writeBlockPos(start);
 		buf.writeShort(length);
-		buf.writeByte(direction.ordinal() | (color.ordinal() << 3));
+		buf.writeByte(direction.ordinal() | (color.ordinal() << 3) | (endedAtAir ? 0x40 : 0));
 	}
 
 	public void validate() {
@@ -270,10 +273,11 @@ public final class LaserBeam implements ILaserEndpoint {
 					break;
 			}
 			i++;
-			foundEnd |= isBlocker(chunk, endPos);
+			foundEnd = isBlocker(chunk, endPos);
 		}
 
 		length = i;
+		endedAtAir = !foundEnd;
 
 		return endPos;
 	}
@@ -294,7 +298,7 @@ public final class LaserBeam implements ILaserEndpoint {
 			endChunk = world.getChunkFromBlockCoords(end);
 		}
 
-		if (length < MAX_DISTANCE && !isBlocker(endChunk, end)) {
+		if (endedAtAir == isBlocker(endChunk, end)) {
 			return false;
 		}
 

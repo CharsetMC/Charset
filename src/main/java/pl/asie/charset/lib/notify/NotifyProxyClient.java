@@ -241,7 +241,7 @@ public class NotifyProxyClient extends NotifyProxy {
             IBlockState bs = co.getWorld().getBlockState(pos);
             AxisAlignedBB bb = bs.getCollisionBoundingBox(co.getWorld(), pos);
             if (bb != null) {
-                y += bb.maxY - bb.minY;
+                y += bb.maxY;
             } else {
                 y += 0.5F;
             }
