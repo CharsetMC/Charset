@@ -48,8 +48,8 @@ import java.util.Map;
 
 @CharsetModule(
 		name = "tweak.dynamicLights",
-		description = "Dynamic lights, based on Albedo!",
-		dependencies = {"mod:albedo"},
+		description = "Dynamic lights, based on Mirage!",
+		dependencies = {"mod:mirage"},
 		isClientOnly = true,
 		profile = ModuleProfile.TESTING
 )
@@ -121,7 +121,7 @@ public class CharsetTweakDynamicLights {
 		}
 	}
 
-	private void addLight(List<Light> lights, Entity e) {
+	private void addLight(GatherLightsEvent lights, Entity e) {
 		if (enableExplosionLights) {
 			if (e instanceof EntityCreeper) {
 				float brightness = ((EntityCreeper) e).getCreeperFlashIntensity(Minecraft.getMinecraft().getRenderPartialTicks());
@@ -148,16 +148,15 @@ public class CharsetTweakDynamicLights {
 
 	@SubscribeEvent
 	public void onGatherLights(GatherLightsEvent event) {
-		List<Light> lights = event.getLightList();
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 
 		if (enableEntityLights) {
 			player.getEntityWorld().loadedEntityList.forEach((e) -> {
 				if (!enablePlayerLights && e instanceof EntityPlayer) return;
-				addLight(lights, e);
+				addLight(event, e);
 			});
 		} else if (enablePlayerLights) {
-			player.getEntityWorld().playerEntities.forEach((e) -> addLight(lights, e));
+			player.getEntityWorld().playerEntities.forEach((e) -> addLight(event, e));
 		}
 	}
 }
