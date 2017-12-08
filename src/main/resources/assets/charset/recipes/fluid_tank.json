@@ -1,1 +1,27 @@
-w
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.tanks"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:fluidtank",
+  "pattern": [
+    "xxx",
+    "x x",
+    "xxx"
+  ],
+  "key": {
+    "x": {
+      "type": "charset:group",
+      "group": "glass",
+      "nbtKey": "color"
+    }
+  },
+  "result": {
+    "item": "charset:fluidtank",
+    "data": 0,
+    "count": 1
+  }
+}
