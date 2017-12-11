@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.tweaks.carry.transforms;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.*;
@@ -36,11 +37,32 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity> {
+	protected boolean isEmptyMinecart(Entity object) {
+		if (object == null) {
+			return false;
+		}
+
+		if (object instanceof EntityMinecartEmpty) {
+			return true;
+		}
+
+		if (object instanceof EntityMinecart && ((EntityMinecart) object).getType() == EntityMinecart.Type.RIDEABLE) {
+			IBlockState displayState = ((EntityMinecart) object).getDisplayTile();
+			return displayState.getBlock().getMaterial(displayState) == Material.AIR;
+		}
+
+		return false;
+	}
+
 	protected Entity transform(Entity object, Class<? extends Entity> target, boolean simulate) {
 		return transform(object, target, null, simulate);
 	}
 
 	protected Entity transform(Entity object, Class<? extends Entity> target, NBTTagCompound patchTag, boolean simulate) {
+		if (!isEmptyMinecart(object)) {
+			return null;
+		}
+
 		Entity targetEntity = null;
 
 		if (!object.world.isRemote && !simulate) {
