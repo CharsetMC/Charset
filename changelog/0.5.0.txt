@@ -1,5 +1,5 @@
 * NOTE: Relicensed to MIT (API) + LGPLv3 (non-API).
-* Minecraft 1.12 port.
+* Minecraft 1.12.2 port.
 * Made sure to set the walking sound on Charset blocks.
 * Major improvements to Just Enough Items support.
 * Many, many bugfixes and improvements throughout the codebase.
@@ -11,6 +11,7 @@
     * Please install CharsetPatches for redstone support in said laser system. Otherwise, the use might be somewhat limited for the time being.
 * [lib] Added many useful commands! See /charset (/ch) and /charsetc (/chc).
 * [lib] Blocks should now properly render landing particles.
+* [lib] Fix force-enabling modules outside of profile.
 * [lib] Improve wire occlusion logic.
 * [lib] Wire connection updates on placement now happen near-instantenously, without the previously visible flicker effect.
 * [misc.pocketcraft] [#146] Fixed item loss bug.
@@ -34,6 +35,7 @@
 * [storage.tanks] [#141] Fix tanks not dropping item when broken.
 * [storage.tanks] [#142] Tanks no longer consume fluids from buckets in creative mode.
 * [storage.tanks] [#158] Added Stained Glass Tanks.
+* [storage.tanks] [#163] Fix tanks crashing when fed a null fluid.
 * [storage.tanks] Tanks with liquid in them are now harder to break than empty tanks to avoid fluid loss by accident.
 * [tools.building] New module! Adds the Chisel.
 * [tools.wrench] Add modded metal ingot support.
@@ -41,20 +43,27 @@
 * [transport.color] Dyed minecarts now use your resource pack's minecart texture
 * [tweak.anvilDyeItems] New tweak - improved over the 1.6.4 AsieLib version.
 * [tweak.carry] [#148] Add placement sound for placing carried blocks.
+* [tweak.carry] Add support for giving your carried block to another player! Give it a try!
 * [tweak.carry] Block carrying can now be disabled in creative mode.
 * [tweak.carry] Carried blocks now render in third person! \o/
 * [tweak.carry] [#154] Carrying a cactus now correctly deals damage to the carrier.
 * [tweak.carry] [#140] Carrying will now respect your pickblock key mapping.
     * However, mapping it to a key as opposed to a mouse button will prevent carrying from working in Creative Mode.
 * [tweak.carry] Fix carried blocks sometimes appearing on other players.
+* [tweak.carry] Fix carrying not respecting spawn protection and world borders.
 * [tweak.carry] [#149] Fix doors being carryable.
+* [tweak.carry] [#166] Fix minecart entity handler not checking if it's actually a minecart it's placing into.
+* [tweak.carry] [#167] Fix non-vanilla chests potentially glitching out on placement.
 * [tweak.carry] [#137] Fix placing double chests potentially causing a rendering glitch.
+* [tweak.carry] Fix rendering bug caused by another player carrying a block.
 * [tweak.carry] Fix rendering bug caused by carrying a block with a notification visible.
+* [tweak.carry] Fix some multiplayer state synchronization bugs.
 * [tweak.carry] Prevent the player from picking up blocks they can't break.
 * [tweak.dynamicLights] New tweak - requires Mirage! Client-side only! Fun!
 * [tweak.remove.netherPortals] New tweak!
 * [tweak.remove.recipeBookButton] New tweak. Hopefully self-explanatory.
 * [tweak.remove.recipeUnlocks] New tweak! Beats Quark's version in that it also hides the pop-up.
+* [tweak.remove.vanillaStyleTools] [#161] Ported to 1.12 *properly* - thanks 3TUSK!
 * [tweak.remove.tutorial] New tweak!
 * [tweak.shiftScroll] New tweak! Allows shift-scrolling between certain items of the same type in vanilla items.
     * It is also configurable - see config/charset/module/lib.shiftScroll/ if this tweak is enabled!
