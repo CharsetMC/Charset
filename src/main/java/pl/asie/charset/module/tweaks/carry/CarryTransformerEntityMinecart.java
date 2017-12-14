@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tweaks.carry.transforms;
+package pl.asie.charset.module.tweaks.carry;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -58,8 +58,9 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 		return transform(object, target, null, simulate);
 	}
 
+
 	protected Entity transform(Entity object, Class<? extends Entity> target, NBTTagCompound patchTag, boolean simulate) {
-		if (!isEmptyMinecart(object)) {
+		if (isEmptyMinecart(object) == (target == EntityMinecartEmpty.class)) {
 			return null;
 		}
 

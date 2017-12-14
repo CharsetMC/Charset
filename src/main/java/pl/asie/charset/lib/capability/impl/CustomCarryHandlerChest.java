@@ -20,13 +20,17 @@
 package pl.asie.charset.lib.capability.impl;
 
 import net.minecraft.block.BlockChest;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pl.asie.charset.api.carry.CustomCarryHandler;
 import pl.asie.charset.api.carry.ICarryHandler;
+
+import java.util.List;
 
 public class CustomCarryHandlerChest extends CustomCarryHandler {
     public CustomCarryHandlerChest(ICarryHandler handler) {
@@ -40,7 +44,10 @@ public class CustomCarryHandlerChest extends CustomCarryHandler {
         for (EnumFacing facing1 : EnumFacing.HORIZONTALS) {
             if (world.getBlockState(pos.offset(facing1)).getBlock() instanceof BlockChest) {
                 // FIXME: Double chests need this (#137)
-                owner.getState().getBlock().onBlockPlacedBy(world, pos, owner.getState(), (EntityLivingBase) owner.getCarrier(), ItemStack.EMPTY);
+                IBlockState state = owner.getState();
+                List<ItemStack> drops = state.getBlock().getDrops(world, pos, state, 0);
+
+                owner.getState().getBlock().onBlockPlacedBy(world, pos, owner.getState(), (EntityLivingBase) owner.getCarrier(), drops.size() > 0 ? drops.get(0) : ItemStack.EMPTY);
                 break;
             }
         }

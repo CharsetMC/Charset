@@ -185,9 +185,10 @@ public abstract class BlockBase extends Block {
 		int fortuneLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack);
 		boolean silkTouch = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, stack) > 0;
 
-		List<ItemStack> items = getDrops(worldIn, pos, state, te, fortuneLevel, silkTouch);
-
+		NonNullList<ItemStack> items = NonNullList.create();
+		getDrops(items, worldIn, pos, state, te, 0, false);
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, worldIn, pos, state, fortuneLevel, 1.0f, silkTouch, player);
+
 		harvesters.set(player);
 
 		if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) {
@@ -216,7 +217,8 @@ public abstract class BlockBase extends Block {
 		if (stateOld == state) {
 			world.setBlockToAir(pos);
 
-			List<ItemStack> items = getDrops(world, pos, state, tile, 0, false);
+			NonNullList<ItemStack> items = NonNullList.create();
+			getDrops(items, world, pos, state, tile, 0, false);
 			float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / Utils.getExplosionSize(explosion), true, null);
 
 			for (ItemStack item : items)
@@ -229,18 +231,16 @@ public abstract class BlockBase extends Block {
 	}
 
 	@Override
-	public final List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-		return getDrops(world, pos, state, null, fortune, false);
+	public final void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+		getDrops(drops, world, pos, state, null, fortune, false);
 	}
 
-	public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
+	public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
 		if (te instanceof TileBase) {
-			List<ItemStack> stacks = new ArrayList<ItemStack>();
-			stacks.add(((TileBase) te).getDroppedBlock(state));
-			return stacks;
+			drops.add(((TileBase) te).getDroppedBlock(state));
+		} else {
+			super.getDrops(drops, world, pos, state, fortune);
 		}
-
-		return super.getDrops(world, pos, state, fortune);
 	}
 
 	@Override

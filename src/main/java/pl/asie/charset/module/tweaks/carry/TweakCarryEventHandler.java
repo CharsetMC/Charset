@@ -153,11 +153,7 @@ public class TweakCarryEventHandler {
             return false;
         }
 
-        if (player.getHeldItem(EnumHand.MAIN_HAND).isEmpty()
-                && player.getHeldItem(EnumHand.OFF_HAND).isEmpty()
-                && !player.isPlayerSleeping()
-                && !player.isRiding()
-                && Minecraft.getMinecraft().currentScreen == null
+        if (CharsetTweakBlockCarrying.canPlayerConsiderCarryingBlock(player)
                 && carryHandler != null) {
 
             if (player.isCreative()) {
@@ -233,6 +229,7 @@ public class TweakCarryEventHandler {
                 if (transformer.insert(entity, state, tile, true)) {
                     carryHandler.empty();
                     transformer.insert(entity, state, tile, false);
+                    CharsetTweakBlockCarrying.syncCarryWithAllClients(player);
                     return;
                 }
             }

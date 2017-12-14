@@ -22,11 +22,11 @@ package pl.asie.charset.module.tweaks.carry;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -45,22 +45,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
-import pl.asie.charset.api.lib.IMovable;
-import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.CharsetIMC;
-import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.ThreeState;
-import pl.asie.charset.module.tweaks.carry.transforms.CarryTransformerEntityMinecart;
-import pl.asie.charset.module.tweaks.carry.transforms.CarryTransformerEntityMinecartDayBarrel;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 @CharsetModule(
@@ -80,11 +73,12 @@ public class CharsetTweakBlockCarrying {
     @CharsetModule.PacketRegistry
     public static PacketRegistry packet;
 
-    public static boolean enabledCreative;
+    public static boolean enabledCreative, enabledSharing;
 
     @Mod.EventHandler
     public void loadConfig(CharsetLoadConfigEvent event) {
         enabledCreative = ConfigUtils.getBoolean(config, "general", "enabledInCreative", true, "Should block carrying be enabled in creative mode?", true);
+        enabledSharing = ConfigUtils.getBoolean(config, "general", "enablePlayerSharing", true, "Should players be able to give blocks they are carrying to other players?", true);
     }
 
     @Mod.EventHandler
@@ -95,6 +89,10 @@ public class CharsetTweakBlockCarrying {
         CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecart());
         if (ModCharset.isModuleLoaded("storage.barrels")) {
             CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecartDayBarrel());
+        }
+
+        if (enabledSharing) {
+            CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerPlayerShare());
         }
 
         CarryHandler.register();
@@ -178,6 +176,14 @@ public class CharsetTweakBlockCarrying {
         }
 
         return true;
+    }
+
+    public static boolean canPlayerConsiderCarryingBlock(EntityPlayer player) {
+        return player.getHeldItem(EnumHand.MAIN_HAND).isEmpty()
+                && player.getHeldItem(EnumHand.OFF_HAND).isEmpty()
+                && !player.isPlayerSleeping()
+                && !player.isRiding()
+                && (player.openContainer == null || player.openContainer == player.inventoryContainer);
     }
 
     public static void grabBlock(EntityPlayer player, World world, BlockPos pos) {
@@ -283,9 +289,7 @@ public class CharsetTweakBlockCarrying {
                 }
                 return false;
             } else {
-                if (entity instanceof EntityPlayer) {
-                    CharsetTweakBlockCarrying.syncCarryWithAllClients(entity);
-                }
+                CharsetTweakBlockCarrying.syncCarryWithAllClients(entity);
                 return true;
             }
         } else {

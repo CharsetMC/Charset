@@ -37,6 +37,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -203,11 +204,9 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
         if (te instanceof TileEntityDayBarrel) {
-            return ((TileEntityDayBarrel) te).getDrops(silkTouch);
-        } else {
-            return Collections.EMPTY_LIST;
+            ((TileEntityDayBarrel) te).getDrops(drops, silkTouch);
         }
     }
 

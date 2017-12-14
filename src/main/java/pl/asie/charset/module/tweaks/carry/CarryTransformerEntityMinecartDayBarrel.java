@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tweaks.carry.transforms;
+package pl.asie.charset.module.tweaks.carry;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;

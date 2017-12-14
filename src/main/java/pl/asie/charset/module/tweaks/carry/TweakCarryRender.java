@@ -179,7 +179,6 @@ public class TweakCarryRender {
 			GlStateManager.disableRescaleNormal();
 			GlStateManager.enableLighting();
 			GlStateManager.popMatrix();
-			Minecraft.getMinecraft().entityRenderer.disableLightmap();
 		}
 	}
 

@@ -1004,11 +1004,9 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         return stacks;
     }
 
-    public List<ItemStack> getDrops(boolean silkTouch) {
-        List<ItemStack> stacks = new ArrayList<>();
+    public void getDrops(NonNullList<ItemStack> stacks, boolean silkTouch) {
         stacks.add(getDroppedBlock(silkTouch));
         stacks.addAll(getContentDrops(silkTouch));
-        return stacks;
     }
 
     public boolean canLose() {
