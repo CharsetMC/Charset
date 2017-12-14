@@ -29,9 +29,12 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.lib.capability.Capabilities;
+
+import javax.annotation.Nullable;
 
 public class TileBase extends TileEntity {
 	private int lastComparatorValue = -1;
@@ -47,7 +50,7 @@ public class TileBase extends TileEntity {
 		}
 	}
 
-	public ItemStack getPickedBlock(EntityPlayer player, IBlockState state) {
+	public ItemStack getPickedBlock(@Nullable EntityPlayer player, @Nullable RayTraceResult result, IBlockState state) {
 		return getDroppedBlock(state);
 	}
 

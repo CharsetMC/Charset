@@ -134,11 +134,23 @@ public abstract class BlockBase extends Block {
 	}
 
 	@Override
+	public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+		if (isTileProvider) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile instanceof TileBase) {
+				return ((TileBase) tile).getPickedBlock(null, null, state);
+			}
+		}
+
+		return new ItemStack(this);
+	}
+
+	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
 		if (isTileProvider) {
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile instanceof TileBase) {
-				return ((TileBase) tile).getPickedBlock(player, state);
+				return ((TileBase) tile).getPickedBlock(player, target, state);
 			}
 		}
 

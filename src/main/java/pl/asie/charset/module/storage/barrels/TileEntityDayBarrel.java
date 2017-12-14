@@ -1098,8 +1098,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     @Override
-    public ItemStack getPickedBlock(EntityPlayer player, IBlockState state) {
-        if (!player.isSneaking()) {
+    public ItemStack getPickedBlock(@Nullable EntityPlayer player, @Nullable RayTraceResult result, IBlockState state) {
+        if (player == null || !player.isSneaking()) {
             return getDroppedBlock(state);
         } else {
             ItemStack stack = item.copy();
