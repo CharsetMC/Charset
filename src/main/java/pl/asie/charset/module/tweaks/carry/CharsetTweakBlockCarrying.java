@@ -73,12 +73,13 @@ public class CharsetTweakBlockCarrying {
     @CharsetModule.PacketRegistry
     public static PacketRegistry packet;
 
-    public static boolean enabledCreative, enabledSharing;
+    public static boolean enabledCreative;
+    // public static boolean enabledSharing;
 
     @Mod.EventHandler
     public void loadConfig(CharsetLoadConfigEvent event) {
         enabledCreative = ConfigUtils.getBoolean(config, "general", "enabledInCreative", true, "Should block carrying be enabled in creative mode?", true);
-        enabledSharing = ConfigUtils.getBoolean(config, "general", "enablePlayerSharing", true, "Should players be able to give blocks they are carrying to other players?", true);
+        // enabledSharing = ConfigUtils.getBoolean(config, "general", "enablePlayerSharing", true, "Should players be able to give blocks they are carrying to other players?", true);
     }
 
     @Mod.EventHandler
@@ -91,9 +92,9 @@ public class CharsetTweakBlockCarrying {
             CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecartDayBarrel());
         }
 
-        if (enabledSharing) {
+        /* if (enabledSharing) {
             CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerPlayerShare());
-        }
+        } */
 
         CarryHandler.register();
 

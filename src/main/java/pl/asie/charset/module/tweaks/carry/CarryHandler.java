@@ -43,6 +43,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.world.BlockEvent;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.carry.CustomCarryHandler;
 import pl.asie.charset.api.carry.ICarryHandler;
 import pl.asie.charset.api.lib.ICacheable;
@@ -154,6 +155,10 @@ public class CarryHandler implements ICacheable, ICarryHandler {
 
             setCustomCarryHandler(false);
             world.setBlockToAir(pos);
+
+            if (!block.getBlock().canPlaceBlockAt(world, pos)) {
+                ModCharset.logger.warn("Block " + block.getBlock().getRegistryName() + " could not be placed in the position it was just picked up from. Interesting?");
+            }
 
             return true;
         } else {

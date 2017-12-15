@@ -91,20 +91,21 @@ public abstract class BaseBakedModel implements IBakedModel {
 
     public BaseBakedModel addDefaultBlockTransforms() {
         TRSRTransformation thirdperson = getTransformation(0, 2.5f, 0, 75, 45, 0, 0.375f);
-        addTransformation(ItemCameraTransforms.TransformType.GUI,                     getTransformation(0, 0, 0, 30, 225, 0, 0.625f));
-        addTransformation(ItemCameraTransforms.TransformType.GROUND,                  getTransformation(0, 3, 0, 0, 0, 0, 0.25f));
-        addTransformation(ItemCameraTransforms.TransformType.FIXED,                   getTransformation(0, 0, 0, 0, 0, 0, 0.5f));
+        addTransformation(ItemCameraTransforms.TransformType.GUI, getTransformation(0, 0, 0, 30, 225, 0, 0.625f));
+        addTransformation(ItemCameraTransforms.TransformType.GROUND, getTransformation(0, 3, 0, 0, 0, 0, 0.25f));
+        addTransformation(ItemCameraTransforms.TransformType.FIXED, getTransformation(0, 0, 0, 0, 0, 0, 0.5f));
         addThirdPersonTransformation(thirdperson);
         addTransformation(ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND, getTransformation(0, 0, 0, 0, 45, 0, 0.4f));
-        addTransformation(ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,  getTransformation(0, 0, 0, 0, 255, 0, 0.4f));
+        addTransformation(ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND, getTransformation(0, 0, 0, 0, 255, 0, 0.4f));
         return this;
     }
 
     public BaseBakedModel addDefaultItemTransforms() {
         TRSRTransformation thirdperson = getTransformation(0, 3, 1, 0, 0, 0, 0.55f);
         TRSRTransformation firstperson = getTransformation(1.13f, 3.2f, 1.13f, 0, -90, 25, 0.68f);
-        addTransformation(ItemCameraTransforms.TransformType.GROUND,                  getTransformation(0, 2, 0, 0, 0, 0, 0.5f));
-        addTransformation(ItemCameraTransforms.TransformType.HEAD,                    getTransformation(0, 13, 7, 0, 180, 0, 1));
+        addTransformation(ItemCameraTransforms.TransformType.GROUND, getTransformation(0, 2, 0, 0, 0, 0, 0.5f));
+        addTransformation(ItemCameraTransforms.TransformType.HEAD, getTransformation(0, 13, 7, 0, 180, 0, 1));
+        addTransformation(ItemCameraTransforms.TransformType.FIXED, getTransformation(0, 0, 0, 0, 180, 0, 1));
         addThirdPersonTransformation(thirdperson);
         addFirstPersonTransformation(firstperson);
         return this;
@@ -112,9 +113,9 @@ public abstract class BaseBakedModel implements IBakedModel {
 
     public BaseBakedModel addDefaultToolTransforms() {
         addTransformation(ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND, getTransformation(0, 4, 0.5f,         0, -90, 55, 0.85f));
-        addTransformation(ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,  getTransformation(0, 4, 0.5f,         0, 90, -55, 0.85f));
+        addTransformation(ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND, getTransformation(0, 4, 0.5f,         0, 90, -55, 0.85f));
         addTransformation(ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND, getTransformation(1.13f, 3.2f, 1.13f, 0, -90, 25, 0.68f));
-        addTransformation(ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,  getTransformation(1.13f, 3.2f, 1.13f, 0, 90, -25, 0.68f));
+        addTransformation(ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND, getTransformation(1.13f, 3.2f, 1.13f, 0, 90, -25, 0.68f));
         return this;
     }
 }
