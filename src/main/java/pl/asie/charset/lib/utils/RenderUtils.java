@@ -230,12 +230,9 @@ public final class RenderUtils {
 
 	public static IModel getModel(ResourceLocation location) {
 		try {
-			IModel model = ModelLoaderRegistry.getModel(location);
-			if (model == null) {
-				ModCharset.logger.error("Model " + location.toString() + " is missing! THIS WILL CAUSE A CRASH!");
-			}
-			return model;
+			return ModelLoaderRegistry.getModel(location);
 		} catch (Exception e) {
+			ModCharset.logger.error("Model " + location.toString() + " is missing! THIS WILL CAUSE A CRASH!");
 			e.printStackTrace();
 			return null;
 		}

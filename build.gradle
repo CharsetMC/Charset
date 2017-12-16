@@ -100,6 +100,7 @@ configurations {
 dependencies {
 	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.0_53"
 	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.136"
+	deobfCompile name: "chiselsandbits", version: "14.11"
 	deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-1.4.0-174"
 	deobfCompile name: "Baubles", version: "1.12-1.4.5"
 	deobfCompile "com.elytradev:mirage:2.0.3-rc3-SNAPSHOT"
