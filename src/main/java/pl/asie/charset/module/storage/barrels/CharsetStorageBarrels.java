@@ -40,6 +40,7 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -70,11 +71,8 @@ public class CharsetStorageBarrels {
 	public static List<ItemStack> BARRELS = Collections.emptyList();
 	public static List<ItemStack> BARRELS_NORMAL = Lists.newArrayList();
 
-	@GameRegistry.ObjectHolder("chiselsandbits:block_bit")
-	private static Item cb_block_bit;
-
-	protected static TObjectIntMap<Item> stackDivisorMultiplierMap = new TObjectIntHashMap<>();
-	protected static TObjectIntMap<Item> stackSizeMultiplierMap = new TObjectIntHashMap<>();
+	public static TObjectIntMap<Item> stackDivisorMultiplierMap = new TObjectIntHashMap<>();
+	public static TObjectIntMap<Item> stackSizeMultiplierMap = new TObjectIntHashMap<>();
 
 	@CharsetModule.Instance
 	public static CharsetStorageBarrels instance;
@@ -151,11 +149,6 @@ public class CharsetStorageBarrels {
 
 		packet.registerPacket(0x01, PacketBarrelCountUpdate.class);
 		FMLInterModComms.sendMessage("charset", "addCarry", barrelBlock.getRegistryName());
-
-		if (cb_block_bit != null) {
-			stackDivisorMultiplierMap.put(cb_block_bit, 8);
-			stackSizeMultiplierMap.put(cb_block_bit, 8);
-		}
 	}
 
 	@SubscribeEvent

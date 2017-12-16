@@ -19,9 +19,9 @@
 
 package pl.asie.charset.lib.modcompat.mcmultipart;
 
-/**
- * Charset's JEI plugin marker, controlled by the belonging module's ID.
- */
+import pl.asie.charset.lib.loader.CharsetCompatAnnotation;
+
+@CharsetCompatAnnotation("mcmultipart")
 public @interface CharsetMCMPAddon {
     String value();
 }

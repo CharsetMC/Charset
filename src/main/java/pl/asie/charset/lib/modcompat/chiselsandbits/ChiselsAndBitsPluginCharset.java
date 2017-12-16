@@ -17,14 +17,23 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.modcompat.jei;
+package pl.asie.charset.lib.modcompat.chiselsandbits;
 
-import pl.asie.charset.lib.loader.CharsetCompatAnnotation;
+import mod.chiselsandbits.api.ChiselsAndBitsAddon;
+import mod.chiselsandbits.api.IChiselAndBitsAPI;
+import mod.chiselsandbits.api.IChiselsAndBitsAddon;
+import pl.asie.charset.lib.loader.AnnotatedPluginHandler;
 
-/**
- * Charset's JEI plugin marker, controlled by the belonging module's ID.
- */
-@CharsetCompatAnnotation("jei")
-public @interface CharsetJEIPlugin {
-    String value();
+@ChiselsAndBitsAddon
+public class ChiselsAndBitsPluginCharset extends AnnotatedPluginHandler<IChiselsAndBitsAddon> implements IChiselsAndBitsAddon {
+    public ChiselsAndBitsPluginCharset() {
+        super(CharsetChiselsAndBitsPlugin.class);
+    }
+
+    @Override
+    public void onReadyChiselsAndBits(IChiselAndBitsAPI api) {
+        for (IChiselsAndBitsAddon addon : getPlugins()) {
+            addon.onReadyChiselsAndBits(api);
+        }
+    }
 }

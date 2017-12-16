@@ -34,6 +34,7 @@ import net.minecraftforge.fml.common.event.FMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.modcompat.chiselsandbits.CharsetChiselsAndBitsPlugin;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
 import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -504,8 +505,15 @@ public class ModuleLoader {
 			MinecraftForge.EVENT_BUS.register(loadedModules.get(s));
 		}
 
-		addClassNames(table, CharsetJEIPlugin.class, "jei");
-		addClassNames(table, CharsetMCMPAddon.class, "mcmultipart");
+
+		for (ASMDataTable.ASMData data : table.getAll(CharsetCompatAnnotation.class.getName())) {
+			String id = (String) data.getAnnotationInfo().get("value");
+			try {
+				addClassNames(table, Class.forName(data.getClassName()), id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 		passEvent(new CharsetLoadConfigEvent(true));
 
