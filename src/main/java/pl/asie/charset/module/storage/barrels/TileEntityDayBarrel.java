@@ -577,15 +577,9 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     private boolean spammed = false;
 
     @Override
-    public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
-        RayTraceResult hit = RayTraceUtils.getCollision(getWorld(), getPos(), placer, Block.FULL_BLOCK_AABB, 0);
-        if (hit != null) {
-            if (hit.hitVec != null) {
-                orientation = SpaceUtils.getOrientation(placer, hit.sideHit, hit.hitVec.subtract(new Vec3d(getPos())));
-            } else if (hit.sideHit != null) {
-                orientation = Orientation.fromDirection(hit.sideHit);
-            }
-        }
+    public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
+        orientation = SpaceUtils.getOrientation(getWorld(), getPos(), placer, face, hitX, hitY, hitZ);
+
         loadFromStack(stack);
         needLogic();
     }

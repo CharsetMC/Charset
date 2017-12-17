@@ -141,8 +141,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     }
 
     @Override
-    public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+    public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
         variant = (stack.getTagCompound().getInteger("color") + 1) % 17;
+        world.notifyNeighborsRespectDebug(pos, CharsetStorageTanks.tankBlock, false);
     }
 
     protected void onTankStructureChanged() {

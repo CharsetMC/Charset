@@ -179,13 +179,16 @@ public abstract class BlockBase extends Block {
 	}
 
 	@Override
-	public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+	public final void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
 		super.onBlockPlacedBy(world, pos, state, placer, stack);
+		onBlockPlacedBy(world, pos, state, placer, stack, null, 0.5f, 0.5f, 0.5f);
+	}
 
+	public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack, @Nullable EnumFacing face, float hitX, float hitY, float hitZ) {
 		if (isTileProvider) {
 			TileEntity tile = world.getTileEntity(pos);
 			if (tile instanceof TileBase) {
-				((TileBase) tile).onPlacedBy(placer, stack);
+				((TileBase) tile).onPlacedBy(placer, face, stack, hitX, hitY, hitZ);
 			}
 		}
 	}

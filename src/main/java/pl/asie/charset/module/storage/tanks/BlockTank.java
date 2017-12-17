@@ -155,12 +155,6 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-        worldIn.notifyNeighborsRespectDebug(pos, state.getBlock(), false);
-    }
-
-    @Override
     public int getMetaFromState(IBlockState state) {
         return 0;
     }

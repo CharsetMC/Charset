@@ -27,6 +27,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import pl.asie.charset.lib.utils.Orientation;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.module.laser.CharsetLaser;
 import pl.asie.charset.api.laser.ILaserReceiver;
 import pl.asie.charset.api.laser.LaserColor;
@@ -122,8 +124,51 @@ public class TileReflector extends TileLaserSourceBase {
 	}
 
 	@Override
-	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		color = LaserColor.VALUES[stack.getItemDamage() & 7];
+
+		Orientation orientation = SpaceUtils.getOrientation(getWorld(), getPos(), placer, face, hitX, hitY, hitZ);
+		EnumFacing rotation = null;
+		switch (orientation) {
+			case FACE_UP_POINT_NORTH:
+			case FACE_NORTH_POINT_UP:
+			case FACE_DOWN_POINT_SOUTH:
+			case FACE_SOUTH_POINT_DOWN:
+				rotation = EnumFacing.WEST;
+				break;
+			case FACE_DOWN_POINT_NORTH:
+			case FACE_NORTH_POINT_DOWN:
+			case FACE_UP_POINT_SOUTH:
+			case FACE_SOUTH_POINT_UP:
+				rotation = EnumFacing.EAST;
+				break;
+			case FACE_WEST_POINT_UP:
+			case FACE_UP_POINT_WEST:
+			case FACE_EAST_POINT_DOWN:
+			case FACE_DOWN_POINT_EAST:
+				rotation = EnumFacing.SOUTH;
+				break;
+			case FACE_WEST_POINT_DOWN:
+			case FACE_DOWN_POINT_WEST:
+			case FACE_EAST_POINT_UP:
+			case FACE_UP_POINT_EAST:
+				rotation = EnumFacing.NORTH;
+				break;
+			case FACE_WEST_POINT_NORTH:
+			case FACE_NORTH_POINT_WEST:
+			case FACE_EAST_POINT_SOUTH:
+			case FACE_SOUTH_POINT_EAST:
+				rotation = EnumFacing.UP;
+				break;
+			case FACE_EAST_POINT_NORTH:
+			case FACE_NORTH_POINT_EAST:
+			case FACE_WEST_POINT_SOUTH:
+			case FACE_SOUTH_POINT_WEST:
+				rotation = EnumFacing.DOWN;
+				break;
+		}
+
+		world.setBlockState(pos, world.getBlockState(pos).withProperty(BlockReflector.ROTATION, rotation));
 	}
 
 	@Override

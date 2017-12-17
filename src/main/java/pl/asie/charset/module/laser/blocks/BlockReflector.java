@@ -40,6 +40,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.utils.RotationUtils;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.module.laser.CharsetLaser;
 
 import javax.annotation.Nonnull;

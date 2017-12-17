@@ -132,7 +132,7 @@ public class TileJar extends TileBase /* implements IColoredLight */ {
 	}
 
 	@Override
-	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+	public void onPlacedBy(EntityLivingBase placer, EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		outputColor = LaserColor.VALUES[stack.getItemDamage() & 7];
 	}
 

@@ -19,11 +19,13 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.*;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -318,10 +320,32 @@ public final class SpaceUtils {
         return EnumFacing.VALUES[ordinal];
     }
 
+    public static Orientation getOrientation(World world, BlockPos pos, EntityLivingBase placer, EnumFacing face, float hitX, float hitY, float hitZ) {
+        Vec3d hitVec = null;
+        if (face == null) {
+            RayTraceResult hit = RayTraceUtils.getCollision(world, pos, placer, Block.FULL_BLOCK_AABB, 0);
+            if (hit != null) {
+                face = hit.sideHit;
+                hitVec = hit.hitVec != null ? hit.hitVec.subtract(new Vec3d(pos)) : null;
+            }
+        } else {
+            hitVec = new Vec3d(hitX, hitY, hitZ);
+        }
+
+        if (hitVec != null) {
+            return SpaceUtils.getOrientation(placer, face, hitVec);
+        } else if (face != null) {
+            return Orientation.fromDirection(face);
+        } else {
+            return Orientation.FACE_UP_POINT_NORTH;
+        }
+    }
+
     public static Orientation getOrientation(EntityLivingBase player, EnumFacing facing, Vec3d hit) {
         double u, v;
-        if (facing == null) facing = EnumFacing.DOWN;
-        assert facing != null;
+        if (facing == null) {
+            facing = EnumFacing.DOWN;
+        }
         switch (facing) {
             default:
             case DOWN:

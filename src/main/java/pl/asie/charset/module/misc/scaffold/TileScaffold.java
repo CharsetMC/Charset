@@ -23,10 +23,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
+
+import javax.annotation.Nullable;
 
 public class TileScaffold extends TileBase {
 	public static final UnlistedPropertyGeneric<ScaffoldCacheInfo> PROPERTY = new UnlistedPropertyGeneric<>("tile", ScaffoldCacheInfo.class);
@@ -56,7 +59,7 @@ public class TileScaffold extends TileBase {
 	}
 
 	@Override
-	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		loadFromStack(stack);
 	}
 

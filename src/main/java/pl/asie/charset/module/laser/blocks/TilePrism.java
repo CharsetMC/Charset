@@ -134,7 +134,7 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable {
 	}
 
 	@Override
-	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		// TODO
 		orientation = Orientation.fromDirection(EnumFacing.getDirectionFromEntityLiving(getPos(), placer));
 	}
@@ -198,10 +198,12 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable {
 
 	public void rotateWrench(EnumFacing axis) {
 		Orientation newOrientation;
-		if (axis == orientation.facing) {
-			newOrientation = orientation.getPrevRotationOnFace();
-		} else {
+		if (axis.getAxis() == orientation.facing.getAxis()) {
+			newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis).ordinal() & (~3) | (orientation.ordinal() & 3)).getNextRotationOnTop();
+		} else if (axis.getAxis() == orientation.top.getAxis()) {
 			newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis).ordinal() & (~3) | (orientation.ordinal() & 3));
+		} else {
+			newOrientation = orientation.getPrevRotationOnFace().getNextRotationOnTop().getNextRotationOnFace();
 		}
 
 		changeOrientation(newOrientation, false);
