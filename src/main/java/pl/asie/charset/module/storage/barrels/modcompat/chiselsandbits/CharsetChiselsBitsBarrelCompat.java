@@ -14,10 +14,7 @@ import java.lang.reflect.Field;
 
 @CharsetChiselsAndBitsPlugin("storage.barrels")
 public class CharsetChiselsBitsBarrelCompat implements IChiselsAndBitsAddon {
-    @GameRegistry.ObjectHolder("chiselsandbits:block_bit")
-    private static Item cb_block_bit;
-    @GameRegistry.ObjectHolder("chiselsandbits:bit_bag")
-    private static Item cb_bit_bag;
+    private static Item cb_block_bit, cb_bit_bag;
 
     private int getBitBagStackMultiplier(IChiselAndBitsAPI api) {
         int bitStackSize = new ItemStack(cb_block_bit).getMaxStackSize();
@@ -51,7 +48,9 @@ public class CharsetChiselsBitsBarrelCompat implements IChiselsAndBitsAddon {
 
     @Override
     public void onReadyChiselsAndBits(IChiselAndBitsAPI api) {
+        cb_block_bit = Item.getByNameOrId("chiselsandbits:block_bit");
         if (cb_block_bit != null) {
+            cb_bit_bag = Item.getByNameOrId("chiselsandbits:bit_bag");
             int multiplier = getBitBagStackMultiplier(api);
             CharsetStorageBarrels.stackDivisorMultiplierMap.put(cb_block_bit, multiplier);
             CharsetStorageBarrels.stackSizeMultiplierMap.put(cb_block_bit, multiplier);

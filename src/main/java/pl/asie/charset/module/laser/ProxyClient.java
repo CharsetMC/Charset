@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -47,6 +48,7 @@ import pl.asie.charset.module.laser.blocks.LaserTintHandler;
 import pl.asie.charset.module.laser.system.LaserRenderer;
 import pl.asie.charset.module.laser.system.SubCommandDebugLasers;
 import pl.asie.charset.module.laser.system.SubCommandDebugLasersClient;
+import pl.asie.charset.module.storage.tanks.TankTintHandler;
 
 public class ProxyClient extends ProxyCommon {
 	private static IModel prismModel;
@@ -55,9 +57,18 @@ public class ProxyClient extends ProxyCommon {
 	public void init() {
 		MinecraftForge.EVENT_BUS.register(new LaserRenderer());
 		CommandCharset.register(new SubCommandDebugLasersClient());
+	}
 
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(LaserTintHandler.INSTANCE, CharsetLaser.blockCrystal, CharsetLaser.blockReflector, CharsetLaser.blockJar);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(LaserTintHandler.INSTANCE, CharsetLaser.itemCrystal, CharsetLaser.itemReflector, CharsetLaser.itemJar);
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorBlock(ColorHandlerEvent.Block event) {
+		event.getBlockColors().registerBlockColorHandler(LaserTintHandler.INSTANCE, CharsetLaser.blockCrystal, CharsetLaser.blockReflector, CharsetLaser.blockJar);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(LaserTintHandler.INSTANCE, CharsetLaser.itemCrystal, CharsetLaser.itemReflector, CharsetLaser.itemJar);
 	}
 
 	@SubscribeEvent

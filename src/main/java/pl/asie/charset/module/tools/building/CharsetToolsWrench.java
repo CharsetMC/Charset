@@ -26,6 +26,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -53,10 +54,10 @@ public class CharsetToolsWrench {
 		wrench = new ItemWrench();
 	}
 
-	@Mod.EventHandler
+	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void initClient(FMLInitializationEvent event) {
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ToolItemColor.INSTANCE, wrench);
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(ToolItemColor.INSTANCE, wrench);
 	}
 
 	@Mod.EventHandler

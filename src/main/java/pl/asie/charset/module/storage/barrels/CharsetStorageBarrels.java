@@ -30,6 +30,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -58,6 +59,7 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.module.tools.building.ToolItemColor;
 
 import java.util.*;
 
@@ -188,10 +190,19 @@ public class CharsetStorageBarrels {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
+	}
 
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(BarrelModel.INSTANCE.colorizer, barrelBlock);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(BarrelModel.INSTANCE.colorizer, barrelItem);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemMinecartDayBarrel.Color(), barrelCartItem);
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorBlock(ColorHandlerEvent.Block event) {
+		event.getBlockColors().registerBlockColorHandler(BarrelModel.INSTANCE.colorizer, barrelBlock);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(BarrelModel.INSTANCE.colorizer, barrelItem);
+		event.getItemColors().registerItemColorHandler(new ItemMinecartDayBarrel.Color(), barrelCartItem);
 	}
 
 	@SubscribeEvent

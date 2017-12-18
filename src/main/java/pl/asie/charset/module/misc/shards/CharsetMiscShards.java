@@ -27,6 +27,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -100,10 +101,10 @@ public class CharsetMiscShards {
 		}
 	}
 
-	@Mod.EventHandler
+	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void initClient(FMLInitializationEvent event) {
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemShard.Color(), CharsetMiscShards.shardItem);
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(new ItemShard.Color(), CharsetMiscShards.shardItem);
 	}
 
 	@SubscribeEvent

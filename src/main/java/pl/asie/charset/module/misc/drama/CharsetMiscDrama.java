@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.RegistryEvent;
@@ -35,6 +36,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.module.tools.building.ToolItemColor;
 
 @CharsetModule(
 		name = "misc.drama",
@@ -64,10 +66,10 @@ public class CharsetMiscDrama {
 		RegistryUtils.registerModel(dramaInABottle, 0, "charset:dramaInABottle");
 	}
 
-	@Mod.EventHandler
+	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void initClient(FMLInitializationEvent event) {
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler((stack, tintIndex) -> (tintIndex == 1 ? 0xFF98D0 : -1), dramaInABottle);
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler((stack, tintIndex) -> (tintIndex == 1 ? 0xFF98D0 : -1), dramaInABottle);
 	}
 
 	@Mod.EventHandler

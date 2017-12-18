@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -86,11 +87,21 @@ public class CharsetStorageTanks {
         FMLInterModComms.sendMessage("charset", "addCarry", tankBlock.getRegistryName());
     }
 
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void registerColorBlock(ColorHandlerEvent.Block event) {
+        event.getBlockColors().registerBlockColorHandler(TankTintHandler.INSTANCE, tankBlock);
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void registerColorItem(ColorHandlerEvent.Item event) {
+        event.getItemColors().registerItemColorHandler(TankTintHandler.INSTANCE, tankItem);
+    }
+
     @Mod.EventHandler
     @SideOnly(Side.CLIENT)
     public void initClient(FMLInitializationEvent event) {
-        Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(TankTintHandler.INSTANCE, tankBlock);
-        Minecraft.getMinecraft().getItemColors().registerItemColorHandler(TankTintHandler.INSTANCE, tankItem);
         ClientRegistry.bindTileEntitySpecialRenderer(TileTank.class, new TileTankRenderer());
     }
 }

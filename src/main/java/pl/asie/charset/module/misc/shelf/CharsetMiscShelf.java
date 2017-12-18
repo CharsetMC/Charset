@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -41,6 +42,8 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.render.ShadingTintColorHandler;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.module.laser.CharsetLaser;
+import pl.asie.charset.module.laser.blocks.LaserTintHandler;
 
 @CharsetModule(
 		name = "misc.shelf",
@@ -84,8 +87,18 @@ public class CharsetMiscShelf {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileShelf.class, new TileShelfRenderer());
-		Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(ShadingTintColorHandler.INSTANCE, shelfBlock);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ShadingTintColorHandler.INSTANCE, shelfItem);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorBlock(ColorHandlerEvent.Block event) {
+		event.getBlockColors().registerBlockColorHandler(ShadingTintColorHandler.INSTANCE, shelfBlock);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(ShadingTintColorHandler.INSTANCE, shelfItem);
 	}
 
 	@SubscribeEvent

@@ -27,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -44,6 +45,7 @@ import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.render.ShadingTintColorHandler;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
@@ -112,12 +114,7 @@ public class CharsetStorageLocks {
 		MinecraftForge.EVENT_BUS.register(new LockEventHandler());
 
 		if (enableKeyKeepInventory) {
-			CharsetLib.deathHandler.addPredicate(new Predicate<ItemStack>() {
-				@Override
-				public boolean apply(@Nullable ItemStack input) {
-					return input != null && input.getItem() instanceof ItemKey;
-				}
-			});
+			CharsetLib.deathHandler.addPredicate(input -> input != null && input.getItem() instanceof ItemKey);
 		}
 
 		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.KEYRING, Side.SERVER, (r) -> new ContainerKeyring(r.player.inventory));
@@ -126,16 +123,20 @@ public class CharsetStorageLocks {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void preInitClient(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityLock.class, manager -> new RenderLock(manager));
+		RenderingRegistry.registerEntityRenderingHandler(EntityLock.class, RenderLock::new);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(new ItemLock.Color(), CharsetStorageLocks.keyItem);
+		event.getItemColors().registerItemColorHandler(new ItemLock.Color(), CharsetStorageLocks.lockItem);
+		event.getItemColors().registerItemColorHandler(new ItemKeyring.Color(), CharsetStorageLocks.keyringItem);
 	}
 
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), CharsetStorageLocks.keyItem);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemLock.Color(), CharsetStorageLocks.lockItem);
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new ItemKeyring.Color(), CharsetStorageLocks.keyringItem);
-
 		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.KEYRING, Side.CLIENT, (r) -> new GuiKeyring(new ContainerKeyring(r.player.inventory)));
 	}
 }

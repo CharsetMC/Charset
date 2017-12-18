@@ -20,6 +20,8 @@
 package pl.asie.charset.lib.utils;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -54,7 +56,8 @@ public final class RayTraceUtils {
 	}
 
 	public static Vec3d getEnd(EntityLivingBase player) {
-		double reachDistance = player instanceof EntityPlayerMP ? ((EntityPlayerMP) player).interactionManager.getBlockReachDistance() : 5.0d;
+		IAttributeInstance attributeInstance = player.getEntityAttribute(EntityPlayer.REACH_DISTANCE);
+		double reachDistance = attributeInstance != null ? attributeInstance.getAttributeValue() : 5.0D;
 		Vec3d lookVec = player.getLookVec();
 
 		return getStart(player).addVector(lookVec.x * reachDistance, lookVec.y * reachDistance, lookVec.z * reachDistance);

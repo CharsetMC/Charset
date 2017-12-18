@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -83,10 +84,15 @@ public class CharsetToolsBuilding {
 		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHISEL, Side.SERVER, (r) -> new ContainerChisel(r.player));
 	}
 
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerColorItem(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(ToolItemColor.INSTANCE, chisel);
+	}
+
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		Minecraft.getMinecraft().getItemColors().registerItemColorHandler(ToolItemColor.INSTANCE, chisel);
 		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHISEL, Side.CLIENT, (r) -> new GuiChisel(new ContainerChisel(r.player)));
 	}
 
