@@ -59,6 +59,7 @@ public class PacketMinecartUpdate extends PacketEntity {
 
 	@Override
 	public void apply(INetHandler handler) {
+		super.apply(handler);
 		if (entity instanceof EntityMinecart) {
 			final EntityMinecart minecart = (EntityMinecart) entity;
 			update(minecart, color);

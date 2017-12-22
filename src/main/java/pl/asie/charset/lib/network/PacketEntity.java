@@ -28,6 +28,7 @@ import pl.asie.charset.lib.utils.Utils;
 
 public abstract class PacketEntity extends Packet {
 	protected Entity entity;
+	private int dim, id;
 
 	public PacketEntity() {
 
@@ -39,19 +40,22 @@ public abstract class PacketEntity extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, PacketBuffer buf) {
-		int dim = buf.readInt();
-		int id = buf.readInt();
-
-		World w = Utils.getLocalWorld(dim);
-
-		if (w != null) {
-			entity = w.getEntityByID(id);
-		}
+		dim = buf.readInt();
+		id = buf.readInt();
 	}
 
 	@Override
 	public void writeData(PacketBuffer buf) {
 		buf.writeInt(entity.world.provider.getDimension());
 		buf.writeInt(entity.getEntityId());
+	}
+
+	@Override
+	public void apply(INetHandler handler) {
+		World w = Utils.getLocalWorld(dim);
+
+		if (w != null) {
+			entity = w.getEntityByID(id);
+		}
 	}
 }
