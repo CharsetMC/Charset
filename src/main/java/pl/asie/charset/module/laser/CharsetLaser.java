@@ -37,6 +37,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
 import pl.asie.charset.lib.command.CommandCharset;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
@@ -44,9 +46,13 @@ import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.render.ArrowHighlightHandler;
+import pl.asie.charset.lib.resources.ColorPaletteParser;
+import pl.asie.charset.lib.resources.ColorPaletteUpdateEvent;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.api.laser.ILaserReceiver;
 import pl.asie.charset.api.laser.LaserColor;
+import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.laser.blocks.*;
 import pl.asie.charset.module.laser.system.*;
 
@@ -67,16 +73,8 @@ public class CharsetLaser {
     @CapabilityInject(ILaserReceiver.class)
     public static Capability<ILaserReceiver> LASER_RECEIVER;
 
-    public static final int[] LASER_COLORS = {
-            0x00000000,
-            0xBF0000FF,
-            0x4F00FF00,
-            0x7F00FFFF,
-            0x7FFF0000,
-            0x9FFF00FF,
-            0x8FFFFF00,
-            0xBFFFFFFF
-    };
+    public static final int[] LASER_COLORS = new int[8];
+
     public static final String[] LASER_LANG_STRINGS = {
             "charset.color.black",
             "charset.color.blue",
@@ -87,6 +85,7 @@ public class CharsetLaser {
             "charset.color.yellow",
             "charset.color.white"
     };
+
     public static LaserStorage laserStorage = new LaserStorage();
 
     public static Block blockCrystal, blockReflector, blockJar, blockPrism;
@@ -119,6 +118,16 @@ public class CharsetLaser {
         itemPrism = new ItemBlockBase(blockPrism);
 
         MinecraftForge.EVENT_BUS.register(proxy);
+    }
+
+    private static final String[] COLOR_NAMES = { "black", "blue", "green", "cyan", "red", "magenta", "yellow", "white" };
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onColorPaletteUpdate(ColorPaletteUpdateEvent event) {
+        for (int i = 0; i < 8; i++) {
+            LASER_COLORS[i] = RenderUtils.asMcIntColor(event.getParser().getColor("charset:laser", COLOR_NAMES[i]));
+        }
     }
 
     @SubscribeEvent
@@ -174,6 +183,12 @@ public class CharsetLaser {
         CommandCharset.register(new SubCommandSetSpeedOfLight());
 
         proxy.init();
+    }
+
+    @Mod.EventHandler
+    @SideOnly(Side.CLIENT)
+    public void initClient(FMLInitializationEvent event) {
+        ArrowHighlightHandler.register(itemReflector);
     }
 
     @Mod.EventHandler

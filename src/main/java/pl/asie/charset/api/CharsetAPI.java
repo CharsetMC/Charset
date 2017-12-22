@@ -58,11 +58,11 @@ public class CharsetAPI {
 	// The following methods should be called after isPresent() ONLY.
 
 	public <T> void registerBlockCapabilityProvider(Capability<T> capability, Block block, IBlockCapabilityProvider<T> provider) {
-		throw new RuntimeException("Charset API not initializeContents - please use isPresent()!");
+		throw new RuntimeException("Charset API not initialized - please use isPresent()!");
 	}
 
 	@Nullable
 	public <T> ISimpleInstantiatingRegistry<T> findSimpleInstantiatingRegistry(Class<T> c) {
-		throw new RuntimeException("Charset API not initializeContents - please use isPresent()!");
+		throw new RuntimeException("Charset API not initialized - please use isPresent()!");
 	}
 }

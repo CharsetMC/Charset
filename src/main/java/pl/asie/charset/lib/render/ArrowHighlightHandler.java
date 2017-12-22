@@ -17,12 +17,14 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.storage.barrels;
+package pl.asie.charset.lib.render;
 
+import com.google.common.collect.Sets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -30,14 +32,31 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.SpaceUtils;
+import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 
-public class BarrelEventListener {
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
+
+public class ArrowHighlightHandler {
+    public static Set<Item> eligibleItems = Collections.newSetFromMap(new IdentityHashMap<>());
+
+    public static void register(Item... i) {
+        if (eligibleItems.isEmpty() && i.length > 0) {
+            MinecraftForge.EVENT_BUS.register(new ArrowHighlightHandler());
+        }
+        for (Item item : i) {
+            eligibleItems.add(item);
+        }
+    }
+
     private Vec3d getCameraPos(double partialTicks) {
         Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
         return new Vec3d(
@@ -49,7 +68,8 @@ public class BarrelEventListener {
 
     private void drawArrowHighlight(EntityPlayer player, RayTraceResult trace, Vec3d cameraPos) {
         Orientation orientation = SpaceUtils.getOrientation(player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
-        if (orientation.top.getDirectionVec().getY() == 1) {
+
+        if (orientation.top.getDirectionVec().getY() == 1 && trace.sideHit.getAxis() == EnumFacing.Axis.Y) {
             /*
              * The purpose of this is two-fold:
              *     - It renders at the wrong spot when pointing upwards on a vertical face
@@ -135,7 +155,7 @@ public class BarrelEventListener {
             EntityPlayer player = mc.player;
             if (player != null) {
                 ItemStack is = player.getHeldItem(EnumHand.MAIN_HAND);
-                if (!is.isEmpty() && is.getItem() == CharsetStorageBarrels.barrelItem) {
+                if (!is.isEmpty() && eligibleItems.contains(is.getItem())) {
                     RayTraceResult mop = mc.objectMouseOver;
                     if (mop != null && mop.hitVec != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
                         drawArrowHighlight(player, mop, getCameraPos(event.getPartialTicks()));

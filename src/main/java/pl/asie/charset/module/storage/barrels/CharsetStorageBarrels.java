@@ -23,7 +23,6 @@ import com.google.common.collect.Lists;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -37,11 +36,9 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -57,9 +54,9 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.module.tools.building.ToolItemColor;
 
 import java.util.*;
 
@@ -123,8 +120,6 @@ public class CharsetStorageBarrels {
 		barrelCartItem = new ItemMinecartDayBarrel();
 
 		barrelBlock.setHarvestLevel("axe", 0);
-
-		MinecraftForge.EVENT_BUS.register(new BarrelEventListener());
 	}
 
 	@SubscribeEvent
@@ -190,6 +185,7 @@ public class CharsetStorageBarrels {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDayBarrel.class, new TileEntityDayBarrelRenderer());
+		ArrowHighlightHandler.register(barrelItem);
 	}
 
 	@SubscribeEvent

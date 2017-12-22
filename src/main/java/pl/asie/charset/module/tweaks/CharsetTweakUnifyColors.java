@@ -33,6 +33,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
+import pl.asie.charset.lib.resources.ColorPaletteParser;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
@@ -156,21 +157,15 @@ public class CharsetTweakUnifyColors {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
 		try {
-			colorPalette = gson.fromJson(
-					new InputStreamReader(
-							Minecraft.getMinecraft().getResourceManager().getResource(COLOR_PALETTE_LOC).getInputStream()
-					), COLOR_PALETTE_TYPE
-			);
-
 			for (int i = 0; i < 16; i++) {
 				EnumDyeColor color = EnumDyeColor.byMetadata(i);
 				String key = ColorUtils.getUnderscoredSuffix(color);
-				if (colorPalette.containsKey(key)) {
-					float[] src = colorPalette.get(key);
+				double[] data = ColorPaletteParser.INSTANCE.getColor("minecraft", key);
+				if (data != null) {
 					float[] dst = ColorUtils.getDyeRgb(color);
-					dst[0] = src[0];
-					dst[1] = src[1];
-					dst[2] = src[2];
+					dst[0] = (float) data[0];
+					dst[1] = (float) data[1];
+					dst[2] = (float) data[2];
 				}
 			}
 		} catch (Exception e) {

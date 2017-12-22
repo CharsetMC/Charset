@@ -183,6 +183,16 @@ public final class RenderUtils {
 		return model != null && model.isBuiltInRenderer();
 	}
 
+	public static int asMcIntColor(double[] data) {
+		int color = ((int)Math.round(data[0] * 255) << 16) | ((int)Math.round(data[1] * 255) << 8) | (int)Math.round(data[2] * 255);
+		if (data.length >= 4) {
+			color |= ((int)Math.round(data[3] * 255) << 24);
+		} else {
+			color |= 0xFF000000;
+		}
+		return color;
+	}
+
 	public static void glColor(int color) {
 		GlStateManager.color((((color >> 16) & 0xFF) / 255.0f), (((color >> 8) & 0xFF) / 255.0f), ((color & 0xFF) / 255.0f), (((color >> 24) & 0xFF) / 255.0f));
 	}

@@ -66,6 +66,7 @@ import pl.asie.charset.lib.recipe.IngredientGroup;
 import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
+import pl.asie.charset.lib.resources.ColorPaletteParser;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
 
@@ -118,7 +119,8 @@ public class CharsetLib {
 			Field field = ReflectionHelper.findField(Minecraft.class, "defaultResourcePacks", "field_110449_ao");
 			((List) field.get(Minecraft.getMinecraft())).add(CharsetFakeResourcePack.INSTANCE);
 
-			((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(CharsetFakeResourcePack.INSTANCE);
+			IReloadableResourceManager rrm = ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager());
+			rrm.registerReloadListener(CharsetFakeResourcePack.INSTANCE);
 
 			// TODO: Can we get rid of this to save a bit of loading time?
 			// (We can, but it involves loading Minecraft.<init> a bit early.
@@ -127,6 +129,8 @@ public class CharsetLib {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		MinecraftForge.EVENT_BUS.register(ColorPaletteParser.INSTANCE);
 	}
 
 	@Mod.EventHandler

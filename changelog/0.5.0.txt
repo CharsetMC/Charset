@@ -8,6 +8,7 @@
     * Also fixes #138 and #129
 * [audio.noteblock] Fix 1.12 compatibility, improve mod compatibility.
 * [laser] New module! Adds a laser-based logic system.
+    * Fun fact: You can change the laser beam colors in assets/charset/color_palette.json. Feel free to supply your own! Partial color_palette.json overrides supported!
     * Please install CharsetPatches for redstone support in said laser system. Otherwise, the use might be somewhat limited for the time being.
 * [lib] Added many useful commands! See /charset (/ch) and /charsetc (/chc).
 * [lib] Blocks should now properly render landing particles.
@@ -27,6 +28,7 @@
 * [storage.barrels] Fix barrels made out of non-burnable materials being burnable.
 * [storage.barrels] Fix extracting only one item at a time only working in creative mode.
 * [storage.barrels] Fix the barrel cap texture being incorrect for certain block types.
+* [storage.barrels] Improve barrel rotation logic.
 * [storage.barrels] Shift-clicking a barrel in creative mode (unless block carrying activates) will now give you the contained item.
 * [storage.locks] Added keyrings! They store keys in style!
 * [storage.locks] Locks now play a sound when attached or removed.
