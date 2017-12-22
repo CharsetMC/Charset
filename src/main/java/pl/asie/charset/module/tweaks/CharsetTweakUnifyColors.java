@@ -19,11 +19,7 @@
 
 package pl.asie.charset.module.tweaks;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -38,23 +34,16 @@ import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Map;
 
-/* @CharsetModule(
+@CharsetModule(
 		name = "tweak.unifyColors",
 		profile = ModuleProfile.EXPERIMENTAL,
+		isDefault = false,
 		description = "Unifies various colored block and item colors. Works with resource packs!",
 		isClientOnly = true
-) */
+)
 public class CharsetTweakUnifyColors {
-	private final Gson gson = new Gson();
-	private final ResourceLocation COLOR_PALETTE_LOC = new ResourceLocation("charset", "color_palette.json");
-	private final Type COLOR_PALETTE_TYPE = new TypeToken<Map<String, float[]>>() {}.getType();
-	private Map<String, float[]> colorPalette;
-
 	private int colorMultiplier(String prefix, EnumDyeColor color) {
 		float[] d = ColorUtils.getDyeRgb(color);
 
@@ -72,10 +61,7 @@ public class CharsetTweakUnifyColors {
 			d[2] += (lum - d[2]) * mul;
 		}
 
-		return    (Math.min(Math.round(d[0] * 255.0F), 255) << 16)
-				| (Math.min(Math.round(d[1] * 255.0F), 255) << 8)
-				| (Math.min(Math.round(d[2] * 255.0F), 255))
-				| 0xFF000000;
+		return RenderUtils.asMcIntColor(d);
 	}
 
 	private BufferedImage toGrayscale(BufferedImage image) {
@@ -160,8 +146,8 @@ public class CharsetTweakUnifyColors {
 			for (int i = 0; i < 16; i++) {
 				EnumDyeColor color = EnumDyeColor.byMetadata(i);
 				String key = ColorUtils.getUnderscoredSuffix(color);
-				double[] data = ColorPaletteParser.INSTANCE.getColor("minecraft", key);
-				if (data != null) {
+				double[] data = ColorPaletteParser.INSTANCE.getColor("minecraft:dye", key);
+				if (data != null && (data.length == 3 || (data.length > 3 && data[3] > 0.0))) {
 					float[] dst = ColorUtils.getDyeRgb(color);
 					dst[0] = (float) data[0];
 					dst[1] = (float) data[1];

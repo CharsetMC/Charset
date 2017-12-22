@@ -180,10 +180,30 @@ public final class RenderUtils {
 		}
 
 		IBakedModel model = renderItem.getItemModelWithOverrides(stack, world, null);
-		return model != null && model.isBuiltInRenderer();
+		return model.isBuiltInRenderer();
+	}
+
+	public static int asMcIntColor(float[] data) {
+		for (int i = 0; i < data.length; i++) {
+			if (data[i] < 0.0f) data[i] = 0.0f;
+			else if (data[i] > 1.0f) data[i] = 1.0f;
+		}
+
+		int color = (Math.round(data[0] * 255) << 16) | (Math.round(data[1] * 255) << 8) | Math.round(data[2] * 255);
+		if (data.length >= 4) {
+			color |= (Math.round(data[3] * 255) << 24);
+		} else {
+			color |= 0xFF000000;
+		}
+		return color;
 	}
 
 	public static int asMcIntColor(double[] data) {
+		for (int i = 0; i < data.length; i++) {
+			if (data[i] < 0.0) data[i] = 0.0;
+			else if (data[i] > 1.0) data[i] = 1.0;
+		}
+
 		int color = ((int)Math.round(data[0] * 255) << 16) | ((int)Math.round(data[1] * 255) << 8) | (int)Math.round(data[2] * 255);
 		if (data.length >= 4) {
 			color |= ((int)Math.round(data[3] * 255) << 24);
