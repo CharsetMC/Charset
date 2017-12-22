@@ -41,7 +41,7 @@ import java.util.Collection;
 @CharsetModule(
 		name = "tweak.shiftScroll",
 		description = "Enables shift-scrolling on vanilla blocks.",
-		profile = ModuleProfile.TESTING
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTweakShiftScroll {
 	@Mod.EventHandler

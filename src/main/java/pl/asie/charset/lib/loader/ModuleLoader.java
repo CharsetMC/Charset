@@ -180,7 +180,7 @@ public class ModuleLoader {
 		Set<String> compatModules = new HashSet<>();
 		Map<String, ASMDataTable.ASMData> moduleData = new HashMap<>();
 
-		Property baseProfileProp = ModCharset.configModules.get(
+		Property baseProfileProp = ModCharset.configGeneral.get(
 				"general",
 				"profile",
 				"DEFAULT"
@@ -200,7 +200,7 @@ public class ModuleLoader {
 			defaultProfile = ModuleProfile.STABLE;
 		}
 
-		baseProfileProp.setComment("Set the base profile for Charset.\nThis will decide whether or not certain modules are accessible.\nAllowed values: STABLE, TESTING, EXPERIMENTAL\nDEFAULT is " + defaultProfile.name());
+		baseProfileProp.setComment("Set the base profile for Charset.\nThis will give you a default set of modules based on stability.\nAllowed values: DEFAULT, STABLE, TESTING, EXPERIMENTAL (DEFAULT means " + defaultProfile.name() + ")\nFor fine-grained configuration, check modules.cfg!");
 
 		if ("DEFAULT".equals(baseProfileProp.getString().toUpperCase())) {
 			profile = defaultProfile;
@@ -338,6 +338,10 @@ public class ModuleLoader {
 					dependencies.putAll(name, deps);
 				}
 			}
+		}
+
+		if (ModCharset.configGeneral.hasChanged()) {
+			ModCharset.configGeneral.save();
 		}
 
 		if (ModCharset.configModules.hasChanged() || configDirty) {

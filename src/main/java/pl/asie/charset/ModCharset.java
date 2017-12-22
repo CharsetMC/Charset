@@ -90,7 +90,7 @@ public class ModCharset {
 	};
 
 	public static Logger logger;
-	public static Configuration configModules, configIds;
+	public static Configuration configModules, configIds, configGeneral;
 
 	public static Map<String, String> defaultOptions = new HashMap<>();
 	private static File configurationDirectory;
@@ -135,6 +135,7 @@ public class ModCharset {
 
 		configModules = new Configuration(getConfigFile("modules.cfg"));
 		configIds = new Configuration(getConfigFile("ids.cfg"));
+		configGeneral = new Configuration(getConfigFile("charset.cfg"));
 		RegistryUtils.loadConfigIds(configIds);
 
 		logger = LogManager.getLogger();

@@ -37,7 +37,7 @@ import pl.asie.charset.lib.utils.ColorUtils;
 		name = "tweak.anvilDyeItems",
 		description = "Allows dyeing item names in an anvil",
 		antidependencies = "mod:quark",
-		profile = ModuleProfile.EXPERIMENTAL
+		profile = ModuleProfile.STABLE
 )
 // TODO: Override GuiIngame.highlightingItemStack?
 public class CharsetTweakDyeAnvilItems {
