@@ -123,10 +123,15 @@ public class IngredientGroup extends IngredientCharset {
             String oreSuffix = i == -1 ? "Colorless" : ColorUtils.getOreDictEntry("", EnumDyeColor.byMetadata(i));
             register("glass", i, "blockGlass" + oreSuffix);
             register("glassPane", i, "paneGlass" + oreSuffix);
-            if (i > 0) {
+            if (i >= 0) {
                 register("dye", i, "dye" + oreSuffix);
                 register("wool", i, new ItemStack(Blocks.WOOL, 1, 15 - i));
-                register("hardenedClay", i, new ItemStack(Blocks.STAINED_HARDENED_CLAY, 1, i));
+
+                ItemStack hc = new ItemStack(Blocks.STAINED_HARDENED_CLAY, 1, i);
+                register("hardenedClay", i, hc);
+                register("hardenedClayStained", i, hc);
+                register("glassStained", i, "blockGlass" + oreSuffix);
+                register("glassPaneStained", i, "paneGlass" + oreSuffix);
             } else {
                 register("hardenedClay", i, new ItemStack(Blocks.HARDENED_CLAY));
             }
