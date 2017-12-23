@@ -186,13 +186,15 @@ public class ProjectorRenderer {
 			int solidCount = 0;
 			int totalCount = 0;
 			boolean isSurface = true;
+			boolean hasBlocks = false;
 
 			for (BlockPos checkPos : BlockPos.getAllInBox(topLeftPos, bottomRightPos)) {
 				totalCount++;
 				IBlockState state = world.getBlockState(checkPos);
-				if (state.getBlock().isAir(state, world, pos) || state.getMaterial().isLiquid() || state.getBlock() instanceof IFluidBlock) {
+				if (!state.getMaterial().isOpaque()) {
 					isSurface = false;
 				} else {
+					hasBlocks = true;
 					if (state.isSideSolid(world, pos, projectorDirection.getOpposite())) {
 						solidCount++;
 					}
@@ -220,6 +222,8 @@ public class ProjectorRenderer {
 				surface.height = sizeFactorH * i;
 
 				return surface;
+			} else if (solidCount != totalCount && hasBlocks) {
+				return null;
 			}
 		}
 
@@ -299,7 +303,7 @@ public class ProjectorRenderer {
 					}
 
 					surface.restoreGLColor();
-					handler.render(stack, surface);
+					handler.render(stack, (IProjector) tileEntity, surface);
 				}
 			}
 		}

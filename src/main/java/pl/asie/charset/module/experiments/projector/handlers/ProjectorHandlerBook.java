@@ -12,8 +12,11 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.Quaternion;
+import pl.asie.charset.module.experiments.projector.IProjector;
 import pl.asie.charset.module.experiments.projector.IProjectorHandler;
 import pl.asie.charset.module.experiments.projector.IProjectorSurface;
 import pl.asie.charset.module.experiments.projector.ProjectorHelper;
@@ -27,26 +30,28 @@ public class ProjectorHandlerBook implements IProjectorHandler<ItemStack> {
 	}
 
 	@Override
+	public int getPageCount(ItemStack target) {
+		if (target.hasTagCompound()) {
+			NBTTagList pages = target.getTagCompound().getTagList("pages", Constants.NBT.TAG_STRING);
+			if (pages.tagCount() >= 1) {
+				return pages.tagCount();
+			}
+		}
+
+		return 1;
+	}
+
+	@Override
 	public float getAspectRatio(ItemStack target) {
 		return 146f/180f;
 	}
 
 	@Override
-	public void render(ItemStack stack, IProjectorSurface surface) {
-		float[] uvValues = surface.createUvArray(20, 166, 1, 1+180);
-
+	@SideOnly(Side.CLIENT)
+	public void render(ItemStack stack, IProjector projector, IProjectorSurface surface) {
 		// oh boy! text!
 		if (stack.hasTagCompound()) {
 			GlStateManager.pushMatrix();
-			double[] data = {
-					surface.getCornerStart().y,
-					surface.getCornerEnd().y,
-					surface.getCornerStart().z,
-					surface.getCornerEnd().z,
-					surface.getCornerStart().x,
-					surface.getCornerEnd().x
-			};
-
 			GlStateManager.translate(((surface.getCornerStart().x + surface.getCornerEnd().x) / 2) + surface.getScreenFacing().getFrontOffsetX() * 0.001f,
 					((surface.getCornerStart().y + surface.getCornerEnd().y) / 2) + surface.getScreenFacing().getFrontOffsetY() * 0.001f,
 					((surface.getCornerStart().z + surface.getCornerEnd().z) / 2) + surface.getScreenFacing().getFrontOffsetZ() * 0.001f);
@@ -63,11 +68,11 @@ public class ProjectorHandlerBook implements IProjectorHandler<ItemStack> {
 			FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
 
 			NBTTagList pages = stack.getTagCompound().getTagList("pages", Constants.NBT.TAG_STRING);
-			if (pages.tagCount() >= 1) {
-				String pageCount = I18n.format("book.pageIndicator", 1, pages.tagCount());
+			if (pages.tagCount() > projector.getPage()) {
+				String pageCount = I18n.format("book.pageIndicator", projector.getPage() + 1, pages.tagCount());
 				renderer.drawString(pageCount,-73 + 129 - renderer.getStringWidth(pageCount), -90 + 15, 0xFF000000);
 
-				String page = ((NBTTagString) pages.get(0)).getString();
+				String page = ((NBTTagString) pages.get(projector.getPage())).getString();
 				ITextComponent fullComponent = ITextComponent.Serializer.jsonToComponent(page);
 				if (fullComponent != null) {
 					List<ITextComponent> components = GuiUtilRenderComponents.splitText(fullComponent, 116, renderer, true, true);

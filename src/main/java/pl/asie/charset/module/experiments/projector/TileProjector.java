@@ -46,10 +46,11 @@ import pl.asie.charset.module.laser.blocks.TileCrystal;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 
-public class TileProjector extends TileBase implements IAxisRotatable, ITileWrenchRotatable {
+public class TileProjector extends TileBase implements IAxisRotatable, IProjector, ITileWrenchRotatable {
 	protected final LaserColor[] colors = new LaserColor[6];
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private ItemStack stack = ItemStack.EMPTY;
+	private int page;
 	private Orientation orientation = Orientation.FACE_NORTH_POINT_UP;
 
 	@Override
@@ -60,6 +61,7 @@ public class TileProjector extends TileBase implements IAxisRotatable, ITileWren
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		orientation = Orientation.getOrientation(compound.getByte("o"));
+		page = compound.getInteger("p");
 		stack = compound.hasKey("stack", Constants.NBT.TAG_COMPOUND) ? new ItemStack(compound.getCompoundTag("stack")) : ItemStack.EMPTY;
 
 		if (isClient) {
@@ -70,6 +72,7 @@ public class TileProjector extends TileBase implements IAxisRotatable, ITileWren
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		compound.setByte("o", (byte) orientation.ordinal());
+		compound.setInteger("p", page);
 		if (!stack.isEmpty()) {
 			ItemUtils.writeToNBT(stack, compound, "stack");
 		}
@@ -153,6 +156,27 @@ public class TileProjector extends TileBase implements IAxisRotatable, ITileWren
 	}
 
 	public boolean activate(EntityPlayer player, EnumFacing side, EnumHand hand) {
+		EnumFacing rightFace = orientation.getNextRotationOnTop().facing;
+		EnumFacing leftFace = orientation.getPrevRotationOnTop().facing;
+
+		if (!stack.isEmpty() && player.getHeldItem(hand).isEmpty()) {
+			IProjectorHandler<ItemStack> handler = CharsetProjector.getHandler(stack);
+			if (handler != null) {
+				int pc = handler.getPageCount(stack);
+				if (pc > 1) {
+					if (side == rightFace && page < (pc - 1)) {
+						page++;
+						markBlockForUpdate();
+						return true;
+					} else if (side == leftFace && page > 0) {
+						page--;
+						markBlockForUpdate();
+						return true;
+					}
+				}
+			}
+		}
+
 		if (side == orientation.top && hand == EnumHand.MAIN_HAND) {
 			if (!stack.isEmpty()) {
 				ItemUtils.spawnItemEntity(getWorld(),
@@ -160,12 +184,14 @@ public class TileProjector extends TileBase implements IAxisRotatable, ITileWren
 					stack, 0, 0, 0, 0
 				);
 				stack = ItemStack.EMPTY;
+				page = 0;
 				markBlockForUpdate();
 				return true;
 			} else {
 				ItemStack held = player.getHeldItem(hand);
 				if (!held.isEmpty()) {
 					stack = held.splitStack(1);
+					page = 0;
 					markBlockForUpdate();
 					return true;
 				}
@@ -173,5 +199,10 @@ public class TileProjector extends TileBase implements IAxisRotatable, ITileWren
 		}
 
 		return false;
+	}
+
+	@Override
+	public int getPage() {
+		return page;
 	}
 }

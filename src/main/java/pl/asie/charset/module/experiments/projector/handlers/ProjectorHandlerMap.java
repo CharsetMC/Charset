@@ -7,11 +7,10 @@ import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.MapData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.utils.MethodHandleHelper;
-import pl.asie.charset.module.experiments.projector.IProjectorHandler;
-import pl.asie.charset.module.experiments.projector.IProjectorSurface;
-import pl.asie.charset.module.experiments.projector.PacketRequestMapData;
-import pl.asie.charset.module.experiments.projector.ProjectorHelper;
+import pl.asie.charset.module.experiments.projector.*;
 
 import java.lang.invoke.MethodHandle;
 
@@ -29,7 +28,8 @@ public class ProjectorHandlerMap implements IProjectorHandler<ItemStack> {
 	}
 
 	@Override
-	public void render(ItemStack stack, IProjectorSurface surface) {
+	@SideOnly(Side.CLIENT)
+	public void render(ItemStack stack, IProjector projector, IProjectorSurface surface) {
 		MapData mapData = ((ItemMap) stack.getItem()).getMapData(stack, surface.getWorld());
 		if (mapData != null && mapData.mapName != null) {
 			MapItemRenderer mapItemRenderer = Minecraft.getMinecraft().entityRenderer.getMapItemRenderer();
