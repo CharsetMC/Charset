@@ -24,6 +24,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -505,6 +506,12 @@ public class Quaternion {
      */
     
     private Quaternion _vector_conversion_cache = null;
+
+    public AxisAlignedBB applyRotation(AxisAlignedBB p) {
+        Vec3d rotatedOne = applyRotation(new Vec3d(p.minX, p.minY, p.minZ));
+        Vec3d rotatedTwo = applyRotation(new Vec3d(p.maxX, p.maxY, p.maxZ));
+        return new AxisAlignedBB(rotatedOne, rotatedTwo);
+    }
 
     public Vec3d applyRotation(Vec3d p) {
         //return this * p * this^-1

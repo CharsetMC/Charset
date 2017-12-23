@@ -25,6 +25,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -45,6 +46,7 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.experiments.projector.handlers.ProjectorHandlerBook;
 import pl.asie.charset.module.experiments.projector.handlers.ProjectorHandlerMap;
+import pl.asie.charset.module.laser.CharsetLaser;
 import pl.asie.charset.module.storage.barrels.BarrelModel;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrelRenderer;
@@ -75,6 +77,12 @@ public class CharsetProjector {
 
 		handlerStack.add(new ProjectorHandlerBook());
 		handlerStack.add(new ProjectorHandlerMap());
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onRegisterModels(ModelRegistryEvent event) {
+		RegistryUtils.registerModel(itemProjector, 0, "charset:projector");
 	}
 
 	@Nullable

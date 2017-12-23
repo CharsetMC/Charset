@@ -7,6 +7,7 @@
     * Now with a GUI config!
     * Also fixes #138 and #129
 * [audio.noteblock] Fix 1.12 compatibility, improve mod compatibility.
+* [experiments.projector] New experimental module! Adds projectors! They project things when powered by LASERS! (See below.)
 * [laser] New module! Adds a laser-based logic system.
     * Fun fact: You can change the laser beam colors in assets/charset/color_palette.json. Feel free to supply your own! Partial color_palette.json overrides supported!
     * Please install CharsetPatches for redstone support in said laser system. Otherwise, the use might be somewhat limited for the time being.

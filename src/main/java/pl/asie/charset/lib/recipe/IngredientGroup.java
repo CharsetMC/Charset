@@ -189,7 +189,7 @@ public class IngredientGroup extends IngredientCharset {
 
     @Override
     public boolean arePermutationsDistinct() {
-        return true;
+        return modifyMeta || nbtTag != null;
     }
 
     @Override

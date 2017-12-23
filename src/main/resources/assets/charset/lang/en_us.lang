@@ -98,6 +98,8 @@ gui.charset.crafting.name=Crafting
 
 itemGroup.charset=The Charset Project
 
+tile.charset.projector.name=Projector
+
 item.charset.gemQuartz.name=Quartz
 tile.charset.oreQuartz.name=Quartz Ore
 
