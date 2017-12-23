@@ -19,8 +19,6 @@
 
 package pl.asie.charset.module.laser.blocks;
 
-import com.elytradev.mirage.lighting.IColoredLight;
-import com.elytradev.mirage.lighting.Light;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -29,9 +27,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.scheduler.Scheduler;
@@ -43,8 +38,7 @@ import pl.asie.charset.module.laser.system.LaserSource;
 
 import javax.annotation.Nullable;
 
-// @Optional.Interface(modid = "mirage", iface = "com.elytradev.mirage.lighting.IColoredLight")
-public class TileJar extends TileBase /* implements IColoredLight */ {
+public class TileJar extends TileBase {
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private final LaserColor[] colors = new LaserColor[6];
 	private LaserColor outputColor = LaserColor.NONE;
@@ -222,13 +216,4 @@ public class TileJar extends TileBase /* implements IColoredLight */ {
 		super.updateContainingBlockInfo();
 		updateRotations();
 	}
-
-	/* @Nullable
-	@Override
-	@Optional.Method(modid = "mirage")
-	@SideOnly(Side.CLIENT)
-	public Light getColoredLight() {
-		int c = CharsetLaser.LASER_COLORS[outputColor.ordinal()];
-		return Light.builder().pos(pos).color(c, false).radius(1.0f).intensity(1.0f).build();
-	} */
 }

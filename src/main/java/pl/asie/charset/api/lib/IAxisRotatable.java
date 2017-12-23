@@ -31,11 +31,6 @@ import net.minecraft.world.World;
  * **specifically** around a given axis. If you're implementing the
  * interface, please ensure that - to the best of my knowledge, Forge
  * does not make such promises in rotateBlock()!
- *
- * For blocks, you may implement IAxisRotatable.IAxisRotatableBlock instead.
- *
- * Note that the order of checking for the block and tile implementations
- * is not defined - do not make two incompatible implementations!
  */
 public interface IAxisRotatable {
 	@Deprecated /* Please use IBlockCapabilityProvider + IAxisRotatable instead. */

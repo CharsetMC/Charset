@@ -37,6 +37,7 @@ public class ToolItemColor implements IItemColor {
 
     @Override
     public int colorMultiplier(ItemStack stack, int tintIndex) {
+        // TODO: Refactor to decouple the enum and let items define their own material slot orders etc
         ItemCharsetTool.MaterialSlot slot = tintIndex == 1 ? ItemCharsetTool.MaterialSlot.HEAD : (tintIndex == 0 ? ItemCharsetTool.MaterialSlot.HANDLE : null);
         if (slot != null && stack.getItem() instanceof ItemCharsetTool) {
             ItemMaterial material = ((ItemCharsetTool) stack.getItem()).getMaterial(stack, slot);

@@ -96,15 +96,6 @@ public final class RotationUtils {
 			axis = axis.getOpposite();
 		}
 
-		IBlockState state = world.getBlockState(pos);
-		if (state.getBlock() instanceof IAxisRotatable.IAxisRotatableBlock) {
-			for (int i = 0; i < count; i++)
-				if (!((IAxisRotatable.IAxisRotatableBlock) state.getBlock()).rotateAround(world, pos, axis, false))
-					return false;
-
-			return true;
-		}
-
 		IAxisRotatable rotatable = CapabilityHelper.get(world, pos, Capabilities.AXIS_ROTATABLE, axis,
 				true, true, false);
 		if (rotatable != null) {
@@ -131,6 +122,7 @@ public final class RotationUtils {
 					break;
 			}
 
+			IBlockState state = world.getBlockState(pos);
 			if (overridesWithRotation(state) && rotation != Rotation.NONE) {
 				world.setBlockState(pos, state.withRotation(rotation));
 				rotatedPreviously = true;

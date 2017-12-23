@@ -142,7 +142,7 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
 
     @Override
     public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
-        variant = (stack.getTagCompound().getInteger("color") + 1) % 17;
+        variant = (stack.getTagCompound().getInteger("color") + 1) % BlockTank.VARIANTS;
         world.notifyNeighborsRespectDebug(pos, CharsetStorageTanks.tankBlock, false);
     }
 
@@ -224,6 +224,10 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
         TileEntity nTank = world.getTileEntity(pos.up());
         if (nTank instanceof TileTank && connects((TileTank) nTank) && ((TileTank) nTank).connects(this)) {
             aboveTank = (TileTank) nTank;
+            if (isCreative() && fluidStack != null && aboveTank.fluidStack == null) {
+                aboveTank.fluidStack = fluidStack.copy();
+                aboveTank.updateAboveTank();
+            }
         } else {
             aboveTank = null;
         }
@@ -300,10 +304,14 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
         return new IFluidTankProperties[]{this};
     }
 
+    private boolean isCreative() {
+        return getVariant() == 17;
+    }
+
     @Override
     public int fill(FluidStack resource, boolean doFill) {
         if (canFillFluidType(resource)) {
-            int toFill = resource.amount;
+            int toFill = isCreative() ? getCapacity() : resource.amount;
             Iterator<TileTank> i = getAllTanks();
             while (i.hasNext() && toFill > 0) {
                 TileTank tank = i.next();
@@ -327,17 +335,26 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     @Nullable
     @Override
     public FluidStack drain(FluidStack resource, boolean doDrain) {
+        return drain(resource, doDrain, true);
+    }
+
+    protected FluidStack drain(FluidStack resource, boolean doDrain, boolean isAutomated) {
         if (canDrainFluidType(resource)) {
-            return drain(resource.amount, doDrain);
+            return drain(resource.amount, doDrain, isAutomated);
         } else {
             return null;
         }
     }
 
+
     @Nullable
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain) {
-        int toDrain = maxDrain;
+        return drain(maxDrain, doDrain, true);
+    }
+
+    protected FluidStack drain(int maxDrain, boolean doDrain, boolean isAutomated) {
+        int toDrain = (!isAutomated && isCreative() && fluidStack != null) ? getContents().amount : maxDrain;
         FluidStack typeSrc = getBottomTank().fluidStack;
         if (typeSrc == null) {
             return null;
@@ -356,7 +373,7 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
         while (!drainTanks.empty() && toDrain > 0) {
             tank = drainTanks.pop();
             int canDrain = Math.min(toDrain, tank.fluidStack.amount);
-            if (doDrain) {
+            if (doDrain && (!isAutomated || !isCreative())) {
                 tank.fluidStack.amount -= canDrain;
                 tank.onStackModified();
             }

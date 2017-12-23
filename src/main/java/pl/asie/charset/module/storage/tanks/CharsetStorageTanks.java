@@ -64,9 +64,23 @@ public class CharsetStorageTanks {
     public void registerModels(ModelRegistryEvent event) {
         ModelResourceLocation locationNormal = new ModelResourceLocation("charset:fluidtank", "inventory");
         ModelResourceLocation locationStained = new ModelResourceLocation("charset:fluidtank", "inventory_stained");
+        ModelResourceLocation locationCreative = new ModelResourceLocation("charset:fluidtank", "inventory_creative");
 
-        ModelLoader.setCustomMeshDefinition(tankItem, stack -> stack.hasTagCompound() && stack.getTagCompound().getInteger("color") >= 0 ? locationStained : locationNormal);
-        ModelLoader.registerItemVariants(tankItem, locationNormal, locationStained);
+        ModelLoader.setCustomMeshDefinition(tankItem, stack -> {
+            if (stack.hasTagCompound()) {
+                int c = stack.getTagCompound().getInteger("color");
+                if (c >= 0 && c < 16) {
+                    return locationStained;
+                } else if (c == 16) {
+                    return locationCreative;
+                } else {
+                    return locationNormal;
+                }
+            } else {
+                return locationNormal;
+            }
+        });
+        ModelLoader.registerItemVariants(tankItem, locationNormal, locationStained, locationCreative);
     }
 
     @SubscribeEvent

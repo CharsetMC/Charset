@@ -28,6 +28,16 @@
         }
       }
     ],
+    "inventory_creative": [
+      {
+        "transform": "forge:default-block",
+        "textures": {
+          "top": "charset:blocks/fluidtank/tank_top_creative",
+          "particle": "charset:blocks/fluidtank/tank_side_3_creative",
+          "side": "charset:blocks/fluidtank/tank_side_3_creative"
+        }
+      }
+    ],
     "connections": {
       "0": {"textures": {"side": "charset:blocks/fluidtank/tank_side_0"}},
       "1": {"textures": {"side": "charset:blocks/fluidtank/tank_side_1"}},
@@ -49,9 +59,29 @@
         "side": "charset:blocks/fluidtank/tank_side_2_stained"
       }},
       "7": {"textures": {
-        "top": "charset:blocks/fluidtank/tank_top_stained",
-        "particle": "charset:blocks/fluidtank/tank_side_3_stained",
-        "side": "charset:blocks/fluidtank/tank_side_3_stained"
+        "top": "charset:blocks/fluidtank/tank_top_creative",
+        "particle": "charset:blocks/fluidtank/tank_side_3_creative",
+        "side": "charset:blocks/fluidtank/tank_side_3_creative"
+      }},
+      "8": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_creative",
+        "particle": "charset:blocks/fluidtank/tank_side_3_creative",
+        "side": "charset:blocks/fluidtank/tank_side_0_creative"
+      }},
+      "9": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_creative",
+        "particle": "charset:blocks/fluidtank/tank_side_3_creative",
+        "side": "charset:blocks/fluidtank/tank_side_1_creative"
+      }},
+      "10": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_creative",
+        "particle": "charset:blocks/fluidtank/tank_side_3_creative",
+        "side": "charset:blocks/fluidtank/tank_side_2_creative"
+      }},
+      "11": {"textures": {
+        "top": "charset:blocks/fluidtank/tank_top_creative",
+        "particle": "charset:blocks/fluidtank/tank_side_3_creative",
+        "side": "charset:blocks/fluidtank/tank_side_3_creative"
       }}
     }
   }

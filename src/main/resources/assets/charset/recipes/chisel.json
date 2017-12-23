@@ -9,10 +9,14 @@
   "group": "charset:chisel",
   "pattern": [
     "  i",
-    " s ",
+    " p ",
     "s  "
   ],
   "key": {
+    "p": {
+      "type": "charset:material",
+      "material": ["block", "wood", "plank"]
+    },
     "s": {
       "type": "charset:material",
       "material": ["item", "wood", "stick"],

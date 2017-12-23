@@ -54,8 +54,9 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 public class BlockTank extends BlockBase implements ITileEntityProvider {
+    public static final int VARIANTS = 18;
     protected static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.05f, 0, 0.05f, 0.95f, 1, 0.95f);
-    private static final PropertyInteger VARIANT = PropertyInteger.create("connections", 0, 7);
+    private static final PropertyInteger VARIANT = PropertyInteger.create("connections", 0, 11);
 
     public BlockTank() {
         super(Material.GLASS);
@@ -86,7 +87,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
         Item item = Item.getItemFromBlock(this);
 
-        for (int i = 0; i <= 16; i++) {
+        for (int i = 0; i <= 17; i++) {
             ItemStack stack = new ItemStack(item);
             ItemUtils.getTagCompound(stack, true).setInteger("color", i - 1);
             items.add(stack);
@@ -136,7 +137,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         return state.withProperty(VARIANT,
                 ((variantUp == variant) ? 0 : 2)
                 | ((variantDown == variant) ? 0 : 1)
-                | (variant > 0 ? 4 : 0));
+                | (variant > 0 ? (variant == 17 ? 8 : 4) : 0));
     }
 
     @Override
@@ -146,7 +147,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         if (tankEntity instanceof TileTank) {
             TileTank tank = (TileTank) tankEntity;
             if (tank.fluidStack != null && tank.fluidStack.amount >= 1000) {
-                float chance = (float) (tank.fluidStack.amount) / 8000;
+                float chance = (float) (tank.fluidStack.amount) / (TileTank.CAPACITY / 2);
                 if (worldIn.rand.nextFloat() <= chance) {
                     worldIn.setBlockState(pos, tank.fluidStack.getFluid().getBlock().getDefaultState());
                 }
@@ -202,12 +203,12 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
                     if (fluidExtracted == null) {
                         // tank -> holder
-                        fluidExtracted = tank.drain(Fluid.BUCKET_VOLUME, false);
+                        fluidExtracted = tank.drain(Fluid.BUCKET_VOLUME, false, false);
                         if (fluidExtracted != null) {
                             int amount = handler.fill(fluidExtracted, false);
                             if (amount > 0) {
                                 fluidExtracted.amount = amount;
-                                fluidExtracted = tank.drain(fluidExtracted, true);
+                                fluidExtracted = tank.drain(fluidExtracted, true, false);
                                 if (fluidExtracted != null) {
                                     handler.fill(fluidExtracted, true);
                                     changed = true;
