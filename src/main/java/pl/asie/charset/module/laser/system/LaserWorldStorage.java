@@ -390,10 +390,10 @@ public class LaserWorldStorage implements IWorldEventListener {
 
 	public boolean add(LaserBeam beam) {
 		if (laserBeamView.add(beam)) {
-			if (updates && (CharsetPatchwork.LASER_REDSTONE)) {
+			if (/* updates && */(CharsetPatchwork.LASER_REDSTONE)) {
 				addEndpoint(beam);
 			}
-			beam.onAdd(updates);
+			beam.onAdd(/* updates */ true);
 			return true;
 		} else {
 			return false;
@@ -427,7 +427,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 						addChunkToRescan(cx, cz);
 			}
 
-			beam.onRemove(updates);
+			beam.onRemove(/* updates */ true);
 			return true;
 		} else {
 			return false;

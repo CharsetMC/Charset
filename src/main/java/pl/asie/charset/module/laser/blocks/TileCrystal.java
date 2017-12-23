@@ -141,6 +141,10 @@ public class TileCrystal extends TileLaserSourceBase {
 			final int _i = i;
 			newColors[i] = LaserColor.NONE;
 			receivers[i] = colorHit -> {
+				if (world.isRemote) {
+					return;
+				}
+
 				IBlockState oldState = world.getBlockState(pos);
 				color = oldState.getValue(CharsetLaser.LASER_COLOR);
 

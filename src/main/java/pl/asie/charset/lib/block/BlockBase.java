@@ -57,6 +57,7 @@ import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.utils.Utils;
+import pl.asie.charset.module.experiments.projector.TileProjector;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -351,6 +352,20 @@ public abstract class BlockBase extends Block {
 		PacketCustomBlockDust packet = new PacketCustomBlockDust(world, pos, entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.15f);
 		CharsetLib.packet.sendToDimension(packet, world.provider.getDimension());
 		return true;
+	}
+
+	@Override
+	public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+		if (axis != null) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile instanceof ITileWrenchRotatable) {
+				return ((ITileWrenchRotatable) tile).rotateWrench(axis);
+			} else {
+				return super.rotateBlock(world, pos, axis);
+			}
+		} else {
+			return super.rotateBlock(world, pos, axis);
+		}
 	}
 
 	@Override

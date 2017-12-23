@@ -26,6 +26,8 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
@@ -35,6 +37,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.api.laser.LaserColor;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.module.laser.CharsetLaser;
@@ -55,6 +58,26 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 		setOpaqueCube(false);
 		setFullCube(false);
 	}
+
+	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (super.onBlockActivated(world, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) {
+			return true;
+		}
+
+		// TODO: This is temporary until a way to light jars up is implemented.
+		ItemStack stack = playerIn.getHeldItem(hand);
+		if (!stack.isEmpty() && stack.getItem() instanceof ItemFlintAndSteel) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile instanceof TileJar) {
+				((TileJar) tile).setColor(LaserColor.WHITE);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {

@@ -25,6 +25,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.lib.IAxisRotatable;
+import pl.asie.charset.lib.block.ITileWrenchRotatable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.module.laser.CharsetLaser;
@@ -35,7 +36,7 @@ import javax.annotation.Nullable;
 
 // down,west -> down-east
 
-public class TilePrism extends TileLaserSourceBase implements IAxisRotatable {
+public class TilePrism extends TileLaserSourceBase implements IAxisRotatable, ITileWrenchRotatable {
 	public enum FaceBehaviour {
 		DIAGONAL,
 		NON_DIAGONAL,
@@ -120,6 +121,10 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable {
 			final int _i = i;
 			sourceColors[i] = LaserColor.NONE;
 			receivers[i] = (color) -> {
+				if (world.isRemote) {
+					return;
+				}
+
 				if (sourceColors[_i] != color) {
 					sourceColors[_i] = color;
 					recalcColors();
@@ -196,7 +201,8 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable {
 		return changeOrientation(orientation.rotateAround(axis), simulate);
 	}
 
-	public void rotateWrench(EnumFacing axis) {
+	@Override
+	public boolean rotateWrench(EnumFacing axis) {
 		Orientation newOrientation;
 		if (axis.getAxis() == orientation.facing.getAxis()) {
 			newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis).ordinal() & (~3) | (orientation.ordinal() & 3)).getNextRotationOnTop();
@@ -207,5 +213,6 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable {
 		}
 
 		changeOrientation(newOrientation, false);
+		return true;
 	}
 }

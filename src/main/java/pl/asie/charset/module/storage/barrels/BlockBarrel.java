@@ -169,19 +169,6 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
-        if (axis != null) {
-            TileEntity tile = world.getTileEntity(pos);
-            if (tile instanceof TileEntityDayBarrel) {
-                ((TileEntityDayBarrel) tile).rotateWrench(axis.getOpposite());
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
     public int getMetaFromState(IBlockState state) {
         return 0;
     }

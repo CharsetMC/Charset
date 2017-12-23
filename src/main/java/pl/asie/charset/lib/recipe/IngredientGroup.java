@@ -57,13 +57,15 @@ public class IngredientGroup extends IngredientCharset {
     private static final Map<String, Entry> entryMap = new HashMap<>();
     private final String type, nbtTag;
     private final TIntSet blacklistedIds;
+    private final boolean modifyMeta;
     private char dependencyChar;
     private Ingredient dependency;
 
-    public IngredientGroup(String type, String nbtTag, TIntSet blacklistedIds, char depChar) {
+    public IngredientGroup(String type, String nbtTag, boolean modifyMeta, TIntSet blacklistedIds, char depChar) {
         super();
         this.type = type;
         this.nbtTag = nbtTag;
+        this.modifyMeta = modifyMeta;
         this.blacklistedIds = blacklistedIds;
         this.dependencyChar = depChar;
     }
@@ -75,7 +77,7 @@ public class IngredientGroup extends IngredientCharset {
         }
     }
 
-    public static void register(String type, String id, Object object) {
+    public static void register(String type, String id, Object... objects) {
         Entry e = entryMap.get(type);
         if (e == null) {
             e = new Entry(true);
@@ -83,10 +85,12 @@ public class IngredientGroup extends IngredientCharset {
         } else if (!e.isStringBased()) {
             throw new RuntimeException("Trying to register string id on int-based entry!");
         }
-        registerBody(e, e.maxNameId++, object, id);
+        for (Object object : objects) {
+            registerBody(e, e.maxNameId++, object, id);
+        }
     }
 
-    public static void register(String type, int id, Object object) {
+    public static void register(String type, int id, Object... objects) {
         Entry e = entryMap.get(type);
         if (e == null) {
             e = new Entry(false);
@@ -94,7 +98,9 @@ public class IngredientGroup extends IngredientCharset {
         } else if (e.isStringBased()) {
             throw new RuntimeException("Trying to register int id on string-based entry!");
         }
-        registerBody(e, id, object, null);
+        for (Object object : objects) {
+            registerBody(e, id, object, null);
+        }
     }
 
     private static void registerBody(Entry e, int id, Object object, String name) {
@@ -170,6 +176,12 @@ public class IngredientGroup extends IngredientCharset {
                 ItemUtils.getTagCompound(stack, true).setString(nbtTag, e.idNameMap.get(id));
             } else {
                 ItemUtils.getTagCompound(stack, true).setInteger(nbtTag, id);
+            }
+        } else if (modifyMeta) {
+            int id = getId(source);
+            Entry e = entryMap.get(type);
+            if (e != null) {
+                stack.setItemDamage(stack.getItemDamage() + id);
             }
         }
         return stack;
@@ -249,7 +261,7 @@ public class IngredientGroup extends IngredientCharset {
         @Override
         public Ingredient parse(JsonContext context, JsonObject json) {
             String type = JsonUtils.getString(json, "group");
-            String tag = JsonUtils.getString(json, "nbtKey");
+            String tag = json.has("nbtKey") ? JsonUtils.getString(json, "nbtKey") : null;
 
             TIntSet blacklistedIds = new TIntHashSet();
             if (JsonUtils.hasField(json, "blacklist")) {
@@ -265,7 +277,7 @@ public class IngredientGroup extends IngredientCharset {
                 dep = JsonUtils.getString(json, "depends").charAt(0);
             }
 
-            return IngredientCharset.wrap(new IngredientGroup(type, tag, blacklistedIds, dep));
+            return IngredientCharset.wrap(new IngredientGroup(type, tag, json.has("modifyMeta"), blacklistedIds, dep));
         }
     }
 }

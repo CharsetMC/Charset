@@ -46,6 +46,7 @@ import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IBarrel;
+import pl.asie.charset.lib.block.ITileWrenchRotatable;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.CapabilityCache;
 import pl.asie.charset.lib.capability.Capabilities;
@@ -58,7 +59,7 @@ import pl.asie.charset.lib.utils.*;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable, ITickable, IAxisRotatable {
+public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable, ITickable, IAxisRotatable, ITileWrenchRotatable {
     public ItemStack item = ItemStack.EMPTY;
     public ItemMaterial woodLog, woodSlab;
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
@@ -1080,7 +1081,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         return changeOrientation(orientation.rotateAround(axis), simulate);
     }
 
-    public void rotateWrench(EnumFacing axis) {
+    @Override
+    public boolean rotateWrench(EnumFacing axis) {
         Orientation newOrientation;
         if (axis == orientation.facing.getOpposite()) {
             newOrientation = orientation.getNextRotationOnFace();
@@ -1089,6 +1091,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         changeOrientation(newOrientation, false);
+        return true;
     }
 
     @Override

@@ -104,6 +104,10 @@ public class TileReflector extends TileLaserSourceBase {
 			bouncedColors[i] = LaserColor.NONE;
 			passedColors[i] = LaserColor.NONE;
 			receivers[i] = (color) -> {
+				if (world.isRemote) {
+					return;
+				}
+
 				sourceColors[_i] = color;
 				updateSourceColor(_i);
 			};

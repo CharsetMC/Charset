@@ -24,6 +24,7 @@ import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonExtension;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -46,6 +47,7 @@ import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.recipe.IngredientGroup;
 import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.resources.ColorPaletteParser;
 import pl.asie.charset.lib.resources.ColorPaletteUpdateEvent;
@@ -76,14 +78,14 @@ public class CharsetLaser {
     public static final int[] LASER_COLORS = new int[8];
 
     public static final String[] LASER_LANG_STRINGS = {
-            "charset.color.black",
-            "charset.color.blue",
-            "charset.color.green",
-            "charset.color.cyan",
-            "charset.color.red",
-            "charset.color.magenta",
-            "charset.color.yellow",
-            "charset.color.white"
+            "charset.color.black", // doesn't need a gem; just use coal if necessary
+            "charset.color.blue", // sapphire?
+            "charset.color.green", // emerald
+            "charset.color.cyan", // opal?
+            "charset.color.red", // ruby
+            "charset.color.magenta", // amethyst?
+            "charset.color.yellow", // amber
+            "charset.color.white" // quartz
     };
 
     public static LaserStorage laserStorage = new LaserStorage();
@@ -100,6 +102,14 @@ public class CharsetLaser {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         CapabilityManager.INSTANCE.register(LaserSource.class, DummyCapabilityStorage.get(), DummyLaserSource::new);
+
+        IngredientGroup.register("charset:laser_gem", 1, "gemSapphire", "gemLapis");
+        IngredientGroup.register("charset:laser_gem", 2, "gemEmerald");
+        IngredientGroup.register("charset:laser_gem", 3, "gemOpal");
+        IngredientGroup.register("charset:laser_gem", 4, "gemRuby");
+        IngredientGroup.register("charset:laser_gem", 5, "gemAmethyst");
+        IngredientGroup.register("charset:laser_gem", 6, "gemAmber", "gemTopaz");
+        IngredientGroup.register("charset:laser_gem", 7, "gemQuartz");
 
         blockCrystal = new BlockCrystal();
         blockCrystal.setUnlocalizedName("charset.laser_crystal");

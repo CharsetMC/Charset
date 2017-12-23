@@ -82,6 +82,10 @@ public class TileJar extends TileBase /* implements IColoredLight */ {
 			final int _i = i;
 			colors[i] = LaserColor.NONE;
 			receivers[i] = (color) -> {
+				if (world.isRemote) {
+					return;
+				}
+
 				colors[_i] = color;
 				recalculateOutputColor();
 			};
@@ -158,6 +162,17 @@ public class TileJar extends TileBase /* implements IColoredLight */ {
 
 	public LaserColor getColor() {
 		return outputColor;
+	}
+
+	public void setColor(LaserColor color) {
+		if (color != this.outputColor) {
+			this.outputColor = color;
+
+			markBlockForUpdate();
+			if (!world.isRemote) {
+				CharsetLaser.laserStorage.markLaserForUpdate(TileJar.this, getJarFacing());
+			}
+		}
 	}
 
 	@Override

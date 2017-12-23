@@ -1,0 +1,34 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "laser"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:light_jar",
+  "pattern": [
+    " b ",
+    "gcg",
+    "ggg"
+  ],
+  "key": {
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "paneGlassColorless"
+    },
+    "b": {
+      "type": "forge:ore_dict",
+      "ore": "paneGlassBlack"
+    },
+    "c": {
+      "type": "forge:ore_dict",
+      "ore": "blockCoal"
+    }
+  },
+  "result": {
+    "item": "charset:light_jar",
+    "data": 0,
+    "count": 1
+  }
+}
