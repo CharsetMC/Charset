@@ -143,3 +143,4 @@ item.charset.wrench.name=Wrench
 
 tile.charset.tank.name=Tank
 tile.charset.tank.colored.name=%s Tank
+tile.charset.tank.creative.name=Infinite Tank

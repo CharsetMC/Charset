@@ -59,9 +59,9 @@
         "side": "charset:blocks/fluidtank/tank_side_2_stained"
       }},
       "7": {"textures": {
-        "top": "charset:blocks/fluidtank/tank_top_creative",
-        "particle": "charset:blocks/fluidtank/tank_side_3_creative",
-        "side": "charset:blocks/fluidtank/tank_side_3_creative"
+        "top": "charset:blocks/fluidtank/tank_top_stained",
+        "particle": "charset:blocks/fluidtank/tank_side_3_stained",
+        "side": "charset:blocks/fluidtank/tank_side_3_stained"
       }},
       "8": {"textures": {
         "top": "charset:blocks/fluidtank/tank_top_creative",
