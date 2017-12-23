@@ -35,6 +35,8 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.utils.Orientation;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 
@@ -50,6 +52,8 @@ public class BlockProjector extends BlockBase implements ITileEntityProvider {
 
 	public BlockProjector() {
 		super(Material.CIRCUITS);
+		setFullCube(false);
+		setOpaqueCube(false);
 	}
 
 	@Override

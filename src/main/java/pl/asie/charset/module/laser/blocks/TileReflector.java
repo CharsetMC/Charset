@@ -37,9 +37,9 @@ import javax.annotation.Nullable;
 
 public class TileReflector extends TileLaserSourceBase {
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
-	private LaserColor[] bouncedColors = new LaserColor[6];
-	private LaserColor[] passedColors = new LaserColor[6];
-	private LaserColor[] sourceColors = new LaserColor[6];
+	private final LaserColor[] bouncedColors = new LaserColor[6];
+	private final LaserColor[] passedColors = new LaserColor[6];
+	private final LaserColor[] sourceColors = new LaserColor[6];
 	private LaserColor color = LaserColor.NONE;
 
 	private void updateColor(int ri) {

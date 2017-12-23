@@ -19,8 +19,11 @@
 
 package pl.asie.charset.module.experiments.projector;
 
+import net.minecraft.block.BlockStainedGlass;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.gui.MapItemRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.EnumFaceDirection;
@@ -29,28 +32,33 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemWrittenBook;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.*;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.MapData;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import pl.asie.charset.api.laser.LaserColor;
-import pl.asie.charset.lib.utils.MethodHandleHelper;
-import pl.asie.charset.lib.utils.Orientation;
-import pl.asie.charset.lib.utils.RayTraceUtils;
+import pl.asie.charset.lib.utils.*;
 import scala.xml.dtd.MIXED;
 
 import java.lang.invoke.MethodHandle;
@@ -59,24 +67,90 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectorRenderer {
-	private static MethodHandle MAP_DATA_LOCATION_GETTER;
-
-	public static class Surface {
+	public static class Surface implements IProjectorSurface {
+		public World world;
 		public Vec3d cornerStart, cornerEnd;
-		public EnumFacing direction;
-		public List<BlockPos> particlePos = new ArrayList<>();
-		public float[] uvValues = {
-				0.0f, 0.0f,
-				0.0f, 1.0f,
-				1.0f, 1.0f,
-				1.0f, 0.0f
-		};
+		public Orientation orientation;
+		public float width, height;
+		public float r, g, b, a;
+
+		@Override
+		public World getWorld() {
+			return world;
+		}
+
+		@Override
+		public Vec3d getCornerStart() {
+			return cornerStart;
+		}
+
+		@Override
+		public Vec3d getCornerEnd() {
+			return cornerEnd;
+		}
+
+		@Override
+		public EnumFacing getScreenFacing() {
+			return orientation.facing.getOpposite();
+		}
+
+		@Override
+		public int getRotation() {
+			return orientation.getRotation();
+		}
+
+		@Override
+		public float getWidth() {
+			return width;
+		}
+
+		@Override
+		public float getHeight() {
+			return height;
+		}
+
+		@Override
+		public float[] createUvArray(int uStart, int uEnd, int vStart, int vEnd) {
+			float[] uvValues = {
+					uStart/256f, vStart/256f,
+					uStart/256f, vEnd/256f,
+					uEnd/256f, vEnd/256f,
+					uEnd/256f, vStart/256f
+			};
+
+			for (int j = 0; j < getRotation(); j++) {
+				float t = uvValues[0];
+				uvValues[0] = uvValues[2];
+				uvValues[2] = uvValues[4];
+				uvValues[4] = uvValues[6];
+				uvValues[6] = t;
+
+				t = uvValues[1];
+				uvValues[1] = uvValues[3];
+				uvValues[3] = uvValues[5];
+				uvValues[5] = uvValues[7];
+				uvValues[7] = t;
+			}
+
+			return uvValues;
+		}
+
+		@Override
+		public void restoreGLColor() {
+			GlStateManager.color(r, g, b, a);
+		}
 	}
 
 	public Surface getSurface(World world, BlockPos pos, Orientation orientation, float sizeFactor, float aspectRatio) {
 		Surface surface = new Surface();
 		EnumFacing projectorDirection = orientation.facing;
 		int maxDistance = 16;
+
+		float sizeFactorW = 1f;
+		float sizeFactorH = 1f / aspectRatio;
+		float sfDiv = (float) Math.sqrt(sizeFactorW * sizeFactorW + sizeFactorH * sizeFactorH);
+		sizeFactorW *= sizeFactor / sfDiv;
+		sizeFactorH *= sizeFactor / sfDiv;
 
 		Vec3d bottomRightOffset = new Vec3d(
 				projectorDirection.getAxis() == EnumFacing.Axis.X ? 0 : 1,
@@ -97,9 +171,10 @@ public class ProjectorRenderer {
 			// TODO: This sucks. All of it.
 			for (EnumFacing.Axis axis : EnumFacing.Axis.values()) {
 				if (axis != projectorDirection.getAxis()) {
-					Vec3d axisVec = new Vec3d(EnumFacing.getFacingFromAxis(EnumFacing.AxisDirection.POSITIVE, axis).getDirectionVec());
-					topLeft = topLeft.subtract(axisVec.scale(sizeFactor * i / (axis == orientation.top.getAxis() ? aspectRatio : 1)));
-					bottomRight = bottomRight.add(axisVec.scale(sizeFactor * i / (axis == orientation.top.getAxis() ? aspectRatio : 1)));
+					Vec3d axisVec = new Vec3d(EnumFacing.getFacingFromAxis(EnumFacing.AxisDirection.POSITIVE, axis).getDirectionVec())
+							.scale((axis == orientation.top.getAxis() ? sizeFactorH : sizeFactorW) * i);
+					topLeft = topLeft.subtract(axisVec);
+					bottomRight = bottomRight.add(axisVec);
 				}
 			}
 
@@ -127,38 +202,24 @@ public class ProjectorRenderer {
 			if (!isSurface && solidCount > 0) {
 				return null;
 			} else if (isSurface && solidCount == totalCount) {
+				float v = projectorDirection.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? 1f : 0f;
+				v += ProjectorHelper.OFFSET + (pos.hashCode() & 31) / 16384f;
+				surface.world = world;
 				surface.cornerStart = topLeft.subtract(
-						projectorDirection.getFrontOffsetX() * 1.001f,
-						projectorDirection.getFrontOffsetY() * 1.001f,
-						projectorDirection.getFrontOffsetZ() * 1.001f
+						projectorDirection.getFrontOffsetX() * v,
+						projectorDirection.getFrontOffsetY() * v,
+						projectorDirection.getFrontOffsetZ() * v
 				);
 				surface.cornerEnd = bottomRight.subtract(
-						projectorDirection.getFrontOffsetX() * 1.001f,
-						projectorDirection.getFrontOffsetY() * 1.001f,
-						projectorDirection.getFrontOffsetZ() * 1.001f
+						projectorDirection.getFrontOffsetX() * v,
+						projectorDirection.getFrontOffsetY() * v,
+						projectorDirection.getFrontOffsetZ() * v
 				);
-				surface.direction = projectorDirection.getOpposite();
-				for (int j = 0; j < orientation.getRotation(); j++) {
-					float t = surface.uvValues[0];
-					surface.uvValues[0] = surface.uvValues[2];
-					surface.uvValues[2] = surface.uvValues[4];
-					surface.uvValues[4] = surface.uvValues[6];
-					surface.uvValues[6] = t;
-
-					t = surface.uvValues[1];
-					surface.uvValues[1] = surface.uvValues[3];
-					surface.uvValues[3] = surface.uvValues[5];
-					surface.uvValues[5] = surface.uvValues[7];
-					surface.uvValues[7] = t;
-				}
+				surface.orientation = orientation;
+				surface.width = sizeFactorW * i;
+				surface.height = sizeFactorH * i;
 
 				return surface;
-			} else {
-				/* for (BlockPos pos2 : BlockPos.getAllInBox(topLeftPos, bottomRightPos)) {
-					if (Math.random() < (1 << Minecraft.getMinecraft().gameSettings.particleSetting)/100f) {
-						surface.particlePos.add(pos2);
-					}
-				} */
 			}
 		}
 
@@ -174,17 +235,18 @@ public class ProjectorRenderer {
 		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
 		GlStateManager.enableTexture2D();
 		GlStateManager.enableAlpha();
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder worldrenderer = tessellator.getBuffer();
+		worldrenderer.setTranslation(0, 0, 0);
 
 		EntityPlayer player = Minecraft.getMinecraft().player;
 		double cameraX = player.lastTickPosX + ((player.posX - player.lastTickPosX) * event.getPartialTicks());
 		double cameraY = player.lastTickPosY + ((player.posY - player.lastTickPosY) * event.getPartialTicks());
 		double cameraZ = player.lastTickPosZ + ((player.posZ - player.lastTickPosZ) * event.getPartialTicks());
 
-		worldrenderer.setTranslation(-cameraX, -cameraY, -cameraZ);
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(-cameraX, -cameraY, -cameraZ);
 
 		for (TileEntity tileEntity : Minecraft.getMinecraft().world.loadedTileEntityList) {
 			if (tileEntity instanceof TileProjector) {
@@ -205,71 +267,44 @@ public class ProjectorRenderer {
 				}
 
 				if (color != LaserColor.NONE) {
-					boolean foundTex = false;
-
 					ItemStack stack = ((TileProjector) tileEntity).getStack();
-					if (stack.getItem() instanceof ItemMap) {
-						MapData mapData = ((ItemMap) stack.getItem()).getMapData(stack, tileEntity.getWorld());
-						if (mapData != null && mapData.mapName != null) {
-							MapItemRenderer mapItemRenderer = Minecraft.getMinecraft().entityRenderer.getMapItemRenderer();
-							mapItemRenderer.updateMapTexture(mapData);
-
-							Object o = mapItemRenderer.getMapInstanceIfExists(mapData.mapName);
-							if (o != null) {
-								if (MAP_DATA_LOCATION_GETTER == null) {
-									MAP_DATA_LOCATION_GETTER = MethodHandleHelper.findFieldGetter(o.getClass(), "location", "field_148240_d");
-								}
-
-								try {
-									Minecraft.getMinecraft().getTextureManager().bindTexture((ResourceLocation) MAP_DATA_LOCATION_GETTER.invoke(o));
-									foundTex = true;
-								} catch (Throwable e) {
-									e.printStackTrace();
-								}
-							}
-						}
-					}
-
-					if (!foundTex) {
+					IProjectorHandler<ItemStack> handler = CharsetProjector.getHandler(stack);
+					if (handler == null) {
 						continue;
 					}
 
-					Surface surface = getSurface(tileEntity.getWorld(), tileEntity.getPos(), orientation, 0.5f, 1.0f);
+					Surface surface = getSurface(tileEntity.getWorld(), tileEntity.getPos(), orientation, 0.5f, handler.getAspectRatio(stack));
 					if (surface == null) {
 						continue;
 					}
 
-					for (BlockPos particlePos : surface.particlePos) {
-						tileEntity.getWorld().spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
-								particlePos.getX() + 0.5,
-								particlePos.getY() + 0.5,
-								particlePos.getZ() + 0.5,
-								0, 0, 0);
+					surface.r = color.red ? 1.0f : 0.0f;
+					surface.g = color.green ? 1.0f : 0.0f;
+					surface.b = color.blue ? 1.0f : 0.0f;
+					surface.a = 0.5f;
+
+					EnumDyeColor dyeColor = null;
+
+					BlockPos inFrontPos = tileEntity.getPos().offset(((TileProjector) tileEntity).getOrientation().facing);
+					IBlockState state = tileEntity.getWorld().getBlockState(inFrontPos);
+					if (state.getBlock() instanceof BlockStainedGlass) {
+						dyeColor = state.getValue(BlockStainedGlass.COLOR);
 					}
 
-					double[] data = {
-							surface.cornerStart.y,
-							surface.cornerEnd.y,
-							surface.cornerStart.z,
-							surface.cornerEnd.z,
-							surface.cornerStart.x,
-							surface.cornerEnd.x
-					};
-
-					worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-
-					EnumFaceDirection efd = EnumFaceDirection.getFacing(surface.direction);
-					for (int i = 0; i < 4; i++) {
-						EnumFaceDirection.VertexInformation vi = efd.getVertexInformation(i);
-						worldrenderer.pos(data[vi.xIndex], data[vi.yIndex], data[vi.zIndex]).tex(surface.uvValues[i * 2], surface.uvValues[i * 2 + 1])
-								.color(color.red ? 255 : 0, color.green ? 255 : 0, color.blue ? 255 : 0, 128).endVertex();
+					if (dyeColor != null) {
+						float[] v = ColorUtils.getDyeRgb(dyeColor);
+						surface.r *= v[0];
+						surface.g *= v[1];
+						surface.b *= v[2];
 					}
-					tessellator.draw();
+
+					surface.restoreGLColor();
+					handler.render(stack, surface);
 				}
 			}
 		}
 
-		worldrenderer.setTranslation(0,0,0);
+		GlStateManager.popMatrix();
 
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);

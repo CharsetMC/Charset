@@ -95,52 +95,12 @@ public class TileProjectorRenderer extends TileEntitySpecialRenderer<TileProject
     }
 
     public void handleRenderItem(ItemStack is, TileProjector projector) {
-        GlStateManager.translate(-0.25f, -0.25f, 0);
+        GlStateManager.translate(-0.25f, -0.1875f, 0);
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
         GlStateManager.pushAttrib();
         RenderHelper.enableStandardItemLighting();
         Minecraft.getMinecraft().getRenderItem().renderItem(is, ItemCameraTransforms.TransformType.FIXED);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popAttrib();
-
-        /* GlStateManager.pushMatrix();
-        GlStateManager.rotate(180, 0, 1, 0);
-        float labelD = -1F / 16F;
-        GlStateManager.translate(0.25, -0.25 - labelD, 0);
-
-        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-
-        IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(is, projector.getWorld(), null);
-        model = model.handlePerspective(ItemCameraTransforms.TransformType.GROUND).getKey();
-
-        // TODO: This might be the ugliest hack in all of barrels. FIXME
-        if (model.isGui3d()) {
-            RenderHelper.enableStandardItemLighting();
-            if (!model.isBuiltInRenderer()) {
-                model = ModelTransformer.transform(model, null, 0, (quad, element, data) -> {
-                    if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
-                        data[0] /= 1.5f;
-                        data[2] *= 1.7f;
-                    }
-                    return data;
-                });
-            }
-        } else {
-            RenderHelper.enableStandardItemLighting();
-        }
-
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        model = ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GUI, false);
-
-        Minecraft.getMinecraft().getRenderItem().renderItem(is, model);
-        GlStateManager.disableRescaleNormal();
-        Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
-
-        GlStateManager.popMatrix(); */
     }
 }

@@ -48,9 +48,9 @@ import java.lang.invoke.MethodHandle;
 
 public class TileProjector extends TileBase implements IAxisRotatable, ITileWrenchRotatable {
 	protected final LaserColor[] colors = new LaserColor[6];
-	private ILaserReceiver[] receivers = new ILaserReceiver[6];
+	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private ItemStack stack = ItemStack.EMPTY;
-	private Orientation orientation;
+	private Orientation orientation = Orientation.FACE_NORTH_POINT_UP;
 
 	@Override
 	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
@@ -164,7 +164,7 @@ public class TileProjector extends TileBase implements IAxisRotatable, ITileWren
 				return true;
 			} else {
 				ItemStack held = player.getHeldItem(hand);
-				if (!held.isEmpty() && held.getItem() instanceof ItemMap) {
+				if (!held.isEmpty()) {
 					stack = held.splitStack(1);
 					markBlockForUpdate();
 					return true;

@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 
 public class TileCrystal extends TileLaserSourceBase {
 	protected final LaserColor[] newColors = new LaserColor[6];
-	private ILaserReceiver[] receivers = new ILaserReceiver[6];
+	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private LaserColor color;
 	private long updateQueued = -1;
 	private int hitMask = 0, newHitMask = 0;

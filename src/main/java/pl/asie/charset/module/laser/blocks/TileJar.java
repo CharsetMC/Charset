@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 // @Optional.Interface(modid = "mirage", iface = "com.elytradev.mirage.lighting.IColoredLight")
 public class TileJar extends TileBase /* implements IColoredLight */ {
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
-	private LaserColor[] colors = new LaserColor[6];
+	private final LaserColor[] colors = new LaserColor[6];
 	private LaserColor outputColor = LaserColor.NONE;
 	private LaserSource source;
 	private EnumFacing jarFacing;

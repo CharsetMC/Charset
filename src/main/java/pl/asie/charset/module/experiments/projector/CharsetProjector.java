@@ -22,6 +22,7 @@ package pl.asie.charset.module.experiments.projector;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -38,33 +39,59 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.module.experiments.projector.handlers.ProjectorHandlerBook;
+import pl.asie.charset.module.experiments.projector.handlers.ProjectorHandlerMap;
 import pl.asie.charset.module.storage.barrels.BarrelModel;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrelRenderer;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 @CharsetModule(
 		name = "experiments.projector",
 		description = "Projectors!",
 		dependencies = {"laser"},
-		profile = ModuleProfile.INDEV
+		profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetProjector {
+	@CharsetModule.PacketRegistry
+	public static PacketRegistry packet;
+
 	public static Block blockProjector;
 	public static Item itemProjector;
+	private static List<IProjectorHandler<ItemStack>> handlerStack = new ArrayList<>();
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		blockProjector = new BlockProjector();
 		itemProjector = new ItemBlockBase(blockProjector);
 		itemProjector.setUnlocalizedName("charset.projector");
+
+		handlerStack.add(new ProjectorHandlerBook());
+		handlerStack.add(new ProjectorHandlerMap());
+	}
+
+	@Nullable
+	public static IProjectorHandler<ItemStack> getHandler(ItemStack stack) {
+		for (IProjectorHandler<ItemStack> handler : handlerStack) {
+			if (handler.matches(stack)) {
+				return handler;
+			}
+		}
+
+		return null;
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		RegistryUtils.register(TileProjector.class, "projector");
+		packet.registerPacket(0x01, PacketRequestMapData.class);
 	}
 
 	@Mod.EventHandler

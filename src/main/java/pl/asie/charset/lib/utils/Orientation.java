@@ -154,8 +154,9 @@ public enum Orientation implements IStringSerializable {
     }
     
     private static Orientation find(EnumFacing f, EnumFacing t) {
-        for (Orientation o : values()) {
-            if (o.facing == f && o.top == t) {
+        for (int i = f.ordinal() * 4; i < f.ordinal() * 4 + 4; i++) {
+            Orientation o = valuesCache[i];
+            if (o.top == t) {
                 return o;
             }
         }
