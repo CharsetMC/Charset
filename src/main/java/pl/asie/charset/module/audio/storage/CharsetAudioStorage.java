@@ -21,8 +21,11 @@ package pl.asie.charset.module.audio.storage;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -32,6 +35,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.tape.IDataStorage;
@@ -39,10 +43,13 @@ import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.audio.storage.system.DataStorage;
 import pl.asie.charset.module.audio.storage.system.DataStorageCapStorage;
 import pl.asie.charset.module.audio.storage.system.DataStorageManager;
+import pl.asie.charset.module.storage.locks.ContainerKeyring;
 
 import java.io.IOException;
 import java.util.List;
@@ -85,12 +92,27 @@ public class CharsetAudioStorage {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        RegistryUtils.register(TileRecordPlayer.class, "record_player");
+
+        packet.registerPacket(0x01, PacketUpdateProgressClient.class);
+        packet.registerPacket(0x02, PacketDriveState.class);
+        packet.registerPacket(0x03, PacketDriveData.class);
+
+        GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.RECORD_PLAYER, Side.SERVER, (r) -> {
+            TileEntity tile = r.getTileEntity();
+            if (tile instanceof TileRecordPlayer) {
+                return new ContainerRecordPlayer((TileRecordPlayer) tile, r.player.inventory);
+            } else {
+                return null;
+            }
+        });
     }
 
     @Mod.EventHandler
     @SideOnly(Side.CLIENT)
     public void initClient(FMLInitializationEvent event) {
-        ClientRegistry.bindTileEntitySpecialRenderer(TileRecordPlayer.class, new TileRendererRecordPlayer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileRecordPlayer.class, TileRecordPlayerRenderer.INSTANCE);
+        GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.RECORD_PLAYER, Side.CLIENT, (r) -> new GuiRecordPlayer(r.getContainer()));
     }
 
     @Mod.EventHandler
@@ -98,7 +120,7 @@ public class CharsetAudioStorage {
     }
 
     @Mod.EventHandler
-    public void serverStart(FMLServerStartedEvent event) {
+    public void serverStart(FMLServerStartingEvent event) {
         storageManager = new DataStorageManager();
         MinecraftForge.EVENT_BUS.register(storageManager);
     }
@@ -117,11 +139,18 @@ public class CharsetAudioStorage {
     }
 
     @SubscribeEvent
+    @SideOnly(Side.CLIENT)
     public void registerModels(ModelRegistryEvent event) {
         RegistryUtils.registerModel(quartzDisc, 0, "charset:quartz_disc#inventory_blank");
         RegistryUtils.registerModel(quartzDisc, 1, "charset:quartz_disc#inventory");
 
         RegistryUtils.registerModel(itemRecordPlayer, 0, "charset:record_player#inventory");
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onTextureStitch(TextureStitchEvent.Pre event) {
+        TileRecordPlayerRenderer.INSTANCE.arm = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/record_player_arm"), event.getMap());
     }
 
     @SubscribeEvent

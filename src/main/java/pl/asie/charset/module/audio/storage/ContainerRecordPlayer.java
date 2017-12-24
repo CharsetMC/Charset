@@ -17,11 +17,19 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.recipe;
+package pl.asie.charset.module.audio.storage;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraftforge.items.SlotItemHandler;
+import pl.asie.charset.lib.ui.ContainerBase;
 
-public interface IRecipeResultBuilder extends IRecipeView {
-    ItemStack getStack(Ingredient i);
+public class ContainerRecordPlayer extends ContainerBase {
+	protected final TileRecordPlayer owner;
+
+	public ContainerRecordPlayer(TileRecordPlayer owner, InventoryPlayer inventoryPlayer) {
+		super(inventoryPlayer);
+		this.owner = owner;
+		this.addSlotToContainer(new SlotItemHandler(owner.getHandler(), 0, 80, 34));
+		this.bindPlayerInventory(inventoryPlayer, 8, 84);
+	}
 }

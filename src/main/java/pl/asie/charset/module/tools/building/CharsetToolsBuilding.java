@@ -93,7 +93,7 @@ public class CharsetToolsBuilding {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHISEL, Side.CLIENT, (r) -> new GuiChisel(new ContainerChisel(r.player)));
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHISEL, Side.CLIENT, (r) -> new GuiChisel((ContainerChisel) r.getContainer()));
 	}
 
 	@SubscribeEvent

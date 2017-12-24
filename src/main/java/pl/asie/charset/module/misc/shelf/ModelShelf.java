@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelStateComposition;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -57,7 +58,7 @@ public class ModelShelf extends ModelFactory<ShelfCacheInfo> {
 		if (info.back) {
 			state = new ModelStateComposition(state, STATE_BACK);
 		}
-		return new WrappedBakedModel(retexturedModel.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter), info.plank).addDefaultBlockTransforms();
+		return new WrappedBakedModel(retexturedModel.bake(state, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()), info.plank).addDefaultBlockTransforms();
 	}
 
 	@Override

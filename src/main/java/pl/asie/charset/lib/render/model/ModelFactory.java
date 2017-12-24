@@ -35,6 +35,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.ModCharset;
@@ -145,7 +146,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return RenderUtils.textureGetter.apply(particle);
+        return ModelLoader.defaultTextureGetter().apply(particle);
     }
 
     @Override

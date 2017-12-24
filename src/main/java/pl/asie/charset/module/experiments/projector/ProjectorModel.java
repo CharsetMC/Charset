@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.IModelState;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.WrappedBakedModel;
@@ -43,7 +44,7 @@ public class ProjectorModel extends ModelFactory<ProjectorCacheInfo> {
     @Override
     public IBakedModel bake(ProjectorCacheInfo info, boolean isItem, BlockRenderLayer layer) {
         IModelState state = info.orientation.toTransformation();
-        return new WrappedBakedModel(template.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter)).addDefaultBlockTransforms();
+        return new WrappedBakedModel(template.bake(state, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter())).addDefaultBlockTransforms();
     }
 
     @Override

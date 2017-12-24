@@ -29,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.IModelState;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.model.ModelColorHandler;
@@ -117,7 +118,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
 
         IModelState state = info.orientation.toTransformation();
         IModel retexture = template.retexture(textures.build());
-        return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, RenderUtils.textureGetter), log).addDefaultBlockTransforms();
+        return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()), log).addDefaultBlockTransforms();
     }
 
     @Override

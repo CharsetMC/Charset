@@ -31,13 +31,24 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.lib.capability.Capabilities;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TileBase extends TileEntity {
+	private final Map<String, Trait> traits = new LinkedHashMap<>();
 	private int lastComparatorValue = -1;
+
+	protected final void register(String s, Trait t) {
+		traits.put(s, t);
+	}
 
 	protected final boolean updateComparators() {
 		int cc = getComparatorValue();
@@ -71,10 +82,20 @@ public class TileBase extends TileEntity {
 	}
 
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
-
+		for (Map.Entry<String, Trait> entry : traits.entrySet()) {
+			if (compound.hasKey(entry.getKey(), Constants.NBT.TAG_COMPOUND)) {
+				entry.getValue().readNBTData(compound.getCompoundTag(entry.getKey()), isClient);
+			}
+		}
 	}
 
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
+		for (Map.Entry<String, Trait> entry : traits.entrySet()) {
+			NBTTagCompound traitCpd = entry.getValue().writeNBTData(isClient);
+			if (traitCpd != null) {
+				compound.setTag(entry.getKey(), traitCpd);
+			}
+		}
 		return compound;
 	}
 
@@ -107,6 +128,28 @@ public class TileBase extends TileEntity {
 	public final NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		compound = super.writeToNBT(compound);
 		return writeNBTData(compound, false);
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+		for (Trait t : traits.values()) {
+			if (t.hasCapability(capability, facing)) {
+				return true;
+			}
+		}
+
+		return super.hasCapability(capability, facing);
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+		for (Trait t : traits.values()) {
+			if (t.hasCapability(capability, facing)) {
+				return t.getCapability(capability, facing);
+			}
+		}
+
+		return super.getCapability(capability, facing);
 	}
 
 	@Override

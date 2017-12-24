@@ -57,7 +57,6 @@ import java.util.function.Function;
 
 public final class RenderUtils {
 	public static final CharsetFaceBakery BAKERY = new CharsetFaceBakery();
-	public static final Function<ResourceLocation, TextureAtlasSprite> textureGetter = ModelLoader.defaultTextureGetter();
 
 	public enum AveragingMode {
 		FULL,

@@ -1,0 +1,22 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 16, 10, 16 ],
+            "faces": {
+                "down":  { "texture": "#down", "cullface": "down" },
+                "up":    { "texture": "#up" },
+                "north": { "texture": "#side", "cullface": "north" },
+                "south": { "texture": "#side", "cullface": "south" },
+                "west":  { "texture": "#side", "cullface": "west" },
+                "east":  { "texture": "#side", "cullface": "east" }
+            }
+        }
+    ],
+    "textures": {
+        "particle": "charset:blocks/record_player/side",
+        "down": "charset:blocks/record_player/bottom",
+        "up": "charset:blocks/record_player/top",
+        "side": "charset:blocks/record_player/side"
+    }
+}

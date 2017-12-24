@@ -21,15 +21,70 @@ package pl.asie.charset.module.audio.storage;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.module.experiments.projector.TileProjector;
 
 import javax.annotation.Nullable;
 
 public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider {
+	public static final AxisAlignedBB BOX = new AxisAlignedBB(0, 0, 0, 1, 0.625f, 1);
+
 	public BlockRecordPlayer() {
 		super(Material.ROCK);
+		setOpaqueCube(false);
+		setFullCube(false);
+	}
+
+	@Override
+	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		return this.getDefaultState().withProperty(Properties.FACING4, placer.getHorizontalFacing().getOpposite());
+	}
+
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return BOX;
+	}
+
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, Properties.FACING4);
+	}
+
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return getDefaultState().withProperty(Properties.FACING4, EnumFacing.getFront((meta & 3) + 2));
+	}
+
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(Properties.FACING4).ordinal() - 2;
+	}
+
+	@Override
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (world == null || world.isRemote) {
+			return true;
+		}
+
+		TileEntity tile = world.getTileEntity(pos);
+		if (tile instanceof TileRecordPlayer) {
+			return ((TileRecordPlayer) tile).activate(player, side, hand, new Vec3d(hitX, hitY, hitZ));
+		}
+
+		return false;
 	}
 
 	@Nullable

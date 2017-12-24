@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.TRSRTransformation;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.WrappedBakedModel;
@@ -43,7 +44,7 @@ public class ModelScaffold extends ModelFactory<ScaffoldCacheInfo> {
 	public IBakedModel bake(ScaffoldCacheInfo info, boolean isItem, BlockRenderLayer layer) {
 		IModel retexturedModel = scaffoldModel.retexture(ImmutableMap.of("plank", info.plank.getIconName()));
 		return new WrappedBakedModel(retexturedModel.bake(TRSRTransformation.identity(),
-				DefaultVertexFormats.BLOCK, RenderUtils.textureGetter), info.plank).addDefaultBlockTransforms();
+				DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()), info.plank).addDefaultBlockTransforms();
 	}
 
 	@Override

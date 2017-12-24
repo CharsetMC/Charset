@@ -137,6 +137,6 @@ public class CharsetStorageLocks {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.KEYRING, Side.CLIENT, (r) -> new GuiKeyring(new ContainerKeyring(r.player.inventory)));
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.KEYRING, Side.CLIENT, (r) -> new GuiKeyring(r.getContainer()));
 	}
 }

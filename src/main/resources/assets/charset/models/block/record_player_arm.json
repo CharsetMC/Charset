@@ -1,0 +1,28 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ 1.5, 10, 1.5 ],
+            "to": [ 3.5, 11, 3.5 ],
+            "faces": {
+                "north": { "texture": "#arm" },
+                "south": { "texture": "#arm" },
+                "west":  { "texture": "#arm" },
+                "east":  { "texture": "#arm" }
+            }
+        },
+        {   "from": [ 1, 11, 1 ],
+            "to": [ 4, 12, 11 ],
+            "faces": {
+                "down":  { "texture": "#arm" },
+                "up":    { "texture": "#arm" },
+                "north": { "texture": "#arm" },
+                "south": { "texture": "#arm" },
+                "west":  { "texture": "#arm" },
+                "east":  { "texture": "#arm" }
+            }
+        }
+    ],
+    "textures": {
+        "arm": "charset:blocks/record_player/arm"
+    }
+}

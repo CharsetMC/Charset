@@ -31,11 +31,15 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.api.laser.ILaserReceiver;
 import pl.asie.charset.api.laser.LaserColor;
 import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.lib.block.ITileWrenchRotatable;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.lib.block.TraitItemHolder;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
@@ -48,10 +52,25 @@ import java.lang.invoke.MethodHandle;
 
 public class TileProjector extends TileBase implements IAxisRotatable, IProjector, ITileWrenchRotatable {
 	protected final LaserColor[] colors = new LaserColor[6];
+	private TraitItemHolder holder;
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
-	private ItemStack stack = ItemStack.EMPTY;
 	private int page;
 	private Orientation orientation = Orientation.FACE_NORTH_POINT_UP;
+
+	public TileProjector() {
+		register("inv", (holder = new TraitItemHolder() {
+			@Override
+			public boolean isStackAllowed(ItemStack stack) {
+				IProjectorHandler<ItemStack> handler = CharsetProjector.getHandler(stack);
+				return handler != null;
+			}
+
+			@Override
+			public EnumFacing getTop() {
+				return orientation.top;
+			}
+		}));
+	}
 
 	@Override
 	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
@@ -60,9 +79,13 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
+		super.readNBTData(compound, isClient);
 		orientation = Orientation.getOrientation(compound.getByte("o"));
 		page = compound.getInteger("p");
-		stack = compound.hasKey("stack", Constants.NBT.TAG_COMPOUND) ? new ItemStack(compound.getCompoundTag("stack")) : ItemStack.EMPTY;
+
+		if (compound.hasKey("stack", Constants.NBT.TAG_COMPOUND)) {
+			holder.setStack(new ItemStack(compound.getCompoundTag("stack")));
+		}
 
 		if (isClient) {
 			markBlockForRenderUpdate();
@@ -71,17 +94,15 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
+		compound = super.writeNBTData(compound, isClient);
 		compound.setByte("o", (byte) orientation.ordinal());
 		compound.setInteger("p", page);
-		if (!stack.isEmpty()) {
-			ItemUtils.writeToNBT(stack, compound, "stack");
-		}
 
 		return compound;
 	}
 
 	public ItemStack getStack() {
-		return stack;
+		return holder.getStack();
 	}
 
 	public Orientation getOrientation() {
@@ -106,7 +127,13 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		return (facing != null && (capability == CharsetLaser.LASER_RECEIVER && receivers[facing.ordinal()] != null)) || capability == Capabilities.AXIS_ROTATABLE || super.hasCapability(capability, facing);
+		if (capability == Capabilities.AXIS_ROTATABLE) {
+			return true;
+		} else if (capability == CharsetLaser.LASER_RECEIVER) {
+			return facing != null && receivers[facing.ordinal()] != null;
+		} else {
+			return super.hasCapability(capability, facing);
+		}
 	}
 
 	@Override
@@ -114,15 +141,11 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == Capabilities.AXIS_ROTATABLE) {
 			return Capabilities.AXIS_ROTATABLE.cast(this);
+		} else if (capability == CharsetLaser.LASER_RECEIVER) {
+			return facing != null ? CharsetLaser.LASER_RECEIVER.cast(receivers[facing.ordinal()]) : null;
+		} else {
+			return super.getCapability(capability, facing);
 		}
-
-		if (facing != null) {
-			if (capability == CharsetLaser.LASER_RECEIVER) {
-				return CharsetLaser.LASER_RECEIVER.cast(receivers[facing.ordinal()]);
-			}
-		}
-
-		return super.getCapability(capability, facing);
 	}
 
 	private boolean changeOrientation(Orientation newOrientation, boolean simulate) {
@@ -159,10 +182,10 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 		EnumFacing rightFace = orientation.getNextRotationOnTop().facing;
 		EnumFacing leftFace = orientation.getPrevRotationOnTop().facing;
 
-		if (!stack.isEmpty() && player.getHeldItem(hand).isEmpty()) {
-			IProjectorHandler<ItemStack> handler = CharsetProjector.getHandler(stack);
+		if (!getStack().isEmpty() && player.getHeldItem(hand).isEmpty()) {
+			IProjectorHandler<ItemStack> handler = CharsetProjector.getHandler(getStack());
 			if (handler != null) {
-				int pc = handler.getPageCount(stack);
+				int pc = handler.getPageCount(getStack());
 				if (pc > 1) {
 					if (side == rightFace && page < (pc - 1)) {
 						page++;
@@ -177,25 +200,10 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 			}
 		}
 
-		if (side == orientation.top && hand == EnumHand.MAIN_HAND) {
-			if (!stack.isEmpty()) {
-				ItemUtils.spawnItemEntity(getWorld(),
-					new Vec3d(getPos()).addVector(0.5F, 0.5F, 0.5F).add(new Vec3d(orientation.top.getDirectionVec()).scale(0.5F)),
-					stack, 0, 0, 0, 0
-				);
-				stack = ItemStack.EMPTY;
-				page = 0;
-				markBlockForUpdate();
-				return true;
-			} else {
-				ItemStack held = player.getHeldItem(hand);
-				if (!held.isEmpty()) {
-					stack = held.splitStack(1);
-					page = 0;
-					markBlockForUpdate();
-					return true;
-				}
-			}
+		if (holder.activate(this, player, side, hand)) {
+			page = 0;
+			markBlockForUpdate();
+			return true;
 		}
 
 		return false;

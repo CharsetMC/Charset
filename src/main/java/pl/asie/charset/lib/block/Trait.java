@@ -17,13 +17,17 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.audio.storage;
+package pl.asie.charset.lib.block;
 
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
 
-public class TileRendererRecordPlayer extends TileEntitySpecialRenderer<TileRecordPlayer> {
-	@Override
-	public void render(TileRecordPlayer tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+import javax.annotation.Nullable;
 
-	}
+public abstract class Trait {
+	public abstract void readNBTData(NBTTagCompound compound, boolean isClient);
+	public abstract NBTTagCompound writeNBTData(boolean isClient);
+	public abstract boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing);
+	public abstract <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing);
 }

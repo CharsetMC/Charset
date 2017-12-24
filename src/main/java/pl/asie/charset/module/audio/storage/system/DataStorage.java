@@ -131,6 +131,9 @@ public class DataStorage implements IDataStorage {
 
 	public int read(byte[] v, int offset, boolean simulate) {
 		int len = Math.min(size - (position + offset) - 1, v.length);
+		if (len == 0) {
+			return 0;
+		}
 
 		System.arraycopy(data, position + offset, v, 0, len);
 		if (!simulate) {
@@ -153,7 +156,9 @@ public class DataStorage implements IDataStorage {
 
 	public int write(byte[] v) {
 		int len = Math.min(size - (position) - 1, v.length);
-		if (len == 0) return 0;
+		if (len == 0) {
+			return 0;
+		}
 
 		System.arraycopy(v, 0, data, position, len);
 		position += len;

@@ -61,7 +61,7 @@ public class DataStorageCapStorage implements Capability.IStorage<IDataStorage> 
 		if (nbt instanceof NBTTagCompound) {
 			NBTTagCompound compoundBase = (NBTTagCompound) nbt;
 			if (compoundBase.hasKey("charset:data_storage", Constants.NBT.TAG_COMPOUND)) {
-				NBTTagCompound compound = compoundBase.getCompoundTag("charset:data-storage");
+				NBTTagCompound compound = compoundBase.getCompoundTag("charset:data_storage");
 				instance.initialize(compound.getString("uid"), compound.getInteger("pos"), compound.getInteger("size"));
 			}
 		}

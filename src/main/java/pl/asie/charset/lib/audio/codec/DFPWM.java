@@ -23,7 +23,7 @@
 package pl.asie.charset.lib.audio.codec;
 
 /**
- * DFPWM1a implementation in Java
+ * DFPWM1a^0x55 implementation in Java
  * operates on 8-bit signed PCM data and little-endian DFPWM data
  *
  * NOTE, len is in bytes relative to DFPWM (len*8 PCM bytes)
@@ -81,7 +81,7 @@ public class DFPWM implements ICodec {
 	{
 		for(int i = 0; i < len; i++)
 		{
-			byte d = src[srcoffs++];
+			byte d = (byte) (src[srcoffs++] ^ 0x55);
 			for(int j = 0; j < 8; j++)
 			{
 				// apply context
@@ -116,7 +116,7 @@ public class DFPWM implements ICodec {
 				d = (curbit ? (d>>1)+128 : d>>1);
 				ctx_update(curbit);
 			}
-			dest[destoffs++] = (byte)d;
+			dest[destoffs++] = (byte) (d ^ 0x55);
 		}
 	}
 
@@ -183,6 +183,9 @@ public class DFPWM implements ICodec {
 					pcmout[i] ^= (byte)0x80;
 				System.out.write(pcmout, 0, 1024);
 			}
+		} else {
+
+			throw new RuntimeException("Unknown mode " + mode + "!");
 		}
 	}
 }

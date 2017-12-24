@@ -27,35 +27,34 @@ import net.minecraft.util.ITickable;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import pl.asie.charset.api.audio.AudioData;
-import pl.asie.charset.api.audio.AudioPacket;
-import pl.asie.charset.api.audio.IAudioDataPCM;
-import pl.asie.charset.api.audio.IAudioReceiver;
+import pl.asie.charset.api.audio.*;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.audio.*;
 import pl.asie.charset.lib.audio.codec.DFPWM;
 import pl.asie.charset.lib.audio.types.AudioDataDFPWM;
 import pl.asie.charset.lib.audio.types.AudioSinkBlock;
+import pl.asie.charset.lib.block.Trait;
+import pl.asie.charset.lib.block.TraitItemHolder;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.module.audio.util.AudioResampler;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Random;
 
-public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSerializable<NBTTagCompound> {
+public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioReceiver {
 	public enum State {
 		STOPPED,
 		PLAYING,
 		RECORDING
 	}
 
-	private final World world;
-	private final BlockPos pos;
-	private final ItemStackHandler inventory;
+	private final IItemHandler inventory;
 	private State state = State.STOPPED, lastState;
 	private Integer sourceId;
 
@@ -63,24 +62,12 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 	private AudioPacket receivedPacket;
 	private int receivedPacketPos;
 
-	public RecordPlayerState(World world, BlockPos pos) {
-		this.world = world;
-		this.pos = pos;
-		this.inventory = new ItemStackHandler(1) {
-			@Override
-			public int getSlotLimit(int slot) {
-				return 1;
-			}
+	public TraitRecordPlayer(IItemHandler handler) {
+		this.inventory = handler;
+	}
 
-			@Override
-			public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-				if (stack.isEmpty() || !stack.hasCapability(CharsetAudioStorage.DATA_STORAGE, null)) {
-					return ItemStack.EMPTY;
-				}
-
-				return super.insertItem(slot, stack, simulate);
-			}
-		};
+	public boolean exposesCapability(EnumFacing facing) {
+		return true;
 	}
 
 	public void setState(State state) {
@@ -93,7 +80,7 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 		}
 	}
 
-	private void applyNoise(byte[] data, float noiseThreshold) {
+	private void applyNoise(World world, byte[] data, float noiseThreshold) {
 		Random rand = world.rand;
 
 		for (int i = 0; i < data.length; i++) {
@@ -109,8 +96,18 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 		}
 	}
 
-	@Override
-	public void update() {
+	public int getSampleRate() {
+		return ItemQuartzDisc.DEFAULT_SAMPLE_RATE;
+	}
+
+	public void stopAudioPlayback() {
+		if (sourceId != null) {
+			AudioUtils.stop(sourceId);
+			sourceId = null;
+		}
+	}
+
+	public void update(World world, BlockPos blockPos) {
 		if (state != State.STOPPED) {
 			if (sourceId == null) {
 				sourceId = AudioUtils.start();
@@ -123,7 +120,7 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 				if (storage != null) {
 					found = true;
 					if (state == State.PLAYING) {
-						int sampleRate = ItemQuartzDisc.DEFAULT_SAMPLE_RATE;
+						int sampleRate = getSampleRate();
 						byte[] data = new byte[sampleRate / (20 * 8)];
 						int len = storage.read(data, false);
 
@@ -131,14 +128,14 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 						boolean received = false;
 
 						for (EnumFacing facing : EnumFacing.VALUES) {
-							TileEntity tile = world.getTileEntity(pos.offset(facing));
+							TileEntity tile = world.getTileEntity(blockPos.offset(facing));
 							if (tile != null && tile.hasCapability(Capabilities.AUDIO_RECEIVER, facing.getOpposite())) {
 								received |= tile.getCapability(Capabilities.AUDIO_RECEIVER, facing.getOpposite()).receive(packet);
 							}
 						}
 
 						if (!received) {
-							new AudioSinkBlock(world, pos).receive(packet);
+							new AudioSinkBlock(world, blockPos).receive(packet);
 						}
 
 						packet.send();
@@ -147,7 +144,8 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 							setState(State.STOPPED);
 						}
 					} else if (state == State.RECORDING) {
-						byte[] dataOut = new byte[ItemQuartzDisc.DEFAULT_SAMPLE_RATE / (20 * 8)];
+						int sampleRate = getSampleRate();
+						byte[] dataOut = new byte[sampleRate / (20 * 8)];
 
 						if (receivedPacket != null) {
 							AudioData data = receivedPacket.getData();
@@ -168,7 +166,7 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 
 									byte[] preEncodeOutput = AudioResampler.toSigned8(
 											targetData, pcm.getSampleSize() * 8, 1, pcm.isSampleBigEndian(),
-											pcm.isSampleSigned(), pcm.getSampleRate(), ItemQuartzDisc.DEFAULT_SAMPLE_RATE,
+											pcm.isSampleSigned(), pcm.getSampleRate(), sampleRate,
 											false);
 
 									if (preEncodeOutput != null) {
@@ -195,11 +193,10 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 		}
 
 		if (lastState != state) {
-			// TODO
-			// CharsetAudioStorage.packet.sendToWatching(new PacketDriveState(owner, state), owner);
+			TileEntity tileEntity = world.getTileEntity(blockPos);
+			CharsetAudioStorage.packet.sendToWatching(new PacketDriveState((TileRecordPlayer) tileEntity, state), tileEntity);
 			if (state == State.STOPPED && lastState == State.PLAYING && sourceId != null) {
-				AudioUtils.stop(sourceId);
-				sourceId = null;
+				stopAudioPlayback();
 			}
 		}
 
@@ -207,28 +204,35 @@ public class RecordPlayerState implements ITickable, IAudioReceiver, INBTSeriali
 	}
 
 	@Override
-	public NBTTagCompound serializeNBT() {
+	public void readNBTData(NBTTagCompound nbt, boolean isClient) {
+		if (nbt.hasKey("st", Constants.NBT.TAG_ANY_NUMERIC)) {
+			int stateId = nbt.getByte("st");
+			if (stateId >= 0 && stateId < State.values().length) {
+				state = State.values()[stateId];
+			}
+		}
+	}
+
+	@Override
+	public NBTTagCompound writeNBTData(boolean isClient) {
 		NBTTagCompound compound = new NBTTagCompound();
 		compound.setByte("st", (byte) state.ordinal());
-		compound.setTag("inv", inventory.serializeNBT());
 		return compound;
 	}
 
 	@Override
-	public void deserializeNBT(NBTTagCompound nbt) {
-		state = State.STOPPED;
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+		return (capability == Capabilities.AUDIO_RECEIVER || capability == Capabilities.AUDIO_SOURCE) && exposesCapability(facing);
+	}
 
-		if (nbt != null) {
-			if (nbt.hasKey("st", Constants.NBT.TAG_ANY_NUMERIC)) {
-				int stateId = nbt.getByte("st");
-				if (stateId >= 0 && stateId < State.values().length) {
-					state = State.values()[stateId];
-				}
-			}
-
-			if (nbt.hasKey("inv", Constants.NBT.TAG_COMPOUND)) {
-				inventory.deserializeNBT(nbt.getCompoundTag("inv"));
-			}
+	@Override
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+		if (capability == Capabilities.AUDIO_SOURCE) {
+			return Capabilities.AUDIO_SOURCE.cast(this);
+		} else if (capability == Capabilities.AUDIO_RECEIVER) {
+			return Capabilities.AUDIO_RECEIVER.cast(this);
+		} else {
+			return null;
 		}
 	}
 

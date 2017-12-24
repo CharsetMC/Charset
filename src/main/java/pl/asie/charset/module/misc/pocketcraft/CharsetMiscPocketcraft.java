@@ -74,7 +74,7 @@ public class CharsetMiscPocketcraft {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.POCKET_TABLE, Side.CLIENT, (r) -> new GuiPocketTable(new ContainerPocketTable(r.player)));
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.POCKET_TABLE, Side.CLIENT, (r) -> new GuiPocketTable((ContainerPocketTable) r.getContainer()));
 	}
 
 	@Mod.EventHandler

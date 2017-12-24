@@ -32,6 +32,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -83,7 +84,7 @@ public class ProxyClient extends ProxyCommon {
 		if (prismModel != null) {
 			for (Orientation o : Orientation.values()) {
 				ModelResourceLocation location = new ModelResourceLocation("charset:laser_prism", "orientation=" + o.name().toLowerCase());
-				IBakedModel model = prismModel.bake(o.toTransformation(), DefaultVertexFormats.BLOCK, RenderUtils.textureGetter);
+				IBakedModel model = prismModel.bake(o.toTransformation(), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
 				event.getModelRegistry().putObject(location, model);
 			}
 		}

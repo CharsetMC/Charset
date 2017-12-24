@@ -22,6 +22,9 @@ package pl.asie.charset.lib.ui;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -33,24 +36,34 @@ import java.util.function.Function;
  * Created by asie on 2/10/17.
  */
 public class GuiHandlerCharset implements IGuiHandler {
-	public static class Request {
+	public static final class Request {
 		public final EntityPlayer player;
 		public final World world;
 		public final int x, y, z;
+		private final int id;
 
-		private Request(EntityPlayer player, World world, int x, int y, int z) {
+		private Request(int id, EntityPlayer player, World world, int x, int y, int z) {
+			this.id = id;
 			this.player = player;
 			this.world = world;
 			this.x = x;
 			this.y = y;
 			this.z = z;
+		}
 
+		public TileEntity getTileEntity() {
+			return world.getTileEntity(new BlockPos(x, y, z));
+		}
+
+		public Container getContainer() {
+			return (Container) GuiHandlerCharset.INSTANCE.getServerGuiElement(id, player, world, x, y, z);
 		}
 	}
 
 	public static final int POCKET_TABLE = 0x100;
 	public static final int KEYRING = 0x101;
 	public static final int CHISEL = 0x102;
+	public static final int RECORD_PLAYER = 0x103;
 
 	public static final GuiHandlerCharset INSTANCE = new GuiHandlerCharset();
 	private static final TIntObjectMap<Function<Request, Object>> map = new TIntObjectHashMap<>();
@@ -71,13 +84,13 @@ public class GuiHandlerCharset implements IGuiHandler {
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
 		Function<Request, Object> supplier = map.get(id * 2);
-		return supplier != null ? supplier.apply(new Request(player, world, x, y, z)) : null;
+		return supplier != null ? supplier.apply(new Request(id, player, world, x, y, z)) : null;
 	}
 
 	@Nullable
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
 		Function<Request, Object> supplier = map.get(id * 2 + 1);
-		return supplier != null ? supplier.apply(new Request(player, world, x, y, z)) : null;
+		return supplier != null ? supplier.apply(new Request(id, player, world, x, y, z)) : null;
 	}
 }

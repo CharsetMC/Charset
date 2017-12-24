@@ -79,7 +79,7 @@ public class PacketAudioData extends Packet {
 	@Override
 	public void readData(INetHandler handler, PacketBuffer buf) {
 		id = buf.readInt();
-		AudioPacket packet = new AudioPacket();
+		packet = new AudioPacket();
 		packet.readData(buf);
 	}
 
