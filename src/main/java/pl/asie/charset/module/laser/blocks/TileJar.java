@@ -32,9 +32,9 @@ import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.module.laser.CharsetLaser;
 import pl.asie.charset.api.laser.ILaserReceiver;
-import pl.asie.charset.module.laser.system.LaserBeam;
+import pl.asie.charset.api.laser.ILaserBeamFactory;
+import pl.asie.charset.api.laser.ILaserSource;
 import pl.asie.charset.api.laser.LaserColor;
-import pl.asie.charset.module.laser.system.LaserSource;
 
 import javax.annotation.Nullable;
 
@@ -42,7 +42,7 @@ public class TileJar extends TileBase {
 	private final ILaserReceiver[] receivers = new ILaserReceiver[6];
 	private final LaserColor[] colors = new LaserColor[6];
 	private LaserColor outputColor = LaserColor.NONE;
-	private LaserSource source;
+	private ILaserSource source;
 	private EnumFacing jarFacing;
 
 	private void recalculateOutputColor() {
@@ -85,14 +85,14 @@ public class TileJar extends TileBase {
 			};
 		}
 
-		source = new LaserSource(this) {
+		source = new ILaserSource.Tile(this) {
 			@Override
-			public void updateBeam() {
+			public void updateBeam(ILaserBeamFactory factory) {
 				EnumFacing jarFacing = getJarFacing();
 				if (outputColor == LaserColor.NONE) {
 					beam = null;
-				} else if (beam == null || !beam.isValid() || !beam.getStart().equals(getPos())  || beam.getColor() != outputColor || beam.getDirection() != jarFacing) {
-					beam = new LaserBeam(TileJar.this, jarFacing, outputColor);
+				} else if (beam == null || !beam.isValid(getWorld(), getPos())  || beam.getColor() != outputColor || beam.getDirection() != jarFacing) {
+					beam = factory.create(TileJar.this, jarFacing, outputColor);
 				}
 			}
 		};

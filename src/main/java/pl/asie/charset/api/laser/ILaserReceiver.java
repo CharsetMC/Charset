@@ -22,6 +22,7 @@
 
 package pl.asie.charset.api.laser;
 
+@FunctionalInterface
 public interface ILaserReceiver {
 	void onLaserUpdate(LaserColor colorHit);
 }

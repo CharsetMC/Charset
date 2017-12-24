@@ -17,27 +17,30 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.laser.system;
+package pl.asie.charset.api.laser;
 
 import net.minecraft.tileentity.TileEntity;
 import pl.asie.charset.api.lib.ICacheable;
 
-public abstract class LaserSource implements ICacheable {
-	protected LaserBeam beam;
-	private final TileEntity tile;
+public interface ILaserSource extends ICacheable {
+	abstract class Tile implements ILaserSource {
+		protected ILaserBeam beam;
+		private final TileEntity tile;
 
-	public LaserSource(TileEntity tile) {
-		this.tile = tile;
+		public Tile(TileEntity tile) {
+			this.tile = tile;
+		}
+
+		public final ILaserBeam getBeam() {
+			return beam;
+		}
+
+		@Override
+		public boolean isCacheValid() {
+			return tile == null || !tile.isInvalid();
+		}
 	}
 
-	public abstract void updateBeam();
-
-	public final LaserBeam getBeam() {
-		return beam;
-	}
-
-	@Override
-	public boolean isCacheValid() {
-		return tile == null || !tile.isInvalid();
-	}
+	ILaserBeam getBeam();
+	void updateBeam(ILaserBeamFactory factory);
 }

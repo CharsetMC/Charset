@@ -24,7 +24,6 @@ import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.BlockPistonExtension;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -40,6 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.api.laser.ILaserSource;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
 import pl.asie.charset.lib.command.CommandCharset;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
@@ -49,7 +49,6 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.recipe.IngredientGroup;
 import pl.asie.charset.lib.render.ArrowHighlightHandler;
-import pl.asie.charset.lib.resources.ColorPaletteParser;
 import pl.asie.charset.lib.resources.ColorPaletteUpdateEvent;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.api.laser.ILaserReceiver;
@@ -70,8 +69,8 @@ public class CharsetLaser {
     public static final PropertyEnum<LaserColor> LASER_COLOR = PropertyEnum.create("color", LaserColor.class);
     public static final Set<Block> BLOCKING_BLOCKS = new HashSet<>();
 
-    @CapabilityInject(LaserSource.class)
-    public static Capability<LaserSource> LASER_SOURCE;
+    @CapabilityInject(ILaserSource.class)
+    public static Capability<ILaserSource> LASER_SOURCE;
     @CapabilityInject(ILaserReceiver.class)
     public static Capability<ILaserReceiver> LASER_RECEIVER;
 
@@ -101,7 +100,7 @@ public class CharsetLaser {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        CapabilityManager.INSTANCE.register(LaserSource.class, DummyCapabilityStorage.get(), DummyLaserSource::new);
+        CapabilityManager.INSTANCE.register(ILaserSource.class, DummyCapabilityStorage.get(), DummyLaserSource::new);
 
         IngredientGroup.register("charset:laser_gem", 1, "gemSapphire", "gemLapis");
         IngredientGroup.register("charset:laser_gem", 2, "gemEmerald");

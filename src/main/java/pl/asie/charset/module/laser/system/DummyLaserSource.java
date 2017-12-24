@@ -20,8 +20,10 @@
 package pl.asie.charset.module.laser.system;
 
 import net.minecraft.tileentity.TileEntity;
+import pl.asie.charset.api.laser.ILaserBeamFactory;
+import pl.asie.charset.api.laser.ILaserSource;
 
-public class DummyLaserSource extends LaserSource {
+public class DummyLaserSource extends ILaserSource.Tile {
 	public DummyLaserSource(TileEntity tile) {
 		super(tile);
 	}
@@ -31,7 +33,7 @@ public class DummyLaserSource extends LaserSource {
 	}
 
 	@Override
-	public void updateBeam() {
+	public void updateBeam(ILaserBeamFactory factory) {
 
 	}
 }

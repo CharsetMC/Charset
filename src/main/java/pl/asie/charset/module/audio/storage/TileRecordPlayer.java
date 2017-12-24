@@ -55,6 +55,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 				if (world != null && !world.isRemote) {
 					setState(TraitRecordPlayer.State.STOPPED);
 				}
+				markBlockForUpdate();
 			}
 
 			@Override

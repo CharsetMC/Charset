@@ -19,6 +19,8 @@
 
 package pl.asie.charset.module.audio.storage;
 
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -45,7 +47,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.module.audio.util.AudioResampler;
 
 import javax.annotation.Nullable;
-import java.util.Random;
+import java.util.*;
 
 public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioReceiver {
 	public enum State {
@@ -60,8 +62,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 	private Integer sourceId;
 
 	private DFPWM recordDFPWM;
-	private AudioPacket receivedPacket;
-	private int receivedPacketPos;
+	private List<AudioPacket> receivedPacket = new ArrayList<>();
 
 	public TraitRecordPlayer(IItemHandler handler) {
 		this.inventory = handler;
@@ -76,7 +77,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 		this.state = state;
 
 		if (state != State.RECORDING) {
-			receivedPacket = null;
+			receivedPacket.clear();
 			recordDFPWM = null;
 		}
 	}
@@ -145,45 +146,57 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 							setState(State.PAUSED);
 						}
 					} else if (state == State.RECORDING) {
+						// TODO: This should advance at a constant pace
+
 						int sampleRate = getSampleRate();
-						byte[] dataOut = new byte[sampleRate / (20 * 8)];
+						if (!receivedPacket.isEmpty()) {
+							int adLen = 0;
+							for (AudioPacket packet : receivedPacket) {
+								adLen = Math.max(adLen, packet.getData().getTime() * sampleRate / 1000);
+							}
 
-						if (receivedPacket != null) {
-							AudioData data = receivedPacket.getData();
-							if (data instanceof IAudioDataPCM) {
-								IAudioDataPCM pcm = (IAudioDataPCM) data;
-								byte[] audioData = pcm.getSamplePCMData();
-								int perTick = audioData.length * 50 / data.getTime();
-								int pos = receivedPacketPos;
-								int len = perTick;
-								if (pos + len > audioData.length) {
-									len = audioData.length - pos;
-								}
+							boolean added = false;
+							byte[] audioData = new byte[adLen];
+							for (AudioPacket packet : receivedPacket) {
+								AudioData data = packet.getData();
+								if (data instanceof IAudioDataPCM && packet.getVolume() >= 0.01f) {
+									IAudioDataPCM pcm = (IAudioDataPCM) data;
+									int len = audioData.length * 50 / data.getTime();
 
-								if (len > 0) {
-									byte[] targetData = new byte[len];
-									System.arraycopy(audioData, pos, targetData, 0, len);
-									receivedPacketPos += len;
+									if (len > 0) {
+										byte[] preEncodeOutput = AudioResampler.toSigned8(
+												pcm.getSamplePCMData(), pcm.getSampleSize() * 8, 1, pcm.isSampleBigEndian(),
+												pcm.isSampleSigned(), pcm.getSampleRate(), sampleRate,
+												false);
 
-									byte[] preEncodeOutput = AudioResampler.toSigned8(
-											targetData, pcm.getSampleSize() * 8, 1, pcm.isSampleBigEndian(),
-											pcm.isSampleSigned(), pcm.getSampleRate(), sampleRate,
-											false);
-
-									if (preEncodeOutput != null) {
-										if (recordDFPWM == null) {
-											recordDFPWM = new DFPWM();
+										if (preEncodeOutput != null) {
+											added = true;
+											if (packet.getVolume() >= 0.995f) {
+												// fast path - no byte->float->byte casting
+												for (int i = 0; i < Math.min(preEncodeOutput.length, audioData.length); i++) {
+													audioData[i] += preEncodeOutput[i];
+												}
+											} else {
+												for (int i = 0; i < Math.min(preEncodeOutput.length, audioData.length); i++) {
+													audioData[i] += (byte) Math.round(preEncodeOutput[i] * packet.getVolume());
+												}
+											}
 										}
-
-										recordDFPWM.compress(dataOut, preEncodeOutput, 0, 0, Math.min(dataOut.length, preEncodeOutput.length / 8));
 									}
-								} else {
-									receivedPacketPos = audioData.length;
 								}
 							}
-						}
 
-						storage.write(dataOut);
+							if (added) {
+								if (recordDFPWM == null) {
+									recordDFPWM = new DFPWM();
+								}
+
+								byte[] dataOut = new byte[audioData.length / 8];
+								recordDFPWM.compress(dataOut, audioData, 0, 0, audioData.length / 8);
+
+								storage.write(dataOut);
+							}
+						}
 					}
 				}
 			}
@@ -202,6 +215,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 		}
 
 		lastState = state;
+		receivedPacket.clear();
 	}
 
 	@Override
@@ -256,8 +270,9 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 	@Override
 	public boolean receive(AudioPacket packet) {
 		if (state == State.RECORDING) {
-			receivedPacket = packet;
-			receivedPacketPos = 0;
+			if (packet.getData() instanceof IAudioDataPCM && !receivedPacket.contains(packet)) {
+				receivedPacket.add(packet);
+			}
 			return true;
 		} else {
 			return false;

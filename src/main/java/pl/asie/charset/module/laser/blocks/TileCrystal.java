@@ -30,9 +30,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.module.laser.CharsetLaser;
 import pl.asie.charset.api.laser.ILaserReceiver;
-import pl.asie.charset.module.laser.system.LaserBeam;
+import pl.asie.charset.api.laser.ILaserBeamFactory;
+import pl.asie.charset.api.laser.ILaserSource;
 import pl.asie.charset.api.laser.LaserColor;
-import pl.asie.charset.module.laser.system.LaserSource;
 
 import javax.annotation.Nullable;
 
@@ -56,10 +56,10 @@ public class TileCrystal extends TileLaserSourceBase {
 	}
 
 	@Override
-	protected LaserSource createLaserSource(int i) {
-		return new LaserSource(this) {
+	protected ILaserSource createLaserSource(int i) {
+		return new ILaserSource.Tile(this) {
 			@Override
-			public void updateBeam() {
+			public void updateBeam(ILaserBeamFactory factory) {
 				LaserColor c = LaserColor.NONE;
 				if (hitMask == 0) {
 					//c = colors[i].union(colors[i ^ 1]);
@@ -69,7 +69,7 @@ public class TileCrystal extends TileLaserSourceBase {
 				if (c == LaserColor.NONE) {
 					beam = null;
 				} else if (beam == null || !beam.isValid() || !beam.getStart().equals(getPos()) || beam.getColor() != c) {
-					beam = new LaserBeam(TileCrystal.this, EnumFacing.getFront(i), c);
+					beam = factory.create(TileCrystal.this, EnumFacing.getFront(i), c);
 				}
 			}
 		};

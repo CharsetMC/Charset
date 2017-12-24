@@ -56,8 +56,8 @@ import java.util.List;
 
 @CharsetModule(
         name = "audio.storage",
-        description = "Audio storage, recording and playback - Quartz Discs",
-        profile = ModuleProfile.INDEV
+        description = "Audio storage, recording and playback - Quartz Discs - still highly experimental",
+        profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetAudioStorage {
     @CapabilityInject(IDataStorage.class)

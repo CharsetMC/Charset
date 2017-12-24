@@ -20,11 +20,6 @@
 package pl.asie.charset.module.laser.system;
 
 import com.google.common.collect.*;
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.map.TLongIntMap;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongIntHashMap;
-import gnu.trove.set.hash.TLongHashSet;
 import it.unimi.dsi.fastutil.longs.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -39,8 +34,7 @@ import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import org.apache.commons.lang3.tuple.Pair;
-import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.network.Packet;
+import pl.asie.charset.api.laser.ILaserSource;
 import pl.asie.charset.module.laser.CharsetLaser;
 import pl.asie.charset.patchwork.CharsetPatchwork;
 
@@ -294,11 +288,11 @@ public class LaserWorldStorage implements IWorldEventListener {
 			TileEntity tile = pair.getLeft();
 			EnumFacing facing = pair.getRight();
 
-			LaserSource src = tile.getCapability(CharsetLaser.LASER_SOURCE, facing);
+			ILaserSource src = tile.getCapability(CharsetLaser.LASER_SOURCE, facing);
 			if (src != null) {
-				LaserBeam oldBeam = src.getBeam();
-				src.updateBeam();
-				LaserBeam newBeam = src.getBeam();
+				LaserBeam oldBeam = (LaserBeam) src.getBeam();
+				src.updateBeam(LaserBeamFactory.INSTANCE);
+				LaserBeam newBeam = (LaserBeam) src.getBeam();
 
 				if (oldBeam != newBeam) {
 					if (oldBeam != null) {

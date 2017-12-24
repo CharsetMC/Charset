@@ -19,8 +19,6 @@
 
 package pl.asie.charset.module.laser.system;
 
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -28,14 +26,13 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.api.CharsetAPI;
-import pl.asie.charset.lib.scheduler.Scheduler;
+import pl.asie.charset.api.laser.ILaserBeam;
+import pl.asie.charset.api.laser.ILaserSource;
 import pl.asie.charset.lib.utils.Utils;
 import pl.asie.charset.module.laser.CharsetLaser;
 import pl.asie.charset.api.laser.ILaserReceiver;
@@ -46,12 +43,13 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 
 // IDEA: Add lastTileEntity to avoid double world.getTileEntity call with onAdd.
-public final class LaserBeam implements ILaserEndpoint {
+public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 	public static final int MAX_DISTANCE = 64;
 	private static long ID_COUNTER = 1;
 
 	private final long id;
-	private final @Nonnull LaserSource source;
+	private final @Nonnull
+	ILaserSource source;
 	private final @Nonnull World world;
 	private final @Nonnull BlockPos start, end;
 	private final @Nonnull LaserColor color;
@@ -67,11 +65,7 @@ public final class LaserBeam implements ILaserEndpoint {
 	@SideOnly(Side.CLIENT)
 	protected float vcdist;
 
-	public LaserBeam(@Nonnull TileEntity tile, @Nonnull EnumFacing facing, @Nonnull LaserColor color) {
-		this(tile.getCapability(CharsetLaser.LASER_SOURCE, facing), tile.getWorld(), tile.getPos(), facing, color);
-	}
-
-	public LaserBeam(@Nonnull LaserSource source, @Nonnull World world, @Nonnull BlockPos start, @Nonnull EnumFacing facing, @Nonnull LaserColor color) {
+	public LaserBeam(@Nonnull ILaserSource source, @Nonnull World world, @Nonnull BlockPos start, @Nonnull EnumFacing facing, @Nonnull LaserColor color) {
 		this.id = ID_COUNTER++;
 		this.source = source;
 		this.world = world;
@@ -334,6 +328,11 @@ public final class LaserBeam implements ILaserEndpoint {
 		}
 
 		return true;
+	}
+
+	@Override
+	public World getBeamWorld() {
+		return getWorld();
 	}
 
 	public World getWorld() {

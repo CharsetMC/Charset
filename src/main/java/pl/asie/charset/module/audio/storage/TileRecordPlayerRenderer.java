@@ -21,19 +21,24 @@ package pl.asie.charset.module.audio.storage;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.TRSRTransformation;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GLSync;
 import pl.asie.charset.lib.Properties;
+import pl.asie.charset.module.laser.CharsetLaser;
 
 public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileRecordPlayer> {
 	public static final TileRecordPlayerRenderer INSTANCE = new TileRecordPlayerRenderer();
@@ -71,9 +76,52 @@ public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileReco
 		GlStateManager.translate(0.125f, 0, 0.125f);
 		GlStateManager.rotate(tile.getArmRotationClient(), 0, 1, 0);
 		GlStateManager.translate(-0.125f, 0, -0.125f);
+
 		Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightnessColor(
 				bakedModel, 1.0f, 1.0f, 1.0f, 1.0f
 		);
+
+		if (Minecraft.getMinecraft().gameSettings.fancyGraphics) {
+			if (tile.getState() == TraitRecordPlayer.State.PLAYING || tile.getState() == TraitRecordPlayer.State.RECORDING) {
+				GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+				GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
+				GlStateManager.enableBlend();
+				GlStateManager.disableLighting();
+				GlStateManager.disableTexture2D();
+
+				int color = CharsetLaser.LASER_COLORS[7];
+				int r = (color >> 16) & 0xFF;
+				int g = (color >> 8) & 0xFF;
+				int b = color & 0xFF;
+				int a = (color >> 24) & 0xFF;
+
+				double[] data = new double[]{
+						0.625f, 0.6875f,
+						9.25f / 16f, 9.75f / 16f,
+						2.25f / 16f, 2.75f / 16f,
+				};
+
+				Tessellator tessellator = Tessellator.getInstance();
+				BufferBuilder worldrenderer = tessellator.getBuffer();
+				worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+
+				for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+					for (int i = 0; i < 4; i++) {
+						EnumFaceDirection.VertexInformation vi = EnumFaceDirection.getFacing(facing).getVertexInformation(i);
+						worldrenderer.pos(data[vi.xIndex], data[vi.yIndex], data[vi.zIndex]).tex(0, 0).lightmap(240, 240).color(r, g, b, a).endVertex();
+					}
+				}
+
+				tessellator.draw();
+
+				GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
+				GlStateManager.disableBlend();
+				GlStateManager.enableLighting();
+				GlStateManager.enableTexture2D();
+			}
+		}
+
 		GlStateManager.popMatrix();
 
 		if (!stack.isEmpty()) {

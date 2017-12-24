@@ -26,9 +26,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IProjectorHandler<T> {
 	boolean matches(T target);
+
 	default int getPageCount(T target) {
 		return 1;
 	}
+
 	float getAspectRatio(T target);
 
 	@SideOnly(Side.CLIENT)

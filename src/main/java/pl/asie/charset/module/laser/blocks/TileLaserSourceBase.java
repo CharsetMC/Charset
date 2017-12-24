@@ -23,15 +23,15 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.module.laser.CharsetLaser;
-import pl.asie.charset.module.laser.system.LaserBeam;
+import pl.asie.charset.api.laser.ILaserBeamFactory;
+import pl.asie.charset.api.laser.ILaserSource;
 import pl.asie.charset.api.laser.LaserColor;
-import pl.asie.charset.module.laser.system.LaserSource;
 
 import javax.annotation.Nullable;
 
 public class TileLaserSourceBase extends TileBase {
 	protected final LaserColor[] colors = new LaserColor[6];
-	private final LaserSource[] sources = new LaserSource[6];
+	private final ILaserSource[] sources = new ILaserSource[6];
 
 	public TileLaserSourceBase() {
 		for (int i = 0; i < 6; i++) {
@@ -40,14 +40,14 @@ public class TileLaserSourceBase extends TileBase {
 		}
 	}
 
-	protected LaserSource createLaserSource(int i) {
-		return new LaserSource(this) {
+	protected ILaserSource createLaserSource(int i) {
+		return new ILaserSource.Tile(this) {
 			@Override
-			public void updateBeam() {
+			public void updateBeam(ILaserBeamFactory factory) {
 				if (colors[i] == LaserColor.NONE) {
 					beam = null;
-				} else if (beam == null || !beam.isValid() || !beam.getStart().equals(getPos()) || beam.getColor() != colors[i]) {
-					beam = new LaserBeam(TileLaserSourceBase.this, EnumFacing.getFront(i), colors[i]);
+				} else if (beam == null || !beam.isValid(getWorld(), getPos()) || beam.getColor() != colors[i]) {
+					beam = factory.create(TileLaserSourceBase.this, EnumFacing.getFront(i), colors[i]);
 				}
 			}
 		};
