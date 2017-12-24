@@ -12,7 +12,7 @@
             "model": "forge:item-layer",
             "transform": "forge:default-item",
             "textures": {
-                "layer0": "charset:items/quartz_disc_blank"
+                "layer0": "charset:items/quartz_disc"
             }
         }
     }

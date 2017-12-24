@@ -51,7 +51,8 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 	public enum State {
 		STOPPED,
 		PLAYING,
-		RECORDING
+		RECORDING,
+		PAUSED
 	}
 
 	private final IItemHandler inventory;
@@ -108,7 +109,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 	}
 
 	public void update(World world, BlockPos blockPos) {
-		if (state != State.STOPPED) {
+		if (state != State.STOPPED && state != State.PAUSED) {
 			if (sourceId == null) {
 				sourceId = AudioUtils.start();
 			}
@@ -141,7 +142,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 						packet.send();
 
 						if (len < data.length) {
-							setState(State.STOPPED);
+							setState(State.PAUSED);
 						}
 					} else if (state == State.RECORDING) {
 						int sampleRate = getSampleRate();
@@ -195,7 +196,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 		if (lastState != state) {
 			TileEntity tileEntity = world.getTileEntity(blockPos);
 			CharsetAudioStorage.packet.sendToWatching(new PacketDriveState((TileRecordPlayer) tileEntity, state), tileEntity);
-			if (state == State.STOPPED && lastState == State.PLAYING && sourceId != null) {
+			if ((state == State.STOPPED || state == State.PAUSED) && lastState == State.PLAYING && sourceId != null) {
 				stopAudioPlayback();
 			}
 		}

@@ -90,11 +90,13 @@ public class AudioRecordThread implements Runnable {
 	private static final int PACKET_SIZE = 8192;
 	private static final DFPWM CODEC = new DFPWM();
 	private final File file;
+	private final int maxSize;
 	private int sampleRate = ItemQuartzDisc.DEFAULT_SAMPLE_RATE;
 	private String statusBar = "Encoding...";
 
-	public AudioRecordThread(File f) {
+	public AudioRecordThread(File f, int maxSize) {
 		this.file = f;
+		this.maxSize = maxSize;
 	}
 
 	public String getStatusBar() {
@@ -135,9 +137,8 @@ public class AudioRecordThread implements Runnable {
 			AudioFormat format;
 
 			if (codec instanceof CodecIBXM) {
-				// TODO: Check for maximum length
-				int maxLength = sampleRate * 240;
 				format = codec.getAudioFormat();
+				long maxLength = (long) maxSize * format.getSampleSizeInBits() / 8 * format.getChannels() * (int) format.getSampleRate() / sampleRate;
 				while (!codec.endOfStream() && (data == null || data.length < maxLength)) {
 					buffer = codec.read();
 					if (buffer == null) {

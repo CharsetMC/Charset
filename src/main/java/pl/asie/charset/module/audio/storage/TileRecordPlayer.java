@@ -52,12 +52,8 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 			@Override
 			public void onContentsChanged() {
 				super.onContentsChanged();
-				setState(TraitRecordPlayer.State.STOPPED);
-				spinLocation = 0;
-
-				IDataStorage storage = player.getStorage();
-				if (storage != null) {
-					storage.setPosition(0);
+				if (world != null && !world.isRemote) {
+					setState(TraitRecordPlayer.State.STOPPED);
 				}
 			}
 
@@ -98,6 +94,14 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		return compound;
 	}
 
+	@Override
+	public void invalidate() {
+		super.invalidate();
+
+		setState(TraitRecordPlayer.State.STOPPED);
+		player.stopAudioPlayback();
+	}
+
 	public EnumFacing getFacing() {
 		return world.getBlockState(pos).getValue(Properties.FACING4);
 	}
@@ -115,13 +119,12 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 	}
 
 	public boolean activate(EntityPlayer player, EnumFacing side, EnumHand hand, Vec3d hitPos) {
-		Vec3d realPos = hitPos.subtract(0.5, 0.5, 0.5).rotateYaw((float) (getFacing().getHorizontalAngle() * Math.PI / 180));
-		System.out.println(realPos);
-
 		if (player.isSneaking() && side.getAxis() != EnumFacing.Axis.Y) {
 			player.openGui(ModCharset.instance, GuiHandlerCharset.RECORD_PLAYER, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
 			return true;
 		}
+
+		Vec3d realPos = hitPos.subtract(0.5, 0.5, 0.5).rotateYaw((float) (getFacing().getHorizontalAngle() * Math.PI / 180));
 
 		if (side == EnumFacing.UP) {
 			if (getStack().isEmpty() || (player.getHeldItem(hand).isEmpty() && player.isSneaking())) {
@@ -131,17 +134,26 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 				}
 			} else {
 				if (realPos.x > -0.075 && realPos.z > -0.25) {
-					float newPos = 1f - ((float) realPos.x / 0.30f);
-					if (newPos < 0.0f) newPos = 0.0f;
-					else if (newPos > 1.0f) newPos = 1.0f;
+					if (realPos.x > 0.4) {
+						setState(TraitRecordPlayer.State.STOPPED);
+					} else {
+						if (getState() != TraitRecordPlayer.State.RECORDING) {
+							setState(TraitRecordPlayer.State.PLAYING);
+						}
 
-					IDataStorage storage = this.player.getStorage();
-					if (storage != null) {
-						storage.setPosition(Math.round((storage.getSize() - 1) * newPos));
-						this.player.stopAudioPlayback();
-						markBlockForUpdate();
+						float newPos = 1f - ((float) (realPos.x - 0.05f) / 0.20f);
+						if (newPos < 0.0f) newPos = 0.0f;
+						else if (newPos > 1.0f) newPos = 1.0f;
+
+						IDataStorage storage = this.player.getStorage();
+						if (storage != null) {
+							storage.setPosition(Math.round((storage.getSize() - 1) * newPos));
+							updateProgressClient();
+							this.player.stopAudioPlayback();
+						}
 					}
 
+					markBlockForUpdate();
 					return true;
 				}
 
@@ -157,7 +169,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		if (storage != null) {
 			pos = ((float) storage.getPosition() / storage.getSize());
 		}
-		if (Math.abs(pos - progressClient) >= 0.05f || (pos == 0f) != (progressClient == 0f)) {
+		if (Math.abs(pos - progressClient) >= 0.0125f || (pos == 0f) != (progressClient == 0f)) {
 			CharsetAudioStorage.packet.sendToWatching(new PacketUpdateProgressClient(this), this);
 			progressClient = pos;
 		}
@@ -165,7 +177,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 
 	public float getArmRotationClient() {
 		ItemStack stack = holder.getStack();
-		if (stack.isEmpty()) {
+		if (stack.isEmpty() || getState() == TraitRecordPlayer.State.STOPPED) {
 			return 0f;
 		} else {
 			return 12f + (progressClient * (35f - 12f));
@@ -203,16 +215,30 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 
 	protected void setState(TraitRecordPlayer.State state) {
 		player.setState(state);
+		if (state == TraitRecordPlayer.State.STOPPED) {
+			spinLocation = 0;
+
+			IDataStorage storage = player.getStorage();
+			if (storage != null) {
+				storage.setPosition(0);
+			}
+		}
 	}
 
 	protected void writeData(byte[] data, boolean isLast, int totalLength) {
 		IDataStorage storage = player.getStorage();
 		if (storage != null) {
-			setState(TraitRecordPlayer.State.STOPPED);
+			if (getState() == TraitRecordPlayer.State.PLAYING || getState() == TraitRecordPlayer.State.RECORDING) {
+				setState(TraitRecordPlayer.State.PAUSED);
+			}
 			storage.write(data);
 			if (isLast) {
 				storage.seek(-totalLength);
 			}
 		}
+	}
+
+	protected IDataStorage getStorage() {
+		return player.getStorage();
 	}
 }

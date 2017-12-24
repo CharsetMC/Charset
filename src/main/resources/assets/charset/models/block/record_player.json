@@ -11,6 +11,16 @@
                 "west":  { "texture": "#side", "cullface": "west" },
                 "east":  { "texture": "#side", "cullface": "east" }
             }
+        },
+        {   "from": [ 7.5, 10, 7.5 ],
+            "to": [ 8.5, 11, 8.5 ],
+            "faces": {
+                "up":  { "texture": "#down" },
+                "north": { "texture": "#side" },
+                "south": { "texture": "#side" },
+                "west":  { "texture": "#side" },
+                "east":  { "texture": "#side" }
+            }
         }
     ],
     "textures": {

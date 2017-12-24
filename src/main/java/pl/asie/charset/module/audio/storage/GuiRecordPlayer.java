@@ -36,6 +36,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lwjgl.opengl.Display;
+import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.ui.GuiContainerCharset;
 
 public class GuiRecordPlayer extends GuiContainerCharset {
@@ -59,6 +60,7 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 	private TraitRecordPlayer.State state = TraitRecordPlayer.State.STOPPED;
 	public enum Button {
 		PLAY,
+		PAUSE,
 		STOP,
 		RECORD_FILE,
 		RECORD_AUDIO
@@ -96,9 +98,11 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 				return button == Button.PLAY;
 			case RECORDING:
 				return button == Button.RECORD_AUDIO;
+			case PAUSED:
+				return button == Button.PAUSE;
 			case STOPPED:
 			default:
-				return button == Button.STOP;
+				return false;
 		}
 	}
 
@@ -123,12 +127,17 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 			case PLAY:
 				setState(TraitRecordPlayer.State.PLAYING);
 				break;
+			case PAUSE:
+				setState(TraitRecordPlayer.State.PAUSED);
+				break;
 			case STOP:
 				setState(TraitRecordPlayer.State.STOPPED);
 				break;
 			case RECORD_FILE:
 				if (owner.getStack() != null) {
-					setState(TraitRecordPlayer.State.STOPPED);
+					if (owner.getState() == TraitRecordPlayer.State.PLAYING || owner.getState() == TraitRecordPlayer.State.RECORDING) {
+						setState(TraitRecordPlayer.State.PAUSED);
+					}
 					if (Minecraft.getMinecraft().isFullScreen()) {
 						Minecraft.getMinecraft().toggleFullscreen();
 					}
@@ -152,7 +161,8 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 		if (fileDialogThread != null && !fileDialogThread.isAlive()) {
 			if (fileDialog.result == JFileChooser.APPROVE_OPTION) {
 				if (fileDialog.chooser.getSelectedFile() != null) {
-					record = new AudioRecordThread(fileDialog.chooser.getSelectedFile());
+					IDataStorage storage = owner.getStorage();
+					record = new AudioRecordThread(fileDialog.chooser.getSelectedFile(), storage != null ? storage.getSize() : Integer.MAX_VALUE);
 					recordThread = new Thread(record);
 					recordThread.start();
 				}

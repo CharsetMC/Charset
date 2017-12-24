@@ -184,7 +184,6 @@ public class DFPWM implements ICodec {
 				System.out.write(pcmout, 0, 1024);
 			}
 		} else {
-
 			throw new RuntimeException("Unknown mode " + mode + "!");
 		}
 	}
