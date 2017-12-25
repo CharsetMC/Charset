@@ -28,6 +28,7 @@
 * [storage.barrels] Chisels & Bits block bits now stack up to 512 in barrels, as per Bit Bags.
 * [storage.barrels] Fix barrels made out of non-burnable materials being burnable.
 * [storage.barrels] Fix extracting only one item at a time only working in creative mode.
+* [storage.barrels] Fix notices with additional item information missing a newline.
 * [storage.barrels] Fix the barrel cap texture being incorrect for certain block types.
 * [storage.barrels] Improve barrel rotation logic.
 * [storage.barrels] Shift-clicking a barrel in creative mode (unless block carrying activates) will now give you the contained item.

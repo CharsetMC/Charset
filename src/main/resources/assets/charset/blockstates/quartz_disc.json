@@ -1,19 +1,49 @@
 {
     "forge_marker": 1,
+    "defaults": {
+        "model": "forge:item-layer",
+        "transform": "forge:default-item"
+    },
     "variants": {
-        "inventory": {
-            "model": "forge:item-layer",
-            "transform": "forge:default-item",
+        "inventory_10": [{
             "textures": {
-                "layer0": "charset:items/quartz_disc"
+                "layer0": "charset:items/quartz_disc_10"
             }
-        },
-        "inventory_blank": {
-            "model": "forge:item-layer",
-            "transform": "forge:default-item",
+        }],
+        "inventory_12": [{
             "textures": {
-                "layer0": "charset:items/quartz_disc"
+                "layer0": "charset:items/quartz_disc_12"
             }
-        }
+        }],
+        "inventory_14": [{
+            "textures": {
+                "layer0": "charset:items/quartz_disc_14"
+            }
+        }],
+        "inventory_16": [{
+            "textures": {
+                "layer0": "charset:items/quartz_disc_16"
+            }
+        }],
+        "inventory_10_blank": [{
+            "textures": {
+                "layer0": "charset:items/quartz_disc_10_blank"
+            }
+        }],
+        "inventory_12_blank": [{
+            "textures": {
+                "layer0": "charset:items/quartz_disc_12_blank"
+            }
+        }],
+        "inventory_14_blank": [{
+            "textures": {
+                "layer0": "charset:items/quartz_disc_14_blank"
+            }
+        }],
+        "inventory_16_blank": [{
+            "textures": {
+                "layer0": "charset:items/quartz_disc_16_blank"
+            }
+        }]
     }
 }

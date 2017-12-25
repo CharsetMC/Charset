@@ -128,21 +128,38 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		Vec3d realPos = hitPos.subtract(0.5, 0.5, 0.5).rotateYaw((float) (getFacing().getHorizontalAngle() * Math.PI / 180));
 
 		if (side == EnumFacing.UP) {
-			if (getStack().isEmpty() || (player.getHeldItem(hand).isEmpty() && player.isSneaking())) {
-				if (holder.activate(this, player, side, hand)) {
-					markBlockForUpdate();
+			if (realPos.x > -0.075 && realPos.z > -0.25 && !getStack().isEmpty()) {
+				if (realPos.x > 0.4) {
+					setState(TraitRecordPlayer.State.STOPPED);
 					return true;
-				}
-			} else {
-				if (realPos.x > -0.075 && realPos.z > -0.25) {
-					if (realPos.x > 0.4) {
-						setState(TraitRecordPlayer.State.STOPPED);
+				} else {
+					if (player.isSneaking()) {
+						// TODO: Store state, allow for recording turning off
+						if (getState() == TraitRecordPlayer.State.PAUSED) {
+							setState(TraitRecordPlayer.State.PLAYING);
+							markBlockForUpdate();
+							return true;
+						} else if (getState() == TraitRecordPlayer.State.PLAYING) {
+							setState(TraitRecordPlayer.State.PAUSED);
+							markBlockForUpdate();
+							return true;
+						} else if (getState() == TraitRecordPlayer.State.RECORDING) {
+							return true;
+						}
 					} else {
-						if (getState() != TraitRecordPlayer.State.RECORDING) {
+						if (getState() == TraitRecordPlayer.State.STOPPED) {
 							setState(TraitRecordPlayer.State.PLAYING);
 						}
 
-						float newPos = 1f - ((float) (realPos.x - 0.05f) / 0.20f);
+						// 0.05f = 0.12f
+						// 0.25f = 0.35f
+
+						float fmul = 0.0085f;
+						float fsub = 0.05f;
+						float fstart = (CharsetAudioStorage.quartzDisc.getArmStartPosition(holder.getStack()) * fmul) - fsub;
+						float fend = (32f * fmul) - fsub;
+						System.out.println(fstart + " . " + fend);
+						float newPos = 1f - ((float) (realPos.x - fstart) / (fend - fstart));
 						if (newPos < 0.0f) newPos = 0.0f;
 						else if (newPos > 1.0f) newPos = 1.0f;
 
@@ -152,12 +169,18 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 							updateProgressClient();
 							this.player.stopAudioPlayback();
 						}
-					}
 
+						markBlockForUpdate();
+						return true;
+					}
+				}
+			}
+
+			if (getStack().isEmpty() || (player.getHeldItem(hand).isEmpty() && player.isSneaking())) {
+				if (holder.activate(this, player, side, hand)) {
 					markBlockForUpdate();
 					return true;
 				}
-
 			}
 		}
 
@@ -181,7 +204,9 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		if (stack.isEmpty() || getState() == TraitRecordPlayer.State.STOPPED) {
 			return 0f;
 		} else {
-			return 12f + (progressClient * (35f - 12f));
+			float fstart = CharsetAudioStorage.quartzDisc.getArmStartPosition(stack);
+			float fend = 32f;
+			return fstart + (progressClient * (fend - fstart));
 		}
 	}
 

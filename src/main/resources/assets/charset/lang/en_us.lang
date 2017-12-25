@@ -22,6 +22,7 @@ item.charset.icon.name=a
 tile.charset.audioCable.name=Audio Cable
 tile.charset.audioCable.freestanding.name=Hovering Audio Cable
 tile.charset.ironNoteBlock.name=Iron Note Block
+item.charset.quartz_disc.name=Quartz Disc
 
 tooltip.charset.disc.none=No Disc
 tooltip.charset.disc.unnamed=Unnamed Disc

@@ -12,7 +12,8 @@
       "east": {"y": 90}
     },
     "inventory": [{
-      "transform": "forge:default-block"
+      "transform": "forge:default-block",
+      "submodel": "charset:record_player_arm"
     }]
   }
 }

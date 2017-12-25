@@ -78,7 +78,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
                 0.5*(1 - Math.abs(face.getDirectionVec().getY())),
                 0.5*(1 - Math.abs(face.getDirectionVec().getZ()))
                 );
-        
+
         Quaternion quat = Quaternion.fromOrientation(bo.getSwapped());
         quat.glRotate();
         GlStateManager.rotate(90, 0, 1, 0);

@@ -97,8 +97,11 @@ class ClientMessage {
             }
         }
 
+        String infoStr = item_info.toString();
+
         msgRendered = msgRendered.replace("{ITEM_NAME}", item_name);
-        msgRendered = msgRendered.replace("{ITEM_INFOS}", item_info.toString());
+        msgRendered = msgRendered.replace("{ITEM_INFOS}", infoStr);
+        msgRendered = msgRendered.replace("{ITEM_INFOS_NL}", infoStr.length() > 0 ? "\n"+infoStr : "");
     }
     
     static double interp(double old, double new_, float partial) {

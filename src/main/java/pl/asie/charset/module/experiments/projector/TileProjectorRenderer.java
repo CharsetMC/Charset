@@ -76,6 +76,7 @@ public class TileProjectorRenderer extends TileEntitySpecialRenderer<TileProject
                 0.5*(1 - Math.abs(face.getDirectionVec().getZ()))
         );
 
+        RenderHelper.enableStandardItemLighting();
         Quaternion quat = Quaternion.fromOrientation(bo);
         quat.glRotate();
         GlStateManager.rotate(90, 0, 1, 0);
@@ -91,16 +92,11 @@ public class TileProjectorRenderer extends TileEntitySpecialRenderer<TileProject
         GlStateManager.popMatrix();
 
         GlStateManager.disableBlend();
-        RenderHelper.enableStandardItemLighting();
     }
 
     public void handleRenderItem(ItemStack is, TileProjector projector) {
         GlStateManager.translate(-0.25f, -0.1875f, 0);
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        GlStateManager.pushAttrib();
-        RenderHelper.enableStandardItemLighting();
         Minecraft.getMinecraft().getRenderItem().renderItem(is, ItemCameraTransforms.TransformType.FIXED);
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.popAttrib();
     }
 }

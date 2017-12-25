@@ -73,10 +73,11 @@ public class CharsetAudioStorage {
     public static ItemQuartzDisc quartzDisc;
 
     public static void addTimeToTooltip(List<String> tooltip, int mins, int secs) {
+        String secStr = secs + " second" + (secs != 1 ? "s" : "");
         if (mins != 0) {
-            tooltip.add(TextFormatting.GRAY + "" + mins + " minutes " + (secs != 0 ? secs + " seconds" : ""));
+            tooltip.add(TextFormatting.GRAY + "" + mins + " minute" + (mins != 1 ? "s" : "") + (secs != 0 ? (" " + secStr) : ""));
         } else {
-            tooltip.add(TextFormatting.GRAY + "" + secs + " seconds");
+            tooltip.add(TextFormatting.GRAY + secStr);
         }
     }
 
@@ -141,8 +142,10 @@ public class CharsetAudioStorage {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void registerModels(ModelRegistryEvent event) {
-        RegistryUtils.registerModel(quartzDisc, 0, "charset:quartz_disc#inventory_blank");
-        RegistryUtils.registerModel(quartzDisc, 1, "charset:quartz_disc#inventory");
+        for (int i = 0; i <= 6; i += 2) {
+            RegistryUtils.registerModel(quartzDisc, i, "charset:quartz_disc#inventory_" + (i + 10) + "_blank");
+            RegistryUtils.registerModel(quartzDisc, i + 1, "charset:quartz_disc#inventory_" + (i + 10));
+        }
 
         RegistryUtils.registerModel(itemRecordPlayer, 0, "charset:record_player#inventory");
     }

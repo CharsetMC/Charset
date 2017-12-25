@@ -22,15 +22,18 @@ package pl.asie.charset.module.audio.storage;
 import java.util.List;
 
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -39,7 +42,18 @@ import pl.asie.charset.module.audio.storage.system.DataStorage;
 
 public class ItemQuartzDisc extends Item {
 	public static final int DEFAULT_SAMPLE_RATE = 48000;
-	private static final int DEFAULT_SIZE = 2880000;
+	private static final int[] SIZES = new int[] {
+			DEFAULT_SAMPLE_RATE / 8 * 60,
+			DEFAULT_SAMPLE_RATE / 8 * 60 * 3,
+			DEFAULT_SAMPLE_RATE / 8 * 60 * 6,
+			DEFAULT_SAMPLE_RATE / 8 * 60 * 10
+	};
+	private static final float[] ARM_STARTS = new float[] {
+			23f,
+			17f,
+			11f,
+			5f
+	};
 
 	public static class CapabilityProvider implements INBTSerializable<NBTTagCompound>, ICapabilityProvider {
 		private final ItemStack stack;
@@ -59,7 +73,8 @@ public class ItemQuartzDisc extends Item {
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 			if (dataStorage != null) {
 				if (!dataStorage.isInitialized()) {
-					dataStorage.initialize(null, 0, stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE);
+					dataStorage.initialize(null, 0, CharsetAudioStorage.quartzDisc.getSize(stack));
+					stack.setItemDamage(stack.getItemDamage() | 1);
 				}
 
 				if (capability == CharsetAudioStorage.DATA_STORAGE) {
@@ -102,10 +117,28 @@ public class ItemQuartzDisc extends Item {
 		this.setMaxStackSize(1);
 	}
 
+	protected float getArmStartPosition(ItemStack stack) {
+		return ARM_STARTS[(stack.getMetadata() >> 1) % ARM_STARTS.length];
+	}
+
+	private int getSize(ItemStack stack) {
+		int defSize = SIZES[(stack.getMetadata() >> 1) % SIZES.length];
+		return stack.hasTagCompound() && stack.getTagCompound().hasKey("size", Constants.NBT.TAG_ANY_NUMERIC) ? stack.getTagCompound().getInteger("size") : defSize;
+	}
+
+	@Override
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+		if (this.isInCreativeTab(tab)) {
+			for (int i = 0; i < SIZES.length; i++) {
+				items.add(new ItemStack(this, 1, i << 1));
+			}
+		}
+	}
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag advanced) {
-		int size = stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE;
+		int size = getSize(stack);
 		int sizeSec = size / (DEFAULT_SAMPLE_RATE / 8);
 		int sizeMin = sizeSec / 60;
 		sizeSec %= 60;

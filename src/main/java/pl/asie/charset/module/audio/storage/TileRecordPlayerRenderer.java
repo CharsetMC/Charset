@@ -126,9 +126,11 @@ public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileReco
 
 		if (!stack.isEmpty()) {
 			GlStateManager.pushMatrix();
+			RenderHelper.enableStandardItemLighting();
 			GlStateManager.rotate(90, 1, 0, 0);
 			GlStateManager.translate(0.5, 0.5, -0.625 - 0.0625/4);
 			handleRenderItem(stack, tile, partialTicks);
+			RenderHelper.disableStandardItemLighting();
 			GlStateManager.popMatrix();
 		}
 
@@ -141,11 +143,7 @@ public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileReco
 	public void handleRenderItem(ItemStack is, TileRecordPlayer player, float partialTicks) {
 		float rotation = player.getDiscRotation() + (player.isDiscSpinning() ? (player.getDiscRotationSpeed() * partialTicks) : 0);
 		GlStateManager.rotate((float) -(rotation % 360.0), 0, 0, 1);
-		GlStateManager.scale(0.625F, 0.625F, 0.625F);
-		GlStateManager.pushAttrib();
-		RenderHelper.enableStandardItemLighting();
+		GlStateManager.scale(0.75F, 0.75F, 0.75F);
 		Minecraft.getMinecraft().getRenderItem().renderItem(is, ItemCameraTransforms.TransformType.FIXED);
-		RenderHelper.disableStandardItemLighting();
-		GlStateManager.popAttrib();
 	}
 }

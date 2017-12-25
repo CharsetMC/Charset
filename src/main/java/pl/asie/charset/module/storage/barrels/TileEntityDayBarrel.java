@@ -940,7 +940,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                         countMsg = "" + count;
                     }
                 }
-                msg.withItem(item).setMessage(new TextComponentTranslation("%1$s %2$s", new TextComponentTranslation(countMsg), new TextComponentString("{ITEM_NAME}{ITEM_INFOS}")));
+                msg.withItem(item).setMessage(new TextComponentTranslation("%1$s %2$s", new TextComponentTranslation(countMsg), new TextComponentString("{ITEM_NAME}{ITEM_INFOS_NL}")));
             }
         }).sendTo(entityplayer);
     }
