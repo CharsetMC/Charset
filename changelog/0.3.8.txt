@@ -1,1 +1,2 @@
 * [Storage] Backport 1.12 barrel rotation fix
+* [Storage] Backport allowing modded slimeballs in barrel upgrade recipes

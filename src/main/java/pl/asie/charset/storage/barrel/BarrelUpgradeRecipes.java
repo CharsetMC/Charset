@@ -45,13 +45,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import pl.asie.charset.storage.ModCharsetStorage;
 
 public class BarrelUpgradeRecipes {
     private static final ItemStack oakLog = new ItemStack(Blocks.LOG);
     private static final ItemStack oakPlank = new ItemStack(Blocks.WOODEN_SLAB);
     private static final ItemStack hopper = new ItemStack(Blocks.HOPPER);
-    private static final ItemStack slime_ball = new ItemStack(Items.SLIME_BALL);
+    private static final String slime_ball = "slimeball";
     private static final ItemStack web = new ItemStack(Blocks.WEB);
 
     public static void addUpgradeRecipes() {
@@ -60,30 +61,27 @@ public class BarrelUpgradeRecipes {
 
         RecipeSorter.register("factorization:barrel_upgrade", BarrelUpgrade.class, RecipeSorter.Category.SHAPED, "");
 
-        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.SILKY, 3, 3, new ItemStack[] {
-                web, web, web,
-                web, oakBarrel, web,
-                web, web, web
+        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.SILKY, new Object[] {
+                "www", "wow", "www",
+                'w', web, 'o', oakBarrel
         }));
 
-        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.HOPPING, 1, 3, new ItemStack[] {
-                hopper,
-                oakBarrel,
-                hopper
+        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.HOPPING, new Object[] {
+                "h", "o", "h",
+                'h', hopper, 'o', oakBarrel
         }));
 
-        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.STICKY, 1, 3, new ItemStack[] {
-                slime_ball,
-                oakBarrel,
-                slime_ball
+        GameRegistry.addRecipe(new BarrelUpgrade(TileEntityDayBarrel.Type.STICKY, new Object[] {
+                "s", "o", "s",
+                's', slime_ball, 'o', oakBarrel
         }));
     }
 
-    public static class BarrelUpgrade extends ShapedRecipes {
+    public static class BarrelUpgrade extends ShapedOreRecipe {
         final TileEntityDayBarrel.Type upgradeType;
 
-        public BarrelUpgrade(TileEntityDayBarrel.Type upgrade, int width, int height, ItemStack[] inputs) {
-            super(width, height, inputs, TileEntityDayBarrel.makeBarrel(upgrade, oakLog, oakPlank));
+        public BarrelUpgrade(TileEntityDayBarrel.Type upgrade, Object[] inputs) {
+            super(TileEntityDayBarrel.makeBarrel(upgrade, oakLog, oakPlank), inputs);
             this.upgradeType = upgrade;
         }
 
