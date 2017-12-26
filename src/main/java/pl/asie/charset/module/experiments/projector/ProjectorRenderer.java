@@ -30,6 +30,8 @@ import net.minecraft.client.renderer.EnumFaceDirection;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
@@ -249,6 +251,9 @@ public class ProjectorRenderer {
 		double cameraY = player.lastTickPosY + ((player.posY - player.lastTickPosY) * event.getPartialTicks());
 		double cameraZ = player.lastTickPosZ + ((player.posZ - player.lastTickPosZ) * event.getPartialTicks());
 
+		ICamera camera = new Frustum();
+		camera.setPosition(cameraX, cameraY, cameraZ);
+
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(-cameraX, -cameraY, -cameraZ);
 
@@ -279,6 +284,10 @@ public class ProjectorRenderer {
 
 					Surface surface = getSurface(tileEntity.getWorld(), tileEntity.getPos(), orientation, 0.5f, handler.getAspectRatio(stack));
 					if (surface == null) {
+						continue;
+					}
+
+					if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(surface.cornerStart, surface.cornerEnd))) {
 						continue;
 					}
 

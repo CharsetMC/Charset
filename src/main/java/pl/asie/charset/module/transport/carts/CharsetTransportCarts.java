@@ -90,7 +90,7 @@ public class CharsetTransportCarts {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        CapabilityManager.INSTANCE.register(Linkable.class, Linkable.STORAGE, Linkable.class);
+        CapabilityManager.INSTANCE.register(Linkable.class, Linkable.STORAGE, Linkable::new);
 
         if (ModCharset.profile.includes(ModuleProfile.INDEV)) {
             linker = new TrainLinker();

@@ -115,6 +115,7 @@ public class LaserRenderer {
 			}
 
 			beamList.sort((first, second) -> Float.compare(second.vcdist, first.vcdist));
+			beamsRender = beamList;
 		}
 
 		worldrenderer.setTranslation(-cameraX, -cameraY, -cameraZ);

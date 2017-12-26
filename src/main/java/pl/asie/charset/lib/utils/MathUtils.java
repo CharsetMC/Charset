@@ -35,6 +35,6 @@ public final class MathUtils {
         Vec3d first = lineStart.subtract(point);
         Vec3d second = lineEnd.subtract(point);
 
-        return MathHelper.sqrt(first.crossProduct(second).lengthSquared()) / MathHelper.sqrt(second.lengthSquared());
+        return MathHelper.sqrt(first.crossProduct(second).lengthSquared() / second.lengthSquared());
     }
 }

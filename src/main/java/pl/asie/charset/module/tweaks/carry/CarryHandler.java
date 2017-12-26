@@ -307,7 +307,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
 
     public static void register() {
         Capability.IStorage<CarryHandler> storage = new CarryHandler.Storage();
-        CapabilityManager.INSTANCE.register(CarryHandler.class, storage, CarryHandler.class);
+        CapabilityManager.INSTANCE.register(CarryHandler.class, storage, CarryHandler::new);
         CarryHandler.PROVIDER = new CapabilityProviderFactory<>(CharsetTweakBlockCarrying.CAPABILITY, storage);
     }
 

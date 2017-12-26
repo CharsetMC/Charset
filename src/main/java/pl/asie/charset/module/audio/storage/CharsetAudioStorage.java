@@ -83,7 +83,7 @@ public class CharsetAudioStorage {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        CapabilityManager.INSTANCE.register(IDataStorage.class, new DataStorageCapStorage(), DataStorage.class);
+        CapabilityManager.INSTANCE.register(IDataStorage.class, new DataStorageCapStorage(), DataStorage::new);
 
         blockRecordPlayer = new BlockRecordPlayer();
         itemRecordPlayer = new ItemBlockBase(blockRecordPlayer);

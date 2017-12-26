@@ -41,6 +41,10 @@ public final class Linkable {
 	public Linkable previous, next;
 	private final Entity owner;
 
+	public Linkable() {
+		this.owner = null;
+	}
+
 	public Linkable(Entity owner) {
 		this.owner = owner;
 	}
@@ -50,7 +54,7 @@ public final class Linkable {
 	}
 
 	public UUID getId() {
-		return owner.getPersistentID();
+		return owner != null ? owner.getPersistentID() : null;
 	}
 
 	public static class Storage implements Capability.IStorage<Linkable> {

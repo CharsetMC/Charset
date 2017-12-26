@@ -26,6 +26,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -220,8 +221,7 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 			}
 		}
 
-		/*
-		if (!world.isRemote) {
+		/* if (!world.isRemote && state.getMaterial().isOpaque()) {
 			Vec3d startPos = new Vec3d(0.5, 0.5, 0.5).addVector(pos.getX(), pos.getY(), pos.getZ());
 			Vec3d endPos = new Vec3d(0.5, 0.5, 0.5).addVector(pos.getX(), pos.getY(), pos.getZ());
 			startPos = startPos.addVector(direction.getOpposite().getFrontOffsetX() * 0.5, direction.getOpposite().getFrontOffsetY() * 0.5, direction.getOpposite().getFrontOffsetZ() * 0.5);
@@ -231,8 +231,7 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 			if (result != null && result.typeOfHit == RayTraceResult.Type.BLOCK) {
 				return true;
 			}
-		}
-		*/
+		} */
 
 		return false;
 	}

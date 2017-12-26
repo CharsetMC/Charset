@@ -48,6 +48,8 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 public class ModuleLoader {
+	public static final Set<String> CATEGORIES_OFF_BY_DEFAULT = Sets.newHashSet("overhaul", "pony");
+
 	private static class EnableInformation {
 		public boolean isDefault;
 		public ThreeState override;
@@ -226,7 +228,7 @@ public class ModuleLoader {
 			List<String> tags = (List<String>) info.getOrDefault("categories", Collections.emptyList());
 			for (String s : tags) {
 				if (!categoryMap.containsKey(s)) {
-					Property prop = ModCharset.configModules.get("categories", s, !"overhaul".equals(s));
+					Property prop = ModCharset.configModules.get("categories", s, !CATEGORIES_OFF_BY_DEFAULT.contains(s));
 					prop.setRequiresMcRestart(true);
 					categoryMap.put(s, prop.getBoolean());
 				}
