@@ -1,2 +1,5 @@
+* [Audio] Backport 1.12 support for importing .MOD, .S3M and .XM files
+* [Audio] Backport 1.12 fix for buttons not emitting press sound
+* [Audio] Prepare for potential upcoming NotEnoughCodecs update
 * [Storage] Backport 1.12 barrel rotation fix
 * [Storage] Backport allowing modded slimeballs in barrel upgrade recipes

@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -35,6 +36,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lwjgl.opengl.Display;
+import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.audio.ModCharsetAudio;
 import pl.asie.charset.lib.container.GuiContainerCharset;
 
@@ -169,7 +171,8 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		if (tapeDialogThread != null && !tapeDialogThread.isAlive()) {
 			if (tapeDialog.result == JFileChooser.APPROVE_OPTION) {
 				if (tapeDialog.chooser.getSelectedFile() != null) {
-					tapeRecord = new TapeRecordThread(tapeDialog.chooser.getSelectedFile(), tapeDrive);
+					IDataStorage storage = tapeDrive.getStorage();
+					tapeRecord = new TapeRecordThread(tapeDialog.chooser.getSelectedFile(), storage != null ? storage.getSize() : Integer.MAX_VALUE, tapeDrive);
 					tapeRecordThread = new Thread(tapeRecord);
 					tapeRecordThread.start();
 				}
@@ -226,13 +229,13 @@ public class GuiTapeDrive extends GuiContainerCharset {
 
 		super.mouseReleased(x, y, which);
 		if(which >= 0 && buttonHovering != null) {
-			this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(new SoundEvent(new ResourceLocation("gui.button.press")), 1.0F));
+			this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			handleButtonPress(buttonHovering);
 			buttonHovering = null;
 		}
 
 		if (which >= 0 && ctrResetHover) {
-			this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(new SoundEvent(new ResourceLocation("gui.button.press")), 1.0F));
+			this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			ModCharsetAudio.packet.sendToServer(new PacketDriveCounter(tapeDrive, 0));
 			ctrResetHover = false;
 		}

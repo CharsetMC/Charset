@@ -232,4 +232,8 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 		}
 		return null;
 	}
+
+	protected IDataStorage getStorage() {
+		return state.getStorage();
+	}
 }

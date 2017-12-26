@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.Loader;
 import javax.sound.sampled.AudioFormat;
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
+import paulscode.sound.codecs.CodecIBXM;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
 import pl.asie.charset.audio.ModCharsetAudio;
@@ -36,28 +37,68 @@ import pl.asie.charset.lib.audio.codec.DFPWM;
 
 public class TapeRecordThread implements Runnable {
 	public static String[] getSupportedExtensions() {
-		List<String> exts = new ArrayList<String>();
-		exts.add("ogg");
-		exts.add("wav");
-		if (Loader.isModLoaded("NotEnoughCodecs")) {
-			exts.add("aac");
-			exts.add("mp3");
-			exts.add("m4a");
-			exts.add("mp4");
-			exts.add("flac");
-		}
+		List<String> exts = getSupportedExtensionList();
 		return exts.toArray(new String[exts.size()]);
+	}
+
+	private static void addIfCodec(List<String> exts, String ext) {
+		if (getCodec(ext) != null) {
+			exts.add(ext);
+		}
+	}
+
+	public static List<String> getSupportedExtensionList() {
+		List<String> exts = new ArrayList<String>();
+		for (String s: new String[] { "ogg", "wav", "mod", "s3m", "xm" }) {
+			addIfCodec(exts, s);
+		}
+
+		if (Loader.isModLoaded("notenoughcodecs")) {
+			for (String s: new String[] { "aac", "mp3", "m4a", "mp4", "flac" }) {
+				addIfCodec(exts, s);
+			}
+		}
+
+		return exts;
+	}
+
+	private static ICodec getCodec(String ext) {
+		try {
+			ICodec codec = null;
+
+			if ("ogg".equals(ext)) {
+				codec = new CodecJOrbis();
+			} else if ("wav".equals(ext)) {
+				codec = new CodecWav();
+			} else if ("mod".equals(ext) || "s3m".equals(ext) || "xm".equals(ext)) {
+				codec = new CodecIBXM();
+			} else if ("mp3".equals(ext)) {
+				codec = (ICodec) TapeRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
+			} else if ("mp4".equals(ext) || "m4a".equals(ext)) {
+				codec = (ICodec) TapeRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
+			} else if ("aac".equals(ext)) {
+				codec = (ICodec) TapeRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecADTS").newInstance();
+			} else if ("flac".equals(ext)) {
+				codec = (ICodec) TapeRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecFLAC").newInstance();
+			}
+
+			return codec;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	private static final int PACKET_SIZE = 8192;
 	private static final DFPWM CODEC = new DFPWM();
 	private final File file;
+	private final int maxSize;
 	private final PartTapeDrive owner;
 	private int sampleRate = ItemTape.DEFAULT_SAMPLE_RATE;
 	private String statusBar = "Encoding...";
 
-	public TapeRecordThread(File f, PartTapeDrive owner) {
+	public TapeRecordThread(File f, int maxSize, PartTapeDrive owner) {
 		this.file = f;
+		this.maxSize = maxSize;
 		this.owner = owner;
 	}
 
@@ -70,23 +111,10 @@ public class TapeRecordThread implements Runnable {
 		try {
 			String ext = FilenameUtils.getExtension(file.getName());
 			SoundBuffer buffer;
-			ICodec codec = null;
 
 			statusBar = "Loading...";
 
-			if ("ogg".equals(ext)) {
-				codec = new CodecJOrbis();
-			} else if ("wav".equals(ext)) {
-				codec = new CodecWav();
-			} else if ("mp3".equals(ext)) {
-				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
-			} else if ("mp4".equals(ext) || "m4a".equals(ext)) {
-				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
-			} else if ("aac".equals(ext)) {
-				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecADTS").newInstance();
-			} else if ("flac".equals(ext)) {
-				codec = (ICodec) getClass().getClassLoader().loadClass("openmods.codecs.adapters.CodecFLAC").newInstance();
-			}
+			ICodec codec = getCodec(ext);
 
 			if (codec == null) {
 				statusBar = "Unsupported format!";
@@ -100,20 +128,43 @@ public class TapeRecordThread implements Runnable {
 				Thread.sleep(1250);
 				return;
 			}
-			buffer = codec.readAll();
 
-			if (buffer == null) {
-				statusBar = "Failed to load!";
-				Thread.sleep(1250);
-				return;
+
+			byte[] data = null;
+			AudioFormat format;
+
+			if (codec instanceof CodecIBXM) {
+				format = codec.getAudioFormat();
+				long maxLength = (long) maxSize * format.getSampleSizeInBits() / 8 * format.getChannels() * (int) format.getSampleRate() / sampleRate;
+				while (!codec.endOfStream() && (data == null || data.length < maxLength)) {
+					buffer = codec.read();
+					if (buffer == null) {
+						statusBar = "Failed to load!";
+						Thread.sleep(1250);
+						return;
+					}
+
+					if (data == null) {
+						data = buffer.audioData;
+					} else {
+						byte[] oldData = data;
+						data = new byte[oldData.length + buffer.audioData.length];
+						System.arraycopy(oldData, 0, data, 0, oldData.length);
+						System.arraycopy(buffer.audioData, 0, data, oldData.length, buffer.audioData.length);
+					}
+				}
+			} else {
+				buffer = codec.readAll();
+				data = buffer.audioData;
+				format = buffer.audioFormat;
 			}
 
 			statusBar = "Reticulating splines...";
 
-			byte[] preEncodeOutput = TapeResampler.toSigned8(buffer.audioData, buffer.audioFormat.getSampleSizeInBits(),
-					buffer.audioFormat.getChannels(), buffer.audioFormat.isBigEndian(),
-					buffer.audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED,
-					(int) buffer.audioFormat.getSampleRate(), sampleRate, true);
+			byte[] preEncodeOutput = TapeResampler.toSigned8(data, format.getSampleSizeInBits(),
+					format.getChannels(), format.isBigEndian(),
+					format.getEncoding() == AudioFormat.Encoding.PCM_SIGNED,
+					(int) format.getSampleRate(), sampleRate, true);
 
 			statusBar = "Encoding...";
 
@@ -122,12 +173,12 @@ public class TapeRecordThread implements Runnable {
 
 			for (int i = 0; i < finalOutput.length; i += PACKET_SIZE) {
 				int len = Math.min(finalOutput.length - i, PACKET_SIZE);
-				byte[] data = new byte[len];
-				System.arraycopy(finalOutput, i, data, 0, len);
+				byte[] outData = new byte[len];
+				System.arraycopy(finalOutput, i, outData, 0, len);
 
 				statusBar = "Uploading (" + (i * 100 / finalOutput.length) + "%)...";
 
-				ModCharsetAudio.packet.sendToServer(new PacketDriveRecord(owner, data, finalOutput.length, (i + len) >= finalOutput.length));
+				ModCharsetAudio.packet.sendToServer(new PacketDriveRecord(owner, outData, finalOutput.length, (i + len) >= finalOutput.length));
 			}
 
 			statusBar = "Uploading (100%)...";
