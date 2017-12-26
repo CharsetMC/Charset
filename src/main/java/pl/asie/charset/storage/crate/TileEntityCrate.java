@@ -118,7 +118,7 @@ public class TileEntityCrate extends TileBase {
     }
 
     @Override
-    public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+    public void onPlacedBy(EntityLivingBase placer, EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
         loadFromStack(stack);
         initCache();
 

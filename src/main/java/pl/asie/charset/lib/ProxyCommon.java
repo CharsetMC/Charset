@@ -28,6 +28,8 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import pl.asie.charset.lib.audio.manager.AudioStreamManager;
 import pl.asie.charset.lib.audio.manager.AudioStreamManagerServer;
+import pl.asie.charset.lib.blocks.BlockBase;
+import pl.asie.charset.lib.blocks.ItemBlockBase;
 import pl.asie.charset.lib.wires.PartWire;
 
 public class ProxyCommon {
@@ -44,7 +46,7 @@ public class ProxyCommon {
 
 	public void registerBlock(Block block, String name) {
 		GameRegistry.register(block.setRegistryName(name));
-		GameRegistry.register(new ItemBlock(block).setRegistryName(name));
+		GameRegistry.register((block instanceof BlockBase ? new ItemBlockBase(block) : new ItemBlock(block)).setRegistryName(name));
 		block.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 	}
 

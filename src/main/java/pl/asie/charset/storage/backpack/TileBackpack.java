@@ -64,7 +64,7 @@ public class TileBackpack extends TileBase implements IInteractionObject, IInven
 	}
 
 	@Override
-	public void onPlacedBy(EntityLivingBase placer, ItemStack stack) {
+	public void onPlacedBy(EntityLivingBase placer, EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		if (stack.hasTagCompound()) {
 			readNBTData(stack.getTagCompound(), false);
 		}

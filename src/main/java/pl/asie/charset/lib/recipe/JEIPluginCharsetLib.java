@@ -12,7 +12,6 @@ public class JEIPluginCharsetLib implements IModPlugin {
     public static IStackHelper STACKS;
     public static IRecipeTransferHandlerHelper RECIPE_TRANSFER_HANDLERS;
     public static IGuiHelper GUIS;
-    public static IItemBlacklist ITEM_BLACKLISTS;
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
@@ -27,7 +26,6 @@ public class JEIPluginCharsetLib implements IModPlugin {
         STACKS = registry.getJeiHelpers().getStackHelper();
         GUIS = registry.getJeiHelpers().getGuiHelper();
         RECIPE_TRANSFER_HANDLERS = registry.getJeiHelpers().recipeTransferHandlerHelper();
-        ITEM_BLACKLISTS = registry.getJeiHelpers().getItemBlacklist();
 
         registry.addRecipeHandlers(new JEIRecipeCharset.Handler());
     }

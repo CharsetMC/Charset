@@ -44,10 +44,11 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.blocks.ItemBlockBase;
 
 import java.util.List;
 
-public class ItemDayBarrel extends ItemBlock {
+public class ItemDayBarrel extends ItemBlockBase {
     public ItemDayBarrel(Block block) {
         super(block);
         setUnlocalizedName("charset.barrel");

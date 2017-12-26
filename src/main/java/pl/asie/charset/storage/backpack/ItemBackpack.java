@@ -35,13 +35,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.lib.blocks.ItemBlockBase;
 import pl.asie.charset.lib.inventory.IInventoryOwner;
 import pl.asie.charset.lib.inventory.InventorySimple;
 import pl.asie.charset.lib.items.IDyeableItem;
 
 import java.util.List;
 
-public class ItemBackpack extends ItemBlock implements IDyeableItem {
+public class ItemBackpack extends ItemBlockBase implements IDyeableItem {
 	public class InventoryOwnerBackpack implements IInventoryOwner {
 		public final ItemStack stack;
 

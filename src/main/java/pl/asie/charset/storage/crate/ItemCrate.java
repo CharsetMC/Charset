@@ -5,8 +5,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
 import pl.asie.charset.lib.ModCharsetLib;
+import pl.asie.charset.lib.blocks.ItemBlockBase;
 
-public class ItemCrate extends ItemBlock {
+public class ItemCrate extends ItemBlockBase {
     public ItemCrate(Block block) {
         super(block);
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);

@@ -14,6 +14,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.UniversalBucket;
@@ -28,7 +29,7 @@ import java.util.List;
 
 public class UniversalClayBucket extends UniversalBucket {
     public UniversalClayBucket() {
-        super(FluidContainerRegistry.BUCKET_VOLUME, null, false);
+        super(Fluid.BUCKET_VOLUME, null, false);
         setCreativeTab(ModCharsetLib.CREATIVE_TAB);
         setUnlocalizedName("charset.clayBucket");
     }

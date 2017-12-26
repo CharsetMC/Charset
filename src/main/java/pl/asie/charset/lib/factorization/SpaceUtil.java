@@ -36,16 +36,15 @@
 
 package pl.asie.charset.lib.factorization;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import pl.asie.charset.lib.utils.RayTraceUtils;
 
 import javax.vecmath.Vector3d;
 import java.util.*;
@@ -369,6 +368,27 @@ public final class SpaceUtil {
         return lineVec.crossProduct(nPoint).lengthVector() / mag;
     }
 
+    public static Orientation getOrientation(World world, BlockPos pos, EntityLivingBase placer, EnumFacing face, float hitX, float hitY, float hitZ) {
+        Vec3d hitVec = null;
+        if (face == null) {
+            RayTraceResult hit = RayTraceUtils.getCollision(world, pos, placer, Block.FULL_BLOCK_AABB, 0);
+            if (hit != null) {
+                face = hit.sideHit;
+                hitVec = hit.hitVec != null ? hit.hitVec.subtract(new Vec3d(pos)) : null;
+            }
+        } else {
+            hitVec = new Vec3d(hitX, hitY, hitZ);
+        }
+
+        if (hitVec != null) {
+            return SpaceUtil.getOrientation(placer, face, hitVec);
+        } else if (face != null) {
+            return Orientation.fromDirection(face);
+        } else {
+            return Orientation.FACE_UP_POINT_NORTH;
+        }
+    }
+
     public static EnumFacing getOrientation(int ordinal) {
         if (ordinal < 0) return null;
         if (ordinal >= 6) return null;
@@ -377,8 +397,9 @@ public final class SpaceUtil {
 
     public static Orientation getOrientation(EntityLivingBase player, EnumFacing facing, Vec3d hit) {
         double u, v;
-        if (facing == null) facing = EnumFacing.DOWN;
-        assert facing != null;
+        if (facing == null) {
+            facing = EnumFacing.DOWN;
+        }
         switch (facing) {
             default:
             case DOWN:
@@ -670,11 +691,5 @@ public final class SpaceUtil {
 
     public static boolean equals(Vec3d a, Vec3d b) {
         return a.xCoord == b.xCoord && a.yCoord == b.yCoord && a.zCoord == b.zCoord;
-    }
-
-    public static double lengthSquare(Vec3d vec) {
-        return vec.xCoord * vec.xCoord
-                + vec.yCoord * vec.yCoord
-                + vec.zCoord * vec.zCoord;
     }
 }
