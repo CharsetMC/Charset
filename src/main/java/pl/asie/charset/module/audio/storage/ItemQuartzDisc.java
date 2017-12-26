@@ -74,7 +74,6 @@ public class ItemQuartzDisc extends Item {
 			if (dataStorage != null) {
 				if (!dataStorage.isInitialized()) {
 					dataStorage.initialize(null, 0, CharsetAudioStorage.quartzDisc.getSize(stack));
-					stack.setItemDamage(stack.getItemDamage() | 1);
 				}
 
 				if (capability == CharsetAudioStorage.DATA_STORAGE) {
@@ -82,6 +81,7 @@ public class ItemQuartzDisc extends Item {
 						return null;
 					}
 
+					stack.setItemDamage(stack.getItemDamage() | 1);
 					return CharsetAudioStorage.DATA_STORAGE.cast(dataStorage);
 				}
 			}

@@ -29,6 +29,8 @@ import pl.asie.charset.lib.utils.Utils;
 
 public abstract class PacketTile extends Packet {
 	protected TileEntity tile;
+	private int dim;
+	private BlockPos pos;
 
 	public PacketTile() {
 
@@ -40,23 +42,22 @@ public abstract class PacketTile extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, PacketBuffer buf) {
-		int dim = buf.readInt();
-		int x = buf.readInt();
-		int y = buf.readInt();
-		int z = buf.readInt();
+		dim = buf.readInt();
+		pos = buf.readBlockPos();
+	}
 
+	@Override
+	public void apply(INetHandler handler) {
 		World w = Utils.getLocalWorld(dim);
 
 		if (w != null) {
-			tile = w.getTileEntity(new BlockPos(x, y, z));
+			tile = w.getTileEntity(pos);
 		}
 	}
 
 	@Override
 	public void writeData(PacketBuffer buf) {
 		buf.writeInt(tile.getWorld().provider.getDimension());
-		buf.writeInt(tile.getPos().getX());
-		buf.writeInt(tile.getPos().getY());
-		buf.writeInt(tile.getPos().getZ());
+		buf.writeBlockPos(tile.getPos());
 	}
 }

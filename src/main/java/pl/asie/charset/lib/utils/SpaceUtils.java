@@ -333,7 +333,7 @@ public final class SpaceUtils {
         }
 
         if (hitVec != null) {
-            return SpaceUtils.getOrientation(placer, face, hitVec);
+            return SpaceUtils.getOrientation(pos, placer, face, hitVec);
         } else if (face != null) {
             return Orientation.fromDirection(face);
         } else {
@@ -341,7 +341,7 @@ public final class SpaceUtils {
         }
     }
 
-    public static Orientation getOrientation(EntityLivingBase player, EnumFacing facing, Vec3d hit) {
+    public static Orientation getOrientation(BlockPos pos, EntityLivingBase player, EnumFacing facing, Vec3d hit) {
         double u, v;
         if (facing == null) {
             facing = EnumFacing.DOWN;
@@ -384,7 +384,7 @@ public final class SpaceUtils {
         for (int X = 0; X < pointy; X++) {
             fo = fo.getNextRotationOnFace();
         }
-        EnumFacing orient = SpaceUtils.determineOrientation(player);
+        EnumFacing orient = EnumFacing.getDirectionFromEntityLiving(pos, player);
         if (orient.getAxis() != EnumFacing.Axis.Y
                 && facing.getAxis() == EnumFacing.Axis.Y) {
             facing = orient;

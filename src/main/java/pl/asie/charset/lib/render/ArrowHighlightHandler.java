@@ -67,14 +67,9 @@ public class ArrowHighlightHandler {
     }
 
     private void drawArrowHighlight(EntityPlayer player, RayTraceResult trace, Vec3d cameraPos) {
-        Orientation orientation = SpaceUtils.getOrientation(player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
+        Orientation orientation = SpaceUtils.getOrientation(trace.getBlockPos(), player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
 
-        if (orientation.top.getDirectionVec().getY() == 1 && trace.sideHit.getAxis() == EnumFacing.Axis.Y) {
-            /*
-             * The purpose of this is two-fold:
-             *     - It renders at the wrong spot when pointing upwards on a vertical face
-             *     - You totally don't really need it in this case
-             */
+        if (orientation.top.getAxis() == trace.sideHit.getAxis()) {
             return;
         }
 

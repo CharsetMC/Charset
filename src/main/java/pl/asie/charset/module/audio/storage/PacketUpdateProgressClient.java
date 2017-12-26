@@ -48,6 +48,7 @@ public class PacketUpdateProgressClient extends PacketTile {
 
 	@Override
 	public void apply(INetHandler handler) {
+		super.apply(handler);
 		if (tile != null && tile instanceof TileRecordPlayer) {
 			((TileRecordPlayer) tile).progressClient = pc;
 		}

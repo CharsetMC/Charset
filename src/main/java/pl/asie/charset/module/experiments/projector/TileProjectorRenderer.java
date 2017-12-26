@@ -76,7 +76,6 @@ public class TileProjectorRenderer extends TileEntitySpecialRenderer<TileProject
                 0.5*(1 - Math.abs(face.getDirectionVec().getZ()))
         );
 
-        RenderHelper.enableStandardItemLighting();
         Quaternion quat = Quaternion.fromOrientation(bo);
         quat.glRotate();
         GlStateManager.rotate(90, 0, 1, 0);

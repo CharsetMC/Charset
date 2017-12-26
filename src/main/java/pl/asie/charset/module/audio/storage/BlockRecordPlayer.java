@@ -20,6 +20,7 @@
 package pl.asie.charset.module.audio.storage;
 
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -44,13 +45,17 @@ public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider 
 
 	public BlockRecordPlayer() {
 		super(Material.ROCK);
-		setOpaqueCube(false);
+		setHardness(2.5F);
+		setHarvestLevel("pickaxe", 0);
+		setSoundType(SoundType.METAL);
+		setUnlocalizedName("charset.record_player");
 		setFullCube(false);
+		setOpaqueCube(false);
 	}
 
 	@Override
 	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		return this.getDefaultState().withProperty(Properties.FACING4, placer.getHorizontalFacing().getOpposite());
+		return this.getDefaultState().withProperty(Properties.FACING4, placer.getHorizontalFacing());
 	}
 
 	@Override

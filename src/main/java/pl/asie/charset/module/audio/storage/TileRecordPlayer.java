@@ -158,7 +158,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 						float fsub = 0.05f;
 						float fstart = (CharsetAudioStorage.quartzDisc.getArmStartPosition(holder.getStack()) * fmul) - fsub;
 						float fend = (32f * fmul) - fsub;
-						System.out.println(fstart + " . " + fend);
+						// System.out.println(fstart + " . " + fend);
 						float newPos = 1f - ((float) (realPos.x - fstart) / (fend - fstart));
 						if (newPos < 0.0f) newPos = 0.0f;
 						else if (newPos > 1.0f) newPos = 1.0f;

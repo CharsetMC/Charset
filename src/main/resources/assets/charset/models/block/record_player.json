@@ -7,13 +7,13 @@
                 "down":  { "texture": "#down", "cullface": "down" },
                 "up":    { "texture": "#up" },
                 "north": { "texture": "#side", "cullface": "north" },
-                "south": { "texture": "#side", "cullface": "south" },
+                "south": { "texture": "#front", "cullface": "south" },
                 "west":  { "texture": "#side", "cullface": "west" },
                 "east":  { "texture": "#side", "cullface": "east" }
             }
         },
-        {   "from": [ 7.5, 10, 7.5 ],
-            "to": [ 8.5, 11, 8.5 ],
+        {   "from": [ 7, 10, 7 ],
+            "to": [ 9, 11, 9 ],
             "faces": {
                 "up":  { "texture": "#down" },
                 "north": { "texture": "#side" },
@@ -27,6 +27,7 @@
         "particle": "charset:blocks/record_player/side",
         "down": "charset:blocks/record_player/bottom",
         "up": "charset:blocks/record_player/top",
+        "front": "charset:blocks/record_player/front",
         "side": "charset:blocks/record_player/side"
     }
 }

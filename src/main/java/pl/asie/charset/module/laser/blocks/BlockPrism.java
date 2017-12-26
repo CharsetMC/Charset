@@ -89,17 +89,4 @@ public class BlockPrism extends BlockBase implements ITileEntityProvider {
 	public BlockRenderLayer getBlockLayer() {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
-
-	@Override
-	public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
-		if (axis != null) {
-			TileEntity tile = world.getTileEntity(pos);
-			if (tile instanceof TilePrism) {
-				((TilePrism) tile).rotateWrench(axis.getOpposite());
-				return true;
-			}
-		}
-
-		return false;
-	}
 }

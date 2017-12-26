@@ -126,18 +126,15 @@ public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileReco
 
 		if (!stack.isEmpty()) {
 			GlStateManager.pushMatrix();
-			RenderHelper.enableStandardItemLighting();
 			GlStateManager.rotate(90, 1, 0, 0);
 			GlStateManager.translate(0.5, 0.5, -0.625 - 0.0625/4);
 			handleRenderItem(stack, tile, partialTicks);
-			RenderHelper.disableStandardItemLighting();
 			GlStateManager.popMatrix();
 		}
 
 		GlStateManager.popMatrix();
 
 		GlStateManager.disableBlend();
-		RenderHelper.enableStandardItemLighting();
 	}
 
 	public void handleRenderItem(ItemStack is, TileRecordPlayer player, float partialTicks) {

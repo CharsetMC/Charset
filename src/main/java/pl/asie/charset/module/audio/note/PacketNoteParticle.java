@@ -47,6 +47,7 @@ public class PacketNoteParticle extends PacketTile {
 
 	@Override
 	public void apply(INetHandler handler) {
+		super.apply(handler);
 		if (tile != null) {
 			BlockPos pos = tile.getPos();
 			tile.getWorld().spawnParticle(EnumParticleTypes.NOTE, (double) pos.getX() + 0.5D, (double) pos.getY() + 1.2D, (double) pos.getZ() + 0.5D,
