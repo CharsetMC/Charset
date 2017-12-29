@@ -132,7 +132,7 @@ public class CharsetTweakSlide {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		RegistryUtils.register(EntitySlidingBlock.class, "sliding_block", 128, 1, true);
+		RegistryUtils.register(EntitySlidingBlock.class, "sliding_block", 64, 1, true);
 	}
 
 	@Mod.EventHandler
@@ -154,18 +154,10 @@ public class CharsetTweakSlide {
 			while (!queue.isEmpty()) {
 				QueuedChange change = queue.remove();
 				if (EntitySlidingBlock.canSlideOn(change.world, change.pos, null)) {
-					IBlockState state = change.world.getBlockState(change.pos);
-					NBTTagCompound tag = null;
-					TileEntity tile = change.world.getTileEntity(change.pos);
-					if (tile != null) {
-						tag = tile.writeToNBT(new NBTTagCompound());
-					}
-					change.world.setBlockToAir(change.pos);
 					EntitySlidingBlock block = new EntitySlidingBlock(
 							change.world,
 							change.pos,
-							change.direction,
-							state, tag
+							change.direction
 					);
 					change.world.spawnEntity(block);
 				}

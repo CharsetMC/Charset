@@ -78,18 +78,17 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 		validate();
 	}
 
-	public LaserBeam(PacketBuffer buffer) throws IOException {
-		id = buffer.readLong();
-		world = Utils.getLocalWorld(buffer.readInt());
-		start = buffer.readBlockPos();
-		length = buffer.readUnsignedShort();
+	public LaserBeam(long id, World world, BlockPos start, int length, int flags) {
+		this.id = id;
+		this.world = world;
+		this.start = start;
+		this.length = length;
 
-		int flags = buffer.readUnsignedByte();
 		direction = EnumFacing.getFront(flags & 7);
 		color = LaserColor.VALUES[(flags >> 3) & 7];
 		endedAtAir = (flags & 0x40) != 0;
 
-		source = new DummyLaserSource(world != null ? world.getTileEntity(start) : null);
+		source = new DummyLaserSource(world.getTileEntity(start));
 		end = start.offset(direction, length);
 
 		validate();

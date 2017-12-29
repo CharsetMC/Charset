@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.module.tweaks.carry.CarryHandler;
@@ -27,32 +28,24 @@ public class EntityRendererSlidingBlock extends Render<EntitySlidingBlock> {
 		super(renderManager);
 	}
 
-	@Override
-	public void doRender(EntitySlidingBlock entity, double x, double y, double z, float entityYaw, float partialTicks) {
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(x - 0.5f, y, z - 0.5f);
-		GlStateManager.disableLighting();
-		GlStateManager.enableBlend();
-		GlStateManager.enableRescaleNormal();
-
+	public void renderBlock(EntitySlidingBlock entity, BlockPos pos, float partialTicks) {
 		try {
 			Tessellator tessellator = Tessellator.getInstance();
 			BufferBuilder buffer = tessellator.getBuffer();
-			IBlockState state = entity.block;
+			IBlockState state = entity.blockStates.get(pos);
 
 			if (state != null && state.getRenderType() == EnumBlockRenderType.MODEL) {
 				buffer.setTranslation(0, -64, 0);
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
 				try {
-					IBlockState renderState = state.getActualState(entity.access, CarryHandler.ACCESS_POS);
-					IBlockState renderStateExt = state.getBlock().getExtendedState(renderState, entity.access, CarryHandler.ACCESS_POS);
+					IBlockState renderState = state.getActualState(entity.access, pos);
+					IBlockState renderStateExt = state.getBlock().getExtendedState(renderState, entity.access, pos);
 
 					BlockRendererDispatcher brd = Minecraft.getMinecraft().getBlockRendererDispatcher();
 					IBakedModel model = brd.getModelForState(renderState);
 					brd.getBlockModelRenderer().renderModelFlat(entity.access,
-							model, renderStateExt,
-							CarryHandler.ACCESS_POS, buffer, false, 0L
+							model, renderStateExt, pos, buffer, false, 0L
 					);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -62,10 +55,10 @@ public class EntityRendererSlidingBlock extends Render<EntitySlidingBlock> {
 				buffer.setTranslation(0, 0, 0);
 			}
 
-			TileEntity tile = entity.access.getTileEntity(CarryHandler.ACCESS_POS);
+			TileEntity tile = entity.getTile(pos);
 			if (tile != null) {
 				RenderHelper.enableStandardItemLighting();
-				int i = entity.access.getCombinedLight(CarryHandler.ACCESS_POS, 0);
+				int i = entity.access.getCombinedLight(pos, 0);
 				int j = i % 65536;
 				int k = i / 65536;
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j, (float)k);
@@ -94,7 +87,21 @@ public class EntityRendererSlidingBlock extends Render<EntitySlidingBlock> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
 
+	@Override
+	public void doRender(EntitySlidingBlock entity, double x, double y, double z, float entityYaw, float partialTicks) {
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(x - 0.5f, y, z - 0.5f);
+		GlStateManager.disableLighting();
+		GlStateManager.enableBlend();
+		GlStateManager.enableRescaleNormal();
+
+		if (entity.blockStates != null) {
+			for (BlockPos pos : entity.blockStates.keySet()) {
+				renderBlock(entity, pos, partialTicks);
+			}
+		}
 
 		GlStateManager.popMatrix();
 		GlStateManager.disableBlend();

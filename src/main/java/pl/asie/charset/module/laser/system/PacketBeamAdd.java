@@ -21,13 +21,21 @@ package pl.asie.charset.module.laser.system;
 
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.network.Packet;
+import pl.asie.charset.lib.utils.Utils;
 import pl.asie.charset.module.laser.CharsetLaser;
 
 import java.io.IOException;
 
 public class PacketBeamAdd extends Packet {
 	private LaserBeam beam;
+	private long id;
+	private int dim;
+	private BlockPos start;
+	private int length, flags;
 
 	public PacketBeamAdd(LaserBeam beam) {
 		this.beam = beam;
@@ -39,16 +47,21 @@ public class PacketBeamAdd extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, PacketBuffer buf) {
-		try {
-			beam = new LaserBeam(buf);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		id = buf.readLong();
+		dim = buf.readInt();
+		start = buf.readBlockPos();
+		length = buf.readUnsignedShort();
+		flags = buf.readUnsignedByte();
 	}
 
 	@Override
 	public void apply(INetHandler handler) {
-		CharsetLaser.laserStorage.add(beam);
+		World world = getWorld(handler);
+		if (world != null && world.provider.getDimension() == dim) {
+			CharsetLaser.laserStorage.add(beam = new LaserBeam(id, world, start, length, flags));
+		} else {
+			ModCharset.logger.warn("Could not find dimension " + dim + " for laser beam!");
+		}
 	}
 
 	@Override
