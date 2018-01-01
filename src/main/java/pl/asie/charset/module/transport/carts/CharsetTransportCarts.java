@@ -54,8 +54,6 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.transport.carts.link.Linkable;
 import pl.asie.charset.module.transport.carts.link.TrainLinker;
-import pl.asie.charset.module.transport.rails.BlockRailCharset;
-import pl.asie.charset.module.transport.rails.CharsetTransportRails;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,12 +125,6 @@ public class CharsetTransportCarts {
 
         if (combiner != null) {
             MinecraftForge.EVENT_BUS.register(combiner);
-
-            // TODO: This needs a redesign... Possibly move the Combiner to Lib.
-            if (ModCharset.isModuleLoaded("transport.rails")) {
-                combiner.register(Blocks.RAIL, CharsetTransportRails.blockRailCross.getDefaultState(), new ItemStack(Blocks.RAIL));
-                combiner.register(Blocks.RAIL, CharsetTransportRails.blockRailCross.getDefaultState().withProperty(BlockRailCharset.DIRECTION, BlockRailBase.EnumRailDirection.EAST_WEST), new ItemStack(Blocks.RAIL));
-            }
             registerCombinerRecipeForDirs(Blocks.RAIL, BlockRail.SHAPE, Blocks.DETECTOR_RAIL, BlockRailDetector.SHAPE, new ItemStack(Blocks.STONE_PRESSURE_PLATE));
         }
     }

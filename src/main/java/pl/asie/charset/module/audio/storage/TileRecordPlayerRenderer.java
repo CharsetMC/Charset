@@ -89,7 +89,7 @@ public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileReco
 				GlStateManager.disableLighting();
 				GlStateManager.disableTexture2D();
 
-				int color = CharsetLaser.LASER_COLORS[7];
+				int color = CharsetAudioStorage.PLAYER_LASER_COLOR;
 				int r = (color >> 16) & 0xFF;
 				int g = (color >> 8) & 0xFF;
 				int b = color & 0xFF;

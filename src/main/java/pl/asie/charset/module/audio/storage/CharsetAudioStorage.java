@@ -43,6 +43,7 @@ import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.resources.ColorPaletteUpdateEvent;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -72,12 +73,24 @@ public class CharsetAudioStorage {
     public static Item itemRecordPlayer;
     public static ItemQuartzDisc quartzDisc;
 
+    public static int PLAYER_LASER_COLOR = 0xBFFFFFFF;
+
     public static void addTimeToTooltip(List<String> tooltip, int mins, int secs) {
         String secStr = secs + " second" + (secs != 1 ? "s" : "");
         if (mins != 0) {
             tooltip.add(TextFormatting.GRAY + "" + mins + " minute" + (mins != 1 ? "s" : "") + (secs != 0 ? (" " + secStr) : ""));
         } else {
             tooltip.add(TextFormatting.GRAY + secStr);
+        }
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void onColorPaletteUpdate(ColorPaletteUpdateEvent event) {
+        if (event.getParser().hasColor("charset:laser", "white")) {
+            PLAYER_LASER_COLOR = RenderUtils.asMcIntColor(event.getParser().getColor("charset:laser", "white"));
+        } else {
+            PLAYER_LASER_COLOR = 0xBFFFFFFF;
         }
     }
 

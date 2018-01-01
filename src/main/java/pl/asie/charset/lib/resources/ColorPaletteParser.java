@@ -65,8 +65,12 @@ public final class ColorPaletteParser {
 
 	}
 
+	public boolean hasColor(String namespace, String color) {
+		return data.palettes.containsKey(namespace) && data.palettes.get(namespace).containsKey(color);
+	}
+
 	public double[] getColor(String namespace, String color) {
-		if (data.palettes.containsKey(namespace) && data.palettes.get(namespace).containsKey(color)) {
+		if (hasColor(namespace, color)) {
 			return data.palettes.get(namespace).get(color);
 		} else {
 			return new double[] { 0.0, 0.0, 0.0, 0.0 }; // Fallback

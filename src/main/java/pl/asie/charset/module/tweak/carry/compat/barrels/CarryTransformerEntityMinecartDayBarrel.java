@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tweak.carry;
+package pl.asie.charset.module.tweak.carry.compat.barrels;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -26,6 +26,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 import pl.asie.charset.module.storage.barrels.EntityMinecartDayBarrel;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
+import pl.asie.charset.module.tweak.carry.CarryTransformerEntityMinecart;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

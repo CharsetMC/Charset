@@ -88,9 +88,6 @@ public class CharsetTweakBlockCarrying {
         packet.registerPacket(0x02, PacketCarrySync.class);
 
         CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecart());
-        if (ModCharset.isModuleLoaded("storage.barrels")) {
-            CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecartDayBarrel());
-        }
 
         /* if (enabledSharing) {
             CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerPlayerShare());
