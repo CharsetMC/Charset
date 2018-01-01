@@ -2,7 +2,7 @@
   "conditions": [
     {
       "type": "charset:module_loaded",
-      "module": "tools.wrench"
+      "module": "tools.building.wrench"
     }
   ],
   "type": "charset:shaped",

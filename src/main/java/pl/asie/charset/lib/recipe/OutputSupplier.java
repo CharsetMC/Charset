@@ -32,6 +32,7 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import pl.asie.charset.ModCharset;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -88,13 +89,17 @@ public class OutputSupplier {
                 for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                     String key = new ResourceLocation(container.getModId(), entry.getKey()).toString();
                     String value = entry.getValue().getAsString();
-                    Object o = Class.forName(value).newInstance();
-                    if (o instanceof IOutputSupplierFactory) {
-                        outputSuppliers.put(key, (IOutputSupplierFactory) o);
-                    } else if (o instanceof IOutputSupplier) {
-                        outputSuppliers.put(key, (a, b) -> (IOutputSupplier) o);
-                    } else {
-                        throw new Exception("Invalid OutputSupplier object type: " + (o != null ? o.getClass().getName() : "null"));
+                    try {
+                        Object o = Class.forName(value).newInstance();
+                        if (o instanceof IOutputSupplierFactory) {
+                            outputSuppliers.put(key, (IOutputSupplierFactory) o);
+                        } else if (o instanceof IOutputSupplier) {
+                            outputSuppliers.put(key, (a, b) -> (IOutputSupplier) o);
+                        } else {
+                            throw new Exception("Invalid OutputSupplier object type: " + (o != null ? o.getClass().getName() : "null"));
+                        }
+                    } catch (Exception e) {
+                        ModCharset.logger.warn("Could not create IOutputSupplierFactory " + value + ": " + e.getMessage());
                     }
                 }
             }
