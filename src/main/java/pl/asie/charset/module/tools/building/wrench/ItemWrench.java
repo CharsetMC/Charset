@@ -34,9 +34,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
-import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
+import pl.asie.charset.module.tools.building.ICustomRotateBlock;
 import pl.asie.charset.module.tools.building.ItemCharsetTool;
 
 import java.util.Optional;

@@ -30,7 +30,7 @@ import java.util.Set;
 
 class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
     final TextureAtlasSprite log, plank;
-    final Set<TileEntityDayBarrel.Upgrade> upgrades;
+    final Set<BarrelUpgrade> upgrades;
     final Orientation orientation;
     final boolean isMetal;
 
@@ -62,7 +62,7 @@ class BarrelCacheInfo implements IRenderComparable<BarrelCacheInfo> {
         return result;
     }
 
-    private BarrelCacheInfo(TextureAtlasSprite log, ItemStack logStack, TextureAtlasSprite plank, Set<TileEntityDayBarrel.Upgrade> upgrade, Orientation orientation, boolean isMetal) {
+    private BarrelCacheInfo(TextureAtlasSprite log, ItemStack logStack, TextureAtlasSprite plank, Set<BarrelUpgrade> upgrade, Orientation orientation, boolean isMetal) {
         this.log = log;
         this.logStack = logStack;
         this.plank = plank;

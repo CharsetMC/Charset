@@ -63,7 +63,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     public ItemStack item = ItemStack.EMPTY;
     public ItemMaterial woodLog, woodSlab;
     public Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
-    public Set<Upgrade> upgrades = EnumSet.noneOf(Upgrade.class);
+    public Set<BarrelUpgrade> upgrades = EnumSet.noneOf(BarrelUpgrade.class);
     Object notice_target = this;
 
     protected final Lockable lockable = new Lockable(this);
@@ -159,20 +159,14 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
     }
 
-    public enum Upgrade {
-        SILKY, HOPPING, STICKY, INFINITE;
-
-        public static final Upgrade[] VALUES = values();
-    }
-
     // TODO: Remove in 1.13
-    private static final Upgrade[][] OLD_TYPE_ORDER = new Upgrade[][] {
+    private static final BarrelUpgrade[][] OLD_TYPE_ORDER = new BarrelUpgrade[][] {
             { },
-            { Upgrade.SILKY },
-            { Upgrade.HOPPING },
+            { BarrelUpgrade.SILKY },
+            { BarrelUpgrade.HOPPING },
             { },
-            { Upgrade.STICKY },
-            { Upgrade.INFINITE, Upgrade.HOPPING }
+            { BarrelUpgrade.STICKY },
+            { BarrelUpgrade.INFINITE, BarrelUpgrade.HOPPING }
     };
 
     private boolean updateRedstoneLevels;
@@ -188,12 +182,12 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         world.markChunkDirty(pos, this);
     }
 
-    public static void populateUpgrades(Set<Upgrade> upgrades, NBTTagCompound compound) {
+    public static void populateUpgrades(Set<BarrelUpgrade> upgrades, NBTTagCompound compound) {
         if (compound.hasKey("upgrades", Constants.NBT.TAG_LIST)) {
             NBTTagList upgradeNBT = compound.getTagList("upgrades", Constants.NBT.TAG_STRING);
             for (int i = 0; i < upgradeNBT.tagCount(); i++) {
                 try {
-                    Upgrade type = Upgrade.valueOf(upgradeNBT.getStringTagAt(i));
+                    BarrelUpgrade type = BarrelUpgrade.valueOf(upgradeNBT.getStringTagAt(i));
                     upgrades.add(type);
                 } catch (IllegalArgumentException e) {
 
@@ -201,16 +195,16 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             }
         } else if (compound.hasKey("type", Constants.NBT.TAG_STRING)) {
             String s = compound.getString("type").toUpperCase();
-            Upgrade type = null;
+            BarrelUpgrade type = null;
             try {
-                type = Upgrade.valueOf(s);
+                type = BarrelUpgrade.valueOf(s);
             } catch (IllegalArgumentException e) {
 
             }
 
             if (s.equals("CREATIVE")) {
-                upgrades.add(Upgrade.HOPPING);
-                upgrades.add(Upgrade.INFINITE);
+                upgrades.add(BarrelUpgrade.HOPPING);
+                upgrades.add(BarrelUpgrade.INFINITE);
             } else if (type != null) {
                 upgrades.add(type);
             }
@@ -309,7 +303,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         compound.setByte("dir", (byte) orientation.ordinal());
 
         NBTTagList upgradeNBT = new NBTTagList();
-        for (Upgrade u : upgrades) {
+        for (BarrelUpgrade u : upgrades) {
             upgradeNBT.appendTag(new NBTTagString(u.name()));
         }
         compound.setTag("upgrades", upgradeNBT);
@@ -352,7 +346,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     void tick() {
-        if (!upgrades.contains(Upgrade.HOPPING) || orientation == null) {
+        if (!upgrades.contains(BarrelUpgrade.HOPPING) || orientation == null) {
             return;
         }
         if (notice_target == this && world.getStrongPower(pos) > 0) {
@@ -390,7 +384,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack got = handler.insertItem(i, toPush, false);
                     if (got.isEmpty()) {
-                        if (!upgrades.contains(Upgrade.INFINITE)) {
+                        if (!upgrades.contains(BarrelUpgrade.INFINITE)) {
                             item.shrink(1);
                         }
                         itemChanged = true;
@@ -410,7 +404,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     public void neighborChanged(BlockPos pos, BlockPos fromPos) {
-        if (!upgrades.contains(Upgrade.HOPPING)) {
+        if (!upgrades.contains(BarrelUpgrade.HOPPING)) {
             updateRedstoneLevel();
             // X/Z can be equal, as we only care about top/bottom neighbors for this
             if (pos.getX() == fromPos.getX() && pos.getZ() == fromPos.getZ()) {
@@ -426,7 +420,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     public int getItemCount() {
         if (item.isEmpty()) {
             return 0;
-        } else if (upgrades.contains(Upgrade.INFINITE)) {
+        } else if (upgrades.contains(BarrelUpgrade.INFINITE)) {
             return ((getMaxStacks() + 1) / 2) * item.getMaxStackSize();
         } else {
             return item.getCount();
@@ -452,7 +446,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             if (amt > 0) {
                 ItemStack stack = item.copy();
                 stack.setCount(amt);
-                if (!simulate && !upgrades.contains(Upgrade.INFINITE)) {
+                if (!simulate && !upgrades.contains(BarrelUpgrade.INFINITE)) {
                     item.shrink(amt);
                     onItemChange(item.isEmpty());
                 }
@@ -468,7 +462,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             return is;
         }
 
-        if (upgrades.contains(Upgrade.INFINITE) && !item.isEmpty()) {
+        if (upgrades.contains(BarrelUpgrade.INFINITE) && !item.isEmpty()) {
             return is;
         }
 
@@ -497,9 +491,9 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     public int getExtractableItemCount() {
         if (item.isEmpty()) {
             return 0;
-        } else if (upgrades.contains(Upgrade.INFINITE)) {
+        } else if (upgrades.contains(BarrelUpgrade.INFINITE)) {
             return item.getMaxStackSize();
-        } else if (upgrades.contains(Upgrade.STICKY)) {
+        } else if (upgrades.contains(BarrelUpgrade.STICKY)) {
             return Math.min(item.getCount() - 1, item.getMaxStackSize());
         } else {
             return Math.min(item.getCount(), item.getMaxStackSize());
@@ -539,7 +533,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     @Override
     public boolean containsUpgrade(String upgradeName) {
-        return upgrades.contains(Upgrade.valueOf(upgradeName));
+        return upgrades.contains(BarrelUpgrade.valueOf(upgradeName));
     }
 
     public boolean itemMatch(ItemStack is) {
@@ -592,7 +586,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         if (is.hasTagCompound()) {
             populateUpgrades(upgrades, is.getTagCompound());
         }
-        if (upgrades.contains(Upgrade.SILKY) && is.hasTagCompound()) {
+        if (upgrades.contains(BarrelUpgrade.SILKY) && is.hasTagCompound()) {
             NBTTagCompound tag = is.getTagCompound();
             int loadCount = tag.getInteger("SilkCount");
             if (loadCount > 0) {
@@ -634,7 +628,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     public void markDirty() {
         super.markDirty();
         sync();
-        if (upgrades.contains(Upgrade.HOPPING)) {
+        if (upgrades.contains(BarrelUpgrade.HOPPING)) {
             needLogic();
         }
     }
@@ -894,7 +888,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             dropPos = dropPos.offset(orientation.facing);
         }
 
-        if (upgrades.contains(Upgrade.INFINITE)) {
+        if (upgrades.contains(BarrelUpgrade.INFINITE)) {
             if (player.isSneaking()) {
                 item = ItemStack.EMPTY;
                 onItemChange(true);
@@ -930,7 +924,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                 msg.setMessage(new TextComponentTranslation("notice.charset.barrel.empty"));
             } else {
                 String countMsg;
-                if (upgrades.contains(Upgrade.INFINITE)) {
+                if (upgrades.contains(BarrelUpgrade.INFINITE)) {
                     countMsg = "notice.charset.barrel.infinite";
                 } else {
                     int count = getItemCount();
@@ -973,7 +967,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     public List<ItemStack> getContentDrops(boolean silkTouch) {
         List<ItemStack> stacks = new ArrayList<>();
 
-        if (upgrades.contains(Upgrade.INFINITE) || (upgrades.contains(Upgrade.SILKY) && silkTouch)) {
+        if (upgrades.contains(BarrelUpgrade.INFINITE) || (upgrades.contains(BarrelUpgrade.SILKY) && silkTouch)) {
             return stacks;
         }
 
@@ -1005,21 +999,21 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     public boolean canLose() {
-        return !item.isEmpty() && !upgrades.contains(Upgrade.INFINITE) && getItemCount() > getMaxDropAmount();
+        return !item.isEmpty() && !upgrades.contains(BarrelUpgrade.INFINITE) && getItemCount() > getMaxDropAmount();
     }
 
-    public static ItemStack makeDefaultBarrel(Set<Upgrade> upgrades) {
+    public static ItemStack makeDefaultBarrel(Set<BarrelUpgrade> upgrades) {
         return makeBarrel(upgrades, ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("log"), ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("slab"));
     }
 
-    public static ItemStack makeBarrel(Set<Upgrade> upgrades, ItemMaterial log, ItemMaterial slab) {
+    public static ItemStack makeBarrel(Set<BarrelUpgrade> upgrades, ItemMaterial log, ItemMaterial slab) {
         ItemStack stack = new ItemStack(CharsetStorageBarrels.barrelItem);
         NBTTagCompound compound = ItemUtils.getTagCompound(stack, true);
         compound.setString("log", log.getId());
         compound.setString("slab", slab.getId());
         if (upgrades.size() > 0) {
             NBTTagList list = new NBTTagList();
-            for (Upgrade u : upgrades)
+            for (BarrelUpgrade u : upgrades)
                 list.appendTag(new NBTTagString(u.name()));
             compound.setTag("upgrades", list);
         }
@@ -1035,7 +1029,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     // TODO: Handle invalid combinations somewhere?
-    static ItemStack addUpgrade(ItemStack barrel, Upgrade upgrade) {
+    static ItemStack addUpgrade(ItemStack barrel, BarrelUpgrade upgrade) {
         NBTTagCompound tag = ItemUtils.getTagCompound(barrel, true);
         NBTTagList list;
         if (!tag.hasKey("upgrades")) {
@@ -1114,7 +1108,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     public ItemStack getDroppedBlock(boolean silkTouch) {
         ItemStack is = makeBarrel(upgrades, woodLog, woodSlab);
-        if (upgrades.contains(Upgrade.SILKY) && !item.isEmpty() && silkTouch) {
+        if (upgrades.contains(BarrelUpgrade.SILKY) && !item.isEmpty() && silkTouch) {
             NBTTagCompound tag = is.getTagCompound();
             if (tag == null) {
                 tag = new NBTTagCompound();

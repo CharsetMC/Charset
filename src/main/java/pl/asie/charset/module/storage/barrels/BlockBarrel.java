@@ -20,18 +20,15 @@
 package pl.asie.charset.module.storage.barrels;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -44,7 +41,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
@@ -55,12 +51,12 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class BlockBarrel extends BlockBase implements ITileEntityProvider {
-    private static final List<Set<TileEntityDayBarrel.Upgrade>> CREATIVE_TAB_UPGRADE_SETS = ImmutableList.of(
-            EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class),
-            EnumSet.of(TileEntityDayBarrel.Upgrade.STICKY),
-            EnumSet.of(TileEntityDayBarrel.Upgrade.HOPPING),
-            EnumSet.of(TileEntityDayBarrel.Upgrade.HOPPING, TileEntityDayBarrel.Upgrade.STICKY),
-            EnumSet.of(TileEntityDayBarrel.Upgrade.SILKY)
+    private static final List<Set<BarrelUpgrade>> CREATIVE_TAB_UPGRADE_SETS = ImmutableList.of(
+            EnumSet.noneOf(BarrelUpgrade.class),
+            EnumSet.of(BarrelUpgrade.STICKY),
+            EnumSet.of(BarrelUpgrade.HOPPING),
+            EnumSet.of(BarrelUpgrade.HOPPING, BarrelUpgrade.STICKY),
+            EnumSet.of(BarrelUpgrade.SILKY)
     );
 
     public BlockBarrel() {
@@ -83,9 +79,9 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
 
         ImmutableList.Builder<ItemStack> builder = ImmutableList.builder();
 
-        for (Set<TileEntityDayBarrel.Upgrade> upgrades : CREATIVE_TAB_UPGRADE_SETS) {
+        for (Set<BarrelUpgrade> upgrades : CREATIVE_TAB_UPGRADE_SETS) {
             boolean allowed = true;
-            for (TileEntityDayBarrel.Upgrade upgrade : upgrades) {
+            for (BarrelUpgrade upgrade : upgrades) {
                 if (!CharsetStorageBarrels.isEnabled(upgrade)) {
                     allowed = false;
                     break;
@@ -130,7 +126,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityDayBarrel) {
-            if (((TileEntityDayBarrel) tile).upgrades.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
+            if (((TileEntityDayBarrel) tile).upgrades.contains(BarrelUpgrade.INFINITE)) {
                 return -1.0F;
             }
         }

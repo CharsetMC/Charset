@@ -19,22 +19,17 @@
 
 package pl.asie.charset.module.audio.storage;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.api.audio.*;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.audio.*;
@@ -42,9 +37,7 @@ import pl.asie.charset.lib.audio.codec.DFPWM;
 import pl.asie.charset.lib.audio.types.AudioDataDFPWM;
 import pl.asie.charset.lib.audio.types.AudioSinkBlock;
 import pl.asie.charset.lib.block.Trait;
-import pl.asie.charset.lib.block.TraitItemHolder;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.module.audio.util.AudioResampler;
 
 import javax.annotation.Nullable;
 import java.util.*;

@@ -29,6 +29,20 @@ public final class MethodHandleHelper {
 
     }
 
+    public static MethodHandle findConstructor(String s, Class<?>... types) {
+        try {
+            return MethodHandles.lookup().unreflectConstructor(
+                    ReflectionHelper.findConstructor(Class.forName(s), types)
+            );
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static MethodHandle findMethod(Class c, String nameDeobf, String nameObf, Class<?>... types) {
         try {
             return MethodHandles.lookup().unreflect(

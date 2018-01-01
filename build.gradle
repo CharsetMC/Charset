@@ -40,12 +40,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.1.2577"
+	version = "1.12.2-14.23.1.2581"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20171217"
+	mappings = "snapshot_20171225"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -98,8 +98,8 @@ configurations {
 }
 
 dependencies {
-	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.0_53"
-	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.136"
+	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.1_58"
+	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.138"
 	deobfCompile name: "chiselsandbits", version: "14.11"
 	deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-1.4.0-174"
 	deobfCompile name: "Baubles", version: "1.12-1.4.5"
@@ -144,7 +144,7 @@ jar.enabled = false
 shadowJar {
 	archiveName = tasks.jar.archiveName
 	configurations = [project.configurations.shadow]
-	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.module.audio.libresample4j'
+	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.module.audio.storage.libresample4j'
 }
 
 reobfJar {

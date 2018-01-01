@@ -42,7 +42,7 @@ public class DramaGenerator {
 				"BuildCraft", "Roguelike Dungeons", "IndustrialCraft 2", "Equivalent Exchange", "Project: E", "Forestry", "RailCraft",
 				"Compact Solars", "ComputerCraft", "Wireless Redstone", "OpenComputers", "GregTech", "Ars Magica", "Thaumcraft", "FTB", "Technic", "Resonant Rise",
 				"MineFactory Reloaded", "Magic Farm 2", "Tekkit", "MCPC+", "ATLauncher", "Metallurgy", "Logistics Pipes", "MCUpdater", "MultiMC", "Curse", "Mojang",
-				"Test Pack Please Ignore", "Agrarian Skies", "Sky Factory 2", "InfiTech 2", "FTB Infinity", "Steve's Carts", "BiblioCraft", "Minecraft",
+				"Test Pack Please Ignore", "Agrarian Skies", "Sky Factory 2", "Sky Factory 3", "InfiTech 2", "FTB Infinity", "Steve's Carts", "BiblioCraft", "Minecraft",
 				"XyCraft", "Forge", "GregTech", "Computronics", "Blood Magic", "Botania", "Ars Magica 2", "Thaumcraft", "Factum Opus", "Flamingo", "TIS-3D",
 				"Actually Additions", "Zetta Industries",
 				"OpenBlocks", "OpenPeripheral", "OpenComputers", "RotaryCraft", "ReactorCraft", "Big Reactors", "Thermal Expansion 4", "Extra Utilities",
@@ -55,7 +55,7 @@ public class DramaGenerator {
 				"Highlands", "Alternate Terrain Generation", "Bukkit", "Spigot", "Sponge", "MortTech", "ICBM", "Galacticraft", "Modular Power Suits",
 				"Team CoFH", "Extra Bees", "Extra Trees", "Mo' Creatures", "Grimoire of Gaia", "Atum", "Sync", "Hats", "Nether Ores"));
 		COMBINATIONS.put("packs" , Arrays.asList("Feed The Beast", "the ForgeCraft pack", "FTB Monster", "FTB Unstable", "Agrarian Skies", "Direwolf20 Pack",
-				"Tekkit", "Hexxit", "ATLauncher", "Resonant Rise", "Sky Factory 2", "InfiTech 2", "FTB Infinity", "MCUpdater", "Attack of the B-Team", "Mindcrack", "Magic Maiden", "ForgeCraft", "Technic"));
+				"Tekkit", "Hexxit", "ATLauncher", "Resonant Rise", "Sky Factory 2", "Sky Factory 3", "InfiTech 2", "FTB Infinity", "MCUpdater", "Attack of the B-Team", "Mindcrack", "Magic Maiden", "ForgeCraft", "Technic"));
 		COMBINATIONS.put("function" , Arrays.asList("MJ support", "RF support", "EU support", "FMP compatibility", "MCMP compatiblity", "quarries", "automatic mining", "GregTech balance",
 				"ComputerCraft APIs", "OpenComputers APIs", "Bukkit plugin compatibility", "MCPC+ support", "ID allocation", "ore processing", "smelting", "crafting", "balance",
 				"bees", "ThaumCraft integration", "realism", "decorative blocks", "new mobs", "TCon tool parts", "new wood types", "bundled cable support", "new player capes",

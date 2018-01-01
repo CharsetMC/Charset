@@ -27,7 +27,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -83,7 +82,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         quat.glRotate();
         GlStateManager.rotate(90, 0, 1, 0);
         GlStateManager.translate(0.25, 0.25 - 1.0/16.0, -1.0/128.0);
-        if (barrel.upgrades.contains(TileEntityDayBarrel.Upgrade.HOPPING)) {
+        if (barrel.upgrades.contains(BarrelUpgrade.HOPPING)) {
             double time = barrel.getWorld().getTotalWorldTime() + partialTicks;
             if (Math.sin(time/22.5) > 0) {
                 double delta = Math.max(0, Math.sin(time/2.25)/16);
@@ -141,7 +140,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
     }
 
     String getCountLabel(ItemStack item, TileEntityDayBarrel barrel) {
-        if (barrel.upgrades.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
+        if (barrel.upgrades.contains(BarrelUpgrade.INFINITE)) {
             return "i";
         }
         int ms = barrel.getStackDivisor();

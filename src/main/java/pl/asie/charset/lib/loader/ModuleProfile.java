@@ -24,7 +24,8 @@ public enum ModuleProfile {
     TESTING,
     EXPERIMENTAL,
     INDEV,
-    COMPAT;
+    COMPAT,
+    FORCED;
 
     public boolean includes(ModuleProfile other) {
         if (other == INDEV) {

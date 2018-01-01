@@ -21,15 +21,13 @@ package pl.asie.charset.module.storage.barrels.modcompat.jei;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import mezz.jei.api.IJeiRuntime;
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;
-import mezz.jei.api.ingredients.IModIngredientRegistration;
 import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
 import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
+import pl.asie.charset.module.storage.barrels.BarrelUpgrade;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -45,7 +43,7 @@ public class JEIPluginBarrels implements IModPlugin {
             TileEntityDayBarrel barrel = new TileEntityDayBarrel();
             barrel.loadFromStack(itemStack);
             List<String> upgradeStringSet = Lists.newArrayList();
-            for (TileEntityDayBarrel.Upgrade u : barrel.upgrades) {
+            for (BarrelUpgrade u : barrel.upgrades) {
                 upgradeStringSet.add(u.name());
             }
             Collections.sort(upgradeStringSet);

@@ -40,7 +40,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.Orientation;
@@ -175,7 +174,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     protected NBTTagCompound getUpgradesNBT() {
         NBTTagCompound compound = new NBTTagCompound();
         NBTTagList list = new NBTTagList();
-        for (TileEntityDayBarrel.Upgrade u : barrel.upgrades)
+        for (BarrelUpgrade u : barrel.upgrades)
             list.appendTag(new NBTTagString(u.name()));
         compound.setTag("upgrades", list);
         return compound;
@@ -264,7 +263,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             if (world.isRemote) {
                 return true;
             }
-            if (barrel.upgrades.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
+            if (barrel.upgrades.contains(BarrelUpgrade.INFINITE)) {
                 return false;
             }
             if (barrel.getItemCount() != oldItemCount) {

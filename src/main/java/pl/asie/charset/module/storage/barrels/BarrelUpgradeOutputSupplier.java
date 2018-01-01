@@ -30,12 +30,10 @@ import pl.asie.charset.lib.recipe.IOutputSupplierFactory;
 import pl.asie.charset.lib.recipe.IngredientMatcher;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
-import javax.annotation.Nullable;
-
 public class BarrelUpgradeOutputSupplier implements IOutputSupplier {
-    private final TileEntityDayBarrel.Upgrade upgradeType;
+    private final BarrelUpgrade upgradeType;
 
-    private BarrelUpgradeOutputSupplier(TileEntityDayBarrel.Upgrade upgradeType) {
+    private BarrelUpgradeOutputSupplier(BarrelUpgrade upgradeType) {
         this.upgradeType = upgradeType;
     }
 
@@ -61,7 +59,7 @@ public class BarrelUpgradeOutputSupplier implements IOutputSupplier {
     public static class Factory implements IOutputSupplierFactory {
         @Override
         public IOutputSupplier parse(JsonContext context, JsonObject json) {
-            return new BarrelUpgradeOutputSupplier(TileEntityDayBarrel.Upgrade.valueOf(JsonUtils.getString(json, "upgrade")));
+            return new BarrelUpgradeOutputSupplier(BarrelUpgrade.valueOf(JsonUtils.getString(json, "upgrade")));
         }
     }
 }

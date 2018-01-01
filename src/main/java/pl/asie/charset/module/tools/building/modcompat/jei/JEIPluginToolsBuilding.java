@@ -26,7 +26,7 @@ import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
-import pl.asie.charset.module.tools.building.CharsetToolsWrench;
+import pl.asie.charset.module.tools.building.wrench.CharsetToolsWrench;
 
 @CharsetJEIPlugin("tools.building")
 public class JEIPluginToolsBuilding implements IModPlugin {

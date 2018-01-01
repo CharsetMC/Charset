@@ -27,7 +27,6 @@ import paulscode.sound.codecs.CodecIBXM;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
 import pl.asie.charset.lib.audio.codec.DFPWM;
-import pl.asie.charset.module.audio.util.AudioResampler;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.File;

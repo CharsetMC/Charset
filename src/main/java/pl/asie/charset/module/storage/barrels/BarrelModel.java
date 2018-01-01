@@ -20,7 +20,6 @@
 package pl.asie.charset.module.storage.barrels;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -45,7 +44,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
     public final ModelColorHandler<BarrelCacheInfo> colorizer = new ModelColorHandler<BarrelCacheInfo>(this) {
         @Override
         public int colorMultiplier(BarrelCacheInfo info, int tintIndex) {
-            if (!info.isMetal && !info.upgrades.contains(TileEntityDayBarrel.Upgrade.HOPPING)) {
+            if (!info.isMetal && !info.upgrades.contains(BarrelUpgrade.HOPPING)) {
                 return ColorLookupHandler.INSTANCE.getColor(info.logStack, RenderUtils.AveragingMode.V_EDGES_ONLY);
             }
             return -1;
@@ -82,10 +81,10 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         TextureAtlasSprite front = this.front;
         TextureAtlasSprite side = this.side;
 
-        if (info.upgrades.contains(TileEntityDayBarrel.Upgrade.STICKY)) {
+        if (info.upgrades.contains(BarrelUpgrade.STICKY)) {
             side = this.side_sticky;
-            front = info.upgrades.contains(TileEntityDayBarrel.Upgrade.SILKY) ? this.front_silky_sticky : this.front_sticky;
-        } else if (info.upgrades.contains(TileEntityDayBarrel.Upgrade.SILKY)) {
+            front = info.upgrades.contains(BarrelUpgrade.SILKY) ? this.front_silky_sticky : this.front_sticky;
+        } else if (info.upgrades.contains(BarrelUpgrade.SILKY)) {
             front = this.front_silky;
         }
 
@@ -99,7 +98,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
         }
 
         if (isItem || layer == BlockRenderLayer.TRANSLUCENT) {
-            if (info.upgrades.contains(TileEntityDayBarrel.Upgrade.HOPPING)) {
+            if (info.upgrades.contains(BarrelUpgrade.HOPPING)) {
                 top = this.top_hopping;
                 textures.put("hopping", side_hopping.getIconName());
             } else {

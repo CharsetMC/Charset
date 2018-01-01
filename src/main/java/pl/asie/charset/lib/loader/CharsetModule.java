@@ -43,6 +43,13 @@ public @interface CharsetModule {
 
 	@Retention(value = RUNTIME)
 	@Target(value = FIELD)
+	@interface SidedProxy {
+		String clientSide() default "";
+		String serverSide() default "";
+	}
+
+	@Retention(value = RUNTIME)
+	@Target(value = FIELD)
 	@interface PacketRegistry {
 		String value() default "";
 	}

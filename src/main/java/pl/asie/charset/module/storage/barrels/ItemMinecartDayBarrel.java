@@ -85,10 +85,10 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
                 List<ItemStack> itemsOut = new ArrayList<>();
 
                 for (ItemStack barrel : items) {
-                    Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+                    Set<BarrelUpgrade> upgradeSet = EnumSet.noneOf(BarrelUpgrade.class);
                     TileEntityDayBarrel.populateUpgrades(upgradeSet, barrel.getTagCompound());
 
-                    if (upgradeSet.size() == 0 || upgradeSet.contains(TileEntityDayBarrel.Upgrade.INFINITE)) {
+                    if (upgradeSet.size() == 0 || upgradeSet.contains(BarrelUpgrade.INFINITE)) {
                         ItemStack barrelCart = makeBarrelCart(barrel);
                         itemsOut.add(barrelCart);
                     }

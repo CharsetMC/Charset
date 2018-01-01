@@ -32,9 +32,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-/**
- * Created by asie on 2/10/17.
- */
 public class GuiHandlerCharset implements IGuiHandler {
 	public static final class Request {
 		public final EntityPlayer player;

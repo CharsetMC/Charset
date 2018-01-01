@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.discovery.asm.ModAnnotation;
 import net.minecraftforge.fml.common.event.FMLEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
@@ -325,7 +326,9 @@ public class ModuleLoader {
 				}
 			}
 
-			if (!compat && modProfile.ordinal() > profile.ordinal()) {
+			if (modProfile == ModuleProfile.FORCED) {
+				isDefault = true;
+			} else if (!compat && modProfile.ordinal() > profile.ordinal()) {
 				isDefault = false;
 			}
 
@@ -473,6 +476,18 @@ public class ModuleLoader {
 				throw new RuntimeException(e);
 			}
 		});
+
+		Side side = FMLCommonHandler.instance().getSide();
+		for (ASMDataTable.ASMData data : table.getAll(CharsetModule.SidedProxy.class.getName())) {
+			String clientSide = (String) data.getAnnotationInfo().get("clientSide");
+			String serverSide = (String) data.getAnnotationInfo().get("serverSide");
+			try {
+				Field f = getField(data);
+				f.set(null, Class.forName(side == Side.CLIENT ? clientSide : serverSide).newInstance());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 
 		List<String> sortedModules = new ArrayList<>();
 		Set<String> remainingModules = Sets.newHashSet(enabledModules);

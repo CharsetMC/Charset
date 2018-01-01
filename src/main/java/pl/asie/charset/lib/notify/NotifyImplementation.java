@@ -38,6 +38,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.loader.CharsetModule;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,7 +46,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 
 public class NotifyImplementation {
-    @SidedProxy(modId = "charset", clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
+    @CharsetModule.SidedProxy(clientSide = "pl.asie.charset.lib.notify.NotifyProxyClient", serverSide = "pl.asie.charset.lib.notify.NotifyProxy")
     public static NotifyProxy proxy;
     public static NotifyImplementation instance;
 

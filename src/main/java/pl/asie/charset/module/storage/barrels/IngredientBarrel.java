@@ -31,20 +31,21 @@ import net.minecraftforge.common.crafting.IIngredientFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
+import pl.asie.charset.module.storage.barrels.BarrelUpgrade;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 
 public class IngredientBarrel extends IngredientCharset {
     private boolean includeCarts;
-    private Set<TileEntityDayBarrel.Upgrade> upgradeBlacklist;
+    private Set<BarrelUpgrade> upgradeBlacklist;
 
-    private static Set<TileEntityDayBarrel.Upgrade> setFromJson(JsonContext context, JsonObject jsonObject, String memberName) {
+    private static Set<BarrelUpgrade> setFromJson(JsonContext context, JsonObject jsonObject, String memberName) {
         if (jsonObject.has(memberName)) {
-            ImmutableSet.Builder<TileEntityDayBarrel.Upgrade> builder = new ImmutableSet.Builder<>();
+            ImmutableSet.Builder<BarrelUpgrade> builder = new ImmutableSet.Builder<>();
             JsonArray array = JsonUtils.getJsonArray(jsonObject, memberName);
             for (JsonElement element : array) {
-                builder.add(TileEntityDayBarrel.Upgrade.valueOf(element.getAsString()));
+                builder.add(BarrelUpgrade.valueOf(element.getAsString()));
             }
             return builder.build();
         } else {
@@ -88,11 +89,11 @@ public class IngredientBarrel extends IngredientCharset {
     public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
         if (!stack.isEmpty() && (stack.getItem() == CharsetStorageBarrels.barrelItem || (includeCarts && stack.getItem() == CharsetStorageBarrels.barrelCartItem))) {
             if (!upgradeBlacklist.isEmpty()) {
-                Set<TileEntityDayBarrel.Upgrade> upgrades = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+                Set<BarrelUpgrade> upgrades = EnumSet.noneOf(BarrelUpgrade.class);
                 if (stack.hasTagCompound()) {
                     TileEntityDayBarrel.populateUpgrades(upgrades, stack.getTagCompound());
                 }
-                for (TileEntityDayBarrel.Upgrade upgrade : upgradeBlacklist) {
+                for (BarrelUpgrade upgrade : upgradeBlacklist) {
                     if (upgrades.contains(upgrade)) {
                         return false;
                     }
@@ -104,11 +105,4 @@ public class IngredientBarrel extends IngredientCharset {
         }
     }
 
-    public static class Factory implements IIngredientFactory {
-        @Nonnull
-        @Override
-        public Ingredient parse(JsonContext context, JsonObject json) {
-            return IngredientCharset.wrap(new IngredientBarrel(context, json));
-        }
-    }
 }

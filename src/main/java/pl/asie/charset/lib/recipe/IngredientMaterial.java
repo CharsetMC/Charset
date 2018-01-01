@@ -43,7 +43,7 @@ public class IngredientMaterial extends IngredientCharset {
         @Nonnull
         @Override
         public Ingredient parse(JsonContext jsonContext, JsonObject jsonObject) {
-            String tag = JsonUtils.getString(jsonObject, "nbtKey");
+            String tag = jsonObject.has("nbtKey") ? JsonUtils.getString(jsonObject, "nbtKey") : null;
             String[] material;
 
             JsonElement oreElem = jsonObject.get("material");

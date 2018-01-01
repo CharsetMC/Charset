@@ -32,7 +32,7 @@ import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 @CharsetModule(
         name = "quark:tools.wrench.rotate",
         profile = ModuleProfile.COMPAT,
-        dependencies = {"tools.wrench", "mod:quark"}
+        dependencies = {"tools.building.wrench", "mod:quark"}
 )
 public class WrenchCompatRotateQuark {
     @Mod.EventHandler

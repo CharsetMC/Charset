@@ -20,7 +20,6 @@
 package pl.asie.charset.module.tools.building;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -41,7 +40,6 @@ import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.tools.building.chisel.*;
 import pl.asie.charset.module.tools.building.trowel.ItemTrowel;
-import pl.asie.charset.module.tools.building.wrench.ICustomRotateBlock;
 
 import java.util.HashMap;
 import java.util.Map;

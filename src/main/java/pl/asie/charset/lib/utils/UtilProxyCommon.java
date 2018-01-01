@@ -44,6 +44,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.render.ParticleBlockDustCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 
@@ -52,7 +53,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class UtilProxyCommon implements IThreadListener {
-	@SidedProxy(clientSide = "pl.asie.charset.lib.utils.UtilProxyClient", serverSide = "pl.asie.charset.lib.utils.UtilProxyCommon", modId = ModCharset.MODID)
+	@CharsetModule.SidedProxy(clientSide = "pl.asie.charset.lib.utils.UtilProxyClient", serverSide = "pl.asie.charset.lib.utils.UtilProxyCommon")
 	public static UtilProxyCommon proxy;
 
 	public EntityPlayer getPlayer(INetHandler handler) {

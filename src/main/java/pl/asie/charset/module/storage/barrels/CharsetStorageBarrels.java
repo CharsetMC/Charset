@@ -33,7 +33,6 @@ import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -90,12 +89,12 @@ public class CharsetStorageBarrels {
 	public static boolean enableSilkyBarrels, enableStickyBarrels, enableHoppingBarrels;
 	public static int maxDroppedStacks;
 
-	public static boolean isEnabled(TileEntityDayBarrel.Upgrade upgrade) {
-		if (upgrade == TileEntityDayBarrel.Upgrade.SILKY) {
+	public static boolean isEnabled(BarrelUpgrade upgrade) {
+		if (upgrade == BarrelUpgrade.SILKY) {
 			return enableSilkyBarrels;
-		} else if (upgrade == TileEntityDayBarrel.Upgrade.HOPPING) {
+		} else if (upgrade == BarrelUpgrade.HOPPING) {
 			return enableHoppingBarrels;
-		} else if (upgrade == TileEntityDayBarrel.Upgrade.STICKY) {
+		} else if (upgrade == BarrelUpgrade.STICKY) {
 			return enableStickyBarrels;
 		} else {
 			return true;
@@ -151,7 +150,7 @@ public class CharsetStorageBarrels {
 	@SubscribeEvent
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
 		CREATIVE_BARRELS.add(TileEntityDayBarrel.makeBarrel(
-				EnumSet.of(TileEntityDayBarrel.Upgrade.HOPPING, TileEntityDayBarrel.Upgrade.INFINITE),
+				EnumSet.of(BarrelUpgrade.HOPPING, BarrelUpgrade.INFINITE),
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.BEDROCK)),
 				ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(new ItemStack(Blocks.DIAMOND_BLOCK))
 		));
@@ -167,7 +166,7 @@ public class CharsetStorageBarrels {
 
 		BARRELS_NORMAL.clear();
 		for (ItemStack is : BARRELS) {
-			Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+			Set<BarrelUpgrade> upgradeSet = EnumSet.noneOf(BarrelUpgrade.class);
 			TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());
 			if (upgradeSet.isEmpty()) {
 				BARRELS_NORMAL.add(is);

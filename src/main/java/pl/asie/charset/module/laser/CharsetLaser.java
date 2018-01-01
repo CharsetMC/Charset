@@ -95,7 +95,7 @@ public class CharsetLaser {
     @CharsetModule.PacketRegistry
     public static PacketRegistry packet;
 
-    @SidedProxy(modId = "charset", clientSide = "pl.asie.charset.module.laser.ProxyClient", serverSide = "pl.asie.charset.module.laser.ProxyCommon")
+    @CharsetModule.SidedProxy(clientSide = "pl.asie.charset.module.laser.ProxyClient", serverSide = "pl.asie.charset.module.laser.ProxyCommon")
     public static ProxyCommon proxy;
 
     @Mod.EventHandler

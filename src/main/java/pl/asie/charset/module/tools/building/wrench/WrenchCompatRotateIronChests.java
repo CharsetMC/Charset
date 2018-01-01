@@ -33,7 +33,7 @@ import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 @CharsetModule(
         name = "ironchest:tools.wrench.rotate",
         profile = ModuleProfile.COMPAT,
-        dependencies = {"tools.wrench", "mod:ironchest"}
+        dependencies = {"tools.building.wrench", "mod:ironchest"}
 )
 public class WrenchCompatRotateIronChests {
     @Mod.EventHandler

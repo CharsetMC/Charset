@@ -21,7 +21,6 @@ package pl.asie.charset.module.storage.barrels;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.text.translation.I18n;
@@ -54,7 +53,7 @@ public class ItemDayBarrel extends ItemBlockBase {
 
     @Override
     public String getItemStackDisplayName(ItemStack is) {
-        Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+        Set<BarrelUpgrade> upgradeSet = EnumSet.noneOf(BarrelUpgrade.class);
         if (is.hasTagCompound()) {
             TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());
         }
@@ -65,7 +64,7 @@ public class ItemDayBarrel extends ItemBlockBase {
         }
 
         StringBuilder type = new StringBuilder();
-        for (TileEntityDayBarrel.Upgrade upgrade : upgradeSet) {
+        for (BarrelUpgrade upgrade : upgradeSet) {
             if (type.length() > 0) {
                 type.append(" ");
             }
@@ -84,12 +83,12 @@ public class ItemDayBarrel extends ItemBlockBase {
 
     @SideOnly(Side.CLIENT) // Invokes a client-only function getTooltip
     protected void addExtraInformation(ItemStack is, World world, List<String> list, ITooltipFlag verbose) {
-        Set<TileEntityDayBarrel.Upgrade> upgradeSet = EnumSet.noneOf(TileEntityDayBarrel.Upgrade.class);
+        Set<BarrelUpgrade> upgradeSet = EnumSet.noneOf(BarrelUpgrade.class);
         if (is.hasTagCompound()) {
             TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());
         }
 
-        if (upgradeSet.contains(TileEntityDayBarrel.Upgrade.SILKY)) {
+        if (upgradeSet.contains(BarrelUpgrade.SILKY)) {
             list.add(I18n.translateToLocal("tile.charset.barrel.SILKY.silkhint"));
             TileEntityDayBarrel db = new TileEntityDayBarrel();
             db.loadFromStack(is);
