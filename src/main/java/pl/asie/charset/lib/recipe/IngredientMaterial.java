@@ -156,7 +156,7 @@ public class IngredientMaterial extends IngredientCharset {
     }
 
     @Override
-    public ItemStack[][] getMatchingStacks() {
+    protected ItemStack[][] createMatchingStacks() {
         if (chain != null) {
             List<ItemStack> stacks = new ArrayList<>();
             for (ItemStack stack : dependency.getMatchingStacks()) {

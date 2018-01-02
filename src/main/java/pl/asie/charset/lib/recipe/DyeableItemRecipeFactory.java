@@ -50,7 +50,7 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			}
 
 			@Override
-			public ItemStack[][] getMatchingStacks() {
+			protected ItemStack[][] createMatchingStacks() {
 				Collection<ItemStack> stacks = OreDictionary.getOres("dye");
 				return new ItemStack[][] { stacks.toArray(new ItemStack[stacks.size()]) };
 			}

@@ -56,7 +56,7 @@ public class RecipeWireConversion extends RecipeCharset {
         }
 
         @Override
-        public ItemStack[][] getMatchingStacks() {
+        protected ItemStack[][] createMatchingStacks() {
             List<ItemStack> stacks = RecipeWireConversion.getMatchingStacks(offset);
             ItemStack[][] stackArray = new ItemStack[stacks.size()][1];
             for (int i = 0; i < stacks.size(); i++) {

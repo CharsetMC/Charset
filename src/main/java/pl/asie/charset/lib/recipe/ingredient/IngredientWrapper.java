@@ -30,6 +30,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class IngredientWrapper extends Ingredient {
     private static final IRecipeResultBuilder DEFAULT_BUILDER = new IRecipeResultBuilder() {
@@ -45,7 +47,6 @@ public final class IngredientWrapper extends Ingredient {
     };
 
     private final IngredientCharset charset;
-    private IntList matchingStacksPacked;
 
     IngredientWrapper(IngredientCharset charset) {
         super(0);
@@ -61,42 +62,21 @@ public final class IngredientWrapper extends Ingredient {
         return stack == null ? charset.matches(ItemStack.EMPTY, DEFAULT_BUILDER) : charset.matches(stack, DEFAULT_BUILDER);
     }
 
+
     @Override
     public ItemStack[] getMatchingStacks() {
-        ItemStack[][] stackArrays = charset.getMatchingStacks();
-        int length = 0;
-        for (ItemStack[] array : stackArrays) {
-            length += array.length;
-        }
-
-        int i = 0;
-        ItemStack[] stacks = new ItemStack[length];
-        for (ItemStack[] array : stackArrays) {
-            System.arraycopy(array, 0, stacks, i, array.length);
-            i += array.length;
-        }
-
-        return stacks;
+        return charset.getMatchingStacksCompressed();
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public IntList getValidItemStacksPacked() {
-        if(this.matchingStacksPacked == null) {
-            ItemStack[] matchingStacks = getMatchingStacks();
-            this.matchingStacksPacked = new IntArrayList(matchingStacks.length);
-            ItemStack[] var1 = matchingStacks;
-            int var2 = var1.length;
+        return charset.getValidItemStacksPacked();
+    }
 
-            for(int var3 = 0; var3 < var2; ++var3) {
-                ItemStack itemstack = var1[var3];
-                this.matchingStacksPacked.add(RecipeItemHelper.pack(itemstack));
-            }
-
-            this.matchingStacksPacked.sort(IntComparators.NATURAL_COMPARATOR);
-        }
-
-        return this.matchingStacksPacked;
+    @Override
+    protected void invalidate() {
+        charset.invalidate();
     }
 
     @Override

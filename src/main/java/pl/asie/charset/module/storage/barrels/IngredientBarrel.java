@@ -37,6 +37,8 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 public class IngredientBarrel extends IngredientCharset {
+    private static final Map<IngredientBarrel, ItemStack[][]> matchingStacksCache = new HashMap<>();
+
     private boolean includeCarts;
     private Set<BarrelUpgrade> upgradeBlacklist;
 
@@ -65,15 +67,27 @@ public class IngredientBarrel extends IngredientCharset {
     }
 
     @Override
-    public ItemStack[][] getMatchingStacks() {
-        List<ItemStack> stacks = CharsetStorageBarrels.BARRELS_NORMAL;
+    protected ItemStack[][] createMatchingStacks() {
+        List<ItemStack> stacks = CharsetStorageBarrels.BARRELS;
         List<ItemStack> stacks2 = stacks;
         if (includeCarts) {
             stacks2 = Lists.newArrayList();
             for (ItemStack s : stacks) {
-                stacks2.add(s);
-                if (includeCarts) {
-                    stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrelCart(s));
+                Set<BarrelUpgrade> upgrades = EnumSet.noneOf(BarrelUpgrade.class);
+                if (s.hasTagCompound()) {
+                    TileEntityDayBarrel.populateUpgrades(upgrades, s.getTagCompound());
+                }
+                for (BarrelUpgrade bUpgrade : upgradeBlacklist) {
+                    if (upgrades.contains(bUpgrade)) {
+                        upgrades = null;
+                        break;
+                    }
+                }
+                if (upgrades != null) {
+                    stacks2.add(s);
+                    if (includeCarts) {
+                        stacks2.add(CharsetStorageBarrels.barrelCartItem.makeBarrelCart(s));
+                    }
                 }
             }
         }
@@ -105,4 +119,18 @@ public class IngredientBarrel extends IngredientCharset {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof IngredientBarrel)) {
+            return false;
+        } else {
+            IngredientBarrel other = (IngredientBarrel) o;
+            return other.includeCarts == includeCarts && other.upgradeBlacklist.equals(upgradeBlacklist);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return (includeCarts ? 31 : 0) + upgradeBlacklist.hashCode();
+    }
 }

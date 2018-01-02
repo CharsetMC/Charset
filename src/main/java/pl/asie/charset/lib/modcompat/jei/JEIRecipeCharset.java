@@ -22,13 +22,15 @@ package pl.asie.charset.lib.modcompat.jei;
 import com.google.common.collect.Lists;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
+import mezz.jei.api.recipe.wrapper.ICraftingRecipeWrapper;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 
 import java.util.Collections;
 
-public class JEIRecipeCharset implements IRecipeWrapper {
+public class JEIRecipeCharset implements ICraftingRecipeWrapper {
     public static class Shapeless extends JEIRecipeCharset {
         public Shapeless(RecipeCharset recipe) {
             super(recipe);
@@ -59,6 +61,11 @@ public class JEIRecipeCharset implements IRecipeWrapper {
 
     private JEIRecipeCharset(RecipeCharset recipe) {
         this.recipe = recipe;
+    }
+
+    @Override
+    public ResourceLocation getRegistryName() {
+        return recipe.getRegistryName();
     }
 
     @Override

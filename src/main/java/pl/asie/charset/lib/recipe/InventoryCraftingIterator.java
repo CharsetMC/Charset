@@ -23,6 +23,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.IngredientNBT;
 import net.minecraftforge.oredict.OreIngredient;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
@@ -49,6 +50,10 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
             } else {
                 output = Collections.singletonList(iterator.recipe.getCraftingResult(iterator));
             }
+        }
+
+        public ResourceLocation getRegistryName() {
+            return base.getRegistryName();
         }
 
         public List getInputs() {

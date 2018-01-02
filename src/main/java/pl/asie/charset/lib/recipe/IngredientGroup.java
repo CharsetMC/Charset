@@ -234,7 +234,7 @@ public class IngredientGroup extends IngredientCharset {
     }
 
     @Override
-    public ItemStack[][] getMatchingStacks() {
+    protected ItemStack[][] createMatchingStacks() {
         TIntList list = new TIntArrayList();
 
         Entry e = entryMap.get(type);

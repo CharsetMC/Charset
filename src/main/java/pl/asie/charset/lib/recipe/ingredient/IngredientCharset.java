@@ -21,13 +21,19 @@ package pl.asie.charset.lib.recipe.ingredient;
 
 import gnu.trove.set.TCharSet;
 import gnu.trove.set.hash.TCharHashSet;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntComparators;
+import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.client.util.RecipeItemHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
 import pl.asie.charset.lib.recipe.IRecipeView;
 import pl.asie.charset.lib.utils.ItemUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Charset's replacement Ingredient class.
@@ -38,9 +44,73 @@ import java.util.List;
  * (The Ingredient wrapper will try to gracefully fall back when necessary.)
  */
 public abstract class IngredientCharset {
+    private static final Map<IngredientCharset, MatchingStacks> MATCHING_STACK_CACHE = new HashMap<>();
+
+    static class MatchingStacks {
+        private ItemStack[][] matchingStacks;
+        private ItemStack[] matchingStacksCompressed;
+        private IntList matchingStacksPacked;
+
+        MatchingStacks(ItemStack[][] matchingStacks) {
+            this.matchingStacks = matchingStacks;
+        }
+
+        ItemStack[] getMatchingStacksCompressed() {
+            if (this.matchingStacksCompressed == null) {
+                int i = 0;
+                int length = 0;
+                for (ItemStack[] array : matchingStacks) {
+                    length += array.length;
+                }
+                ItemStack[] stacks = new ItemStack[length];
+                for (ItemStack[] array : matchingStacks) {
+                    System.arraycopy(array, 0, stacks, i, array.length);
+                    i += array.length;
+                }
+                this.matchingStacksCompressed = stacks;
+            }
+            return matchingStacksCompressed;
+        }
+
+        IntList getValidItemStacksPacked() {
+            if(this.matchingStacksPacked == null) {
+                this.matchingStacksPacked = new IntArrayList(matchingStacks.length);
+                for(int i = 0; i < matchingStacksCompressed.length; i++) {
+                    ItemStack itemstack = matchingStacksCompressed[i];
+                    this.matchingStacksPacked.add(RecipeItemHelper.pack(itemstack));
+                }
+
+                this.matchingStacksPacked.sort(IntComparators.NATURAL_COMPARATOR);
+            }
+
+            return this.matchingStacksPacked;
+        }
+    }
+
     private static final TCharSet EMPTY_CHAR_SET = new TCharHashSet();
 
     public IngredientCharset() {
+    }
+
+    private MatchingStacks getMatchingStacksObj() {
+        MatchingStacks ms = MATCHING_STACK_CACHE.get(this);
+        if (ms == null) {
+            ms = new MatchingStacks(createMatchingStacks());
+            MATCHING_STACK_CACHE.put(this, ms);
+        }
+        return ms;
+    }
+
+    public final ItemStack[][] getMatchingStacks() {
+        return getMatchingStacksObj().matchingStacks;
+    }
+
+    ItemStack[] getMatchingStacksCompressed() {
+        return getMatchingStacksObj().getMatchingStacksCompressed();
+    }
+
+    IntList getValidItemStacksPacked() {
+        return getMatchingStacksObj().getValidItemStacksPacked();
     }
 
     /**
@@ -103,7 +173,7 @@ public abstract class IngredientCharset {
      * per possible permutation. If permutations are not distinct, the outer array
      * should have a length of 1!
      */
-    public abstract ItemStack[][] getMatchingStacks();
+    protected abstract ItemStack[][] createMatchingStacks();
 
     /**
      * @return A set of characters which signify Ingredients this ingredient
@@ -121,5 +191,9 @@ public abstract class IngredientCharset {
      */
     public static final Ingredient wrap(IngredientCharset ingredient) {
         return new IngredientWrapper(ingredient);
+    }
+
+    public void invalidate() {
+        MATCHING_STACK_CACHE.remove(this);
     }
 }
