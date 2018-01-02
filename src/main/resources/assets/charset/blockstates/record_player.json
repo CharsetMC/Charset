@@ -14,6 +14,13 @@
     "inventory": [{
       "transform": "forge:default-block",
       "submodel": "charset:record_player_arm"
+    }],
+    "inventory_hopping": [{
+      "transform": "forge:default-block",
+      "submodel": {
+        "arm": {"model": "charset:record_player_arm"},
+        "hopping_overlay": {"model": "charset:record_player_hopping"}
+      }
     }]
   }
 }
