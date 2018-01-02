@@ -23,6 +23,7 @@ tile.charset.audioCable.name=Audio Cable
 tile.charset.audioCable.freestanding.name=Hovering Audio Cable
 tile.charset.ironNoteBlock.name=Iron Note Block
 tile.charset.record_player.name=Record Player
+item.charset.quartz_disc.blank.name=Blank Quartz Disc
 item.charset.quartz_disc.name=Quartz Disc
 
 tooltip.charset.disc.none=No Disc

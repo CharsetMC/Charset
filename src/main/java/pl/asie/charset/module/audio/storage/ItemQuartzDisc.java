@@ -127,6 +127,15 @@ public class ItemQuartzDisc extends Item {
 	}
 
 	@Override
+	public String getUnlocalizedName(ItemStack stack) {
+		if ((stack.getItemDamage() & 1) == 0) {
+			return "item.charset.quartz_disc.blank";
+		} else {
+			return "item.charset.quartz_disc";
+		}
+	}
+
+	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
 		if (this.isInCreativeTab(tab)) {
 			for (int i = 0; i < SIZES.length; i++) {
