@@ -56,6 +56,10 @@ public class UtilProxyCommon implements IThreadListener {
 	@CharsetModule.SidedProxy(clientSide = "pl.asie.charset.lib.utils.UtilProxyClient", serverSide = "pl.asie.charset.lib.utils.UtilProxyCommon")
 	public static UtilProxyCommon proxy;
 
+	public World getWorld(INetHandler handler, int dim) {
+		return DimensionManager.getWorld(dim);
+	}
+
 	public EntityPlayer getPlayer(INetHandler handler) {
 		return handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).player : null;
 	}

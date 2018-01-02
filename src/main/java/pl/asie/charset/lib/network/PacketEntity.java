@@ -52,7 +52,7 @@ public abstract class PacketEntity extends Packet {
 
 	@Override
 	public void apply(INetHandler handler) {
-		World w = Utils.getLocalWorld(dim);
+		World w = getWorld(handler, dim);
 
 		if (w != null) {
 			entity = w.getEntityByID(id);

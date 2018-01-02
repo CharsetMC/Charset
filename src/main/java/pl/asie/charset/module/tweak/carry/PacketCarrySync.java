@@ -60,7 +60,7 @@ public class PacketCarrySync extends Packet {
 		if (isSelf) {
 			player = getPlayer(handler);
 		} else {
-			World world = Utils.getLocalWorld(dimension);
+			World world = getWorld(handler, dimension);
 			if (world != null) {
 				player = world.getEntityByID(playerId);
 			}

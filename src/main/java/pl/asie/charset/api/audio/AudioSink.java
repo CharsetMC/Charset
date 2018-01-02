@@ -23,6 +23,7 @@
 package pl.asie.charset.api.audio;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.network.INetHandler;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistryEntry;

@@ -48,8 +48,8 @@ public class PacketBeamRemove extends Packet {
 
 	@Override
 	public void apply(INetHandler handler) {
-		World world = getWorld(handler);
-		if (world != null && world.provider.getDimension() == dim) {
+		World world = getWorld(handler, dim);
+		if (world != null) {
 			CharsetLaser.laserStorage.remove(world, id);
 		}
 	}

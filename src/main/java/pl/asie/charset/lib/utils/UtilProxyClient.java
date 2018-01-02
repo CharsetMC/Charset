@@ -73,6 +73,20 @@ public class UtilProxyClient extends UtilProxyCommon {
 	}
 
 	@Override
+	public World getWorld(INetHandler handler, int dim) {
+		if (handler instanceof INetHandlerPlayClient || handler instanceof INetHandlerLoginClient) {
+			World w = getPlayer(handler).world;
+			if (w.provider.getDimension() == dim) {
+				return w;
+			} else {
+				return null;
+			}
+		} else {
+			return super.getWorld(handler, dim);
+		}
+	}
+
+	@Override
 	public EntityPlayer getPlayer(INetHandler handler) {
 		return (handler instanceof INetHandlerPlayClient || handler instanceof INetHandlerLoginClient)
 				? Minecraft.getMinecraft().player : super.getPlayer(handler);

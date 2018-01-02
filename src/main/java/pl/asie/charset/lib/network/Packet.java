@@ -27,6 +27,7 @@ import net.minecraft.util.IThreadListener;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import pl.asie.charset.lib.utils.PacketUtils;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.lib.utils.Utils;
 
 public abstract class Packet {
@@ -46,6 +47,10 @@ public abstract class Packet {
 		} else {
 			return null;
 		}
+	}
+
+	protected static final World getWorld(INetHandler handler, int dim) {
+		return UtilProxyCommon.proxy.getWorld(handler, dim);
 	}
 
 	public abstract void readData(INetHandler handler, PacketBuffer buf);

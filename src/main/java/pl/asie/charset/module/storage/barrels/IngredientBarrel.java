@@ -70,7 +70,8 @@ public class IngredientBarrel extends IngredientCharset {
     protected ItemStack[][] createMatchingStacks() {
         List<ItemStack> stacks = CharsetStorageBarrels.BARRELS;
         List<ItemStack> stacks2 = stacks;
-        if (includeCarts) {
+
+        if (includeCarts || !upgradeBlacklist.isEmpty()) {
             stacks2 = Lists.newArrayList();
             for (ItemStack s : stacks) {
                 Set<BarrelUpgrade> upgrades = EnumSet.noneOf(BarrelUpgrade.class);

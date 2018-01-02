@@ -43,6 +43,7 @@ public class PacketCarryGrab extends Packet {
 	private World world;
 	private BlockPos pos;
 	private Entity entity;
+	private int dim;
 
 	public PacketCarryGrab() {
 
@@ -62,11 +63,8 @@ public class PacketCarryGrab extends Packet {
 
 	@Override
 	public void readData(INetHandler handler, PacketBuffer buf) {
-		int dim = buf.readInt();
-
-		player = getPlayer(handler);
+		dim = buf.readInt();
 		type = Type.values()[buf.readByte()];
-		world = Utils.getLocalWorld(dim);
 
 		switch (type) {
 			case BLOCK:
@@ -84,7 +82,10 @@ public class PacketCarryGrab extends Packet {
 
 	@Override
 	public void apply(INetHandler handler) {
-		if (player != null) {
+		player = getPlayer(handler);
+		world = getWorld(handler, dim);
+
+		if (player != null && world != null) {
 			switch (type) {
 				case BLOCK:
 					CharsetTweakBlockCarrying.grabBlock(player, world, pos);

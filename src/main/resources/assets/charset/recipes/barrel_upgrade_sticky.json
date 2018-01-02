@@ -24,7 +24,7 @@
     "b": {
       "type": "charset:barrel",
       "carts": true,
-      "upgradeBlacklist": ["STICKY"]
+      "upgradeBlacklist": ["STICKY", "INFINITE"]
     }
   },
   "result": {

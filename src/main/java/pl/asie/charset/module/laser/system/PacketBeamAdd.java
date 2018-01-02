@@ -56,8 +56,8 @@ public class PacketBeamAdd extends Packet {
 
 	@Override
 	public void apply(INetHandler handler) {
-		World world = getWorld(handler);
-		if (world != null && world.provider.getDimension() == dim) {
+		World world = getWorld(handler, dim);
+		if (world != null) {
 			CharsetLaser.laserStorage.add(beam = new LaserBeam(id, world, start, length, flags));
 		} else {
 			ModCharset.logger.warn("Could not find dimension " + dim + " for laser beam!");

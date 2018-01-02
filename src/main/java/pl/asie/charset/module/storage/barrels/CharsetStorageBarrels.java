@@ -66,7 +66,7 @@ import java.util.*;
 )
 public class CharsetStorageBarrels {
 	public static final List<ItemStack> CREATIVE_BARRELS = Lists.newArrayList();
-	public static List<ItemStack> BARRELS = Collections.emptyList();
+	public static List<ItemStack> BARRELS = Lists.newArrayList();
 	public static List<ItemStack> BARRELS_NORMAL = Lists.newArrayList();
 
 	public static TObjectIntMap<Item> stackDivisorMultiplierMap = new TObjectIntHashMap<>();
@@ -90,14 +90,15 @@ public class CharsetStorageBarrels {
 	public static int maxDroppedStacks;
 
 	public static boolean isEnabled(BarrelUpgrade upgrade) {
-		if (upgrade == BarrelUpgrade.SILKY) {
-			return enableSilkyBarrels;
-		} else if (upgrade == BarrelUpgrade.HOPPING) {
-			return enableHoppingBarrels;
-		} else if (upgrade == BarrelUpgrade.STICKY) {
-			return enableStickyBarrels;
-		} else {
-			return true;
+		switch (upgrade) {
+			case SILKY:
+				return enableSilkyBarrels;
+			case HOPPING:
+				return enableHoppingBarrels;
+			case STICKY:
+				return enableStickyBarrels;
+			default:
+				return true;
 		}
 	}
 
@@ -162,9 +163,9 @@ public class CharsetStorageBarrels {
 	}
 
 	private void populateBarrelStackLists() {
+		BARRELS_NORMAL.clear();
 		BARRELS = barrelBlock.getSubItemProvider().getAllItems();
 
-		BARRELS_NORMAL.clear();
 		for (ItemStack is : BARRELS) {
 			Set<BarrelUpgrade> upgradeSet = EnumSet.noneOf(BarrelUpgrade.class);
 			TileEntityDayBarrel.populateUpgrades(upgradeSet, is.getTagCompound());

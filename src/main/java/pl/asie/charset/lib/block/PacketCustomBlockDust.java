@@ -36,7 +36,7 @@ public class PacketCustomBlockDust extends Packet {
     private World world;
     private BlockPos pos;
     private float posX, posY, posZ;
-    private int numberOfParticles;
+    private int numberOfParticles, dim;
     private float particleSpeed;
 
     public PacketCustomBlockDust() {
@@ -55,7 +55,7 @@ public class PacketCustomBlockDust extends Packet {
 
     @Override
     public void readData(INetHandler handler, PacketBuffer buf) {
-        int dim = buf.readInt();
+        dim = buf.readInt();
         int x = buf.readInt();
         int y = buf.readInt();
         int z = buf.readInt();
@@ -65,13 +65,15 @@ public class PacketCustomBlockDust extends Packet {
         this.posZ = buf.readFloat();
         this.particleSpeed = buf.readFloat();
 
-        this.world = Utils.getLocalWorld(dim);
         this.pos = new BlockPos(x, y, z);
     }
 
     @Override
     public void apply(INetHandler handler) {
-        UtilProxyCommon.proxy.spawnBlockDustClient(world, pos, rand, posX, posY, posZ, numberOfParticles, particleSpeed);
+        this.world = getWorld(handler, dim);
+        if (world != null) {
+            UtilProxyCommon.proxy.spawnBlockDustClient(world, pos, rand, posX, posY, posZ, numberOfParticles, particleSpeed);
+        }
     }
 
     @Override

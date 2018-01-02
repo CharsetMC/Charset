@@ -23,7 +23,7 @@
     "b": {
       "type": "charset:barrel",
       "carts": true,
-      "upgradeBlacklist": ["SILKY"]
+      "upgradeBlacklist": ["SILKY", "INFINITE"]
     }
   },
   "result": {
