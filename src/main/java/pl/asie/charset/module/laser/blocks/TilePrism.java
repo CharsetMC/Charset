@@ -109,8 +109,8 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable, IT
 	}
 
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	public void invalidate(InvalidationType type) {
+		super.invalidate(type);
 		for (int i = 0; i < 6; i++) {
 			sourceColors[i] = LaserColor.NONE;
 		}

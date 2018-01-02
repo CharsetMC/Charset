@@ -43,10 +43,25 @@ import java.util.List;
 import java.util.Map;
 
 public class TileBase extends TileEntity {
-	private final Map<String, Trait> traits = new LinkedHashMap<>();
+	public enum InvalidationType {
+		REMOVAL,
+		UNLOAD
+	};
+
+	private Map<String, Trait> traits;
 	private int lastComparatorValue = -1;
 
-	protected final void register(String s, Trait t) {
+	public TileBase() {
+		super();
+		if (traits == null) {
+			traits = new LinkedHashMap<>();
+		}
+	}
+
+	public final void registerTrait(String s, Trait t) {
+		if (traits == null) {
+			traits = new LinkedHashMap<>();
+		}
 		traits.put(s, t);
 	}
 
@@ -59,6 +74,30 @@ public class TileBase extends TileEntity {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public void onLoad() {
+		for (Trait t : traits.values()) {
+			t.onLoad();
+		}
+	}
+
+	public void invalidate(InvalidationType type) {
+		for (Trait t : traits.values()) {
+			t.onInvalidate(type);
+		}
+	}
+
+	@Override
+	public final void invalidate() {
+		super.invalidate();
+		invalidate(InvalidationType.REMOVAL);
+	}
+
+	@Override
+	public final void onChunkUnload() {
+		invalidate(InvalidationType.UNLOAD);
 	}
 
 	public ItemStack getPickedBlock(@Nullable EntityPlayer player, @Nullable RayTraceResult result, IBlockState state) {

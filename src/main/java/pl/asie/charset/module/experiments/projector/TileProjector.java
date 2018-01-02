@@ -19,21 +19,14 @@
 
 package pl.asie.charset.module.experiments.projector;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.api.laser.ILaserReceiver;
 import pl.asie.charset.api.laser.LaserColor;
 import pl.asie.charset.api.lib.IAxisRotatable;
@@ -41,14 +34,11 @@ import pl.asie.charset.lib.block.ITileWrenchRotatable;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitItemHolder;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.module.laser.CharsetLaser;
-import pl.asie.charset.module.laser.blocks.TileCrystal;
 
 import javax.annotation.Nullable;
-import java.lang.invoke.MethodHandle;
 
 public class TileProjector extends TileBase implements IAxisRotatable, IProjector, ITileWrenchRotatable {
 	protected final LaserColor[] colors = new LaserColor[6];
@@ -58,7 +48,7 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 	private Orientation orientation = Orientation.FACE_NORTH_POINT_UP;
 
 	public TileProjector() {
-		register("inv", (holder = new TraitItemHolder() {
+		registerTrait("inv", (holder = new TraitItemHolder() {
 			@Override
 			public boolean isStackAllowed(ItemStack stack) {
 				IProjectorHandler<ItemStack> handler = CharsetProjector.getHandler(stack);

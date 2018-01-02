@@ -36,10 +36,6 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitItemHolder;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
-import pl.asie.charset.module.audio.storage.system.DataStorage;
-import pl.asie.charset.module.experiments.projector.CharsetProjector;
-import pl.asie.charset.module.experiments.projector.IProjectorHandler;
-import pl.asie.charset.module.laser.CharsetLaser;
 
 public class TileRecordPlayer extends TileBase implements ITickable {
 	protected float progressClient;
@@ -48,7 +44,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 	private float spinLocation;
 
 	public TileRecordPlayer() {
-		register("inv", (holder = new TraitItemHolder() {
+		registerTrait("inv", (holder = new TraitItemHolder() {
 			@Override
 			public void onContentsChanged() {
 				super.onContentsChanged();
@@ -68,7 +64,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 				return EnumFacing.UP;
 			}
 		}));
-		register("player", (player = new TraitRecordPlayer(holder.getHandler()) {
+		registerTrait("player", (player = new TraitRecordPlayer(holder.getHandler()) {
 			@Override
 			public boolean exposesCapability(EnumFacing facing) {
 				return facing != EnumFacing.UP;
@@ -96,8 +92,8 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 	}
 
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	public void invalidate(InvalidationType type) {
+		super.invalidate(type);
 
 		setState(TraitRecordPlayer.State.STOPPED);
 		player.stopAudioPlayback();
@@ -239,7 +235,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		return player.getState();
 	}
 
-	protected void setState(TraitRecordPlayer.State state) {
+	public void setState(TraitRecordPlayer.State state) {
 		player.setState(state);
 		if (state == TraitRecordPlayer.State.STOPPED) {
 			spinLocation = 0;
@@ -264,7 +260,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		}
 	}
 
-	protected IDataStorage getStorage() {
+	public IDataStorage getStorage() {
 		return player.getStorage();
 	}
 }

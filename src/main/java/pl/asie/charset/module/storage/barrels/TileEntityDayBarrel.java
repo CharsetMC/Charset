@@ -240,8 +240,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     @Override
-    public void invalidate() {
-        super.invalidate();
+    public void invalidate(InvalidationType type) {
+        super.invalidate(type);
         woodLogAccess = null;
         helperTop = null;
         helperBottom = null;

@@ -183,8 +183,8 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
     }
 
     @Override
-    public void invalidate() {
-        super.invalidate();
+    public void invalidate(InvalidationType type) {
+        super.invalidate(type);
         world.notifyNeighborsRespectDebug(getPos(), CharsetStorageTanks.tankBlock, false);
     }
 

@@ -76,8 +76,8 @@ public class TileCrystal extends TileLaserSourceBase {
 	}
 
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	public void invalidate(InvalidationType type) {
+		super.invalidate(type);
 		hitMask = 0;
 
 		for (int i = 0; i < 6; i++) {

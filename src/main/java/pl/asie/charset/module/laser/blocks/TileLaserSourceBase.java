@@ -54,8 +54,8 @@ public class TileLaserSourceBase extends TileBase {
 	}
 
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	public void invalidate(InvalidationType type) {
+		super.invalidate(type);
 		for (int i = 0; i < 6; i++) {
 			colors[i] = LaserColor.NONE;
 		}

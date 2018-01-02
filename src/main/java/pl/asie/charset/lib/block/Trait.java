@@ -30,4 +30,10 @@ public abstract class Trait {
 	public abstract NBTTagCompound writeNBTData(boolean isClient);
 	public abstract boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing);
 	public abstract <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing);
+	public void onLoad() {
+
+	}
+	public void onInvalidate(TileBase.InvalidationType type) {
+
+	}
 }

@@ -60,8 +60,8 @@ public class TileReflector extends TileLaserSourceBase {
 	}
 
 	@Override
-	public void invalidate() {
-		super.invalidate();
+	public void invalidate(InvalidationType type) {
+		super.invalidate(type);
 		for (int i = 0; i < 6; i++) {
 			bouncedColors[i] = LaserColor.NONE;
 			passedColors[i] = LaserColor.NONE;
