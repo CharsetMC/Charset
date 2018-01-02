@@ -19,14 +19,8 @@
 
 package pl.asie.charset.module.storage.locks;
 
-import com.google.common.base.Predicate;
-import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.datafix.FixTypes;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -39,19 +33,14 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
-import pl.asie.charset.lib.render.ShadingTintColorHandler;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
-
-import javax.annotation.Nullable;
-import java.util.Random;
-import java.util.UUID;
 
 @CharsetModule(
 		name = "storage.locks",
@@ -85,6 +74,8 @@ public class CharsetStorageLocks {
 		keyItem = new ItemKey();
 		keyringItem = new ItemKeyring();
 		lockItem = new ItemLock();
+
+		ModCharset.dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new FixCharsetLockKeyTagChange());
 	}
 
 	@SubscribeEvent

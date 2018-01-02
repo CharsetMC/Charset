@@ -17,34 +17,34 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.upgrade;
+package pl.asie.charset.module.storage.locks;
 
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.datafix.IFixableData;
-import net.minecraftforge.common.util.Constants;
-import pl.asie.charset.module.storage.barrels.ItemDayBarrel;
 import pl.asie.charset.module.storage.locks.ItemLockingDyeable;
 
-public class CharsetFixEmptyUpgradeTagBarrels implements IFixableData {
+public class FixCharsetLockKeyTagChange implements IFixableData {
     @Override
     public int getFixVersion() {
-        return 3;
+        return 2;
     }
 
     @Override
     public NBTTagCompound fixTagCompound(NBTTagCompound compound) {
         if (compound.hasKey("id", 8) && compound.hasKey("tag", 10)) {
             Item item = Item.getByNameOrId(compound.getString("id"));
-            if (item instanceof ItemDayBarrel) {
+            if (item instanceof ItemLockingDyeable) {
                 NBTTagCompound tag = compound.getCompoundTag("tag");
-                if (tag.hasKey("upgrades", Constants.NBT.TAG_LIST)) {
-                    NBTTagList tagList = tag.getTagList("upgrades", Constants.NBT.TAG_STRING);
-                    if (tagList.hasNoTags()) {
-                        tag.removeTag("upgrades");
-                    }
+                if (tag.hasKey("color0")) {
+                    tag.removeTag("color0");
+                }
+
+                if (tag.hasKey("color1")) {
+                    NBTBase colorTag = tag.getTag("color1").copy();
+                    tag.setTag("color", colorTag);
+                    tag.removeTag("color1");
                 }
             }
         }

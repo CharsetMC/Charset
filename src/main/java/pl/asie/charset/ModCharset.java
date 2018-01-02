@@ -21,7 +21,6 @@ package pl.asie.charset;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -53,11 +52,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.lib.utils.UtilProxyCommon;
-import pl.asie.charset.upgrade.CharsetFixEmptyUpgradeTagBarrels;
-import pl.asie.charset.upgrade.CharsetGlassTankColorNBT;
-import pl.asie.charset.upgrade.CharsetLockKeyTagChange;
-import pl.asie.charset.upgrade.CharsetUnifiedModIdFixer;
+import pl.asie.charset.lib.misc.FixCharsetUnifyModId;
 
 import java.io.File;
 import java.io.InputStream;
@@ -94,7 +89,7 @@ public class ModCharset {
 
 	public static Map<String, String> defaultOptions = new HashMap<>();
 	private static File configurationDirectory;
-	private static ModFixs dataFixes;
+	public static ModFixs dataFixes;
 
 	public static File getConfigDir() {
 		return configurationDirectory;
@@ -143,10 +138,7 @@ public class ModCharset {
 		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 
 		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 4);
-		dataFixes.registerFix(FixTypes.ENTITY, new CharsetUnifiedModIdFixer.Entity(oldPrefixes));
-		dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new CharsetLockKeyTagChange());
-		dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new CharsetFixEmptyUpgradeTagBarrels());
-		dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new CharsetGlassTankColorNBT());
+		dataFixes.registerFix(FixTypes.ENTITY, new FixCharsetUnifyModId.Entity(oldPrefixes));
 
 		charsetIconItem = new IconCharset();
 		charsetIconStack = new ItemStack(charsetIconItem);

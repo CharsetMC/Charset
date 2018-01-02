@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.upgrade;
+package pl.asie.charset.module.storage.tanks;
 
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +27,7 @@ import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.module.storage.barrels.ItemDayBarrel;
 import pl.asie.charset.module.storage.tanks.ItemBlockTank;
 
-public class CharsetGlassTankColorNBT implements IFixableData {
+public class FixCharsetGlassTankMoveColorNBT implements IFixableData {
     @Override
     public int getFixVersion() {
         return 4;

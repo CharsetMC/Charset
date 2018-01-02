@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.upgrade;
+package pl.asie.charset.lib.misc;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -25,7 +25,7 @@ import net.minecraft.util.datafix.IFixableData;
 
 import java.util.Set;
 
-public class CharsetUnifiedModIdFixer {
+public class FixCharsetUnifyModId {
     public static class Entity implements IFixableData {
         private final Set<String> prefixes;
 

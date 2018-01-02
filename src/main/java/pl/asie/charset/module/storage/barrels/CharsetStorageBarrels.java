@@ -29,6 +29,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.datafix.FixTypes;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -120,6 +121,8 @@ public class CharsetStorageBarrels {
 		barrelCartItem = new ItemMinecartDayBarrel();
 
 		barrelBlock.setHarvestLevel("axe", 0);
+
+		ModCharset.dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new FixCharsetEmptyUpgradeTagBarrels());
 	}
 
 	@SubscribeEvent
