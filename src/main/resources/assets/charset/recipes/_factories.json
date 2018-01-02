@@ -17,6 +17,7 @@
     "barrel_cart": "pl.asie.charset.module.storage.barrels.BarrelCartOutputSupplier",
     "barrel_upgrade": "pl.asie.charset.module.storage.barrels.BarrelUpgradeOutputSupplier$Factory",
     "key": "pl.asie.charset.module.storage.locks.KeyOutputSupplier$Factory",
-    "lock": "pl.asie.charset.module.storage.locks.LockOutputSupplier$Factory"
+    "lock": "pl.asie.charset.module.storage.locks.LockOutputSupplier$Factory",
+    "wire": "pl.asie.charset.lib.wires.WireOutputSupplier$Factory"
   }
 }

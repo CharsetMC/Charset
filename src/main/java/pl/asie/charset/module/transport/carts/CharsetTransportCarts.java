@@ -61,7 +61,7 @@ import java.util.Map;
 @CharsetModule(
         name = "transport.carts",
         description = "Minecart rework. WIP",
-        profile = ModuleProfile.TESTING
+        profile = ModuleProfile.INDEV
 )
 public class CharsetTransportCarts {
     public static final Map<Class<? extends Entity>, Class<? extends EntityMinecart>> REPLACEMENT_MAP = new HashMap<>();

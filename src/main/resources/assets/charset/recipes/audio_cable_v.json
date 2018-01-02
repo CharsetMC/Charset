@@ -1,0 +1,29 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "audio.transport"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:audio_cable",
+  "pattern": [
+    "a",
+    "b",
+    "a"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:stone_slab",
+      "data": 0
+    },
+    "b": {
+      "item": "minecraft:noteblock",
+      "data": 0
+    }
+  },
+  "result": {
+    "supplier": "charset:wire",
+    "id": "charset:audio_cable"
+  }
+}

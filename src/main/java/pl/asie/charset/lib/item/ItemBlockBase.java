@@ -67,7 +67,11 @@ public class ItemBlockBase extends ItemBlock {
 		IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() == this.block) {
 			setTileEntityNBT(world, player, pos, stack);
-			((BlockBase) this.block).onBlockPlacedBy(world, pos, state, player, stack, side, hitX, hitY, hitZ);
+			if (this.block instanceof BlockBase) {
+				((BlockBase) this.block).onBlockPlacedBy(world, pos, state, player, stack, side, hitX, hitY, hitZ);
+			} else {
+				this.block.onBlockPlacedBy(world, pos, state, player, stack);
+			}
 
 			if (player instanceof EntityPlayerMP)
 				CriteriaTriggers.PLACED_BLOCK.trigger((EntityPlayerMP)player, pos, stack);
