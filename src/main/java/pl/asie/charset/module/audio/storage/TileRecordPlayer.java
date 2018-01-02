@@ -26,6 +26,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -101,6 +102,14 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 
 	public EnumFacing getFacing() {
 		return world.getBlockState(pos).getValue(Properties.FACING4);
+	}
+
+	@Override
+	public void getDrops(NonNullList<ItemStack> stacks, IBlockState state, int fortune, boolean silkTouch) {
+		super.getDrops(stacks, state, fortune, silkTouch);
+		if (!holder.getStack().isEmpty()) {
+			stacks.add(holder.getStack());
+		}
 	}
 
 	@Override

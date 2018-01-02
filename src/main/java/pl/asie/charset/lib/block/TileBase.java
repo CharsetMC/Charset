@@ -28,6 +28,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -98,6 +99,10 @@ public class TileBase extends TileEntity {
 	@Override
 	public final void onChunkUnload() {
 		invalidate(InvalidationType.UNLOAD);
+	}
+
+	public void getDrops(NonNullList<ItemStack> stacks, IBlockState state, int fortune, boolean silkTouch) {
+		stacks.add(getDroppedBlock(state));
 	}
 
 	public ItemStack getPickedBlock(@Nullable EntityPlayer player, @Nullable RayTraceResult result, IBlockState state) {

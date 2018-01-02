@@ -19,12 +19,14 @@
 
 package pl.asie.charset.module.experiments.projector;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.api.laser.ILaserReceiver;
@@ -89,6 +91,14 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 		compound.setInteger("p", page);
 
 		return compound;
+	}
+
+	@Override
+	public void getDrops(NonNullList<ItemStack> stacks, IBlockState state, int fortune, boolean silkTouch) {
+		super.getDrops(stacks, state, fortune, silkTouch);
+		if (!holder.getStack().isEmpty()) {
+			stacks.add(holder.getStack());
+		}
 	}
 
 	public ItemStack getStack() {

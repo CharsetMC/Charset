@@ -253,7 +253,7 @@ public abstract class BlockBase extends Block {
 
 	public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
 		if (te instanceof TileBase) {
-			drops.add(((TileBase) te).getDroppedBlock(state));
+			((TileBase) te).getDrops(drops, state, fortune, silkTouch);
 		} else {
 			super.getDrops(drops, world, pos, state, fortune);
 		}

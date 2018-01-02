@@ -58,33 +58,33 @@ public class TraitRecordPlayerOC extends TraitOCEnvironment {
 
 	}
 
-	@Callback(doc = "function():boolean; Returns true if there is a record in the player", direct = true)
+	@Callback(doc = "function():boolean -- Returns true if there is a record in the player", direct = true)
 	public Object[] isReady(Context context, Arguments args) {
 		return new Object[] { hasReadyStorage() };
 	}
 
-	@Callback(doc = "function():number; Returns the record player's position, in seconds. Negative values indicate a resting arm.", direct = true)
+	@Callback(doc = "function():number -- Returns the record player's position, in seconds. Negative values indicate a resting arm.", direct = true)
 	public Object[] getPosition(Context context, Arguments args) {
 		return new Object[] { hasReadyStorage() ? (double) getStorage().getPosition() / getBytesPerSecond() : -1.0 };
 	}
 
-	@Callback(doc = "function():number; Returns the duration of the record, in seconds.", direct = true)
+	@Callback(doc = "function():number -- Returns the duration of the record, in seconds.", direct = true)
 	public Object[] getDuration(Context context, Arguments args) {
 		return new Object[] { hasReadyStorage() ? (double) getStorage().getSize() / getBytesPerSecond() : 0.0 };
 	}
 
-	@Callback(doc = "function():number; Returns the current sampling rate of the record player.", direct = true)
+	@Callback(doc = "function():number -- Returns the current sampling rate of the record player.", direct = true)
 	public Object[] getSampleRate(Context context, Arguments args) {
 		return new Object[] { getSampleRate() };
 	}
 
-	@Callback(doc = "function():string; Returns the name of the inserted record, if any.", direct = true)
+	@Callback(doc = "function():string -- Returns the name of the inserted record, if any.", direct = true)
 	public Object[] getName(Context context, Arguments args) {
 		ItemStack stack = getStack();
 		return new Object[] { stack.isEmpty() ? "" : (stack.hasDisplayName() ? stack.getDisplayName() : "") };
 	}
 
-	@Callback(doc = "function(duration:number):number; Seeks the specified amount of seconds on the record. "
+	@Callback(doc = "function(duration:number):number -- Seeks the specified amount of seconds on the record. "
 			+ "Negative values for rewinding. Returns the number of seconds sought.")
 	public Object[] seek(Context context, Arguments args) {
 		if (hasReadyStorage()) {
@@ -105,12 +105,12 @@ public class TraitRecordPlayerOC extends TraitOCEnvironment {
 		}
 	}
 
-	@Callback(doc = "function():string; Returns the current state of the player: \"playing\", \"paused\", \"stopped\" or \"recording\".", direct = true)
+	@Callback(doc = "function():string -- Returns the current state of the player: \"playing\", \"paused\", \"stopped\" or \"recording\".", direct = true)
 	public Object[] getState(Context context, Arguments args) {
 		return new Object[] { getTile().getState().name().toLowerCase() };
 	}
 
-	@Callback(doc = "function():boolean; Sets the record player to play. Returns true if successful.")
+	@Callback(doc = "function():boolean -- Sets the record player to play. Returns true if successful.")
 	public Object[] play(Context context, Arguments args) {
 		if (hasReadyStorage()) {
 			getTile().setState(TraitRecordPlayer.State.PLAYING);
@@ -120,7 +120,7 @@ public class TraitRecordPlayerOC extends TraitOCEnvironment {
 		}
 	}
 
-	@Callback(doc = "function():boolean; Sets the record player to pause. Returns true if successful.")
+	@Callback(doc = "function():boolean -- Sets the record player to pause. Returns true if successful.")
 	public Object[] pause(Context context, Arguments args) {
 		if (hasReadyStorage()) {
 			getTile().setState(TraitRecordPlayer.State.PAUSED);
@@ -130,7 +130,7 @@ public class TraitRecordPlayerOC extends TraitOCEnvironment {
 		}
 	}
 
-	@Callback(doc = "function():boolean; Sets the record player to record from external devices. Returns true if successful.")
+	@Callback(doc = "function():boolean -- Sets the record player to record from external devices. Returns true if successful.")
 	public Object[] record(Context context, Arguments args) {
 		if (hasReadyStorage()) {
 			getTile().setState(TraitRecordPlayer.State.RECORDING);
@@ -140,7 +140,7 @@ public class TraitRecordPlayerOC extends TraitOCEnvironment {
 		}
 	}
 
-	@Callback(doc = "function():boolean; Sets the record player to stop. Returns true if successful.")
+	@Callback(doc = "function():boolean -- Sets the record player to stop. Returns true if successful.")
 	public Object[] stop(Context context, Arguments args) {
 		getTile().setState(TraitRecordPlayer.State.STOPPED);
 		return new Object[] { getTile().getState() == TraitRecordPlayer.State.STOPPED };

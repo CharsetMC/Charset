@@ -191,14 +191,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     protected BlockStateContainer createBlockState() {
         return new ExtendedBlockState(this, new IProperty[]{}, new IUnlistedProperty[]{BARREL_INFO});
     }
-
-    @Override
-    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
-        if (te instanceof TileEntityDayBarrel) {
-            ((TileEntityDayBarrel) te).getDrops(drops, silkTouch);
-        }
-    }
-
+    
     @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
         TileEntity tile = world.getTileEntity(pos);

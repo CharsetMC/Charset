@@ -565,6 +565,10 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         return orientation != null && d == orientation.top.getOpposite();
     }
 
+	boolean isFront(EnumFacing d) {
+		return orientation != null && d == orientation.facing;
+	}
+
     boolean isBack(EnumFacing d) {
         return orientation != null && d == orientation.facing.getOpposite();
     }
@@ -649,10 +653,12 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if (isTop(facing) || isBottom(facing) || facing == null) {
-                return true;
-            }
-        } else if (capability == Capabilities.BARREL || capability == Capabilities.LOCKABLE) {
+	        if (isTop(facing) || isBottom(facing) || facing == null) {
+		        return true;
+	        }
+        } else if (capability == Capabilities.BARREL) {
+        	return !isFront(facing);
+        } else if (capability == Capabilities.LOCKABLE) {
             return true;
         } else if (capability == Capabilities.AXIS_ROTATABLE) {
             return facing != null;
@@ -993,7 +999,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         return stacks;
     }
 
-    public void getDrops(NonNullList<ItemStack> stacks, boolean silkTouch) {
+    @Override
+    public void getDrops(NonNullList<ItemStack> stacks, IBlockState state, int fortune, boolean silkTouch) {
         stacks.add(getDroppedBlock(silkTouch));
         stacks.addAll(getContentDrops(silkTouch));
     }
