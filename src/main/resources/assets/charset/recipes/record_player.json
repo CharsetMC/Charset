@@ -1,0 +1,38 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "audio.storage"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:record_player",
+  "pattern": [
+    "s  ",
+    "nin",
+    "srs"
+  ],
+  "key": {
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stone"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "n": {
+      "item": "minecraft:noteblock",
+      "data": 0
+    },
+    "r": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    }
+  },
+  "result": {
+    "item": "charset:record_player",
+    "data": 0,
+    "count": 1
+  }
+}

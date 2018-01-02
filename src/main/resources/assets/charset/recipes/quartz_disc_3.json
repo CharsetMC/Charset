@@ -1,0 +1,33 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "audio.storage"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:quartz_disc_2",
+  "pattern": [
+    "aqa",
+    "qiq",
+    "aqa"
+  ],
+  "key": {
+    "i": {
+      "item": "charset:quartz_disc",
+      "data": 4
+    },
+    "a": {
+      "type": "forge:ore_dict",
+      "ore": "gemQuartz"
+    },
+    "q": {
+      "type": "forge:ore_dict",
+      "ore": "blockQuartz"
+    }
+  },
+  "result": {
+    "item": "charset:quartz_disc",
+    "data": 6
+  }
+}

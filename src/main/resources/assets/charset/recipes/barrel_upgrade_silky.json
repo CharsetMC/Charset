@@ -9,7 +9,7 @@
       "upgrade": "SILKY"
     }
   ],
-  "type": "charset:barrel_upgrade_shaped",
+  "type": "charset:shaped",
   "group": "charset:barrel_upgrade",
   "pattern": [
     "hhh",
