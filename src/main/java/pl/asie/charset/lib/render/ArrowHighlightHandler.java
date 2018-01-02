@@ -69,7 +69,7 @@ public class ArrowHighlightHandler {
     private void drawArrowHighlight(EntityPlayer player, RayTraceResult trace, Vec3d cameraPos) {
         Orientation orientation = SpaceUtils.getOrientation(trace.getBlockPos(), player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
 
-        if (orientation.top.getAxis() == trace.sideHit.getAxis()) {
+        if (orientation.top.getAxis() == trace.sideHit.getAxis() || trace.sideHit == EnumFacing.UP) {
             return;
         }
 

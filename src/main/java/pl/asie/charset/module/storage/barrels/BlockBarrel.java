@@ -45,6 +45,7 @@ import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
+import pl.asie.charset.lib.item.SubItemSetHelper;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nullable;
@@ -101,6 +102,11 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
     @Override
     protected ISubItemProvider createSubItemProvider() {
         return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetStorageBarrels.barrelItem) {
+            @Override
+            protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
+                return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("log", SubItemSetHelper::sortByItem));
+            }
+
             @Override
             protected List<ItemStack> createForcedItems() {
                 return CharsetStorageBarrels.CREATIVE_BARRELS;

@@ -52,6 +52,7 @@ import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
+import pl.asie.charset.lib.item.SubItemSetHelper;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.module.misc.shelf.CharsetMiscShelf;
@@ -84,7 +85,12 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	protected ISubItemProvider createSubItemProvider() {
-		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetMiscScaffold.scaffoldItem));
+		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetMiscScaffold.scaffoldItem) {
+			@Override
+			protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
+				return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("plank", SubItemSetHelper::sortByItem));
+			}
+		});
 	}
 
 	private boolean canStay(IBlockAccess world, BlockPos pos) {

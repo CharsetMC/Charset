@@ -388,7 +388,7 @@ public final class SpaceUtils {
         if (orient.getAxis() != EnumFacing.Axis.Y
                 && facing.getAxis() == EnumFacing.Axis.Y) {
             facing = orient;
-            fo = orient == null ? null : Orientation.fromDirection(orient.getOpposite());
+            fo = orient == null ? null : Orientation.fromDirection(orient);
             if (fo != null) {
                 Orientation perfect = fo.pointTopTo(EnumFacing.UP);
                 if (perfect != null) {

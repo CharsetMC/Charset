@@ -26,6 +26,10 @@ import pl.asie.charset.lib.CharsetLib;
 import java.util.*;
 
 public class SubItemProviderSets implements ISubItemProvider {
+    protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
+        return 0;
+    }
+
     protected List<ItemStack> createForcedItems() {
         return Collections.emptyList();
     }
@@ -45,12 +49,14 @@ public class SubItemProviderSets implements ISubItemProvider {
 
         if (sets.size() > 0) {
             if (all || getVisibleSetAmount() >= sets.size()) {
+                sets.sort(this::compareSets);
                 for (Collection<ItemStack> set : sets)
                     builder.addAll(set);
             } else {
                 Calendar cal = CharsetLib.calendar.get();
                 int doy = (cal.get(Calendar.YEAR) * 366) + cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
                 Collections.shuffle(sets, new Random(doy));
+                sets.sort(this::compareSets);
                 for (int i = 0; i < Math.min(getVisibleSetAmount(), sets.size()); i++)
                     builder.addAll(sets.get(i));
             }
