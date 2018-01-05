@@ -18,8 +18,8 @@ To use Charset in your Gradle project, add the following lines to build.gradle:
     }
     
     dependencies {
-        deobfCompile "pl.asie.charset:Charset:0.4.2.1"
+        deobfCompile "pl.asie.charset:charset:0.5.0.119"
     }
 
-Feel free to replace 0.4.2.1 with the Charset version you want to use and "api" with the module you want to include. To include multiple modules, just 
-copy the "deobfCompile" line multiple times to match.
+Feel free to replace 0.5.0.119 with the Charset version you want to use. You can also use ":api". To include multiple 
+modules, just copy the "deobfCompile" line multiple times to match.
