@@ -19,7 +19,6 @@
 
 package pl.asie.charset.module.laser.system;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -27,11 +26,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.module.laser.CharsetLaser;
+import pl.asie.charset.patchwork.LaserRedstoneHook;
 
-import java.util.Collection;
-
-public class LaserRedstoneHelper {
-	private static int getLaserPower(IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+public class LaserRedstoneHelper implements LaserRedstoneHook.Handler {
+	@Override
+	public int getLaserPower(IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
 		if (blockAccess instanceof World) {
 			pos = pos.offset(side.getOpposite());
 
@@ -49,15 +48,5 @@ public class LaserRedstoneHelper {
 		}
 
 		return 0;
-	}
-
-	public static int getRedstonePower(World world, BlockPos pos, EnumFacing facing) {
-		int l = getLaserPower(world, pos, facing);
-		if (l == 15) return l; else return Math.max(world.getRedstonePower(pos, facing), l);
-	}
-
-	public static int getStrongPower(Block block, IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-		int l = getLaserPower(blockAccess, pos, side);
-		if (l == 15) return l; else return Math.max(block.getStrongPower(blockState, blockAccess, pos, side), l);
 	}
 }

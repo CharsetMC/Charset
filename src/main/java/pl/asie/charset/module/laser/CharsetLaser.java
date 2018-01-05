@@ -56,6 +56,7 @@ import pl.asie.charset.api.laser.LaserColor;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.laser.blocks.*;
 import pl.asie.charset.module.laser.system.*;
+import pl.asie.charset.patchwork.LaserRedstoneHook;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -101,6 +102,7 @@ public class CharsetLaser {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         CapabilityManager.INSTANCE.register(ILaserSource.class, DummyCapabilityStorage.get(), DummyLaserSource::new);
+        LaserRedstoneHook.handler = new LaserRedstoneHelper();
 
         IngredientGroup.register("charset:laser_gem", 1, "gemSapphire", "gemLapis");
         IngredientGroup.register("charset:laser_gem", 2, "gemEmerald");
