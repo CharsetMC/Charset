@@ -3,6 +3,7 @@ pipeline {
 	stages {
 		stage('Build') {
 			steps {
+				sh 'git submodule update --init --recursive'
 				sh 'rm -f private.gradle'
 				sh './gradlew setupCiWorkspace clean build'
 				archive 'build/libs/*jar'
