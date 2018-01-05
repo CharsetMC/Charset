@@ -40,17 +40,19 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.laser.LaserColor;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.module.laser.CharsetLaser;
 
 import javax.annotation.Nullable;
 
 public class BlockJar extends BlockBase implements ITileEntityProvider {
-	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[3]; // X, Y, Z
+	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
 
 	static {
-		BOXES[0] = new AxisAlignedBB(0, 2/16f, 2/16f, 1, 14/16f, 14/16f);
-		BOXES[1] = new AxisAlignedBB(2/16f, 0, 2/16f, 14/16f, 1, 14/16f);
-		BOXES[2] = new AxisAlignedBB(2/16f, 2/16f, 0, 14/16f, 14/16f, 1);
+		BOXES[1] = new AxisAlignedBB(6/16f, 0, 6/16f, 10/16f, 10/16f, 10/16f);
+		for (int i = 1; i < 6; i++) {
+			BOXES[i ^ 1] = RotationUtils.rotateFace(BOXES[1], EnumFacing.getFront(i));
+		}
 	}
 
 	public BlockJar() {
@@ -81,7 +83,48 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return BOXES[state.getValue(Properties.FACING).getAxis().ordinal()];
+		return BOXES[state.getValue(Properties.FACING).ordinal()];
+	}
+
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return NULL_AABB;
+	}
+
+	protected boolean canPlaceAt(IBlockAccess world, BlockPos pos, EnumFacing facing) {
+		BlockPos destPos = pos.offset(facing.getOpposite());
+		IBlockState destState = world.getBlockState(destPos);
+		return destState.getBlock().canPlaceTorchOnTop(destState, world, destPos);
+	}
+
+	protected boolean dropIfNotBacked(World world, BlockPos pos, IBlockState state) {
+		if (state.getBlock() == this) {
+			EnumFacing facing = state.getValue(Properties.FACING);
+			if (!canPlaceAt(world, pos, facing)) {
+				dropBlockAsItem(world, pos, state, 0);
+				world.setBlockToAir(pos);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean canPlaceBlockOnSide(World world, BlockPos pos, EnumFacing side) {
+		return canPlaceAt(world, pos, side);
+	}
+
+	@Override
+	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+		super.onBlockAdded(worldIn, pos, state);
+		dropIfNotBacked(worldIn, pos, state);
+	}
+
+	@Override
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+		dropIfNotBacked(worldIn, pos, state);
 	}
 
 	@Override
@@ -142,7 +185,7 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 	}
 
 	@Override
-	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		return this.getDefaultState().withProperty(Properties.FACING, EnumFacing.getDirectionFromEntityLiving(pos, placer));
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+		return this.getDefaultState().withProperty(Properties.FACING, facing);
 	}
 }

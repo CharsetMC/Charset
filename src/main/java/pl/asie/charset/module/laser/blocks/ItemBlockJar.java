@@ -41,10 +41,7 @@ public class ItemBlockJar extends ItemBlockBase {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		if (stack.getItemDamage() > 0) {
-			tooltip.add(TextFormatting.ITALIC + I18n.format("tile.charset.light_jar.tip",
-					I18n.format(CharsetLaser.LASER_LANG_STRINGS[stack.getItemDamage() & 7])));
-		}
+	public String getItemStackDisplayName(ItemStack stack) {
+		return I18n.format("tile.charset.beam_torch.name", I18n.format(CharsetLaser.LASER_LANG_STRINGS[stack.getItemDamage() & 7]));
 	}
 }

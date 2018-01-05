@@ -8,22 +8,18 @@
   "type": "charset:shaped",
   "group": "charset:light_jar",
   "pattern": [
-    " b ",
-    "gcg",
-    "ggg"
+    "c",
+    "s"
   ],
   "key": {
-    "g": {
-      "type": "forge:ore_dict",
-      "ore": "paneGlassColorless"
-    },
-    "b": {
-      "type": "forge:ore_dict",
-      "ore": "paneGlassBlack"
-    },
     "c": {
+      "type": "charset:group",
+      "group": "charset:laser_gem",
+      "modifyMeta": true
+    },
+    "s": {
       "type": "forge:ore_dict",
-      "ore": "blockCoal"
+      "ore": "stickWood"
     }
   },
   "result": {

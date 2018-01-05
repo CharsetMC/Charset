@@ -51,8 +51,7 @@ item.charset.clayBucket.empty.name=Clay Bucket
 
 # CharsetLaser
 tile.charset.crystal.name=%s Crystal
-tile.charset.light_jar.name=Light Jar
-tile.charset.light_jar.tip=%s Light
+tile.charset.beam_torch.name=%s Beam Torch
 tile.charset.prism.name=Prism
 tile.charset.reflector.name=%s Reflector
 tile.charset.splitter.name=%s Splitter

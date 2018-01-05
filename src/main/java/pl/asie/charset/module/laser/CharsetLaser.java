@@ -119,7 +119,7 @@ public class CharsetLaser {
         itemReflector = new ItemBlockReflector(blockReflector);
 
         blockJar = new BlockJar();
-        blockJar.setUnlocalizedName("charset.light_jar");
+        blockJar.setUnlocalizedName("charset.beam_torch");
         itemJar = new ItemBlockJar(blockJar);
 
         blockPrism = new BlockPrism();
