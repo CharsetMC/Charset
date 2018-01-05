@@ -20,6 +20,8 @@
 package pl.asie.charset.module.laser.blocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPistonBase;
+import net.minecraft.block.BlockPistonExtension;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
@@ -94,7 +96,13 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 	protected boolean canPlaceAt(IBlockAccess world, BlockPos pos, EnumFacing facing) {
 		BlockPos destPos = pos.offset(facing.getOpposite());
 		IBlockState destState = world.getBlockState(destPos);
-		return destState.getBlock().canPlaceTorchOnTop(destState, world, destPos);
+		if (destState.getBlock() instanceof BlockPistonExtension) {
+			return destState.getValue(BlockPistonExtension.FACING) == facing;
+		} else if (destState.getBlock() instanceof BlockPistonBase) {
+			return true;
+		} else {
+			return destState.isSideSolid(world, destPos, facing);
+		}
 	}
 
 	protected boolean dropIfNotBacked(World world, BlockPos pos, IBlockState state) {

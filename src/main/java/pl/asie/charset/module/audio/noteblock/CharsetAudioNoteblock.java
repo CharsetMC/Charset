@@ -19,9 +19,12 @@
 
 package pl.asie.charset.module.audio.noteblock;
 
+import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockNote;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityNote;
 import net.minecraft.util.EnumFacing;
@@ -30,10 +33,13 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.NoteBlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.ModCharset;
@@ -43,6 +49,7 @@ import pl.asie.charset.lib.audio.types.AudioDataGameSound;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.audio.DefaultAudioSource;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -54,7 +61,7 @@ import java.util.function.Supplier;
 
 @CharsetModule(
         name = "audio.noteblock",
-        description = "Noteblock rework. WIP",
+        description = "Noteblock rework.",
         profile = ModuleProfile.TESTING
 )
 public class CharsetAudioNoteblock {
@@ -62,10 +69,15 @@ public class CharsetAudioNoteblock {
     private static final Supplier<CapabilityProviderFactory<IAudioSource>> PROVIDER = FunctionalUtils.lazySupplier(() -> new CapabilityProviderFactory<>(Capabilities.AUDIO_SOURCE));
     private static final ResourceLocation NOTE_SOURCE_KEY = new ResourceLocation("charsetaudio:noteSource");
 
+    @CharsetModule.Configuration
+    public Configuration config;
+
     @CharsetModule.PacketRegistry
     public PacketRegistry packet;
 
-    public static SoundEvent getSound(World world, BlockPos pos, int id) {
+    public static boolean compatibilityMode;
+
+    private static SoundEvent getSoundVanilla(World world, BlockPos pos, int id) {
         if (GET_INSTRUMENT == null) {
             ModCharset.logger.error("BlockNote.getInstrument not found! This is bad!");
         }
@@ -78,24 +90,85 @@ public class CharsetAudioNoteblock {
         }
     }
 
+    public static float getSoundVolume(World world, BlockPos pos) {
+        float volume = 3.0f;
+        if (!compatibilityMode) {
+            // White/Light Gray/Dark Gray/Black Wool:
+            // 35/50/65/80% dampening
+            BlockPos dampPos = pos.up();
+            IBlockState state;
+            while ((state = world.getBlockState(dampPos)).getBlock() == Blocks.WOOL) {
+                switch (state.getValue(BlockColored.COLOR)) {
+                    case WHITE:
+                        volume *= 0.8f;
+                        break;
+                    case SILVER:
+                        volume *= 0.65f;
+                        break;
+                    case GRAY:
+                        volume *= 0.5f;
+                        break;
+                    case BLACK:
+                        volume *= 0.35f;
+                        break;
+                }
+                dampPos = dampPos.up();
+            }
+        }
+        return volume;
+    }
+
+    public static SoundEvent getSound(World world, BlockPos pos, int id) {
+        SoundEvent soundEvent = getSoundVanilla(world, pos, id);
+        if (!compatibilityMode) {
+            // TODO: Custom instrument code
+        }
+        return soundEvent;
+    }
+
+    @Mod.EventHandler
+    public void onReloadConfig(CharsetLoadConfigEvent event) {
+        compatibilityMode = config.getBoolean("compatibilityMode", "general", false, "If compatibility mode should be enabled. Use this to disable custom instruments and volume dampening.");
+    }
+
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         packet.registerPacket(0x01, PacketNoteParticle.class);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
+    public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
+        if (!event.getWorld().isRemote && event.getEntityPlayer().isSneaking()) {
+            TileEntity tile = event.getWorld().getTileEntity(event.getPos());
+            if (tile instanceof TileEntityNote) {
+                TileEntityNote note = (TileEntityNote) tile;
+                event.setCanceled(true);
+
+                byte old = note.note;
+                note.note = (byte) (old == 0 ? 24 : (old - 1));
+                if (!net.minecraftforge.common.ForgeHooks.onNoteChange(note, old)) return;
+                note.markDirty();
+                if (old != note.note) {
+                    note.triggerNote(event.getWorld(), event.getPos());
+                    event.getEntityPlayer().addStat(StatList.NOTEBLOCK_TUNED);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
     public void onNoteEvent(NoteBlockEvent.Play event) {
-        World worldIn = event.getWorld();
+        World world = event.getWorld();
         BlockPos pos = event.getPos();
         int param = event.getVanillaNoteId();
         SoundEvent sound = getSound(event.getWorld(), event.getPos(), event.getInstrument().ordinal());
         float pitch = (float)Math.pow(2.0D, (double)(param - 12) / 12.0D);
 
-        if (!worldIn.isRemote) {
-            TileEntity note = worldIn.getTileEntity(pos);
+        if (!world.isRemote) {
+            TileEntity note = world.getTileEntity(pos);
             if (note != null && note.hasCapability(Capabilities.AUDIO_SOURCE, null)) {
                 AudioDataGameSound dataSound = new AudioDataGameSound(SoundEvent.REGISTRY.getNameForObject(sound).toString(), pitch);
-                AudioPacket packet = new AudioPacket(dataSound, 1.0f);
+                AudioPacket packet = new AudioPacket(dataSound, getSoundVolume(world, pos));
 
                 for (EnumFacing facing : EnumFacing.VALUES) {
                     TileEntity tile = event.getWorld().getTileEntity(pos.offset(facing));
@@ -111,12 +184,13 @@ public class CharsetAudioNoteblock {
                 }
             }
 
-            // Did not send sound via speaker - use default implementation *for impl note blocks*
-            if (event.getState().getBlock() == Blocks.NOTEBLOCK) {
-                event.setCanceled(true);
+            if (!compatibilityMode) {
+                if (event.getState().getBlock() == Blocks.NOTEBLOCK) {
+                    event.setCanceled(true);
 
-                worldIn.playSound(null, pos, sound, SoundCategory.BLOCKS, 3.0F, pitch);
-                packet.sendToAllAround(new PacketNoteParticle(note, param), note, 32);
+                    world.playSound(null, pos, sound, SoundCategory.BLOCKS, getSoundVolume(world, pos), pitch);
+                    packet.sendToAllAround(new PacketNoteParticle(note, param), note, 32);
+                }
             }
         }
     }
