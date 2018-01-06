@@ -92,7 +92,7 @@ public class CharsetAudioNoteblock {
 
     public static float getSoundVolume(World world, BlockPos pos) {
         float volume = 3.0f;
-        if (!compatibilityMode) {
+        /* if (!compatibilityMode) {
             // White/Light Gray/Dark Gray/Black Wool:
             // 35/50/65/80% dampening
             BlockPos dampPos = pos.up();
@@ -114,7 +114,7 @@ public class CharsetAudioNoteblock {
                 }
                 dampPos = dampPos.up();
             }
-        }
+        } */
         return volume;
     }
 
@@ -128,7 +128,7 @@ public class CharsetAudioNoteblock {
 
     @Mod.EventHandler
     public void onReloadConfig(CharsetLoadConfigEvent event) {
-        compatibilityMode = config.getBoolean("compatibilityMode", "general", false, "If compatibility mode should be enabled. Use this to disable custom instruments and volume dampening.");
+        compatibilityMode = config.getBoolean("compatibilityMode", "general", false, "If compatibility mode should be enabled. Use this to disable custom instruments.");
     }
 
     @Mod.EventHandler
