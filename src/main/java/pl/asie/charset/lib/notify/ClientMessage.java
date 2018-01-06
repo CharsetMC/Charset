@@ -113,18 +113,11 @@ class ClientMessage {
             return (Vec3d) locus;
         }
         if (locus instanceof Entity) {
-            if (locus instanceof EntityMinecart) {
-                partial = 1; // Wtf?
-            }
             Entity e = ((Entity) locus);
-            double w = e.width * -1.5;
-            double eye_height = 4.0 / 16.0;
-            if (e instanceof EntityLiving) {
-                eye_height += e.getEyeHeight();
-            }
-            final double x = interp(e.prevPosX, e.posX, partial) + w / 2;
-            final double y = interp(e.prevPosY, e.posY, partial) + eye_height;
-            final double z = interp(e.prevPosZ, e.posZ, partial) + w / 2;
+            double w = e.width * -1;
+            final double x = interp(e.lastTickPosX, e.posX, partial) + w / 2;
+            final double y = interp(e.lastTickPosY, e.posY, partial) + e.height;
+            final double z = interp(e.lastTickPosZ, e.posZ, partial) + w / 2;
             return new Vec3d(x, y, z);
         }
         if (locus instanceof TileEntity) {

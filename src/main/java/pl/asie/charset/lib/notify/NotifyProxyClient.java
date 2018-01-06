@@ -234,16 +234,16 @@ public class NotifyProxyClient extends NotifyProxy {
             double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
             scaling *= Math.sqrt(dist);
         }
-        
+
         NotificationCoord co = m.asCoord();
         if (co != null && !m.position_important) {
             BlockPos pos = co.getPos();
             IBlockState bs = co.getWorld().getBlockState(pos);
             AxisAlignedBB bb = bs.getCollisionBoundingBox(co.getWorld(), pos);
             if (bb != null) {
-                y += bb.maxY;
+                y = (float) Math.max(y, pos.getY() + bb.maxY);
             } else {
-                y += 0.5F;
+                y = (float) Math.max(y, pos.getY() + 0.5f);
             }
         }
         GlStateManager.translate(x + 0.5F, y, z + 0.5F);

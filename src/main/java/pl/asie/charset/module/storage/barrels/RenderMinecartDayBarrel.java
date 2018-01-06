@@ -21,11 +21,17 @@ package pl.asie.charset.module.storage.barrels;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.block.BlockBase;
+
+import java.util.Random;
 
 public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBarrel> {
     private static final TileEntityDayBarrelRenderer tesr = new TileEntityDayBarrelRenderer();
@@ -44,13 +50,25 @@ public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBar
         GlStateManager.enableAlpha();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.rotate(90, 0, 1, 0);
-        GlStateManager.translate(0, 0, 1);
-        Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModelBrightness(
-                BarrelModel.INSTANCE, state, minecart.getBrightness(), true);
+        GlStateManager.rotate(180, 0, 1, 0);
+        GlStateManager.translate(-1, 0, 0);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        RenderHelper.disableStandardItemLighting();
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        buffer.setTranslation(-minecart.getPosition().getX(), -minecart.getPosition().getY(), -minecart.getPosition().getZ());
+
+        Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer()
+                .renderModelFlat(minecart.getEntityWorld(), BarrelModel.INSTANCE, state, minecart.getPosition(), buffer, false, 0L);
+
+        tessellator.draw();
+        buffer.setTranslation(0, 0, 0);
+
         GlStateManager.disableBlend();
         tesr.render(minecart.barrel, 0, 0, 0, partialTicks, 0, 1.0f);
-        RenderHelper.enableStandardItemLighting();
         GlStateManager.popMatrix();
     }
 }

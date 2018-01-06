@@ -49,7 +49,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
     private static final DataParameter<String> BARREL_LOG = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
     private static final DataParameter<String> BARREL_SLAB = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.STRING);
     private static final DataParameter<Byte> BARREL_ORIENTATION = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.BYTE);
-    private static final DataParameter<NBTTagCompound> BARREL_UPGRADES = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.COMPOUND_TAG);
+    private static final DataParameter<Integer> BARREL_UPGRADES = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.VARINT);
     private static final DataParameter<Integer> BARREL_ITEM_COUNT = EntityDataManager.createKey(EntityMinecartDayBarrel.class, DataSerializers.VARINT);
 
     protected TileEntityDayBarrel barrel;
@@ -74,18 +74,20 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            ItemStack result = barrel.insertionView.insertItem(slot, stack, simulate);
             if (!simulate) {
                 updateDataWatcher(false);
             }
-            return barrel.insertionView.insertItem(slot, stack, simulate);
+            return result;
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            ItemStack result = barrel.extractionView.extractItem(slot, amount, simulate);
             if (!simulate) {
                 updateDataWatcher(false);
             }
-            return barrel.extractionView.extractItem(slot, amount, simulate);
+            return result;
         }
     }
 
@@ -102,7 +104,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         this.setDead();
 
         ItemStack itemstack = getCartItem();
-        if (this.getCustomNameTag() != null) {
+        if (this.hasCustomName()) {
             itemstack.setStackDisplayName(getCustomNameTag());
         }
 
@@ -171,13 +173,23 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         barrel.writeNBTData(tag, false);
     }
 
-    protected NBTTagCompound getUpgradesNBT() {
-        NBTTagCompound compound = new NBTTagCompound();
-        NBTTagList list = new NBTTagList();
+    protected int serializeUpgrades() {
+        int i = 0;
         for (BarrelUpgrade u : barrel.upgrades)
-            list.appendTag(new NBTTagString(u.name()));
-        compound.setTag("upgrades", list);
-        return compound;
+            i |= (1 << u.ordinal());
+        return i;
+    }
+
+    protected void deserializeUpgrades(int i) {
+        barrel.upgrades.clear();
+        int j = 0;
+        while (i > 0) {
+            if ((i & 1) != 0) {
+                barrel.upgrades.add(BarrelUpgrade.values()[j]);
+            }
+            j++;
+            i >>= 1;
+        }
     }
 
     @Override
@@ -190,7 +202,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         dataManager.register(BARREL_LOG, barrel.woodLog.getId());
         dataManager.register(BARREL_SLAB, barrel.woodSlab.getId());
         dataManager.register(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
-        dataManager.register(BARREL_UPGRADES, getUpgradesNBT());
+        dataManager.register(BARREL_UPGRADES, serializeUpgrades());
     }
 
     private void updateDataWatcher(boolean full) {
@@ -201,7 +213,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
                 dataManager.set(BARREL_LOG, barrel.woodLog.getId());
                 dataManager.set(BARREL_SLAB, barrel.woodSlab.getId());
                 dataManager.set(BARREL_ORIENTATION, (byte) barrel.orientation.ordinal());
-                dataManager.set(BARREL_UPGRADES, getUpgradesNBT());
+                dataManager.set(BARREL_UPGRADES, serializeUpgrades());
             }
         }
     }
@@ -223,8 +235,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
             barrel.woodLog = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_LOG));
             barrel.woodSlab = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_SLAB));
             barrel.orientation = Orientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
-            barrel.upgrades.clear();
-            TileEntityDayBarrel.populateUpgrades(barrel.upgrades, dataManager.get(BARREL_UPGRADES));
+            deserializeUpgrades(dataManager.get(BARREL_UPGRADES));
         }
 
         if (!world.isRemote) {

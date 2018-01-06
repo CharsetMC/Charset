@@ -51,7 +51,7 @@ public class PacketBarrelCountUpdate extends PacketTile {
 	@Override
 	public void apply(INetHandler handler) {
 		super.apply(handler);
-		if (tile != null && tile instanceof TileEntityDayBarrel) {
+		if (tile instanceof TileEntityDayBarrel) {
 			((TileEntityDayBarrel) tile).onCountUpdate(this);
 		}
 	}

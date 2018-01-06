@@ -138,7 +138,8 @@ public class CharsetAudioNoteblock {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
-        if (!event.getWorld().isRemote && event.getEntityPlayer().isSneaking()) {
+        if (!event.getWorld().isRemote && event.getEntityPlayer().isSneaking()
+                && event.getEntityPlayer().getHeldItem(event.getHand()).isEmpty()) {
             TileEntity tile = event.getWorld().getTileEntity(event.getPos());
             if (tile instanceof TileEntityNote) {
                 TileEntityNote note = (TileEntityNote) tile;
