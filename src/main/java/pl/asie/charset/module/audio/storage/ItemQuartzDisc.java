@@ -121,7 +121,7 @@ public class ItemQuartzDisc extends Item {
 		return ARM_STARTS[(stack.getMetadata() >> 1) % ARM_STARTS.length];
 	}
 
-	private int getSize(ItemStack stack) {
+	int getSize(ItemStack stack) {
 		int defSize = SIZES[(stack.getMetadata() >> 1) % SIZES.length];
 		return stack.hasTagCompound() && stack.getTagCompound().hasKey("size", Constants.NBT.TAG_ANY_NUMERIC) ? stack.getTagCompound().getInteger("size") : defSize;
 	}
