@@ -26,14 +26,71 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderMinecart;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.block.BlockBase;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBarrel> {
+    private static class ProxyBlockAccess implements IBlockAccess {
+        private final IBlockAccess parent;
+        private final int brightness;
+
+        public ProxyBlockAccess(IBlockAccess access, int brightness) {
+            this.parent = access;
+            this.brightness = brightness;
+        }
+
+        @Nullable
+        @Override
+        public TileEntity getTileEntity(BlockPos pos) {
+            return parent.getTileEntity(pos);
+        }
+
+        @Override
+        public int getCombinedLight(BlockPos pos, int lightValue) {
+            return brightness;
+        }
+
+        @Override
+        public IBlockState getBlockState(BlockPos pos) {
+            return parent.getBlockState(pos);
+        }
+
+        @Override
+        public boolean isAirBlock(BlockPos pos) {
+            return parent.isAirBlock(pos);
+        }
+
+        @Override
+        public Biome getBiome(BlockPos pos) {
+            return parent.getBiome(pos);
+        }
+
+        @Override
+        public int getStrongPower(BlockPos pos, EnumFacing direction) {
+            return 0;
+        }
+
+        @Override
+        public WorldType getWorldType() {
+            return parent.getWorldType();
+        }
+
+        @Override
+        public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+            return parent.isSideSolid(pos, side, _default);
+        }
+    }
+
     private static final TileEntityDayBarrelRenderer tesr = new TileEntityDayBarrelRenderer();
 
     static {
@@ -62,7 +119,7 @@ public class RenderMinecartDayBarrel extends RenderMinecart<EntityMinecartDayBar
         buffer.setTranslation(-minecart.getPosition().getX(), -minecart.getPosition().getY(), -minecart.getPosition().getZ());
 
         Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer()
-                .renderModelFlat(minecart.getEntityWorld(), BarrelModel.INSTANCE, state, minecart.getPosition(), buffer, false, 0L);
+                .renderModelFlat(new ProxyBlockAccess(minecart.getEntityWorld(), minecart.getBrightnessForRender()), BarrelModel.INSTANCE, state, minecart.getPosition(), buffer, false, 0L);
 
         tessellator.draw();
         buffer.setTranslation(0, 0, 0);
