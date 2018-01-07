@@ -74,6 +74,8 @@ public abstract class IngredientCharset {
 
         IntList getValidItemStacksPacked() {
             if(this.matchingStacksPacked == null) {
+                getMatchingStacksCompressed();
+
                 this.matchingStacksPacked = new IntArrayList(matchingStacks.length);
                 for(int i = 0; i < matchingStacksCompressed.length; i++) {
                     ItemStack itemstack = matchingStacksCompressed[i];

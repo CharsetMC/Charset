@@ -160,7 +160,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-		if (blockAccess.getBlockState(pos.up()).getBlock() == this)
+		if (side == EnumFacing.UP && blockAccess.getBlockState(pos.up()).getBlock() == this)
 			return false;
 
 		return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
