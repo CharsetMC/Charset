@@ -45,7 +45,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
         } else {
             // Modifying it instantly will cause a CME in MCMultiPart.
             // We only get here upon module removal anyway, so...
-            Scheduler.INSTANCE.in(world, 1, () -> world.setBlockToAir(getPos()));
+            Scheduler.INSTANCE.in(world, 0, () -> world.setBlockToAir(getPos()));
         }
     }
 

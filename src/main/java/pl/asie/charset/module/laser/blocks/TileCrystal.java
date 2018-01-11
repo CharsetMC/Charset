@@ -98,6 +98,10 @@ public class TileCrystal extends TileLaserSourceBase {
 			if (updateQueued != world.getTotalWorldTime()) {
 				// System.out.println("queued");
 				Scheduler.INSTANCE.in(world, 0, () -> {
+					if (this.isInvalid()) {
+						return;
+					}
+
 					// System.out.println("hitMask change " + world.getTotalWorldTime() + " " + pos + " " + hitMask + "->" + newHitMask);
 					IBlockState oldState2 = world.getBlockState(pos);
 					if (oldState2.getBlock() instanceof BlockCrystal && oldState2.getValue(BlockCrystal.OPAQUE) != (newHitMask != 0)) {
@@ -123,6 +127,7 @@ public class TileCrystal extends TileLaserSourceBase {
 					}
 				});
 			}
+
 			updateQueued = world.getTotalWorldTime();
 		} else {
 			hitMask = newHitMask;

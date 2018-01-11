@@ -114,6 +114,10 @@ public class TileJar extends TileBase {
 	}
 
 	public void updateRotations() {
+		if (this.isInvalid()) {
+			return;
+		}
+
 		IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() == CharsetLaser.blockJar) {
 			this.jarFacing = null;
