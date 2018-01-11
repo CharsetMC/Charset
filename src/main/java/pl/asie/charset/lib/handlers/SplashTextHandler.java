@@ -50,7 +50,7 @@ public class SplashTextHandler {
 			String s;
 
 			while ((s = bufferedreader.readLine()) != null) {
-				if (s.charAt(0) == '#')
+				if (s.length() == 0 || s.charAt(0) == '#')
 					continue;
 
 				s = s.trim();
