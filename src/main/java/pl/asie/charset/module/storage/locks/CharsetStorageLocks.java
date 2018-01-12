@@ -26,6 +26,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -33,14 +34,17 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.patchwork.LocksCapabilityHook;
 
 @CharsetModule(
 		name = "storage.locks",
@@ -76,6 +80,20 @@ public class CharsetStorageLocks {
 		lockItem = new ItemLock();
 
 		ModCharset.dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new FixCharsetLockKeyTagChange());
+
+		if (ModCharset.profile == ModuleProfile.INDEV) {
+			LocksCapabilityHook.handler = new LocksCapabilityHandler();
+
+			LocksCapabilityHandler.addCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, true);
+			LocksCapabilityHandler.addCapability(Capabilities.ITEM_INSERTION_HANDLER, true);
+			LocksCapabilityHandler.addCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, true);
+
+			CharsetStorageLocks.config.getCategory("blockedCapabilities").setComment("NOTE: This functionality requires a special configuration option in CharsetPatches to be turned on! Otherwise, it will not be effective!");
+
+			if (config.hasChanged()) {
+				config.save();
+			}
+		}
 	}
 
 	@SubscribeEvent

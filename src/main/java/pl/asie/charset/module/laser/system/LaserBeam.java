@@ -26,7 +26,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -34,14 +33,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.laser.ILaserBeam;
 import pl.asie.charset.api.laser.ILaserSource;
-import pl.asie.charset.lib.utils.Utils;
 import pl.asie.charset.module.laser.CharsetLaser;
 import pl.asie.charset.api.laser.ILaserReceiver;
 import pl.asie.charset.api.laser.LaserColor;
-import pl.asie.charset.patchwork.CharsetPatchwork;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 
 // IDEA: Add lastTileEntity to avoid double world.getTileEntity call with onAdd.
 public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
@@ -121,7 +117,7 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 					if (receiver != null) {
 						receiver.onLaserUpdate(color);
 					}
-				} else if (CharsetPatchwork.LASER_REDSTONE) {
+				} else if (CharsetLaser.REDSTONE_HOOK_ACTIVE) {
 					world.neighborChanged(end, Blocks.AIR, end.offset(direction.getOpposite()));
 				}
 			}
@@ -141,7 +137,7 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 					if (receiver != null) {
 						receiver.onLaserUpdate(LaserColor.NONE);
 					}
-				} else if (CharsetPatchwork.LASER_REDSTONE) {
+				} else if (CharsetLaser.REDSTONE_HOOK_ACTIVE) {
 					world.neighborChanged(end, Blocks.AIR, end.offset(direction.getOpposite()));
 					world.notifyNeighborsOfStateChange(end, Blocks.AIR, false);
 				}

@@ -36,7 +36,6 @@ import net.minecraft.world.chunk.Chunk;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.api.laser.ILaserSource;
 import pl.asie.charset.module.laser.CharsetLaser;
-import pl.asie.charset.patchwork.CharsetPatchwork;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -213,7 +212,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 	}
 
 	protected boolean isEndpointHit(BlockPos pos, EnumFacing facing) {
-		if (!CharsetPatchwork.LASER_REDSTONE) {
+		if (!CharsetLaser.REDSTONE_HOOK_ACTIVE) {
 			throw new RuntimeException("Endpoint functionality not enabled! Please report to mod author.");
 		}
 
@@ -230,7 +229,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 	}
 
 	protected void addEndpoint(ILaserEndpoint endpoint) {
-		if (CharsetPatchwork.LASER_REDSTONE) {
+		if (CharsetLaser.REDSTONE_HOOK_ACTIVE) {
 			long k = endpoint.getPos().toLong();
 			Set<ILaserEndpoint> set = endpoints.get(k);
 			if (set == null) {
@@ -242,7 +241,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 	}
 
 	protected void removeEndpoint(ILaserEndpoint endpoint) {
-		if (CharsetPatchwork.LASER_REDSTONE) {
+		if (CharsetLaser.REDSTONE_HOOK_ACTIVE) {
 			long k = endpoint.getPos().toLong();
 			Set<ILaserEndpoint> set = endpoints.get(k);
 			if (set != null && set.remove(endpoint)) {
@@ -384,7 +383,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 
 	public boolean add(LaserBeam beam) {
 		if (laserBeamView.add(beam)) {
-			if (/* updates && */(CharsetPatchwork.LASER_REDSTONE)) {
+			if (/* updates && */(CharsetLaser.REDSTONE_HOOK_ACTIVE)) {
 				addEndpoint(beam);
 			}
 			beam.onAdd(/* updates */ true);
@@ -397,7 +396,7 @@ public class LaserWorldStorage implements IWorldEventListener {
 	public boolean remove(LaserBeam beam, boolean alreadyRemoved) {
 		if (alreadyRemoved || laserBeamView.remove(beam)) {
 			if (updates) {
-				if (CharsetPatchwork.LASER_REDSTONE) {
+				if (CharsetLaser.REDSTONE_HOOK_ACTIVE) {
 					removeEndpoint(beam);
 				}
 				int cx1 = beam.getStart().getX() >> 4;

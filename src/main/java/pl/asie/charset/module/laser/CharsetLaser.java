@@ -57,6 +57,7 @@ import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.laser.blocks.*;
 import pl.asie.charset.module.laser.system.*;
 import pl.asie.charset.patchwork.LaserRedstoneHook;
+import pl.asie.charset.patchwork.PatchworkHelper;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -69,6 +70,8 @@ import java.util.Set;
 public class CharsetLaser {
     public static final PropertyEnum<LaserColor> LASER_COLOR = PropertyEnum.create("color", LaserColor.class);
     public static final Set<Block> BLOCKING_BLOCKS = new HashSet<>();
+
+    public static boolean REDSTONE_HOOK_ACTIVE;
 
     @CapabilityInject(ILaserSource.class)
     public static Capability<ILaserSource> LASER_SOURCE;
@@ -102,6 +105,8 @@ public class CharsetLaser {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         CapabilityManager.INSTANCE.register(ILaserSource.class, DummyCapabilityStorage.get(), DummyLaserSource::new);
+
+        CharsetLaser.REDSTONE_HOOK_ACTIVE = PatchworkHelper.getBoolean("LASER_REDSTONE");
         LaserRedstoneHook.handler = new LaserRedstoneHelper();
 
         IngredientGroup.register("charset:laser_gem", 1, "gemSapphire", "gemLapis");

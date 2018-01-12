@@ -33,6 +33,14 @@ public enum ThreeState {
             return MAYBE;
     }
 
+    public boolean hasResult() {
+        return this != MAYBE;
+    }
+
+    public boolean getResult() {
+        return this == YES;
+    }
+
     public boolean matches(boolean value) {
         return this == MAYBE || ((this == YES) == value);
     }
