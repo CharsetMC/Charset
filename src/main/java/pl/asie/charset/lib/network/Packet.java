@@ -19,14 +19,12 @@
 
 package pl.asie.charset.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import pl.asie.charset.lib.utils.PacketUtils;
 import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.lib.utils.Utils;
 
@@ -37,7 +35,7 @@ public abstract class Packet {
 	}
 
 	protected static final EntityPlayer getPlayer(INetHandler handler) {
-		return PacketUtils.getPlayer(handler);
+		return UtilProxyCommon.proxy.getPlayer(handler);
 	}
 
 	protected static final World getWorld(INetHandler handler) {

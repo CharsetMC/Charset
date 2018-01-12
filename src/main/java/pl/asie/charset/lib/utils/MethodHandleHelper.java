@@ -34,10 +34,7 @@ public final class MethodHandleHelper {
             return MethodHandles.lookup().unreflectConstructor(
                     ReflectionHelper.findConstructor(Class.forName(s), types)
             );
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } catch (ClassNotFoundException e) {
+        } catch (IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
         }

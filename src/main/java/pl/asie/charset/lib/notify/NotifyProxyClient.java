@@ -42,6 +42,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.utils.EntityUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -141,11 +142,9 @@ public class NotifyProxyClient extends NotifyProxy {
         Iterator<ClientMessage> it = messages.iterator();
         long approximateNow = System.currentTimeMillis();
         Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
-        double cx = camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * (double) event.getPartialTicks();
-        double cy = camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * (double) event.getPartialTicks();
-        double cz = camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * (double) event.getPartialTicks();
+        Vec3d cameraPos = EntityUtils.interpolate(camera, event.getPartialTicks());
         GlStateManager.pushMatrix();
-        GlStateManager.translate(-cx, -cy, -cz);
+        GlStateManager.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
         GlStateManager.depthMask(false);
         GlStateManager.disableDepth();
@@ -179,7 +178,7 @@ public class NotifyProxyClient extends NotifyProxy {
             }
             opacity = (float) Math.sin(opacity);
             if (opacity > 0.12) {
-                renderMessage(m, event.getPartialTicks(), opacity, cx, cy, cz);
+                renderMessage(m, event.getPartialTicks(), opacity, cameraPos);
             }
         }
 
@@ -195,7 +194,7 @@ public class NotifyProxyClient extends NotifyProxy {
 
     private RenderItem renderItem = null;
 
-    private void renderMessage(ClientMessage m, float partial, float opacity, double cx, double cy, double cz) {
+    private void renderMessage(ClientMessage m, float partial, float opacity, Vec3d c) {
         int width = 0;
         String[] lines = m.msgRendered.split("\n");
 
@@ -228,9 +227,9 @@ public class NotifyProxyClient extends NotifyProxy {
         float y = (float) vec.y;
         float z = (float) vec.z;
         if (m.style.contains(NoticeStyle.SCALE_SIZE)) {
-            double dx = x - cx;
-            double dy = y - cy;
-            double dz = z - cz;
+            double dx = x - c.x;
+            double dy = y - c.y;
+            double dz = z - c.z;
             double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
             scaling *= Math.sqrt(dist);
         }
@@ -265,9 +264,9 @@ public class NotifyProxyClient extends NotifyProxy {
             if (m.show_item) {
                 item_add += 24;
             }
-            float c = 0.0F;
+            float col = 0.0F;
             GlStateManager.disableTexture2D();
-            GlStateManager.color(c, c, c, Math.min(opacity, 0.2F));
+            GlStateManager.color(col, col, col, Math.min(opacity, 0.2F));
             double Z = 0.001D;
             // TODO: Use 2 tessellator + 2 draw calls to do all notice rendering
 

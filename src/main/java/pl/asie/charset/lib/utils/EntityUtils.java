@@ -19,15 +19,26 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetHandler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.util.FakePlayer;
 
-public final class PacketUtils {
-	private PacketUtils() {
-
+public class EntityUtils {
+	public static boolean isPlayerFake(EntityPlayer player) {
+		return player instanceof FakePlayer || !player.addedToChunk;
 	}
 
-	public static EntityPlayer getPlayer(INetHandler handler) {
-		return UtilProxyCommon.proxy.getPlayer(handler);
+	public static EntityPlayer findPlayer(MinecraftServer server, String name) {
+		return UtilProxyCommon.proxy.findPlayer(server, name);
+	}
+
+	public static Vec3d interpolate(Entity entity, float partialTicks) {
+		return new Vec3d(
+				entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks,
+				entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks,
+				entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
+		);
 	}
 }

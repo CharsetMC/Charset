@@ -514,13 +514,12 @@ public final class SpaceUtils {
      * @return A novel direction
      */
     public static EnumFacing rotateDirection(EnumFacing dir, Quaternion rot, Iterable<EnumFacing> allow) {
-        Vec3d v = fromDirection(dir);
-        rot.applyRotation(v);
+        Vec3d v = rot.applyRotation(fromDirection(dir));
         EnumFacing best = null;
         double bestDot = Double.POSITIVE_INFINITY;
         for (EnumFacing fd : allow) {
-            Vec3d f = fromDirection(fd);
-            rot.applyRotation(f);
+            Vec3d f = rot.applyRotation(fromDirection(fd));
+            f = rot.applyRotation(f);
             double dot = v.dotProduct(f);
             if (dot < bestDot) {
                 bestDot = dot;

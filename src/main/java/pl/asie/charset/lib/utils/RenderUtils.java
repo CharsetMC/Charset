@@ -37,6 +37,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
@@ -142,19 +143,21 @@ public final class RenderUtils {
 		return col;
 	}
 
-	public static BufferedImage getTextureImage(ResourceLocation location) {
-		Minecraft mc = Minecraft.getMinecraft();
-		/* TextureAtlasSprite sprite = mc.getTextureMapBlocks().getTextureExtry(location.toString());
-		if (sprite != null) {
+	public static BufferedImage getTextureImage(TextureAtlasSprite sprite) {
+		if (sprite.getFrameCount() > 0) {
 			int[][] dataM = sprite.getFrameTextureData(0);
-			if (dataM != null && dataM.length > 0) {
+			if (dataM.length > 0) {
 				int[] data = dataM[0];
 				BufferedImage image = new BufferedImage(sprite.getIconWidth(), sprite.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 				image.setRGB(0, 0, image.getWidth(), image.getHeight(), data, 0, image.getWidth());
 				return image;
 			}
-		} */
+		}
 
+		return null;
+	}
+
+	public static BufferedImage getTextureImage(ResourceLocation location) {
 		try {
 			ResourceLocation pngLocation = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {"textures", location.getResourcePath(), ".png"}));
 			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(pngLocation);
@@ -286,50 +289,52 @@ public final class RenderUtils {
 		worldrenderer.pos(x2, y2, z2).endVertex();
 	}
 
-	public static int getSelectionMask(EnumFacing face) {
+	private static final int[] selectionMask;
+
+	static {
+		selectionMask = new int[6];
+		selectionMask[0] = 0x00F;
+		selectionMask[1] = 0xF00;
+
 		int lineMask = 0;
-		switch (face) {
-			case DOWN:
-				return 0x00F;
-			case UP:
-				return 0xF00;
-			case NORTH:
-				lineMask |= getSelectionMask(1, 0, 0);
-				lineMask |= getSelectionMask(1, 1, 0);
-				lineMask |= getSelectionMask(0, 0, 0);
-				lineMask |= getSelectionMask(2, 0, 0);
-				return lineMask;
-			case SOUTH:
-				lineMask |= getSelectionMask(1, 0, 1);
-				lineMask |= getSelectionMask(1, 1, 1);
-				lineMask |= getSelectionMask(0, 0, 1);
-				lineMask |= getSelectionMask(2, 0, 1);
-				return lineMask;
-			case WEST:
-				lineMask |= getSelectionMask(1, 0, 0);
-				lineMask |= getSelectionMask(1, 0, 1);
-				lineMask |= getSelectionMask(0, 1, 0);
-				lineMask |= getSelectionMask(2, 1, 0);
-				return lineMask;
-			case EAST:
-				lineMask |= getSelectionMask(1, 1, 0);
-				lineMask |= getSelectionMask(1, 1, 1);
-				lineMask |= getSelectionMask(0, 1, 1);
-				lineMask |= getSelectionMask(2, 1, 1);
-				return lineMask;
-		}
-		return lineMask;
+		lineMask |= getSelectionMask(1, 0, 0);
+		lineMask |= getSelectionMask(1, 1, 0);
+		lineMask |= getSelectionMask(0, 0, 0);
+		lineMask |= getSelectionMask(2, 0, 0);
+		selectionMask[2] = lineMask;
+
+		lineMask = 0;
+		lineMask |= getSelectionMask(1, 0, 1);
+		lineMask |= getSelectionMask(1, 1, 1);
+		lineMask |= getSelectionMask(0, 0, 1);
+		lineMask |= getSelectionMask(2, 0, 1);
+		selectionMask[3] = lineMask;
+
+		lineMask = 0;
+		lineMask |= getSelectionMask(1, 0, 0);
+		lineMask |= getSelectionMask(1, 0, 1);
+		lineMask |= getSelectionMask(0, 1, 0);
+		lineMask |= getSelectionMask(2, 1, 0);
+		selectionMask[4] = lineMask;
+
+		lineMask = 0;
+		lineMask |= getSelectionMask(1, 1, 0);
+		lineMask |= getSelectionMask(1, 1, 1);
+		lineMask |= getSelectionMask(0, 1, 1);
+		lineMask |= getSelectionMask(2, 1, 1);
+		selectionMask[5] = lineMask;
+	}
+
+	public static int getSelectionMask(EnumFacing face) {
+		return selectionMask[face.ordinal()];
 	}
 
 	public static void drawSelectionBoundingBox(AxisAlignedBB box, int lineMask) {
 		EntityPlayer player = Minecraft.getMinecraft().player;
 		float partialTicks = Minecraft.getMinecraft().getRenderPartialTicks();
 
-		double playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double)partialTicks;
-		double playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double)partialTicks;
-		double playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double)partialTicks;
-
-		AxisAlignedBB boundingBox = box.grow(0.0020000000949949026D).offset(-playerX, -playerY, -playerZ);
+		Vec3d cameraPos = EntityUtils.interpolate(player, partialTicks);
+		AxisAlignedBB boundingBox = box.grow(0.002).offset(cameraPos.scale(-1));
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 		GlStateManager.color(0.0F, 0.0F, 0.0F, 0.4F);
@@ -340,62 +345,62 @@ public final class RenderUtils {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder worldrenderer = tessellator.getBuffer();
 		worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-		if ((lineMask & getSelectionMask(0, 0, 0)) != 0) {
+		if ((lineMask & /* getSelectionMask(0, 0, 0) */ 0x001) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.minY, boundingBox.minZ);
 		}
-		if ((lineMask & getSelectionMask(0, 0, 1)) != 0) {
+		if ((lineMask & /* getSelectionMask(0, 0, 1) */ 0x002) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.maxZ,
 					boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
 		}
-		if ((lineMask & getSelectionMask(0, 1, 0)) != 0) {
+		if ((lineMask & /* getSelectionMask(0, 1, 0) */ 0x004) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.minX, boundingBox.minY, boundingBox.maxZ);
 		}
-		if ((lineMask & getSelectionMask(0, 1, 1)) != 0) {
+		if ((lineMask & /* getSelectionMask(0, 1, 1) */ 0x008) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.minY, boundingBox.maxZ);
 		}
-		if ((lineMask & getSelectionMask(1, 0, 0)) != 0) {
+		if ((lineMask & /* getSelectionMask(1, 0, 0) */ 0x010) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.minX, boundingBox.maxY, boundingBox.minZ);
 		}
-		if ((lineMask & getSelectionMask(1, 0, 1)) != 0) {
+		if ((lineMask & /* getSelectionMask(1, 0, 1) */ 0x020) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.minY, boundingBox.maxZ,
 					boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getSelectionMask(1, 1, 0)) != 0) {
+		if ((lineMask & /* getSelectionMask(1, 1, 0) */ 0x040) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.minY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
 		}
-		if ((lineMask & getSelectionMask(1, 1, 1)) != 0) {
+		if ((lineMask & /* getSelectionMask(1, 1, 1) */ 0x080) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.minY, boundingBox.maxZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getSelectionMask(2, 0, 0)) != 0) {
+		if ((lineMask & /* getSelectionMask(2, 0, 0) */ 0x100) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.maxY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.minZ);
 		}
-		if ((lineMask & getSelectionMask(2, 0, 1)) != 0) {
+		if ((lineMask & /* getSelectionMask(2, 0, 1) */ 0x200) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.maxY, boundingBox.maxZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getSelectionMask(2, 1, 0)) != 0) {
+		if ((lineMask & /* getSelectionMask(2, 1, 0) */ 0x400) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.minX, boundingBox.maxY, boundingBox.minZ,
 					boundingBox.minX, boundingBox.maxY, boundingBox.maxZ);
 		}
-		if ((lineMask & getSelectionMask(2, 1, 1)) != 0) {
+		if ((lineMask & /* getSelectionMask(2, 1, 1) */ 0x800) != 0) {
 			drawLine(worldrenderer, tessellator,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.minZ,
 					boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);

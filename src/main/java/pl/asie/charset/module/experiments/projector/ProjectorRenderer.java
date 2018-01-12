@@ -35,6 +35,7 @@ import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -246,16 +247,14 @@ public class ProjectorRenderer {
 		BufferBuilder worldrenderer = tessellator.getBuffer();
 		worldrenderer.setTranslation(0, 0, 0);
 
-		EntityPlayer player = Minecraft.getMinecraft().player;
-		double cameraX = player.lastTickPosX + ((player.posX - player.lastTickPosX) * event.getPartialTicks());
-		double cameraY = player.lastTickPosY + ((player.posY - player.lastTickPosY) * event.getPartialTicks());
-		double cameraZ = player.lastTickPosZ + ((player.posZ - player.lastTickPosZ) * event.getPartialTicks());
+		Entity cameraEntity = Minecraft.getMinecraft().getRenderViewEntity();
+		Vec3d cameraPos = EntityUtils.interpolate(cameraEntity, event.getPartialTicks());
 
 		ICamera camera = new Frustum();
-		camera.setPosition(cameraX, cameraY, cameraZ);
+		camera.setPosition(cameraPos.x, cameraPos.y, cameraPos.z);
 
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(-cameraX, -cameraY, -cameraZ);
+		GlStateManager.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
 		for (TileEntity tileEntity : Minecraft.getMinecraft().world.loadedTileEntityList) {
 			if (tileEntity instanceof TileProjector) {

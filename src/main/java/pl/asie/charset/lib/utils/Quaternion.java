@@ -36,12 +36,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Quaternion {
-    public double w, x, y, z;
+    public final double w, x, y, z;
 
     //Data functions
     public Quaternion() {
         this(1, 0, 0, 0);
-        //NORELEASE.fixme("Should we make this class pure?");
     }
     
     public Quaternion(double w, double x, double y, double z) {
@@ -52,17 +51,22 @@ public class Quaternion {
     }
     
     public Quaternion(Quaternion orig) {
-        this.w = orig.w;
-        this.x = orig.x;
-        this.y = orig.y;
-        this.z = orig.z;
+        this(orig.w, orig.x, orig.y, orig.z);
     }
     
     public Quaternion(double[] init) {
         this(init[0], init[1], init[2], init[3]);
         assert init.length == 4;
     }
-    
+
+    public static Quaternion fromDirection(double w, EnumFacing dir) {
+        return new Quaternion(w, dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
+    }
+
+    public Quaternion(Vec3d v) {
+        this(0, v.x, v.y, v.z);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -167,25 +171,6 @@ public class Quaternion {
         return x == 0 && y == 0 && z == 0;
     }
 
-    public void update(double nw, double nx, double ny, double nz) {
-        w = nw;
-        x = nx;
-        y = ny;
-        z = nz;
-    }
-
-    public void update(Quaternion other) {
-        update(other.w, other.x, other.y, other.z);
-    }
-    
-    public void update(EnumFacing dir) {
-        update(w, dir.getDirectionVec().getX(), dir.getDirectionVec().getY(), dir.getDirectionVec().getZ());
-    }
-    
-    public void update(Vec3d v) {
-        update(0, v.x, v.y, v.z);
-    }
-
     public Vec3d toVector() {
         return new Vec3d(x, y, z);
     }
@@ -203,17 +188,13 @@ public class Quaternion {
     }
     
     //Math functions
-    public Quaternion incrNormalize() {
+    public Quaternion normalize() {
         double normSquared = magnitudeSquared();
         if (normSquared == 1 || normSquared == 0) {
             return this;
         }
         double norm = Math.sqrt(normSquared);
-        w /= norm;
-        x /= norm;
-        y /= norm;
-        z /= norm;
-        return this;
+        return new Quaternion(w / norm, x / norm, y / norm, z / norm);
     }
 
     /**
@@ -293,8 +274,7 @@ public class Quaternion {
         default: return quat_cache[ord] = new Quaternion(); //Won't happen
         }
         final Quaternion q2 = Quaternion.getRotationQuaternionRadians(rotation*quart, orient.facing);
-        q2.incrMultiply(q1);
-        return quat_cache[ord] = q2;
+        return quat_cache[ord] = q2.multiply(q1);
     }
 
     @SideOnly(Side.CLIENT)
@@ -308,34 +288,29 @@ public class Quaternion {
         return w*other.w + x*other.x + y*other.y + z*other.z;
     }
     
-    public void incrLerp(Quaternion other, double t) {
-        other.incrAdd(this, -1);
-        other.incrScale(t);
-        this.incrAdd(other);
-        this.incrNormalize();
-    }
-    
     public Quaternion lerp(Quaternion other, double t) {
-        Quaternion ret = new Quaternion(this);
-        ret.incrLerp(other, t);
-        return ret;
+        return this.add(other.add(this, -1).scale(t)).normalize();
     }
-    
+
     /**
      * When this Quaternion is going to be interpolated to other, it can be interpolated either the long way around, or the short way.
      * This method makes sure it will be the short interpolation.
      */
-    public void incrShortFor(Quaternion other) {
+    public Quaternion shortFor(Quaternion other) {
         double cosom = this.dotProduct(other);
         if (cosom < 0) {
-            incrScale(-1);
+            return scale(-1);
+        } else {
+            return this;
         }
     }
     
-    public void incrLongFor(Quaternion other) {
+    public Quaternion longFor(Quaternion other) {
         double cosom = this.dotProduct(other);
         if (cosom > 0) {
-            incrScale(-1);
+            return scale(-1);
+        } else {
+            return this;
         }
     }
     
@@ -370,7 +345,7 @@ public class Quaternion {
         boolean rev = cosom < 0;
         if (rev) {
             cosom = -cosom;
-            other.incrScale(-1);
+            other = other.scale(-1);
         }
         double omega, sinom, sc1, sc2;
 
@@ -389,7 +364,6 @@ public class Quaternion {
                 sc1 * this.x + sc2 * other.x,
                 sc1 * this.y + sc2 * other.y,
                 sc1 * this.z + sc2 * other.z);
-        if (rev) other.incrScale(-1);
         return ret;
     }
     
@@ -411,101 +385,55 @@ public class Quaternion {
         return w*w + x*x + y*y + z*z;
     }
     
-    public double incrDistance(Quaternion other) {
-        incrAdd(other);
-        return magnitude();
+    public Quaternion conjugate() {
+        return new Quaternion(w, -x, -y, -z);
     }
     
-    public Quaternion incrConjugate() {
-        x = -x;
-        y = -y;
-        z = -z;
-        return this;
+    public Quaternion add(Quaternion other) {
+        return new Quaternion(w + other.w, x + other.x, y + other.y, z + other.z);
     }
     
-    public Quaternion incrAdd(Quaternion other) {
-        w += other.w;
-        x += other.x;
-        y += other.y;
-        z += other.z;
-        return this;
+    public Quaternion add(Quaternion other, double scale) {
+        return new Quaternion(w + other.w * scale, x + other.x * scale, y + other.y * scale, z + other.z * scale);
     }
     
-    public Quaternion incrAdd(Quaternion other, double scale) {
-        w += other.w*scale;
-        x += other.x*scale;
-        y += other.y*scale;
-        z += other.z*scale;
-        return this;
-    }
-    
-    public Quaternion incrMultiply(Quaternion other) {
+    public Quaternion multiply(Quaternion other) {
         double nw, nx, ny, nz;
         nw = w*other.w - x*other.x - y*other.y - z*other.z;
         nx = w*other.x + x*other.w + y*other.z - z*other.y;
         ny = w*other.y - x*other.z + y*other.w + z*other.x;
         nz = w*other.z + x*other.y - y*other.x + z*other.w;
-        update(nw, nx, ny, nz);
-        return this;
+        return new Quaternion(nw, nx, ny, nz);
     }
     
-    /** 
-     * Acts like {@link incrMultiply}, but the argument gets incremented instead of this.
-     */
-    public void incrToOtherMultiply(Quaternion other) {
-        double nw, nx, ny, nz;
-        nw = w*other.w - x*other.x - y*other.y - z*other.z;
-        nx = w*other.x + x*other.w + y*other.z - z*other.y;
-        ny = w*other.y - x*other.z + y*other.w + z*other.x;
-        nz = w*other.z + x*other.y - y*other.x + z*other.w;
-        other.update(nw, nx, ny, nz);
+    public Quaternion scale(double scaler) {
+        return new Quaternion(w * scaler, x * scaler, y * scaler, z * scaler);
     }
     
-    public void incrScale(double scaler) {
-        this.w *= scaler;
-        this.x *= scaler;
-        this.y *= scaler;
-        this.z *= scaler;
+    public Quaternion unit() {
+        return scale(1/magnitude());
     }
     
-    public void incrUnit() {
-        incrScale(1/magnitude());
-    }
-    
-    public void incrReciprocal() {
+    public Quaternion reciprocal() {
         double m = magnitude();
-        incrConjugate();
-        incrScale(1/(m*m));
-    }
-    
-    public void incrCross(Quaternion other) {
-        double X = this.y * other.z - this.z * other.y;
-        double Y = this.z * other.x - this.x * other.z;
-        double Z = this.x * other.y - this.y * other.x;
-        this.x = X;
-        this.y = Y;
-        this.z = Z;
+        return this.conjugate().scale(1/(m*m));
     }
     
     public Quaternion cross(Quaternion other) {
-        Quaternion m = new Quaternion(this);
-        m.incrCross(other);
-        return m;
+        double X = this.y * other.z - this.z * other.y;
+        double Y = this.z * other.x - this.x * other.z;
+        double Z = this.x * other.y - this.y * other.x;
+        return new Quaternion(w, X, Y, Z);
     }
-    
-    public void incrRotateBy(Quaternion rotation) {
-        rotation.incrToOtherMultiply(this);
-        rotation.incrConjugate();
-        this.incrMultiply(rotation);
-        rotation.incrConjugate();
+
+    public Quaternion rotateBy(Quaternion rotation) {
+        return this.multiply(rotation).multiply(rotation.conjugate());
     }
     
     /**
      * Note: This assumes that this quaternion is normal (magnitude = 1).
      * @param p
      */
-    
-    private Quaternion _vector_conversion_cache = null;
 
     public AxisAlignedBB applyRotation(AxisAlignedBB p) {
         Vec3d rotatedOne = applyRotation(new Vec3d(p.minX, p.minY, p.minZ));
@@ -518,71 +446,21 @@ public class Quaternion {
         if (this.isZero()) {
             return p;
         }
-        if (_vector_conversion_cache == null) {
-            _vector_conversion_cache = new Quaternion();
-        }
-        Quaternion point = _vector_conversion_cache;
-        point.update(p);
-        this.incrToOtherMultiply(point);
-        this.incrConjugate();
-        point.incrMultiply(this);
-        this.incrConjugate();
+        Quaternion point = new Quaternion(p);
+        point = point.multiply(this);
+        point = point.multiply(this.conjugate());
         return point.toVector();
     }
 
-    public void applyReverseRotation(Vec3d p) {
-        incrConjugate();
-        applyRotation(p);
-        incrConjugate();
+    public Vec3d applyReverseRotation(Vec3d p) {
+        return conjugate().applyRotation(p);
     }
     
     //Other math forms
     public double distance(Quaternion other) {
         return add(other).magnitude();
     }
-    
-    public Quaternion conjugate() {
-        Quaternion ret = new Quaternion(this);
-        ret.incrConjugate();
-        return ret;
-    }
-    
-    public Quaternion add(Quaternion other) {
-        Quaternion ret = new Quaternion(this);
-        ret.incrAdd(other);
-        return ret;
-    }
-    
-    public Quaternion add(Quaternion other, double scale) {
-        Quaternion ret = new Quaternion(this);
-        ret.incrAdd(other, scale);
-        return ret;
-    }
-    
-    public Quaternion multiply(Quaternion other) {
-        Quaternion a = new Quaternion(this);
-        a.incrMultiply(other);
-        return a;
-    }
-    
-    public Quaternion scale(double scaler) {
-        Quaternion a = new Quaternion(this);
-        a.incrScale(scaler);
-        return a;
-    }
-    
-    public Quaternion unit() {
-        Quaternion r = new Quaternion(this);
-        r.incrUnit();
-        return r;
-    }
-    
-    public Quaternion reciprocal() {
-        Quaternion r = new Quaternion(this);
-        r.incrReciprocal();
-        return r;
-    }
-    
+
     public Quaternion power(double alpha) {
         // http://en.wikipedia.org/wiki/Quaternion#Exponential.2C_logarithm.2C_and_power
         double norm = this.magnitude();

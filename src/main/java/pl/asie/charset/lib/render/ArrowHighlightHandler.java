@@ -37,6 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.utils.EntityUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
@@ -55,15 +56,6 @@ public class ArrowHighlightHandler {
         for (Item item : i) {
             eligibleItems.add(item);
         }
-    }
-
-    private Vec3d getCameraPos(double partialTicks) {
-        Entity camera = Minecraft.getMinecraft().getRenderViewEntity();
-        return new Vec3d(
-            camera.lastTickPosX + (camera.posX - camera.lastTickPosX) * partialTicks,
-            camera.lastTickPosY + (camera.posY - camera.lastTickPosY) * partialTicks,
-            camera.lastTickPosZ + (camera.posZ - camera.lastTickPosZ) * partialTicks
-        );
     }
 
     private void drawArrowHighlight(EntityPlayer player, RayTraceResult trace, Vec3d cameraPos) {
@@ -153,7 +145,7 @@ public class ArrowHighlightHandler {
                 if (!is.isEmpty() && eligibleItems.contains(is.getItem())) {
                     RayTraceResult mop = mc.objectMouseOver;
                     if (mop != null && mop.hitVec != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
-                        drawArrowHighlight(player, mop, getCameraPos(event.getPartialTicks()));
+                        drawArrowHighlight(player, mop, EntityUtils.interpolate(Minecraft.getMinecraft().getRenderViewEntity(), event.getPartialTicks()));
                     }
                 }
             }

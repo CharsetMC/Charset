@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -41,6 +42,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+import pl.asie.charset.lib.utils.EntityUtils;
 import pl.asie.charset.lib.utils.MathUtils;
 import pl.asie.charset.module.laser.CharsetLaser;
 
@@ -84,14 +86,11 @@ public class LaserRenderer {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder worldrenderer = tessellator.getBuffer();
 
-		EntityPlayer player = Minecraft.getMinecraft().player;
-		double cameraX = player.lastTickPosX + ((player.posX - player.lastTickPosX) * event.getPartialTicks());
-		double cameraY = player.lastTickPosY + ((player.posY - player.lastTickPosY) * event.getPartialTicks());
-		double cameraZ = player.lastTickPosZ + ((player.posZ - player.lastTickPosZ) * event.getPartialTicks());
+		Entity cameraEntity = Minecraft.getMinecraft().getRenderViewEntity();
+		Vec3d cameraPos = EntityUtils.interpolate(cameraEntity, event.getPartialTicks());
 
 		ICamera camera = new Frustum();
-		camera.setPosition(cameraX, cameraY, cameraZ);
-		Vec3d vp = new Vec3d(cameraX, cameraY, cameraZ);
+		camera.setPosition(cameraPos.x, cameraPos.y, cameraPos.z);
 
 		int maxDist = Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 16 + 1;
 
@@ -101,7 +100,7 @@ public class LaserRenderer {
 			for (LaserBeam beam : beams) {
 				beam.vcstart = beam.calculateStartpoint();
 				beam.vcend = beam.calculateEndpoint();
-				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, vp);
+				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, cameraPos);
 
 				if (beam.vcdist > maxDist) {
 					continue;
@@ -118,14 +117,14 @@ public class LaserRenderer {
 			beamsRender = beamList;
 		}
 
-		worldrenderer.setTranslation(-cameraX, -cameraY, -cameraZ);
+		worldrenderer.setTranslation(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 		worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
 		for (LaserBeam beam : beamsRender) {
 			if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
 				beam.vcstart = beam.calculateStartpoint();
 				beam.vcend = beam.calculateEndpoint();
-				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, vp);
+				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, cameraPos);
 
 				if (beam.vcdist > maxDist) {
 					continue;

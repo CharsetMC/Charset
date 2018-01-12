@@ -24,13 +24,12 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
-import pl.asie.charset.lib.utils.PlayerUtils;
+import pl.asie.charset.lib.utils.EntityUtils;
 
 @CharsetModule(
         name = "tweak.chat",
@@ -51,7 +50,7 @@ public class CharsetTweakChat {
 
     @SubscribeEvent
     public void onServerChat(ServerChatEvent event) {
-        if (!PlayerUtils.isFake(event.getPlayer())) {
+        if (!EntityUtils.isPlayerFake(event.getPlayer())) {
             String message = event.getMessage();
 
             for (int i = 0; i < message.length() - 1; i++) {
