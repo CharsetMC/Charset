@@ -55,6 +55,8 @@ import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.ThreeState;
+import pl.asie.charset.lib.utils.color.Colorspace;
+import pl.asie.charset.lib.utils.color.Colorspaces;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -197,7 +199,7 @@ public class LockEventHandler {
                 break;
             }
 
-            double d = ColorUtils.getColorDistanceSq(c, color);
+            double d = Colorspaces.getColorDistance(c, color, Colorspace.LAB);
             if (d < maxDistance) {
                 maxDistance = d;
                 closestColor = dyeColor;

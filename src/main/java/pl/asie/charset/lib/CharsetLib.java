@@ -69,6 +69,8 @@ import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.resources.ColorPaletteParser;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
+import pl.asie.charset.lib.utils.color.Colorspace;
+import pl.asie.charset.lib.utils.color.Colorspaces;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -161,7 +163,7 @@ public class CharsetLib {
 		MinecraftForge.EVENT_BUS.register(new CharsetLibEventHandler());
 		MinecraftForge.EVENT_BUS.register(Scheduler.INSTANCE);
 
-		config.save();
+		Colorspaces.init();
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
