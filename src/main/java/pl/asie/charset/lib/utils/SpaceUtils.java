@@ -323,7 +323,7 @@ public final class SpaceUtils {
     public static Orientation getOrientation(World world, BlockPos pos, EntityLivingBase placer, EnumFacing face, float hitX, float hitY, float hitZ) {
         Vec3d hitVec = null;
         if (face == null) {
-            RayTraceResult hit = RayTraceUtils.getCollision(world, pos, placer, Block.FULL_BLOCK_AABB, 0);
+            RayTraceResult hit = RayTraceUtils.getCollision(world, pos, placer, Block.FULL_BLOCK_AABB);
             if (hit != null) {
                 face = hit.sideHit;
                 hitVec = hit.hitVec != null ? hit.hitVec.subtract(new Vec3d(pos)) : null;
