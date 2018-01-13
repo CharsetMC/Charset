@@ -32,7 +32,9 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.utils.ModPathIterator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -63,31 +65,14 @@ public class OutputSupplier {
     private static boolean initialized;
 
     // TODO: Allow iterating over mod assets server-side generically (based on this code, no less - but also UCW!)
-    private static void loadFactories(ModContainer container) {
-        File file = container.getSource();
+    private static void loadFactories(Pair<String, Path> p) {
         try {
-            BufferedReader reader;
-            if (file.exists()) {
-                if (file.isDirectory()) {
-                    File f = new File(file, "assets/" + container.getModId() + "/recipes/_factories.json");
-                    if (f.exists()) {
-                        reader = Files.newBufferedReader(f.toPath());
-                    } else {
-                        return;
-                    }
-                } else {
-                    FileSystem fileSystem = FileSystems.newFileSystem(file.toPath(), null);
-                    Path p = fileSystem.getPath("assets/" + container.getModId() + "/recipes/_factories.json");
-                    reader = Files.newBufferedReader(p, Charsets.UTF_8);
-                }
-            } else {
-                return;
-            }
+            BufferedReader reader = Files.newBufferedReader(p.getValue(), Charsets.UTF_8);
             JsonObject json = JsonUtils.fromJson(GSON, reader, JsonObject.class);
             if (json != null && json.has("charset:output_suppliers")) {
                 JsonObject object = JsonUtils.getJsonObject(json, "charset:output_suppliers");
                 for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-                    String key = new ResourceLocation(container.getModId(), entry.getKey()).toString();
+                    String key = new ResourceLocation(p.getKey(), entry.getKey()).toString();
                     String value = entry.getValue().getAsString();
                     try {
                         Object o = Class.forName(value).newInstance();
@@ -113,7 +98,7 @@ public class OutputSupplier {
     private static void initialize() {
         if (initialized) return;
 
-        Loader.instance().getActiveModList().forEach(OutputSupplier::loadFactories);
+        ModPathIterator.getValidPaths("assets/%1/recipes/_factories.json").forEach(OutputSupplier::loadFactories);
 
         initialized = true;
     }

@@ -122,12 +122,13 @@ public class RouterMediaWiki implements IRouterSearchable {
 						JsonArray names = array.get(1).getAsJsonArray();
 						JsonArray urls = array.get(3).getAsJsonArray();
 						for (int i = 0; i < Math.min(names.size(), urls.size()); i++) {
+							String name = names.get(i).getAsString();
 							URI realUri = new URI(urls.get(i).getAsString());
-
-							SearchResult result = new SearchResult(names.get(i).getAsString(),
-									friendlyName,
-									new URI("wiki://" + name + realUri.getPath()));
-							results.add(result);
+							if (!name.contains("/")) {
+								SearchResult result = new SearchResult(name, friendlyName,
+										new URI("wiki://" + this.name + realUri.getPath()));
+								results.add(result);
+							}
 						}
 					}
 				}
