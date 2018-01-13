@@ -35,10 +35,7 @@ Those of you in creative mode may find special \i{infinite} barrels. They will n
 
 In addition, you can craft any barrel with a minecart to create a Barrel Cart! \item{charset:barrelcart}{1}{32767}
 
-% \topic{item.factorization:daybarrel}
-% Doesn't show the variations recipes, so we do this the ugly way.
-% Oh well.
-% \newpage
-% \generate{recipes/item.factorization:daybarrel}
-% \topic{item.factorization:barrelCart}
-% \i{(Not all recipes are shown. Barrels can be made out of most logs and their corresponding slab.)}
+\checkmods{any}{chiselsandbits}{\header{Mod Integration}
+
+\checkmods{all}{chiselsandbits}{\- C&B Bits match their Bit Bag stack size.}
+}

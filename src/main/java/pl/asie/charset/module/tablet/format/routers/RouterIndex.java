@@ -22,7 +22,8 @@ package pl.asie.charset.module.tablet.format.routers;
 import com.google.common.base.Charsets;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import pl.asie.charset.module.tablet.TabletUtil;
+import net.minecraft.util.text.translation.I18n;
+import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.module.tablet.format.api.IRouter;
 import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
 import pl.asie.charset.module.tablet.format.api.TabletAPI;
@@ -33,42 +34,17 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class RouterSearch implements IRouter {
-	private final Cache<String, List<IRouterSearchable.SearchResult>> cache = CacheBuilder.newBuilder()
-			.expireAfterWrite(30, TimeUnit.MINUTES)
-			.build();
-
+public class RouterIndex implements IRouter {
 	@Nullable
 	@Override
 	public String get(URI path) {
 		try {
-			String query = TabletUtil.decode(path.getPath()).substring(1);
-			List<IRouterSearchable.SearchResult> resultList = cache.getIfPresent(query.toLowerCase());
-			if (resultList == null) {
-				resultList = new ArrayList<>();
-				for (IRouter router : TabletAPI.INSTANCE.getRouters()) {
-					if (router instanceof IRouterSearchable) {
-						((IRouterSearchable) router).find(resultList, query.toLowerCase(Locale.ROOT));
-					}
-				}
-				cache.put(query.toLowerCase(Locale.ROOT), resultList);
+			StringBuilder result = new StringBuilder("\\title{Tablet}\n\n");
+			for (Pair<String, String> book : TabletAPI.INSTANCE.getBooks()) {
+				result.append("\\- \\url{" + book.getRight() + "}{" + I18n.translateToLocal(book.getLeft()) + "}\n");
 			}
 
-			StringBuilder search = new StringBuilder("\\title{" + query + "}\n\n");
-			if (resultList.size() == 0) {
-				search.append("No results.");
-			} else {
-				Set<IRouterSearchable.SearchResult> resultSet = new HashSet<>();
-				for (IRouterSearchable.SearchResult result : resultList) {
-					if (resultSet.add(result)) {
-						search.append("\\- \\url{" + result.uri.toString() + "}{" + result.text + "} (" + result.providerName + ")\n");
-					}
-				}
-
-				search.append("\n" + resultSet.size() + " result" + (resultSet.size() == 1 ? "" : "s") + ".");
-			}
-
-			return search.toString().trim();
+			return result.toString().trim();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "";
@@ -77,6 +53,6 @@ public class RouterSearch implements IRouter {
 
 	@Override
 	public boolean matches(URI path) {
-		return "about".equals(path.getScheme()) && "search".equals(path.getHost());
+		return "about".equals(path.getScheme()) && "index".equals(path.getHost());
 	}
 }

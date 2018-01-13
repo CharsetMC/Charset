@@ -1,0 +1,9 @@
+\scale{2}{\item{charset:fluidtank}{1}{32767}} \title{Fluid Tank}
+
+Fluid Tanks can store up to 16 buckets of a single liquid - say, water or lava - per block.
+They do, however, stack vertically - for example, a tower of four Fluid Tanks can store up to 64 buckets total.
+
+Right clicking a tank with a fluid container will insert the fluid you're holding into the tank,
+and left clicking will try to move the fluid inside the tank into the held container.
+
+Fluid Tanks can be made out of Glass or Stained Glass. Tanks of different glass types do not connect to each other.

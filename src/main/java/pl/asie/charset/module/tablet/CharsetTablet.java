@@ -21,6 +21,7 @@ package pl.asie.charset.module.tablet;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -33,10 +34,8 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.tablet.format.api.ICommand;
 import pl.asie.charset.module.tablet.format.api.TabletAPI;
-import pl.asie.charset.module.tablet.format.commands.CommandImg;
-import pl.asie.charset.module.tablet.format.commands.CommandItem;
-import pl.asie.charset.module.tablet.format.commands.CommandURLMissing;
-import pl.asie.charset.module.tablet.format.commands.CommandURL;
+import pl.asie.charset.module.tablet.format.commands.*;
+import pl.asie.charset.module.tablet.format.routers.RouterIndex;
 import pl.asie.charset.module.tablet.format.routers.RouterMediaWiki;
 import pl.asie.charset.module.tablet.format.routers.RouterModDocumentation;
 import pl.asie.charset.module.tablet.format.routers.RouterSearch;
@@ -46,7 +45,7 @@ import pl.asie.charset.module.tablet.format.words.minecraft.*;
 @CharsetModule(
 		name = "tablet",
 		description = "The Tablet, providing documentation for Charset and other mods!",
-		profile = ModuleProfile.INDEV
+		profile = ModuleProfile.TESTING
 )
 public class CharsetTablet {
 	public static ItemTablet itemTablet;
@@ -55,13 +54,20 @@ public class CharsetTablet {
 	public static ProxyCommon proxy;
 
 	@Mod.EventHandler
+	public void onPreInit(FMLPreInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(proxy);
+	}
+
+	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void onPreInitClient(FMLPreInitializationEvent event) {
 		ICommand spaceCommand = ((typesetter, tokenizer) -> typesetter.write(new WordText(" ")));
 		ICommand newlineCommand = ((typesetter, tokenizer) -> typesetter.write(new WordNewline()));
 
+		TabletAPI.INSTANCE.registerRouter(new RouterIndex());
 		TabletAPI.INSTANCE.registerRouter(new RouterSearch());
-		TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("charset"));
+
+		TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("charset", "Book of Charset"));
 		TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("gamepedia", "Gamepedia",  "ftb.gamepedia.com", "minecraft.gamepedia.com"));
 		if (Loader.isModLoaded("mekanism")) {
 			TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("mekanism", "Mekanism Wiki", "wiki.aidancbrady.com/w"));
@@ -119,6 +125,7 @@ public class CharsetTablet {
 			typesetter.popStyle();
 		}));
 
+		TabletAPI.INSTANCE.registerCommand("\\checkmods", new CommandCheckMods());
 		TabletAPI.INSTANCE.registerCommand("\\img", new CommandImg());
 		TabletAPI.INSTANCE.registerCommand("\\item", new CommandItem());
 		TabletAPI.INSTANCE.registerCommand("\\url", new CommandURL());
@@ -130,6 +137,8 @@ public class CharsetTablet {
 		TabletAPI.INSTANCE.registerPrinterMinecraft(WordNewline.class, new WordPrinterMCNewline());
 		TabletAPI.INSTANCE.registerPrinterMinecraft(WordText.class, new WordPrinterMCText());
 		TabletAPI.INSTANCE.registerPrinterMinecraft(WordURL.class, new WordPrinterMCURL());
+
+		TabletAPI.INSTANCE.addBook("Book of Charset", "mod://charset/index");
 	}
 
 	@SubscribeEvent

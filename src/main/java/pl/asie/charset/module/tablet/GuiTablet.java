@@ -99,7 +99,7 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 		// load text
 		if (currentFuture == null && currentURI == null) {
 			try {
-				openURI(new URI("mod://charset/index"));
+				openURI(new URI("about://index"));
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
@@ -140,7 +140,7 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 		}
 
 		heightEnd -= pageHeight;
-		heightEnd = heightEnd - (heightEnd % fontRenderer.FONT_HEIGHT);
+		heightEnd = heightEnd - (heightEnd % fontRenderer.FONT_HEIGHT+1);
 		if (heightEnd < 0) {
 			heightEnd = 0;
 		}
@@ -212,9 +212,9 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 
 		if (w != 0) {
 			if (w < 0) {
-				heightPos += fontRenderer.FONT_HEIGHT;
+				heightPos += fontRenderer.FONT_HEIGHT+1;
 			} else {
-				heightPos -= fontRenderer.FONT_HEIGHT;
+				heightPos -= fontRenderer.FONT_HEIGHT+1;
 			}
 
 			heightPos = Math.max(Math.min(heightEnd, heightPos), heightStart);
@@ -248,7 +248,7 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 				uriQueue.removeFirst(); // remove the just removed URI
 			} else {
 				try {
-					openURI(new URI("mod://charset/index"));
+					openURI(new URI("about://index"));
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}

@@ -19,12 +19,31 @@
 
 package pl.asie.charset.module.tablet;
 
+import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ProxyCommon {
 	public void onTabletRightClick(World world, EntityPlayer player, EnumHand hand) {
 
+	}
+
+	@SubscribeEvent
+	public void onRightClick(PlayerInteractEvent.EntityInteract event) {
+		if (event.getEntityPlayer().isSneaking() && event.getHand() == EnumHand.MAIN_HAND && event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemTablet) {
+			event.setCanceled(true);
+			onTabletRightClick(event.getWorld(), event.getEntityPlayer(), EnumHand.MAIN_HAND);
+		}
+	}
+
+	@SubscribeEvent
+	public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
+		if (event.getEntityPlayer().isSneaking() && event.getHand() == EnumHand.MAIN_HAND && event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemTablet) {
+			event.setCanceled(true);
+			onTabletRightClick(event.getWorld(), event.getEntityPlayer(), EnumHand.MAIN_HAND);
+		}
 	}
 }

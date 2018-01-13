@@ -33,7 +33,7 @@ public abstract class WordPrinterMinecraft<T extends Word> {
 	public abstract int getWidth(IPrintingContextMinecraft context, T word);
 	public abstract int getHeight(IPrintingContextMinecraft context, T word);
 	public int getPaddingAbove(IPrintingContextMinecraft context, T word) {
-		return 0;
+		return 1;
 	}
 
 	public abstract void draw(IPrintingContextMinecraft context, T word, int x, int y, boolean isHovering);

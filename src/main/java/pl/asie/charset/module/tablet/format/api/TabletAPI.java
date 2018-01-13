@@ -39,8 +39,17 @@ public class TabletAPI {
 	private final Map<String, ICommand> commandMap = new HashMap<>();
 	private final Map<Class<? extends Word>, WordPrinterMinecraft> printerMinecraftMap = new IdentityHashMap<>();
 	private final Table<TextPrinterFormat, Class<? extends Word>, WordPrinterText> textOutputPrinterTable = HashBasedTable.create();
+	private final List<Pair<String, String>> books = new ArrayList<>();
 	private final List<IRouter> routes = new ArrayList<>();
 	private final ExecutorService service;
+
+	public void addBook(String name, String url) {
+		books.add(Pair.of(name, url));
+	}
+
+	public Collection<Pair<String, String>> getBooks() {
+		return books;
+	}
 
 	public void registerRouter(IRouter route) {
 		routes.add(route);

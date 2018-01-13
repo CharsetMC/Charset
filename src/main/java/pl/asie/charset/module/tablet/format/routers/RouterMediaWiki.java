@@ -29,6 +29,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.module.tablet.TabletUtil;
 import pl.asie.charset.module.tablet.format.api.IRouter;
 import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
 import pl.asie.charset.module.tablet.format.mediawiki.MediaWikiData;
@@ -68,7 +69,7 @@ public class RouterMediaWiki implements IRouterSearchable {
 		for (String host : hostsChecks) {
 			try {
 				URI uri = new URI("http://" + host + "/api.php?action=parse&prop=wikitext%7clanglinks%7ccategories%7clinks%7cdisplaytitle%7ciwlinks%7cproperties"
-						+ "&format=json&page=" + URLEncoder.encode(path.getPath().substring(1), Charsets.UTF_8.name()).replaceAll("\\+", "%20"));
+						+ "&format=json&page=" + TabletUtil.encode(path.getPath().substring(1)));
 
 				HttpClient client = HttpClientBuilder.create().setUserAgent("Charset/" + ModCharset.VERSION + " (tablet)").build();
 				HttpGet request = new HttpGet(uri);
@@ -107,7 +108,7 @@ public class RouterMediaWiki implements IRouterSearchable {
 		for (String host : hosts) {
 			try {
 				URI uri = new URI("https://" + host + "/api.php?action=opensearch&search=" +
-						URLEncoder.encode(query, Charsets.UTF_8.name()).replaceAll("\\+", "%20")
+						TabletUtil.encode(query)
 						+ "&limit=50&format=json");
 
 				HttpClient client = HttpClientBuilder.create().setUserAgent("Charset/" + ModCharset.VERSION + " (tablet)").build();

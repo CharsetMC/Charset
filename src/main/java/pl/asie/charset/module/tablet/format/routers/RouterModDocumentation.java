@@ -22,50 +22,77 @@ package pl.asie.charset.module.tablet.format.routers;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.module.tablet.format.api.IRouter;
+import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
 
 import javax.annotation.Nullable;
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Locale;
 
-public class RouterModDocumentation implements IRouter {
-	private final String modid;
+public class RouterModDocumentation implements IRouterSearchable {
+	private final String modid, friendlyName;
 
-	public RouterModDocumentation(String modid) {
+	public RouterModDocumentation(String modid, String friendlyName) {
 		this.modid = modid;
+		this.friendlyName = friendlyName;
 	}
 
 	@Nullable
 	@Override
 	public String get(URI path) {
-		ResourceLocation loc = null;
-		if ("item".equals(path.getScheme())) {
-			loc = new ResourceLocation(modid, "doc/item" + path.getPath() + ".txt");
-		} else if ("mod".equals(path.getScheme())) {
+		ResourceLocation loc;
+		if ("mod".equals(path.getScheme())) {
 			loc = new ResourceLocation(modid, "doc" + path.getPath() + ".txt");
+		} else {
+			loc = new ResourceLocation(modid, "doc/" + path.getScheme() + path.getPath() + ".txt");
 		}
 
-		if (loc != null) {
-			try {
-				byte[] data = ByteStreams.toByteArray(Minecraft.getMinecraft().getResourceManager().getResource(loc).getInputStream());
-				return new String(data, Charsets.UTF_8);
-			} catch (FileNotFoundException e) {
-				return "\\title{Not found!}\n\nThe documentation you are looking for cannot be found.";
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
+		try {
+			byte[] data = ByteStreams.toByteArray(Minecraft.getMinecraft().getResourceManager().getResource(loc).getInputStream());
+			return new String(data, Charsets.UTF_8);
+		} catch (FileNotFoundException e) {
+			return "\\title{Not found!}\n\nThe documentation you are looking for cannot be found.";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 
 	@Override
 	public boolean matches(URI path) {
-		if ("item".equals(path.getScheme()) || "mod".equals(path.getScheme())) {
+		if ("item".equals(path.getScheme()) || "mod".equals(path.getScheme()) || "entity".equals(path.getScheme())) {
 			return modid.equals(path.getHost());
 		}
 
 		return false;
+	}
+
+	@Override
+	public void find(Collection<SearchResult> results, String query) {
+		for (Item i : Item.REGISTRY) {
+			if (modid.equals(i.getRegistryName().getResourceDomain())) {
+				ResourceLocation loc = new ResourceLocation(modid, "doc/item/" + i.getRegistryName().getResourcePath() + ".txt");
+				try {
+					Minecraft.getMinecraft().getResourceManager().getResource(loc);
+					String name = I18n.translateToLocal(i.getUnlocalizedName() + ".name");
+					if (query.toLowerCase().contains(name.toLowerCase())) {
+						results.add(new SearchResult(
+								name,
+								friendlyName,
+								new URI("item://" + modid + "/" + i.getRegistryName().getResourcePath())
+						));
+					}
+				} catch (Exception e) {
+					// Skip
+				}
+			}
+		}
 	}
 }

@@ -22,6 +22,8 @@ package pl.asie.charset.module.tablet;
 import com.google.common.base.Charsets;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -30,6 +32,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -40,13 +44,13 @@ public class ProxyClient extends ProxyCommon {
 	@Override
 	public void onTabletRightClick(World world, EntityPlayer player, EnumHand hand) {
 		super.onTabletRightClick(world, player, hand);
-		if (world.isRemote) {
+		if (world.isRemote && !(Minecraft.getMinecraft().currentScreen instanceof GuiTablet)) {
 			GuiTablet tablet = new GuiTablet(player);
 			RayTraceResult result = Minecraft.getMinecraft().objectMouseOver;
 			if (result != null) {
 				try {
 					switch (result.typeOfHit) {
-						case BLOCK:
+						case BLOCK: {
 							IBlockState state = world.getBlockState(result.getBlockPos());
 							ItemStack stack = state.getBlock().getPickBlock(state, result, world, result.getBlockPos(), player);
 							ResourceLocation loc = state.getBlock().getRegistryName();
@@ -56,11 +60,40 @@ public class ProxyClient extends ProxyCommon {
 								if (name.equals(key)) {
 									name = I18n.translateToLocal(key);
 								}
-								tablet.openURI(new URI("about://search/" + URLEncoder.encode(name, Charsets.UTF_8.name())));
+								tablet.openURI(new URI("about://search/" + TabletUtil.encode(name)));
 							}
-							break;
+						} break;
+						case ENTITY: {
+							if (result.entityHit != null) {
+								if (result.entityHit instanceof EntityItemFrame) {
+									ItemStack stack = ((EntityItemFrame) result.entityHit).getDisplayedItem();
+									ResourceLocation loc = stack.getItem().getRegistryName();
+									if (!stack.isEmpty() && !tablet.openURI(new URI("item://" + loc.getResourceDomain() + "/" + loc.getResourcePath()))) {
+										String key = stack.getUnlocalizedName() + ".name";
+										String name = I18n.translateToFallback(key);
+										if (name.equals(key)) {
+											name = I18n.translateToLocal(key);
+										}
+										tablet.openURI(new URI("about://search/" + TabletUtil.encode(name)));
+									}
+								} else {
+									EntityEntry entry = EntityRegistry.getEntry(result.entityHit.getClass());
+									if (entry != null) {
+										ResourceLocation loc = entry.getRegistryName();
+										if (loc != null && !tablet.openURI(new URI("entity://" + loc.getResourceDomain() + "/" + loc.getResourcePath()))) {
+											String key = "entity." + EntityList.getEntityString(result.entityHit) + ".name";
+											String name = I18n.translateToFallback(key);
+											if (name.equals(key)) {
+												name = I18n.translateToLocal(key);
+											}
+											tablet.openURI(new URI("about://search/" + TabletUtil.encode(name)));
+										}
+									}
+								}
+							}
+						}
 					}
-				} catch (URISyntaxException | UnsupportedEncodingException e) {
+				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}
 			}

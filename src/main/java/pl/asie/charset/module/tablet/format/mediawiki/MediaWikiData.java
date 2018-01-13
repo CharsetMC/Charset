@@ -23,6 +23,7 @@ import com.google.common.base.Charsets;
 import com.google.gson.*;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.lib.utils.ThreeState;
+import pl.asie.charset.module.tablet.TabletUtil;
 
 import java.net.URLEncoder;
 import java.util.*;
@@ -44,8 +45,8 @@ public class MediaWikiData {
 	}
 
 	private void initReplacers() {
-		replacers.add(replace("''([^']+)''", 0, "\\\\i{$1}"));
 		replacers.add(replace("'''([^']+)'''", 0, "\\\\b{$1}"));
+		replacers.add(replace("''([^']+)''", 0, "\\\\i{$1}"));
 		replacers.add(replace("======([^=]+)======", 0,"\\\\header{$1}\n\n"));
 		replacers.add(replace("=====([^=]+)=====", 0,"\\\\header{$1}\n\n"));
 		replacers.add(replace("====([^=]+)====", 0,"\\\\header{$1}\n\n"));
@@ -69,7 +70,7 @@ public class MediaWikiData {
 				if (url.startsWith("Category:") || url.startsWith("Template:")) {
 					return "";
 				} else if (urlExists(url) != ThreeState.NO) {
-					return "\\\\url{/" + URLEncoder.encode(url, Charsets.UTF_8.name()).replaceAll("\\+", "%20") + "}{" + m.group(1) + "}";
+					return "\\\\url{/" + TabletUtil.encode(url) + "}{" + m.group(1) + "}";
 				} else {
 					return "\\\\urlmissing{" + m.group(1) + "}";
 				}
@@ -84,7 +85,7 @@ public class MediaWikiData {
 				if (url.startsWith("Category:") || url.startsWith("Template:")) {
 					return "";
 				} else if (urlExists(url) != ThreeState.NO) {
-					return "\\\\url{/" + URLEncoder.encode(url, Charsets.UTF_8.name()).replaceAll("\\+", "%20") + "}{" + m.group(2) + "}";
+					return "\\\\url{/" + TabletUtil.encode(url) + "}{" + m.group(2) + "}";
 				} else {
 					return "\\\\urlmissing{" + m.group(2) + "}";
 				}

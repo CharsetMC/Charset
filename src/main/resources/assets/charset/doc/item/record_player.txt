@@ -1,0 +1,17 @@
+\scale{2}{\item{charset:record_player}{1}{32767}} \title{Record Player}
+
+Record Players can be used to record and play back audio.
+
+They may be operated in one of two ways:
+
+\- In-world - right-click the top to insert the disc and adjust the playback head, sneak-right-click to eject the disc,
+\- GUI - sneak-right-click one of the side faces. The GUI provides additional recording functionality not available
+through in-world operation.
+
+\header{Recording}
+
+Recording may be done in one of two ways:
+
+\- from a file - OGG, WAV, MOD, S3M and XM files are supported by default, installing NotEnoughCodecs
+additionally allows importing MP3 and FLAC files,
+\- from an audio source - for instance, another Record Player connected via a cable.

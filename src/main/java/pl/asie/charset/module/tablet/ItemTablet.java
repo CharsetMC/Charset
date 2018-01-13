@@ -31,6 +31,7 @@ import pl.asie.charset.lib.item.ItemBase;
 public class ItemTablet extends ItemBase {
 	public ItemTablet() {
 		super();
+		setMaxStackSize(1);
 		setUnlocalizedName("charset.tablet");
 	}
 

@@ -1,0 +1,6 @@
+\scale{2}{\item{charset:quartz_disc}{1}{32767}} \title{Quartz Disc}
+
+Quartz Discs are used to store audio. They come in four sizes, storing one, three, six and ten minutes each
+at the default playback frequency.
+
+You can use \url{mod://charset/item/record_player}{Record Player}s for playback and recording of those discs.
