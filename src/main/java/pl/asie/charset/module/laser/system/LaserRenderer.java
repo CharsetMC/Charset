@@ -133,20 +133,24 @@ public class LaserRenderer {
 
 			Vec3d startVec = beam.vcstart;
 			Vec3d endVec = beam.vcend;
+			float t = THICKNESS;
+			if (beam.getColor().red) t += 0.004f;
+			if (beam.getColor().green) t += 0.002f;
+			if (beam.getColor().blue) t += 0.001f;
 
 			if (beam.getStart().getX() == beam.getEnd().getX()) {
-				startVec = startVec.addVector(-THICKNESS / 16.0, 0, 0);
-				endVec = endVec.addVector(THICKNESS / 16.0, 0, 0);
+				startVec = startVec.addVector(-t / 16.0, 0, 0);
+				endVec = endVec.addVector(t / 16.0, 0, 0);
 			}
 
 			if (beam.getStart().getY() == beam.getEnd().getY()) {
-				startVec = startVec.addVector(0, -THICKNESS / 16.0, 0);
-				endVec = endVec.addVector(0, THICKNESS / 16.0, 0);
+				startVec = startVec.addVector(0, -t / 16.0, 0);
+				endVec = endVec.addVector(0, t / 16.0, 0);
 			}
 
 			if (beam.getStart().getZ() == beam.getEnd().getZ()) {
-				startVec = startVec.addVector(0, 0, -THICKNESS / 16.0);
-				endVec = endVec.addVector(0, 0, THICKNESS / 16.0);
+				startVec = startVec.addVector(0, 0, -t / 16.0);
+				endVec = endVec.addVector(0, 0, t / 16.0);
 			}
 
 			if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {

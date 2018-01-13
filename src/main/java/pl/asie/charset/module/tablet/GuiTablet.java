@@ -1,0 +1,297 @@
+
+package pl.asie.charset.module.tablet;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.ByteStreams;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import pl.asie.charset.module.tablet.format.ClientTypesetter;
+import pl.asie.charset.module.tablet.format.api.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.Future;
+
+public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
+	private static final boolean ENABLE_HIGHLIGHT = false;
+
+	private static final int[] PALETTE = new int[]{
+			0x00000000, 0x1c000000, 0x30000000, 0x48000000,
+			0x60000000, 0x78000000, 0x9a000000, 0xbc000000
+	};
+	private static final ResourceLocation TEXTURE = new ResourceLocation("charset", "textures/gui/tabletgui.png");
+	private static final int X_SIZE = 142;
+	private static final int Y_SIZE = 180;
+	private int guiLeft, guiTop;
+	private float glScale = 1.0f;
+	private int buttonState = 1;
+	private int heightStart = 0;
+	private int heightEnd = 0;
+	private int heightPos = 0;
+	private int pageWidth = 240;
+	private int pageHeight = 300;
+	private Queue<URI> uriQueue = new LinkedList<>();
+	private URI currentURI = null;
+	private Future<String> currentFuture;
+	private ClientTypesetter typesetter;
+	private List<IStyle> currentStyle;
+
+	public GuiTablet(EntityPlayer player) {
+		super();
+	}
+
+	protected final boolean insideRect(int x, int y, int x0, int y0, int w, int h) {
+		return x >= x0 && y >= y0 && x < (x0 + w) && y < (y0 + h);
+	}
+
+	@Override
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
+
+	@Override
+	public void initGui() {
+		super.initGui();
+		// recalculate width/height
+		int oldScale = mc.gameSettings.guiScale;
+		ScaledResolution realRes = new ScaledResolution(mc);
+		mc.gameSettings.guiScale = realRes.getScaleFactor() == 1 ? 2 : (realRes.getScaleFactor() & (~1));
+		ScaledResolution currentRes = new ScaledResolution(mc);
+		mc.gameSettings.guiScale = oldScale;
+
+		glScale = (float) (currentRes.getScaledWidth_double() / realRes.getScaledWidth_double());
+
+		this.guiLeft = (currentRes.getScaledWidth() - X_SIZE) / 2;
+		this.guiTop = (currentRes.getScaledHeight() - Y_SIZE) / 2;
+
+		// load text
+		try {
+			openURI(new URI("mod://charset/index"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void onGuiClosed() {
+		super.onGuiClosed();
+		closePreviousFuture();
+	}
+
+	private void closePreviousFuture() {
+		if (currentFuture != null) {
+			currentFuture.cancel(true);
+			currentFuture = null;
+		}
+	}
+
+	private void load(String text) {
+		typesetter = new ClientTypesetter(fontRenderer, pageWidth);
+		try {
+			typesetter.write(text);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		heightStart = 0;
+		heightPos = 0;
+		heightEnd = 0;
+
+		for (int i = 0; i < typesetter.lines.size(); i++) {
+			ClientTypesetter.Line l = typesetter.lines.get(i);
+			heightEnd += l.height;
+			if (i > 0) {
+				heightEnd += l.paddingAbove;
+			}
+		}
+
+		heightEnd -= pageHeight;
+		heightEnd = heightEnd - (heightEnd % fontRenderer.FONT_HEIGHT);
+		if (heightEnd < 0) {
+			heightEnd = 0;
+		}
+	}
+
+	public void bindTexture(ResourceLocation texture) {
+		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+	}
+
+	@Override
+	public void updateScreen() {
+		super.updateScreen();
+
+		if (currentFuture != null && currentFuture.isDone()) {
+			try {
+				load(currentFuture.get());
+				currentFuture = null;
+			} catch (Exception e) {
+				e.printStackTrace();
+				currentFuture = null;
+				load("\\b{Error!} " + e.getMessage());
+			}
+		}
+	}
+
+	private boolean isButton(int mx, int my) {
+		return mx >= (guiLeft + 65) && my >= (guiTop + 167) && mx < (guiLeft + 65 + 18) && my < (guiTop + 167 + 8);
+	}
+
+	private void checkTypesetterClicked(int mx, int my) {
+		int y = 0;
+		for (int i = 0; i < typesetter.lines.size(); i++) {
+			ClientTypesetter.Line line = typesetter.lines.get(i);
+			ClientTypesetter.Line nextLine = i < typesetter.lines.size() - 1 ? typesetter.lines.get(i + 1) : null;
+
+			if (y >= heightPos) {
+				int x = 0;
+				for (ClientTypesetter.WordContainer word : line.words) {
+					int hOff = (line.height - word.printer.getHeight(this, word.word)) / 3;
+					currentStyle = word.styles;
+					if (insideRect(mx - this.guiLeft, my - this.guiTop, x, y - heightPos + hOff,
+							word.printer.getWidth(this, word.word),
+							word.printer.getHeight(this, word.word))) {
+						if (word.printer.onClick(this, word.word)) {
+							return;
+						}
+					}
+				}
+			}
+
+			y += line.height;
+			if (nextLine != null) {
+				y += nextLine.paddingAbove;
+			}
+		}
+	}
+
+	@Override
+	public void handleMouseInput() {
+		int x = (int) (Mouse.getEventX() * this.width / this.mc.displayWidth * glScale);
+		int y = (int) ((this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1) * glScale);
+		int k = Mouse.getEventButton();
+		int w = Mouse.getEventDWheel();
+		int oldButtonState = buttonState;
+
+		if (w != 0) {
+			if (w < 0) {
+				heightPos += fontRenderer.FONT_HEIGHT;
+			} else {
+				heightPos -= fontRenderer.FONT_HEIGHT;
+			}
+
+			heightPos = Math.max(Math.min(heightEnd, heightPos), heightStart);
+		}
+
+		if (k == 0) {
+			if (Mouse.getEventButtonState()) {
+				if (isButton(x, y)) {
+					buttonState = 2;
+				} else if (typesetter != null) {
+					checkTypesetterClicked(x, y);
+				}
+			} else if (buttonState == 2) {
+				if (isButton(x, y)) {
+					buttonState = ENABLE_HIGHLIGHT ? 0 : 1;
+				} else {
+					buttonState = 1;
+				}
+			}
+		} else if (ENABLE_HIGHLIGHT && k == -1 && buttonState != 2) {
+			if (isButton(x, y)) {
+				buttonState = 0;
+			} else {
+				buttonState = 1;
+			}
+		}
+
+		if (oldButtonState != buttonState && buttonState == 2 && !uriQueue.isEmpty()) {
+			openURI(uriQueue.remove());
+			uriQueue.remove(); // remove the just removed URI
+		}
+	}
+
+	@Override
+	public void drawScreen(int fmx, int fmy, float p) {
+		this.drawDefaultBackground();
+
+		GlStateManager.color(1.0f, 1.0f, 1.0f);
+		GlStateManager.pushMatrix();
+		GlStateManager.scale(1.0f / glScale, 1.0f / glScale, 1.0f / glScale);
+
+		bindTexture(TEXTURE);
+		drawTexturedModalRect(guiLeft, guiTop, 0, 0, X_SIZE, Y_SIZE);
+		drawTexturedModalRect(guiLeft + 65, guiTop + 167, 142, 147 + (buttonState * 10), 18, 8);
+
+		GlStateManager.enableBlend();
+		// GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+
+		GlStateManager.scale(0.5f, 0.5f, 0.5f);
+		GlStateManager.translate((guiLeft + 10 + 2) * 2, (guiTop + 8 + 2) * 2, 0);
+
+		if (typesetter != null) {
+			int y = 0;
+			for (int i = 0; i < typesetter.lines.size(); i++) {
+				ClientTypesetter.Line line = typesetter.lines.get(i);
+				ClientTypesetter.Line nextLine = i < typesetter.lines.size() - 1 ? typesetter.lines.get(i + 1) : null;
+
+				if (y >= heightPos) {
+					int x = 0;
+					for (ClientTypesetter.WordContainer word : line.words) {
+						currentStyle = word.styles;
+						int hOff = (line.height - word.printer.getHeight(this, word.word)) / 3;
+						word.printer.draw(this, word.word, x, y - heightPos + hOff, false);
+						x += word.printer.getWidth(this, word.word);
+						if (line.words.size() > 1) {
+							//x += (120 - line.length) / (line.words.size() - 1);
+						}
+					}
+				}
+				y += line.height;
+				if (nextLine != null) {
+					y += nextLine.paddingAbove;
+				}
+				if (y >= heightPos + pageHeight) {
+					break;
+				}
+			}
+		} else if (currentFuture != null) {
+			fontRenderer.drawString("Loading...", 0, 0, 0xFF000000);
+		}
+
+		// GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		GlStateManager.disableBlend();
+
+		GlStateManager.popMatrix();
+	}
+
+	@Override
+	public FontRenderer getFontRenderer() {
+		return typesetter.getFontRenderer();
+	}
+
+	@Override
+	public boolean openURI(URI uri) {
+		closePreviousFuture();
+		if (currentURI != null) {
+			uriQueue.offer(currentURI);
+		}
+		currentURI = currentURI == null ? uri : currentURI.resolve(uri);
+		currentFuture = TabletAPI.INSTANCE.getRoute(currentURI);
+		return true;
+	}
+
+	@Override
+	public List<IStyle> getStyleList() {
+		return currentStyle;
+	}
+}

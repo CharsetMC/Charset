@@ -653,7 +653,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-	        if (isTop(facing) || isBottom(facing) || facing == null) {
+	        if (shouldInsertToSide(facing) || shouldExtractFromSide(facing) || facing == null) {
 		        return true;
 	        }
         } else if (capability == Capabilities.BARREL) {
@@ -674,7 +674,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     @Override
     public boolean shouldInsertToSide(EnumFacing side) {
-        return isTop(side);
+        return isTopOrBack(side);
     }
 
     @Override

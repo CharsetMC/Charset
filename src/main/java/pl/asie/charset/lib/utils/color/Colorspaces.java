@@ -44,7 +44,7 @@ public class Colorspaces {
 				}
 			}
 
-			System.out.println(Arrays.toString(distances));
+			// System.out.println(Arrays.toString(distances));
 
 			for (Colorspace to : Colorspace.values()) {
 				if (from == to || predecessors[to.ordinal()] == null) continue;

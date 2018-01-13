@@ -1,0 +1,44 @@
+\item{charset:barrel}{2}{1}{32767} \title{The Barrel}
+
+Barrels can store up to 64 stacks of a single item.
+So, a single barrel can store 4096 sticks,
+64 swords, or 1024 eggs.
+
+Right clicking a barrel will store what you're holding,
+and left clicking removes a stack.
+Shift left clicking will remove a single item.
+Double right-clicking will fill the barrel
+from your inventory.
+
+Barrels can have any direction and orientation.
+Clicking near the side edge of a block will place the barrel
+with its top pointing to that side.
+
+Machines can only extract from the bottom of the barrel.
+Insertion is done from the top, or the back.
+
+\header{Upgrades}
+
+There are a few upgrades for the standard barrel.
+
+\item{minecraft:hopper} \item{slimeball}
+
+The hopping upgrade will pull one item from its above into it,
+and push one item out its bottom, at the same speed as a
+vanilla hopper.
+It also hops.
+A direct redstone signal will disable it.
+
+The sticky upgrade ensures that the first item put into the barrel gets stuck to the slime, and must be removed manually.
+
+Those of you in creative mode may find special \i{infinite} barrels. They will never run out of their item!
+
+In addition, you can craft any barrel with a minecart to create a Barrel Cart! \item{charset:barrelcart}{1}{1}{32767}
+
+% \topic{item.factorization:daybarrel}
+% Doesn't show the variations recipes, so we do this the ugly way.
+% Oh well.
+% \newpage
+% \generate{recipes/item.factorization:daybarrel}
+% \topic{item.factorization:barrelCart}
+% \i{(Not all recipes are shown. Barrels can be made out of most logs and their corresponding slab.)}

@@ -17,6 +17,7 @@ config.charset.lib.functionalityregistry.name=Functionality Registry
 config.charset.lib.general.name=General
 
 item.charset.icon.name=a
+item.charset.tablet.name=Tablet
 
 # CharsetAudio
 tile.charset.audioCable.name=Audio Cable
