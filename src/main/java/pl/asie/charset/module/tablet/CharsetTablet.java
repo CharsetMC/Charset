@@ -70,7 +70,6 @@ public class CharsetTablet {
 	@SideOnly(Side.CLIENT)
 	public void onPreInitClient(FMLPreInitializationEvent event) {
 		ICommand spaceCommand = ((typesetter, tokenizer) -> typesetter.write(new WordText(" ")));
-		ICommand newlineCommand = ((typesetter, tokenizer) -> typesetter.write(new WordNewline()));
 
 		TabletAPI.INSTANCE.registerRouter(new RouterIndex());
 		TabletAPI.INSTANCE.registerRouter(new RouterSearch());
@@ -85,8 +84,8 @@ public class CharsetTablet {
 
 		TabletAPI.INSTANCE.registerCommand("\\", spaceCommand);
 		TabletAPI.INSTANCE.registerCommand("\\ ", spaceCommand);
-		TabletAPI.INSTANCE.registerCommand("\\nl", newlineCommand);
-		TabletAPI.INSTANCE.registerCommand("\\p", newlineCommand);
+		TabletAPI.INSTANCE.registerCommand("\\nl", ((typesetter, tokenizer) -> typesetter.write(new WordNewline(1))));
+		TabletAPI.INSTANCE.registerCommand("\\p", ((typesetter, tokenizer) -> typesetter.write(new WordNewline(2))));
 		TabletAPI.INSTANCE.registerCommand("\\\\", (((typesetter, tokenizer) -> typesetter.write(new WordText("\\")))));
 		TabletAPI.INSTANCE.registerCommand("\\-", (((typesetter, tokenizer) -> {
 			String padS = tokenizer.getOptionalParameter();

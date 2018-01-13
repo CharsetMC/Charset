@@ -22,15 +22,20 @@ import java.util.Map;
 public class RouterGuideAPI implements IRouterSearchable {
 	private final ResourceLocation location;
 	private final Book book;
-	private final Map<String, CategoryAbstract> categoryAbstractMap;
 
 	public RouterGuideAPI(ResourceLocation location, Book book) {
 		this.location = location;
 		this.book = book;
-		this.categoryAbstractMap = new HashMap<>();
+	}
+
+	public CategoryAbstract getCategory(String name) {
+		name = name.toLowerCase(Locale.ROOT);
 		for (CategoryAbstract category : book.getCategoryList()) {
-			categoryAbstractMap.put(category.name.toLowerCase(Locale.ROOT), category);
+			if (category.name.toLowerCase(Locale.ROOT).equals(name)) {
+				return category;
+			}
 		}
+		return null;
 	}
 
 	private String getIndex() {
@@ -54,9 +59,9 @@ public class RouterGuideAPI implements IRouterSearchable {
 		StringBuilder builder = new StringBuilder("\\title{" + entry.getLocalizedName() + "}\n\n");
 		for (IPage page : entry.pageList) {
 			if (page instanceof PageTextImage) {
-				builder.append(((PageTextImage) page).draw).append("\n\n");
+				builder.append(((PageTextImage) page).draw.replaceAll("\\\\n", "\n")).append("\n\n");
 			} else if (page instanceof PageText) {
-				builder.append(((PageText) page).draw).append("\n\n");
+				builder.append(((PageText) page).draw.replaceAll("\\\\n", "\n")).append("\n\n");
 			}
 		}
 		builder.append("\\url{/" + location.getResourcePath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "}{Back}");
@@ -76,9 +81,9 @@ public class RouterGuideAPI implements IRouterSearchable {
 
 			String[] splits = cutPath.split("/");
 			if (splits.length == 1) {
-				return getCategory(categoryAbstractMap.get(splits[0]));
+				return getCategory(getCategory(splits[0]));
 			} else if (splits.length == 2) {
-				CategoryAbstract category = categoryAbstractMap.get(splits[0]);
+				CategoryAbstract category = getCategory(splits[0]);
 				for (Map.Entry<ResourceLocation, EntryAbstract> entry : category.entries.entrySet()) {
 					if (splits[1].equals(entry.getValue().name.toLowerCase(Locale.ROOT))) {
 						return getEntry(category, entry.getValue());

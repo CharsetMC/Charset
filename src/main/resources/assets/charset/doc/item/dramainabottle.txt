@@ -1,0 +1,4 @@
+\scale{2}{\item{charset:dramainabottle}} \title{Drama in a Bottle}
+
+Crafted by brewing an Awkward Potion with some Pink Dye, this Drama in a Bottle will permanently store one
+unit of community drama just for you!

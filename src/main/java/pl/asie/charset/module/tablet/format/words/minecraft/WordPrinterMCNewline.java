@@ -31,7 +31,7 @@ public class WordPrinterMCNewline extends WordPrinterMinecraft<WordNewline> {
 
 	@Override
 	public int getPaddingAbove(IPrintingContextMinecraft context, WordNewline word) {
-		return context.getFontRenderer().FONT_HEIGHT;
+		return (word.getLines() - 1) * context.getFontRenderer().FONT_HEIGHT;
 	}
 
 	@Override

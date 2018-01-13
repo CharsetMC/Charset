@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -74,6 +75,9 @@ public class CharsetMiscDrama {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		BrewingRecipeRegistry.addRecipe(new ItemStack(Items.POTIONITEM, 1, 16), "dyePink", new ItemStack(dramaInABottle));
+		ItemStack potion = new ItemStack(Items.POTIONITEM, 1);
+		potion.setTagCompound(new NBTTagCompound());
+		potion.getTagCompound().setString("Potion", "minecraft:awkward");
+		BrewingRecipeRegistry.addRecipe(potion, "dyePink", new ItemStack(dramaInABottle));
 	}
 }

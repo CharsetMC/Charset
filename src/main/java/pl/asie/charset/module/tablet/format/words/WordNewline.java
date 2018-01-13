@@ -25,4 +25,17 @@ import java.util.Arrays;
 import java.util.EnumSet;
 
 public class WordNewline extends Word {
+	private final int lines;
+
+	public WordNewline() {
+		this(1);
+	}
+
+	public WordNewline(int lines) {
+		this.lines = lines;
+	}
+
+	public int getLines() {
+		return lines;
+	}
 }

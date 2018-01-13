@@ -10,11 +10,14 @@
 \checkmods{all}{charset:storage.barrels}{\- \item{charset:barrel} \url{item://charset/barrel}{Barrel}}
 \checkmods{all}{charset:storage.tanks}{\- \item{charset:fluidtank} \url{item://charset/fluidtank}{Fluid Tank}}}
 
-\checkmods{any}{charset:transport.dyeableMinecarts charset:tweak.carry}{\b{New Mechanics}
+\checkmods{any}{charset:transport.dyeableMinecarts charset:tweak.carry charset:tweak.zorro}{\b{New Mechanics}
 
 \checkmods{all}{charset:tweak.carry}{\- \item{minecraft:chest} \url{mod://charset/info/block_carrying}{Block Carrying}}
-\checkmods{all}{charset:transport.dyeableMinecarts}{\- \item{minecraft:minecart} \url{mod://charset/info/cart_dyeing}{Dyeable Minecarts}}}
+\checkmods{all}{charset:transport.dyeableMinecarts}{\- \item{minecraft:minecart} \url{mod://charset/info/cart_dyeing}{Dyeable Minecarts}}
+\checkmods{all}{charset:tweak.zorro}{\- \item{minecraft:iron_horse_armor} \url{mod://charset/info/zorro}{The Zorro Thing}}}
 
 \b{Misc}
 
+\checkmods{all}{charset:misc.drama}{\- \item{charset:dramainabottle} \url{item://charset/dramainabottle}{Drama in a Bottle}}}
 \- \item{charset:tablet} \url{item://charset/tablet}{Tablet}
+\- \item{charset:icon} \url{mod://charset/info/tweaks}{Tweaks}

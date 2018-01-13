@@ -1,0 +1,7 @@
+\title{Tweaks}
+
+The following tweaks are enabled:
+
+\checkmods{all}{charset:tweak.doubledoors}{\- Double doors now open together, even if you right-click just one.}
+\checkmods{all}{charset:tweak.anvilDyeItems}{\- Item names can now be dyed in the Anvil.}
+\checkmods{all}{charset:tweak.pushableTnt}{\- Hands and projectiles can now push primed TNT around.}
