@@ -3,5 +3,17 @@
 The following tweaks are enabled:
 
 \checkmods{all}{charset:tweak.doubledoors}{\- Double doors now open together, even if you right-click just one.}
+
+\checkmods{all}{charset:tweak.dynlights}{\- Dynamic lights! You may find that some things, perhaps ones held in your hand, have a new glow to them.}
+
 \checkmods{all}{charset:tweak.anvilDyeItems}{\- Item names can now be dyed in the Anvil.}
+
 \checkmods{all}{charset:tweak.pushableTnt}{\- Hands and projectiles can now push primed TNT around.}
+
+\checkmods{all}{charset:tweak.remove.recipeBookButton}{\- The vanilla recipe book is gone!
+\checkmods{all}{jei}{At least you still have JEI.}}
+
+\checkmods{all}{charset:tweak.remove.sprinting}{\- Sprinting is disabled!}
+
+\checkmods{all}{charset:overhaul.oneDimension}{\- Where's the Nether and End, anyway?}{
+\checkmods{all}{charset:tweak.remove.netherPortals}{\- Fire and obsidian will no longer take you to the Nether.}}

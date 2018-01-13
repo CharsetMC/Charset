@@ -1,0 +1,7 @@
+\scale{2}{\item{charset:shard}{1}{32767}} \title{Glass Shards}
+
+Our scientists have arrived at a breakthrough discovery! Instead of making punched glass disappear into the void,
+we have been able to materialize a significant fraction of it in the form of shards! Simply craft four in a 2x2 box
+to get your beloved glass blocks back!
+
+This can also be used to turn panes back into glass, although not losslessly!

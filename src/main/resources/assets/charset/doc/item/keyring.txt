@@ -1,0 +1,8 @@
+\scale{2}{\item{charset:keyring}} \title{Keyring}
+
+The Keyring lets you hold up to nine keys in one place!
+\checkmods{all}{baubles}{It}{If you have Baubles installed, it} can also serve as a bauble
+and open \url{mod://charset/item/lock}{Lock}s without you having to hold it explicitly!
+
+For those of you who enjoy color-coding, keep in mind that it will not only list the keys'
+colors on its tooltip, it will also show the color of the three leftmost keys on its icon!

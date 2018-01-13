@@ -1,0 +1,9 @@
+\scale{2}{\item{charset:lock}} \title{Lock}
+
+The Lock can be used to lock containers. It is crafted based on a specific
+\url{mod://charset/item/key}{Key}, and only that Key - or a duplicate - may
+be used to open it.
+
+In order to apply a Lock on a container, simply sneak-right-click it. The container
+will now not be openable without holding a matching Key or \url{mod://charset/item/keyring}{Keyring}.
+To remove the Lock, simply left-click it!

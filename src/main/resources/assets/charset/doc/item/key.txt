@@ -1,0 +1,9 @@
+\scale{2}{\item{charset:key}} \title{Key}
+
+The Key is your primary - and only - way to open containers locked using the
+\url{mod://charset/item/lock}{Lock}.
+
+If you're scared of losing your key, you can duplicate them! If you, instead,
+fear forgetting which key is which, you can dye them. As for the tedium of
+carrying multiple keys, the \url{mod://charset/item/keyring}{Keyring} might
+be able to help you there.

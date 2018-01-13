@@ -8,12 +8,12 @@
   "type": "charset:shaped",
   "group": "charset:tablet",
   "pattern": [
-    "sss",
-    "sgs",
-    "sbs"
+    "ppp",
+    "pgp",
+    "pdp"
   ],
   "key": {
-    "s": {
+    "p": {
       "type": "forge:ore_dict",
       "ore": "stone"
     },
@@ -21,7 +21,7 @@
       "type": "forge:ore_dict",
       "ore": "paneGlass"
     },
-    "b": {
+    "d": {
       "item": "minecraft:stone_button",
       "data": 0
     }

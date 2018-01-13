@@ -64,6 +64,18 @@ public class MediaWikiData {
 		replacers.add(replace("^\\*", Pattern.MULTILINE, "\\\\-"));
 		replacers.add(replace("^\\#", Pattern.MULTILINE, "\\\\-"));
 
+		replacers.add(Pair.of(Pattern.compile("\\[\\[File:([^|.]+\\.[a-z]+)\\|([^|]+)\\|([^|]+)]]", 0), (m) -> {
+			if (m.group(2).equals("thumb")) {
+				return "\\\\i{Image: " + m.group(3) + "}";
+			} else {
+				return "\\\\i{Image: " + m.group(2) + "}";
+			}
+		}));
+
+		replacers.add(Pair.of(Pattern.compile("\\[\\[Image:([^|.]+\\.[a-z]+)\\|([^|]+)\\|([^|]+)\\|([^|]+)]]", 0), (m) -> {
+			return "\\\\i{Image: " + m.group(4) + "}";
+		}));
+
 		replacers.add(Pair.of(Pattern.compile("\\[\\[([^|\\]]+?)]]", 0), (m) -> {
 			try {
 				String url = m.group(1);
@@ -186,14 +198,14 @@ public class MediaWikiData {
 		int cutEnd = 0;
 		StringBuilder newOut = new StringBuilder();
 		for (int i = 0; i < out.length() - 1; i++) {
-			if (out.codePointAt(i) == '{' && out.codePointAt(i + 1) == '{') {
+			if (out.codePointAt(i) == '{' && (out.codePointAt(i + 1) == '{' || out.codePointAt(i + 1) == '|')) {
 				count++;
 				if (count == 1) {
 					cutStart = i;
 					newOut.append(out.substring(cutEnd, cutStart));
 				}
 				i++;
-			} else if (out.codePointAt(i) == '}' && out.codePointAt(i + 1) == '}' && count > 0) {
+			} else if ((out.codePointAt(i) == '}' || out.codePointAt(i) == '|') && out.codePointAt(i + 1) == '}' && count > 0) {
 				count--;
 				if (count == 0) {
 					cutEnd = i + 2;

@@ -28,11 +28,13 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.module.tablet.format.ClientTypesetter;
 import pl.asie.charset.module.tablet.format.api.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Deque;
@@ -129,7 +131,7 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 
 		heightStart = 0;
 		heightPos = 0;
-		heightEnd = 0;
+		heightEnd = 10;
 
 		for (int i = 0; i < typesetter.lines.size(); i++) {
 			ClientTypesetter.Line l = typesetter.lines.get(i);
@@ -203,6 +205,46 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 	}
 
 	@Override
+	protected void keyTyped(char typedChar, int keyCode) throws IOException {
+		super.keyTyped(typedChar, keyCode);
+
+		switch (keyCode) {
+			case Keyboard.KEY_HOME:
+				heightPos = heightStart;
+				break;
+			case Keyboard.KEY_END:
+				heightPos = heightEnd;
+				break;
+			case Keyboard.KEY_PRIOR:
+				heightPos -= pageHeight-32;
+				break;
+			case Keyboard.KEY_NEXT:
+				heightPos += pageHeight-32;
+				break;
+			case Keyboard.KEY_BACK:
+				if (!uriQueue.isEmpty()) {
+					openURI(uriQueue.removeFirst());
+					uriQueue.removeFirst(); // remove the just removed URI
+				} else {
+					try {
+						openURI(new URI("about://index"));
+					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+			case Keyboard.KEY_F5:
+				if (currentURI != null) {
+					openURI(currentURI);
+					uriQueue.removeFirst();
+				}
+				break;
+		}
+
+		heightPos = Math.max(Math.min(heightEnd, heightPos), heightStart);
+	}
+
+	@Override
 	public void handleMouseInput() {
 		int x = (int) (Mouse.getEventX() * this.width / this.mc.displayWidth * glScale);
 		int y = (int) ((this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1) * glScale);
@@ -258,6 +300,9 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 
 	@Override
 	public void drawScreen(int fmx, int fmy, float p) {
+		int mx = (fmx - this.guiLeft - offsetLeft) * 2;
+		int my = (fmy - this.guiTop - offsetTop) * 2;
+
 		this.drawDefaultBackground();
 
 		GlStateManager.color(1.0f, 1.0f, 1.0f);
@@ -293,8 +338,14 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 					int x = 0;
 					for (ClientTypesetter.WordContainer word : line.words) {
 						currentStyle = word.styles;
-						int hOff = (line.height - word.printer.getHeight(this, word.word)) / 3;
-						word.printer.draw(this, word.word, x, y - heightPos + hOff, false);
+						int wwidth = word.printer.getWidth(this, word.word);
+						int wheight = word.printer.getHeight(this, word.word);
+						int hOff = (line.height - wheight) / 3;
+						boolean isHovering = insideRect(mx, my, x, y - heightPos + hOff, wwidth, wheight);
+						word.printer.draw(this, word.word, x, y - heightPos + hOff, isHovering);
+						if (isHovering) {
+							word.printer.drawTooltip(this, word.word, mx, my);
+						}
 						x += word.printer.getWidth(this, word.word);
 						if (line.words.size() > 1) {
 							//x += (120 - line.length) / (line.words.size() - 1);
@@ -305,7 +356,7 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 				if (nextLine != null) {
 					y += nextLine.paddingAbove;
 				}
-				if (y >= heightPos + pageHeight) {
+				if (y + (nextLine != null ? nextLine.height : 0) >= heightPos + pageHeight) {
 					break;
 				}
 			}

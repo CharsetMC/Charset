@@ -1,0 +1,4 @@
+\scale{2}{\item{charset:graphite}} \title{Graphite}
+
+Tired of hunting down Squids? Fear not - you can now produce black dye from Charcoal!
+All you have to do is put a piece of Charcoal inside a Crafting Table of choice.

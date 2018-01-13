@@ -169,8 +169,6 @@ public class RouterIGW implements IRouterSearchable {
 
 	@Override
 	public void find(Collection<SearchResult> results, String query) {
-		System.out.println(getIndex());
-
 		for (Item i : Item.REGISTRY) {
 			if (modid.equals(i.getRegistryName().getResourceDomain())) {
 				Path p = getDocIfExists(i.getRegistryName());

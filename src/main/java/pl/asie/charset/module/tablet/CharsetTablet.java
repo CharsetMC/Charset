@@ -26,10 +26,12 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -60,15 +62,18 @@ public class CharsetTablet {
 	public static boolean allowRemoteLookups;
 
 	@Mod.EventHandler
+	public void onLoadConfig(CharsetLoadConfigEvent event) {
+		allowRemoteLookups = config.getBoolean("allowRemoteLookups", "general", true, "Should remote lookups be allowed?");;
+	}
+
+	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(proxy);
-
-		allowRemoteLookups = config.getBoolean("allowRemoteLookups", "general", true, "Should remote lookups be allowed?");
 	}
 
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
-	public void onPreInitClient(FMLPreInitializationEvent event) {
+	public void onInitClient(FMLInitializationEvent event) {
 		ICommand spaceCommand = ((typesetter, tokenizer) -> typesetter.write(new WordText(" ")));
 
 		TabletAPI.INSTANCE.registerRouter(new RouterIndex());

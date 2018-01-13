@@ -1,0 +1,11 @@
+\scale{2}{\item{charset:pockettable}} \title{Pocket Crafting}
+
+The Pocket Crafting Table is a compact, portable version of the Crafting Table. However,
+in order to achieve an effective volume of \i{nothing}, some compromises had to be made -
+notably, it uses the 3x3 rightmost slots of your inventory to perform the crafting!
+
+In exchange, however, it provides useful functionality:
+
+\- The clear button can be used to clear the Pocket Crafting Table's crafting area.
+\- The swirl button can be used to move items around in the clockwise direction.
+\- The balance button can be used to equalize the stack sizes between slots with matching items.

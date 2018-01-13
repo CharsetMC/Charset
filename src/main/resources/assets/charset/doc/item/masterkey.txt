@@ -1,0 +1,4 @@
+\scale{2}{\item{charset:masterkey}} \title{Master Key}
+
+A magical \url{mod://charset/item/key}{Key} which opens all \url{mod://charset/item/lock}{Lock}s.
+Intended for server administrators.
