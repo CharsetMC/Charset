@@ -16,6 +16,7 @@
 
 package pl.asie.charset.drama;
 
+import net.minecraft.nbt.NBTTagCompound;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -65,7 +66,10 @@ public class ModCharsetDrama {
 	public void init(FMLInitializationEvent event) {
 		if(!ModCharsetLib.moduleEnabled(ModCharsetLib.MODULE_DRAMA))
 			return;
-		
-		BrewingRecipeRegistry.addRecipe(new ItemStack(Items.POTIONITEM, 1, 16), "dyePink", new ItemStack(dramaInABottle));
+
+		ItemStack potion = new ItemStack(Items.POTIONITEM, 1);
+		potion.setTagCompound(new NBTTagCompound());
+		potion.getTagCompound().setString("Potion", "minecraft:awkward");
+		BrewingRecipeRegistry.addRecipe(potion, "dyePink", new ItemStack(dramaInABottle));
 	}
 }
