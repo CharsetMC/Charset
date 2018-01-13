@@ -17,21 +17,28 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tablet.format;
+package pl.asie.charset.module.tablet.format.words;
 
-import pl.asie.charset.module.tablet.format.api.TruthError;
+import pl.asie.charset.module.tablet.format.api.IStyle;
 
-public interface ITokenizer {
-    /**
-     * Reads a parameter
-     * @param info Information on the parameter, to be shown if an error occurs.
-     * @return The text of the parameter. Does not return null. May return the empty string.
-     * @throws TruthError if there was no parameter
-     */
-    String getParameter(String info) throws TruthError;
+import java.util.List;
 
-    /**
-     * @return null or the text of a following parameter.
-     */
-    String getOptionalParameter();
+public class StyleScale implements IStyle {
+	public final float scale;
+
+	public StyleScale(float scale) {
+		this.scale = scale;
+	}
+
+	public static float get(List<IStyle> styleList) {
+		float scale = 1.0f;
+
+		for (IStyle style : styleList) {
+			if (style instanceof StyleScale) {
+				scale *= ((StyleScale) style).scale;
+			}
+		}
+
+		return scale;
+	}
 }

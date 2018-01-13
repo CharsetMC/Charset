@@ -19,22 +19,40 @@
 
 package pl.asie.charset.module.tablet.format.api;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.concurrent.Future;
+import java.util.Collection;
+import java.util.List;
 
-public interface IRouter {
-	/**
-	 * Called in a separate thread, so you better be prepared for this.
-	 * This, however, means you can do things like download data from the
-	 * Internet.
-	 */
-	@Nullable
-	String get(URI path);
+public interface IRouterSearchable extends IRouter {
+	class SearchResult {
+		public final String text;
+		public final String providerName;
+		public final URI uri;
 
-	/**
-	 * This should NOT perform any external lookups! Called on the
-	 * Minecraft thread.
-	 */
-	boolean matches(URI path);
+		public SearchResult(String text, String providerName, URI uri) {
+			this.text = text;
+			this.providerName = providerName;
+			this.uri = uri;
+		}
+
+		@Override
+		public int hashCode() {
+			return 31 * text.hashCode() + uri.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof SearchResult)) {
+				return false;
+			} else {
+				SearchResult other = (SearchResult) o;
+				return other.text.equals(text) && other.uri.equals(uri);
+			}
+		}
+	}
+
+	void find(Collection<SearchResult> results, String query);
 }

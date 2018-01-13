@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2015, 2016, 2017 Adrian Siekierka
+ *
+ * This file is part of Charset.
+ *
+ * Charset is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Charset is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package pl.asie.charset.module.tablet;
 
@@ -17,10 +35,12 @@ import pl.asie.charset.module.tablet.format.api.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 	private static final boolean ENABLE_HIGHLIGHT = false;
@@ -32,6 +52,8 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 	private static final ResourceLocation TEXTURE = new ResourceLocation("charset", "textures/gui/tabletgui.png");
 	private static final int X_SIZE = 142;
 	private static final int Y_SIZE = 180;
+	private static final int offsetLeft = 12;
+	private static final int offsetTop = 10;
 	private int guiLeft, guiTop;
 	private float glScale = 1.0f;
 	private int buttonState = 1;
@@ -40,7 +62,7 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 	private int heightPos = 0;
 	private int pageWidth = 240;
 	private int pageHeight = 300;
-	private Queue<URI> uriQueue = new LinkedList<>();
+	private Deque<URI> uriQueue = new LinkedBlockingDeque<>();
 	private URI currentURI = null;
 	private Future<String> currentFuture;
 	private ClientTypesetter typesetter;
@@ -75,10 +97,12 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 		this.guiTop = (currentRes.getScaledHeight() - Y_SIZE) / 2;
 
 		// load text
-		try {
-			openURI(new URI("mod://charset/index"));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
+		if (currentFuture == null && currentURI == null) {
+			try {
+				openURI(new URI("mod://charset/index"));
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -147,6 +171,9 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 	}
 
 	private void checkTypesetterClicked(int mx, int my) {
+		mx = (mx - this.guiLeft - offsetLeft) * 2;
+		my = (my - this.guiTop - offsetTop) * 2;
+
 		int y = 0;
 		for (int i = 0; i < typesetter.lines.size(); i++) {
 			ClientTypesetter.Line line = typesetter.lines.get(i);
@@ -155,15 +182,16 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 			if (y >= heightPos) {
 				int x = 0;
 				for (ClientTypesetter.WordContainer word : line.words) {
-					int hOff = (line.height - word.printer.getHeight(this, word.word)) / 3;
 					currentStyle = word.styles;
-					if (insideRect(mx - this.guiLeft, my - this.guiTop, x, y - heightPos + hOff,
+					int hOff = (line.height - word.printer.getHeight(this, word.word)) / 3;
+					if (insideRect(mx, my, x, y - heightPos + hOff,
 							word.printer.getWidth(this, word.word),
 							word.printer.getHeight(this, word.word))) {
 						if (word.printer.onClick(this, word.word)) {
 							return;
 						}
 					}
+					x += word.printer.getWidth(this, word.word);
 				}
 			}
 
@@ -214,9 +242,17 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 			}
 		}
 
-		if (oldButtonState != buttonState && buttonState == 2 && !uriQueue.isEmpty()) {
-			openURI(uriQueue.remove());
-			uriQueue.remove(); // remove the just removed URI
+		if (oldButtonState != buttonState && buttonState == 2) {
+			if (!uriQueue.isEmpty()) {
+				openURI(uriQueue.removeFirst());
+				uriQueue.removeFirst(); // remove the just removed URI
+			} else {
+				try {
+					openURI(new URI("mod://charset/index"));
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -228,15 +264,24 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 		GlStateManager.pushMatrix();
 		GlStateManager.scale(1.0f / glScale, 1.0f / glScale, 1.0f / glScale);
 
+		// bg
 		bindTexture(TEXTURE);
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, X_SIZE, Y_SIZE);
 		drawTexturedModalRect(guiLeft + 65, guiTop + 167, 142, 147 + (buttonState * 10), 18, 8);
 
+		// led
+		int ledColor = 0xFF000000;
+		if (currentFuture != null && (System.currentTimeMillis() % 250) >= 125) {
+			ledColor = 0xFF00FF00;
+		}
+		drawRect(guiLeft + 127, guiTop + 4, guiLeft + 127 + 4, guiTop + 4 + 1, ledColor);
+
+		// text
 		GlStateManager.enableBlend();
 		// GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 
 		GlStateManager.scale(0.5f, 0.5f, 0.5f);
-		GlStateManager.translate((guiLeft + 10 + 2) * 2, (guiTop + 8 + 2) * 2, 0);
+		GlStateManager.translate((guiLeft + offsetLeft) * 2, (guiTop + offsetTop) * 2, 0);
 
 		if (typesetter != null) {
 			int y = 0;
@@ -264,8 +309,6 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 					break;
 				}
 			}
-		} else if (currentFuture != null) {
-			fontRenderer.drawString("Loading...", 0, 0, 0xFF000000);
 		}
 
 		// GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
@@ -281,11 +324,20 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 
 	@Override
 	public boolean openURI(URI uri) {
+		if (uri == null) {
+			return false;
+		}
+
+		uri = currentURI == null ? uri : currentURI.resolve(uri);
+		if (!TabletAPI.INSTANCE.matchesRoute(uri)) {
+			return false;
+		}
+
 		closePreviousFuture();
 		if (currentURI != null) {
-			uriQueue.offer(currentURI);
+			uriQueue.addFirst(currentURI);
 		}
-		currentURI = currentURI == null ? uri : currentURI.resolve(uri);
+		currentURI = uri;
 		currentFuture = TabletAPI.INSTANCE.getRoute(currentURI);
 		return true;
 	}

@@ -1,3 +1,4 @@
-Welcome to The Charset Project!
+\title{The Charset Project}
 
-\- \url{item://charset/barrel}{Barrel}
+\- \item{charset:barrel} \url{item://charset/barrel}{Barrel}
+\- \url{wiki://gamepedia/Barrel%20(Charset)}{Barrel (FTB)}

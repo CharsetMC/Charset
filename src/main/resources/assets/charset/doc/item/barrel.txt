@@ -1,4 +1,4 @@
-\item{charset:barrel}{2}{1}{32767} \title{The Barrel}
+\scale{2}{\item{charset:barrel}{1}{32767}} \title{The Barrel}
 
 Barrels can store up to 64 stacks of a single item.
 So, a single barrel can store 4096 sticks,
@@ -33,7 +33,7 @@ The sticky upgrade ensures that the first item put into the barrel gets stuck to
 
 Those of you in creative mode may find special \i{infinite} barrels. They will never run out of their item!
 
-In addition, you can craft any barrel with a minecart to create a Barrel Cart! \item{charset:barrelcart}{1}{1}{32767}
+In addition, you can craft any barrel with a minecart to create a Barrel Cart! \item{charset:barrelcart}{1}{32767}
 
 % \topic{item.factorization:daybarrel}
 % Doesn't show the variations recipes, so we do this the ugly way.

@@ -19,47 +19,28 @@
 
 package pl.asie.charset.module.tablet.format.commands;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.module.tablet.format.ITokenizer;
 import pl.asie.charset.module.tablet.format.api.ICommand;
 import pl.asie.charset.module.tablet.format.api.ITypesetter;
 import pl.asie.charset.module.tablet.format.api.TruthError;
-import pl.asie.charset.module.tablet.format.words.WordItem;
+import pl.asie.charset.module.tablet.format.words.StyleColor;
+import pl.asie.charset.module.tablet.format.words.StyleFormat;
+import pl.asie.charset.module.tablet.format.words.WordText;
+import pl.asie.charset.module.tablet.format.words.WordURL;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URI;
 
-public class CommandItem implements ICommand {
+public class CommandURLMissing implements ICommand {
 	@Override
 	public void call(ITypesetter typesetter, ITokenizer tokenizer) throws TruthError {
-		String itemName = tokenizer.getParameter("No item specified");
-		List<ItemStack> items = new ArrayList<>();
-		Item i = Item.getByNameOrId(itemName);
-
-		int stackSize = 1;
-		int dmg = 0;
-
-		String stackSizeS = tokenizer.getOptionalParameter();
-
-		if (stackSizeS != null) {
-			stackSize = Integer.parseInt(stackSizeS);
-			String dmgS = tokenizer.getOptionalParameter();
-			if (dmgS != null) {
-				dmg = Integer.parseInt(dmgS);
-			}
+		String content = tokenizer.getParameter("\\urlmissing missing parameter: content");
+		try {
+			typesetter.pushStyle(new StyleColor(0xFFCC3333), StyleFormat.ITALIC, StyleFormat.UNDERLINE);
+			typesetter.write(new WordText(content));
+			typesetter.popStyle(3);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TruthError(e.getMessage());
 		}
-
-		if (i == null) {
-			items.addAll(OreDictionary.getOres(itemName));
-		} else {
-			ItemStack stack = new ItemStack(i, stackSize, dmg);
-			items.add(stack);
-		}
-
-		typesetter.write(new WordItem(items));
 	}
 }

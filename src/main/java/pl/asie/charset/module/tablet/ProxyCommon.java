@@ -17,21 +17,14 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tablet.format;
+package pl.asie.charset.module.tablet;
 
-import pl.asie.charset.module.tablet.format.api.TruthError;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumHand;
+import net.minecraft.world.World;
 
-public interface ITokenizer {
-    /**
-     * Reads a parameter
-     * @param info Information on the parameter, to be shown if an error occurs.
-     * @return The text of the parameter. Does not return null. May return the empty string.
-     * @throws TruthError if there was no parameter
-     */
-    String getParameter(String info) throws TruthError;
+public class ProxyCommon {
+	public void onTabletRightClick(World world, EntityPlayer player, EnumHand hand) {
 
-    /**
-     * @return null or the text of a following parameter.
-     */
-    String getOptionalParameter();
+	}
 }
