@@ -1,24 +1,18 @@
 package pl.asie.charset.module.tablet.modcompat.igw;
 
-import amerifrance.guideapi.api.impl.abstraction.CategoryAbstract;
 import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.MoreFiles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import pl.asie.charset.ModCharset;
-import pl.asie.charset.module.tablet.TabletUtil;
 import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;

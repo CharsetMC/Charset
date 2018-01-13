@@ -1,0 +1,14 @@
+\title{Block Carrying}
+
+Have you ever wished you didn't have to demolish half of your base just to move your machines three blocks to the right?
+Well, here's the solution - \i{Block Carrying}! Simply sneak-middle-click a nearby block to try it!
+
+Beware though, as some challenges do apply:
+
+\- You cannot sprint while carrying blocks - they're quite heavy! A Strength potion or two might help, though.
+\- If you fall from a great height, it's pretty likely you'll drop your block somewhere nearby.
+\- Mob Spawners are enchanted with a hidden power which won't easily bend to your will. Be careful!
+
+There's also some neat tricks you can do, however:
+
+\- Try sneak-middle-clicking a minecart with a chest - or a chest \i{into} a minecart!

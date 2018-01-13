@@ -95,40 +95,17 @@ public class LaserRenderer {
 		int maxDist = Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 16 + 1;
 
 		Collection<LaserBeam> beamsRender = beams;
-		if (Minecraft.getMinecraft().gameSettings.fancyGraphics) {
-			List<LaserBeam> beamList = new ArrayList<>();
-			for (LaserBeam beam : beams) {
-				beam.vcstart = beam.calculateStartpoint();
-				beam.vcend = beam.calculateEndpoint();
-				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, cameraPos);
-
-				if (beam.vcdist > maxDist) {
-					continue;
-				}
-
-				if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(beam.vcstart.subtract(THICKNESS / 16.0, THICKNESS / 16.0, THICKNESS / 16.0), beam.vcend.addVector(THICKNESS / 16.0, THICKNESS / 16.0, THICKNESS / 16.0)))) {
-					continue;
-				}
-
-				beamList.add(beam);
-			}
-
-			beamList.sort((first, second) -> Float.compare(second.vcdist, first.vcdist));
-			beamsRender = beamList;
-		}
 
 		worldrenderer.setTranslation(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 		worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
 		for (LaserBeam beam : beamsRender) {
-			if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
-				beam.vcstart = beam.calculateStartpoint();
-				beam.vcend = beam.calculateEndpoint();
-				beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, cameraPos);
+			beam.vcstart = beam.calculateStartpoint();
+			beam.vcend = beam.calculateEndpoint();
+			beam.vcdist = MathUtils.linePointDistance(beam.vcstart, beam.vcend, cameraPos);
 
-				if (beam.vcdist > maxDist) {
-					continue;
-				}
+			if (beam.vcdist > maxDist) {
+				continue;
 			}
 
 			Vec3d startVec = beam.vcstart;
@@ -153,10 +130,8 @@ public class LaserRenderer {
 				endVec = endVec.addVector(0, 0, t / 16.0);
 			}
 
-			if (!Minecraft.getMinecraft().gameSettings.fancyGraphics) {
-				if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(startVec, endVec))) {
-					continue;
-				}
+			if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(startVec, endVec))) {
+				continue;
 			}
 
 			renderedLasers++;
@@ -184,6 +159,9 @@ public class LaserRenderer {
 			}
 		}
 
+		if (Minecraft.getMinecraft().gameSettings.fancyGraphics) {
+			tessellator.getBuffer().sortVertexData((float) cameraPos.x, (float) cameraPos.y, (float) cameraPos.z);
+		}
 		tessellator.draw();
 
 		worldrenderer.setTranslation(0,0,0);
