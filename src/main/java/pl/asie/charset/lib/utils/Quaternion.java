@@ -36,6 +36,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Quaternion {
+    public static final Quaternion ORIGIN = new Quaternion();
     public final double w, x, y, z;
 
     //Data functions
@@ -234,7 +235,7 @@ public class Quaternion {
             return quat_cache[ord];
         }
         if (orient == null) {
-            return quat_cache[ord] = new Quaternion();
+            return quat_cache[ord] = ORIGIN;
         }
         final Quaternion q1;
         final double quart = Math.toRadians(90);
@@ -271,7 +272,7 @@ public class Quaternion {
             rotation += Math.abs(orient.top.getDirectionVec().getY())*2;
             break;
         }
-        default: return quat_cache[ord] = new Quaternion(); //Won't happen
+        default: return quat_cache[ord] = ORIGIN; //Won't happen
         }
         final Quaternion q2 = Quaternion.getRotationQuaternionRadians(rotation*quart, orient.facing);
         return quat_cache[ord] = q2.multiply(q1);
@@ -478,7 +479,7 @@ public class Quaternion {
     }
 
     public Quaternion cleanAbnormalNumbers() {
-        if (hasNaN() || hasInf()) return new Quaternion();
+        if (hasNaN() || hasInf()) return ORIGIN;
         return this;
     }
 

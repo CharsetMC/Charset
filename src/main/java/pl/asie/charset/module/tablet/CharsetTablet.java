@@ -40,10 +40,7 @@ import pl.asie.charset.module.tablet.format.api.TabletAPI;
 import pl.asie.charset.module.tablet.format.api.TabletAPIClient;
 import pl.asie.charset.module.tablet.format.api.TextPrinterFormat;
 import pl.asie.charset.module.tablet.format.commands.*;
-import pl.asie.charset.module.tablet.format.routers.RouterIndex;
-import pl.asie.charset.module.tablet.format.routers.RouterMediaWiki;
-import pl.asie.charset.module.tablet.format.routers.RouterModDocumentation;
-import pl.asie.charset.module.tablet.format.routers.RouterSearch;
+import pl.asie.charset.module.tablet.format.routers.*;
 import pl.asie.charset.module.tablet.format.words.*;
 import pl.asie.charset.module.tablet.format.words.text.StylePrinterTextFormat;
 import pl.asie.charset.module.tablet.format.words.minecraft.*;
@@ -81,13 +78,6 @@ public class CharsetTablet {
 		TabletAPI.INSTANCE.registerRouter(new RouterIndex());
 		TabletAPI.INSTANCE.registerRouter(new RouterSearch());
 		TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("charset", "Book of Charset"));
-
-		if (allowRemoteLookups) {
-			TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("gamepedia", "Gamepedia", "ftb.gamepedia.com", "minecraft.gamepedia.com"));
-			if (Loader.isModLoaded("mekanism")) {
-				TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("mekanism", "Mekanism Wiki", "wiki.aidancbrady.com/w"));
-			}
-		}
 
 		TabletAPI.INSTANCE.registerCommand("\\", spaceCommand);
 		TabletAPI.INSTANCE.registerCommand("\\ ", spaceCommand);
@@ -154,6 +144,30 @@ public class CharsetTablet {
 		TabletAPI.INSTANCE.registerPrinterText(TextPrinterFormat.HTML, WordText.class, (c, w) -> ((WordText) w).getText());
 
 		TabletAPI.INSTANCE.addBook("Book of Charset", "mod://charset/index");
+
+		if (allowRemoteLookups) {
+			TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("gamepedia", "Gamepedia", "ftb.gamepedia.com", "minecraft.gamepedia.com"));
+			if (Loader.isModLoaded("mekanism")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("mekanism", "Mekanism Wiki", "wiki.aidancbrady.com/w"));
+			}
+			if (Loader.isModLoaded("techreborn")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("techreborn", "TechReborn Wiki", "wiki.techreborn.ovh/doku.php"));
+				TabletAPI.INSTANCE.addBook("TechReborn Wiki", "wiki://techreborn/");
+			}
+			if (Loader.isModLoaded("forestry")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("forestry", "Forestry Wiki", "forestryforminecraft.info/doku.php"));
+				TabletAPI.INSTANCE.addBook("Forestry Wiki", "wiki://forestry/");
+			}
+			if (Loader.isModLoaded("railcraft")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("railcraft", "Railcraft Wiki", "railcraft.info/wiki/doku.php"));
+				TabletAPI.INSTANCE.addBook("Railcraft Wiki", "wiki://railcraft/");
+			}
+
+			// WIP: it's a tad ugly
+			/* if (Loader.isModLoaded("opencomputers")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("opencomputers", "OpenComputers Wiki", "ocdoc.cil.li/doku.php"));
+			} */
+		}
 	}
 
 	@Mod.EventHandler

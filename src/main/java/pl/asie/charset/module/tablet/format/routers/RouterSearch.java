@@ -46,11 +46,18 @@ public class RouterSearch implements IRouter {
 			List<IRouterSearchable.SearchResult> resultList = cache.getIfPresent(query.toLowerCase());
 			if (resultList == null) {
 				resultList = new ArrayList<>();
-				for (IRouter router : TabletAPI.INSTANCE.getRouters()) {
+				final List<IRouterSearchable.SearchResult> resultListF = resultList;
+				TabletAPI.INSTANCE.getRouters().parallelStream().forEach((router) -> {
 					if (router instanceof IRouterSearchable) {
-						((IRouterSearchable) router).find(resultList, query.toLowerCase(Locale.ROOT));
+						List<IRouterSearchable.SearchResult> resultListInner = new ArrayList<>();
+						((IRouterSearchable) router).find(resultListInner, query.toLowerCase(Locale.ROOT));
+						if (!resultListInner.isEmpty()) {
+							synchronized (resultListF) {
+								resultListF.addAll(resultListInner);
+							}
+						}
 					}
-				}
+				});
 				cache.put(query.toLowerCase(Locale.ROOT), resultList);
 			}
 

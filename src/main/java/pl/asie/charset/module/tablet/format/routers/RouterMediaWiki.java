@@ -27,16 +27,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.module.tablet.TabletUtil;
-import pl.asie.charset.module.tablet.format.api.IRouter;
 import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
-import pl.asie.charset.module.tablet.format.mediawiki.MediaWikiData;
+import pl.asie.charset.module.tablet.format.wiki.WikiParser;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.util.Collection;
 
 public class RouterMediaWiki implements IRouterSearchable {
@@ -76,8 +73,9 @@ public class RouterMediaWiki implements IRouterSearchable {
 
 				HttpResponse response = client.execute(request);
 				if (response.getStatusLine().getStatusCode() == 200) {
-					MediaWikiData mediaWikiData = new MediaWikiData(
-							new String(ByteStreams.toByteArray(response.getEntity().getContent()), Charsets.UTF_8)
+					WikiParser mediaWikiData = new WikiParser(
+							new String(ByteStreams.toByteArray(response.getEntity().getContent()), Charsets.UTF_8),
+							WikiParser.Type.MEDIAWIKI
 					);
 					if (mediaWikiData.shouldRetain()) {
 						if (mediaWikiData.isError()) {
