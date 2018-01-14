@@ -27,6 +27,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -35,6 +36,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.capability.Capabilities;
@@ -44,6 +46,8 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.module.storage.locks.wrapper.ReadOnlyFluidHandler;
+import pl.asie.charset.module.storage.locks.wrapper.ReadOnlyItemHandler;
 import pl.asie.charset.patchwork.LocksCapabilityHook;
 import pl.asie.charset.patchwork.PatchworkHelper;
 
@@ -85,9 +89,21 @@ public class CharsetStorageLocks {
 		if (PatchworkHelper.getBoolean("LOCKS_BLOCK_CAPABILITIES")) {
 			LocksCapabilityHook.handler = new LocksCapabilityHandler();
 
-			LocksCapabilityHandler.addCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, true);
-			LocksCapabilityHandler.addCapability(Capabilities.ITEM_INSERTION_HANDLER, true);
-			LocksCapabilityHandler.addCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, true);
+			LocksCapabilityHandler.addCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, (o) -> {
+				if (o != null) {
+					return new ReadOnlyItemHandler((IItemHandler) o);
+				} else {
+					return null;
+				}
+			}, true);
+			LocksCapabilityHandler.addCapability(Capabilities.ITEM_INSERTION_HANDLER, null, true);
+			LocksCapabilityHandler.addCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (o) -> {
+				if (o != null) {
+					return new ReadOnlyFluidHandler((IFluidHandler) o);
+				} else {
+					return null;
+				}
+			}, true);
 
 			CharsetStorageLocks.config.getCategory("blockedCapabilities").setComment("NOTE: This functionality requires a special configuration option in CharsetPatches to be turned on! Otherwise, it will not be effective!");
 

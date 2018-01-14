@@ -19,20 +19,45 @@
 
 package pl.asie.charset.patchwork;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import pl.asie.charset.lib.utils.ThreeState;
+
+import java.util.function.Function;
 
 public class LocksCapabilityHook {
-	public interface Handler {
-		boolean blocksCapability(TileEntity tile, Capability capability, EnumFacing facing);
+	public static final Result NO = new Result(false);
+
+	public static final class Result {
+		private final Function<Object, Object> transformer;
+		private final boolean result;
+
+		public Result(boolean b) {
+			this.transformer = null;
+			this.result = b;
+		}
+
+		public Result(boolean b, Function<Object, Object> transformer) {
+			this.transformer = transformer;
+			this.result = b;
+		}
+
+		public boolean captures() {
+			return result;
+		}
+
+		public boolean canApply() {
+			return transformer != null;
+		}
+
+		public Object apply(Object o) {
+			return transformer.apply(o);
+		}
 	}
 
-	public static Handler handler = (tile, capability, facing) -> false;
+	public interface Handler {
+		Result wrapCapability(TileEntity tile, Capability capability, EnumFacing facing);
+	}
+
+	public static Handler handler = (tile, capability, facing) -> NO;
 }
