@@ -45,9 +45,6 @@ public class LocksCapabilityHandler implements Handler {
 		if (capability == Capabilities.LOCKABLE) {
 			// Early return to prevent recursion
 			return false;
-		} else if (facing == null) {
-			// We don't block internal capabilities
-			return false;
 		} else {
 			if (tile.hasCapability(Capabilities.LOCKABLE, facing)) {
 				Lockable lockable = tile.getCapability(Capabilities.LOCKABLE, facing);

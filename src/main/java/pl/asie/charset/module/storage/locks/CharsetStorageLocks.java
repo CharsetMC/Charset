@@ -45,6 +45,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.patchwork.LocksCapabilityHook;
+import pl.asie.charset.patchwork.PatchworkHelper;
 
 @CharsetModule(
 		name = "storage.locks",
@@ -80,8 +81,8 @@ public class CharsetStorageLocks {
 		lockItem = new ItemLock();
 
 		ModCharset.dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new FixCharsetLockKeyTagChange());
-
-		if (ModCharset.profile == ModuleProfile.INDEV) {
+		
+		if (PatchworkHelper.getBoolean("LOCKS_BLOCK_CAPABILITIES")) {
 			LocksCapabilityHook.handler = new LocksCapabilityHandler();
 
 			LocksCapabilityHandler.addCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, true);
