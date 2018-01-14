@@ -53,7 +53,7 @@ public class ClientTypesetter extends AbstractTypesetter implements IPrintingCon
         }
 
         public boolean add(Word word, boolean force) {
-            WordPrinterMinecraft<Word> printer = TabletAPI.INSTANCE.getPrinterMinecraft(word);
+            WordPrinterMinecraft<Word> printer = TabletAPIClient.INSTANCE.getPrinterMinecraft(word);
             if (printer == null) {
                 return false;
             }

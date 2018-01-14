@@ -97,7 +97,6 @@ public class LockEventHandler {
         return stacks;
     }
 
-
     public static boolean unlockOrRaiseError(EntityPlayer player, TileEntity tile, Lockable lock) {
         if (player.getEntityWorld().isRemote) {
             return true;
@@ -208,7 +207,7 @@ public class LockEventHandler {
         }
 
         return FontRendererFancy.getColorFormat(color)
-            + I18n.format(ColorUtils.getLangEntry("charset.color.", closestColor))
+            + (closestColor != null ? I18n.format(ColorUtils.getLangEntry("charset.color.", closestColor)) : "???")
             + FontRendererFancy.getColorResetFormat();
     }
 }

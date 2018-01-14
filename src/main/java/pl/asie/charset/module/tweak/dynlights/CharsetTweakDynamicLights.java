@@ -33,6 +33,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -90,7 +93,7 @@ public class CharsetTweakDynamicLights {
 		enableItemLights = ConfigUtils.getBoolean(config, "sources", "items", true, "Light sources based on items.", false);
 		enableEntityLights = ConfigUtils.getBoolean(config, "holders", "entities", true, "Light sources held by non-player entities.", false);
 		enablePlayerLights = ConfigUtils.getBoolean(config, "holders", "players", true, "Light sources held by players.", false);
-		blockBrightnessDivider = 1f / ConfigUtils.getFloat(config, "general", "blockBrightnessMultiplier", 0.4f, 0, 1, "The multiplier for block-derived light brightness.", false);
+		blockBrightnessDivider = 1f / ConfigUtils.getFloat(config, "general", "blockBrightnessMultiplier", 0.5f, 0, 1, "The multiplier for block-derived light brightness.", false);
 	}
 
 	@Mod.EventHandler
@@ -99,20 +102,38 @@ public class CharsetTweakDynamicLights {
 
 	private Light getLight(double x, double y, double z, ItemStack s) {
 		LightKey key = new LightKey(s.getItem(), s.getMetadata());
-		float[] data = lightData.computeIfAbsent(key, (lightKey -> {
-			try {
-				if (key.item instanceof ItemBlock) {
-					IBlockState b = ItemUtils.getBlockState(s);
-					if (b.getLightValue() > 0) {
-						return new float[] {1, 1, 1, b.getLightValue() / (16.0f * blockBrightnessDivider), b.getLightValue() / blockBrightnessDivider};
+		float[] data = null;
+
+		if (s.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+			IFluidHandlerItem fluidHandlerItem = s.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
+			IFluidTankProperties[] properties = fluidHandlerItem.getTankProperties();
+			int light = 0;
+			if (properties != null) {
+				for (IFluidTankProperties p : properties) {
+					if (p.getContents() != null) {
+						light = Math.max(light, p.getContents().getFluid().getLuminosity());
 					}
 				}
-
-				return null;
-			} catch (Exception e) {
-				return null;
 			}
-		}));
+			data = new float[] {1, 1, 1, light / (16.0f * blockBrightnessDivider), light / blockBrightnessDivider};
+		}
+
+		if (data == null) {
+			data = lightData.computeIfAbsent(key, (lightKey -> {
+				try {
+					if (key.item instanceof ItemBlock) {
+						IBlockState b = ItemUtils.getBlockState(s);
+						if (b.getLightValue() > 0) {
+							return new float[]{1, 1, 1, b.getLightValue() / (16.0f * blockBrightnessDivider), b.getLightValue() / blockBrightnessDivider};
+						}
+					}
+
+					return null;
+				} catch (Exception e) {
+					return null;
+				}
+			}));
+		}
 
 		if (data != null) {
 			return Light.builder().pos(x, y, z).color(data[0], data[1], data[2], data[3]).radius(data[4]).build();

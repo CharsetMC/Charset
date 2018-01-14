@@ -37,12 +37,15 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.tablet.format.api.ICommand;
 import pl.asie.charset.module.tablet.format.api.TabletAPI;
+import pl.asie.charset.module.tablet.format.api.TabletAPIClient;
+import pl.asie.charset.module.tablet.format.api.TextPrinterFormat;
 import pl.asie.charset.module.tablet.format.commands.*;
 import pl.asie.charset.module.tablet.format.routers.RouterIndex;
 import pl.asie.charset.module.tablet.format.routers.RouterMediaWiki;
 import pl.asie.charset.module.tablet.format.routers.RouterModDocumentation;
 import pl.asie.charset.module.tablet.format.routers.RouterSearch;
 import pl.asie.charset.module.tablet.format.words.*;
+import pl.asie.charset.module.tablet.format.words.text.StylePrinterTextFormat;
 import pl.asie.charset.module.tablet.format.words.minecraft.*;
 
 @CharsetModule(
@@ -72,8 +75,7 @@ public class CharsetTablet {
 	}
 
 	@Mod.EventHandler
-	@SideOnly(Side.CLIENT)
-	public void onInitClient(FMLInitializationEvent event) {
+	public void onInit(FMLInitializationEvent event) {
 		ICommand spaceCommand = ((typesetter, tokenizer) -> typesetter.write(new WordText(" ")));
 
 		TabletAPI.INSTANCE.registerRouter(new RouterIndex());
@@ -145,14 +147,24 @@ public class CharsetTablet {
 		TabletAPI.INSTANCE.registerCommand("\\url", new CommandURL());
 		TabletAPI.INSTANCE.registerCommand("\\urlmissing", new CommandURLMissing());
 
-		TabletAPI.INSTANCE.registerPrinterMinecraft(WordBullet.class, new WordPrinterMCBullet());
-		TabletAPI.INSTANCE.registerPrinterMinecraft(WordImage.class, new WordPrinterMCImage());
-		TabletAPI.INSTANCE.registerPrinterMinecraft(WordItem.class, new WordPrinterMCItem());
-		TabletAPI.INSTANCE.registerPrinterMinecraft(WordNewline.class, new WordPrinterMCNewline());
-		TabletAPI.INSTANCE.registerPrinterMinecraft(WordText.class, new WordPrinterMCText());
-		TabletAPI.INSTANCE.registerPrinterMinecraft(WordURL.class, new WordPrinterMCURL());
+		for (TextPrinterFormat format : TextPrinterFormat.values()) {
+			TabletAPI.INSTANCE.registerPrinterStyle(format, StyleFormat.class, new StylePrinterTextFormat(format));
+		}
+
+		TabletAPI.INSTANCE.registerPrinterText(TextPrinterFormat.HTML, WordText.class, (c, w) -> ((WordText) w).getText());
 
 		TabletAPI.INSTANCE.addBook("Book of Charset", "mod://charset/index");
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void onInitClient(FMLInitializationEvent event) {
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordBullet.class, new WordPrinterMCBullet());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordImage.class, new WordPrinterMCImage());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordItem.class, new WordPrinterMCItem());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordNewline.class, new WordPrinterMCNewline());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordText.class, new WordPrinterMCText());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordURL.class, new WordPrinterMCURL());
 	}
 
 	@SubscribeEvent

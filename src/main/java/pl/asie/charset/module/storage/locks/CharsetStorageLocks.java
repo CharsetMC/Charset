@@ -38,14 +38,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.storage.IBarrel;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.inventory.DefaultItemInsertionHandler;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.module.storage.locks.wrapper.ReadOnlyBarrel;
 import pl.asie.charset.module.storage.locks.wrapper.ReadOnlyFluidHandler;
 import pl.asie.charset.module.storage.locks.wrapper.ReadOnlyItemHandler;
 import pl.asie.charset.patchwork.LocksCapabilityHook;
@@ -96,10 +99,17 @@ public class CharsetStorageLocks {
 					return null;
 				}
 			}, true);
-			LocksCapabilityHandler.addCapability(Capabilities.ITEM_INSERTION_HANDLER, null, true);
+			LocksCapabilityHandler.addCapability(Capabilities.ITEM_INSERTION_HANDLER, (o) -> new DefaultItemInsertionHandler(), true);
 			LocksCapabilityHandler.addCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (o) -> {
 				if (o != null) {
 					return new ReadOnlyFluidHandler((IFluidHandler) o);
+				} else {
+					return null;
+				}
+			}, true);
+			LocksCapabilityHandler.addCapability(Capabilities.BARREL, (o) -> {
+				if (o != null) {
+					return new ReadOnlyBarrel((IBarrel) o);
 				} else {
 					return null;
 				}

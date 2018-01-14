@@ -19,7 +19,7 @@
 
 package pl.asie.charset.module.tablet.format.api;
 
-@FunctionalInterface
-public interface WordPrinterText<T extends Word> {
-	String output(IPrintingContext context, T word);
+public interface StylePrinterText<T extends IStyle> {
+	String push(IPrintingContext context, T style);
+	String pop(IPrintingContext context, T style);
 }

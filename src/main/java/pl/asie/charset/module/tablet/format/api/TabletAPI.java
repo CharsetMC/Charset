@@ -37,8 +37,8 @@ public class TabletAPI {
 	}
 
 	private final Map<String, ICommand> commandMap = new HashMap<>();
-	private final Map<Class<? extends Word>, WordPrinterMinecraft> printerMinecraftMap = new IdentityHashMap<>();
 	private final Table<TextPrinterFormat, Class<? extends Word>, WordPrinterText> textOutputPrinterTable = HashBasedTable.create();
+	private final Table<TextPrinterFormat, Class<? extends IStyle>, StylePrinterText> styleOutputPrinterTable = HashBasedTable.create();
 	private final List<Pair<String, String>> books = new ArrayList<>();
 	private final List<IRouter> routes = new ArrayList<>();
 	private final ExecutorService service;
@@ -89,8 +89,17 @@ public class TabletAPI {
 		});
 	}
 
-	public void registerPrinterMinecraft(Class<? extends Word> c, WordPrinterMinecraft<? extends Word> printer) {
-		printerMinecraftMap.put(c, printer);
+	public void registerPrinterStyle(TextPrinterFormat format, Class<? extends IStyle> c, StylePrinterText<? extends IStyle> printerText) {
+		styleOutputPrinterTable.put(format, c, printerText);
+	}
+
+	@SuppressWarnings("unchecked")
+	public StylePrinterText getPrinterStyle(TextPrinterFormat format, IStyle w) {
+		Class c = w.getClass();
+		while (c != IStyle.class && c != Object.class && c != null && !styleOutputPrinterTable.contains(format, c)) {
+			c = c.getSuperclass();
+		}
+		return styleOutputPrinterTable.get(format, c);
 	}
 
 	public void registerPrinterText(TextPrinterFormat format, Class<? extends Word> c, WordPrinterText<? extends Word> printerText) {
@@ -100,19 +109,10 @@ public class TabletAPI {
 	@SuppressWarnings("unchecked")
 	public WordPrinterText getPrinterText(TextPrinterFormat format, Word w) {
 		Class c = w.getClass();
-		while (c != Word.class && !textOutputPrinterTable.contains(format, c)) {
+		while (c != Word.class && c != Object.class && c != null && !textOutputPrinterTable.contains(format, c)) {
 			c = c.getSuperclass();
 		}
 		return textOutputPrinterTable.get(format, c);
-	}
-
-	@SuppressWarnings("unchecked")
-	public WordPrinterMinecraft getPrinterMinecraft(Word w) {
-		Class c = w.getClass();
-		while (c != Word.class && !printerMinecraftMap.containsKey(c)) {
-			c = c.getSuperclass();
-		}
-		return printerMinecraftMap.get(c);
 	}
 
 	public ICommand getCommand(String name) {
