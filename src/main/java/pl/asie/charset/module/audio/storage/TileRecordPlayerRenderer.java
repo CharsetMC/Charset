@@ -55,13 +55,18 @@ public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileReco
 		}
 
 		IBlockState state = getWorld().getBlockState(tile.getPos());
+		EnumFacing facing = EnumFacing.NORTH;
+		if (state.getBlock() instanceof BlockRecordPlayer) {
+			facing = state.getValue(Properties.FACING4);
+		}
+
 		ItemStack stack = tile.getStack();
 
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);
 
 		GlStateManager.translate(0.5f, 0.5f, 0.5f);
-		GlStateManager.rotate(180.0f - state.getValue(Properties.FACING4).getHorizontalAngle(), 0, 1, 0);
+		GlStateManager.rotate(180.0f - facing.getHorizontalAngle(), 0, 1, 0);
 		GlStateManager.translate(-0.5f, -0.5f, -0.5f);
 
 		GlStateManager.enableAlpha();
@@ -105,9 +110,9 @@ public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileReco
 				BufferBuilder worldrenderer = tessellator.getBuffer();
 				worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 
-				for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+				for (EnumFacing facing2 : EnumFacing.HORIZONTALS) {
 					for (int i = 0; i < 4; i++) {
-						EnumFaceDirection.VertexInformation vi = EnumFaceDirection.getFacing(facing).getVertexInformation(i);
+						EnumFaceDirection.VertexInformation vi = EnumFaceDirection.getFacing(facing2).getVertexInformation(i);
 						worldrenderer.pos(data[vi.xIndex], data[vi.yIndex], data[vi.zIndex]).tex(0, 0).lightmap(240, 240).color(r, g, b, a).endVertex();
 					}
 				}

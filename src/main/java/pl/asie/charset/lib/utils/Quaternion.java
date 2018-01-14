@@ -446,10 +446,7 @@ public class Quaternion {
         if (this.isZero()) {
             return p;
         }
-        Quaternion point = new Quaternion(p);
-        point = point.multiply(this);
-        point = point.multiply(this.conjugate());
-        return point.toVector();
+        return this.multiply(new Quaternion(p)).multiply(this.conjugate()).toVector();
     }
 
     public Vec3d applyReverseRotation(Vec3d p) {

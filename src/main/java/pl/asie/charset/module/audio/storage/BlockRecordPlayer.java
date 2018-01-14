@@ -80,13 +80,11 @@ public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider 
 
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (world == null || world.isRemote) {
-			return true;
-		}
-
-		TileEntity tile = world.getTileEntity(pos);
-		if (tile instanceof TileRecordPlayer) {
-			return ((TileRecordPlayer) tile).activate(player, side, hand, new Vec3d(hitX, hitY, hitZ));
+		if (world != null) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile instanceof TileRecordPlayer) {
+				return ((TileRecordPlayer) tile).activate(player, side, hand, new Vec3d(hitX, hitY, hitZ));
+			}
 		}
 
 		return false;

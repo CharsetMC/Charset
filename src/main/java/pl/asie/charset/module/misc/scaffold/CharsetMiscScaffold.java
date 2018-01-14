@@ -119,6 +119,8 @@ public class CharsetMiscScaffold {
 		BlockPos pos = event.getPos();
 
 		ItemStack stack = playerIn.getHeldItem(hand);
+		ItemStack oldStack = stack.copy();
+
 		if (!stack.isEmpty() && stack.getItem() instanceof ItemScaffold) {
 			if (worldIn.getBlockState(pos).getBlock() instanceof BlockScaffold) {
 				event.setCanceled(true);
@@ -126,6 +128,9 @@ public class CharsetMiscScaffold {
 				for (int overhang = 1; overhang < BlockScaffold.MAX_OVERHANG; overhang++) {
 					BlockPos targetPos = new BlockPos(pos.getX(), pos.getY() + overhang, pos.getZ());
 					if (worldIn.isValid(targetPos) && stack.getItem().onItemUse(playerIn, worldIn, targetPos, hand, EnumFacing.DOWN, 0.5f, 0.0f, 0.5f) == EnumActionResult.SUCCESS) {
+						if (playerIn.isCreative()) {
+							playerIn.setHeldItem(hand, oldStack);
+						}
 						return;
 					}
 

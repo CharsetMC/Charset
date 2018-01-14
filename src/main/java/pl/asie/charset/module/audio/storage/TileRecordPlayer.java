@@ -126,7 +126,9 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 
 	public boolean activate(EntityPlayer player, EnumFacing side, EnumHand hand, Vec3d hitPos) {
 		if (player.isSneaking() && side.getAxis() != EnumFacing.Axis.Y) {
-			player.openGui(ModCharset.instance, GuiHandlerCharset.RECORD_PLAYER, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
+			if (!world.isRemote) {
+				player.openGui(ModCharset.instance, GuiHandlerCharset.RECORD_PLAYER, getWorld(), getPos().getX(), getPos().getY(), getPos().getZ());
+			}
 			return true;
 		}
 
@@ -135,47 +137,55 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		if (side == EnumFacing.UP) {
 			if (realPos.x > -0.075 && realPos.z > -0.25 && !getStack().isEmpty()) {
 				if (realPos.x > 0.4) {
-					setState(TraitRecordPlayer.State.STOPPED);
+					if (!world.isRemote) {
+						setState(TraitRecordPlayer.State.STOPPED);
+					}
 					return true;
 				} else {
 					if (player.isSneaking()) {
 						// TODO: Store state, allow for recording turning off
 						if (getState() == TraitRecordPlayer.State.PAUSED) {
-							setState(TraitRecordPlayer.State.PLAYING);
-							markBlockForUpdate();
+							if (!world.isRemote) {
+								setState(TraitRecordPlayer.State.PLAYING);
+								markBlockForUpdate();
+							}
 							return true;
 						} else if (getState() == TraitRecordPlayer.State.PLAYING) {
-							setState(TraitRecordPlayer.State.PAUSED);
-							markBlockForUpdate();
+							if (!world.isRemote) {
+								setState(TraitRecordPlayer.State.PAUSED);
+								markBlockForUpdate();
+							}
 							return true;
 						} else if (getState() == TraitRecordPlayer.State.RECORDING) {
 							return true;
 						}
 					} else {
-						if (getState() == TraitRecordPlayer.State.STOPPED) {
-							setState(TraitRecordPlayer.State.PLAYING);
+						if (!world.isRemote) {
+							if (getState() == TraitRecordPlayer.State.STOPPED) {
+								setState(TraitRecordPlayer.State.PLAYING);
+							}
+
+							// 0.05f = 0.12f
+							// 0.25f = 0.35f
+
+							float fmul = 0.0085f;
+							float fsub = 0.05f;
+							float fstart = (CharsetAudioStorage.quartzDisc.getArmStartPosition(holder.getStack()) * fmul) - fsub;
+							float fend = (32f * fmul) - fsub;
+							// System.out.println(fstart + " . " + fend);
+							float newPos = 1f - ((float) (realPos.x - fstart) / (fend - fstart));
+							if (newPos < 0.0f) newPos = 0.0f;
+							else if (newPos > 1.0f) newPos = 1.0f;
+
+							IDataStorage storage = this.player.getStorage();
+							if (storage != null) {
+								storage.setPosition(Math.round((storage.getSize() - 1) * newPos));
+								updateProgressClient();
+								this.player.stopAudioPlayback();
+							}
+
+							markBlockForUpdate();
 						}
-
-						// 0.05f = 0.12f
-						// 0.25f = 0.35f
-
-						float fmul = 0.0085f;
-						float fsub = 0.05f;
-						float fstart = (CharsetAudioStorage.quartzDisc.getArmStartPosition(holder.getStack()) * fmul) - fsub;
-						float fend = (32f * fmul) - fsub;
-						// System.out.println(fstart + " . " + fend);
-						float newPos = 1f - ((float) (realPos.x - fstart) / (fend - fstart));
-						if (newPos < 0.0f) newPos = 0.0f;
-						else if (newPos > 1.0f) newPos = 1.0f;
-
-						IDataStorage storage = this.player.getStorage();
-						if (storage != null) {
-							storage.setPosition(Math.round((storage.getSize() - 1) * newPos));
-							updateProgressClient();
-							this.player.stopAudioPlayback();
-						}
-
-						markBlockForUpdate();
 						return true;
 					}
 				}

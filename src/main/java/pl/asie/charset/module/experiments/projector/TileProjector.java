@@ -188,12 +188,16 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 				int pc = handler.getPageCount(getStack());
 				if (pc > 1) {
 					if (side == rightFace && page < (pc - 1)) {
-						page++;
-						markBlockForUpdate();
+						if (!world.isRemote) {
+							page++;
+							markBlockForUpdate();
+						}
 						return true;
 					} else if (side == leftFace && page > 0) {
-						page--;
-						markBlockForUpdate();
+						if (!world.isRemote) {
+							page--;
+							markBlockForUpdate();
+						}
 						return true;
 					}
 				}
@@ -201,8 +205,10 @@ public class TileProjector extends TileBase implements IAxisRotatable, IProjecto
 		}
 
 		if (holder.activate(this, player, side, hand)) {
-			page = 0;
-			markBlockForUpdate();
+			if (!world.isRemote) {
+				page = 0;
+				markBlockForUpdate();
+			}
 			return true;
 		}
 

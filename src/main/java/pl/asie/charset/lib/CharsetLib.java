@@ -58,6 +58,7 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
+import pl.asie.charset.lib.misc.Todokete;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.notify.PacketNotification;
@@ -198,6 +199,8 @@ public class CharsetLib {
 		packet.registerPacket(0x30, PacketRequestScroll.class);
 
 		MinecraftForge.EVENT_BUS.register(ShiftScrollHandler.INSTANCE);
+
+		MinecraftForge.EVENT_BUS.register(new Todokete());
 
 		Capabilities.init();
 		DataSerializersCharset.init();

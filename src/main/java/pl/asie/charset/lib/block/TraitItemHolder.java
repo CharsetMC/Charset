@@ -90,16 +90,20 @@ public abstract class TraitItemHolder extends Trait {
 	public boolean activate(TileBase parent, EntityPlayer player, EnumFacing side, EnumHand hand) {
 		if (side == getTop() && hand == EnumHand.MAIN_HAND) {
 			if (!getStack().isEmpty()) {
-				ItemUtils.spawnItemEntity(parent.getWorld(),
-						new Vec3d(parent.getPos()).addVector(0.5F, 0.5F, 0.5F).add(new Vec3d(getTop().getDirectionVec()).scale(0.5F)),
-						getStack(), 0, 0, 0, 0
-				);
-				setStack(ItemStack.EMPTY);
+				if (!parent.getWorld().isRemote) {
+					ItemUtils.spawnItemEntity(parent.getWorld(),
+							new Vec3d(parent.getPos()).addVector(0.5F, 0.5F, 0.5F).add(new Vec3d(getTop().getDirectionVec()).scale(0.5F)),
+							getStack(), 0, 0, 0, 0
+					);
+					setStack(ItemStack.EMPTY);
+				}
 				return true;
 			} else {
 				ItemStack held = player.getHeldItem(hand);
 				if (!held.isEmpty() && isStackAllowed(held)) {
-					setStack(held.splitStack(1));
+					if (!parent.getWorld().isRemote) {
+						setStack(held.splitStack(1));
+					}
 					return true;
 				}
 			}
