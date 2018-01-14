@@ -84,9 +84,9 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         @Override
         public ItemStack getStackInSlot(int slot) {
             ItemStack stack = item;
-            if (stack.getCount() > 64) {
+            if (!stack.isEmpty() && stack.getCount() > item.getMaxStackSize()) {
                 stack = stack.copy();
-                stack.setCount(64);
+                stack.setCount(item.getMaxStackSize());
             }
             return stack;
         }
@@ -98,7 +98,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
         @Override
         public int getSlotLimit(int slot) {
-            return 64;
+            return !item.isEmpty() ? item.getMaxStackSize() : 64;
         }
 
         @Override
@@ -119,6 +119,23 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     public class InsertionHandler extends BaseItemHandler {
         @Override
+        public ItemStack getStackInSlot(int slot) {
+            ItemStack stack = item;
+            int cutoff = getMaxItemCount() - stack.getMaxStackSize();
+            if (stack.isEmpty() || stack.getCount() < cutoff) {
+                return ItemStack.EMPTY;
+            } else {
+                stack = stack.copy();
+                stack.setCount(stack.getCount() - cutoff);
+                if (stack.getCount() > stack.getMaxStackSize()) {
+                    // ???
+                    stack.setCount(stack.getMaxStackSize());
+                }
+            }
+            return stack;
+        }
+
+        @Override
         public ItemStack insertItem(int slot, ItemStack is, boolean simulate) {
             return TileEntityDayBarrel.this.insertItem(is, simulate, false);
         }
@@ -133,8 +150,8 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             int count = item.getCount() - (slot * item.getMaxStackSize());
             if (count <= 0)
                 return ItemStack.EMPTY;
-            else if (count > 64)
-                count = 64;
+            else if (count > item.getMaxStackSize())
+                count = item.getMaxStackSize();
 
             ItemStack stack = item.copy();
             stack.setCount(count);
@@ -1085,10 +1102,10 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     @Override
     public boolean rotateWrench(EnumFacing axis) {
         Orientation newOrientation;
-        if (axis == orientation.facing.getOpposite()) {
+        if (axis == orientation.facing) {
             newOrientation = orientation.getNextRotationOnFace();
         } else {
-            newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis.getOpposite()).ordinal() & (~3) | (orientation.ordinal() & 3));
+            newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis).ordinal() & (~3) | (orientation.ordinal() & 3));
         }
 
         changeOrientation(newOrientation, false);
