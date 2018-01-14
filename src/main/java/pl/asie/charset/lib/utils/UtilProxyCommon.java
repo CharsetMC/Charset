@@ -73,6 +73,10 @@ public class UtilProxyCommon implements IThreadListener {
 		return null;
 	}
 
+	public String getLanguageCode() {
+		return "en_us";
+	}
+
 	public void registerItemModel(Item item, int meta, String name) {
 
 	}

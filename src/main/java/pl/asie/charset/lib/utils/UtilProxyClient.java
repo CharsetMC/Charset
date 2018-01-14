@@ -73,6 +73,11 @@ public class UtilProxyClient extends UtilProxyCommon {
 	}
 
 	@Override
+	public String getLanguageCode() {
+		return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode().toLowerCase();
+	}
+
+	@Override
 	public World getWorld(INetHandler handler, int dim) {
 		if (handler instanceof INetHandlerPlayClient || handler instanceof INetHandlerLoginClient) {
 			World w = getPlayer(handler).world;

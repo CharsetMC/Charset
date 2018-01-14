@@ -28,6 +28,7 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
 
 import javax.annotation.Nullable;
@@ -165,7 +166,7 @@ public class RouterIGW implements IRouterSearchable {
 
 	@Nullable
 	public Path getDocIfExists(ResourceLocation loc) {
-		String l = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode().toLowerCase();
+		String l = UtilProxyCommon.proxy.getLanguageCode();
 		Path path = getDocIfExists(loc, l, "block");
 		if (path == null) path = getDocIfExists(loc, l, "item");
 		if (path == null && !("en_us".equals(l))) {
