@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2016, 2017 Adrian Siekierka
+ * Copyright (c) 2015, 2016, 2017, 2018 Adrian Siekierka
  *
  * This file is part of Charset.
  *
