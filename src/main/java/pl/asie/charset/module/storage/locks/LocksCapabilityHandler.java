@@ -45,12 +45,12 @@ public class LocksCapabilityHandler implements Handler {
 
 	@Override
 	public LocksCapabilityHook.Result wrapCapability(TileEntity tile, Capability capability, EnumFacing facing) {
-		if (capability == Capabilities.LOCKABLE) {
+		if (capability == Capabilities.LOCKABLE || capability == Capabilities.MULTIBLOCK_STRUCTURE) {
 			// Early return to prevent recursion
 			return LocksCapabilityHook.NO;
 		} else {
 			if (tile.hasCapability(Capabilities.LOCKABLE, facing)) {
-				Lockable lockable = tile.getCapability(Capabilities.LOCKABLE, facing);
+				Lockable lockable = LockEventHandler.getLock(tile);
 				if (lockable != null && lockable.hasLock()) {
 					return new LocksCapabilityHook.Result(true, FORBIDDEN.get(capability));
 				} else {

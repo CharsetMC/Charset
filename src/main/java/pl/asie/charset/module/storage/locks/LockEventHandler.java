@@ -65,6 +65,7 @@ import java.util.Iterator;
 public class LockEventHandler {
     public static CapabilityProviderFactory<Lockable> PROVIDER;
 
+    // ENSURE LocksCapabilityHandler has all of the capabilities used here whitelisted!
     public static Lockable getLock(TileEntity tile) {
         if (tile != null) {
             if (tile.hasCapability(Capabilities.MULTIBLOCK_STRUCTURE, null)) {
