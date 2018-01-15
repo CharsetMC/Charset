@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
@@ -150,17 +151,21 @@ public class CharsetTablet {
 			if (Loader.isModLoaded("mekanism")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("mekanism", "Mekanism Wiki", "wiki.aidancbrady.com/w"));
 			}
-			if (Loader.isModLoaded("techreborn")) {
+			if (ModCharset.INDEV || Loader.isModLoaded("techreborn")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("techreborn", "TechReborn Wiki", "wiki.techreborn.ovh/doku.php"));
 				TabletAPI.INSTANCE.addBook("TechReborn Wiki", "wiki://techreborn/");
 			}
-			if (Loader.isModLoaded("forestry")) {
+			if (ModCharset.INDEV || Loader.isModLoaded("forestry")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("forestry", "Forestry Wiki", "forestryforminecraft.info/doku.php"));
 				TabletAPI.INSTANCE.addBook("Forestry Wiki", "wiki://forestry/");
 			}
-			if (Loader.isModLoaded("railcraft")) {
+			if (ModCharset.INDEV || Loader.isModLoaded("railcraft")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("railcraft", "Railcraft Wiki", "railcraft.info/wiki/doku.php"));
 				TabletAPI.INSTANCE.addBook("Railcraft Wiki", "wiki://railcraft/");
+			}
+			if (ModCharset.INDEV /* || Loader.isModLoaded("cofhcore") */) {
+				TabletAPI.INSTANCE.registerRouter(new RouterCoFH());
+				TabletAPI.INSTANCE.addBook("CoFH Docs", "wiki://cofh/docs/index");
 			}
 
 			// WIP: it's a tad ugly

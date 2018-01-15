@@ -30,7 +30,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.module.tablet.TabletUtil;
 import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
-import pl.asie.charset.module.tablet.format.wiki.WikiParser;
+import pl.asie.charset.module.tablet.format.parsers.WikiParser;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -68,7 +68,7 @@ public class RouterMediaWiki implements IRouterSearchable {
 				URI uri = new URI("http://" + host + "/api.php?action=parse&prop=wikitext%7clanglinks%7ccategories%7clinks%7cdisplaytitle%7ciwlinks%7cproperties"
 						+ "&format=json&page=" + TabletUtil.encode(path.getPath().substring(1)));
 
-				HttpClient client = HttpClientBuilder.create().setUserAgent("Charset/" + ModCharset.VERSION + " (tablet)").build();
+				HttpClient client = TabletUtil.createHttpClient();
 				HttpGet request = new HttpGet(uri);
 
 				HttpResponse response = client.execute(request);
@@ -109,7 +109,7 @@ public class RouterMediaWiki implements IRouterSearchable {
 						TabletUtil.encode(query)
 						+ "&limit=50&format=json");
 
-				HttpClient client = HttpClientBuilder.create().setUserAgent("Charset/" + ModCharset.VERSION + " (tablet)").build();
+				HttpClient client = TabletUtil.createHttpClient();
 				HttpGet request = new HttpGet(uri);
 
 				HttpResponse response = client.execute(request);

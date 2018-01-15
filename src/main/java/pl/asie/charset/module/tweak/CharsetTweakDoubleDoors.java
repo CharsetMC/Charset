@@ -21,6 +21,7 @@ package pl.asie.charset.module.tweak;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -42,6 +43,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.ThreeState;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,8 +77,11 @@ public class CharsetTweakDoubleDoors {
 					}
 
 					if (allowed) {
-						allowedDoors.add((BlockDoor) block);
-						ModCharset.logger.info("[tweak.doubledoors] Allowing " + block.getRegistryName().toString());
+						Collection<IProperty<?>> properties = block.getBlockState().getProperties();
+						if (properties.contains(BlockDoor.FACING) && properties.contains(BlockDoor.OPEN) && properties.contains(BlockDoor.HINGE)) {
+							allowedDoors.add((BlockDoor) block);
+							ModCharset.logger.info("[tweak.doubledoors] Allowing " + block.getRegistryName().toString());
+						}
 					}
 				}
 			} catch (ReflectionHelper.UnableToFindMethodException e) {

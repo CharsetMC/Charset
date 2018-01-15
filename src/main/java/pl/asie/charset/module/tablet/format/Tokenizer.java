@@ -61,7 +61,7 @@ public class Tokenizer implements ITokenizer {
     private int prevScan = -1;
 
     private TokenType type;
-    private String token;
+    private String token = "";
 
     private int contigLines = 0;
     private int contigSpaces = 0;

@@ -22,8 +22,10 @@
 
 package pl.asie.charset.api.locks;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import pl.asie.charset.api.lib.ICacheable;
 
@@ -72,15 +74,24 @@ public final class Lockable implements ICacheable, INBTSerializable<NBTTagCompou
     public NBTTagCompound serializeNBT() {
         NBTTagCompound compound = new NBTTagCompound();
         if (hasLock()) {
-            compound.setInteger("lockILockingEntityId", lock.getLockEntityId());
+            compound.setInteger("lockId", lock.getLockEntityId());
+            // compound.setString("lockKey", lock.getLockKey());
         }
         return compound;
     }
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
-        if (nbt.hasKey("lockILockingEntityId") && owner.getWorld() != null) {
-            lock = (ILockingEntity) owner.getWorld().getEntityByID(nbt.getInteger("lockILockingEntityId"));
+        if (nbt.hasKey("lockId", Constants.NBT.TAG_ANY_NUMERIC) && owner.getWorld() != null) {
+            Entity entity = owner.getWorld().getEntityByID(nbt.getInteger("lockId"));
+            if (entity instanceof ILockingEntity) {
+                lock = (ILockingEntity) entity;
+            }
+        } else if (nbt.hasKey("lockILockingEntityId", Constants.NBT.TAG_ANY_NUMERIC) && owner.getWorld() != null /* derp */) {
+            Entity entity = owner.getWorld().getEntityByID(nbt.getInteger("lockILockingEntityId"));
+            if (entity instanceof ILockingEntity) {
+                lock = (ILockingEntity) entity;
+            }
         } else {
             lock = null;
         }

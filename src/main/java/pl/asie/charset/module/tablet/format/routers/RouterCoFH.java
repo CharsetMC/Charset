@@ -27,7 +27,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.module.tablet.TabletUtil;
+import pl.asie.charset.module.tablet.format.api.IRouter;
 import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
+import pl.asie.charset.module.tablet.format.parsers.MarkdownParser;
 import pl.asie.charset.module.tablet.format.parsers.WikiParser;
 
 import javax.annotation.Nullable;
@@ -36,17 +38,9 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RouterDokuWiki implements IRouterSearchable {
-	private static final Pattern PATTERN = Pattern.compile("<a href=\"[^\"]+\" class=\"wikilink1\" title=\"([:_a-z]+)\">([^<]+)</a>");
-
-	private final String host;
-	private final String name;
-	private final String friendlyName;
-
-	public RouterDokuWiki(String name, String friendlyName, String host) {
-		this.name = name;
-		this.friendlyName = friendlyName;
-		this.host = host;
+public class RouterCoFH implements IRouter {
+	private final String host = "https://raw.githubusercontent.com/CoFH/cofh.github.io/master";
+	public RouterCoFH() {
 	}
 
 	@Nullable
@@ -55,23 +49,23 @@ public class RouterDokuWiki implements IRouterSearchable {
 		String err = "";
 
 		try {
-			URI uri = new URI("http://" + host + "?id=" + TabletUtil.encode(path.getPath().substring(1).replace('/', ':')) + "&do=export_raw");
+			String pathCleaned = path.getPath();
+			if (pathCleaned.endsWith("/")) {
+				pathCleaned = pathCleaned.substring(0, pathCleaned.length() - 1);
+			}
+			if (pathCleaned.endsWith("/index")) {
+				pathCleaned = pathCleaned.substring(0, pathCleaned.length() - 6);
+			}
+
+			URI uri = new URI(host + pathCleaned + "/index.md");
+			System.out.println(uri);
 			HttpClient client = TabletUtil.createHttpClient();
 			HttpGet request = new HttpGet(uri);
 
 			HttpResponse response = client.execute(request);
 			if (response.getStatusLine().getStatusCode() == 200) {
-				WikiParser mediaWikiData = new WikiParser(
-						new String(ByteStreams.toByteArray(response.getEntity().getContent()), Charsets.UTF_8),
-						WikiParser.Type.DOKUWIKI
-				);
-				if (mediaWikiData.shouldRetain()) {
-					if (mediaWikiData.isError()) {
-						err = err + mediaWikiData.getText() + "\n\n";
-					} else {
-						return mediaWikiData.getText();
-					}
-				}
+				MarkdownParser parser = new MarkdownParser();
+				return parser.parse(new String(ByteStreams.toByteArray(response.getEntity().getContent()), Charsets.UTF_8));
 			} else {
 				err = err + "ERROR: " + response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase() + "\n\n";
 			}
@@ -85,33 +79,6 @@ public class RouterDokuWiki implements IRouterSearchable {
 
 	@Override
 	public boolean matches(URI path) {
-		return "wiki".equals(path.getScheme()) && name.equals(path.getHost());
-	}
-
-	@Override
-	public void find(Collection<SearchResult> results, String query) {
-		try {
-			URI uri = new URI("http://" + host + "?do=search&id=" + TabletUtil.encode(query));
-
-			HttpClient client = TabletUtil.createHttpClient();
-			HttpGet request = new HttpGet(uri);
-
-			HttpResponse response = client.execute(request);
-			if (response.getStatusLine().getStatusCode() == 200) {
-				// No API? No way!
-				String data = new String(ByteStreams.toByteArray(response.getEntity().getContent()), Charsets.UTF_8);
-				int i = data.indexOf("search_results");
-				if (i >= 0) {
-					Matcher m = PATTERN.matcher(data.substring(i));
-					while (m.find()) {
-						SearchResult result = new SearchResult(m.group(2), friendlyName,
-								new URI("wiki://" + this.name + "/" + m.group(1).replace(':', '/')));
-						results.add(result);
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		return "wiki".equals(path.getScheme()) && "cofh".equals(path.getHost());
 	}
 }

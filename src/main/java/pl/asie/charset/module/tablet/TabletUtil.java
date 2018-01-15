@@ -20,6 +20,9 @@
 package pl.asie.charset.module.tablet;
 
 import com.google.common.base.Charsets;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import pl.asie.charset.ModCharset;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -28,6 +31,10 @@ import java.net.URLEncoder;
 public final class TabletUtil {
 	private TabletUtil() {
 
+	}
+
+	public static HttpClient createHttpClient() {
+		return HttpClientBuilder.create().setUserAgent("Charset/" + ModCharset.VERSION + " (tablet)").build();
 	}
 
 	public static String encode(String s) {

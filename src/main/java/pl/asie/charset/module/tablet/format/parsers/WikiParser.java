@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tablet.format.wiki;
+package pl.asie.charset.module.tablet.format.parsers;
 
 import com.google.gson.*;
 import org.apache.commons.lang3.tuple.Pair;
