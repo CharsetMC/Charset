@@ -101,11 +101,11 @@ configurations {
 }
 
 dependencies {
-	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.1_58"
-	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.138"
-	deobfCompile name: "chiselsandbits", version: "14.11"
+	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.1_59"
+	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.144"
+	deobfCompile name: "chiselsandbits", version: "14.12"
 	deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-1.4.0-174"
-	deobfCompile name: "Baubles", version: "1.12-1.4.5"
+	deobfCompile name: "Baubles", version: "1.12-1.5.2"
 	deobfCompile "com.elytradev:mirage:2.0.3-rc3-SNAPSHOT"
 	deobfCompile "com.elytradev:probedataproviderapi:MC1.12_ver1.1.1"
 	deobfCompile "li.cil.oc:OpenComputers:MC1.12-1.7.+:api"

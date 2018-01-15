@@ -60,7 +60,6 @@ public final class Lockable implements ICacheable, INBTSerializable<NBTTagCompou
             return false;
         }
     }
-
     public boolean removeLock(ILockingEntity lock) {
         if (hasLock() && this.getLock() == lock) {
             this.lock = null;
@@ -82,6 +81,8 @@ public final class Lockable implements ICacheable, INBTSerializable<NBTTagCompou
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
+        lock = null;
+
         if (nbt.hasKey("lockId", Constants.NBT.TAG_ANY_NUMERIC) && owner.getWorld() != null) {
             Entity entity = owner.getWorld().getEntityByID(nbt.getInteger("lockId"));
             if (entity instanceof ILockingEntity) {
@@ -92,8 +93,6 @@ public final class Lockable implements ICacheable, INBTSerializable<NBTTagCompou
             if (entity instanceof ILockingEntity) {
                 lock = (ILockingEntity) entity;
             }
-        } else {
-            lock = null;
         }
     }
 
