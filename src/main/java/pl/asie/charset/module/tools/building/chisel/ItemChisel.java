@@ -124,7 +124,10 @@ public class ItemChisel extends ItemCharsetTool {
                         if ((result.getCount() % inputCount) == 0) {
                             ItemStack resultCopy = result.copy();
                             resultCopy.setCount(1);
-                            ToolsUtils.placeBlockOrRollback(resultCopy, playerIn, worldIn, pos);
+                            ActionResult<ItemStack> placeResult = ToolsUtils.placeBlockOrRollback(resultCopy, playerIn, worldIn, pos);
+                            if (placeResult.getType() == EnumActionResult.FAIL) {
+                                return EnumActionResult.FAIL;
+                            }
                             if (result.getCount() > inputCount) {
                                 ItemStack resultCopyRemainder = result.copy();
                                 resultCopyRemainder.setCount((result.getCount() / inputCount) - 1);

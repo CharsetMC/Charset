@@ -167,6 +167,12 @@ public class CharsetTablet {
 				TabletAPI.INSTANCE.registerRouter(new RouterCoFH());
 				TabletAPI.INSTANCE.addBook("CoFH Docs", "wiki://cofh/docs/index");
 			}
+			/* if (ModCharset.INDEV) {
+				TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("projectred", "Project: Red Wiki", "projectredwiki.com/w"));
+			}
+			if (ModCharset.INDEV) {
+				TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("binniemods", "Binnie's Mods Wiki", "binnie.mods.wiki/w"));
+			} */
 
 			// WIP: it's a tad ugly
 			/* if (Loader.isModLoaded("opencomputers")) {
