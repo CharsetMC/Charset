@@ -28,29 +28,24 @@ import pl.asie.charset.lib.utils.RenderUtils;
 import java.awt.image.BufferedImage;
 import java.util.function.Function;
 
-public abstract class PixelOperationSprite extends TextureAtlasSprite {
-    public static class Multiply extends PixelOperationSprite {
-        private final int color;
+public class PixelOperationSprite extends TextureAtlasSprite {
+    @FunctionalInterface
+    public interface Operator {
+        int apply(int x, int y, int value);
+    }
 
-        public Multiply(String entry, ResourceLocation location, int color) {
-            super(entry, location);
-            this.color = color;
-        }
-
-        @Override
-        public int apply(int x, int y, int value) {
-            return RenderUtils.multiplyColor(value, color);
-        }
+    public static Operator multiply(int color) {
+        return (x, y, value) -> RenderUtils.multiplyColor(value, color);
     }
 
     private final ResourceLocation location;
+    private final Operator operator;
 
-    protected PixelOperationSprite(String entry, ResourceLocation location) {
+    public PixelOperationSprite(String entry, ResourceLocation location, Operator operator) {
         super(entry);
         this.location = location;
+        this.operator = operator;
     }
-
-    public abstract int apply(int x, int y, int value);
 
     @Override
     public boolean hasCustomLoader(IResourceManager manager, ResourceLocation location) {
@@ -67,12 +62,12 @@ public abstract class PixelOperationSprite extends TextureAtlasSprite {
         setIconWidth(image.getWidth());
         setIconHeight(image.getHeight());
 
-        int[][] pixels = new int[Minecraft.getMinecraft().gameSettings.mipmapLevels + 1][];
+        int[][] pixels = new int[Minecraft.getMinecraft().getTextureMapBlocks().getMipmapLevels() + 1][];
         pixels[0] = new int[image.getWidth() * image.getHeight()];
 
         image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels[0], 0, image.getWidth());
         for (int i = 0; i < pixels[0].length; i++) {
-            pixels[0][i] = apply(i % image.getWidth(), i / image.getWidth(), pixels[0][i]);
+            pixels[0][i] = operator.apply(i % image.getWidth(), i / image.getWidth(), pixels[0][i]);
         }
 
         this.clearFramesTextureData();

@@ -69,7 +69,7 @@ public class SpritesheetFactory {
             setIconWidth(pieceWidth);
             setIconHeight(pieceHeight);
 
-            int[][] pixels = new int[Minecraft.getMinecraft().gameSettings.mipmapLevels + 1][];
+            int[][] pixels = new int[Minecraft.getMinecraft().getTextureMapBlocks().getMipmapLevels() + 1][];
             pixels[0] = new int[pieceWidth * pieceHeight];
 
             sheet.getRGB(pieceWidth * x, pieceHeight * y, pieceWidth, pieceHeight, pixels[0], 0, pieceWidth);

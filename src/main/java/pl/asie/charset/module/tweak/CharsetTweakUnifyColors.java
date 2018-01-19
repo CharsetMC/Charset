@@ -116,25 +116,22 @@ public class CharsetTweakUnifyColors {
 				final float divisor = delta > 5 ? (float) delta / 5.0f : 1.0f;
 				final int value2 = colorMultiplier(prefix, EnumDyeColor.byMetadata(i));
 
-				map.setTextureEntry(new PixelOperationSprite(target.toString(), source) {
-					@Override
-					public int apply(int x, int y, int value) {
-						int out = 0xFF000000;
-						for (int i = 0; i < 24; i += 8) {
-							int v1 = (((imageGrayscale.getRGB(x, y) >> i) & 0xFF) * 255 / imageGrayData[i >> 3]) - 0xFF;
-							v1 /= divisor;
-							int v2 = ((value2 >> i) & 0xFF) + v1;
-							if (v2 < 0) v2 = 0;
-							if (v2 > 255) v2 = 255;
-							int nonTintedOut = (v2 & 0xFF);
-							int tintedOut = nonTintedOut * imageData[8 + (i >> 3)] / imageData[0 + 3];
-							out |= Math.round((nonTintedOut + tintedOut + (tintedOut / 2)) / 2.5f) << i;
-						}
-						return out;
+				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, (x, y, value) -> {
+					int out = 0xFF000000;
+					for (int coff = 0; coff < 24; coff += 8) {
+						int v1 = (((imageGrayscale.getRGB(x, y) >> coff) & 0xFF) * 255 / imageGrayData[coff >> 3]) - 0xFF;
+						v1 /= divisor;
+						int v2 = ((value2 >> coff) & 0xFF) + v1;
+						if (v2 < 0) v2 = 0;
+						if (v2 > 255) v2 = 255;
+						int nonTintedOut = (v2 & 0xFF);
+						int tintedOut = nonTintedOut * imageData[8 + (coff >> 3)] / imageData[0 + 3];
+						out |= Math.round((nonTintedOut + tintedOut + (tintedOut / 2)) / 2.5f) << coff;
 					}
-				});
+					return out;
+				}));
 			} else if (i > 0) { // skip white for non-clay
-				map.setTextureEntry(new PixelOperationSprite.Multiply(target.toString(), source, colorMultiplier(prefix, EnumDyeColor.byMetadata(i))));
+				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, PixelOperationSprite.multiply(colorMultiplier(prefix, EnumDyeColor.byMetadata(i)))));
 			}
 		}
 	}
