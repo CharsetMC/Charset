@@ -77,10 +77,6 @@ public class ItemQuartzDisc extends Item {
 				}
 
 				if (capability == CharsetAudioStorage.DATA_STORAGE) {
-					if (!((DataStorage) dataStorage).initializeContents()) {
-						return null;
-					}
-
 					stack.setItemDamage(stack.getItemDamage() | 1);
 					return CharsetAudioStorage.DATA_STORAGE.cast(dataStorage);
 				}

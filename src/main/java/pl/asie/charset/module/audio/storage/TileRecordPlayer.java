@@ -177,7 +177,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 							if (newPos < 0.0f) newPos = 0.0f;
 							else if (newPos > 1.0f) newPos = 1.0f;
 
-							IDataStorage storage = this.player.getStorage();
+							IDataStorage storage = this.getStorage();
 							if (storage != null) {
 								storage.setPosition(Math.round((storage.getSize() - 1) * newPos));
 								updateProgressClient();
@@ -204,7 +204,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 
 	private void updateProgressClient() {
 		float pos = 0f;
-		IDataStorage storage = player.getStorage();
+		IDataStorage storage = getStorage();
 		if (storage != null) {
 			pos = ((float) storage.getPosition() / storage.getSize());
 		}
@@ -256,25 +256,29 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 
 	public void setState(TraitRecordPlayer.State state) {
 		player.setState(state);
-		if (state == TraitRecordPlayer.State.STOPPED) {
-			spinLocation = 0;
+		if (!isInvalid()) {
+			if (state == TraitRecordPlayer.State.STOPPED) {
+				spinLocation = 0;
 
-			IDataStorage storage = player.getStorage();
-			if (storage != null) {
-				storage.setPosition(0);
+				IDataStorage storage = getStorage();
+				if (storage != null) {
+					storage.setPosition(0);
+				}
 			}
 		}
 	}
 
 	protected void writeData(byte[] data, boolean isLast, int totalLength) {
-		IDataStorage storage = player.getStorage();
-		if (storage != null) {
-			if (getState() == TraitRecordPlayer.State.PLAYING || getState() == TraitRecordPlayer.State.RECORDING) {
-				setState(TraitRecordPlayer.State.PAUSED);
-			}
-			storage.write(data);
-			if (isLast) {
-				storage.seek(-totalLength);
+		if (!isInvalid()) {
+			IDataStorage storage = getStorage();
+			if (storage != null) {
+				if (getState() == TraitRecordPlayer.State.PLAYING || getState() == TraitRecordPlayer.State.RECORDING) {
+					setState(TraitRecordPlayer.State.PAUSED);
+				}
+				storage.write(data);
+				if (isLast) {
+					storage.seek(-totalLength);
+				}
 			}
 		}
 	}

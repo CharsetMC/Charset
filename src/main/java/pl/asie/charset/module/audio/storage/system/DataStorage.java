@@ -45,8 +45,12 @@ public class DataStorage implements IDataStorage {
 		return data != null;
 	}
 
-	public boolean initializeContents() {
+	boolean initializeContents() {
 		if (file == null && CharsetAudioStorage.storageManager.isReady()) {
+			if (this.uniqueId == null) {
+				this.uniqueId = CharsetAudioStorage.storageManager.generateUID();
+			}
+
 			this.file = CharsetAudioStorage.storageManager.getFileForId(this.uniqueId);
 			if (!file.exists()) {
 				try {
@@ -69,7 +73,7 @@ public class DataStorage implements IDataStorage {
 
 	public void initialize(String id, int position, int size) {
 		if (id == null || id.length() == 0) {
-			this.uniqueId = CharsetAudioStorage.storageManager.generateUID();
+			this.uniqueId = null;
 		} else {
 			this.uniqueId = id;
 		}
@@ -122,6 +126,8 @@ public class DataStorage implements IDataStorage {
 	public int read(boolean simulate) {
 		if (position >= size) return 0;
 
+		initializeContents();
+
 		if (simulate) {
 			return (int) data[position] & 0xFF;
 		} else {
@@ -134,6 +140,8 @@ public class DataStorage implements IDataStorage {
 		if (len == 0) {
 			return 0;
 		}
+
+		initializeContents();
 
 		System.arraycopy(data, position + offset, v, 0, len);
 		if (!simulate) {
@@ -150,6 +158,8 @@ public class DataStorage implements IDataStorage {
 	public void write(byte v) {
 		if (position >= size) return;
 
+		initializeContents();
+
 		dirty = true;
 		data[position++] = v;
 	}
@@ -159,6 +169,8 @@ public class DataStorage implements IDataStorage {
 		if (len == 0) {
 			return 0;
 		}
+
+		initializeContents();
 
 		System.arraycopy(v, 0, data, position, len);
 		position += len;
@@ -208,6 +220,8 @@ public class DataStorage implements IDataStorage {
 
 	void writeFile() throws IOException {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			initializeContents();
+
 			FileOutputStream fileStream = new FileOutputStream(file);
 			GZIPOutputStream stream = new GZIPOutputStream(fileStream);
 
