@@ -42,8 +42,7 @@ public class PacketCarryGrab extends Packet {
 	private Type type;
 	private World world;
 	private BlockPos pos;
-	private Entity entity;
-	private int dim;
+	private int dim, entityId;
 
 	public PacketCarryGrab() {
 
@@ -58,7 +57,7 @@ public class PacketCarryGrab extends Packet {
 	public PacketCarryGrab(World world, Entity entity) {
 		this.world = world;
 		this.type = Type.ENTITY;
-		this.entity = entity;
+		this.entityId = entity.getEntityId();
 	}
 
 	@Override
@@ -74,8 +73,7 @@ public class PacketCarryGrab extends Packet {
 				pos = new BlockPos(x, y, z);
 				break;
 			case ENTITY:
-				int eid = buf.readInt();
-				entity = world.getEntityByID(eid);
+				entityId = buf.readInt();
 				break;
 		}
 	}
@@ -91,7 +89,10 @@ public class PacketCarryGrab extends Packet {
 					CharsetTweakBlockCarrying.grabBlock(player, world, pos);
 					break;
 				case ENTITY:
-					CharsetTweakBlockCarrying.grabEntity(player, world, entity);
+					Entity entity = world.getEntityByID(entityId);
+					if (entity != null) {
+						CharsetTweakBlockCarrying.grabEntity(player, world, entity);
+					}
 					break;
 			}
 		}
@@ -109,7 +110,7 @@ public class PacketCarryGrab extends Packet {
 				break;
 			case ENTITY:
 				buf.writeByte(1);
-				buf.writeInt(entity.getEntityId());
+				buf.writeInt(entityId);
 				break;
 		}
 	}
