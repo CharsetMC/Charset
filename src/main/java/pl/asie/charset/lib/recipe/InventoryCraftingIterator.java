@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.recipe;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -39,11 +40,13 @@ public class InventoryCraftingIterator extends InventoryCrafting implements Iter
 
         private Container(InventoryCraftingIterator iterator) {
             base = iterator.recipe;
-            stacks = new ArrayList<>();
+            ImmutableList.Builder inputBuilder = ImmutableList.builder();
 
             for (int i = 0; i < iterator.recipe.input.size(); i++) {
-                stacks.add(iterator.inputReal[i]);
+                inputBuilder.add(iterator.inputReal[i]);
             }
+
+            stacks = inputBuilder.build();
 
             if (iterator.permutations == 1) {
                 output = iterator.recipe.getAllRecipeOutputs();

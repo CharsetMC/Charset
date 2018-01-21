@@ -70,7 +70,8 @@ public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> impleme
                 while (iterator.hasNext()) {
                     iterator.next();
                     if (recipe.matches(iterator, null)) {
-                        registry.addRecipes(Collections.singletonList(iterator.contain()), VanillaRecipeCategoryUid.CRAFTING);
+                        InventoryCraftingIterator.Container ctr = iterator.contain();
+                        registry.addRecipes(Collections.singletonList(ctr), VanillaRecipeCategoryUid.CRAFTING);
                     }
                 }
             }

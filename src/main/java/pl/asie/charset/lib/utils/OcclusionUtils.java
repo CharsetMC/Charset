@@ -44,8 +44,9 @@ public class OcclusionUtils {
     }
 
     public boolean intersects(Collection<AxisAlignedBB> boxes1, IBlockAccess world, BlockPos pos) {
-        if (boxes1.size() == 0)
+        if (boxes1.isEmpty()) {
             return false;
+        }
 
         if (world instanceof World) {
             List<AxisAlignedBB> boxes2 = new ArrayList<>();

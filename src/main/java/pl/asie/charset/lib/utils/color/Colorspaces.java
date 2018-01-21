@@ -23,6 +23,7 @@ import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
@@ -165,7 +166,7 @@ public class Colorspaces {
 			conversionGraph.putEdgeValue(Colorspace.sRGB, Colorspace.YUV, ColorspaceFunctions::sRGBtoYUV);
 			conversionGraph.putEdgeValue(Colorspace.sRGB, Colorspace.YIQ, ColorspaceFunctions::sRGBtoYIQ);
 
-			conversionTable = HashBasedTable.create();
+			conversionTable = Tables.newCustomTable(new EnumMap<>(Colorspace.class), () -> new EnumMap<>(Colorspace.class));
 			buildConversionTable(conversionGraph);
 		}
 	}
