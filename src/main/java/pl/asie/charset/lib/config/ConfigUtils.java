@@ -43,6 +43,15 @@ public final class ConfigUtils {
 		return prop.getBoolean();
 	}
 
+	public static String getString(Configuration config, String category, String name, String defaultValue, String comment, boolean requiresRestart) {
+		prepareCategory(config, category);
+		Property prop = config.get(category, name, defaultValue);
+		prop.setComment(comment);
+		prop.setRequiresMcRestart(requiresRestart);
+		prop.setLanguageKey("config.charset." + ModuleLoader.moduleConfigs.inverse().get(config) + "." + name + ".name");
+		return prop.getString();
+	}
+
 	public static String[] getStringList(Configuration config, String category, String name, String[] defaultValue, String comment, boolean requiresRestart) {
 		prepareCategory(config, category);
 		Property prop = config.get(category, name, defaultValue);

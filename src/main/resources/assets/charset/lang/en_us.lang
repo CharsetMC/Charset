@@ -1,3 +1,5 @@
+chat.charset.shout=%1$s %2$s
+
 # Config
 config.charset.title=Charset Configuration
 config.charset.profile.name=Profile
