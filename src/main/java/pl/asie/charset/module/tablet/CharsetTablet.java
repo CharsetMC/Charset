@@ -145,6 +145,17 @@ public class CharsetTablet {
 		TabletAPI.INSTANCE.registerPrinterText(TextPrinterFormat.HTML, WordText.class, (c, w) -> ((WordText) w).getText());
 
 		TabletAPI.INSTANCE.addBook("Book of Charset", "mod://charset/index");
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void onInitClient(FMLInitializationEvent event) {
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordBullet.class, new WordPrinterMCBullet());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordImage.class, new WordPrinterMCImage());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordItem.class, new WordPrinterMCItem());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordNewline.class, new WordPrinterMCNewline());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordText.class, new WordPrinterMCText());
+		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordURL.class, new WordPrinterMCURL());
 
 		if (allowRemoteLookups) {
 			TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("gamepedia", "Gamepedia", "ftb.gamepedia.com", "minecraft.gamepedia.com"));
@@ -179,17 +190,6 @@ public class CharsetTablet {
 				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("opencomputers", "OpenComputers Wiki", "ocdoc.cil.li/doku.php"));
 			} */
 		}
-	}
-
-	@Mod.EventHandler
-	@SideOnly(Side.CLIENT)
-	public void onInitClient(FMLInitializationEvent event) {
-		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordBullet.class, new WordPrinterMCBullet());
-		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordImage.class, new WordPrinterMCImage());
-		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordItem.class, new WordPrinterMCItem());
-		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordNewline.class, new WordPrinterMCNewline());
-		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordText.class, new WordPrinterMCText());
-		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordURL.class, new WordPrinterMCURL());
 	}
 
 	@SubscribeEvent
