@@ -36,6 +36,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.CharsetLib;
 
@@ -177,14 +180,21 @@ public final class ItemUtils {
 	}
 
 	public static EntityItem giveOrSpawnItemEntity(EntityPlayer player, World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
-		if (!CharsetLib.alwaysDropDroppablesGivenToPlayer && player.inventory != null && !EntityUtils.isPlayerFake(player) && player.inventory.addItemStackToInventory(stack)) {
-			return null;
-		} else {
-			return spawnItemEntity(world, loc, stack, mXm, mYm, mZm, randomness);
+		EntityItem entityItem = createItemEntity(world, loc, stack, mXm, mYm, mZm, randomness);
+		if (!CharsetLib.alwaysDropDroppablesGivenToPlayer && player.inventory != null && !EntityUtils.isPlayerFake(player)) {
+			EntityItemPickupEvent event = new EntityItemPickupEvent(player, entityItem);
+			if (!MinecraftForge.EVENT_BUS.post(event) && event.getResult() != Event.Result.DENY) {
+				if (player.addItemStackToInventory(stack)) {
+					return null;
+				}
+			}
 		}
+
+		world.spawnEntity(entityItem);
+		return entityItem;
 	}
 
-	public static EntityItem spawnItemEntity(World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
+	private static EntityItem createItemEntity(World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
 		EntityItem entityItem = new EntityItem(world, loc.x, loc.y, loc.z, stack);
 		entityItem.setDefaultPickupDelay();
 		if (randomness <= 0.0f) {
@@ -196,6 +206,11 @@ public final class ItemUtils {
 			entityItem.motionY = ((1.0f - randomness) + (((world.rand.nextDouble() - 0.5) * 2.0f) * randomness)) * mYm;
 			entityItem.motionZ = ((1.0f - randomness) + (((world.rand.nextDouble() - 0.5) * 2.0f) * randomness)) * mZm;
 		}
+		return entityItem;
+	}
+
+	public static EntityItem spawnItemEntity(World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
+		EntityItem entityItem = createItemEntity(world, loc, stack, mXm, mYm, mZm, randomness);
 		world.spawnEntity(entityItem);
 		return entityItem;
 	}

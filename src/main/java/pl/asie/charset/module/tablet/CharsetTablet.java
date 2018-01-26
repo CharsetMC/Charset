@@ -27,6 +27,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -156,7 +157,11 @@ public class CharsetTablet {
 		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordNewline.class, new WordPrinterMCNewline());
 		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordText.class, new WordPrinterMCText());
 		TabletAPIClient.INSTANCE.registerPrinterMinecraft(WordURL.class, new WordPrinterMCURL());
+	}
 
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void onPostInitClient(FMLPostInitializationEvent event) {
 		if (allowRemoteLookups) {
 			TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("gamepedia", "Gamepedia", "ftb.gamepedia.com", "minecraft.gamepedia.com"));
 			if (Loader.isModLoaded("mekanism")) {

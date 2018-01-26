@@ -69,7 +69,7 @@ public class CharsetTweakDoubleDoors {
 								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
 								EnumHand.class, EnumFacing.class,
 								float.class, float.class, float.class);
-						if (m != null && m.getDeclaringClass() == BlockDoor.class) {
+						if (m.getDeclaringClass() == BlockDoor.class) {
 							allowed = true;
 						}
 					} else if (state == ThreeState.YES) {
