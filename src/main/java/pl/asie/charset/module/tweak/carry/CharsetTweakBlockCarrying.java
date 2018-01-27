@@ -297,7 +297,7 @@ public class CharsetTweakBlockCarrying {
 
     protected static void syncCarryWithClient(Entity who, EntityPlayer target) {
         if (who instanceof EntityPlayerMP && who.hasCapability(CAPABILITY, null)) {
-            packet.sendTo(new PacketCarrySync(who, true), target);
+            packet.sendTo(new PacketCarrySync(who, who == target), target);
         }
     }
 
