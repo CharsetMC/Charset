@@ -27,10 +27,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
 import pl.asie.charset.lib.utils.ItemUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ItemMaterialRegistry {
 	public static final ItemMaterialRegistry INSTANCE = new ItemMaterialRegistry();
@@ -102,8 +99,19 @@ public class ItemMaterialRegistry {
 
 	// TODO: slow - optimize
 	public Collection<ItemMaterial> getMaterialsByTypes(String... types) {
+		Collection<ItemMaterial> startingPoint = materialsById.values();
+
+		for (String type : types) {
+			if (type.charAt(0) != '!') {
+				Collection<ItemMaterial> collection = materialsByType.get(type);
+				if (collection.size() < startingPoint.size()) {
+					startingPoint = collection;
+				}
+			}
+		}
+
 		ImmutableSet.Builder<ItemMaterial> set = new ImmutableSet.Builder<>();
-		for (ItemMaterial material : materialsById.values()) {
+		for (ItemMaterial material : startingPoint) {
 			Collection<String> srcTypes = material.getTypes();
 			boolean valid = true;
 			for (String type : types) {
@@ -184,7 +192,7 @@ public class ItemMaterialRegistry {
 
 	public boolean matches(ItemMaterial mat, String... mats) {
 		for (String matStr : mats) {
-			if (matStr.startsWith("!")) {
+			if (matStr.length() > 0 && matStr.charAt(0) == '!') {
 				matStr = matStr.substring(1);
 				if (mat.getTypes().contains(matStr)) {
 					return false;

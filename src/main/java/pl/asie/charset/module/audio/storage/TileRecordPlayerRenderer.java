@@ -29,16 +29,12 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.TRSRTransformation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GLSync;
 import pl.asie.charset.lib.Properties;
-import pl.asie.charset.module.laser.CharsetLaser;
 
 public class TileRecordPlayerRenderer extends TileEntitySpecialRenderer<TileRecordPlayer> {
 	public static final TileRecordPlayerRenderer INSTANCE = new TileRecordPlayerRenderer();

@@ -17,44 +17,34 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.audio.storage;
+package pl.asie.charset.module.optics.laser.blocks;
 
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import pl.asie.charset.lib.Properties;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.utils.Orientation;
 
 import javax.annotation.Nullable;
 
-public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider {
-	public static final AxisAlignedBB BOX = new AxisAlignedBB(0, 0, 0, 1, 0.625f, 1);
+public class BlockPrism extends BlockBase implements ITileEntityProvider {
+	public static final PropertyEnum<Orientation> ORIENTATION = PropertyEnum.create("orientation", Orientation.class);
+	public static final AxisAlignedBB BOX = new AxisAlignedBB(0.25f,0.25f,0.25f,0.75f,0.75f,0.75f);
 
-	public BlockRecordPlayer() {
-		super(Material.ROCK);
-		setHardness(2.5F);
-		setHarvestLevel("pickaxe", 0);
-		setSoundType(SoundType.METAL);
-		setUnlocalizedName("charset.record_player");
+	public BlockPrism() {
+		super(Material.GLASS);
 		setFullCube(false);
 		setOpaqueCube(false);
-	}
-
-	@Override
-	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		return this.getDefaultState().withProperty(Properties.FACING4, placer.getHorizontalFacing());
 	}
 
 	@Override
@@ -64,34 +54,38 @@ public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider 
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, Properties.FACING4);
+		return new BlockStateContainer(this, ORIENTATION);
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(Properties.FACING4, EnumFacing.getFront((meta & 3) + 2));
+		return getDefaultState();
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(Properties.FACING4).ordinal() - 2;
+		return 0;
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (world != null) {
-			TileEntity tile = world.getTileEntity(pos);
-			if (tile instanceof TileRecordPlayer) {
-				return ((TileRecordPlayer) tile).activate(player, side, hand, new Vec3d(hitX, hitY, hitZ));
-			}
+	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if (tile instanceof TilePrism) {
+			return state.withProperty(ORIENTATION, ((TilePrism) tile).getOrientation());
+		} else {
+			return state;
 		}
-
-		return false;
 	}
 
 	@Nullable
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileRecordPlayer();
+		return new TilePrism();
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.TRANSLUCENT;
 	}
 }

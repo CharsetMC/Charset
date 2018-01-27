@@ -19,7 +19,6 @@
 
 package pl.asie.charset.lib.block;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
@@ -55,13 +54,9 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
-import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.utils.Utils;
-import pl.asie.charset.module.experiments.projector.TileProjector;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider;

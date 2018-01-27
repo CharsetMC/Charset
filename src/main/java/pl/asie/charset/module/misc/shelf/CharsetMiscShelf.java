@@ -20,7 +20,6 @@
 package pl.asie.charset.module.misc.shelf;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
@@ -42,8 +41,6 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.render.ShadingTintColorHandler;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.module.laser.CharsetLaser;
-import pl.asie.charset.module.laser.blocks.LaserTintHandler;
 
 @CharsetModule(
 		name = "misc.shelf",

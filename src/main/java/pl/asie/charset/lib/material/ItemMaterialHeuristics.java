@@ -99,21 +99,19 @@ public final class ItemMaterialHeuristics {
         int height = craftMatrix.getHeight();
 
         for (IRecipe irecipe : ForgeRegistries.RECIPES) {
-            // These cut the search time significantly.
-            if (irecipe.getClass() == ShapedRecipes.class || irecipe.getClass() == ShapedOreRecipe.class || (irecipe instanceof RecipeCharset.Shaped)) {
-                // I don't trust non-vanilla/non-Charset recipes to be correct with this
+            if (noShapeless && (irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe
+                    || (irecipe instanceof RecipeCharset && ((RecipeCharset) irecipe).getType() == RecipeCharset.Type.SHAPELESS))) {
+                continue;
+            }
+
+            if (irecipe instanceof IShapedRecipe && !irecipe.isDynamic()) {
                 if (((IShapedRecipe) irecipe).getRecipeWidth() != width || ((IShapedRecipe) irecipe).getRecipeHeight() != height) {
                     continue;
                 }
-            }
-
-            if (noShapeless && (irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe
-                || (irecipe instanceof RecipeCharset && ((RecipeCharset) irecipe).getType() == RecipeCharset.Type.SHAPELESS))) {
-                continue;
-            }
-
-            if (!irecipe.canFit(width, height)) {
-                continue;
+            } else {
+                if (!irecipe.canFit(width, height)) {
+                    continue;
+                }
             }
 
             if (irecipe.matches(craftMatrix, worldIn)) {
