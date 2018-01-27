@@ -22,28 +22,32 @@ package pl.asie.charset.lib.material;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 public final class ItemMaterial {
-	private final String id;
 	private final ItemStack stack;
 
+	private final transient String id;
+	private final transient Set<String> types;
+	private final transient Map<String, ItemMaterial> relations;
+
 	protected ItemMaterial(ItemStack stack) {
-		this.id = ItemMaterialRegistry.createId(stack);
 		this.stack = stack;
+		this.id = ItemMaterialRegistry.createId(stack);
+		this.types = new HashSet<>();
+		this.relations = new HashMap<>();
 	}
 
 	public Collection<String> getTypes() {
-		return ItemMaterialRegistry.INSTANCE.getMaterialTypes(this);
+		return types;
 	}
 
 	public Map<String, ItemMaterial> getRelations() {
-		return ItemMaterialRegistry.INSTANCE.materialRelations.row(this);
+		return relations;
 	}
 
 	public ItemMaterial getRelated(String relation) {
-		return ItemMaterialRegistry.INSTANCE.materialRelations.get(this, relation);
+		return relations.get(relation);
 	}
 
 	public String getId() {

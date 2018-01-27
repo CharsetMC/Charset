@@ -97,17 +97,19 @@ public final class ItemMaterialHeuristics {
     public static IRecipe findMatchingRecipeQuickly(boolean noShapeless, InventoryCrafting craftMatrix, World worldIn) {
         int width = craftMatrix.getWidth();
         int height = craftMatrix.getHeight();
+
         for (IRecipe irecipe : ForgeRegistries.RECIPES) {
             // These cut the search time significantly.
-            if (irecipe instanceof IShapedRecipe) {
+            if (irecipe.getClass() == ShapedRecipes.class || irecipe.getClass() == ShapedOreRecipe.class || (irecipe instanceof RecipeCharset.Shaped)) {
+                // I don't trust non-vanilla/non-Charset recipes to be correct with this
                 if (((IShapedRecipe) irecipe).getRecipeWidth() != width || ((IShapedRecipe) irecipe).getRecipeHeight() != height) {
                     continue;
                 }
-            } else {
-                if (noShapeless && (irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe
-                    || (irecipe instanceof RecipeCharset && ((RecipeCharset) irecipe).getType() == RecipeCharset.Type.SHAPELESS))) {
-                    continue;
-                }
+            }
+
+            if (noShapeless && (irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe
+                || (irecipe instanceof RecipeCharset && ((RecipeCharset) irecipe).getType() == RecipeCharset.Type.SHAPELESS))) {
+                continue;
             }
 
             if (!irecipe.canFit(width, height)) {
@@ -168,9 +170,9 @@ public final class ItemMaterialHeuristics {
                 if (reg.registerTypes(plankMaterial, "plank", "wood", "block")) {
                     reg.registerRelation(logMaterial, plankMaterial, "plank", "log");
 
-                    ItemStack stick = getCraftingResultQuickly(true, null, 2, 2,
-                            plank, null,
-                            plank, null);
+                    ItemStack stick = getCraftingResultQuickly(true, null, 1, 2,
+                            plank,
+                            plank);
                     if (stick.isEmpty()) {
                         stick = new ItemStack(Items.STICK);
                     } else {
@@ -420,7 +422,7 @@ public final class ItemMaterialHeuristics {
                 for (ItemMaterial material : reg.getAllMaterials()) {
                     writer.println(material.getId());
                     writer.println("- Types: " + commaJoiner.join(material.getTypes()));
-                    for (Map.Entry<String, ItemMaterial> entry : ItemMaterialRegistry.INSTANCE.materialRelations.row(material).entrySet()) {
+                    for (Map.Entry<String, ItemMaterial> entry : material.getRelations().entrySet()) {
                         writer.println("- Relation: " + entry.getKey() + " -> " + entry.getValue().getId());
                     }
                 }

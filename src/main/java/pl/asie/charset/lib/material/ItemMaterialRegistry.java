@@ -35,9 +35,7 @@ import java.util.Map;
 public class ItemMaterialRegistry {
 	public static final ItemMaterialRegistry INSTANCE = new ItemMaterialRegistry();
 	private final Map<String, ItemMaterial> materialsById = new HashMap<>();
-	private final LinkedListMultimap<String, ItemMaterial> materialsByType = LinkedListMultimap.create();
-	private final Multimap<ItemMaterial, String> materialTypes = MultimapBuilder.hashKeys().hashSetValues().build();
-	protected final Table<ItemMaterial, String, ItemMaterial> materialRelations = HashBasedTable.create();
+	private final ListMultimap<String, ItemMaterial> materialsByType = MultimapBuilder.hashKeys().arrayListValues().build();
 
 	protected ItemMaterialRegistry() {
 
@@ -95,7 +93,7 @@ public class ItemMaterialRegistry {
 
 	public ItemMaterial getDefaultMaterialByType(String type) {
 		List<ItemMaterial> materials = materialsByType.get(type);
-		return materials != null && materials.size() > 0 ? materials.get(0) : null;
+		return materials != null && !materials.isEmpty() ? materials.get(0) : null;
 	}
 
 	public Collection<ItemMaterial> getMaterialsByType(String type) {
@@ -132,10 +130,6 @@ public class ItemMaterialRegistry {
 		return materialsById.get(id);
 	}
 
-	public Collection<String> getMaterialTypes(ItemMaterial material) {
-		return materialTypes.get(material);
-	}
-
 	public ItemMaterial getMaterialIfPresent(ItemStack stack) {
 		return materialsById.get(createId(stack));
 	}
@@ -158,8 +152,8 @@ public class ItemMaterialRegistry {
 	}
 
 	public boolean registerType(ItemMaterial material, String type) {
-		if (type.length() > 0 && !materialTypes.containsEntry(material, type)) {
-			materialTypes.put(material, type);
+		if (type.length() > 0 && !material.getTypes().contains(type)) {
+			material.getTypes().add(type);
 			materialsByType.put(type, material);
 			return true;
 		} else {
@@ -172,7 +166,7 @@ public class ItemMaterialRegistry {
 	}
 
 	public boolean registerRelation(ItemMaterial source, ItemMaterial target, String relation) {
-		materialRelations.put(source, relation, target);
+		source.getRelations().put(relation, target);
 		return true;
 	}
 
