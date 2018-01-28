@@ -1,4 +1,5 @@
 chat.charset.shout=%1$s %2$s
+notice.charset.cauldron.no_dye=Cannot mix dye!
 
 # Config
 config.charset.title=Charset Configuration

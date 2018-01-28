@@ -11,10 +11,10 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public final class CharsetCauldronEventListener implements IWorldEventListener {
-	protected static final CharsetCauldronEventListener INSTANCE = new CharsetCauldronEventListener();
+public final class CauldronLevelUpdateListener implements IWorldEventListener {
+	protected static final CauldronLevelUpdateListener INSTANCE = new CauldronLevelUpdateListener();
 
-	private CharsetCauldronEventListener() {
+	private CauldronLevelUpdateListener() {
 
 	}
 

@@ -159,10 +159,14 @@ public final class RenderUtils {
 		return null;
 	}
 
+	public static ResourceLocation toTextureFilePath(ResourceLocation location) {
+		ResourceLocation pngLocation = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", "textures", location.getResourcePath(), ".png"));
+		return pngLocation;
+	}
+
 	public static BufferedImage getTextureImage(ResourceLocation location) {
 		try {
-			ResourceLocation pngLocation = new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {"textures", location.getResourcePath(), ".png"}));
-			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(pngLocation);
+			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(toTextureFilePath(location));
 			return TextureUtil.readBufferedImage(resource.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();

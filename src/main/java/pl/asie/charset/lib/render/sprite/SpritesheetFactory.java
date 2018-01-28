@@ -34,7 +34,7 @@ public class SpritesheetFactory {
     private final ResourceLocation location;
     private final int width, height;
 
-    protected static class SliceSprite extends TextureAtlasSprite {
+    protected static class SliceSprite extends TextureAtlasSpriteCustom {
         private final ResourceLocation location;
         private final int x, y, width, height;
         private BufferedImage sheet;
@@ -66,17 +66,10 @@ public class SpritesheetFactory {
             int pieceWidth = sheet.getWidth() / width;
             int pieceHeight = sheet.getHeight() / height;
 
-            setIconWidth(pieceWidth);
-            setIconHeight(pieceHeight);
+            int[] pixels = new int[pieceWidth * pieceHeight];
+            sheet.getRGB(pieceWidth * x, pieceHeight * y, pieceWidth, pieceHeight, pixels, 0, pieceWidth);
 
-            int[][] pixels = new int[Minecraft.getMinecraft().getTextureMapBlocks().getMipmapLevels() + 1][];
-            pixels[0] = new int[pieceWidth * pieceHeight];
-
-            sheet.getRGB(pieceWidth * x, pieceHeight * y, pieceWidth, pieceHeight, pixels[0], 0, pieceWidth);
-
-            this.clearFramesTextureData();
-            this.framesTextureData.add(pixels);
-
+            this.addFrameTextureData(pieceWidth, pieceHeight, pixels);
             return false;
         }
     }

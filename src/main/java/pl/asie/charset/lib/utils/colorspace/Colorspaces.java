@@ -64,7 +64,7 @@ public class Colorspaces {
 			for (Colorspace to : Colorspace.values()) {
 				if (from == to || predecessors[to.ordinal()] == null) continue;
 
-				Colorspace[] path = new Colorspace[distances[to.ordinal()]];
+				Colorspace[] path = new Colorspace[distances[to.ordinal()] + 1];
 				Colorspace current = to;
 				for (int i = path.length - 1; i >= 0; i--) {
 					path[i] = current;
@@ -164,5 +164,9 @@ public class Colorspaces {
 			conversionTable = Tables.newCustomTable(new EnumMap<>(Colorspace.class), () -> new EnumMap<>(Colorspace.class));
 			buildConversionTable(conversionGraph);
 		}
+	}
+
+	public static void main(String[] args) {
+		init();
 	}
 }

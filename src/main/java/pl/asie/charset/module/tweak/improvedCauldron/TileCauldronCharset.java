@@ -120,6 +120,18 @@ public class TileCauldronCharset extends TileBase implements IFluidHandler, IFlu
 		return stack;
 	}
 
+	protected void setContents(FluidStack stack) {
+		int oldC = getComparatorValue();
+
+		this.stack = stack;
+		rebuildFromStack(false);
+		markBlockForUpdate();
+
+		if (oldC != getComparatorValue()) {
+			world.updateComparatorOutputLevel(pos, CharsetTweakImprovedCauldron.blockCauldron);
+		}
+	}
+
 	@Override
 	public int getCapacity() {
 		return 1000;
