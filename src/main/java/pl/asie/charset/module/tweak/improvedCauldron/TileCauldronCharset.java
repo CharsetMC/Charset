@@ -164,8 +164,20 @@ public class TileCauldronCharset extends TileBase implements IFluidHandler, IFlu
 
 	@Override
 	public int fill(FluidStack resource, boolean doFill) {
-		if (resource == null || (stack != null && !resource.isFluidEqual(stack))) {
+		if (resource == null) {
 			return 0;
+		}
+
+		if (stack != null && !resource.isFluidEqual(stack)) {
+			boolean isOkay = false;
+
+			if (resource.getFluid() == FluidRegistry.WATER && stack.getFluid() == CharsetTweakImprovedCauldron.dyedWater) {
+				isOkay = true;
+			}
+
+			if (!isOkay) {
+				return 0;
+			}
 		}
 
 		int toFill = Math.min(stack != null ? (getCapacity() - stack.amount) : getCapacity(), resource.amount);

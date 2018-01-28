@@ -95,6 +95,9 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 								new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.no_dye")).sendTo(playerIn);
 							} else {
 								((TileCauldronCharset) tankEntity).setContents(newStack);
+								if (!playerIn.isCreative()) {
+									heldItem.shrink(1);
+								}
 							}
 						}
 
@@ -176,8 +179,18 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 
 	@Override
 	public void fillWithRain(World worldIn, BlockPos pos) {
-		if (isEmptyOrWater(worldIn, pos)) {
-			super.fillWithRain(worldIn, pos);
+		float f = worldIn.getBiome(pos).getTemperature(pos);
+
+		if (worldIn.getBiomeProvider().getTemperatureAtHeight(f, pos.getY()) >= 0.15F) {
+			TileEntity tile = worldIn.getTileEntity(pos);
+			if (tile instanceof TileCauldronCharset) {
+				FluidStack stack = ((TileCauldronCharset) tile).getContents();
+				if (stack == null || stack.getFluid() == FluidRegistry.WATER || stack.getFluid() == CharsetTweakImprovedCauldron.dyedWater) {
+					if (stack == null || stack.amount < 667) {
+						((TileCauldronCharset) tile).fill(new FluidStack(FluidRegistry.WATER, Math.min(40, 667 - (stack == null ? 0 : stack.amount))), true);
+					}
+				}
+			}
 		}
 	}
 
