@@ -49,6 +49,7 @@ import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.scheduler.Scheduler;
+import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
@@ -56,7 +57,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-public class TileTank extends TileBase implements IFluidHandler, IFluidTankProperties, IMovable, IDebuggable, IMultiblockStructure, ICacheable {
+public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutomationDetecting, IFluidTankProperties, IMovable, IDebuggable, IMultiblockStructure, ICacheable {
     public static class TankIterator implements Iterator<TileTank> {
         private TileTank currTank;
 
@@ -338,7 +339,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
         return drain(resource, doDrain, true);
     }
 
-    protected FluidStack drain(FluidStack resource, boolean doDrain, boolean isAutomated) {
+    @Nullable
+    @Override
+    public FluidStack drain(FluidStack resource, boolean doDrain, boolean isAutomated) {
         if (canDrainFluidType(resource)) {
             return drain(resource.amount, doDrain, isAutomated);
         } else {
@@ -353,7 +356,9 @@ public class TileTank extends TileBase implements IFluidHandler, IFluidTankPrope
         return drain(maxDrain, doDrain, true);
     }
 
-    protected FluidStack drain(int maxDrain, boolean doDrain, boolean isAutomated) {
+    @Nullable
+    @Override
+    public FluidStack drain(int maxDrain, boolean doDrain, boolean isAutomated) {
         int toDrain = (!isAutomated && isCreative() && fluidStack != null) ? getContents().amount : maxDrain;
         FluidStack typeSrc = getBottomTank().fluidStack;
         if (typeSrc == null) {

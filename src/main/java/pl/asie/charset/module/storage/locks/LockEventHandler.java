@@ -137,11 +137,7 @@ public class LockEventHandler {
         boolean hasCap = state == ThreeState.YES;
 
         if (state == ThreeState.MAYBE) {
-            if (tile instanceof TileEntityChest) {
-                hasCap = true;
-            }
-
-            if ("minecraft".equals(location.getResourceDomain()) && tile instanceof TileEntityLockable) {
+            if (tile instanceof TileEntityLockable) {
                 hasCap = true;
             }
         }

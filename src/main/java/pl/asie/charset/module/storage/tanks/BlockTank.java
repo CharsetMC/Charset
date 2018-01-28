@@ -46,11 +46,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 public class BlockTank extends BlockBase implements ITileEntityProvider {
@@ -181,63 +183,12 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         if (hand != EnumHand.MAIN_HAND)
             return false;
 
-        ItemStack stack = playerIn.getHeldItem(hand);
-        IFluidHandlerItem handler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, stack, null);
-        if (handler != null) {
-            TileEntity tile = worldIn.getTileEntity(pos);
-
-            if (tile instanceof TileTank) {
-                TileTank tank = (TileTank) tile;
-                if (!worldIn.isRemote) {
-                    boolean changed = false;
-
-                    FluidStack fluidContained = tank.getBottomTank().fluidStack;
-                    FluidStack fluidExtracted;
-                    if (fluidContained != null) {
-                        FluidStack f = fluidContained.copy();
-                        f.amount = Fluid.BUCKET_VOLUME;
-                        fluidExtracted = handler.drain(f, false);
-                    } else {
-                        fluidExtracted = handler.drain(Fluid.BUCKET_VOLUME, false);
-                    }
-
-                    if (fluidExtracted == null) {
-                        // tank -> holder
-                        fluidExtracted = tank.drain(Fluid.BUCKET_VOLUME, false, false);
-                        if (fluidExtracted != null) {
-                            int amount = handler.fill(fluidExtracted, false);
-                            if (amount > 0) {
-                                fluidExtracted.amount = amount;
-                                fluidExtracted = tank.drain(fluidExtracted, true, false);
-                                if (fluidExtracted != null) {
-                                    handler.fill(fluidExtracted, true);
-                                    changed = true;
-                                }
-                            }
-                        }
-                    } else {
-                        // holder -> tank
-                        int amount = tank.fill(fluidExtracted, false);
-                        if (amount > 0) {
-                            fluidExtracted.amount = amount;
-                            fluidExtracted = handler.drain(fluidExtracted, !playerIn.isCreative());
-                            if (fluidExtracted != null) {
-                                tank.fill(fluidExtracted, true);
-                                changed = true;
-                            }
-                        }
-                    }
-
-                    if (changed) {
-                        playerIn.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, handler.getContainer());
-                    }
-                }
-            }
-
-            return true;
+        TileEntity tankEntity = worldIn.getTileEntity(pos);
+        if (tankEntity instanceof TileTank) {
+            return FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileTank) tankEntity).getContents(), worldIn, pos, playerIn, hand);
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     @Override
