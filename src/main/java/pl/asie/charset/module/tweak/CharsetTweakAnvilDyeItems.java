@@ -40,7 +40,7 @@ import pl.asie.charset.lib.utils.ColorUtils;
 		profile = ModuleProfile.STABLE
 )
 // TODO: Override GuiIngame.highlightingItemStack?
-public class CharsetTweakDyeAnvilItems {
+public class CharsetTweakAnvilDyeItems {
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onAnvilUpdate(AnvilUpdateEvent event) {
 		if (!event.getLeft().isEmpty() && !event.getRight().isEmpty()

@@ -77,7 +77,7 @@ public class TileShelf extends TileBase {
 		handler.setStackInSlot(slotId, ItemStack.EMPTY);
 		markBlockForUpdate();
 
-		ItemUtils.giveOrSpawnItemEntity(player, getWorld(), new Vec3d(pos).addVector(hitX, hitY, hitZ), stack, 0,0,0,0);
+		ItemUtils.giveOrSpawnItemEntity(player, getWorld(), new Vec3d(pos).addVector(hitX, hitY, hitZ), stack, 0,0,0,0, true);
 		return true;
 	}
 

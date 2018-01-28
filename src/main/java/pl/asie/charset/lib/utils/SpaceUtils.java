@@ -492,14 +492,16 @@ public final class SpaceUtils {
     }
 
     public static double getVolume(AxisAlignedBB box) {
-        if (box == null) return 0;
-        double x = box.maxX - box.minX;
-        double y = box.maxY - box.minY;
-        double z = box.maxZ - box.minZ;
-        double volume = x * y * z;
+        if (box != null) {
+            double x = box.maxX - box.minX;
+            double y = box.maxY - box.minY;
+            double z = box.maxZ - box.minZ;
+            double volume = x * y * z;
 
-        if (volume < 0) return 0;
-        return volume;
+            return volume > 0.0D ? volume : 0.0D;
+        } else {
+            return 0.0D;
+        }
     }
 
     public static AxisAlignedBB createBox(BlockPos at, int radius) {
@@ -578,6 +580,6 @@ public final class SpaceUtils {
     public static AxisAlignedBB getChunkBoundingBox(Chunk chunk) {
         int minX = chunk.x << 4;
         int minZ = chunk.z << 4;
-        return new AxisAlignedBB(minX, 0, minZ, minX + 16, 0xFF, minZ + 16);
+        return new AxisAlignedBB(minX, 0, minZ, minX + 16, chunk.getWorld().getActualHeight(), minZ + 16);
     }
 }

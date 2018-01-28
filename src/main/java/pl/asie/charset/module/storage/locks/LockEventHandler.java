@@ -33,7 +33,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -55,8 +54,8 @@ import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.ThreeState;
-import pl.asie.charset.lib.utils.color.Colorspace;
-import pl.asie.charset.lib.utils.color.Colorspaces;
+import pl.asie.charset.lib.utils.colorspace.Colorspace;
+import pl.asie.charset.lib.utils.colorspace.Colorspaces;
 
 import java.util.ArrayList;
 import java.util.Collection;

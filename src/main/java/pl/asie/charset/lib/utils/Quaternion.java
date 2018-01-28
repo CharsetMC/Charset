@@ -19,7 +19,6 @@
 
 package pl.asie.charset.lib.utils;
 
-import com.google.common.io.ByteArrayDataOutput;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,6 +31,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Quat4f;
 import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -99,7 +99,7 @@ public class Quaternion {
         return new Quaternion(tag.getDouble(prefix+"w"), tag.getDouble(prefix+"x"), tag.getDouble(prefix+"y"), tag.getDouble(prefix+"z"));
     }
     
-    public void write(ByteArrayDataOutput out) {
+    public void write(DataOutput out) throws IOException {
         double[] d = toStaticArray();
         for (int i = 0; i < d.length; i++) {
             out.writeDouble(d[i]);
@@ -135,16 +135,7 @@ public class Quaternion {
         }
         return new Quaternion(d);
     }
-    
-    /* @Override
-    public IDataSerializable serialize(String name_prefix, DataHelper data) throws IOException {
-        w = data.asSameShare(name_prefix + "w").putDouble(w);
-        x = data.asSameShare(name_prefix + "x").putDouble(x);
-        y = data.asSameShare(name_prefix + "y").putDouble(y);
-        z = data.asSameShare(name_prefix + "z").putDouble(z);
-        return this;
-    } */
-    
+
     public double[] fillArray(double[] out) {
         out[0] = w;
         out[1] = x;
@@ -156,14 +147,9 @@ public class Quaternion {
     public double[] toArray() {
         return fillArray(new double[4]);
     }
-    
-    private static ThreadLocal<double[]> localStaticArray = new ThreadLocal<double[]>() {
-        @Override
-        protected double[] initialValue() {
-            return new double[4];
-        };
-    };
-    
+
+    private static ThreadLocal<double[]> localStaticArray = ThreadLocal.withInitial(() -> new double[4]);
+
     public double[] toStaticArray() {
         return fillArray(localStaticArray.get());
     }

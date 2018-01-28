@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -49,6 +50,7 @@ import pl.asie.charset.lib.render.CharsetFaceBakery;
 import pl.asie.charset.module.misc.scaffold.ModelScaffold;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -168,21 +170,20 @@ public final class RenderUtils {
 		}
 	}
 
-	public static TextureAtlasSprite getItemSprite(ItemStack stack) {
-		if (renderItem == null) {
-			renderItem = Minecraft.getMinecraft().getRenderItem();
-		}
-
-		return renderItem.getItemModelWithOverrides(stack, null, null).getParticleTexture();
+	public static IBakedModel getItemModel(ItemStack stack) {
+		return getItemModel(stack, null, null);
 	}
 
-	public static boolean isBuiltInRenderer(World world, ItemStack stack) {
+	public static IBakedModel getItemModel(ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {
 		if (renderItem == null) {
 			renderItem = Minecraft.getMinecraft().getRenderItem();
 		}
 
-		IBakedModel model = renderItem.getItemModelWithOverrides(stack, world, null);
-		return model.isBuiltInRenderer();
+		return renderItem.getItemModelWithOverrides(stack, null, null);
+	}
+
+	public static TextureAtlasSprite getItemSprite(ItemStack stack) {
+		return getItemModel(stack).getParticleTexture();
 	}
 
 	public static int asMcIntColor(float[] data) {

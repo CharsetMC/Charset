@@ -70,8 +70,7 @@ import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.resources.ColorPaletteParser;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
-import pl.asie.charset.lib.utils.color.Colorspace;
-import pl.asie.charset.lib.utils.color.Colorspaces;
+import pl.asie.charset.lib.utils.colorspace.Colorspaces;
 
 import java.lang.reflect.Field;
 import java.util.Calendar;
@@ -199,7 +198,7 @@ public class CharsetLib {
 		packet.registerPacket(0x30, PacketRequestScroll.class);
 
 		MinecraftForge.EVENT_BUS.register(ShiftScrollHandler.INSTANCE);
-
+		MinecraftForge.EVENT_BUS.register(new DyeableItemWashHandler());
 		MinecraftForge.EVENT_BUS.register(new Todokete());
 
 		Capabilities.init();

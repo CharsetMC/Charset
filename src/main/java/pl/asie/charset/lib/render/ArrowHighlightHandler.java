@@ -19,10 +19,8 @@
 
 package pl.asie.charset.lib.render;
 
-import com.google.common.collect.Sets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -40,7 +38,6 @@ import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.utils.EntityUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.SpaceUtils;
-import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;

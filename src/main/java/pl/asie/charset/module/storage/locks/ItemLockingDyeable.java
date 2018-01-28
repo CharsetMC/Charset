@@ -38,8 +38,17 @@ public class ItemLockingDyeable extends ItemBase implements IDyeableItem {
     }
 
     @Override
-    public void setColor(ItemStack stack, int color) {
+    public boolean setColor(ItemStack stack, int color) {
         ItemUtils.getTagCompound(stack, true).setInteger("color", color);
+        return true;
+    }
+
+    @Override
+    public boolean removeColor(ItemStack stack) {
+        if (stack.hasTagCompound()) {
+            stack.getTagCompound().removeTag("color");
+        }
+        return true;
     }
 
     @SideOnly(Side.CLIENT)

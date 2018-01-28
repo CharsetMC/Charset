@@ -40,6 +40,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import pl.asie.charset.api.laser.LaserColor;
 import pl.asie.charset.lib.utils.*;
+import pl.asie.charset.lib.utils.Orientation;
 
 public class ProjectorRenderer {
 	public static class Surface implements IProjectorSurface {

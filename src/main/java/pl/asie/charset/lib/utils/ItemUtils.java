@@ -179,12 +179,12 @@ public final class ItemUtils {
 		}
 	}
 
-	public static EntityItem giveOrSpawnItemEntity(EntityPlayer player, World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness) {
+	public static EntityItem giveOrSpawnItemEntity(EntityPlayer player, World world, Vec3d loc, ItemStack stack, float mXm, float mYm, float mZm, float randomness, boolean emitEquipSound) {
 		EntityItem entityItem = createItemEntity(world, loc, stack, mXm, mYm, mZm, randomness);
 		if (!CharsetLib.alwaysDropDroppablesGivenToPlayer && player.inventory != null && !EntityUtils.isPlayerFake(player)) {
 			EntityItemPickupEvent event = new EntityItemPickupEvent(player, entityItem);
 			if (!MinecraftForge.EVENT_BUS.post(event) && event.getResult() != Event.Result.DENY) {
-				if (player.addItemStackToInventory(stack)) {
+				if (emitEquipSound ? player.addItemStackToInventory(stack) : player.inventory.addItemStackToInventory(stack)) {
 					return null;
 				}
 			}

@@ -17,19 +17,14 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.utils.color;
+package pl.asie.charset.lib.utils.colorspace;
 
-import com.google.common.base.Functions;
-import com.google.common.base.Joiner;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
-import java.awt.color.ColorSpace;
 import java.util.*;
 import java.util.function.Function;
 

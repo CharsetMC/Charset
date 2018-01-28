@@ -55,6 +55,7 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
+import pl.asie.charset.lib.utils.Orientation;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -937,7 +938,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         if (!stack.isEmpty()) {
-            ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), stack, 0.2f, 0.2f, 0.2f, 1);
+            ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), stack, 0.2f, 0.2f, 0.2f, 1, true);
         }
     }
 

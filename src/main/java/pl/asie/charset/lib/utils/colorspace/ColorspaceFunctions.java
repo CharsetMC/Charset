@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.utils.color;
+package pl.asie.charset.lib.utils.colorspace;
 
 final class ColorspaceFunctions {
 	private static final float[] D65_WHITE = {0.9504f, 1.0000f, 1.0888f};

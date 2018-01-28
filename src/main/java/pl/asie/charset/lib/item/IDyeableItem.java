@@ -28,5 +28,7 @@ public interface IDyeableItem {
 		return getColor(stack) >= 0;
 	}
 
-	void setColor(ItemStack stack, int color);
+	boolean removeColor(ItemStack stack);
+
+	boolean setColor(ItemStack stack, int color);
 }
