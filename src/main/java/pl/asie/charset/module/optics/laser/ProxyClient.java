@@ -20,12 +20,16 @@
 package pl.asie.charset.module.optics.laser;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -39,6 +43,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.command.CommandCharset;
 import pl.asie.charset.lib.render.model.ModelTransformer;
+import pl.asie.charset.lib.render.model.SimpleMultiLayerBakedModel;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -97,19 +102,32 @@ public class ProxyClient extends ProxyCommon {
 				format.addElement(DefaultVertexFormats.TEX_2S);
 
 				if (model != null) {
-					model = ModelTransformer.transform(model, state, 0, (quad, element, data) -> {
-						if (quad.getTintIndex() == 0 && element == DefaultVertexFormats.TEX_2S) {
-							return new float[] { 15f * 0x20 / 0xFFFF, 0, 0, 0 };
+					SimpleMultiLayerBakedModel result = new SimpleMultiLayerBakedModel(model);
+
+					BlockRenderLayer layerPre = MinecraftForgeClient.getRenderLayer();
+					for (BlockRenderLayer layer : new BlockRenderLayer[] { BlockRenderLayer.SOLID, BlockRenderLayer.TRANSLUCENT }) {
+						ForgeHooksClient.setRenderLayer(layer);
+						for (int i = 0; i <= 6; i++) {
+							EnumFacing facingIn = (i < 6) ? EnumFacing.getFront(i) : null;
+							for (BakedQuad quadIn : model.getQuads(state, facingIn, 0)) {
+								result.addQuad(layer, facingIn, ModelTransformer.transform(quadIn, (quad, element, data) -> {
+									if (quad.getTintIndex() == 0 && element == DefaultVertexFormats.TEX_2S) {
+										return new float[] { 15f * 0x20 / 0xFFFF, 0, 0, 0 };
+									}
+									return data;
+								}, (bakedQuad -> {
+									if (bakedQuad.getTintIndex() == 0) {
+										return format;
+									} else {
+										return bakedQuad.getFormat();
+									}
+								})));
+							}
 						}
-						return data;
-					}, (bakedQuad -> {
-						if (bakedQuad.getTintIndex() == 0) {
-							return format;
-						} else {
-							return bakedQuad.getFormat();
-						}
-					}));
-					event.getModelRegistry().putObject(location, model);
+					}
+
+					ForgeHooksClient.setRenderLayer(layerPre);
+					event.getModelRegistry().putObject(location, result);
 				}
 			}
 		}

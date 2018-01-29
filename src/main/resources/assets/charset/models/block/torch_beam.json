@@ -1,0 +1,20 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ 7, 8, 7 ],
+            "to": [ 9, 10, 9 ],
+            "shade": false,
+            "faces": {
+                "up":   { "texture": "#inner", "tintindex": 0 },
+                "north": { "texture": "#inner", "tintindex": 0 },
+                "south": { "texture": "#inner", "tintindex": 0 },
+                "west": { "texture": "#inner", "tintindex": 0 },
+                "east": { "texture": "#inner", "tintindex": 0 }
+            }
+        }
+    ],
+    "textures": {
+        "particle": "minecraft:blocks/concrete_powder_white",
+        "inner": "minecraft:blocks/concrete_powder_white"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ 7, 0, 7 ],
+            "to": [ 9, 10, 9 ],
+            "shade": false,
+            "faces": {
+                "down": { "texture": "#torch" }
+            }
+        },
+        {   "from": [ 7, 0, 7 ],
+            "to": [ 9, 8, 9 ],
+            "shade": false,
+            "faces": {
+                "north": { "texture": "#torch" },
+                "south": { "texture": "#torch" },
+                "west": { "texture": "#torch" },
+                "east": { "texture": "#torch" }
+            }
+        }
+    ],
+    "textures": {
+        "particle": "minecraft:blocks/torch_on",
+        "torch": "minecraft:blocks/torch_on"
+    }
+}

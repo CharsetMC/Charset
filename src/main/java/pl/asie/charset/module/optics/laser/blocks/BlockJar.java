@@ -176,6 +176,12 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+		return layer == BlockRenderLayer.SOLID || layer == BlockRenderLayer.TRANSLUCENT;
+	}
+
+	@Override
 	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> itemList) {
 		for (int i = 0; i <= 7; i++) {
 			itemList.add(new ItemStack(this, 1, i));

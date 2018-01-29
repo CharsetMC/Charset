@@ -1,10 +1,21 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "charset:light_jar"
+    "model": "forge:multi-layer",
+    "custom": {
+      "base": "charset:light_jar#base",
+      "Solid": "charset:light_jar#base",
+      "Translucent": "charset:light_jar#beam"
+    }
   },
   "variants": {
     "normal": [{}],
+    "base": [{
+      "model": "charset:torch_base"
+    }],
+    "beam": [{
+      "model": "charset:torch_beam"
+    }],
     "color": {
       "none": {},
       "blue": {},
