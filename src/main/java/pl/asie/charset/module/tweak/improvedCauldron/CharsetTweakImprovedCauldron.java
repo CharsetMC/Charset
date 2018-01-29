@@ -59,7 +59,6 @@ public class CharsetTweakImprovedCauldron {
 	public void preInit(FMLPreInitializationEvent event) {
 		blockCauldron = new BlockCauldronCharset();
 		FluidRegistry.registerFluid(dyedWater = new FluidDyedWater("dyed_water"));
-		FluidRegistry.addBucketForFluid(dyedWater);
 		dyedWater.setUnlocalizedName("charset.dyed_water");
 	}
 

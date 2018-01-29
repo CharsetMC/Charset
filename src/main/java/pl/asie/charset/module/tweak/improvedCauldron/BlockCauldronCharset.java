@@ -6,6 +6,7 @@ import net.minecraft.block.BlockSponge;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
@@ -65,15 +66,49 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 				FluidStack stack = ((TileCauldronCharset) tile).getContents();
 				float height = (float) pos.getY() + ((TileCauldronCharset) tile).getFluidHeight() / 16.0F;
 
-				if (stack != null && stack.amount > 0) {
+				if (stack != null && stack.amount > 0 && entityIn.getEntityBoundingBox().minY <= height) {
 					if (stack.getFluid() == FluidRegistry.LAVA) {
-						if (!entityIn.isBurning() && stack.amount >= 100 && !entityIn.isImmuneToFire() && entityIn.getEntityBoundingBox().minY <= height) {
+						if (!entityIn.isBurning() && stack.amount >= 100 && !entityIn.isImmuneToFire()) {
 							entityIn.setFire(stack.amount / 100);
+							return;
 						}
 					} else if (stack.getFluid() == FluidRegistry.WATER) {
-						if (entityIn.isBurning() && stack.amount >= 250 && entityIn.getEntityBoundingBox().minY <= height) {
+						if (entityIn.isBurning() && stack.amount >= 250) {
 							entityIn.extinguish();
 							((TileCauldronCharset) tile).drain(250, true);
+							return;
+						}
+					}
+
+					if (entityIn instanceof EntityItem) {
+						EntityItem entityItem = (EntityItem) entityIn;
+						ItemStack heldItem = entityItem.getItem();
+
+						if (!heldItem.isEmpty()) {
+							ItemStack heldItemOne = heldItem.copy();
+							heldItemOne.setCount(1);
+							Optional<CauldronContents> contentsNew = CharsetTweakImprovedCauldron.craft(tile, new CauldronContents(stack, heldItemOne));
+
+							if (contentsNew.isPresent()) {
+								CauldronContents cc = contentsNew.get();
+								if (!cc.hasResponse()) {
+									if (cc.getHeldItem().isEmpty()) {
+										heldItem.shrink(1);
+									} else if (cc.getHeldItem().getCount() == 1 && ItemUtils.canMerge(cc.getHeldItem(), heldItem)) {
+										// pass
+									} else {
+										heldItem.shrink(1);
+										ItemUtils.spawnItemEntity(
+												worldIn,
+												entityItem.getPositionVector(),
+												cc.getHeldItem(),
+												0, 0, 0, 0
+										);
+									}
+
+									((TileCauldronCharset) tile).setContents(cc.getFluidStack());
+								}
+							}
 						}
 					}
 				}

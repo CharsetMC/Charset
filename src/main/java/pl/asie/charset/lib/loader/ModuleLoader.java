@@ -326,9 +326,7 @@ public class ModuleLoader {
 				}
 			}
 
-			if (modProfile == ModuleProfile.FORCED) {
-				isDefault = true;
-			} else if (!compat && modProfile.ordinal() > profile.ordinal()) {
+			if (!compat && modProfile != ModuleProfile.FORCED && modProfile.ordinal() > profile.ordinal()) {
 				isDefault = false;
 			}
 
