@@ -86,7 +86,7 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable, IT
 					if (isRed || isBlue) {
 						for (EnumFacing target : EnumFacing.VALUES) {
 							FaceBehaviour targetB = getFaceBehaviour(target);
-							if (targetB != FaceBehaviour.PASS && face.getAxis() != target.getAxis()) {
+							if (targetB != FaceBehaviour.PASS) {
 								if (isRed && targetB != b) {
 									colors[target.ordinal()] = colors[target.ordinal()].union(LaserColor.RED);
 								}

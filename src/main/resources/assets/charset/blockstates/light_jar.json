@@ -35,7 +35,7 @@
       "east": {"x": 90, "y": 90}
     },
     "inventory": [{
-      "transform": "forge:default-block"
+      "transform": "forge:default-item"
     }]
   }
 }

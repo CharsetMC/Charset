@@ -76,6 +76,7 @@ public class LaserRenderer {
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
 		GlStateManager.enableAlpha();
+		GlStateManager.disableLighting();
 		GlStateManager.disableTexture2D();
 
 		Tessellator tessellator = Tessellator.getInstance();

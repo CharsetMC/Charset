@@ -40,6 +40,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -52,8 +54,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.NoticeStyle;
+import pl.asie.charset.lib.notify.NotificationCoord;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.module.tweak.improvedCauldron.TileCauldronCharset;
 
 public class BlockTank extends BlockBase implements ITileEntityProvider {
     public static final int VARIANTS = 18;
@@ -178,6 +184,23 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         return BlockRenderLayer.TRANSLUCENT;
     }
 
+    private void notice(World worldIn, TileEntity tankEntity, EntityPlayer playerIn, float noticeX, float noticeY, float noticeZ) {
+        if (!worldIn.isRemote) {
+            if (tankEntity instanceof TileTank) {
+                FluidStack stack = ((TileTank) tankEntity).getContents();
+                if (stack == null) {
+                    new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.empty"))
+                            .sendTo(playerIn);
+                } else {
+                    new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.fluid",
+                            new TextComponentString(Integer.toString(stack.amount)),
+                            new TextComponentTranslation(FluidUtils.getCorrectUnlocalizedName(stack))
+                    )).sendTo(playerIn);
+                }
+            }
+        }
+    }
+
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (hand != EnumHand.MAIN_HAND)
@@ -185,7 +208,20 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
         TileEntity tankEntity = worldIn.getTileEntity(pos);
         if (tankEntity instanceof TileTank) {
-            return FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileTank) tankEntity).getContents(), worldIn, pos, playerIn, hand);
+            ItemStack held = playerIn.getHeldItem(hand);
+            if (held.isEmpty()) {
+                notice(worldIn, tankEntity, playerIn,
+                        tankEntity.getPos().getX() + hitX,
+                        tankEntity.getPos().getY() + hitY,
+                        tankEntity.getPos().getZ() + hitZ);
+                return true;
+            }
+
+            if (FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileTank) tankEntity).getContents(), worldIn, pos, playerIn, hand)) {
+                return true;
+            }
+
+            return false;
         } else {
             return false;
         }

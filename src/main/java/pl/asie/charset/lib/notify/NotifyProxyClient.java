@@ -184,7 +184,7 @@ public class NotifyProxyClient extends NotifyProxy {
 
         GlStateManager.disableBlend();
         GlStateManager.enableDepth();
-        GlStateManager.enableLighting();
+        // GlStateManager.enableLighting();
         GlStateManager.depthMask(true);
         GlStateManager.color(1, 1, 1, 1);
 
