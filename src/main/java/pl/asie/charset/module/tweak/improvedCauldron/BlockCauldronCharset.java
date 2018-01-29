@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -34,8 +35,10 @@ import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.storage.tanks.TileTank;
+import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class BlockCauldronCharset extends BlockCauldron implements ITileEntityProvider {
 	private boolean isEmptyOrWater(IBlockAccess access, BlockPos pos) {
@@ -78,33 +81,30 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 		}
 	}
 
+	private void notice(World worldIn, TileEntity tankEntity, EntityPlayer playerIn) {
+		if (!worldIn.isRemote) {
+			if (tankEntity instanceof TileCauldronCharset) {
+				FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
+				if (stack == null) {
+					new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.empty")).sendTo(playerIn);
+				} else {
+					new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.fluid",
+							new TextComponentString(Integer.toString(stack.amount)),
+							new TextComponentTranslation(FluidUtils.getCorrectUnlocalizedName(stack))
+					)).sendTo(playerIn);
+				}
+			}
+		}
+	}
+
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		TileEntity tankEntity = worldIn.getTileEntity(pos);
 		ItemStack heldItem = playerIn.getHeldItem(hand);
-		EnumDyeColor color = ColorUtils.getDyeColor(heldItem);
 
-		if (color != null) {
-			if (tankEntity instanceof TileCauldronCharset) {
-				FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
-				if (stack != null) {
-					if (stack.getFluid() == FluidRegistry.WATER || stack.getFluid() == CharsetTweakImprovedCauldron.dyedWater) {
-						if (!worldIn.isRemote) {
-							FluidStack newStack = CharsetTweakImprovedCauldron.dyedWater.appendDye(stack, color);
-							if (newStack == null) {
-								new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.no_dye")).sendTo(playerIn);
-							} else {
-								((TileCauldronCharset) tankEntity).setContents(newStack);
-								if (!playerIn.isCreative()) {
-									heldItem.shrink(1);
-								}
-							}
-						}
-
-						return true;
-					}
-				}
-			}
+		if (heldItem.isEmpty()) {
+			notice(worldIn, tankEntity, playerIn);
+			return true;
 		}
 
 		if (isEmptyOrWater(worldIn, pos)) {
@@ -113,58 +113,47 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 			}
 		}
 
-		if (hand != EnumHand.MAIN_HAND)
+		if (hand != EnumHand.MAIN_HAND) {
 			return false;
+		}
 
 		if (tankEntity instanceof TileCauldronCharset) {
 			if (FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileCauldronCharset) tankEntity).getContents(), worldIn, pos, playerIn, hand)) {
 				return true;
 			}
 
-			FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
-			if (stack != null) {
-				if (stack.getFluid() == CharsetTweakImprovedCauldron.dyedWater) {
-					if (heldItem.getItem() instanceof ItemBlock && Block.getBlockFromItem(heldItem.getItem()) instanceof BlockSponge) {
-						if (!worldIn.isRemote) {
-							((TileCauldronCharset) tankEntity).setContents(new FluidStack(FluidRegistry.WATER, stack.amount));
-						}
-						return true;
-					}
+			if (!heldItem.isEmpty()) {
+				FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
+				ItemStack heldItemOne = heldItem.copy();
+				heldItemOne.setCount(1);
+				Optional<CauldronContents> contentsNew = CharsetTweakImprovedCauldron.craft(tankEntity, new CauldronContents(stack, heldItemOne));
 
-					if (stack.tag != null
-						&& stack.amount >= 250
-						&& stack.tag.hasKey("dyes", Constants.NBT.TAG_LIST)
-						&& !heldItem.isEmpty()) {
-						if (!worldIn.isRemote) {
-							NBTTagList dyes = (NBTTagList) stack.tag.getTag("dyes");
-							ItemStack[] stacks = new ItemStack[9];
-							stacks[0] = heldItem.copy();
-							stacks[0].setCount(1);
-							for (int i = 0; i < 8; i++) {
-								if (i < dyes.tagCount()) {
-									stacks[i + 1] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(i)).getByte());
-								} else {
-									stacks[i + 1] = ItemStack.EMPTY;
+				if (contentsNew.isPresent()) {
+					if (!worldIn.isRemote) {
+						boolean success = false;
+						CauldronContents cc = contentsNew.get();
+						if (cc.hasResponse()) {
+							new Notice(tankEntity, cc.getResponse()).sendTo(playerIn);
+						} else {
+							if (cc.getHeldItem().isEmpty()) {
+								if (!playerIn.isCreative()) {
+									heldItem.shrink(1);
 								}
+								success = true;
+							} else if (cc.getHeldItem().getCount() == 1 && ItemUtils.canMerge(cc.getHeldItem(), heldItem)) {
+								success = true;
+							} else if (heldItem.getCount() > 1) {
+								if (playerIn.inventory.addItemStackToInventory(cc.getHeldItem())) {
+									heldItem.shrink(1);
+									success = true;
+								}
+							} else if (heldItem.getCount() == 1) {
+								playerIn.setHeldItem(hand, cc.getHeldItem());
+								success = true;
 							}
 
-							ItemStack result = RecipeUtils.getCraftingResult(worldIn, 3, 3, stacks);
-							if (!result.isEmpty() && !ItemUtils.canMerge(stacks[0], result)) {
-								boolean success = false;
-
-								if (heldItem.getCount() == 1) {
-									playerIn.setHeldItem(hand, result);
-									success = true;
-								} else {
-									if (playerIn.inventory.addItemStackToInventory(result)) {
-										heldItem.shrink(1);
-										success = true;
-									}
-								}
-
-								if (success) {
-									((TileCauldronCharset) tankEntity).drain(250, true);
-								}
+							if (success) {
+								((TileCauldronCharset) tankEntity).setContents(cc.getFluidStack());
 							}
 						}
 					}
@@ -172,6 +161,11 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 					return true;
 				}
 			}
+		}
+
+		if (!playerIn.isSneaking()) {
+			notice(worldIn, tankEntity, playerIn);
+			return true;
 		}
 
 		return false;

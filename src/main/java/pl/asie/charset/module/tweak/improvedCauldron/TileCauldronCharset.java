@@ -123,6 +123,10 @@ public class TileCauldronCharset extends TileBase implements IFluidHandler, IFlu
 	protected void setContents(FluidStack stack) {
 		int oldC = getComparatorValue();
 
+		if (stack != null && stack.amount <= 0) {
+			stack = null;
+		}
+
 		this.stack = stack;
 		rebuildFromStack(false);
 		markBlockForUpdate();

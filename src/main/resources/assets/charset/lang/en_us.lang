@@ -1,5 +1,10 @@
 chat.charset.shout=%1$s %2$s
-notice.charset.cauldron.no_dye=Cannot mix dye!
+fluid.charset.dyed_water.name=Dyed Water
+notice.charset.cauldron.no_dye=Cannot mix more dye!
+notice.charset.cauldron.empty=Empty
+notice.charset.cauldron.fluid=%1$s mB of %2$s
+notice.charset.barrel.infinite=Infinite
+notice.charset.barrel.no=No.
 
 # Config
 config.charset.title=Charset Configuration

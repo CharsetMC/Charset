@@ -29,6 +29,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -40,7 +41,17 @@ import pl.asie.charset.module.storage.tanks.TileTank;
 import javax.annotation.Nullable;
 
 public final class FluidUtils {
-    public interface IFluidHandlerAutomationDetecting extends IFluidHandler {
+	public static String getCorrectUnlocalizedName(FluidStack stack) {
+	    if (stack.getFluid() == FluidRegistry.WATER) {
+	        return "tile.water.name";
+        } else if (stack.getFluid() == FluidRegistry.LAVA) {
+	        return "tile.lava.name";
+        } else {
+	        return stack.getUnlocalizedName() + ".name";
+        }
+	}
+
+	public interface IFluidHandlerAutomationDetecting extends IFluidHandler {
         @Nullable
         FluidStack drain(int maxDrain, boolean doDrain, boolean isAutomated);
         @Nullable
