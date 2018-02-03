@@ -145,7 +145,7 @@ public class CharsetStorageBarrels {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		GameRegistry.registerTileEntity(TileEntityDayBarrel.class, "charset:barrel");
-		RegistryUtils.register(EntityMinecartDayBarrel.class, "barrelCart", 64, 1, true);
+		RegistryUtils.register(EntityMinecartDayBarrel.class, "barrelCart", 80, 3, true);
 
 		packet.registerPacket(0x01, PacketBarrelCountUpdate.class);
 		FMLInterModComms.sendMessage("charset", "addCarry", barrelBlock.getRegistryName());

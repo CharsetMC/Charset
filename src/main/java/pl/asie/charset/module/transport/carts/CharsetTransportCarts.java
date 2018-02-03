@@ -78,7 +78,7 @@ public class CharsetTransportCarts {
     public static Item itemLinker;
 
     private void register(Class<? extends EntityMinecart> minecart, String name) {
-        RegistryUtils.register(minecart, name, 64, 1, true);
+        RegistryUtils.register(minecart, name, 80, 3, true);
     }
 
     private void register(Class<? extends EntityMinecart> minecart, String name, Class<? extends Entity> from) {

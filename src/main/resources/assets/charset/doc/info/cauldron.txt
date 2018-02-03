@@ -1,0 +1,8 @@
+\title{The Cauldron}
+
+The cauldron has received major upgrades!
+
+\- It is now a fully qualified fluid container! It can store up to one bucket of any fluid in the game.
+\- Putting lava into a cauldron makes anything dropped into it burn.
+\- You can fill buckets by dropping them into the cauldron!
+\- By adding dye to water, you can create Dyed Water. It can be used to dye items! You can also clear the color with a Sponge.

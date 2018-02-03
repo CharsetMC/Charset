@@ -20,6 +20,7 @@
 package pl.asie.charset.lib.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
@@ -113,7 +114,17 @@ public class UtilProxyCommon implements IThreadListener {
 	}
 
 	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
-
+		if (entry instanceof Block) {
+			Block block = (Block) entry;
+			if (block.getCreativeTabToDisplayOn() == null) {
+				block.setCreativeTab(tab);
+			}
+		} else if (entry instanceof Item) {
+			Item item = (Item) entry;
+			if (item.getCreativeTab() == null) {
+				item.setCreativeTab(tab);
+			}
+		}
 	}
 
 	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed, EnumFacing facing) {

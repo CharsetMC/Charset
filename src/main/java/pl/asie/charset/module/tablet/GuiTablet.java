@@ -28,6 +28,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -86,17 +87,23 @@ public class GuiTablet extends GuiScreen implements IPrintingContextMinecraft {
 	@Override
 	public void initGui() {
 		super.initGui();
-		// recalculate width/height
-		int oldScale = mc.gameSettings.guiScale;
 		ScaledResolution realRes = new ScaledResolution(mc);
-		mc.gameSettings.guiScale = realRes.getScaleFactor() == 1 ? 2 : (realRes.getScaleFactor() & (~1));
-		ScaledResolution currentRes = new ScaledResolution(mc);
-		mc.gameSettings.guiScale = oldScale;
+		int scaleFactor = 1;
+		int margin = 4;
+		while (mc.displayWidth / scaleFactor >= X_SIZE + margin && mc.displayHeight / scaleFactor >= Y_SIZE + margin) {
+			scaleFactor++;
+			if (scaleFactor >= 2 && (scaleFactor & 1) == 1) scaleFactor++;
+		}
+		scaleFactor--;
+		if (scaleFactor > 2 && (scaleFactor & 1) == 1) scaleFactor--;
 
-		glScale = (float) (currentRes.getScaledWidth_double() / realRes.getScaledWidth_double());
+		double scaledWidth = ((double) mc.displayWidth / scaleFactor);
+		double scaledHeight = ((double) mc.displayHeight / scaleFactor);
 
-		this.guiLeft = (currentRes.getScaledWidth() - X_SIZE) / 2;
-		this.guiTop = (currentRes.getScaledHeight() - Y_SIZE) / 2;
+		glScale = (float) (scaledWidth / realRes.getScaledWidth_double());
+
+		this.guiLeft = (MathHelper.ceil(scaledWidth) - X_SIZE) / 2;
+		this.guiTop = (MathHelper.ceil(scaledHeight) - Y_SIZE) / 2;
 
 		// load text
 		if (currentFuture == null && currentURI == null) {

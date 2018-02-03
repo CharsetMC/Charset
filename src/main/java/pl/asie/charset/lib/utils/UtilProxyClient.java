@@ -185,17 +185,6 @@ public class UtilProxyClient extends UtilProxyCommon {
 
 	@Override
 	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
-		if (entry instanceof Block) {
-			Block block = (Block) entry;
-			if (block.getCreativeTabToDisplayOn() == null) {
-				block.setCreativeTab(tab);
-			}
-		} else if (entry instanceof Item) {
-			Item item = (Item) entry;
-			if (item.getCreativeTab() == null) {
-				item.setCreativeTab(tab);
-			}
-		}
 	}
 
 	@Override

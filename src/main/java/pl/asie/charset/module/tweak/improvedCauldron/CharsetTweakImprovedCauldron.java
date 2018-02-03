@@ -45,7 +45,6 @@ import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 import pl.asie.charset.module.tweak.improvedCauldron.fluid.FluidDyedWater;
 import pl.asie.charset.module.tweak.improvedCauldron.fluid.FluidTextureGenerator;
-import pl.asie.charset.module.tweak.improvedCauldron.patches.RecipeHideItemDyeing;
 import pl.asie.charset.module.tweak.improvedCauldron.recipe.*;
 
 import java.util.ArrayList;
@@ -120,11 +119,6 @@ public class CharsetTweakImprovedCauldron {
 	@SubscribeEvent
 	public void registerBlocks(RegistryEvent.Register<Block> event) {
 		event.getRegistry().register(blockCauldron.setRegistryName("minecraft:cauldron"));
-	}
-
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void disableRecipes(RegistryEvent.Register<IRecipe> event) {
-		event.getRegistry().register(new RecipeHideItemDyeing("charset:recipe_hide_item_dye").setRegistryName("charset:recipe_hide_item_dye"));
 	}
 
 	@SubscribeEvent
