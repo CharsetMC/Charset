@@ -64,7 +64,7 @@ import pl.asie.charset.module.tweak.improvedCauldron.TileCauldronCharset;
 public class BlockTank extends BlockBase implements ITileEntityProvider {
     public static final int VARIANTS = 18;
     protected static final AxisAlignedBB BOUNDING_BOX = new AxisAlignedBB(0.05f, 0, 0.05f, 0.95f, 1, 0.95f);
-    private static final PropertyInteger VARIANT = PropertyInteger.create("connections", 0, 11);
+    protected static final PropertyInteger VARIANT = PropertyInteger.create("connections", 0, 11);
 
     public BlockTank() {
         super(Material.GLASS);
@@ -182,6 +182,12 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     @SideOnly(Side.CLIENT)
     public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.TRANSLUCENT;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+        return layer == BlockRenderLayer.TRANSLUCENT || layer == BlockRenderLayer.CUTOUT;
     }
 
     private void notice(World worldIn, TileEntity tankEntity, EntityPlayer playerIn, float noticeX, float noticeY, float noticeZ) {

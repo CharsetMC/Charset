@@ -13,6 +13,11 @@
     "normal": [
       {}
     ],
+    "base": [
+      {
+        "model": "charset:fluidtank"
+      }
+    ],
     "inventory": [
       {
         "transform": "forge:default-block"
