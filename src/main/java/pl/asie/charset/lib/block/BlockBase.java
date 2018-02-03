@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
@@ -54,6 +55,7 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.lib.utils.Utils;
 
 import javax.annotation.Nullable;
@@ -261,7 +263,7 @@ public abstract class BlockBase extends Block {
 		IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
 		if (model instanceof IStateParticleBakedModel) {
 			state = getExtendedState(state.getActualState(world, pos), world, pos);
-			TextureAtlasSprite sprite = ((IStateParticleBakedModel) model).getParticleTexture(state);
+			TextureAtlasSprite sprite = ((IStateParticleBakedModel) model).getParticleTexture(state, null);
 			if (sprite != null) {
 				for (int j = 0; j < 4; ++j) {
 					for (int k = 0; k < 4; ++k) {
@@ -290,7 +292,7 @@ public abstract class BlockBase extends Block {
 			EnumFacing side = target.sideHit;
 
 			state = getExtendedState(state.getActualState(world, pos), world, pos);
-			TextureAtlasSprite sprite = ((IStateParticleBakedModel) model).getParticleTexture(state);
+			TextureAtlasSprite sprite = ((IStateParticleBakedModel) model).getParticleTexture(state, side);
 			if (sprite != null) {
 				int i = pos.getX();
 				int j = pos.getY();
@@ -347,6 +349,11 @@ public abstract class BlockBase extends Block {
 		PacketCustomBlockDust packet = new PacketCustomBlockDust(world, pos, entity.posX, entity.posY, entity.posZ, numberOfParticles, 0.15f);
 		CharsetLib.packet.sendToDimension(packet, world.provider.getDimension());
 		return true;
+	}
+
+	@Override
+	public boolean addRunningEffects(IBlockState state, World world, BlockPos pos, Entity entity) {
+		return UtilProxyCommon.proxy.addRunningParticles(state, world, pos, entity);
 	}
 
 	@Override

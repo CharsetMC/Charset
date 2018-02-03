@@ -24,19 +24,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.FluidStack;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.tweak.improvedCauldron.CharsetTweakImprovedCauldron;
-import pl.asie.charset.module.tweak.improvedCauldron.TileCauldronCharset;
 import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 
 import java.util.Optional;
 
-public class RecipeDyeItem implements ICauldronRecipe {
+public class RecipeDyeItemPure implements ICauldronRecipe {
 	@Override
 	public Optional<CauldronContents> apply(World world, BlockPos pos, CauldronContents contents) {
 		if (!contents.hasFluidStack() || !contents.hasHeldItem()) {
@@ -52,23 +52,41 @@ public class RecipeDyeItem implements ICauldronRecipe {
 				&& stack.tag.hasKey("dyes", Constants.NBT.TAG_LIST)) {
 
 			NBTTagList dyes = (NBTTagList) stack.tag.getTag("dyes");
+			boolean isImpure = dyes.tagCount() > 1;
+
 			ItemStack[] stacks = new ItemStack[9];
 			stacks[0] = heldItem.copy();
 			stacks[0].setCount(1);
-			for (int i = 0; i < 8; i++) {
-				if (i < dyes.tagCount()) {
-					stacks[i + 1] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(i)).getByte());
-				} else {
-					stacks[i + 1] = ItemStack.EMPTY;
-				}
+			for (int i = 1; i <= 8; i++) {
+				if (i == 4) continue;
+				stacks[i] = stacks[0];
 			}
+			stacks[4] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
 
 			ItemStack result = RecipeUtils.getCraftingResult(world, 3, 3, stacks);
-			if (!result.isEmpty() && !ItemUtils.canMerge(stacks[0], result)) {
-				return Optional.of(new CauldronContents(
-						new FluidStack(stack, stack.amount - 125),
-						result
-				));
+			int expectedCount = 8;
+
+			if (result.isEmpty()) {
+				stacks = new ItemStack[2];
+				stacks[0] = heldItem.copy();
+				stacks[0].setCount(1);
+				stacks[1] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
+
+				result = RecipeUtils.getCraftingResult(world, 2, 1, stacks);
+				expectedCount = 1;
+			}
+
+			if (!result.isEmpty() && result.getCount() == expectedCount && !ItemUtils.canMerge(stacks[0], result)) {
+				if (isImpure) {
+					return Optional.of(new CauldronContents(new TextComponentTranslation("notice.charset.cauldron.dye_impure")));
+				} else {
+					ItemStack result1 = result.copy();
+					result1.setCount(1);
+					return Optional.of(new CauldronContents(
+							new FluidStack(stack, stack.amount - 125),
+							result1
+							));
+				}
 			}
 		}
 

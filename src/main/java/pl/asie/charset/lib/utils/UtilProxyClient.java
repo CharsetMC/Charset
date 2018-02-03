@@ -31,12 +31,14 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.login.INetHandlerLoginClient;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -48,8 +50,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.block.PacketCustomBlockDust;
 import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.render.ParticleBlockDustCharset;
+import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 
@@ -59,6 +63,23 @@ import java.util.Random;
 
 public class UtilProxyClient extends UtilProxyCommon {
 	public static FontRenderer FONT_RENDERER_FANCY;
+
+	@Override
+	public boolean addRunningParticles(IBlockState state, World world, BlockPos pos, Entity entity) {
+		IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+		if (model instanceof IStateParticleBakedModel) {
+			state = state.getBlock().getExtendedState(state.getActualState(world, pos), world, pos);
+			TextureAtlasSprite sprite = ((IStateParticleBakedModel) model).getParticleTexture(state, EnumFacing.UP);
+
+			Particle particle = new ParticleDiggingCharset(world, entity.posX + ((double)PacketCustomBlockDust.rand.nextFloat() - 0.5D) * (double)entity.width, entity.getEntityBoundingBox().minY + 0.1D, entity.posZ + ((double) PacketCustomBlockDust.rand.nextFloat() - 0.5D) * (double)entity.width, -entity.motionX * 4.0D, 1.5D, -entity.motionZ * 4.0D,
+					state, pos, sprite, ((BlockBase) state.getBlock()).getParticleTintIndex());
+			Minecraft.getMinecraft().effectRenderer.addEffect(particle);
+
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	@Override
 	public void init() {
@@ -178,7 +199,7 @@ public class UtilProxyClient extends UtilProxyCommon {
 	}
 
 	@Override
-	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed) {
+	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed, EnumFacing facing) {
 		TextureAtlasSprite sprite;
 		int tintIndex = -1;
 
@@ -190,7 +211,7 @@ public class UtilProxyClient extends UtilProxyCommon {
 		IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
 		if (model instanceof IStateParticleBakedModel) {
 			state = state.getBlock().getExtendedState(state.getActualState(world, pos), world, pos);
-			sprite = ((IStateParticleBakedModel) model).getParticleTexture(state);
+			sprite = ((IStateParticleBakedModel) model).getParticleTexture(state, facing);
 		} else {
 			sprite = model.getParticleTexture();
 		}

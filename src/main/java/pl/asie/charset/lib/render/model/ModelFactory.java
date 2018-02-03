@@ -42,6 +42,7 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -120,6 +121,15 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         }
     }
 
+    @Nullable
+    protected T get(IBlockState state) {
+        if (state instanceof IExtendedBlockState) {
+            return ((IExtendedBlockState) state).getValue(property);
+        } else {
+            return null;
+        }
+    }
+
     private IBakedModel getModel(IBlockState state) {
         return getModel(state, null);
     }
@@ -150,7 +160,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
     }
 
     @Override
-    public TextureAtlasSprite getParticleTexture(IBlockState state) {
+    public TextureAtlasSprite getParticleTexture(IBlockState state, EnumFacing facing) {
         IBakedModel model = getModel(state);
         return model != null ? model.getParticleTexture() : getParticleTexture();
     }

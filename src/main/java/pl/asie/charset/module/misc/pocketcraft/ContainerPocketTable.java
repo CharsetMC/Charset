@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.ui.ContainerBase;
 import pl.asie.charset.lib.ui.SlotBlocked;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.RecipeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +100,7 @@ public class ContainerPocketTable extends ContainerBase {
         }
         movePlayerToMatrix();
         ItemStack result = ItemStack.EMPTY;
-        IRecipe match = CraftingManager.findMatchingRecipe(craftMatrix, player.getEntityWorld());
+        IRecipe match = RecipeUtils.findMatchingRecipe(craftMatrix, player.getEntityWorld());
         if (match != null) {
             result = match.getCraftingResult(craftMatrix);
         }

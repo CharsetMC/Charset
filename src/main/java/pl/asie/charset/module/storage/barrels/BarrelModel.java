@@ -20,12 +20,14 @@
 package pl.asie.charset.module.storage.barrels;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
@@ -36,6 +38,7 @@ import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.WrappedBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 
 public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
@@ -70,6 +73,16 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public TextureAtlasSprite getParticleTexture(IBlockState state, @Nullable EnumFacing facing) {
+        BarrelCacheInfo info = get(state);
+        if (info != null) {
+            return (facing != null && info.orientation.top.getAxis() == facing.getAxis()) ? info.plank : info.log;
+        } else {
+            return super.getParticleTexture();
         }
     }
 

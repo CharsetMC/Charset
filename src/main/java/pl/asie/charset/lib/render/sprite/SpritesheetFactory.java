@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.render.sprite;
 
+import com.google.common.base.Suppliers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -29,15 +30,12 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class SpritesheetFactory {
-    private final ResourceLocation location;
-    private final int width, height;
-
+public final class SpritesheetFactory {
     protected static class SliceSprite extends TextureAtlasSpriteCustom {
         private final ResourceLocation location;
         private final int x, y, width, height;
-        private BufferedImage sheet;
 
         protected SliceSprite(ResourceLocation loc, ResourceLocation location, int i, int width, int height) {
             super(loc.toString());
@@ -55,6 +53,7 @@ public class SpritesheetFactory {
 
         @Override
         public boolean load(IResourceManager manager, ResourceLocation loc, Function<ResourceLocation, TextureAtlasSprite> getter) {
+            BufferedImage sheet = null;
             if (sheet == null) {
                 sheet = RenderUtils.getTextureImage(location);
                 if (sheet == null) {
@@ -74,18 +73,11 @@ public class SpritesheetFactory {
         }
     }
 
-    private SpritesheetFactory(ResourceLocation location, int width, int height) {
-        this.location = location;
-        this.width = width;
-        this.height = height;
+    private SpritesheetFactory() {
+
     }
 
     public static TextureAtlasSprite[] register(TextureMap map, ResourceLocation location, int width, int height) {
-        SpritesheetFactory factory = new SpritesheetFactory(location, width, height);
-        return factory.register(map);
-    }
-
-    public TextureAtlasSprite[] register(TextureMap map) {
         TextureAtlasSprite[] sprites = new TextureAtlasSprite[width * height];
         for (int i = 0; i < sprites.length; i++) {
             String s = String.format(location.toString() + "#%d", i);

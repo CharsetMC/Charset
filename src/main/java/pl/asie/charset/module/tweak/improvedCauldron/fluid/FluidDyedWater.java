@@ -45,6 +45,19 @@ public class FluidDyedWater extends Fluid {
 		super(fluidName, TEXTURE_STILL, TEXTURE_FLOW);
 	}
 
+	@Override
+	public String getUnlocalizedName(FluidStack stack) {
+		NBTTagCompound tag = stack.tag;
+		if (tag != null && tag.hasKey("dyes", Constants.NBT.TAG_LIST)) {
+			NBTTagList dyes = ((NBTTagList) stack.tag.getTag("dyes"));
+			if (dyes.tagCount() == 1) {
+				return "fluid.charset.dyed_water.pure";
+			}
+		}
+
+		return "fluid.charset.dyed_water";
+	}
+
 	@Nullable
 	public FluidStack appendDye(FluidStack stack, EnumDyeColor color) {
 		FluidStack newStack;

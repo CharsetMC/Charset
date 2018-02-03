@@ -22,6 +22,7 @@ package pl.asie.charset.lib.block;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.network.Packet;
@@ -31,7 +32,7 @@ import pl.asie.charset.lib.utils.Utils;
 import java.util.Random;
 
 public class PacketCustomBlockDust extends Packet {
-    private static final Random rand = new Random();
+    public static final Random rand = new Random();
     
     private World world;
     private BlockPos pos;
@@ -72,7 +73,7 @@ public class PacketCustomBlockDust extends Packet {
     public void apply(INetHandler handler) {
         this.world = getWorld(handler, dim);
         if (world != null) {
-            UtilProxyCommon.proxy.spawnBlockDustClient(world, pos, rand, posX, posY, posZ, numberOfParticles, particleSpeed);
+            UtilProxyCommon.proxy.spawnBlockDustClient(world, pos, rand, posX, posY, posZ, numberOfParticles, particleSpeed, EnumFacing.UP);
         }
     }
 

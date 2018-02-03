@@ -39,6 +39,7 @@ import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.module.storage.tanks.TileTank;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public final class FluidUtils {
 	public static String getCorrectUnlocalizedName(FluidStack stack) {
@@ -78,8 +79,7 @@ public final class FluidUtils {
         }
     }
 
-    public static boolean handleTank(IFluidHandler tank, FluidStack fluidContained, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand) {
-        ItemStack stack = playerIn.getHeldItem(hand);
+    public static Optional<ItemStack> handleTank(IFluidHandler tank, FluidStack fluidContained, World worldIn, BlockPos pos, ItemStack stack, boolean isCreative, boolean drainTank, boolean fillTank) {
         IFluidHandlerItem handler = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, stack, null);
         if (handler != null) {
             if (!worldIn.isRemote) {
@@ -95,41 +95,81 @@ public final class FluidUtils {
                 }
 
                 if (fluidExtracted == null) {
-                    // tank -> holder
-                    fluidExtracted = drain(tank, Fluid.BUCKET_VOLUME, false, false);
-                    if (fluidExtracted != null) {
-                        int amount = handler.fill(fluidExtracted, false);
-                        if (amount > 0) {
-                            fluidExtracted.amount = amount;
-                            fluidExtracted = drain(tank, fluidExtracted, true, false);
-                            if (fluidExtracted != null) {
-                                handler.fill(fluidExtracted, true);
-                                changed = true;
+                    if (drainTank) {
+                        // tank -> holder
+                        fluidExtracted = drain(tank, Fluid.BUCKET_VOLUME, false, false);
+                        if (fluidExtracted != null) {
+                            int amount = handler.fill(fluidExtracted, false);
+                            if (amount > 0) {
+                                fluidExtracted.amount = amount;
+                                fluidExtracted = drain(tank, fluidExtracted, true, false);
+                                if (fluidExtracted != null) {
+                                    handler.fill(fluidExtracted, true);
+                                    changed = true;
+                                }
                             }
                         }
                     }
                 } else {
                     // holder -> tank
-                    int amount = tank.fill(fluidExtracted, false);
-                    if (amount > 0) {
-                        fluidExtracted.amount = amount;
-                        fluidExtracted = handler.drain(fluidExtracted, !playerIn.isCreative());
-                        if (fluidExtracted != null) {
-                            tank.fill(fluidExtracted, true);
-                            changed = true;
+                    if (fillTank) {
+                        int amount = tank.fill(fluidExtracted, false);
+                        if (amount > 0) {
+                            fluidExtracted.amount = amount;
+                            fluidExtracted = handler.drain(fluidExtracted, !isCreative);
+                            if (fluidExtracted != null) {
+                                tank.fill(fluidExtracted, true);
+                                changed = true;
+                            }
                         }
                     }
                 }
 
                 if (changed) {
-                    playerIn.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, handler.getContainer());
+                    return Optional.of(handler.getContainer());
                 }
             }
 
-            return true;
+            return Optional.of(stack);
         }
 
-        return false;
+        return Optional.empty();
+
+    }
+
+    public static boolean handleTank(IFluidHandler tank, FluidStack fluidContained, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand) {
+        ItemStack stack = playerIn.getHeldItem(hand);
+        if (stack.isEmpty()) {
+            return false;
+        } else if (stack.getCount() == 1) {
+            Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stack, playerIn.isCreative(), true, true);
+            if (result.isPresent()) {
+                ItemStack resultStack = result.get();
+                if (resultStack != stack) {
+                    playerIn.setHeldItem(hand, resultStack);
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            ItemStack stackOne = stack.splitStack(1);
+
+            Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stackOne, playerIn.isCreative(), true, true);
+            if (result.isPresent()) {
+                ItemStack resultStack = result.get();
+                if (resultStack != stackOne) {
+                    playerIn.inventory.addItemStackToInventory(resultStack);
+                } else {
+                    stackOne.grow(1);
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     public static boolean matches(IFluidHandler handler, FluidStack stack) {

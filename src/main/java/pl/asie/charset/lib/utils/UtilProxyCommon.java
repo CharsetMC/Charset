@@ -27,6 +27,7 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -35,6 +36,7 @@ import net.minecraft.item.Item;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -77,6 +79,10 @@ public class UtilProxyCommon implements IThreadListener {
 		return "en_us";
 	}
 
+	public boolean addRunningParticles(IBlockState state, World world, BlockPos pos, Entity entity) {
+		return true;
+	}
+
 	public void registerItemModel(Item item, int meta, String name) {
 
 	}
@@ -110,7 +116,7 @@ public class UtilProxyCommon implements IThreadListener {
 
 	}
 
-	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed) {
+	public void spawnBlockDustClient(World world, BlockPos pos, Random rand, float posX, float posY, float posZ, int numberOfParticles, float particleSpeed, EnumFacing facing) {
 
 	}
 

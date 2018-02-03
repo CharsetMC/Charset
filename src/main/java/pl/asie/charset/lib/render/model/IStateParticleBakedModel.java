@@ -21,7 +21,10 @@ package pl.asie.charset.lib.render.model;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.EnumFacing;
+
+import javax.annotation.Nullable;
 
 public interface IStateParticleBakedModel {
-	TextureAtlasSprite getParticleTexture(IBlockState state);
+	TextureAtlasSprite getParticleTexture(IBlockState state, @Nullable EnumFacing facing);
 }

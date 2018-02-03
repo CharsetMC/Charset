@@ -1,5 +1,7 @@
 chat.charset.shout=%1$s %2$s
 fluid.charset.dyed_water.name=Dyed Water
+fluid.charset.dyed_water.pure.name=Pure Dyed Water
+notice.charset.cauldron.dye_impure=Must use pure dyed water!
 notice.charset.cauldron.no_dye=Cannot mix more dye!
 notice.charset.cauldron.empty=Empty
 notice.charset.cauldron.fluid=%1$s mB of %2$s

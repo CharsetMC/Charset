@@ -22,6 +22,7 @@ package pl.asie.charset.module.tweak.improvedCauldron;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -33,6 +34,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -43,10 +45,8 @@ import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 import pl.asie.charset.module.tweak.improvedCauldron.fluid.FluidDyedWater;
 import pl.asie.charset.module.tweak.improvedCauldron.fluid.FluidTextureGenerator;
-import pl.asie.charset.module.tweak.improvedCauldron.recipe.RecipeBucketCraft;
-import pl.asie.charset.module.tweak.improvedCauldron.recipe.RecipeDyeItem;
-import pl.asie.charset.module.tweak.improvedCauldron.recipe.RecipeDyeWater;
-import pl.asie.charset.module.tweak.improvedCauldron.recipe.RecipeWashDyedWater;
+import pl.asie.charset.module.tweak.improvedCauldron.patches.RecipeHideItemDyeing;
+import pl.asie.charset.module.tweak.improvedCauldron.recipe.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +90,7 @@ public class CharsetTweakImprovedCauldron {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		recipeList.add(new RecipeDyeWater());
+		recipeList.add(new RecipeDyeItemPure()); // has to go before RecipeDyeItem to emit error on impure dye
 		recipeList.add(new RecipeDyeItem());
 		recipeList.add(new RecipeWashDyedWater());
 		recipeList.add(new RecipeBucketCraft());
@@ -119,6 +120,11 @@ public class CharsetTweakImprovedCauldron {
 	@SubscribeEvent
 	public void registerBlocks(RegistryEvent.Register<Block> event) {
 		event.getRegistry().register(blockCauldron.setRegistryName("minecraft:cauldron"));
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void disableRecipes(RegistryEvent.Register<IRecipe> event) {
+		event.getRegistry().register(new RecipeHideItemDyeing("charset:recipe_hide_item_dye").setRegistryName("charset:recipe_hide_item_dye"));
 	}
 
 	@SubscribeEvent

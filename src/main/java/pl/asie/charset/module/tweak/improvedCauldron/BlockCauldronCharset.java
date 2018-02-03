@@ -102,15 +102,25 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 					if (entityIn instanceof EntityItem) {
 						EntityItem entityItem = (EntityItem) entityIn;
 						ItemStack heldItem = entityItem.getItem();
-
 						if (!heldItem.isEmpty()) {
 							ItemStack heldItemOne = heldItem.copy();
 							heldItemOne.setCount(1);
-							Optional<CauldronContents> contentsNew = CharsetTweakImprovedCauldron.craft(tile, new CauldronContents(stack, heldItemOne));
+							Optional<CauldronContents> contentsNew = Optional.empty();
+
+							Optional<ItemStack> fluidResult = FluidUtils.handleTank((IFluidHandler) tile, stack, worldIn, pos, heldItemOne, false, true, false);
+							if (fluidResult.isPresent()) {
+								contentsNew = Optional.of(new CauldronContents(((TileCauldronCharset) tile).getContents(), fluidResult.get()));
+							}
+
+							if (!contentsNew.isPresent()) {
+								contentsNew = CharsetTweakImprovedCauldron.craft(tile, new CauldronContents(stack, heldItemOne));
+							}
 
 							if (contentsNew.isPresent()) {
 								CauldronContents cc = contentsNew.get();
-								if (!cc.hasResponse()) {
+								if (cc.hasResponse()) {
+									new Notice(tile, cc.getResponse()).sendToAll();
+								} else {
 									if (cc.getHeldItem().isEmpty()) {
 										heldItem.shrink(1);
 									} else if (cc.getHeldItem().getCount() == 1 && ItemUtils.canMerge(cc.getHeldItem(), heldItem)) {

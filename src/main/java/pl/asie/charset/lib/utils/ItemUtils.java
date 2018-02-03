@@ -40,7 +40,11 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.oredict.OreDictionary;
+import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.lib.CharsetLib;
+
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 public final class ItemUtils {
 	private ItemUtils() {

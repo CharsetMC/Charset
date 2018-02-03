@@ -39,6 +39,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,15 +65,16 @@ public class NotifyImplementation {
         if (where == null) {
             return;
         }
-        if (player instanceof FakePlayer) {
-            return;
+        int baseRange = 32;
+        if (player != null && EntityUtils.isPlayerFake(player)) {
+            player = null;
         }
-        if ((player != null && player.world.isRemote) || FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+        if ((player != null && player.world.isRemote) || (world != null && world.isRemote)) {
             proxy.addMessage(where, item, style, message);
         } else {
             TargetPoint target = null;
             if (player == null) {
-                final int range = style.contains(NoticeStyle.DRAWFAR) ? 128 : 32;
+                final int range = style.contains(NoticeStyle.DRAWFAR) ? (baseRange * 4) : baseRange;
                 int x = 0, y = 0, z = 0;
                 boolean failed = false;
                 BlockPos pos = null;
