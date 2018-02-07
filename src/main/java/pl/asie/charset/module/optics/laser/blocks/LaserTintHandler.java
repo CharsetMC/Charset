@@ -38,11 +38,13 @@ public class LaserTintHandler implements IBlockColor, IItemColor {
 
 	@Override
 	public int colorMultiplier(IBlockState state, @Nullable IBlockAccess worldIn, @Nullable BlockPos pos, int tintIndex) {
+		if (tintIndex != 0) return 0xFFFFFFFF;
 		return 0xFF000000 | CharsetLaser.LASER_COLORS[state.getValue(CharsetLaser.LASER_COLOR).ordinal()];
 	}
 
 	@Override
 	public int colorMultiplier(ItemStack stack, int tintIndex) {
+		if (tintIndex != 0) return 0xFFFFFFFF;
 		return 0xFF000000 | CharsetLaser.LASER_COLORS[stack.getMetadata() & 7];
 	}
 }

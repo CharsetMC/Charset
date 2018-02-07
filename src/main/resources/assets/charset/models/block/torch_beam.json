@@ -1,20 +1,20 @@
 {
-    "parent": "block/block",
-    "elements": [
-        {   "from": [ 7, 8, 7 ],
-            "to": [ 9, 10, 9 ],
-            "shade": false,
-            "faces": {
-                "up":   { "texture": "#inner", "tintindex": 0 },
-                "north": { "texture": "#inner", "tintindex": 0 },
-                "south": { "texture": "#inner", "tintindex": 0 },
-                "west": { "texture": "#inner", "tintindex": 0 },
-                "east": { "texture": "#inner", "tintindex": 0 }
-            }
-        }
-    ],
-    "textures": {
-        "particle": "minecraft:blocks/concrete_powder_white",
-        "inner": "minecraft:blocks/concrete_powder_white"
+  "elements": [
+    {
+      "from": [7, 8, 7],
+      "to": [9, 10, 9],
+      "shade": false,
+      "faces": {
+        "up": {"uv": [7, 6, 9, 8], "texture": "#texture", "tintindex": 0},
+        "north": {"uv": [7, 6, 9, 8], "texture": "#texture", "tintindex": 0},
+        "south": {"uv": [7, 6, 9, 8], "texture": "#texture", "tintindex": 0},
+        "west": {"uv": [7, 6, 9, 8], "texture": "#texture", "tintindex": 0},
+        "east": {"uv": [7, 6, 9, 8], "texture": "#texture", "tintindex": 0}
+      }
     }
+  ],
+  "textures": {
+    "particle": "charset:blocks/torch_beam",
+    "texture": "charset:blocks/torch_beam"
+  }
 }
