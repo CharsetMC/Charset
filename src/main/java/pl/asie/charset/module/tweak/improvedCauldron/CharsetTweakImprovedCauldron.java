@@ -89,8 +89,8 @@ public class CharsetTweakImprovedCauldron {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		recipeList.add(new RecipeDyeWater());
-		recipeList.add(new RecipeDyeItemPure()); // has to go before RecipeDyeItem to emit error on impure dye
 		recipeList.add(new RecipeDyeItem());
+		recipeList.add(new RecipeDyeItemPure()); // has to go after RecipeDyeItem to emit error on impure dye after handling impure dye recipes
 		recipeList.add(new RecipeWashDyedWater());
 		recipeList.add(new RecipeBucketCraft());
 

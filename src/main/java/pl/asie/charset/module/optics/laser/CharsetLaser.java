@@ -64,7 +64,7 @@ import java.util.Set;
 @CharsetModule(
         name = "optics.laser",
         description = "Lasers!",
-        profile = ModuleProfile.TESTING
+        profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetLaser {
     public static final PropertyEnum<LaserColor> LASER_COLOR = PropertyEnum.create("color", LaserColor.class);

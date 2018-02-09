@@ -59,6 +59,7 @@ import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.lib.utils.Utils;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider;
@@ -253,6 +254,21 @@ public abstract class BlockBase extends Block {
 			((TileBase) te).getDrops(drops, state, fortune, silkTouch);
 		} else {
 			super.getDrops(drops, world, pos, state, fortune);
+		}
+	}
+
+	@Override
+	public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
+		if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) {
+			NonNullList<ItemStack> drops = NonNullList.create();
+			getDrops(drops, worldIn, pos, state, worldIn.getTileEntity(pos), fortune, false);
+			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(drops, worldIn, pos, state, fortune, chance, false, harvesters.get());
+
+			for (ItemStack drop : drops) {
+				if (worldIn.rand.nextFloat() <= chance) {
+					spawnAsEntity(worldIn, pos, drop);
+				}
+			}
 		}
 	}
 

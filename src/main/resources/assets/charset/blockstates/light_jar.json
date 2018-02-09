@@ -35,7 +35,12 @@
       "east": {"x": 90, "y": 90}
     },
     "inventory": [{
-      "transform": "forge:default-item"
+      "model": "forge:item-layer",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "charset:blocks/torch_base_generated",
+        "layer1": "charset:items/beam_torch_center"
+      }
     }]
   }
 }

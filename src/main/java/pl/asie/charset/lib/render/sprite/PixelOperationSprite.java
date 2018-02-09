@@ -27,25 +27,29 @@ import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.function.Function;
 
 public class PixelOperationSprite extends TextureAtlasSpriteCustom {
     @FunctionalInterface
     public interface Operator {
-        int apply(int x, int y, int value);
+        int apply(Function<ResourceLocation, TextureAtlasSprite> getter, int x, int y, int value);
     }
 
     public static Operator multiply(int color) {
-        return (x, y, value) -> RenderUtils.multiplyColor(value, color);
+        return (getter, x, y, value) -> RenderUtils.multiplyColor(value, color);
     }
 
     private final ResourceLocation location;
     private final Operator operator;
+    private final Collection<ResourceLocation> deps;
 
-    public PixelOperationSprite(String entry, ResourceLocation location, Operator operator) {
+    public PixelOperationSprite(String entry, ResourceLocation location, Operator operator, ResourceLocation... deps) {
         super(entry);
         this.location = location;
         this.operator = operator;
+        this.deps = Arrays.asList(deps);
     }
 
     @Override
@@ -64,7 +68,7 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
 
         image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
         for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = operator.apply(i % image.getWidth(), i / image.getWidth(), pixels[i]);
+            pixels[i] = operator.apply(getter, i % image.getWidth(), i / image.getWidth(), pixels[i]);
         }
 
         try {
@@ -75,5 +79,10 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
         }
 
         return false;
+    }
+
+    @Override
+    public java.util.Collection<ResourceLocation> getDependencies() {
+        return deps;
     }
 }

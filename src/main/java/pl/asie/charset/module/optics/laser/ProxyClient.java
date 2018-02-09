@@ -23,6 +23,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.BlockRenderLayer;
@@ -44,6 +45,7 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.command.CommandCharset;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleMultiLayerBakedModel;
+import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -77,6 +79,18 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void addCustomModels(TextureStitchEvent.Pre event) {
 		prismModel = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/laser_prism"), event.getMap());
+
+		ResourceLocation torchOnLoc = new ResourceLocation("minecraft:blocks/torch_on");
+		ResourceLocation torchCenterLoc = new ResourceLocation("charset:items/beam_torch_center");
+
+		event.getMap().setTextureEntry(new PixelOperationSprite("charset:blocks/torch_base_generated", torchOnLoc, (getter, x, y, value) -> {
+			TextureAtlasSprite torchOnSprite = getter.apply(torchOnLoc);
+			TextureAtlasSprite torchCenterSprite = getter.apply(torchCenterLoc);
+			int tcx = x * torchCenterSprite.getIconWidth() / torchOnSprite.getIconWidth();
+			int tcy = y * torchCenterSprite.getIconHeight() / torchOnSprite.getIconHeight();
+			int alpha = (torchCenterSprite.getFrameTextureData(0)[0][tcy * torchCenterSprite.getIconWidth() + tcx] >> 24) & 0xFF;
+			return alpha > 0 ? 0 : value;
+		}, torchOnLoc, torchCenterLoc));
 	}
 
 	@SubscribeEvent
@@ -105,23 +119,25 @@ public class ProxyClient extends ProxyCommon {
 					SimpleMultiLayerBakedModel result = new SimpleMultiLayerBakedModel(model);
 
 					BlockRenderLayer layerPre = MinecraftForgeClient.getRenderLayer();
-					for (BlockRenderLayer layer : new BlockRenderLayer[] { BlockRenderLayer.SOLID, BlockRenderLayer.TRANSLUCENT }) {
-						ForgeHooksClient.setRenderLayer(layer);
-						for (int i = 0; i <= 6; i++) {
-							EnumFacing facingIn = (i < 6) ? EnumFacing.getFront(i) : null;
-							for (BakedQuad quadIn : model.getQuads(state, facingIn, 0)) {
-								result.addQuad(layer, facingIn, ModelTransformer.transform(quadIn, (quad, element, data) -> {
-									if (quad.getTintIndex() == 0 && element == DefaultVertexFormats.TEX_2S) {
-										return new float[] { 15f * 0x20 / 0xFFFF, 0, 0, 0 };
-									}
-									return data;
-								}, (bakedQuad -> {
-									if (bakedQuad.getTintIndex() == 0) {
-										return format;
-									} else {
-										return bakedQuad.getFormat();
-									}
-								})));
+					for (BlockRenderLayer layer : BlockRenderLayer.values()) {
+						if (CharsetLaser.blockJar.canRenderInLayer(CharsetLaser.blockJar.getDefaultState(), layer)) {
+							ForgeHooksClient.setRenderLayer(layer);
+							for (int i = 0; i <= 6; i++) {
+								EnumFacing facingIn = (i < 6) ? EnumFacing.getFront(i) : null;
+								for (BakedQuad quadIn : model.getQuads(state, facingIn, 0)) {
+									result.addQuad(layer, facingIn, ModelTransformer.transform(quadIn, (quad, element, data) -> {
+										if (quad.getTintIndex() == 1 && element == DefaultVertexFormats.TEX_2S) {
+											return new float[]{15f * 0x20 / 0xFFFF, 0, 0, 0};
+										}
+										return data;
+									}, (bakedQuad -> {
+										if (bakedQuad.getTintIndex() == 1) {
+											return format;
+										} else {
+											return bakedQuad.getFormat();
+										}
+									})));
+								}
 							}
 						}
 					}

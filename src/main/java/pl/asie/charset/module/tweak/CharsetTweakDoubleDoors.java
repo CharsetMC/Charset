@@ -34,12 +34,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.utils.MethodHandleHelper;
 import pl.asie.charset.lib.utils.ThreeState;
 
 import java.lang.reflect.Method;
@@ -57,7 +58,7 @@ public class CharsetTweakDoubleDoors {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		for (Block block : GameRegistry.findRegistry(Block.class)) {
+		for (Block block : ForgeRegistries.BLOCKS) {
 			try {
 				if (block != null && block instanceof BlockDoor) {
 					ThreeState state = CharsetIMC.INSTANCE.allows("doubleDoor", block.getRegistryName());
@@ -65,7 +66,7 @@ public class CharsetTweakDoubleDoors {
 
 					if (state == ThreeState.MAYBE && !(block.getRegistryName().getResourceDomain().equals("malisisdoors"))) {
 						Class c = block.getClass();
-						Method m = ReflectionHelper.findMethod(c, "onBlockActivated", "func_180639_a",
+						Method m = MethodHandleHelper.reflectMethodRecurse(c, "onBlockActivated", "func_180639_a",
 								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
 								EnumHand.class, EnumFacing.class,
 								float.class, float.class, float.class);

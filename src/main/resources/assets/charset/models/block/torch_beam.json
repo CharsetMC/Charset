@@ -5,16 +5,16 @@
             "to": [ 9, 10, 9 ],
             "shade": false,
             "faces": {
-                "up":   { "texture": "#inner", "tintindex": 0 },
-                "north": { "texture": "#inner", "tintindex": 0 },
-                "south": { "texture": "#inner", "tintindex": 0 },
-                "west": { "texture": "#inner", "tintindex": 0 },
-                "east": { "texture": "#inner", "tintindex": 0 }
+                "up":   { "uv": [ 7, 6, 9, 8 ], "texture": "#inner", "tintindex": 1 },
+                "north": { "texture": "#inner", "tintindex": 1 },
+                "south": { "texture": "#inner", "tintindex": 1 },
+                "west": { "texture": "#inner", "tintindex": 1 },
+                "east": { "texture": "#inner", "tintindex": 1 }
             }
         }
     ],
     "textures": {
-        "particle": "minecraft:blocks/concrete_powder_white",
-        "inner": "minecraft:blocks/concrete_powder_white"
+        "particle": "charset:items/beam_torch_center",
+        "inner": "charset:items/beam_torch_center"
     }
 }

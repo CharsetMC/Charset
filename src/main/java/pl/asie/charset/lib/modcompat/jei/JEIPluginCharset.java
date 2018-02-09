@@ -25,6 +25,7 @@ import mezz.jei.api.recipe.IStackHelper;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import pl.asie.charset.lib.loader.AnnotatedPluginHandler;
 import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
@@ -64,7 +65,7 @@ public class JEIPluginCharset extends AnnotatedPluginHandler<IModPlugin> impleme
         GUIS = registry.getJeiHelpers().getGuiHelper();
         RECIPE_TRANSFER_HANDLERS = registry.getJeiHelpers().recipeTransferHandlerHelper();
 
-        for (IRecipe recipe : GameRegistry.findRegistry(IRecipe.class)) {
+        for (IRecipe recipe : ForgeRegistries.RECIPES) {
             if (recipe instanceof RecipeCharset) {
                 InventoryCraftingIterator iterator = new InventoryCraftingIterator((RecipeCharset) recipe, false);
                 while (iterator.hasNext()) {

@@ -78,7 +78,9 @@ public class RecipeDyeItemPure implements ICauldronRecipe {
 
 			if (!result.isEmpty() && result.getCount() == expectedCount && !ItemUtils.canMerge(stacks[0], result)) {
 				if (isImpure) {
-					return Optional.of(new CauldronContents(new TextComponentTranslation("notice.charset.cauldron.dye_impure")));
+					// TODO
+					return Optional.empty();
+//					return Optional.of(new CauldronContents(new TextComponentTranslation("notice.charset.cauldron.dye_impure")));
 				} else {
 					ItemStack result1 = result.copy();
 					result1.setCount(1);

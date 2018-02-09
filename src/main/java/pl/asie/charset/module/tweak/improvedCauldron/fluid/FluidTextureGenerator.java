@@ -71,7 +71,7 @@ public class FluidTextureGenerator {
 	}
 
 	private void remap(TextureMap map, ResourceLocation oldLoc, ResourceLocation newLoc, float luma, int a) {
-		map.setTextureEntry(new PixelOperationSprite(newLoc.toString(), oldLoc, (x, y, value) -> {
+		map.setTextureEntry(new PixelOperationSprite(newLoc.toString(), oldLoc, (getter, x, y, value) -> {
 			float[] vals = Colorspaces.convertFromRGB(value, Colorspace.LAB);
 			vals[0] *= 100.0f / luma;
 			vals[1] = 0.0f;

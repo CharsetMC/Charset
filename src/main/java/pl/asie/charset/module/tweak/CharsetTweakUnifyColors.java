@@ -116,7 +116,7 @@ public class CharsetTweakUnifyColors {
 				final float divisor = delta > 5 ? (float) delta / 5.0f : 1.0f;
 				final int value2 = colorMultiplier(prefix, EnumDyeColor.byMetadata(i));
 
-				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, (x, y, value) -> {
+				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, (getter, x, y, value) -> {
 					int out = 0xFF000000;
 					for (int coff = 0; coff < 24; coff += 8) {
 						int v1 = (((imageGrayscale.getRGB(x, y) >> coff) & 0xFF) * 255 / imageGrayData[coff >> 3]) - 0xFF;
