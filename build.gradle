@@ -40,12 +40,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.1.2607"
+	version = "1.12.2-14.23.2.2613"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20180128"
+	mappings = "snapshot_20180208"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -102,8 +102,8 @@ configurations {
 
 dependencies {
 	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.1_59"
-	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.147"
-	deobfCompile name: "chiselsandbits", version: "14.12"
+	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.151"
+	deobfCompile name: "chiselsandbits", version: "14.13"
 	deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-1.4.0-174"
 	deobfCompile name: "Baubles", version: "1.12-1.5.2"
 	deobfCompile "com.elytradev:mirage:2.0.3-rc3-SNAPSHOT"
