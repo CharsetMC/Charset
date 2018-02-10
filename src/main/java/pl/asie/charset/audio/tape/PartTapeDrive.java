@@ -236,4 +236,8 @@ public class PartTapeDrive extends PartSlab implements IAudioSource, ITickable, 
 	protected IDataStorage getStorage() {
 		return state.getStorage();
 	}
+
+	protected ItemStack getStack() {
+		return state.getStack();
+	}
 }

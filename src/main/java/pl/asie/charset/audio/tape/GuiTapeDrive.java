@@ -171,8 +171,7 @@ public class GuiTapeDrive extends GuiContainerCharset {
 		if (tapeDialogThread != null && !tapeDialogThread.isAlive()) {
 			if (tapeDialog.result == JFileChooser.APPROVE_OPTION) {
 				if (tapeDialog.chooser.getSelectedFile() != null) {
-					IDataStorage storage = tapeDrive.getStorage();
-					tapeRecord = new TapeRecordThread(tapeDialog.chooser.getSelectedFile(), storage != null ? storage.getSize() : Integer.MAX_VALUE, tapeDrive);
+					tapeRecord = new TapeRecordThread(tapeDialog.chooser.getSelectedFile(), ModCharsetAudio.tapeItem.getSize(tapeDrive.getStack()), tapeDrive);
 					tapeRecordThread = new Thread(tapeRecord);
 					tapeRecordThread.start();
 				}

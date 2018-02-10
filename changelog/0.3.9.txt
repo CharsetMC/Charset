@@ -1,0 +1,3 @@
+* [Audio] [#195] Backport 1.12 crash fix.
+* [Drama] Fix crafting recipe.
+* [Tweaks] Fix double door tweak not working on modded doors as intended.

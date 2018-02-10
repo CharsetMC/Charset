@@ -264,4 +264,8 @@ public class TapeDriveState implements ITickable, IAudioReceiver, INBTSerializab
 			return false;
 		}
 	}
+
+	protected ItemStack getStack() {
+		return inventory.getStackInSlot(0);
+	}
 }

@@ -117,7 +117,7 @@ public class ItemTape extends Item implements IDyeableItem {
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 			if (dataStorage != null) {
 				if (!dataStorage.isInitialized()) {
-					dataStorage.initialize(null, 0, stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE);
+					dataStorage.initialize(null, 0, ModCharsetAudio.tapeItem.getSize(stack));
 				}
 
 				if (capability == ModCharsetAudio.CAP_STORAGE) {
@@ -158,6 +158,10 @@ public class ItemTape extends Item implements IDyeableItem {
 		this.setUnlocalizedName("charset.tape");
 		this.setCreativeTab(ModCharsetLib.CREATIVE_TAB);
 		this.setMaxStackSize(1);
+	}
+
+	public int getSize(ItemStack stack) {
+		return stack.hasTagCompound() && stack.getTagCompound().hasKey("size") ? stack.getTagCompound().getInteger("size") : DEFAULT_SIZE;
 	}
 
 	@Override
