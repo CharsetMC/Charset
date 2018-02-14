@@ -125,8 +125,12 @@ public class CharsetTweakBonemeal {
 		}
 
 		if (stateNew != null) {
-			event.getWorld().setBlockState(event.getPos(), stateNew, 2);
-			event.setResult(Event.Result.ALLOW);
+			if (stateNew != state) {
+				event.getWorld().setBlockState(event.getPos(), stateNew, 2);
+				event.setResult(Event.Result.ALLOW);
+			} else {
+				return;
+			}
 		}
 	}
 }
