@@ -40,12 +40,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.2.2613"
+	version = "1.12.2-14.23.2.2616"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20180208"
+	mappings = "snapshot_20180213"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -76,6 +76,12 @@ repositories {
 	maven {
 		url "http://repo.elytradev.com"
 	}
+	maven {
+		url "http://maven.blamejared.com/"
+	}
+	maven {
+		url "http://maven.k-4u.nl"
+	}
 	ivy {
 		name 'asie dependency mirror'
 		artifactPattern "http://asie.pl/javadeps/[module]-[revision](-[classifier]).[ext]"
@@ -101,6 +107,9 @@ configurations {
 }
 
 dependencies {
+	deobfCompile name: "theoneprobe", version: "1.12-1.4.19-api"
+	deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.0.10.310"
+	deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12:api"
 	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.1_59"
 	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.151"
 	deobfCompile name: "chiselsandbits", version: "14.13"
