@@ -27,10 +27,19 @@ import java.util.Optional;
 
 @FunctionalInterface
 public interface ICauldronRecipe {
+	enum Scenario {
+		RIGHT_CLICK,
+		ITEM_ENTITY
+	}
+
+	default boolean matches(Scenario scenario) {
+		return true;
+	}
+
 	/**
 	 * Apply the recipe.
 	 * @param contents The current contents of the cauldron.
 	 * @return A non-empty optional if the recipe matches; an empty optional if the recipe does not match.
 	 */
-	Optional<CauldronContents> apply(World world, BlockPos pos, CauldronContents contents);
+	Optional<CauldronContents> apply(ICauldron cauldron, CauldronContents contents);
 }

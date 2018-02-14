@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.storage.barrels;
 
+import com.elytradev.mirage.lighting.Light;
 import gnu.trove.impl.Constants;
 import gnu.trove.map.TCharIntMap;
 import gnu.trove.map.hash.TCharIntHashMap;
@@ -39,14 +40,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.ForgeHooksClient;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.render.model.ModelTransformer;
-import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.utils.Orientation;
-import pl.asie.charset.lib.utils.Quaternion;
-import pl.asie.charset.lib.utils.SpaceUtils;
+import pl.asie.charset.lib.utils.*;
+import pl.asie.charset.module.tweak.dynlights.CharsetTweakDynamicLights;
 
 import java.util.Calendar;
 
@@ -123,6 +123,16 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             int l = barrel.getWorld().getCombinedLight(facingPos, barrel.getWorld().getSkylightSubtracted());
             int j = l % 65536;
             int k = l / 65536;
+
+            /* if (!barrel.item.isEmpty()) {
+                Light light = CharsetTweakDynamicLights.getLight(0, 0, 0, barrel.item);
+                if (light != null) {
+                    int k2 = Math.round(light.r * 256);
+                    k2 = MathHelper.clamp(k2, 0, 255);
+                    j = Math.max(k2, j);
+                }
+            } */
+
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
         }
 

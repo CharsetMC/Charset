@@ -44,4 +44,8 @@ public enum ThreeState {
     public boolean matches(boolean value) {
         return this == MAYBE || ((this == YES) == value);
     }
+
+	public static ThreeState from(boolean value) {
+        return value ? ThreeState.YES : ThreeState.NO;
+	}
 }

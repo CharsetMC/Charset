@@ -32,13 +32,14 @@ import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.tweak.improvedCauldron.CharsetTweakImprovedCauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.TileCauldronCharset;
 import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 
 import java.util.Optional;
 
 public class RecipeDyeItem implements ICauldronRecipe {
 	@Override
-	public Optional<CauldronContents> apply(World world, BlockPos pos, CauldronContents contents) {
+	public Optional<CauldronContents> apply(ICauldron cauldron, CauldronContents contents) {
 		if (!contents.hasFluidStack() || !contents.hasHeldItem()) {
 			return Optional.empty();
 		}
@@ -63,7 +64,7 @@ public class RecipeDyeItem implements ICauldronRecipe {
 				}
 			}
 
-			ItemStack result = RecipeUtils.getCraftingResult(world, 3, 3, stacks);
+			ItemStack result = RecipeUtils.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
 			if (!result.isEmpty() && !ItemUtils.canMerge(stacks[0], result)) {
 				return Optional.of(new CauldronContents(
 						new FluidStack(stack, stack.amount - 125),

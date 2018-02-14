@@ -32,13 +32,14 @@ import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.tweak.improvedCauldron.CharsetTweakImprovedCauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 
 import java.util.Optional;
 
 public class RecipeDyeItemPure implements ICauldronRecipe {
 	@Override
-	public Optional<CauldronContents> apply(World world, BlockPos pos, CauldronContents contents) {
+	public Optional<CauldronContents> apply(ICauldron cauldron, CauldronContents contents) {
 		if (!contents.hasFluidStack() || !contents.hasHeldItem()) {
 			return Optional.empty();
 		}
@@ -63,7 +64,7 @@ public class RecipeDyeItemPure implements ICauldronRecipe {
 			}
 			stacks[4] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
 
-			ItemStack result = RecipeUtils.getCraftingResult(world, 3, 3, stacks);
+			ItemStack result = RecipeUtils.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
 			int expectedCount = 8;
 
 			if (result.isEmpty()) {
@@ -72,7 +73,7 @@ public class RecipeDyeItemPure implements ICauldronRecipe {
 				stacks[0].setCount(1);
 				stacks[1] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
 
-				result = RecipeUtils.getCraftingResult(world, 2, 1, stacks);
+				result = RecipeUtils.getCraftingResult(cauldron.getCauldronWorld(), 2, 1, stacks);
 				expectedCount = 1;
 			}
 

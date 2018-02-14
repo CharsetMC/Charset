@@ -42,6 +42,7 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 import pl.asie.charset.module.tweak.improvedCauldron.fluid.FluidDyedWater;
 import pl.asie.charset.module.tweak.improvedCauldron.fluid.FluidTextureGenerator;
@@ -62,9 +63,13 @@ public class CharsetTweakImprovedCauldron {
 	public static FluidDyedWater dyedWater;
 	private static List<ICauldronRecipe> recipeList = new ArrayList<>();
 
-	public static Optional<CauldronContents> craft(TileEntity cauldronCharset, CauldronContents contents) {
+	public static Optional<CauldronContents> craft(ICauldron cauldronCharset, ICauldronRecipe.Scenario scenario, CauldronContents contents) {
 		for (ICauldronRecipe recipe : recipeList) {
-			Optional<CauldronContents> contentsNew = recipe.apply(cauldronCharset.getWorld(), cauldronCharset.getPos(), contents);
+			if (!recipe.matches(scenario)) {
+				continue;
+			}
+
+			Optional<CauldronContents> contentsNew = recipe.apply(cauldronCharset, contents);
 			if (contentsNew.isPresent()) {
 				return contentsNew;
 			}

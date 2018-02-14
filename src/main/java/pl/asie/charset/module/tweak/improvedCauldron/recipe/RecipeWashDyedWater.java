@@ -29,13 +29,14 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import pl.asie.charset.module.tweak.improvedCauldron.CharsetTweakImprovedCauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 
 import java.util.Optional;
 
 public class RecipeWashDyedWater implements ICauldronRecipe {
 	@Override
-	public Optional<CauldronContents> apply(World world, BlockPos pos, CauldronContents contents) {
+	public Optional<CauldronContents> apply(ICauldron cauldron, CauldronContents contents) {
 		if (!contents.hasFluidStack()) {
 			return Optional.empty();
 		}

@@ -37,13 +37,14 @@ import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.tweak.improvedCauldron.CharsetTweakImprovedCauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 
 import java.util.Optional;
 
 public class RecipeBucketCraft implements ICauldronRecipe {
 	@Override
-	public Optional<CauldronContents> apply(World world, BlockPos pos, CauldronContents contents) {
+	public Optional<CauldronContents> apply(ICauldron cauldron, CauldronContents contents) {
 		if (!contents.hasFluidStack() || !contents.hasHeldItem()) {
 			return Optional.empty();
 		}
@@ -54,7 +55,7 @@ public class RecipeBucketCraft implements ICauldronRecipe {
 		if (stack.amount >= Fluid.BUCKET_VOLUME) {
 			ItemStack filledBucket = FluidUtil.getFilledBucket(stack);
 			InventoryCrafting inventoryCrafting = RecipeUtils.getCraftingInventory(2, 1, heldItem, filledBucket);
-			IRecipe recipe = RecipeUtils.findMatchingRecipe(inventoryCrafting, world);
+			IRecipe recipe = RecipeUtils.findMatchingRecipe(inventoryCrafting, cauldron.getCauldronWorld());
 
 			if (recipe != null) {
 				ItemStack result = recipe.getCraftingResult(inventoryCrafting);

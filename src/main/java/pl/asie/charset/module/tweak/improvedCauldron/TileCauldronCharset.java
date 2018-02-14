@@ -21,8 +21,10 @@ package pl.asie.charset.module.tweak.improvedCauldron;
 
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -33,10 +35,12 @@ import net.minecraftforge.fluids.capability.FluidTankProperties;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 
-public class TileCauldronCharset extends TileBase implements IFluidHandler, IFluidTankProperties {
+public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHandler, IFluidTankProperties {
 	private FluidStack stack;
 
 	public boolean isEmptyOrWater() {
@@ -290,5 +294,33 @@ public class TileCauldronCharset extends TileBase implements IFluidHandler, IFlu
 
 	public float getFluidHeight() {
 		return 6.0f + (stack != null ? (stack.amount * 9.0f / 1000) : 0);
+	}
+
+	@Override
+	public World getCauldronWorld() {
+		return getWorld();
+	}
+
+	@Override
+	public BlockPos getCauldronPos() {
+		return getPos();
+	}
+
+	@Override
+	public Collection<EntityItem> getCauldronItemEntities(boolean immersed) {
+		AxisAlignedBB axisAlignedBB = BlockCauldronCharset.AABB_INSIDE;
+
+		if (immersed) {
+			axisAlignedBB = new AxisAlignedBB(
+					axisAlignedBB.minX,
+					axisAlignedBB.minY,
+					axisAlignedBB.minZ,
+					axisAlignedBB.maxX,
+					getFluidHeight(),
+					axisAlignedBB.maxZ
+			);
+		}
+
+		return world.getEntitiesWithinAABB(EntityItem.class, axisAlignedBB.offset(pos));
 	}
 }

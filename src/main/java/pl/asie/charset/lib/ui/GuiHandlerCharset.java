@@ -68,7 +68,7 @@ public class GuiHandlerCharset implements IGuiHandler {
 	public void register(int id, Side side, Function<Request, Object> supplier) {
 		int rId = id * 2 + (side == Side.CLIENT ? 1 : 0);
 		if (map.containsKey(rId)) {
-			throw new RuntimeException("GuiHandler ID " + id + "[" + side.name() + "] is taken!");
+			throw new RuntimeException("GuiHandler ID " + id + "[" + side.name() + "] is taken by " + map.get(rId).getClass().getName() + ", tried to insert " + supplier.getClass().getName() + "!");
 		}
 		map.put(rId, supplier);
 	}

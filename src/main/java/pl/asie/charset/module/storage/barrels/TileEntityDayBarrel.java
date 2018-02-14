@@ -19,6 +19,9 @@
 
 package pl.asie.charset.module.storage.barrels;
 
+import com.elytradev.mirage.event.GatherLightsEvent;
+import com.elytradev.mirage.lighting.ILightEventConsumer;
+import com.elytradev.mirage.lighting.Light;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
@@ -56,6 +59,7 @@ import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
 import pl.asie.charset.lib.utils.Orientation;
+import pl.asie.charset.module.tweak.dynlights.CharsetTweakDynamicLights;
 
 import javax.annotation.Nullable;
 import java.util.*;

@@ -36,6 +36,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -56,11 +57,15 @@ import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.storage.tanks.TileTank;
 import pl.asie.charset.module.tweak.improvedCauldron.api.CauldronContents;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
+import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldronRecipe;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class BlockCauldronCharset extends BlockCauldron implements ITileEntityProvider {
+	protected static final AxisAlignedBB AABB_INSIDE = new AxisAlignedBB(0.125D, 0.3125D, 0.125D, 0.875D, 1.0D, 0.875D);
+
 	private boolean isEmptyOrWater(IBlockAccess access, BlockPos pos) {
 		TileEntity tile = access.getTileEntity(pos);
 		if (tile instanceof TileCauldronCharset) {
@@ -113,7 +118,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 							}
 
 							if (!contentsNew.isPresent()) {
-								contentsNew = CharsetTweakImprovedCauldron.craft(tile, new CauldronContents(stack, heldItemOne));
+								contentsNew = CharsetTweakImprovedCauldron.craft((ICauldron) tile, ICauldronRecipe.Scenario.ITEM_ENTITY, new CauldronContents(stack, heldItemOne));
 							}
 
 							if (contentsNew.isPresent()) {
@@ -190,7 +195,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 				FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
 				ItemStack heldItemOne = heldItem.copy();
 				heldItemOne.setCount(1);
-				Optional<CauldronContents> contentsNew = CharsetTweakImprovedCauldron.craft(tankEntity, new CauldronContents(stack, heldItemOne));
+				Optional<CauldronContents> contentsNew = CharsetTweakImprovedCauldron.craft((ICauldron) tankEntity, ICauldronRecipe.Scenario.RIGHT_CLICK, new CauldronContents(stack, heldItemOne));
 
 				if (contentsNew.isPresent()) {
 					if (!worldIn.isRemote) {

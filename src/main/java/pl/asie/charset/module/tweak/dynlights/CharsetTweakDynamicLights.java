@@ -100,7 +100,7 @@ public class CharsetTweakDynamicLights {
 	public void onPreInit(FMLPreInitializationEvent event) {
 	}
 
-	private Light getLight(double x, double y, double z, ItemStack s) {
+	public static Light getLight(double x, double y, double z, ItemStack s) {
 		LightKey key = new LightKey(s.getItem(), s.getMetadata());
 		float[] data = null;
 

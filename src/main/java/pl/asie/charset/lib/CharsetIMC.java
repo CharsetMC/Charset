@@ -80,7 +80,7 @@ public final class CharsetIMC {
         }
     }
 
-    public ThreeState allows(String key, Set<ResourceLocation> locations) {
+    public ThreeState allows(String key, Collection<ResourceLocation> locations) {
         ThreeState result = ThreeState.MAYBE;
 
         for (ResourceLocation loc : locations) {

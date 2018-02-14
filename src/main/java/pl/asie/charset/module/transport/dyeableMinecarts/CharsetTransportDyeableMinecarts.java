@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.transport.dyeableMinecarts;
 
+import akka.util.Reflect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
@@ -41,6 +42,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -158,29 +160,17 @@ public class CharsetTransportDyeableMinecarts {
 	public void overrideRenderers(FMLPostInitializationEvent event) {
 		Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap = Minecraft.getMinecraft().getRenderManager().entityRenderMap;
 
-		for (Render<? extends Entity> e : entityRenderMap.values()) {
-			if (e instanceof RenderMinecart) {
-				Field f;
-
-				try {
-					f = RenderMinecart.class.getDeclaredField("modelMinecart");
-				} catch (NoSuchFieldException eee) {
-					try {
-						f = RenderMinecart.class.getDeclaredField("field_77013_a");
-					} catch (NoSuchFieldException ee) {
-						f = null;
-					}
-				}
-
-				if (f != null) {
-					try {
-						f.setAccessible(true);
-						f.set(e, new ModelMinecartWrapped((ModelBase) f.get(e)));
-					} catch (IllegalAccessException eee) {
-						eee.printStackTrace();
-					}
+		try {
+			Field f = ReflectionHelper.findField(RenderMinecart.class, "modelMinecart", "field_77013_a");
+			for (Render<? extends Entity> e : entityRenderMap.values()) {
+				if (e instanceof RenderMinecart) {
+					f.set(e, new ModelMinecartWrapped((ModelBase) f.get(e)));
 				}
 			}
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ReflectionHelper.UnableToFindFieldException e) {
+			// pass
 		}
 	}
 

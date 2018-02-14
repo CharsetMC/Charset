@@ -111,11 +111,11 @@ public class CharsetTweakBlockCarrying {
         boolean hasTileEntity = state.getBlock().hasTileEntity(state);
         boolean isVanilla = "minecraft".equals(block.getRegistryName().getResourceDomain());
 
-        Set<String> names = new HashSet<>();
+        // Set<String> names = new HashSet<>();
         Set<ResourceLocation> locs = new HashSet<>();
 
         locs.add(state.getBlock().getRegistryName());
-        names.add(state.getBlock().getClass().getName());
+        // names.add(state.getBlock().getClass().getName());
 
         if (hasTileEntity) {
             TileEntity tile = world.getTileEntity(pos);
@@ -123,12 +123,12 @@ public class CharsetTweakBlockCarrying {
             if (tile != null) {
                 Class<? extends TileEntity> tileClass = tile.getClass();
                 locs.add(TileEntity.getKey(tileClass));
-                names.add(tileClass.getName());
+                // names.add(tileClass.getName());
             }
         }
 
-        for (ResourceLocation r : locs)
-            names.add(r.toString());
+        /* for (ResourceLocation r : locs)
+            names.add(r.toString()); */
 
         ThreeState allowedIMC = CharsetIMC.INSTANCE.allows("carry", locs);
 
