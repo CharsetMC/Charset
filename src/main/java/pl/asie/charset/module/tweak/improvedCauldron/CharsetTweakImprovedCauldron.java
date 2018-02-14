@@ -63,6 +63,10 @@ public class CharsetTweakImprovedCauldron {
 	public static FluidDyedWater dyedWater;
 	private static List<ICauldronRecipe> recipeList = new ArrayList<>();
 
+	public static void add(ICauldronRecipe recipe) {
+		recipeList.add(recipe);
+	}
+
 	public static Optional<CauldronContents> craft(ICauldron cauldronCharset, ICauldronRecipe.Scenario scenario, CauldronContents contents) {
 		for (ICauldronRecipe recipe : recipeList) {
 			if (!recipe.matches(scenario)) {

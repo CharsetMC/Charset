@@ -34,6 +34,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.FluidTankProperties;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.module.tweak.improvedCauldron.api.ICauldron;
 
@@ -151,6 +152,12 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 		}
 
 		this.stack = stack;
+		if (this.stack != null && this.stack.amount > getCapacity()) {
+			ModCharset.logger.warn("Something tried to overflow cauldron @ " + getCauldronPos() + " with " + this.stack.amount + " mB of " + this.stack.getLocalizedName() + "!");
+			this.stack = stack.copy();
+			this.stack.amount = getCapacity();
+		}
+
 		rebuildFromStack(false);
 		markBlockForUpdate();
 
