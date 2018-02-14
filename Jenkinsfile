@@ -5,7 +5,7 @@ pipeline {
 			steps {
 				sh 'git submodule update --init --recursive'
 				sh 'rm -f private.gradle'
-				sh './gradlew setupCiWorkspace clean build'
+				sh './gradlew setupCiWorkspace clean build --refresh-dependencies'
 				archive 'build/libs/*jar'
 			}
 		}
