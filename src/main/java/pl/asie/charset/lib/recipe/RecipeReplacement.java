@@ -101,6 +101,8 @@ public class RecipeReplacement {
 
             for (int j = 0; j < matchingStacks.length; j++) {
                 ItemStack stack = matchingStacks[j];
+                if (stack.isEmpty()) continue;
+
                 ItemStack newStack = null;
                 Object replacement = null;
 

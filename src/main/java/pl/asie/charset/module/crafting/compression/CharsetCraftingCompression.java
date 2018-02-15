@@ -6,6 +6,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -19,6 +20,7 @@ import pl.asie.charset.lib.utils.UtilProxyCommon;
 @CharsetModule(
 		name = "crafting.compression",
 		description = "Compression Crafter, for all your large-scale auto-crafting needs.",
+		dependencies = {"storage.barrels"},
 		profile = ModuleProfile.INDEV
 )
 public class CharsetCraftingCompression {
@@ -29,6 +31,11 @@ public class CharsetCraftingCompression {
 	public void onPreInit(FMLPreInitializationEvent event) {
 		blockCompressionCrafter = new BlockCompressionCrafter();
 		itemCompressionCrafter = new ItemBlockBase(blockCompressionCrafter);
+	}
+
+	@Mod.EventHandler
+	public void onInit(FMLInitializationEvent event) {
+		RegistryUtils.register(TileCompressionCrafter.class, "compression_crafter");
 	}
 
 	@SubscribeEvent
