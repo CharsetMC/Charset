@@ -61,8 +61,8 @@ public class SubCommandHand extends SubCommand {
                 for (int id : OreDictionary.getOreIDs(stack)) {
                     String name = OreDictionary.getOreName(id);
                     names.add(name);
-                    sender.sendMessage(new TextComponentString("Ores: [" + CommandCharset.COMMAS.join(names) + "]"));
                 }
+                sender.sendMessage(new TextComponentString("Ores: [" + CommandCharset.COMMAS.join(names) + "]"));
             } else if (args.length > 0 && "material".equalsIgnoreCase(args[0])) {
                 ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
                 if (material == null) {

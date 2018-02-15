@@ -187,10 +187,12 @@ public class ModCharset {
 	@Mod.EventHandler
 	public void passThrough(FMLServerStartedEvent event) {
 		ModuleLoader.INSTANCE.passEvent(event);
+		CharsetIMC.INSTANCE.freezeRegistries();
 	}
 
 	@Mod.EventHandler
 	public void passThrough(FMLServerStoppingEvent event) {
+		CharsetIMC.INSTANCE.unfreezeRegistries();
 		ModuleLoader.INSTANCE.passEvent(event);
 	}
 

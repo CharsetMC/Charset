@@ -19,8 +19,10 @@
 
 package pl.asie.charset.module.tweak;
 
+import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
+import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -55,13 +58,29 @@ import java.util.Set;
 )
 public class CharsetTweakDoubleDoors {
 	private final Set<BlockDoor> allowedDoors = new HashSet<BlockDoor>();
+	private boolean changeCalled = false;
+
+	@Mod.EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		CharsetIMC.INSTANCE.registerListener("doubleDoor", this::onDoubleDoorChange);
+	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
+		if (!changeCalled) {
+			onDoubleDoorChange(CharsetIMC.INSTANCE);
+		}
+	}
+
+	public void onDoubleDoorChange(CharsetIMC imc) {
+		changeCalled = true;
+		Set<BlockDoor> oldAllowedDoors = Sets.newHashSet(allowedDoors);
+		allowedDoors.clear();
+
 		for (Block block : ForgeRegistries.BLOCKS) {
 			try {
 				if (block != null && block instanceof BlockDoor) {
-					ThreeState state = CharsetIMC.INSTANCE.allows("doubleDoor", block.getRegistryName());
+					ThreeState state = imc.allows("doubleDoor", block.getRegistryName());
 					boolean allowed = false;
 
 					if (state == ThreeState.MAYBE && !(block.getRegistryName().getResourceDomain().equals("malisisdoors"))) {
@@ -81,13 +100,21 @@ public class CharsetTweakDoubleDoors {
 						Collection<IProperty<?>> properties = block.getBlockState().getProperties();
 						if (properties.contains(BlockDoor.FACING) && properties.contains(BlockDoor.OPEN) && properties.contains(BlockDoor.HINGE)) {
 							allowedDoors.add((BlockDoor) block);
-							ModCharset.logger.info("[tweak.doubledoors] Allowing " + block.getRegistryName().toString());
+							if (!oldAllowedDoors.contains(block)) {
+								ModCharset.logger.info("[tweak.doubledoors] Allowing " + block.getRegistryName().toString());
+							} else {
+								oldAllowedDoors.remove(block);
+							}
 						}
 					}
 				}
 			} catch (ReflectionHelper.UnableToFindMethodException e) {
 				// This is fine.
 			}
+		}
+
+		for (BlockDoor block : oldAllowedDoors) {
+			ModCharset.logger.info("[tweak.doubledoors] Removing " + block.getRegistryName().toString());
 		}
 	}
 

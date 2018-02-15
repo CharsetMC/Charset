@@ -114,7 +114,7 @@ public abstract class BlockBase extends Block {
 	}
 
 	@Override
-	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+	public final boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
 		return getBlockFaceShape(world, base_state, pos, side) == BlockFaceShape.SOLID;
 	}
 

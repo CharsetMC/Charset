@@ -22,6 +22,7 @@ package pl.asie.charset.lib;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
@@ -29,21 +30,81 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.utils.ThreeState;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public final class CharsetIMC {
     public static CharsetIMC INSTANCE = new CharsetIMC();
     private final Multimap<String, ResourceLocation> registryLocs = HashMultimap.create();
     private final Multimap<String, String> registryDomainLocs = HashMultimap.create();
+    private final Multimap<String, Consumer<CharsetIMC>> registryChangeListeners = MultimapBuilder.hashKeys().arrayListValues().build();
+    private Set<Consumer<CharsetIMC>> queuedListeners = Collections.newSetFromMap(new IdentityHashMap<>());
+    private int registriesFrozen = 0;
+    private int buildingCallQueue = 0;
 
     private CharsetIMC() {
 
     }
 
+    public void freezeRegistries() {
+        registriesFrozen++;
+    }
+
+    public void unfreezeRegistries() {
+        registriesFrozen--;
+        if (registriesFrozen < 0) {
+            ModCharset.logger.warn("unfreezeRegistries called without matching freeze!", new Throwable());
+            registriesFrozen = 0;
+        }
+    }
+
+    private boolean checkFrozen(String key) {
+        if (registriesFrozen > 0) {
+            ModCharset.logger.warn("Tried to register for key " + key + " while registries frozen!", new Throwable());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean registerListener(String key, Consumer<CharsetIMC> consumer) {
+        return registryChangeListeners.put(key, consumer);
+    }
+
+    public void beginQueueingListeners() {
+        buildingCallQueue++;
+    }
+
+    public void endQueueingListeners() {
+        buildingCallQueue--;
+        if (buildingCallQueue < 0) {
+            throw new RuntimeException("endQueueingListeners called without matching begin!");
+        } else if (buildingCallQueue == 0) {
+            for (Consumer<CharsetIMC> consumer : queuedListeners) {
+                consumer.accept(this);
+            }
+            queuedListeners.clear();
+        }
+    }
+
+    private void onChange(String key) {
+        if (key.contains(":")) {
+            key = key.substring(key.indexOf(":") + 1);
+        }
+
+        if (buildingCallQueue > 0) {
+            queuedListeners.addAll(registryChangeListeners.get(key));
+        } else {
+            for (Consumer<CharsetIMC> consumer : registryChangeListeners.get(key)) {
+                consumer.accept(this);
+            }
+        }
+    }
+
     public void loadConfig(Configuration config) {
+        beginQueueingListeners();
+
         for (String s : ConfigUtils.getStringList(config, "functionalityRegistry", "whitelist", new String[]{}, "Functionality registry whitelist (example entry: carry:minecraft:bedrock)", true)) {
             String[] sSplit = s.split(":", 2);
             if (sSplit.length >= 2) {
@@ -61,6 +122,8 @@ public final class CharsetIMC {
             }
         }
         config.get("functionalityRegistry", "whitelist", new String[]{});
+
+        endQueueingListeners();
     }
 
     public ThreeState allows(String key, ResourceLocation location) {
@@ -94,18 +157,42 @@ public final class CharsetIMC {
         return result;
     }
 
-    private void add(Collection<String> entryKeys, ResourceLocation entry) {
+    private boolean add(Collection<String> entryKeys, ResourceLocation entry) {
+        boolean result = false;
         for (String entryKey : entryKeys) {
-            add(entryKey, entry);
+            result |= add(entryKey, entry);
         }
+        return result;
     }
 
-    private void add(String entryKey, ResourceLocation entry) {
+    private boolean add(String entryKey, ResourceLocation entry) {
+        if (checkFrozen(entryKey)) return false;
+
+        boolean result;
         if (entry.getResourcePath().equals("*")) {
-            registryDomainLocs.put(entryKey, entry.getResourceDomain());
+            result = registryDomainLocs.put(entryKey, entry.getResourceDomain());
         } else {
-            registryLocs.put(entryKey, entry);
+            result = registryLocs.put(entryKey, entry);
         }
+        if (result) {
+            onChange(entryKey);
+        }
+        return result;
+    }
+
+    private boolean remove(String entryKey, ResourceLocation entry) {
+        if (checkFrozen(entryKey)) return false;
+
+        boolean result;
+        if (entry.getResourcePath().equals("*")) {
+            result = registryDomainLocs.remove(entryKey, entry.getResourceDomain());
+        } else {
+            result = registryLocs.remove(entryKey, entry);
+        }
+        if (result) {
+            onChange(entryKey);
+        }
+        return result;
     }
 
     private String toEntryKey(String entryKey, String prefix) {
@@ -125,7 +212,31 @@ public final class CharsetIMC {
         }
     }
 
+    public boolean add(ThreeState state, String key, ResourceLocation location) {
+        switch (state) {
+            case YES:
+                return add("w:" + key, location);
+            case NO:
+                return add("b:" + key, location);
+        }
+
+        return false;
+    }
+
+    public boolean remove(ThreeState state, String key, ResourceLocation location) {
+        switch (state) {
+            case YES:
+                return remove("w:" + key, location);
+            case NO:
+                return remove("b:" + key, location);
+        }
+
+        return false;
+    }
+
     public void receiveMessage(FMLInterModComms.IMCMessage msg) {
+        beginQueueingListeners();
+
         for (String key : msg.key.split(";")) {
             key = key.trim();
             if (key.startsWith("add")) {
@@ -142,5 +253,7 @@ public final class CharsetIMC {
                 }
             }
         }
+
+        endQueueingListeners();
     }
 }

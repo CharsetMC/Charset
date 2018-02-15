@@ -1,0 +1,32 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "crafting.compression"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:compression_crafter",
+  "pattern": [
+    "-",
+    "c",
+    "p"
+  ],
+  "key": {
+    "-": {
+      "type": "charset:material",
+      "material": ["stone", "slab"]
+    },
+    "c": {
+      "type": "forge:ore_dict",
+      "ore": "workbench"
+    },
+    "p": {
+      "item": "minecraft:piston"
+    }
+  },
+  "result": {
+    "item": "charset:compression_crafter",
+    "count": 1
+  }
+}

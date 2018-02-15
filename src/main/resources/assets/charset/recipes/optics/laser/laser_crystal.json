@@ -1,0 +1,26 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "optics.laser"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:laser_crystal",
+  "pattern": [
+    "rr",
+    "rr"
+  ],
+  "key": {
+    "r": {
+      "type": "charset:group",
+      "group": "charset:laser_gem",
+      "modifyMeta": true
+    }
+  },
+  "result": {
+    "item": "charset:laser_crystal",
+    "data": 0,
+    "count": 1
+  }
+}
