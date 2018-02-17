@@ -721,7 +721,11 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     public void clear() {
-        item = ItemStack.EMPTY;
+        setItem(ItemStack.EMPTY);
+    }
+
+    public void setItem(ItemStack item) {
+        this.item = item;
         onItemChange(true);
     }
 

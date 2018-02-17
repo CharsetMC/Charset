@@ -5,14 +5,6 @@
   },
   "variants": {
     "normal": [{}],
-    "facing": {
-      "up": {},
-      "down": {"x": 180},
-      "north": {"x": 90},
-      "south": {"x": 90, "y": 180},
-      "west": {"x": 90, "y": 270},
-      "east": {"x": 90, "y": 90}
-    },
     "inventory": [{
       "transform": "forge:default-block",
       "x": 90, "y": 90
