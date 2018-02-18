@@ -32,6 +32,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
@@ -43,6 +45,7 @@ import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RecipeUtils;
@@ -204,6 +207,7 @@ public class CompressionShape {
 			CharsetCraftingCompression.proxy.markShapeRender(sender, this);
 			return true;
 		} else {
+			new Notice(sender, new TextComponentTranslation("notice.charset.compression.cannot_craft")).sendToAll();
 			return false;
 		}
 	}
@@ -246,30 +250,34 @@ public class CompressionShape {
 			return false;
 		}
 
+		Set<EnumFacing> validSides = craftingDirections;
+		BlockPos sourcePos = craftingSourcePos;
+		EnumFacing sourceDir = craftingSourceDir;
+
+		List<IItemInsertionHandler> outputs = new ArrayList<>();
+		for (EnumFacing facing : validSides) {
+			addItemHandlers(outputs, facing, expectedFacings.get(facing));
+		}
+/*
+		if (outputs.isEmpty()) {
+			return false;
+		}
+*/
 		if (!simulate) {
-			Set<EnumFacing> validSides = craftingDirections;
-			BlockPos sourcePos = craftingSourcePos;
-			EnumFacing sourceDir = craftingSourceDir;
-
-			List<IItemInsertionHandler> outputs = new ArrayList<>();
-			for (EnumFacing facing : validSides) {
-				addItemHandlers(outputs, facing, expectedFacings.get(facing));
-			}
-
 			NonNullList<ItemStack> remainingItems = recipe.getRemainingItems(crafting);
 			for (int i = 0; i < width * height; i++) {
 				ItemStack source = barrels.get(i).item;
 				ItemStack target = remainingItems.get(i);
 
+				ItemStack sourceOrig = source;
 				if (!source.isEmpty() && !barrels.get(i).upgrades.contains(BarrelUpgrade.INFINITE)) {
+					sourceOrig = source.copy();
 					source.shrink(1);
 				}
 
 				if (target.isEmpty()) {
 					// we're fine
-				} else if (source.isEmpty()) {
-					source = target;
-				} else if (ItemUtils.canMerge(source, target)) {
+				} else if (ItemUtils.canMerge(sourceOrig, target)) {
 					source.grow(target.getCount());
 				} else {
 					outputStack(target, sourcePos, sourceDir, outputs);

@@ -25,6 +25,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.misc.IItemInsertionEmitter;
@@ -63,7 +64,7 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 		if (shape == null) {
 			shape = CompressionShape.build(world, pos);
 			if (shape == null && warn) {
-				new Notice(this, new TextComponentString("Invalid shape")).sendToAll();
+				new Notice(this, new TextComponentTranslation("notice.charset.compression.invalid_shape")).sendToAll();
 			}
 		}
 	}

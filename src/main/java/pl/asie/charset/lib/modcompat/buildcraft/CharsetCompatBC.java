@@ -36,7 +36,7 @@ import pl.asie.charset.lib.modcompat.opencomputers.ManagedEnvironmentBarrel;
 @CharsetModule(
         name = "buildcraft:lib",
         profile = ModuleProfile.COMPAT,
-        dependencies = {"mod:buildcraft"}
+        dependencies = {"mod:buildcraftlib"}
 )
 public class CharsetCompatBC {
 	@Mod.EventHandler

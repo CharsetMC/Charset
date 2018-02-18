@@ -1,74 +1,27 @@
-tile.charset.compression_crafter.name=Compression Crafter
-chat.charset.shout=%1$s %2$s
-fluid.charset.dyed_water.name=Dyed Water
-fluid.charset.dyed_water.pure.name=Pure Dyed Water
-notice.charset.cauldron.dye_impure=Must use pure dyed water!
-notice.charset.cauldron.no_dye=Cannot mix more dye!
-notice.charset.cauldron.empty=Empty
-notice.charset.cauldron.fluid=%1$s mB of %2$s
-notice.charset.barrel.infinite=Infinite
-notice.charset.barrel.no=No.
+# config
 
-# Config
 config.charset.title=Charset Configuration
 config.charset.profile.name=Profile
 config.charset.categories.name=Toggle Module Categories
 config.charset.overrides.name=Toggle Individual Modules
 
-config.charset.tweak.blockCarrying.general.name=General
+# audio.storage
 
-config.charset.storage.locks.general.name=General
-
-config.charset.storage.barrels.features.name=Toggle Features
-config.charset.storage.barrels.general.name=General
-config.charset.storage.barrels.render.name=Client/Rendering
-
-config.charset.lib.expert.name=Expert Settings
-config.charset.lib.functionalityregistry.name=Functionality Registry
-config.charset.lib.general.name=General
-
-item.charset.icon.name=a
-item.charset.tablet.name=Tablet
-
-# CharsetAudio
-tile.charset.audioCable.name=Audio Cable
-tile.charset.audioCable.freestanding.name=Hovering Audio Cable
-tile.charset.ironNoteBlock.name=Iron Note Block
-tile.charset.record_player.name=Record Player
 item.charset.quartz_disc.blank.name=Blank Quartz Disc
 item.charset.quartz_disc.name=Quartz Disc
+
+tile.charset.record_player.name=Record Player
 
 tooltip.charset.disc.none=No Disc
 tooltip.charset.disc.unnamed=Unnamed Disc
 
-# CharsetCarts
-tile.charset.rail_cross.name=Crossing Rail
+# audio.transport
 
-# CharsetCrafting
-item.charset.pocket_crafting_table.name=Pocket Crafting Table
+tile.charset.audioCable.name=Audio Cable
+tile.charset.audioCable.freestanding.name=Hovering Audio Cable
 
-# CharsetDecoration
-item.charset.poster.name=Poster
-tile.charset.scaffold.name=Scaffold
-tile.charset.scaffold.format=%s Scaffold
-tile.charset.shelf.name=Shelf
-tile.charset.shelf.format=%s Shelf
+# lib
 
-# CharsetDrama
-item.charset.dramaInABottle.name=Drama in a Bottle
-
-# CharsetFarming
-item.charset.clayBucket.filled.name=%s Clay Bucket
-item.charset.clayBucket.empty.name=Clay Bucket
-
-# CharsetLaser
-tile.charset.crystal.name=%s Crystal
-tile.charset.beam_torch.name=%s Beam Torch
-tile.charset.prism.name=Prism
-tile.charset.reflector.name=%s Reflector
-tile.charset.splitter.name=%s Splitter
-
-# CharsetLib
 charset.color.black=Black
 charset.color.red=Red
 charset.color.green=Green
@@ -86,36 +39,89 @@ charset.color.lightBlue=Light Blue
 charset.color.magenta=Magenta
 charset.color.orange=Orange
 charset.color.white=White
+
 charset.point.toofar=You can't point that far!
+
+config.charset.lib.expert.name=Expert Settings
+config.charset.lib.functionalityregistry.name=Functionality Registry
+config.charset.lib.general.name=General
 
 gui.charset.crafting.name=Crafting
 
 itemGroup.charset=The Charset Project
 
+item.charset.icon.name=a
+
+# crafting.cauldron
+
+fluid.charset.dyed_water.name=Dyed Water
+fluid.charset.dyed_water.pure.name=Pure Dyed Water
+
+notice.charset.cauldron.dye_impure=Must use pure dyed water!
+notice.charset.cauldron.no_dye=Cannot mix more dye!
+notice.charset.cauldron.empty=Empty
+notice.charset.cauldron.fluid=%1$s mB of %2$s
+
+# crafting.compression
+
+notice.charset.compression.invalid_shape=Invalid shape!
+notice.charset.compression.cannot_craft=Could not craft!
+
+tile.charset.compression_crafter.name=Compression Crafter
+
+# crafting.pocket
+
+item.charset.pocket_crafting_table.name=Pocket Crafting Table
+
+# misc.drama
+
+item.charset.dramaInABottle.name=Drama in a Bottle
+
+# misc.graphite
+
+item.charset.graphite.name=Graphite
+
+# misc.scaffold
+
+tile.charset.scaffold.name=Scaffold
+tile.charset.scaffold.format=%s Scaffold
+
+# misc.shards
+
+item.charset.shard.colored.name=%s Glass Shard
+item.charset.shard.name=Glass Shard
+
+# optics.laser
+
+tile.charset.beam_torch.name=%s Beam Torch
+tile.charset.crystal.name=%s Crystal
+tile.charset.prism.name=Prism
+tile.charset.reflector.name=%s Reflector
+tile.charset.splitter.name=%s Splitter
+
+# optics.projector
+
 tile.charset.projector.name=Projector
+
+# overhaul.oneDimension
 
 item.charset.gemQuartz.name=Quartz
 tile.charset.oreQuartz.name=Quartz Ore
 
-# CharsetPipes
-item.charset.pipe.name=Pipe
-tile.charset.pipe.format=%s Pipe
-tile.charset.pipe.name=Pipe
-tile.charset.shifter.name=Shifter
+# storage.barrels
 
-# CharsetStorage
-gui.charset.keyring.name=Keyring
-key.charset.backpackOpen=Open Backpack
+config.charset.storage.barrels.features.name=Toggle Features
+config.charset.storage.barrels.general.name=General
+config.charset.storage.barrels.render.name=Client/Rendering
+
 item.charset.barrelCart.name=Barrel Cart
 item.charset.barrelCart.known.name=Barrel Cart: %s
-item.charset.key.name=Key
-item.charset.keyring.name=Keyring
-item.charset.lock.name=Lock
-item.charset.masterKey.name=Master Key
+
 notice.charset.barrel.empty=Empty
 notice.charset.barrel.full=Full of
 notice.charset.barrel.infinite=Infinite
 notice.charset.barrel.no=No.
+
 tile.charset.barrel.name=Barrel
 tile.charset.barrel.format=%2$s Barrel
 tile.charset.barrel.format2=%1$s %2$s Barrel
@@ -125,16 +131,54 @@ tile.charset.barrel.HOPPING.name=Hopping
 tile.charset.barrel.STICKY.name=Sticky
 tile.charset.barrel.INFINITE.name=Infinite
 
-# CharsetTweaks
-item.charset.graphite.name=Graphite
-item.charset.shard.colored.name=%s Glass Shard
-item.charset.shard.name=Glass Shard
+# storage.locks
 
-# CharsetWrench
-item.charset.chisel.name=Chisel
-item.charset.chisel.large.name=Large Chisel
-item.charset.wrench.name=Wrench
+config.charset.storage.locks.general.name=General
+
+gui.charset.keyring.name=Keyring
+
+item.charset.key.name=Key
+item.charset.keyring.name=Keyring
+item.charset.lock.name=Lock
+item.charset.masterKey.name=Master Key
+
+# storage.tanks
 
 tile.charset.tank.name=Tank
 tile.charset.tank.colored.name=%s Tank
 tile.charset.tank.creative.name=Infinite Tank
+
+# tablet
+
+item.charset.tablet.name=Tablet
+
+# transport.rails
+
+tile.charset.rail_cross.name=Crossing Rail
+
+# tweak.carry
+
+config.charset.tweak.carry.general.name=General
+
+# tweak.chat
+
+chat.charset.shout=%1$s %2$s
+
+# tools.building
+
+item.charset.chisel.name=Chisel
+item.charset.chisel.large.name=Large Chisel
+item.charset.wrench.name=Wrench
+
+# abandoned (but may be returned to)
+
+item.charset.clayBucket.filled.name=%s Clay Bucket
+item.charset.clayBucket.empty.name=Clay Bucket
+item.charset.pipe.name=Pipe
+item.charset.poster.name=Poster
+
+tile.charset.pipe.format=%s Pipe
+tile.charset.pipe.name=Pipe
+tile.charset.shelf.name=Shelf
+tile.charset.shelf.format=%s Shelf
+tile.charset.shifter.name=Shifter
