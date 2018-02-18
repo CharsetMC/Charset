@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -16,8 +17,11 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelStateComposition;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.utils.RenderUtils;
 
@@ -32,10 +36,25 @@ public class ProxyClient extends ProxyCommon {
 			ModelRotation.X90_Y0,
 			ModelRotation.X90_Y180,
 			ModelRotation.X90_Y270,
-			ModelRotation.X90_Y90,
-			ModelRotation.X180_Y90,
-			ModelRotation.X0_Y90
+			ModelRotation.X90_Y90
 	};
+
+	protected static final IBakedModel[] rodModels = new IBakedModel[6];
+
+	public void init() {
+		super.init();
+		ClientRegistry.bindTileEntitySpecialRenderer(TileCompressionCrafter.class, new TileCompressionCrafterRenderer());
+		MinecraftForge.EVENT_BUS.register(CompressionShapeRenderer.INSTANCE);
+	}
+
+	@Override
+	public void markShapeRender(TileCompressionCrafter sender, CompressionShape shape) {
+		if (shape.world.isRemote) {
+			CompressionShapeRenderer.INSTANCE.addShape(shape);
+		} else {
+			super.markShapeRender(sender, shape);
+		}
+	}
 
 	@SubscribeEvent
 	public void onModelRegistry(ModelRegistryEvent event) {
@@ -53,21 +72,34 @@ public class ProxyClient extends ProxyCommon {
 		CTMTextureFactory.register(event.getMap(), new ResourceLocation("charset:blocks/compact/compact_bottom"));
 		CTMTextureFactory.register(event.getMap(), new ResourceLocation("charset:blocks/compact/compact_top"));
 		CTMTextureFactory.register(event.getMap(), new ResourceLocation("charset:blocks/compact/compact_side"));
+		CTMTextureFactory.register(event.getMap(), new ResourceLocation("charset:blocks/compact/compact_inner"));
 	}
 
 	@SubscribeEvent
 	public void onModelBake(ModelBakeEvent event) {
 		IBakedModel origModel = event.getModelRegistry().getObject(bmLoc);
 		ModelCompressionCrafter result = new ModelCompressionCrafter(origModel);
-
 		event.getModelRegistry().putObject(bmLoc, result);
-		IModel model = RenderUtils.getModel(new ResourceLocation("charset:block/compression_crafter"));
+
+		ProgressManager.ProgressBar bar = ProgressManager.push("Compression Crafter", 6 + (4*12));
+
+		IModel modelRod = RenderUtils.getModel(new ResourceLocation("charset:block/compression_crafter_rod"));
+		for (EnumFacing side : EnumFacing.VALUES) {
+			bar.step("rod " + side.name());
+			rodModels[side.ordinal()] = modelRod.bake(
+					ROTATIONS[side.ordinal()],
+					DefaultVertexFormats.ITEM,
+					ModelLoader.defaultTextureGetter()
+			);
+		}
+
+		IModel model = RenderUtils.getModel(new ResourceLocation("charset:block/compression_crafter_block"));
 		IBlockState defState = CharsetCraftingCompression.blockCompressionCrafter.getDefaultState();
 
 		for (int i = 0; i < 4; i++) {
 			IModel retexModel = model.retexture(
 					ImmutableMap.of(
-							"top", "charset:blocks/compact/compact_top#" + i,
+							"top", "charset:blocks/compact/compact_inner#" + i,
 							"bottom", "charset:blocks/compact/compact_bottom#" + i,
 							"side_x", "charset:blocks/compact/compact_side#" + i,
 							"side_z", "charset:blocks/compact/compact_side#" + i
@@ -75,9 +107,17 @@ public class ProxyClient extends ProxyCommon {
 			);
 
 			for (int k = 0; k < 12; k++) {
+				bar.step("crafter " + (i * 4 + k + 1) + "/48");
+				if (i == 0 && k >= 6) {
+					for (EnumFacing side : EnumFacing.VALUES) {
+						result.quads[k][side.ordinal()][i] = result.quads[k - 6][side.ordinal()][i];
+					}
+					continue;
+				}
+
 				EnumFacing facing = EnumFacing.getFront(k % 6);
-				IModelState modelState = ROTATIONS[k >= 8 ? (k - 6) : k];
-				if (k >= 8) {
+				IModelState modelState = ROTATIONS[k % 6];
+				if (k >= 6) {
 					modelState = new ModelStateComposition(
 							modelState,
 							ModelRotation.X0_Y90
@@ -106,5 +146,7 @@ public class ProxyClient extends ProxyCommon {
 				}
 			}
 		}
+
+		ProgressManager.pop(bar);
 	}
 }

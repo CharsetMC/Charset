@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,27 +39,52 @@ public class CompressionShape {
 	private static final int MAX_HEIGHT = 3;
 
 	private static int nextId = 1;
-
 	private final int id;
-	private final IBlockAccess world;
-	private final Set<BlockPos> positions = new HashSet<>();
-	private final Multimap<EnumFacing, BlockPos> expectedFacings = MultimapBuilder.enumKeys(EnumFacing.class).arrayListValues().build();
-	private final List<TileCompressionCrafter> compressionCrafters = new ArrayList<>();
-	private final List<TileEntityDayBarrel> barrels = new ArrayList<>();
-	// private final List<List<BlockPos>> outputPositions = new ArrayList<>();
-	private int width, height;
-	private BlockPos topLeft;
-	private EnumFacing topDir, leftDir, bottomDir, rightDir;
-	private Orientation barrelOrientation;
+
+	protected final World world;
+	protected final Set<BlockPos> positions = new HashSet<>();
+	protected final Multimap<EnumFacing, BlockPos> expectedFacings = MultimapBuilder.enumKeys(EnumFacing.class).arrayListValues().build();
+	protected final List<TileCompressionCrafter> compressionCrafters = new ArrayList<>();
+	protected final List<TileEntityDayBarrel> barrels = new ArrayList<>();
+	protected int width, height;
+	protected BlockPos topLeft;
+	protected EnumFacing topDir, leftDir, bottomDir, rightDir;
+	protected Orientation barrelOrientation;
+
 	private boolean invalid = false;
 	private boolean[] lastRedstoneLevels = new boolean[6];
 
-	private CompressionShape(IBlockAccess world) {
+	protected long craftingTickStart = -1;
+	protected long craftingTickEnd = -1;
+	protected Set<EnumFacing> craftingDirections;
+	protected BlockPos craftingSourcePos;
+	protected EnumFacing craftingSourceDir;
+
+	private CompressionShape(World world) {
 		this.id = nextId++;
 		this.world = world;
 	}
 
-	protected Set<EnumFacing> checkRedstoneLevels() {
+	protected float getRenderProgress() {
+		if (craftingTickStart < 0 || craftingTickEnd < 0) {
+			return -1;
+		}
+
+		double duration = (craftingTickEnd - craftingTickStart) / 2f;
+		double currTime = world.getTotalWorldTime() - craftingTickStart;
+		if (currTime >= duration * 2) {
+			return -1;
+		} else if (currTime <= 0) {
+			return 0;
+		} else if (currTime >= duration) {
+			currTime = (duration * 2) - currTime;
+		}
+
+		float progress = (float) Math.sin((float) (currTime * Math.PI / 2f / duration));
+		return progress * (((width + height) / 2f) + 1) * 0.0625f;
+	}
+
+	protected Set<EnumFacing> checkRedstoneLevels(boolean clearOnly) {
 		EnumSet<EnumFacing> set = EnumSet.noneOf(EnumFacing.class);
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
@@ -67,7 +93,9 @@ public class CompressionShape {
 			if (currLevel && !lastLevel) {
 				set.add(facing);
 			}
-			lastRedstoneLevels[facing.ordinal()] = currLevel;
+			if (!clearOnly || !currLevel) {
+				lastRedstoneLevels[facing.ordinal()] = currLevel;
+			}
 		}
 
 		return set;
@@ -96,12 +124,14 @@ public class CompressionShape {
 
 		for (Map.Entry<EnumFacing, BlockPos> entry : expectedFacings.entries()) {
 			if (getCrafterDirection(entry.getValue()) != entry.getKey()) {
+				invalid = true;
 				return true;
 			}
 		}
 
 		for (TileEntityDayBarrel barrel : barrels) {
 			if (barrel.isInvalid() || barrel.orientation != barrelOrientation) {
+				invalid = true;
 				return true;
 			}
 		}
@@ -136,20 +166,35 @@ public class CompressionShape {
 
 		if (!stack.isEmpty()) {
 			ItemUtils.spawnItemEntity(
-					((World) world), new Vec3d(sourcePos.offset(sourceDir.getOpposite())).addVector(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
+					world, new Vec3d(sourcePos.offset(sourceDir.getOpposite())).addVector(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
 			);
 		}
 	}
 
-	public ItemStack craft(BlockPos sourcePos, EnumFacing sourceDir, boolean simulate) {
-		Set<EnumFacing> validSides = EnumSet.noneOf(EnumFacing.class);
-		if (!simulate) {
-			validSides = checkRedstoneLevels();
-			if (validSides.isEmpty()) {
-				return ItemStack.EMPTY;
-			}
+	public boolean craftBegin(TileCompressionCrafter sender, EnumFacing sourceDir) {
+		if (craftingTickEnd >= world.getTotalWorldTime()) {
+			return false;
 		}
 
+		Set<EnumFacing> validSides = checkRedstoneLevels(false);
+		if (validSides.isEmpty()) {
+			return false;
+		}
+
+		craftingDirections = validSides;
+		craftingSourcePos = sender.getPos();
+		craftingSourceDir = sourceDir;
+		if (craftEnd(true)) {
+			craftingTickStart = world.getTotalWorldTime();
+			craftingTickEnd = world.getTotalWorldTime() + 20;
+			CharsetCraftingCompression.proxy.markShapeRender(sender, this);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean craftEnd(boolean simulate) {
 		InventoryCrafting crafting = RecipeUtils.getCraftingInventory(width, height);
 		boolean hasNonEmpty = false;
 
@@ -175,20 +220,23 @@ public class CompressionShape {
 		}
 
 		if (!hasNonEmpty) {
-			return ItemStack.EMPTY;
+			return false;
 		}
 
-		World recipeWorld = world instanceof World ? (World) world : null;
-		IRecipe recipe = RecipeUtils.findMatchingRecipe(crafting, recipeWorld);
+		IRecipe recipe = RecipeUtils.findMatchingRecipe(crafting, world);
 		if (recipe == null) {
-			return ItemStack.EMPTY;
+			return false;
 		}
 		ItemStack stack = recipe.getCraftingResult(crafting);
 		if (stack.isEmpty()) {
-			return ItemStack.EMPTY;
+			return false;
 		}
 
 		if (!simulate) {
+			Set<EnumFacing> validSides = craftingDirections;
+			BlockPos sourcePos = craftingSourcePos;
+			EnumFacing sourceDir = craftingSourceDir;
+
 			List<IItemInsertionHandler> outputs = new ArrayList<>();
 			for (EnumFacing facing : validSides) {
 				addItemHandlers(outputs, facing, expectedFacings.get(facing));
@@ -218,7 +266,7 @@ public class CompressionShape {
 			outputStack(stack.copy(), sourcePos, sourceDir, outputs);
 		}
 
-		return stack;
+		return true;
 	}
 
 	private boolean setCrafterShapeIfMatchesDirection(BlockPos pos, EnumFacing facing) {
@@ -254,7 +302,7 @@ public class CompressionShape {
 		return tile instanceof TileEntityDayBarrel ? (TileEntityDayBarrel) tile : null;
 	}
 
-	public static CompressionShape build(IBlockAccess world, BlockPos start) {
+	public static CompressionShape build(World world, BlockPos start) {
 		CompressionShape shape = new CompressionShape(world);
 		EnumFacing firstBarrelFacing = shape.getCrafterDirection(start);
 		if (firstBarrelFacing == null) {
@@ -357,5 +405,23 @@ public class CompressionShape {
 		}
 
 		return shape;
+	}
+
+	public void tick() {
+		if (craftingTickStart >= 0) {
+			if (isInvalid()) {
+				craftingTickStart = craftingTickEnd = -1;
+			}
+
+			long time = world.getTotalWorldTime();
+			if (time >= craftingTickStart && time < craftingTickEnd) {
+				checkRedstoneLevels(true);
+			} else if (time >= craftingTickEnd) {
+				craftingTickStart = craftingTickEnd = -1;
+				if (!world.isRemote) {
+					craftEnd(false);
+				}
+			}
+		}
 	}
 }

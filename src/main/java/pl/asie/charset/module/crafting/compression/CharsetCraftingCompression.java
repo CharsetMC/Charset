@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.UtilProxyCommon;
 
@@ -27,6 +28,9 @@ import pl.asie.charset.lib.utils.UtilProxyCommon;
 public class CharsetCraftingCompression {
 	public static BlockCompressionCrafter blockCompressionCrafter;
 	public static ItemBlock itemCompressionCrafter;
+
+	@CharsetModule.PacketRegistry
+	public static PacketRegistry packet;
 
 	@CharsetModule.SidedProxy(clientSide = "pl.asie.charset.module.crafting.compression.ProxyClient", serverSide = "pl.asie.charset.module.crafting.compression.ProxyCommon")
 	public static ProxyCommon proxy;
@@ -42,6 +46,9 @@ public class CharsetCraftingCompression {
 	@Mod.EventHandler
 	public void onInit(FMLInitializationEvent event) {
 		RegistryUtils.register(TileCompressionCrafter.class, "compression_crafter");
+		packet.registerPacket(0x01, PacketCompactAnimation.class);
+
+		proxy.init();
 	}
 
 	@SubscribeEvent

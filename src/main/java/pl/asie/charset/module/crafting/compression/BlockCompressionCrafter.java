@@ -26,7 +26,13 @@ public class BlockCompressionCrafter extends BlockBase implements ITileEntityPro
 
 	public BlockCompressionCrafter() {
 		super(Material.ROCK);
+		setOpaqueCube(false);
 		setUnlocalizedName("charset.compression_crafter");
+	}
+
+	@Override
+	public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+		return state.getValue(Properties.FACING).getAxis() == face.getAxis();
 	}
 
 	private int modelOffset(IBlockAccess access, BlockPos pos, EnumFacing facing, EnumFacing.Axis axis, boolean flip) {

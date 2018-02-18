@@ -21,26 +21,31 @@ public class ModelCompressionCrafter extends WrappedBakedModel {
 
 	@Override
 	public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
-		if (side == null || state == null) {
+		if (state == null) {
 			return Collections.emptyList();
-		} else {
-			int facing = state.getValue(Properties.FACING).ordinal();
+		}
 
-			int offY = state.getValue(BlockCompressionCrafter.OFFSET_Y);
-			if (offY >= 4) {
-				facing += 6;
-				offY -= 4;
-			}
 
-			switch (side.getAxis()) {
-				case Y:
-				default:
-					return ImmutableList.of(quads[facing][side.ordinal()][offY]);
-				case X:
-					return ImmutableList.of(quads[facing][side.ordinal()][state.getValue(BlockCompressionCrafter.OFFSET_X)]);
-				case Z:
-					return ImmutableList.of(quads[facing][side.ordinal()][state.getValue(BlockCompressionCrafter.OFFSET_Z)]);
-			}
+		int facing = state.getValue(Properties.FACING).ordinal();
+		if (side == null) {
+			side = EnumFacing.getFront(facing);
+		} else if (side.ordinal() == facing) {
+			return Collections.emptyList();
+		}
+
+		int offY = state.getValue(BlockCompressionCrafter.OFFSET_Y);
+		if (offY >= 4) {
+			facing += 6;
+		}
+
+		switch (side.getAxis()) {
+			case Y:
+			default:
+				return ImmutableList.of(quads[facing][side.ordinal()][offY & 3]);
+			case X:
+				return ImmutableList.of(quads[facing][side.ordinal()][state.getValue(BlockCompressionCrafter.OFFSET_X)]);
+			case Z:
+				return ImmutableList.of(quads[facing][side.ordinal()][state.getValue(BlockCompressionCrafter.OFFSET_Z)]);
 		}
 	}
 }

@@ -31,6 +31,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -119,21 +120,6 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             if (barrel.getWorld().isSideSolid(facingPos, facing.getOpposite())) {
                 return;
             }
-
-            int l = barrel.getWorld().getCombinedLight(facingPos, barrel.getWorld().getSkylightSubtracted());
-            int j = l % 65536;
-            int k = l / 65536;
-
-            /* if (!barrel.item.isEmpty()) {
-                Light light = CharsetTweakDynamicLights.getLight(0, 0, 0, barrel.item);
-                if (light != null) {
-                    int k2 = Math.round(light.r * 256);
-                    k2 = MathHelper.clamp(k2, 0, 255);
-                    j = Math.max(k2, j);
-                }
-            } */
-
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
         }
 
         Minecraft.getMinecraft().mcProfiler.startSection("barrels");
@@ -209,6 +195,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
         }
 
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
         GlStateManager.rotate(180, 0, 0, 1);
         GlStateManager.disableLighting();
 

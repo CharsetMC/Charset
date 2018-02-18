@@ -131,7 +131,7 @@ public abstract class IngredientCharset {
      *
      * This, among others, governs recipe preview behaviour in JEI
      * as well as whether two different stacks in two different recipe
-     * slots under the same ingredient object can be used to craft
+     * slots under the same ingredient object can be used to craftBegin
      * the item. (If true, they cannot - the stacks must all be mergeable.)
      */
     public boolean arePermutationsDistinct() {

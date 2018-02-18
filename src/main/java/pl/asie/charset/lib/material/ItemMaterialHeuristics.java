@@ -49,6 +49,8 @@ import pl.asie.charset.lib.utils.RecipeUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;

@@ -1,0 +1,33 @@
+{
+  "elements": [
+    {   "from": [ -0.05, 12, -0.05 ],
+      "to": [ 16.05, 16, 16.05 ],
+      "faces": {
+        "down":  { "uv": [0,0,16,16], "texture": "#top", "cullface": "down" },
+        "up":    { "uv": [0,0,16,16], "texture": "#top", "cullface": "up" },
+        "north": { "uv": [0,0,16,4], "texture": "#side_z", "cullface": "north" },
+        "south": { "uv": [0,0,16,4], "texture": "#side_z", "cullface": "south" },
+        "west":  { "uv": [0,0,16,4], "texture": "#side_x", "cullface": "west" },
+        "east":  { "uv": [0,0,16,4], "texture": "#side_x", "cullface": "east" }
+      }
+    },
+    {   "from": [ 6, 0, 6 ],
+      "to": [ 10, 16, 10 ],
+      "faces": {
+        "north": { "uv": [ 16, 4,  4, 0 ], "texture": "#pside", "rotation": 270 },
+        "south": { "uv": [  4, 0, 16, 4 ], "texture": "#pside", "rotation": 90 },
+        "west": { "uv": [ 16, 4,  4, 0 ], "texture": "#pside", "rotation": 270 },
+        "east": { "uv": [  4, 0, 16, 4 ], "texture": "#pside", "rotation": 90 }
+      }
+    }
+  ],
+  "textures": {
+    "particle": "charset:blocks/compact/compact_side#0",
+    "pside": "minecraft:blocks/piston_side",
+    "side_x": "charset:blocks/compact/compact_side#0",
+    "side_z": "charset:blocks/compact/compact_side#0",
+    "top": "charset:blocks/compact/compact_top#0",
+    "bottom": "charset:blocks/compact/compact_bottom#0"
+  }
+}
+
