@@ -38,11 +38,7 @@ public class CompressionShape {
 	private static final int MAX_WIDTH = 3;
 	private static final int MAX_HEIGHT = 3;
 
-	private static int nextId = 1;
-	private final int id;
-
 	protected final World world;
-	protected final Set<BlockPos> positions = new HashSet<>();
 	protected final Multimap<EnumFacing, BlockPos> expectedFacings = MultimapBuilder.enumKeys(EnumFacing.class).arrayListValues().build();
 	protected final List<TileCompressionCrafter> compressionCrafters = new ArrayList<>();
 	protected final List<TileEntityDayBarrel> barrels = new ArrayList<>();
@@ -52,7 +48,7 @@ public class CompressionShape {
 	protected Orientation barrelOrientation;
 
 	private boolean invalid = false;
-	private boolean[] lastRedstoneLevels = new boolean[6];
+	private final boolean[] lastRedstoneLevels = new boolean[6];
 
 	protected long craftingTickStart = -1;
 	protected long craftingTickEnd = -1;
@@ -61,17 +57,16 @@ public class CompressionShape {
 	protected EnumFacing craftingSourceDir;
 
 	private CompressionShape(World world) {
-		this.id = nextId++;
 		this.world = world;
 	}
 
-	protected float getRenderProgress() {
+	protected float getRenderProgress(float partialTicks) {
 		if (craftingTickStart < 0 || craftingTickEnd < 0) {
 			return -1;
 		}
 
 		double duration = (craftingTickEnd - craftingTickStart) / 2f;
-		double currTime = world.getTotalWorldTime() - craftingTickStart;
+		double currTime = (world.getTotalWorldTime() - craftingTickStart) + partialTicks;
 		if (currTime >= duration * 2) {
 			return -1;
 		} else if (currTime <= 0) {
@@ -81,7 +76,7 @@ public class CompressionShape {
 		}
 
 		float progress = (float) Math.sin((float) (currTime * Math.PI / 2f / duration));
-		return progress * (((width + height) / 2f) + 1) * 0.0625f;
+		return progress * (((width + height) / 2f) + 1) * 0.06f;
 	}
 
 	protected Set<EnumFacing> checkRedstoneLevels(boolean clearOnly) {
@@ -277,7 +272,6 @@ public class CompressionShape {
 				if (tile instanceof TileCompressionCrafter) {
 					((TileCompressionCrafter) tile).shape = this;
 					compressionCrafters.add((TileCompressionCrafter) tile);
-					positions.add(pos);
 					expectedFacings.put(facing, pos);
 					return true;
 				}
@@ -385,7 +379,6 @@ public class CompressionShape {
 					return null;
 				}
 				shape.barrels.add(barrel);
-				shape.positions.add(tmp);
 
 				// check sides
 				if (xPos == 0 && !shape.setCrafterShapeIfMatchesDirection(tmp.offset(leftDir), shape.rightDir)) {

@@ -27,7 +27,7 @@ public class TileCompressionCrafterRenderer extends FastTESR<TileCompressionCraf
 			EnumFacing facing = state.getValue(Properties.FACING);
 			float extension = 0f;
 			if (te.shape != null) {
-				extension = Math.max(0, te.shape.getRenderProgress());
+				extension = Math.max(0, te.shape.getRenderProgress(partialTicks));
 			}
 
 			double tx = x - pos.getX() + (facing.getFrontOffsetX() * extension);
@@ -36,9 +36,9 @@ public class TileCompressionCrafterRenderer extends FastTESR<TileCompressionCraf
 
 			long r = MathHelper.getPositionRandom(pos);
 
-			tx += ((r & 0x00F) - 7.5f) / 2048f;
-			ty += (((r >> 4) & 0x00F) - 7.5f) / 2048f;
-			tz += (((r >> 8) & 0x00F) - 7.5f) / 2048f;
+			tx += ((r & 0x00F) - 7.5f) / 4096f;
+			ty += (((r >> 4) & 0x00F) - 7.5f) / 4096f;
+			tz += (((r >> 8) & 0x00F) - 7.5f) / 4096f;
 
 			buffer.setTranslation(tx, ty, tz);
 			renderer.renderModel(getWorld(), ProxyClient.rodModels[facing.ordinal()], state, pos, buffer, false);

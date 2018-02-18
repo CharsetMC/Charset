@@ -8,10 +8,11 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.text.TextComponentString;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.lib.misc.IItemInsertionEmitter;
 import pl.asie.charset.lib.notify.Notice;
 
 // todo: make it less ITickable
-public class TileCompressionCrafter extends TileBase implements ITickable {
+public class TileCompressionCrafter extends TileBase implements ITickable, IItemInsertionEmitter {
 	protected CompressionShape shape;
 	protected boolean redstoneLevel;
 
@@ -72,5 +73,15 @@ public class TileCompressionCrafter extends TileBase implements ITickable {
 	@Override
 	public boolean hasFastRenderer() {
 		return true;
+	}
+
+	@Override
+	public boolean connectsForItemInsertion(EnumFacing side) {
+		IBlockState state = world.getBlockState(pos);
+		if (state.getBlock() instanceof BlockCompressionCrafter) {
+			return state.getValue(Properties.FACING) != side;
+		} else {
+			return false;
+		}
 	}
 }

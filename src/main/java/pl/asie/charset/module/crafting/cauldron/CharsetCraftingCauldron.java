@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -53,7 +54,7 @@ import java.util.Optional;
 		name = "crafting.cauldron",
 		description = "Improved Cauldron!",
 		profile = ModuleProfile.STABLE,
-		antidependencies = {"mod:inspirations"}
+		antidependencies = "mod:inspirations"
 )
 public class CharsetCraftingCauldron {
 	public static int waterAlpha = 180;
@@ -111,7 +112,7 @@ public class CharsetCraftingCauldron {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileCauldronCharset.class, new TileRendererCauldronCharset());
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOW)
 	@SideOnly(Side.CLIENT)
 	public void onModelBake(ModelBakeEvent event) {
 		IBakedModel l0 = event.getModelRegistry().getObject(new ModelResourceLocation("minecraft:cauldron#level=0"));

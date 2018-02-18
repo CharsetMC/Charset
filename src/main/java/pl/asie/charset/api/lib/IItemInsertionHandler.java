@@ -22,6 +22,7 @@
 
 package pl.asie.charset.api.lib;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -38,4 +39,9 @@ public interface IItemInsertionHandler {
 	 * @return The remaining ItemStack that was not inserted.
 	 */
 	ItemStack insertItem(ItemStack stack, boolean simulate);
+
+	// For pipes which dye items. Color-coding.
+	default ItemStack insertItem(ItemStack stack, EnumDyeColor color, boolean simulate) {
+		return insertItem(stack, simulate);
+	}
 }
