@@ -1,0 +1,11 @@
+\scale{2}{\item{charset:compression_crafter}{1}{32767}} \title{Comp. Crafter}
+
+The Compression Crafter is a powerful crafting machine.
+
+It crafts using barrels. It is built like a ring, with an inside area ranging from 3x3 to 1x1.
+The individual Crafters must face inwards. It can be built flat or vertically.
+
+It is activated with a redstone signal. There must be an inventory for the results of crafting to be output to on the
+side being powered by the signal.
+
+The top of the crafting grid is defined by the top of the barrels.

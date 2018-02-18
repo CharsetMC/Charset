@@ -5,6 +5,12 @@
 \checkmods{all}{charset:audio.storage}{\- \item{charset:quartz_disc}{1}{7} \url{item://charset/quartz_disc}{Quartz Disc}}
 \checkmods{all}{charset:audio.storage}{\- \item{charset:record_player} \url{item://charset/record_player}{Record Player}}}
 
+\checkmods{any}{charset:crafting.cauldron charset:crafting.compression charset:crafting.pocket}{\b{Crafting}
+
+\checkmods{all}{charset:crafting.cauldron}{\- \item{minecraft:cauldron} \url{mod://charset/info/cauldron}{Cauldron}}
+\checkmods{all}{charset:crafting.compression}{\- \item{charset:compression_crafter} \url{item://charset/compression_crafter}{Compression Crafter}}
+\checkmods{all}{charset:crafting.pocket}{\- \item{charset:pockettable} \url{item://charset/pockettable}{Pocket Crafting Table}}}
+
 \checkmods{any}{charset:storage.locks}{\b{Locking}
 
 \- \item{charset:key} \url{item://charset/key}{Key}
@@ -20,15 +26,13 @@
 \checkmods{all}{charset:storage.barrels}{\- \item{charset:barrel} \url{item://charset/barrel}{Barrel}}
 \checkmods{all}{charset:storage.tanks}{\- \item{charset:fluidtank} \url{item://charset/fluidtank}{Fluid Tank}}}
 
-\checkmods{any}{charset:misc.pocketcraft charset:tools.building.wrench}{\b{Tools}
+\checkmods{any}{charset:tools.building.wrench}{\b{Tools}
 
-\checkmods{all}{charset:misc.pocketcraft}{\- \item{charset:pockettable} \url{item://charset/pockettable}{Pocket Crafting Table}}
 \checkmods{all}{charset:tools.building.wrench}{\- \item{charset:wrench} \url{item://charset/wrench}{Wrench}}}
 
 \checkmods{any}{charset:transport.dyeableMinecarts charset:tweak.carry charset:tweak.zorro}{\b{New Mechanics}
 
 \checkmods{all}{charset:tweak.carry}{\- \item{minecraft:chest} \url{mod://charset/info/block_carrying}{Block Carrying}}
-\checkmods{all}{charset:tweak.improvedCauldron}{\- \item{minecraft:cauldron} \url{mod://charset/info/cauldron}{Cauldron}}
 \checkmods{all}{charset:transport.dyeableMinecarts}{\- \item{minecraft:minecart} \url{mod://charset/info/cart_dyeing}{Dyeable Minecarts}}
 \checkmods{all}{charset:tweak.zorro}{\- \item{minecraft:iron_horse_armor} \url{mod://charset/info/zorro}{The Zorro Thing}}}
 
