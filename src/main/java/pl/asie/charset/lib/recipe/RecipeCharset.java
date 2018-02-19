@@ -216,7 +216,7 @@ public class RecipeCharset extends RecipeBase implements IRecipeView {
 
     @Override
     public boolean canFit(int i, int i1) {
-        return shapeless ? (i * i1) >= input.size() : this.width >= i && this.height >= i1;
+        return shapeless ? (i * i1) >= input.size() : i >= this.width && i1 >= this.height;
     }
 
     @Override
