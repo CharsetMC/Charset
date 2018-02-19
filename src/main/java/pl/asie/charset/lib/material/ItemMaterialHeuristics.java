@@ -109,25 +109,30 @@ public final class ItemMaterialHeuristics {
             }
 
             for (IRecipe irecipe : ForgeRegistries.RECIPES) {
-                if ((irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe) && !irecipe.isDynamic()) {
+                if ((irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe || irecipe instanceof RecipeCharset) && !irecipe.isDynamic()) {
                     recipeLists.get(irecipe.getIngredients().size() - 1).add(irecipe);
                 } else if (irecipe instanceof IShapedRecipe && !irecipe.isDynamic()) {
                     int wh = 9 + (((IShapedRecipe) irecipe).getRecipeWidth() - 1) * 3 + ((IShapedRecipe) irecipe).getRecipeHeight() - 1;
                     recipeLists.get(wh).add(irecipe);
                 } else {
-                    // if it can fit in 2x2, it can also fit in 3x2, 2x3 and 3x3
-                    int width = 3;
-                    int height = 3;
-                    while (irecipe.canFit(width - 1, height) && width > 0) {
-                        width--;
-                    }
-                    while (irecipe.canFit(width, height - 1) && height > 0) {
-                        height--;
-                    }
-                    if (width == 0 || height == 0) {
+                    if (!irecipe.canFit(4, 4)) {
+                        // always true?
                         recipeLists.get(27).add(irecipe);
                     } else {
-                        recipeLists.get(18 + (width - 1) * 3 + (height - 1)).add(irecipe);
+                        // if it can fit in 2x2, it can also fit in 3x2, 2x3 and 3x3
+                        int width = 3;
+                        int height = 3;
+                        while (irecipe.canFit(width - 1, height) && width > 0) {
+                            width--;
+                        }
+                        while (irecipe.canFit(width, height - 1) && height > 0) {
+                            height--;
+                        }
+                        if (width == 0 || height == 0) {
+                            recipeLists.get(27).add(irecipe);
+                        } else {
+                            recipeLists.get(18 + (width - 1) * 3 + (height - 1)).add(irecipe);
+                        }
                     }
                 }
             }
