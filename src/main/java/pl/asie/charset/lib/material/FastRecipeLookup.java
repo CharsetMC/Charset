@@ -1,6 +1,24 @@
+/*
+ * Copyright (c) 2015, 2016, 2017, 2018 Adrian Siekierka
+ *
+ * This file is part of Charset.
+ *
+ * Charset is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Charset is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package pl.asie.charset.lib.material;
 
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -16,22 +34,36 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.IngredientNBT;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.OreIngredient;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.recipe.RecipeCharset;
-import pl.asie.charset.lib.utils.MethodHandleHelper;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
 import javax.annotation.Nullable;
-import java.lang.invoke.MethodHandle;
 import java.util.*;
 
 public class FastRecipeLookup {
 	public static boolean ENABLED = true;
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
+	private static final Set<Class> saneClasses = new HashSet<>();
+
+	static {
+		saneClasses.add(ShapedOreRecipe.class);
+		saneClasses.add(ShapedRecipes.class);
+		saneClasses.add(RecipeCharset.Shaped.class);
+		saneClasses.add(ShapelessOreRecipe.class);
+		saneClasses.add(ShapelessRecipes.class);
+		saneClasses.add(RecipeCharset.class);
+		addSaneClass("forestry.core.recipes.ShapedRecipeCustom");
+	}
+
+	private static void addSaneClass(String s) {
+		try {
+			saneClasses.add(Class.forName(s));
+		} catch (Throwable t) {
+			//
+		}
+	}
 
 	public static ItemStack getCraftingResult(World world, int width, int height, ItemStack... stacks) {
 		return getCraftingResult(RecipeUtils.getCraftingInventory(width, height, stacks), world);
@@ -58,12 +90,13 @@ public class FastRecipeLookup {
 		}
 	}
 
-	public static void clearRecipeLists() {
-		recipeLists.clear();
-	}
-
 	private static List<Collection<IRecipe>> recipeLists = new ArrayList<>();
 	private static TIntObjectMap<Collection<IRecipe>> shapelessOneElement = new TIntObjectHashMap<>();
+
+	public static void clearRecipeLists() {
+		recipeLists.clear();
+		shapelessOneElement.clear();
+	}
 
 	private static void addShapelessOneElement(IRecipe recipe, int i) {
 		Collection<IRecipe> list = shapelessOneElement.get(i);
@@ -103,8 +136,6 @@ public class FastRecipeLookup {
 		}
 	}
 
-	private static final Map<NonNullList<ItemStack>, TIntSet> oreIdSetCache = new IdentityHashMap<>();
-
 	public static void initRecipeLists() {
 		if (!ENABLED) {
 			return;
@@ -121,68 +152,78 @@ public class FastRecipeLookup {
 
 			for (IRecipe irecipe : ForgeRegistries.RECIPES) {
 				Class c = irecipe.getClass();
-				if ((c == ShapelessRecipes.class || c == ShapelessOreRecipe.class || c == RecipeCharset.class) && !irecipe.isDynamic()) {
-					NonNullList<Ingredient> ings = irecipe.getIngredients();
-					boolean isReallyWeird = false;
-					for (Ingredient i : ings) {
-						if (i == Ingredient.EMPTY) {
+				if (saneClasses.contains(c)) {
+					if (irecipe instanceof IShapedRecipe) {
+						// okay, cool, but is it trimmable?
+						// if it's trimmable, it depends on whitespace and is thus "really weird"
+						int width = ((IShapedRecipe) irecipe).getRecipeWidth();
+						int height = ((IShapedRecipe) irecipe).getRecipeHeight();
+						NonNullList<Ingredient> ingredients = irecipe.getIngredients();
+						boolean isReallyWeird = false;
+
+						if (ingredients.size() != width * height) {
 							isReallyWeird = true;
-							break;
-						}
-					}
-					if (isReallyWeird) {
-						recipeLists.get(27).add(irecipe);
-					} else {
-						if (ings.size() == 1) {
-							addShapelessOneElement(irecipe);
 						} else {
-							recipeLists.get(ings.size() - 1).add(irecipe);
+							boolean canTrimTop = true;
+							boolean canTrimBottom = true;
+							boolean canTrimLeft = true;
+							boolean canTrimRight = true;
+
+							for (int i = 0; i < width; i++) {
+								if (ingredients.get(i) != Ingredient.EMPTY) {
+									canTrimTop = false;
+								}
+								if (ingredients.get(i + (height - 1) * width) != Ingredient.EMPTY) {
+									canTrimBottom = false;
+								}
+							}
+
+							for (int i = 0; i < height; i++) {
+								if (ingredients.get(i * width) != Ingredient.EMPTY) {
+									canTrimLeft = false;
+								}
+								if (ingredients.get(i * width + (width - 1)) != Ingredient.EMPTY) {
+									canTrimRight = false;
+								}
+							}
+
+							if (canTrimTop || canTrimLeft || canTrimRight || canTrimBottom) {
+								isReallyWeird = true;
+							}
 						}
-					}
-				} else if ((c == ShapedRecipes.class || c == ShapedOreRecipe.class || c == RecipeCharset.Shaped.class) && !irecipe.isDynamic()) {
-					// okay, cool, but is it trimmable?
-					// if it's trimmable, it depends on whitespace and is thus "really weird"
-					int width = ((IShapedRecipe) irecipe).getRecipeWidth();
-					int height = ((IShapedRecipe) irecipe).getRecipeHeight();
-					NonNullList<Ingredient> ingredients = irecipe.getIngredients();
-					boolean isReallyWeird = false;
 
-					if (ingredients.size() != width * height) {
-						isReallyWeird = true;
-					} else {
-						boolean canTrimTop = true;
-						boolean canTrimBottom = true;
-						boolean canTrimLeft = true;
-						boolean canTrimRight = true;
-
-						for (int i = 0; i < width; i++) {
-							if (ingredients.get(i) != Ingredient.EMPTY) { canTrimTop = false; }
-							if (ingredients.get(i + (height-1)*width) != Ingredient.EMPTY) { canTrimBottom = false; }
-						}
-
-						for (int i = 0; i < height; i++) {
-							if (ingredients.get(i*width) != Ingredient.EMPTY) { canTrimLeft = false; }
-							if (ingredients.get(i*width + (width-1)) != Ingredient.EMPTY) { canTrimRight = false; }
-						}
-
-						if (canTrimTop || canTrimLeft || canTrimRight || canTrimBottom) {
-							isReallyWeird = true;
-						}
-					}
-
-					if (isReallyWeird) {
-						recipeLists.get(27).add(irecipe);
-					} else {
-						if (width * height == 1) {
-							addShapelessOneElement(irecipe);
+						if (isReallyWeird) {
+							recipeLists.get(27).add(irecipe);
 						} else {
-							int wh = (width - 1) * 3 + (height - 1);
-							recipeLists.get(9 + wh).add(irecipe);
+							if (width * height == 1) {
+								addShapelessOneElement(irecipe);
+							} else {
+								int wh = (width - 1) * 3 + (height - 1);
+								recipeLists.get(9 + wh).add(irecipe);
+							}
+						}
+					} else {
+						NonNullList<Ingredient> ings = irecipe.getIngredients();
+						boolean isReallyWeird = false;
+						for (Ingredient i : ings) {
+							if (i == Ingredient.EMPTY) {
+								isReallyWeird = true;
+								break;
+							}
+						}
+						if (isReallyWeird) {
+							recipeLists.get(27).add(irecipe);
+						} else {
+							if (ings.size() == 1) {
+								addShapelessOneElement(irecipe);
+							} else {
+								recipeLists.get(ings.size() - 1).add(irecipe);
+							}
 						}
 					}
 				} else {
 					if (!irecipe.canFit(4, 4)) {
-						// always true?
+						// always false?
 						recipeLists.get(27).add(irecipe);
 					} else {
 						int smallestFittable = 10;
@@ -405,21 +446,19 @@ public class FastRecipeLookup {
 		}
 
 		// then, check recipes which are larger (just in case)
-		if (craftMatrixUntrimmed != null) {
-			for (int r = base + 1; r < 9; r++) {
-				for (IRecipe irecipe : recipeLists.get(18 + r)) {
-					if (!irecipe.canFit(width, height)) {
-						continue;
-					}
+		InventoryCrafting craftMatrixWeird = craftMatrixUntrimmed != null ? craftMatrixUntrimmed : craftMatrix;
 
-					if (irecipe.matches(craftMatrixUntrimmed, worldIn)) {
-						return irecipe;
-					}
+		for (int r = base + 1; r < 9; r++) {
+			for (IRecipe irecipe : recipeLists.get(18 + r)) {
+				if (!irecipe.canFit(craftMatrixWeird.getWidth(), craftMatrixWeird.getHeight())) {
+					continue;
+				}
+
+				if (irecipe.matches(craftMatrixWeird, worldIn)) {
+					return irecipe;
 				}
 			}
 		}
-
-		InventoryCrafting craftMatrixWeird = craftMatrixUntrimmed != null ? craftMatrixUntrimmed : craftMatrix;
 
 		// and finally, the true oddballs
 		for (IRecipe irecipe : recipeLists.get(27)) {
