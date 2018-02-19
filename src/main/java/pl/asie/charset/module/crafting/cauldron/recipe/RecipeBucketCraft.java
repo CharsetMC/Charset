@@ -25,6 +25,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fluids.*;
+import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.crafting.cauldron.api.CauldronContents;
@@ -46,7 +47,7 @@ public class RecipeBucketCraft implements ICauldronRecipe {
 		if (stack.amount >= Fluid.BUCKET_VOLUME) {
 			ItemStack filledBucket = FluidUtil.getFilledBucket(stack);
 			InventoryCrafting inventoryCrafting = RecipeUtils.getCraftingInventory(2, 1, heldItem, filledBucket);
-			IRecipe recipe = RecipeUtils.findMatchingRecipe(inventoryCrafting, cauldron.getCauldronWorld());
+			IRecipe recipe = FastRecipeLookup.findMatchingRecipe(inventoryCrafting, cauldron.getCauldronWorld());
 
 			if (recipe != null) {
 				ItemStack result = recipe.getCraftingResult(inventoryCrafting);

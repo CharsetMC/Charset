@@ -45,6 +45,7 @@ import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
@@ -241,7 +242,7 @@ public class CompressionShape {
 			return false;
 		}
 
-		IRecipe recipe = RecipeUtils.findMatchingRecipe(crafting, world);
+		IRecipe recipe = FastRecipeLookup.findMatchingRecipe(crafting, world);
 		if (recipe == null) {
 			return false;
 		}

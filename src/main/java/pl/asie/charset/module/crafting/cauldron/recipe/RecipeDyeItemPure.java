@@ -25,6 +25,7 @@ import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.FluidStack;
+import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.crafting.cauldron.api.CauldronContents;
@@ -61,7 +62,7 @@ public class RecipeDyeItemPure implements ICauldronRecipe {
 			}
 			stacks[4] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
 
-			ItemStack result = RecipeUtils.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
+			ItemStack result = FastRecipeLookup.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
 			int expectedCount = 8;
 
 			if (result.isEmpty()) {
@@ -70,7 +71,7 @@ public class RecipeDyeItemPure implements ICauldronRecipe {
 				stacks[0].setCount(1);
 				stacks[1] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
 
-				result = RecipeUtils.getCraftingResult(cauldron.getCauldronWorld(), 2, 1, stacks);
+				result = FastRecipeLookup.getCraftingResult(cauldron.getCauldronWorld(), 2, 1, stacks);
 				expectedCount = 1;
 			}
 

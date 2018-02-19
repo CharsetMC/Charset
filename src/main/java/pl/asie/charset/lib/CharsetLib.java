@@ -57,6 +57,7 @@ import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
 import pl.asie.charset.lib.misc.Todokete;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -139,6 +140,7 @@ public class CharsetLib {
 	public void loadConfig(CharsetLoadConfigEvent event) {
 		alwaysDropDroppablesGivenToPlayer = ConfigUtils.getBoolean(config, "general", "alwaysDropDroppablesGivenToPlayer", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).", true);
 		enableDebugInfo = ConfigUtils.getBoolean(config, "expert","enableDebugInfo", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.", false);
+		FastRecipeLookup.ENABLED = !ConfigUtils.getBoolean(config, "general", "disableRecipeOptimizations", false, "Set to true to disable recipe optimizations. Use only if weird behaviour exhibited, and always contact the developer first!", false);
 
 		boolean oldShowAllItemTypes = showAllItemTypes;
 		showAllItemTypes = ConfigUtils.getBoolean(config, "general","showAllItemTypes", ModCharset.INDEV, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.", false);
@@ -235,6 +237,11 @@ public class CharsetLib {
 	public void serverStarting(FMLServerStartingEvent event) {
 		event.registerServerCommand(CommandCharset.SERVER);
 		NotifyImplementation.instance.registerServerCommands(event);
+	}
+
+	@Mod.EventHandler
+	public void serverStarting(FMLServerStartedEvent event) {
+		FastRecipeLookup.clearRecipeLists();
 	}
 
 	@Mod.EventHandler

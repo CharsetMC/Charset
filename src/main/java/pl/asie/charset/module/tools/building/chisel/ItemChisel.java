@@ -39,6 +39,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBase;
+import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
@@ -108,7 +109,7 @@ public class ItemChisel extends ItemCharsetTool {
                         }
                     }
 
-                    ItemStack result = RecipeUtils.getCraftingResult(worldIn, 3, 3, inputStacks);
+                    ItemStack result = FastRecipeLookup.getCraftingResult(worldIn, 3, 3, inputStacks);
                     if (result != null && !result.isEmpty() && !(result.getItem() instanceof ItemBlock && ((ItemBlock) result.getItem()).getBlock() instanceof BlockButton)) {
                         if (result.getItem() instanceof ItemBlock) {
                             Block block = ((ItemBlock) result.getItem()).getBlock();

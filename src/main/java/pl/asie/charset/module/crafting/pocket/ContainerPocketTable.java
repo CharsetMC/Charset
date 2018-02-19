@@ -26,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.ui.ContainerBase;
 import pl.asie.charset.lib.ui.SlotBlocked;
 import pl.asie.charset.lib.utils.ItemUtils;
@@ -99,7 +100,7 @@ public class ContainerPocketTable extends ContainerBase {
         }
         movePlayerToMatrix();
         ItemStack result = ItemStack.EMPTY;
-        IRecipe match = RecipeUtils.findMatchingRecipe(craftMatrix, player.getEntityWorld());
+        IRecipe match = FastRecipeLookup.findMatchingRecipe(craftMatrix, player.getEntityWorld());
         if (match != null) {
             result = match.getCraftingResult(craftMatrix);
         }

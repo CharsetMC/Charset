@@ -25,6 +25,7 @@ import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.FluidStack;
+import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.crafting.cauldron.api.CauldronContents;
@@ -61,7 +62,7 @@ public class RecipeDyeItem implements ICauldronRecipe {
 				}
 			}
 
-			ItemStack result = RecipeUtils.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
+			ItemStack result = FastRecipeLookup.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
 			if (!result.isEmpty() && !ItemUtils.canMerge(stacks[0], result)) {
 				return Optional.of(new CauldronContents(
 						new FluidStack(stack, stack.amount - 125),

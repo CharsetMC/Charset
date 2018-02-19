@@ -51,29 +51,4 @@ public final class RecipeUtils {
         }
         return crafting;
     }
-
-    public static ItemStack getCraftingResult(World world, int width, int height, ItemStack... stacks) {
-        return getCraftingResult(world, getCraftingInventory(width, height, stacks));
-    }
-
-    public static ItemStack getCraftingResult(World world, InventoryCrafting crafting) {
-        IRecipe recipe = findMatchingRecipe(crafting, world);
-        if (recipe != null) {
-            return recipe.getCraftingResult(crafting);
-        }
-
-        return ItemStack.EMPTY;
-    }
-
-    public static IRecipe findMatchingRecipe(InventoryCrafting craftMatrix, World worldIn) {
-        int width = craftMatrix.getWidth();
-        int height = craftMatrix.getHeight();
-        for (IRecipe irecipe : ForgeRegistries.RECIPES) {
-            if (irecipe.canFit(width, height) && irecipe.matches(craftMatrix, worldIn)) {
-                return irecipe;
-            }
-        }
-
-        return null;
-    }
 }

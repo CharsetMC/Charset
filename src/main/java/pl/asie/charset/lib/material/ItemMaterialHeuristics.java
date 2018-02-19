@@ -20,6 +20,8 @@
 package pl.asie.charset.lib.material;
 
 import com.google.common.base.Joiner;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -85,116 +87,11 @@ public final class ItemMaterialHeuristics {
         }
     }
 
-    public static ItemStack getCraftingResultQuickly(boolean noShapeless, int nonEmptyStacks, World world, int width, int height, ItemStack... stacks) {
-        InventoryCrafting crafting = RecipeUtils.getCraftingInventory(width, height, stacks);
-        IRecipe recipe = findMatchingRecipeQuickly(noShapeless, nonEmptyStacks, crafting, world);
-
-        if (recipe != null) {
-            return recipe.getCraftingResult(crafting);
-        }
-
-        return ItemStack.EMPTY;
-    }
-
-    private static List<List<IRecipe>> recipeLists = new ArrayList<>();
-
-    public static void initRecipeLists() {
-        if (recipeLists.isEmpty()) {
-            // 0-8: shapeless 1-9 ingredients
-            // 9-17: shaped 1-9 w/h
-            // 18-26: other 1-9 canFit
-            // 27: weird
-            for (int i = 0; i < 28; i++) {
-                recipeLists.add(new ArrayList<>());
-            }
-
-            for (IRecipe irecipe : ForgeRegistries.RECIPES) {
-                if ((irecipe instanceof ShapelessRecipes || irecipe instanceof ShapelessOreRecipe || irecipe instanceof RecipeCharset) && !irecipe.isDynamic()) {
-                    recipeLists.get(irecipe.getIngredients().size() - 1).add(irecipe);
-                } else if (irecipe instanceof IShapedRecipe && !irecipe.isDynamic()) {
-                    int wh = 9 + (((IShapedRecipe) irecipe).getRecipeWidth() - 1) * 3 + ((IShapedRecipe) irecipe).getRecipeHeight() - 1;
-                    recipeLists.get(wh).add(irecipe);
-                } else {
-                    if (!irecipe.canFit(4, 4)) {
-                        // always true?
-                        recipeLists.get(27).add(irecipe);
-                    } else {
-                        // if it can fit in 2x2, it can also fit in 3x2, 2x3 and 3x3
-                        int width = 3;
-                        int height = 3;
-                        while (irecipe.canFit(width - 1, height) && width > 0) {
-                            width--;
-                        }
-                        while (irecipe.canFit(width, height - 1) && height > 0) {
-                            height--;
-                        }
-                        if (width == 0 || height == 0) {
-                            recipeLists.get(27).add(irecipe);
-                        } else {
-                            recipeLists.get(18 + (width - 1) * 3 + (height - 1)).add(irecipe);
-                        }
-                    }
-                }
-            }
-
-/*            for (int i = 0; i < 9; i++) {
-                System.out.println("SHAPELESS " + (i+1) + " = " + recipeLists.get(i).size());
-            }
-            for (int i = 0; i < 9; i++) {
-                System.out.println("SHAPED " + ((i%3)+1) + "x" + ((i/3)+1) + " = " + recipeLists.get(i + 9).size());
-            }
-            for (int i = 0; i < 9; i++) {
-                System.out.println("WEIRD " + ((i%3)+1) + "x" + ((i/3)+1) + " = " + recipeLists.get(i + 18).size());
-            }
-            System.out.println("REALLY WEIRD = " + recipeLists.get(27).size()); */
-        }
-    }
-
-    public static IRecipe findMatchingRecipeQuickly(boolean noShapeless, int nonEmptyStacks, InventoryCrafting craftMatrix, World worldIn) {
-        initRecipeLists();
-
-        int width = craftMatrix.getWidth();
-        int height = craftMatrix.getHeight();
-
-        for (IRecipe irecipe : recipeLists.get(9 + (width-1)*3 + (height-1))) {
-            if (irecipe.matches(craftMatrix, worldIn)) {
-                return irecipe;
-            }
-        }
-
-        if (!noShapeless) {
-            for (IRecipe irecipe : recipeLists.get(nonEmptyStacks - 1)) {
-                if (irecipe.matches(craftMatrix, worldIn)) {
-                    return irecipe;
-                }
-            }
-        }
-
-        for (int rw = width; rw <= 3; rw++) {
-            for (int rh = height; rh <= 3; rh++) {
-                for (IRecipe irecipe : recipeLists.get(18 + (rw-1)*3 + (rh-1))) {
-                    if (irecipe.matches(craftMatrix, worldIn)) {
-                        return irecipe;
-                    }
-                }
-
-            }
-        }
-
-        for (IRecipe irecipe : recipeLists.get(27)) {
-            if (irecipe.matches(craftMatrix, worldIn)) {
-                return irecipe;
-            }
-        }
-
-        return null;
-    }
-
     private static void findSlab(ItemMaterial base) {
         if (!base.getTypes().contains("block") || base.getRelated("slab") != null)
             return;
 
-        ItemStack slab = getCraftingResultQuickly(true, 3, null, 3, 1,
+        ItemStack slab = FastRecipeLookup.getCraftingResultQuickly(true, 3, null, 3, 1,
                 base.getStack(), base.getStack(), base.getStack());
         if (isBlock(slab)) {
             addResultingBlock(base, slab, "block", "slab");
@@ -205,7 +102,7 @@ public final class ItemMaterialHeuristics {
         if (!base.getTypes().contains("block") || base.getRelated("stairs") != null)
             return;
 
-        ItemStack stair = getCraftingResultQuickly(true, 6, null, 3, 3,
+        ItemStack stair = FastRecipeLookup.getCraftingResultQuickly(true, 6, null, 3, 3,
                 null, null, base.getStack(),
                 null, base.getStack(), base.getStack(),
                 base.getStack(), base.getStack(), base.getStack());
@@ -227,7 +124,7 @@ public final class ItemMaterialHeuristics {
         // We look for the plank first to ensure only valid logs
         // get registered.
 
-        ItemStack plank = getCraftingResultQuickly(false, 1,null, 1, 1, log);
+        ItemStack plank = FastRecipeLookup.getCraftingResultQuickly(false, 1,null, 1, 1, log);
         if (isBlock(plank) && ItemUtils.isOreType(plank, "plankWood")) {
             ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
             if (reg.registerTypes(logMaterial, "log", "wood", "block")) {
@@ -236,7 +133,7 @@ public final class ItemMaterialHeuristics {
                 if (reg.registerTypes(plankMaterial, "plank", "wood", "block")) {
                     reg.registerRelation(logMaterial, plankMaterial, "plank", "log");
 
-                    ItemStack stick = getCraftingResultQuickly(true, 2, null, 1, 2,
+                    ItemStack stick = FastRecipeLookup.getCraftingResultQuickly(true, 2, null, 1, 2,
                             plank,
                             plank);
                     if (stick.isEmpty()) {
@@ -294,7 +191,7 @@ public final class ItemMaterialHeuristics {
                 }
 
                 // Try crafting a block
-                ItemStack block = getCraftingResultQuickly(true, 4, null, 2, 2,
+                ItemStack block = FastRecipeLookup.getCraftingResultQuickly(true, 4, null, 2, 2,
                         stack, stack,
                         stack, stack);
                 if (!block.isEmpty() && block.getItem() instanceof ItemBlock) {
@@ -310,7 +207,7 @@ public final class ItemMaterialHeuristics {
         if (reg.registerTypes(ingotMat, prefix, suffix, "item")) {
             // Try crafting a nugget
             if (prefix.equals("ingot")) {
-                ItemStack nugget = getCraftingResultQuickly(false, 1, null, 1, 1,
+                ItemStack nugget = FastRecipeLookup.getCraftingResultQuickly(false, 1, null, 1, 1,
                         stack);
                 if (!nugget.isEmpty() && containsOreDict(nugget, "nugget" + suffixU)) {
                     ItemMaterial nuggetMat = reg.getOrCreateMaterial(nugget);
@@ -320,7 +217,7 @@ public final class ItemMaterialHeuristics {
             }
 
             // Try crafting a block
-            ItemStack block = getCraftingResultQuickly(false, 9, null, 3, 3,
+            ItemStack block = FastRecipeLookup.getCraftingResultQuickly(false, 9, null, 3, 3,
                     stack, stack, stack,
                     stack, stack, stack,
                     stack, stack, stack);
@@ -356,7 +253,7 @@ public final class ItemMaterialHeuristics {
         ItemMaterial stoneMat = reg.getOrCreateMaterial(stack);
         if (reg.registerTypes(stoneMat, "stone", suffix, "block")) {
             // Try crafting a brick
-            ItemStack block = getCraftingResultQuickly(true, 4, null, 2, 2,
+            ItemStack block = FastRecipeLookup.getCraftingResultQuickly(true, 4, null, 2, 2,
                     stack, stack,
                     stack, stack);
             if (!block.isEmpty()) {
@@ -399,9 +296,10 @@ public final class ItemMaterialHeuristics {
     }
 
     public static void init(boolean modded) {
-        recipeLists.clear();
+        FastRecipeLookup.clearRecipeLists();
+        FastRecipeLookup.initRecipeLists();
 
-   //     long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         if (initPhase >= (modded ? 2 : 1))
             return;
 
@@ -482,8 +380,8 @@ public final class ItemMaterialHeuristics {
 
         ProgressManager.pop(bar);
 
-/*        time = System.currentTimeMillis() - time;
-        System.out.println("slow search: " + time); */
+        time = System.currentTimeMillis() - time;
+        ModCharset.logger.info("Charset material heuristics time (phase " + initPhase + "): " + time + "ms");
 
         if (CharsetLib.enableDebugInfo && initPhase == 2) {
             try {
