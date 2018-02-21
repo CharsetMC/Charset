@@ -280,6 +280,11 @@ public class IngredientGroup extends IngredientCharset {
         return stacks;
     }
 
+    @Override
+    public boolean hasMatchingStacks() {
+        return true;
+    }
+
     public static class Factory implements IIngredientFactory {
         @Nonnull
         @Override

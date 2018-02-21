@@ -32,8 +32,8 @@ import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.utils.ThreeState;
 
 public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
+	protected ThreeState dynamic;
 	private final String group;
-	private final ThreeState dynamic;
 
 	public RecipeBase(JsonContext context, JsonObject object) {
 		if (object != null && context != null) {
@@ -85,7 +85,7 @@ public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> imple
 	@Override
 	public boolean isDynamic() {
 		if (dynamic == ThreeState.MAYBE) {
-			return !getRecipeOutput().isEmpty();
+			return getRecipeOutput().isEmpty();
 		} else {
 			return dynamic == ThreeState.YES;
 		}

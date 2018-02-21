@@ -66,6 +66,11 @@ public class RecipeWireConversion extends RecipeCharset {
         }
 
         @Override
+        public boolean hasMatchingStacks() {
+            return true;
+        }
+
+        @Override
         public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
             if (!stack.isEmpty() && stack.getItem() == CharsetLibWires.itemWire && ((stack.getMetadata() & 1) == offset)) {
                 WireProvider provider = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);

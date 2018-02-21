@@ -182,6 +182,11 @@ public class IngredientMaterial extends IngredientCharset {
         }
     }
 
+    @Override
+    public boolean hasMatchingStacks() {
+        return true;
+    }
+
     public void setRequireMatches(boolean requireMatches) {
         this.matchStack = requireMatches;
     }

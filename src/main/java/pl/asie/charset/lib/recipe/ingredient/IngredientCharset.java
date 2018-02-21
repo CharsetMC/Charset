@@ -46,7 +46,7 @@ import java.util.Map;
 public abstract class IngredientCharset {
     private static final Map<IngredientCharset, MatchingStacks> MATCHING_STACK_CACHE = new HashMap<>();
 
-    static class MatchingStacks {
+	static class MatchingStacks {
         private ItemStack[][] matchingStacks;
         private ItemStack[] matchingStacksCompressed;
         private IntList matchingStacksPacked;
@@ -176,6 +176,8 @@ public abstract class IngredientCharset {
      * should have a length of 1!
      */
     protected abstract ItemStack[][] createMatchingStacks();
+
+    public abstract boolean hasMatchingStacks();
 
     /**
      * @return A set of characters which signify Ingredients this ingredient

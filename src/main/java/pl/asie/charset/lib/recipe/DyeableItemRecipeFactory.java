@@ -56,6 +56,11 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			}
 
 			@Override
+			public boolean hasMatchingStacks() {
+				return true;
+			}
+
+			@Override
 			public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
 				return getColor(stack) != null;
 			}

@@ -101,6 +101,11 @@ public class IngredientBarrel extends IngredientCharset {
     }
 
     @Override
+    public boolean hasMatchingStacks() {
+        return true;
+    }
+
+    @Override
     public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
         if (!stack.isEmpty() && (stack.getItem() == CharsetStorageBarrels.barrelItem || (includeCarts && stack.getItem() == CharsetStorageBarrels.barrelCartItem))) {
             if (!upgradeBlacklist.isEmpty()) {

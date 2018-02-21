@@ -43,6 +43,7 @@ import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.common.crafting.JsonContext;
 import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.utils.ItemStackHashSet;
+import pl.asie.charset.lib.utils.ThreeState;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -195,6 +196,26 @@ public class RecipeCharset extends RecipeBase implements IRecipeView {
             }
 
             return null;
+        }
+    }
+
+    private void calculateDynamic() {
+        dynamic = ThreeState.NO;
+        if (getRecipeOutput().isEmpty()) {
+            dynamic = ThreeState.YES;
+            return;
+        }
+
+        for (Ingredient ingredient : input) {
+            if (ingredient instanceof IngredientWrapper) {
+                if (!((IngredientWrapper) ingredient).getIngredientCharset().hasMatchingStacks()) {
+                    dynamic = ThreeState.YES;
+                    return;
+                }
+            } else if (ingredient.getMatchingStacks().length == 0) {
+                dynamic = ThreeState.YES;
+                return;
+            }
         }
     }
 
@@ -354,6 +375,8 @@ public class RecipeCharset extends RecipeBase implements IRecipeView {
                     ((IngredientWrapper) ing).getIngredientCharset().onAdded(recipe);
                 }
             }
+
+            recipe.calculateDynamic();
             return recipe;
         }
     }
