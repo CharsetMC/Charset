@@ -84,7 +84,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         FACTORIES.add(this);
 
         this.particle = particle;
-        this.cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
+        this.cache = CacheBuilder.newBuilder().softValues().expireAfterAccess(1, TimeUnit.MINUTES).build();
         this.property = property;
     }
 
@@ -136,7 +136,7 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
 
     private IBakedModel getModel(IBlockState state, BlockRenderLayer layer) {
         if (state instanceof IExtendedBlockState) {
-            return getModel(((IExtendedBlockState) state).getValue(property), layer);
+            return getModel(get(state), layer);
         } else {
             return null;
         }

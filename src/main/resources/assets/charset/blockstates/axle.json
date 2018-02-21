@@ -1,0 +1,17 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "charset:axle"
+  },
+  "variants": {
+    "normal": [{}],
+    "axis": {
+      "y": {},
+      "x": {"x": 90, "y": 90},
+      "z": {"x": 90}
+    },
+    "inventory": [{
+      "transform": "forge:default-block"
+    }]
+  }
+}

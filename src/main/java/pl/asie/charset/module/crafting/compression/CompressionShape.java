@@ -293,16 +293,16 @@ public class CompressionShape {
 	}
 
 	private boolean setCrafterShapeIfMatchesDirection(BlockPos pos, EnumFacing facing) {
+		if (!world.isBlockLoaded(pos, true)) return false;
+
 		IBlockState state = world.getBlockState(pos);
-		if (state.getBlock() instanceof BlockCompressionCrafter) {
-			if (state.getValue(Properties.FACING) == facing) {
-				TileEntity tile = world.getTileEntity(pos);
-				if (tile instanceof TileCompressionCrafter) {
-					((TileCompressionCrafter) tile).shape = this;
-					compressionCrafters.add((TileCompressionCrafter) tile);
-					expectedFacings.put(facing, pos);
-					return true;
-				}
+		if (state.getBlock() instanceof BlockCompressionCrafter && state.getValue(Properties.FACING) == facing) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile instanceof TileCompressionCrafter) {
+				((TileCompressionCrafter) tile).shape = this;
+				compressionCrafters.add((TileCompressionCrafter) tile);
+				expectedFacings.put(facing, pos);
+				return true;
 			}
 		}
 
@@ -311,6 +311,8 @@ public class CompressionShape {
 
 	@Nullable
 	private EnumFacing getCrafterDirection(BlockPos pos) {
+		if (!world.isBlockLoaded(pos, true)) return null;
+
 		IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof BlockCompressionCrafter) {
 			return state.getValue(Properties.FACING);
@@ -320,6 +322,8 @@ public class CompressionShape {
 	}
 
 	private TileEntityDayBarrel getBarrel(BlockPos pos) {
+		if (!world.isBlockLoaded(pos, true)) return null;
+
 		TileEntity tile = world.getTileEntity(pos);
 		return tile instanceof TileEntityDayBarrel ? (TileEntityDayBarrel) tile : null;
 	}

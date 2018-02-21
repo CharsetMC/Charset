@@ -184,7 +184,8 @@ public class UtilProxyClient extends UtilProxyCommon {
 	}
 
 	@Override
-	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
+	public void setTabAndNameIfNotPresent(IForgeRegistryEntry entry, String name, CreativeTabs tab) {
+		super.setTabAndNameIfNotPresent(entry, name, tab);
 	}
 
 	@Override

@@ -156,6 +156,7 @@ public class ProxyClient extends ProxyCommon {
 							|| (facing == EnumFacing.UP && (side == EnumFacing.NORTH || side == EnumFacing.EAST))
 							|| ((facing == EnumFacing.SOUTH || facing == EnumFacing.WEST) &&
 							(side.getAxis() == EnumFacing.Axis.Y || (side.getAxis() == facing.getAxis() && k < 8)))
+							|| (facing == EnumFacing.DOWN && side == EnumFacing.UP && k >= 6)
 							|| (facing.getAxis() != EnumFacing.Axis.Y && k >= 8 && side == facing.rotateY())) {
 						if (j == 1) j = 2;
 						else if (j == 2) j = 1;

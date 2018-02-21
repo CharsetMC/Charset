@@ -1,0 +1,30 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "power"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:axle",
+  "pattern": [
+    "p",
+    "s",
+    "p"
+  ],
+  "key": {
+    "p": {
+      "type": "charset:material",
+      "material": ["plank", "block"],
+      "nbtKey": "material"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    }
+  },
+  "result": {
+    "item": "charset:axle",
+    "count": 2
+  }
+}

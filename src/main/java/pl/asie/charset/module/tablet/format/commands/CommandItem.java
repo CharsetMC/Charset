@@ -54,7 +54,7 @@ public class CommandItem implements ICommand {
 		}
 
 		if (i == null) {
-			items.addAll(OreDictionary.getOres(itemName));
+			items.addAll(OreDictionary.getOres(itemName, false));
 		} else {
 			ItemStack stack = new ItemStack(i, stackSize, dmg);
 			items.add(stack);

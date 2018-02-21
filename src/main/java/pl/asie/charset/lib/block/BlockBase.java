@@ -114,7 +114,7 @@ public abstract class BlockBase extends Block {
 	}
 
 	@Override
-	public final boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
 		return getBlockFaceShape(world, base_state, pos, side) == BlockFaceShape.SOLID;
 	}
 
@@ -392,6 +392,15 @@ public abstract class BlockBase extends Block {
 			return state.withProperty(Properties.FACING, rot.rotate(state.getValue(Properties.FACING)));
 		} else if (state.getPropertyKeys().contains(Properties.FACING4)) {
 			return state.withProperty(Properties.FACING4, rot.rotate(state.getValue(Properties.FACING4)));
+		} else if (state.getPropertyKeys().contains(Properties.AXIS) && (rot == Rotation.CLOCKWISE_90 || rot == Rotation.COUNTERCLOCKWISE_90)) {
+			EnumFacing.Axis axis = state.getValue(Properties.AXIS);
+			if (axis == EnumFacing.Axis.X) {
+				return state.withProperty(Properties.AXIS, EnumFacing.Axis.Z);
+			} else if (axis == EnumFacing.Axis.Z) {
+				return state.withProperty(Properties.AXIS, EnumFacing.Axis.X);
+			} else {
+				return state;
+			}
 		} else {
 			return state;
 		}

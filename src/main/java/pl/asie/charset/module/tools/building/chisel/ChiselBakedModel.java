@@ -108,7 +108,7 @@ public class ChiselBakedModel extends BaseBakedModel {
     public ChiselBakedModel(IBakedModel parent) {
         this.parent = parent;
         this.sprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("charset:items/chisel_pattern");
-        this.cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build();
+        this.cache = CacheBuilder.newBuilder().softValues().expireAfterAccess(1, TimeUnit.MINUTES).build();
         this.list = new ItemOverrideList(Collections.emptyList()) {
             @Override
             public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {

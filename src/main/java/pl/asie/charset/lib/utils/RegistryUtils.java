@@ -29,7 +29,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -83,7 +82,7 @@ public final class RegistryUtils {
 
 		object.setRegistryName(new ResourceLocation(ModCharset.MODID, name));
 		registry.register(object);
-		UtilProxyCommon.proxy.setCreativeTabIfNotPresent(object, tab);
+		UtilProxyCommon.proxy.setTabAndNameIfNotPresent(object, name, tab);
 	}
 
 	public static void loadConfigIds(Configuration configIds) {

@@ -160,6 +160,7 @@ public class FastRecipeLookup {
 						int height = ((IShapedRecipe) irecipe).getRecipeHeight();
 						NonNullList<Ingredient> ingredients = irecipe.getIngredients();
 						boolean isReallyWeird = false;
+						boolean isSlightlyWeird = false;
 
 						if (ingredients.size() != width * height) {
 							isReallyWeird = true;
@@ -188,12 +189,14 @@ public class FastRecipeLookup {
 							}
 
 							if (canTrimTop || canTrimLeft || canTrimRight || canTrimBottom) {
-								isReallyWeird = true;
+								isSlightlyWeird = true;
 							}
 						}
 
 						if (isReallyWeird) {
 							recipeLists.get(27).add(irecipe);
+						} else if (isSlightlyWeird) {
+							recipeLists.get(18 + (width - 1) * 3 + (height - 1)).add(irecipe);
 						} else {
 							if (width * height == 1) {
 								addShapelessOneElement(irecipe);

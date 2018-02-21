@@ -113,16 +113,22 @@ public class UtilProxyCommon implements IThreadListener {
 		return false;
 	}
 
-	public void setCreativeTabIfNotPresent(IForgeRegistryEntry entry, CreativeTabs tab) {
+	public void setTabAndNameIfNotPresent(IForgeRegistryEntry entry, String name, CreativeTabs tab) {
 		if (entry instanceof Block) {
 			Block block = (Block) entry;
 			if (block.getCreativeTabToDisplayOn() == null) {
 				block.setCreativeTab(tab);
 			}
+			if (block.getUnlocalizedName() == null) {
+				block.setUnlocalizedName("charset.missing_name." + name);
+			}
 		} else if (entry instanceof Item) {
 			Item item = (Item) entry;
 			if (item.getCreativeTab() == null) {
 				item.setCreativeTab(tab);
+			}
+			if (item.getUnlocalizedName() == null) {
+				item.setUnlocalizedName("charset.missing_name." + name);
 			}
 		}
 	}

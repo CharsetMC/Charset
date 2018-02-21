@@ -1,0 +1,22 @@
+{
+  "elements": [
+    {
+      "from": [ 0, 12, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "down":  { "texture": "#face" },
+        "up":    { "texture": "#face", "cullface": "up" },
+        "north": { "texture": "#side", "cullface": "north" },
+        "south": { "texture": "#side", "cullface": "south" },
+        "west":  { "texture": "#side", "cullface": "west" },
+        "east":  { "texture": "#side", "cullface": "east" }
+      }
+    }
+  ],
+  "textures": {
+    "particle": "charset:blocks/socket/face",
+    "face": "charset:blocks/socket/face",
+    "side": "charset:blocks/socket/side"
+  }
+}
+

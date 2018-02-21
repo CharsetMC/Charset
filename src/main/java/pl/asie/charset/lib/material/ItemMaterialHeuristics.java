@@ -235,7 +235,7 @@ public final class ItemMaterialHeuristics {
         String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
 
         // Create ore materials for each ore
-        supplyExpandedStacks(OreDictionary.getOres(oreName), (stack -> {
+        supplyExpandedStacks(OreDictionary.getOres(oreName, false), (stack -> {
             if (isBlock(stack)) {
                 ItemMaterial oreMaterial = reg.getOrCreateMaterial(stack);
                 reg.registerTypes(oreMaterial, prefix, suffix, "block");

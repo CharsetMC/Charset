@@ -1,0 +1,21 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "charset:socket"
+  },
+  "variants": {
+    "normal": [{}],
+    "facing": {
+      "down": {},
+      "up": {"x": 180},
+      "south": {"x": 90},
+      "north": {"x": 90, "y": 180},
+      "east": {"x": 90, "y": 270},
+      "west": {"x": 90, "y": 90}
+    },
+    "inventory": [{
+      "transform": "forge:default-block",
+      "x": 90, "y": 90
+    }]
+  }
+}
