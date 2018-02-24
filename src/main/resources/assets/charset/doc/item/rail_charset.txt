@@ -1,0 +1,5 @@
+\scale{2}{\item{charset:rail_charset}{1}{32767}} \title{Rails}
+
+A selection of additional Rails is available:
+
+\- The Crossing Rail allows you to connect two opposite directions in a single rail, smoothly crossing over each other.

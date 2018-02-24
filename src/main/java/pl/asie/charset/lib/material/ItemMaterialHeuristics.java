@@ -103,8 +103,8 @@ public final class ItemMaterialHeuristics {
             return;
 
         ItemStack stair = FastRecipeLookup.getCraftingResultQuickly(true, 6, null, 3, 3,
-                null, null, base.getStack(),
-                null, base.getStack(), base.getStack(),
+                base.getStack(), null, null,
+                base.getStack(), base.getStack(), null,
                 base.getStack(), base.getStack(), base.getStack());
         if (isBlock(stair)) {
             addResultingBlock(base, stair, "block", "stairs");
@@ -136,6 +136,10 @@ public final class ItemMaterialHeuristics {
                     ItemStack stick = FastRecipeLookup.getCraftingResultQuickly(true, 2, null, 1, 2,
                             plank,
                             plank);
+                    if (!stick.isEmpty() && !ItemUtils.isOreType(stick, "stickWood")) {
+                        stick = ItemStack.EMPTY;
+                    }
+
                     if (stick.isEmpty()) {
                         stick = new ItemStack(Items.STICK);
                     } else {
@@ -297,7 +301,9 @@ public final class ItemMaterialHeuristics {
 
     public static void init(boolean modded) {
         FastRecipeLookup.clearRecipeLists();
-        FastRecipeLookup.initRecipeLists();
+        if (modded) {
+            FastRecipeLookup.initRecipeLists();
+        }
 
         long time = System.currentTimeMillis();
         if (initPhase >= (modded ? 2 : 1))
@@ -311,13 +317,14 @@ public final class ItemMaterialHeuristics {
         bar.step("Wood");
         // Pre-initialize impl woods
         if (!modded) {
+            ItemMaterial stick = reg.getOrCreateMaterial(new ItemStack(Items.STICK));
+            reg.registerTypes(stick, "stick", "item", "wood");
+
             for (int i = 0; i < 6; i++) {
                 ItemMaterial log = reg.getOrCreateMaterial(new ItemStack(i >= 4 ? Blocks.LOG2 : Blocks.LOG, 1, i % 4));
                 ItemMaterial plank = reg.getOrCreateMaterial(new ItemStack(Blocks.PLANKS, 1, i));
-                ItemMaterial stick = reg.getOrCreateMaterial(new ItemStack(Items.STICK));
                 reg.registerTypes(log, "log", "block", "wood");
                 reg.registerTypes(plank, "plank", "block", "wood");
-                reg.registerTypes(stick, "stick", "item", "wood");
                 reg.registerRelation(log, plank, "plank", "log");
                 if (i == 0) {
                     reg.registerRelation(plank, stick, "stick", "plank");
@@ -373,9 +380,11 @@ public final class ItemMaterialHeuristics {
 
         bar.step("Slabs/Stairs");
 
-        for (ItemMaterial material : reg.getMaterialsByType("block")) {
-            findSlab(material);
-            findStair(material);
+        if (modded) {
+            for (ItemMaterial material : reg.getMaterialsByType("block")) {
+                findSlab(material);
+                findStair(material);
+            }
         }
 
         ProgressManager.pop(bar);

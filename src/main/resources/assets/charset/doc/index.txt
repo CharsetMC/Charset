@@ -17,7 +17,7 @@
 \- \item{charset:keyring} \url{item://charset/keyring}{Keyring}
 \- \item{charset:lock} \url{item://charset/lock}{Lock}}
 
-\checkmods{any}{charset:experiments.projector charset:laser}{\b{Optics}
+\checkmods{any}{charset:optics.projector charset:optics.laser}{\b{Optics}
 
 }
 
@@ -30,10 +30,14 @@
 
 \checkmods{all}{charset:tools.building.wrench}{\- \item{charset:wrench} \url{item://charset/wrench}{Wrench}}}
 
-\checkmods{any}{charset:transport.dyeableMinecarts charset:tweak.carry charset:tweak.zorro}{\b{New Mechanics}
+\checkmods{any}{charset:transport.dyeableMinecarts charset:transport.rails}{\b{Transport}
+
+\checkmods{all}{charset:transport.dyeableMinecarts}{\- \item{minecraft:minecart} \url{mod://charset/info/cart_dyeing}{Dyeable Minecarts}}
+\checkmods{all}{charset:transport.rails}{\- \item{charset:rail_charset} \url{item://charset/rail_charset}{Rails}}}
+
+\checkmods{any}{charset:tweak.carry charset:tweak.zorro}{\b{New Mechanics}
 
 \checkmods{all}{charset:tweak.carry}{\- \item{minecraft:chest} \url{mod://charset/info/block_carrying}{Block Carrying}}
-\checkmods{all}{charset:transport.dyeableMinecarts}{\- \item{minecraft:minecart} \url{mod://charset/info/cart_dyeing}{Dyeable Minecarts}}
 \checkmods{all}{charset:tweak.zorro}{\- \item{minecraft:iron_horse_armor} \url{mod://charset/info/zorro}{The Zorro Thing}}}
 
 \b{Misc}

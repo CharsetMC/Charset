@@ -9,3 +9,7 @@ It is activated with a redstone signal. There must be an inventory for the resul
 side being powered by the signal.
 
 The top of the crafting grid is defined by the top of the barrels.
+
+Occasionally, you may find that one of the Crafters has issues fully retracting. This means that it contains
+stacks of items which were output by the crafting, but could not be put in any inventory. To fix that issue, just
+hit it with a Wrench - or, if you're lacking a wrench, you can simply break it.
