@@ -20,21 +20,57 @@
 package pl.asie.charset.module.crafting.compression;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.misc.IItemInsertionEmitter;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 // todo: make it less ITickable
 public class TileCompressionCrafter extends TileBase implements ITickable, IItemInsertionEmitter {
+	private final NonNullList<ItemStack> buffer = NonNullList.create();
 	protected CompressionShape shape;
-	protected boolean redstoneLevel;
+	private boolean redstoneLevel, backstuffedClient;
+
+	public boolean isBackstuffed() {
+		return !buffer.isEmpty();
+	}
+
+	protected boolean isBackstuffedClient() {
+		return backstuffedClient;
+	}
+
+	public boolean backstuff(ItemStack stack) {
+		if (buffer.isEmpty()) {
+			markBlockForUpdate();
+		}
+		return buffer.add(stack);
+	}
+
+	public boolean dropBackstuff(EntityPlayer player, EnumFacing facing) {
+		if (buffer.isEmpty()) {
+			return false;
+		}
+
+		Vec3d dropPos = new Vec3d(pos.offset(facing)).addVector(0.5, 0.5, 0.5);
+		for (ItemStack stack : buffer) {
+			ItemUtils.giveOrSpawnItemEntity(player, world, dropPos, stack, 0, 0, 0, 0, true);
+		}
+		buffer.clear();
+		markBlockForUpdate();
+		return true;
+	}
 
 	@Override
 	public void update() {
@@ -47,12 +83,34 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		super.readNBTData(compound, isClient);
 		redstoneLevel = compound.getByte("rs") > 0;
+
+		if (!isClient) {
+			buffer.clear();
+
+			int i = 0;
+			while (compound.hasKey("buffer" + i, Constants.NBT.TAG_COMPOUND)) {
+				buffer.add(new ItemStack(compound.getCompoundTag("buffer" + (i++))));
+			}
+		} else {
+			backstuffedClient = compound.getBoolean("bs");
+		}
 	}
 
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		super.writeNBTData(compound, isClient);
 		compound.setByte("rs", (byte) (redstoneLevel ? 15 : 0));
+
+		if (!isClient) {
+			for (int i = 0; i < buffer.size(); i++) {
+				NBTTagCompound tag = new NBTTagCompound();
+				buffer.get(i).writeToNBT(tag);
+				compound.setTag("buffer"+i, tag);
+			}
+		} else {
+			compound.setBoolean("bs", isBackstuffed());
+		}
+
 		return compound;
 	}
 
@@ -103,5 +161,9 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 		} else {
 			return false;
 		}
+	}
+
+	public boolean isPowered() {
+		return redstoneLevel;
 	}
 }

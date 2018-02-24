@@ -20,14 +20,21 @@
 package pl.asie.charset.module.crafting.compression;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -84,5 +91,27 @@ public class CharsetCraftingCompression {
 	@SideOnly(Side.CLIENT)
 	public void onModelRegistry(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(itemCompressionCrafter, 0, "charset:compression_crafter");
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+		IBlockState state = event.getWorld().getBlockState(event.getPos());
+		if (state.getBlock() instanceof BlockCompressionCrafter) {
+			ItemStack clickItem = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
+			if (clickItem.getItem().getToolClasses(clickItem).contains("wrench")) {
+				TileEntity tile = event.getWorld().getTileEntity(event.getPos());
+				if (tile instanceof TileCompressionCrafter) {
+					if (event.getWorld().isRemote) {
+						if (((TileCompressionCrafter) tile).isBackstuffedClient()) {
+							event.setCanceled(true);
+						}
+					} else {
+						if (((TileCompressionCrafter) tile).dropBackstuff(event.getEntityPlayer(), event.getFace())) {
+							event.setCanceled(true);
+						}
+					}
+				}
+			}
+		}
 	}
 }

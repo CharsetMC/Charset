@@ -32,6 +32,7 @@ notice.charset.cauldron.fluid=%1$s mB of %2$s
 
 # crafting.compression
 
+notice.charset.compression.backstuffed=Crafter clogged!
 notice.charset.compression.cannot_craft=Could not craft!
 notice.charset.compression.invalid_shape=Invalid shape!
 notice.charset.compression.need_output=Need output inventory!

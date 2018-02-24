@@ -122,7 +122,7 @@ public class CompressionShape {
 	private boolean getRedstoneLevel(EnumFacing side) {
 		for (TileCompressionCrafter tile : compressionCrafters) {
 			if (expectedFacings.get(side).contains(tile.getPos())) {
-				if (tile.redstoneLevel) {
+				if (tile.isPowered()) {
 					return true;
 				}
 			}
@@ -176,7 +176,7 @@ public class CompressionShape {
 		}
 	}
 
-	private boolean outputStack(ItemStack stack, BlockPos sourcePos, EnumFacing sourceDir, Collection<IItemInsertionHandler> outputs, boolean simulate) {
+	private boolean outputStack(ItemStack stack, Collection<IItemInsertionHandler> outputs, boolean simulate) {
 		for (IItemInsertionHandler output : outputs) {
 			if (stack.isEmpty()) break;
 			stack = output.insertItem(stack, simulate);
@@ -184,9 +184,36 @@ public class CompressionShape {
 
 		if (!stack.isEmpty()) {
 			if (!simulate) {
-				ItemUtils.spawnItemEntity(
-						world, new Vec3d(sourcePos.offset(sourceDir.getOpposite())).addVector(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
-				);
+				TileEntity tile = world.getTileEntity(craftingSourcePos);
+				if (tile instanceof TileCompressionCrafter) {
+					if (((TileCompressionCrafter) tile).backstuff(stack)) {
+						stack = ItemStack.EMPTY;
+					}
+				}
+
+				if (!stack.isEmpty()) {
+					for (TileCompressionCrafter crafter : compressionCrafters) {
+						boolean f = false;
+						for (EnumFacing facing : craftingDirections) {
+							if (expectedFacings.containsEntry(facing, crafter.getPos())) {
+								f = true;
+								break;
+							}
+						}
+
+						if (f && crafter.backstuff(stack)) {
+							stack = ItemStack.EMPTY;
+							break;
+						}
+					}
+				}
+
+				if (!stack.isEmpty()) {
+					ModCharset.logger.error("Compression Crafter dropping item at " + craftingSourcePos + " - this should NOT happen!");
+					ItemUtils.spawnItemEntity(
+							world, new Vec3d(craftingSourcePos.offset(craftingSourceDir.getOpposite())).addVector(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
+					);
+				}
 				return true;
 			} else {
 				return false;
@@ -203,6 +230,17 @@ public class CompressionShape {
 
 		Set<EnumFacing> validSides = checkRedstoneLevels(false);
 		if (validSides.isEmpty()) {
+			return false;
+		}
+
+		boolean isBackstuffed = false;
+		for (TileCompressionCrafter crafter : compressionCrafters) {
+			if (crafter.isBackstuffed()) {
+				new Notice(crafter, new TextComponentTranslation("notice.charset.compression.backstuffed"));
+				isBackstuffed = true;
+			}
+		}
+		if (isBackstuffed) {
 			return false;
 		}
 
@@ -262,8 +300,6 @@ public class CompressionShape {
 		}
 
 		Set<EnumFacing> validSides = craftingDirections;
-		BlockPos sourcePos = craftingSourcePos;
-		EnumFacing sourceDir = craftingSourceDir;
 
 		List<IItemInsertionHandler> outputs = new ArrayList<>();
 		for (EnumFacing facing : validSides) {
@@ -274,7 +310,7 @@ public class CompressionShape {
 			return Optional.of("notice.charset.compression.need_output");
 		}
 
-		if (!outputStack(stack.copy(), sourcePos, sourceDir, outputs, simulate)) {
+		if (!outputStack(stack.copy(), outputs, simulate)) {
 			return Optional.of("notice.charset.compression.need_output_room");
 		}
 
@@ -298,7 +334,7 @@ public class CompressionShape {
 					source.grow(target.getCount());
 				}
 			} else {
-				if (!outputStack(target, sourcePos, sourceDir, outputs, simulate)) {
+				if (!outputStack(target, outputs, simulate)) {
 					if (simulate) {
 						return Optional.of("notice.charset.compression.need_output_room");
 					}
