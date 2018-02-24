@@ -27,6 +27,7 @@ import mcmultipart.api.slot.IPartSlot;
 import mcmultipart.api.world.IMultipartWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -60,6 +61,7 @@ public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvi
 
     public BlockWire() {
         super(Material.CIRCUITS);
+        setHardness(0.0f);
         setOpaqueCube(false);
         setFullCube(false);
     }
