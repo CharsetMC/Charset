@@ -23,8 +23,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.culling.Frustum;
-import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -32,23 +30,16 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
-import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.EntityUtils;
+import pl.asie.charset.module.crafting.compression.grid.GridEntry;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
-import pl.asie.charset.module.tweak.carry.CarryHandler;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class CompressionShapeRenderer {
@@ -106,7 +97,7 @@ public class CompressionShapeRenderer {
 				continue;
 			}
 
-			double volume = shape.barrels.size();
+			double volume = shape.grid.size();
 			float[] scale = new float[3];
 			int topI = shape.barrelOrientation.top.ordinal() >> 1;
 			int leftI = shape.barrelOrientation.getNextRotationOnFace().top.ordinal() >> 1;
@@ -120,8 +111,8 @@ public class CompressionShapeRenderer {
 			}
 
 			Vec3d center = Vec3d.ZERO;
-			for (TileEntityDayBarrel barrel : shape.barrels) {
-				center = center.add(new Vec3d(barrel.getPos()).scale(1.0 / shape.barrels.size()));
+			for (GridEntry barrel : shape.grid) {
+				center = center.add(new Vec3d(barrel.getPos()).scale(1.0 / shape.grid.size()));
 			}
 			center = center.addVector(0.5, 0.5, 0.5);
 
@@ -135,7 +126,7 @@ public class CompressionShapeRenderer {
 			GlStateManager.disableLighting();
 
 			for (int i = 0; i < 2; i++) {
-				for (TileEntityDayBarrel barrel : shape.barrels) {
+				for (GridEntry barrel : shape.grid) {
 					textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 					int cl = world.getCombinedLight(barrel.getPos(), 0);
 					int j = cl % 65536;
@@ -153,9 +144,8 @@ public class CompressionShapeRenderer {
 
 					try {
 						if (i == 0) {
-							IBlockState state = world.getBlockState(barrel.getPos());
+							IBlockState state = barrel.getState();
 							if (state.getRenderType() == EnumBlockRenderType.MODEL) {
-
 								try {
 									IBlockState renderState = state.getActualState(world, barrel.getPos());
 									IBlockState renderStateExt = state.getBlock().getExtendedState(renderState, world, barrel.getPos());
@@ -170,8 +160,11 @@ public class CompressionShapeRenderer {
 								}
 							}
 						} else {
-							textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-							TileEntityRendererDispatcher.instance.render(barrel, barrel.getPos().getX(), barrel.getPos().getY(), barrel.getPos().getZ(), 0);
+							TileEntity tile = barrel.getTileEntity();
+							if (tile != null) {
+								textureManager.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+								TileEntityRendererDispatcher.instance.render(tile, barrel.getPos().getX(), barrel.getPos().getY(), barrel.getPos().getZ(), 0);
+							}
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

@@ -1,4 +1,5 @@
 \scale{2}{\item{charset:wrench}{1}{32767}} \title{Wrench}
 
-The Wrench is a simple tool which you can use to rotate blocks in the world. That's it - for things such as dismantling
-machines, you're better off with more traditional tools.
+The Wrench is a simple tool which you can use to help orient blocks in the world.
+
+Sometimes, it can also be used to help blocks get "unstuck" by left-clicking them.

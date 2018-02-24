@@ -19,27 +19,19 @@
 
 package pl.asie.charset.module.crafting.compression;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.Properties;
@@ -50,8 +42,9 @@ import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RecipeUtils;
+import pl.asie.charset.module.crafting.compression.grid.GridEntry;
+import pl.asie.charset.module.crafting.compression.grid.GridEntryBarrel;
 import pl.asie.charset.module.storage.barrels.BarrelUpgrade;
-import pl.asie.charset.module.storage.barrels.BlockBarrel;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 
 import javax.annotation.Nullable;
@@ -64,7 +57,7 @@ public class CompressionShape {
 	protected final World world;
 	protected final Multimap<EnumFacing, BlockPos> expectedFacings = MultimapBuilder.enumKeys(EnumFacing.class).arrayListValues().build();
 	protected final List<TileCompressionCrafter> compressionCrafters = new ArrayList<>();
-	protected final List<TileEntityDayBarrel> barrels = new ArrayList<>();
+	protected final List<GridEntry> grid = new ArrayList<>();
 	protected int width, height;
 	protected BlockPos topLeft;
 	protected EnumFacing topDir, leftDir, bottomDir, rightDir;
@@ -147,8 +140,8 @@ public class CompressionShape {
 			}
 		}
 
-		for (TileEntityDayBarrel barrel : barrels) {
-			if (barrel.isInvalid() || barrel.orientation != barrelOrientation) {
+		for (GridEntry entry : grid) {
+			if (entry.isInvalid()) {
 				invalid = true;
 				return true;
 			}
@@ -266,22 +259,9 @@ public class CompressionShape {
 		boolean hasNonEmpty = false;
 
 		for (int i = 0; i < width * height; i++) {
-			ItemStack stack = barrels.get(i).item;
+			ItemStack stack = grid.get(i).getCraftingStack();
 			if (!stack.isEmpty()) {
 				hasNonEmpty = true;
-				boolean copied = false;
-				if (barrels.get(i).upgrades.contains(BarrelUpgrade.STICKY)) {
-					stack = stack.copy();
-					stack.shrink(1);
-					copied = true;
-				}
-				if (stack.getCount() > 1) {
-					if (!copied) {
-						stack = stack.copy();
-						copied = true;
-					}
-					stack.setCount(1);
-				}
 			}
 			crafting.setInventorySlotContents(i, stack);
 		}
@@ -316,33 +296,13 @@ public class CompressionShape {
 
 		NonNullList<ItemStack> remainingItems = recipe.getRemainingItems(crafting);
 		for (int i = 0; i < width * height; i++) {
-			ItemStack source = barrels.get(i).item;
-			ItemStack target = remainingItems.get(i);
-
-			ItemStack sourceOrig = source;
-			if (!source.isEmpty() && !barrels.get(i).upgrades.contains(BarrelUpgrade.INFINITE)) {
-				sourceOrig = source.copy();
-				if (!simulate) {
-					source.shrink(1);
-				}
-			}
-
-			if (target.isEmpty()) {
-				// we're fine
-			} else if (ItemUtils.canMerge(sourceOrig, target)) {
-				if (!simulate) {
-					source.grow(target.getCount());
-				}
-			} else {
-				if (!outputStack(target, outputs, simulate)) {
+			ItemStack rem = grid.get(i).mergeRemainingItem(remainingItems.get(i), simulate);
+			if (!rem.isEmpty()) {
+				if (!outputStack(rem, outputs, simulate)) {
 					if (simulate) {
 						return Optional.of("notice.charset.compression.need_output_room");
 					}
 				}
-			}
-
-			if (!simulate) {
-				barrels.get(i).setItem(source);
 			}
 		}
 
@@ -466,8 +426,10 @@ public class CompressionShape {
 				if (barrel == null) {
 					ModCharset.logger.warn("Should never happen!", new Throwable());
 					return null;
+				} else if (barrel.orientation != shape.barrelOrientation) {
+					return null;
 				}
-				shape.barrels.add(barrel);
+				shape.grid.add(new GridEntryBarrel(barrel));
 
 				// check sides
 				if (xPos == 0 && !shape.setCrafterShapeIfMatchesDirection(tmp.offset(leftDir), shape.rightDir)) {

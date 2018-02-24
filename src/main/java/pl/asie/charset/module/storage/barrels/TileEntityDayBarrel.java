@@ -262,6 +262,14 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     @Override
+    public void setPos(BlockPos posIn) {
+        super.setPos(posIn);
+        woodLogAccess = null;
+        helperTop = null;
+        helperBottom = null;
+    }
+
+    @Override
     public void invalidate(InvalidationType type) {
         super.invalidate(type);
         woodLogAccess = null;
