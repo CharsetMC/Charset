@@ -44,6 +44,8 @@ public class BlockAxle extends BlockBase implements ITileEntityProvider {
 
 	public BlockAxle() {
 		super(Material.WOOD);
+		setHardness(1.0F);
+		setHarvestLevel("axe", 0);
 		setOpaqueCube(false);
 		setFullCube(false);
 	}

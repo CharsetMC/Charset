@@ -19,10 +19,7 @@
 
 package pl.asie.charset.module.optics.laser.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.BlockPistonExtension;
-import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -59,6 +56,8 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 
 	public BlockJar() {
 		super(Material.GLASS);
+		setHardness(0.0F);
+		setSoundType(SoundType.WOOD);
 		setOpaqueCube(false);
 		setFullCube(false);
 	}

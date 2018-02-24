@@ -20,6 +20,7 @@
 package pl.asie.charset.module.optics.laser.blocks;
 
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -43,6 +44,8 @@ public class BlockPrism extends BlockBase implements ITileEntityProvider {
 
 	public BlockPrism() {
 		super(Material.GLASS);
+		setHardness(0.4F);
+		setSoundType(SoundType.GLASS);
 		setFullCube(false);
 		setOpaqueCube(false);
 	}

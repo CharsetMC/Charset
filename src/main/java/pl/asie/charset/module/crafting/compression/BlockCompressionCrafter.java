@@ -21,6 +21,7 @@ package pl.asie.charset.module.crafting.compression;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -45,6 +46,8 @@ public class BlockCompressionCrafter extends BlockBase implements ITileEntityPro
 
 	public BlockCompressionCrafter() {
 		super(Material.ROCK);
+		setSoundType(SoundType.STONE);
+		setHardness(0.5F);
 		setOpaqueCube(false);
 		setUnlocalizedName("charset.compression_crafter");
 	}

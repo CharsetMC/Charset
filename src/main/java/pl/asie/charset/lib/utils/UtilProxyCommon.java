@@ -115,6 +115,10 @@ public class UtilProxyCommon implements IThreadListener {
 
 	public void setTabAndNameIfNotPresent(IForgeRegistryEntry entry, String name, CreativeTabs tab) {
 		if (entry instanceof Block) {
+			if (entry instanceof BlockBase) {
+				((BlockBase) entry).verifyPreGameLaunch();
+			}
+
 			Block block = (Block) entry;
 			if (block.getCreativeTabToDisplayOn() == null) {
 				block.setCreativeTab(tab);

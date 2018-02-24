@@ -20,6 +20,7 @@
 package pl.asie.charset.module.optics.laser.blocks;
 
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
@@ -45,6 +46,8 @@ public class BlockCrystal extends BlockBase implements ITileEntityProvider {
 
 	public BlockCrystal() {
 		super(Material.GLASS);
+		setHardness(0.4F);
+		setSoundType(SoundType.GLASS);
 		setDefaultState(getBlockState().getBaseState().withProperty(OPAQUE, false));
 	}
 

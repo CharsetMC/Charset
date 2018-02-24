@@ -47,6 +47,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
@@ -55,16 +56,35 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
+import pl.asie.charset.lib.utils.MethodHandleHelper;
 import pl.asie.charset.lib.utils.UtilProxyCommon;
 import pl.asie.charset.lib.utils.Utils;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public abstract class BlockBase extends Block {
 	private final boolean isTileProvider;
 	private final ISubItemProvider subItemProvider;
 	private boolean fullCube = true, opaqueCube = true, comparatorInputOverride = false;
+
+	// I am very forgetful.
+	private boolean calledSetHardness = false;
+
+	@Override
+	public Block setHardness(float val) {
+		calledSetHardness = true;
+		return super.setHardness(val);
+	}
+
+	public void verifyPreGameLaunch() {
+		if (ModCharset.INDEV) {
+			if (!calledSetHardness) {
+				ModCharset.logger.warn("[INDEV] Modder did not call setHardness on " + getRegistryName() + "!");
+			}
+		}
+	}
 
 	public BlockBase(Material materialIn) {
 		super(materialIn);
@@ -83,6 +103,7 @@ public abstract class BlockBase extends Block {
 	public final ISubItemProvider getSubItemProvider() {
 		return subItemProvider;
 	}
+
 
 	protected BlockBase setComparatorInputOverride(boolean value) {
 		comparatorInputOverride = value;
