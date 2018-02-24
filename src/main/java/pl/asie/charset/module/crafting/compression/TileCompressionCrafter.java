@@ -73,6 +73,12 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 	}
 
 	@Override
+	public void getDrops(NonNullList<ItemStack> stacks, IBlockState state, int fortune, boolean silkTouch) {
+		super.getDrops(stacks, state, fortune, silkTouch);
+		stacks.addAll(buffer);
+	}
+
+	@Override
 	public void update() {
 		if (shape != null) {
 			shape.tick();
