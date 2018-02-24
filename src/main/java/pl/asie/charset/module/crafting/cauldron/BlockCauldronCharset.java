@@ -103,7 +103,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 							}
 
 							if (!contentsNew.isPresent()) {
-								contentsNew = CharsetCraftingCauldron.craft((ICauldron) tile, ICauldronRecipe.Scenario.ITEM_ENTITY, new CauldronContents(stack, heldItemOne));
+								contentsNew = CharsetCraftingCauldron.craft((ICauldron) tile, new CauldronContents(CauldronContents.Source.ENTITY, stack, heldItemOne));
 							}
 
 							if (contentsNew.isPresent()) {
@@ -180,7 +180,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 				FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
 				ItemStack heldItemOne = heldItem.copy();
 				heldItemOne.setCount(1);
-				Optional<CauldronContents> contentsNew = CharsetCraftingCauldron.craft((ICauldron) tankEntity, ICauldronRecipe.Scenario.RIGHT_CLICK, new CauldronContents(stack, heldItemOne));
+				Optional<CauldronContents> contentsNew = CharsetCraftingCauldron.craft((ICauldron) tankEntity, new CauldronContents(CauldronContents.Source.HAND, stack, heldItemOne));
 
 				if (contentsNew.isPresent()) {
 					if (!worldIn.isRemote) {

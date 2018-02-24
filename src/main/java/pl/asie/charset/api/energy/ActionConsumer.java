@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package pl.asie.charset.api.power;
+package pl.asie.charset.api.energy;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;

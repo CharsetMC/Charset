@@ -37,7 +37,7 @@ import java.util.List;
 public class BlockAxle extends BlockBase implements ITileEntityProvider {
 	private static final IUnlistedProperty<ItemMaterial> MATERIAL = new UnlistedPropertyGeneric<>("material", ItemMaterial.class);
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[] {
-			new AxisAlignedBB(6/16f, 6/16f, 0/16f, 16/16f, 10/16f, 10/16f),
+			new AxisAlignedBB(0/16f, 6/16f, 6/16f, 16/16f, 10/16f, 10/16f),
 			new AxisAlignedBB(6/16f, 0/16f, 6/16f, 10/16f, 16/16f, 10/16f),
 			new AxisAlignedBB(6/16f, 6/16f, 0/16f, 10/16f, 10/16f, 16/16f)
 	};
@@ -56,6 +56,11 @@ public class BlockAxle extends BlockBase implements ITileEntityProvider {
 				return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("material", SubItemSetHelper::sortByItem));
 			}
 		});
+	}
+
+	@Override
+	public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
+		return true;
 	}
 
 	@Override

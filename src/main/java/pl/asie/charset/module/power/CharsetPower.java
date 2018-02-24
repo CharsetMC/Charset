@@ -39,7 +39,7 @@ public class CharsetPower {
 		blockCreativeGenerator = new BlockCreativeGenerator();
 		blockGearbox = new BlockGearbox();
 		blockSocket = new BlockSocket();
-		itemAxle = new ItemBlockBase(blockAxle);
+		itemAxle = new ItemBlockAxle(blockAxle);
 		itemCreativeGenerator = new ItemBlockBase(blockCreativeGenerator);
 		itemGearbox = new ItemBlockBase(blockGearbox);
 		itemSocket = new ItemBlockBase(blockSocket);

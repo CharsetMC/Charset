@@ -23,12 +23,7 @@ import java.util.Optional;
 
 @FunctionalInterface
 public interface ICauldronRecipe {
-	enum Scenario {
-		RIGHT_CLICK,
-		ITEM_ENTITY
-	}
-
-	default boolean matches(Scenario scenario) {
+	default boolean matches(CauldronContents.Source source) {
 		return true;
 	}
 

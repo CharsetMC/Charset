@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -47,7 +48,9 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 			this.axis = axis;
 			this.rotation = rotation;
 			this.texturing = (int) (texturing & 7);
-			this.position = (int) (((position % 90f) * ACCURACY / 90f));
+			int tPos = (int) ((position * ACCURACY / 90f)) % ACCURACY;
+			if (tPos < 0) tPos += ACCURACY;
+			this.position = tPos;
 			this.hash = (this.axis * 13 + this.rotation * 7 + this.texturing * 3 + this.position) * 31 + material.hashCode();
 		}
 
@@ -159,6 +162,11 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 
 		float rotation = te.getWorld().getTotalWorldTime() + partialTicks;
 		rotation *= 16;
+
+		/* boolean direction = EnumFacing.SOUTH.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE;
+		if (direction) {
+			rotation = 0 - rotation;
+		} */
 
 		BlockPos pos = te.getPos();
 		IBlockState state = te.getWorld().getBlockState(te.getPos());

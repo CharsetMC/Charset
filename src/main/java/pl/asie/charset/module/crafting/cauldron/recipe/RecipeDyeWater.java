@@ -19,11 +19,13 @@
 
 package pl.asie.charset.module.crafting.cauldron.recipe;
 
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.module.crafting.cauldron.api.ICauldronRecipe;
 import pl.asie.charset.module.crafting.cauldron.CharsetCraftingCauldron;
@@ -42,6 +44,13 @@ public class RecipeDyeWater implements ICauldronRecipe {
 		EnumDyeColor color = ColorUtils.getDyeColor(contents.getHeldItem());
 		if (color != null) {
 			FluidStack stack = contents.getFluidStack();
+
+			// HACK: sky resources workaround
+			if (Loader.isModLoaded("skyresources") && contents.getSource() != CauldronContents.Source.HAND &&
+					stack.getFluid() == FluidRegistry.WATER && contents.getHeldItem().getItem() == Items.DYE && contents.getHeldItem().getItemDamage() == 4) {
+				return Optional.empty();
+			}
+
 			if (stack.getFluid() == FluidRegistry.WATER || stack.getFluid() == CharsetCraftingCauldron.dyedWater) {
 				FluidStack newStack = CharsetCraftingCauldron.dyedWater.appendDye(stack, color);
 				if (newStack == null) {

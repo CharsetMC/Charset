@@ -20,6 +20,29 @@ tooltip.charset.disc.unnamed=Unnamed Disc
 tile.charset.audioCable.name=Audio Cable
 tile.charset.audioCable.freestanding.name=Hovering Audio Cable
 
+# crafting.cauldron
+
+fluid.charset.dyed_water.name=Dyed Water
+fluid.charset.dyed_water.pure.name=Pure Dyed Water
+
+notice.charset.cauldron.dye_impure=Must use pure dyed water!
+notice.charset.cauldron.no_dye=Cannot mix more dye!
+notice.charset.cauldron.empty=Empty
+notice.charset.cauldron.fluid=%1$s mB of %2$s
+
+# crafting.compression
+
+notice.charset.compression.cannot_craft=Could not craft!
+notice.charset.compression.invalid_shape=Invalid shape!
+notice.charset.compression.need_output=Need output inventory!
+notice.charset.compression.need_output_room=No room in output inventories!
+
+tile.charset.compression_crafter.name=Compression Crafter
+
+# crafting.pocket
+
+item.charset.pocket_crafting_table.name=Pocket Crafting Table
+
 # lib
 
 charset.color.black=Black
@@ -51,27 +74,6 @@ gui.charset.crafting.name=Crafting
 itemGroup.charset=The Charset Project
 
 item.charset.icon.name=a
-
-# crafting.cauldron
-
-fluid.charset.dyed_water.name=Dyed Water
-fluid.charset.dyed_water.pure.name=Pure Dyed Water
-
-notice.charset.cauldron.dye_impure=Must use pure dyed water!
-notice.charset.cauldron.no_dye=Cannot mix more dye!
-notice.charset.cauldron.empty=Empty
-notice.charset.cauldron.fluid=%1$s mB of %2$s
-
-# crafting.compression
-
-notice.charset.compression.invalid_shape=Invalid shape!
-notice.charset.compression.cannot_craft=Could not craft!
-
-tile.charset.compression_crafter.name=Compression Crafter
-
-# crafting.pocket
-
-item.charset.pocket_crafting_table.name=Pocket Crafting Table
 
 # misc.drama
 

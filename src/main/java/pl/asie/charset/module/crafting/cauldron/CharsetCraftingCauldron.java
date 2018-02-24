@@ -66,9 +66,9 @@ public class CharsetCraftingCauldron {
 		recipeList.add(recipe);
 	}
 
-	public static Optional<CauldronContents> craft(ICauldron cauldronCharset, ICauldronRecipe.Scenario scenario, CauldronContents contents) {
+	public static Optional<CauldronContents> craft(ICauldron cauldronCharset, CauldronContents contents) {
 		for (ICauldronRecipe recipe : recipeList) {
-			if (!recipe.matches(scenario)) {
+			if (!recipe.matches(contents.getSource())) {
 				continue;
 			}
 

@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-package pl.asie.charset.api.power;
+package pl.asie.charset.api.energy;
 
-public class ActionGenerator {
+@FunctionalInterface
+public interface IActionListener {
+    void onActionReceived();
 }

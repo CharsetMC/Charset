@@ -26,18 +26,38 @@ import net.minecraftforge.fluids.FluidStack;
 public final class CauldronContents {
 	private final FluidStack fluidStack;
 	private final ItemStack heldItem;
+	private final Source source;
 	private final ITextComponent response;
+
+	public enum Source {
+		HAND,
+		ENTITY,
+		UNKNOWN
+	}
 
 	public CauldronContents(ITextComponent response) {
 		this.response = response;
 		this.fluidStack = null;
+		this.source = Source.UNKNOWN;
 		this.heldItem = ItemStack.EMPTY;
 	}
 
 	public CauldronContents(FluidStack fluidStack, ItemStack heldItem) {
 		this.response = null;
+		this.source = Source.UNKNOWN;
 		this.fluidStack = fluidStack;
 		this.heldItem = heldItem;
+	}
+
+	public CauldronContents(Source source, FluidStack fluidStack, ItemStack heldItem) {
+		this.response = null;
+		this.source = source;
+		this.fluidStack = fluidStack;
+		this.heldItem = heldItem;
+	}
+
+	public Source getSource() {
+		return source;
 	}
 
 	public FluidStack getFluidStack() {

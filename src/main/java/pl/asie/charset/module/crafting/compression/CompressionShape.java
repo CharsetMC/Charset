@@ -176,16 +176,23 @@ public class CompressionShape {
 		}
 	}
 
-	private void outputStack(ItemStack stack, BlockPos sourcePos, EnumFacing sourceDir, Collection<IItemInsertionHandler> outputs) {
+	private boolean outputStack(ItemStack stack, BlockPos sourcePos, EnumFacing sourceDir, Collection<IItemInsertionHandler> outputs, boolean simulate) {
 		for (IItemInsertionHandler output : outputs) {
 			if (stack.isEmpty()) break;
-			stack = output.insertItem(stack, false);
+			stack = output.insertItem(stack, simulate);
 		}
 
 		if (!stack.isEmpty()) {
-			ItemUtils.spawnItemEntity(
-					world, new Vec3d(sourcePos.offset(sourceDir.getOpposite())).addVector(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
-			);
+			if (!simulate) {
+				ItemUtils.spawnItemEntity(
+						world, new Vec3d(sourcePos.offset(sourceDir.getOpposite())).addVector(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
+				);
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
 		}
 	}
 
@@ -202,18 +209,21 @@ public class CompressionShape {
 		craftingDirections = validSides;
 		craftingSourcePos = sender.getPos();
 		craftingSourceDir = sourceDir;
-		if (craftEnd(true)) {
+		Optional<String> error = craftEnd(true);
+		if (!error.isPresent()) {
 			craftingTickStart = world.getTotalWorldTime();
 			craftingTickEnd = world.getTotalWorldTime() + 20;
 			CharsetCraftingCompression.proxy.markShapeRender(sender, this);
 			return true;
 		} else {
-			new Notice(sender, new TextComponentTranslation("notice.charset.compression.cannot_craft")).sendToAll();
+			if (error.get().length() > 0) {
+				new Notice(sender, new TextComponentTranslation(error.get())).sendToAll();
+			}
 			return false;
 		}
 	}
 
-	public boolean craftEnd(boolean simulate) {
+	public Optional<String> craftEnd(boolean simulate) {
 		InventoryCrafting crafting = RecipeUtils.getCraftingInventory(width, height);
 		boolean hasNonEmpty = false;
 
@@ -239,16 +249,16 @@ public class CompressionShape {
 		}
 
 		if (!hasNonEmpty) {
-			return false;
+			return Optional.of("");
 		}
 
 		IRecipe recipe = FastRecipeLookup.findMatchingRecipe(crafting, world);
 		if (recipe == null) {
-			return false;
+			return Optional.of("notice.charset.compression.cannot_craft");
 		}
 		ItemStack stack = recipe.getCraftingResult(crafting);
 		if (stack.isEmpty()) {
-			return false;
+			return Optional.of("notice.charset.compression.cannot_craft");
 		}
 
 		Set<EnumFacing> validSides = craftingDirections;
@@ -259,37 +269,48 @@ public class CompressionShape {
 		for (EnumFacing facing : validSides) {
 			addItemHandlers(outputs, facing, expectedFacings.get(facing));
 		}
-/*
-		if (outputs.isEmpty()) {
-			return false;
-		}
-*/
-		if (!simulate) {
-			NonNullList<ItemStack> remainingItems = recipe.getRemainingItems(crafting);
-			for (int i = 0; i < width * height; i++) {
-				ItemStack source = barrels.get(i).item;
-				ItemStack target = remainingItems.get(i);
 
-				ItemStack sourceOrig = source;
-				if (!source.isEmpty() && !barrels.get(i).upgrades.contains(BarrelUpgrade.INFINITE)) {
-					sourceOrig = source.copy();
+		if (outputs.isEmpty()) {
+			return Optional.of("notice.charset.compression.need_output");
+		}
+
+		if (!outputStack(stack.copy(), sourcePos, sourceDir, outputs, simulate)) {
+			return Optional.of("notice.charset.compression.need_output_room");
+		}
+
+		NonNullList<ItemStack> remainingItems = recipe.getRemainingItems(crafting);
+		for (int i = 0; i < width * height; i++) {
+			ItemStack source = barrels.get(i).item;
+			ItemStack target = remainingItems.get(i);
+
+			ItemStack sourceOrig = source;
+			if (!source.isEmpty() && !barrels.get(i).upgrades.contains(BarrelUpgrade.INFINITE)) {
+				sourceOrig = source.copy();
+				if (!simulate) {
 					source.shrink(1);
 				}
+			}
 
-				if (target.isEmpty()) {
-					// we're fine
-				} else if (ItemUtils.canMerge(sourceOrig, target)) {
+			if (target.isEmpty()) {
+				// we're fine
+			} else if (ItemUtils.canMerge(sourceOrig, target)) {
+				if (!simulate) {
 					source.grow(target.getCount());
-				} else {
-					outputStack(target, sourcePos, sourceDir, outputs);
 				}
+			} else {
+				if (!outputStack(target, sourcePos, sourceDir, outputs, simulate)) {
+					if (simulate) {
+						return Optional.of("notice.charset.compression.need_output_room");
+					}
+				}
+			}
 
+			if (!simulate) {
 				barrels.get(i).setItem(source);
 			}
-			outputStack(stack.copy(), sourcePos, sourceDir, outputs);
 		}
 
-		return true;
+		return Optional.empty();
 	}
 
 	private boolean setCrafterShapeIfMatchesDirection(BlockPos pos, EnumFacing facing) {
