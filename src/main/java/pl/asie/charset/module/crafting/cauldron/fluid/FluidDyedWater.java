@@ -95,7 +95,7 @@ public class FluidDyedWater extends Fluid {
 			}
 
 			for (int i = 0; i < count; i++) {
-				float[] colF = ColorUtils.getDyeRgb(EnumDyeColor.byMetadata(((NBTPrimitive) dyes.get(i)).getByte()));
+				float[] colF = EnumDyeColor.byMetadata(((NBTPrimitive) dyes.get(i)).getByte()).getColorComponentValues();
 				int[] col = new int[]{
 						(int) (colF[0] * 255.0F),
 						(int) (colF[1] * 255.0F),

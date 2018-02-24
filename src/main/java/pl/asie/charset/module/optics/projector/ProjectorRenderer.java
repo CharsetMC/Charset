@@ -285,7 +285,7 @@ public class ProjectorRenderer {
 					}
 
 					if (dyeColor != null) {
-						float[] v = ColorUtils.getDyeRgb(dyeColor);
+						float[] v = dyeColor.getColorComponentValues();
 						surface.r *= v[0];
 						surface.g *= v[1];
 						surface.b *= v[2];

@@ -45,7 +45,7 @@ import java.util.Arrays;
 )
 public class CharsetTweakUnifyColors {
 	private int colorMultiplier(String prefix, EnumDyeColor color) {
-		float[] d = ColorUtils.getDyeRgb(color);
+		float[] d = color.getColorComponentValues();
 
 		if (prefix.contains("hardened_clay")) {
 			float[] dOrig = d;
@@ -145,7 +145,7 @@ public class CharsetTweakUnifyColors {
 				String key = ColorUtils.getUnderscoredSuffix(color);
 				double[] data = ColorPaletteParser.INSTANCE.getColor("minecraft:dye", key);
 				if (data != null && (data.length == 3 || (data.length > 3 && data[3] > 0.0))) {
-					float[] dst = ColorUtils.getDyeRgb(color);
+					float[] dst = color.getColorComponentValues();
 					dst[0] = (float) data[0];
 					dst[1] = (float) data[1];
 					dst[2] = (float) data[2];

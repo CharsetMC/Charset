@@ -25,6 +25,7 @@ import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.DyeUtils;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
@@ -59,23 +60,6 @@ public final class ColorUtils {
 			'f', '6', 'd', '9', 'e', 'a', 'd', '8',
 			'7', '3', '5', '1', '6', '2', '4', '0'
 	};
-
-	private static final Map<EnumDyeColor, float[]> DYE_TO_RGB;
-
-	static {
-		MethodHandle DYE_TO_RGB_GETTER = MethodHandleHelper.findFieldGetter(EntitySheep.class, "DYE_TO_RGB", "field_175514_bm");
-		Map<EnumDyeColor, float[]> map = null;
-		try {
-			map = (Map<EnumDyeColor, float[]>) DYE_TO_RGB_GETTER.invokeExact();
-		} catch (Throwable t) {
-
-		}
-		DYE_TO_RGB = map;
-	}
-
-	public static float[] getDyeRgb(EnumDyeColor dyeColor) {
-		return DYE_TO_RGB.get(dyeColor);
-	}
 
 	private ColorUtils() {
 
@@ -121,7 +105,7 @@ public final class ColorUtils {
 	}
 
 	public static int toIntColor(EnumDyeColor color) {
-		float[] d = ColorUtils.getDyeRgb(color);
+		float[] d = color.getColorComponentValues();
 		return    (Math.min(Math.round(d[0] * 255.0F), 255) << 16)
 				| (Math.min(Math.round(d[1] * 255.0F), 255) << 8)
 				| (Math.min(Math.round(d[2] * 255.0F), 255))

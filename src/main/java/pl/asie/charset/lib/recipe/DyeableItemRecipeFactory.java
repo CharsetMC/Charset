@@ -91,7 +91,7 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 				} else {
 					EnumDyeColor dyeId = ColorUtils.getDyeColor(stack);
 					if (dyeId != null) {
-						float[] col = ColorUtils.getDyeRgb(dyeId);
+						float[] col = dyeId.getColorComponentValues();
 						return new int[]{
 								(int) (col[0] * 255.0F),
 								(int) (col[1] * 255.0F),

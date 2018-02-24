@@ -42,7 +42,7 @@ public class ModelMinecartWrapped extends ModelBase {
 			MinecartDyeable dyeable = MinecartDyeable.get(minecart);
 			if (dyeable != null && dyeable.getColor() != null) {
 				Minecraft.getMinecraft().renderEngine.bindTexture(DYEABLE_MINECART);
-				float[] color = ColorUtils.getDyeRgb(dyeable.getColor());
+				float[] color = dyeable.getColor().getColorComponentValues();
 
 				GlStateManager.color(color[0], color[1], color[2]);
 			}
