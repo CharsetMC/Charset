@@ -209,11 +209,11 @@ public class CharsetTablet {
 				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("desht/ModularRouters", "modularrouters"));
 				TabletAPI.INSTANCE.addBook("Modular Routers Wiki", "wiki://modularrouters/Home");
 			}
-/*			if (ModCharset.INDEV || Loader.isModLoaded("toughasnails")) {
+			if (ModCharset.INDEV || Loader.isModLoaded("toughasnails")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("Glitchfiend/ToughAsNails", "toughasnails"));
 				TabletAPI.INSTANCE.addBook("Tough As Nails Wiki", "wiki://toughasnails/_Sidebar");
 			}
-			if (ModCharset.INDEV || Loader.isModLoaded("vampirism")) {
+/*			if (ModCharset.INDEV || Loader.isModLoaded("vampirism")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("TeamLapen/Vampirism", "vampirism"));
 				TabletAPI.INSTANCE.addBook("Vampirism Wiki", "wiki://vampirism/Home");
 			} */

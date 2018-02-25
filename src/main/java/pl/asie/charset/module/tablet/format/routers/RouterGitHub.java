@@ -47,6 +47,10 @@ public class RouterGitHub implements IRouter {
 
 		try {
 			String pathCleaned = path.getPath();
+			if (pathCleaned.length() <= 1) {
+				pathCleaned = "/Home";
+			}
+
 			String hostPath = "https://raw.githubusercontent.com/wiki/" + host;
 
 			URI uri = new URI(hostPath + pathCleaned + ".md");

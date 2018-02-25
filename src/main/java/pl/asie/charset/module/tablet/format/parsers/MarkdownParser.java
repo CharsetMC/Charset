@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 public class MarkdownParser extends ParserBase {
 	public MarkdownParser() {
 		Pattern.compile("<!--(.+)-->");
-		replacers.add(Pair.of(Pattern.compile("\\[([^]]+)]\\(([^)]+)\\)", Pattern.DOTALL), this::urlHandler));
+		replacers.add(Pair.of(Pattern.compile("\\[([^]]*)]\\(([^)]+)\\)", Pattern.DOTALL), this::urlHandler));
 		replace("<!--(.+)-->", Pattern.DOTALL | Pattern.MULTILINE, "");
 	}
 
@@ -52,8 +52,10 @@ public class MarkdownParser extends ParserBase {
 					builder = new StringBuilder();
 					continue;
 				}
-			} else if (line.startsWith("!")) {
-				continue;
+			}
+
+			while (line.startsWith("!")) {
+				line = line.substring(line.indexOf(")") + 1).trim() + "\n";
 			}
 
 			if (line.matches("^-+$")) {
