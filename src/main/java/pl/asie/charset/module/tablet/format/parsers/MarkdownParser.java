@@ -54,7 +54,7 @@ public class MarkdownParser extends ParserBase {
 				}
 			}
 
-			while (line.startsWith("!")) {
+			while (line.startsWith("!") && line.contains(")")) {
 				line = line.substring(line.indexOf(")") + 1).trim() + "\n";
 			}
 
