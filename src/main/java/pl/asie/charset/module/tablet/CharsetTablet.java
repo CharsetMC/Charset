@@ -179,7 +179,7 @@ public class CharsetTablet {
 				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("railcraft", "Railcraft Wiki", "railcraft.info/wiki/doku.php"));
 				TabletAPI.INSTANCE.addBook("Railcraft Wiki", "wiki://railcraft/");
 			}
-			if (ModCharset.INDEV || Loader.isModLoaded("cofhcore")) {
+			if (ModCharset.INDEV) {
 				TabletAPI.INSTANCE.registerRouter(new RouterCoFH());
 				TabletAPI.INSTANCE.addBook("CoFH Docs", "wiki://cofh/docs/index");
 			}
