@@ -29,23 +29,18 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WikiParser {
+public class WikiParser extends ParserBase {
 	public enum Type {
 		MEDIAWIKI,
 		DOKUWIKI
 	};
 
-	private static final Pair<Pattern, Function<Matcher, String>> replace(String from, int flags, String to) {
-		return Pair.of(Pattern.compile(from, flags), (m) -> to);
-	}
-
-	private final List<Pair<Pattern, Function<Matcher, String>>> replacers;
 	private final Map<String, ThreeState> existsData;
-	private String text = null, displaytitle = null;
-
 	private ThreeState urlExists(String url) {
 		return existsData.getOrDefault(url.toLowerCase(Locale.ROOT), ThreeState.MAYBE);
 	}
+
+	private String text = null, displaytitle = null;
 
 	private void initReplacers(Type type) {
 		if (type == Type.DOKUWIKI) {
@@ -124,7 +119,6 @@ public class WikiParser {
 
 	public WikiParser(String string, Type type) {
 		existsData = new HashMap<>();
-		replacers = new ArrayList<>();
 		initReplacers(type);
 
 		if (type == Type.MEDIAWIKI) {

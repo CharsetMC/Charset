@@ -179,15 +179,43 @@ public class CharsetTablet {
 				TabletAPI.INSTANCE.registerRouter(new RouterDokuWiki("railcraft", "Railcraft Wiki", "railcraft.info/wiki/doku.php"));
 				TabletAPI.INSTANCE.addBook("Railcraft Wiki", "wiki://railcraft/");
 			}
-			if (ModCharset.INDEV /* || Loader.isModLoaded("cofhcore") */) {
+			if (ModCharset.INDEV || Loader.isModLoaded("cofhcore")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterCoFH());
 				TabletAPI.INSTANCE.addBook("CoFH Docs", "wiki://cofh/docs/index");
 			}
-			/* if (ModCharset.INDEV) {
+			/* if (ModCharset.INDEV || Loader.isModLoaded("projectred-core")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("projectred", "Project: Red Wiki", "projectredwiki.com/w"));
 			}
-			if (ModCharset.INDEV) {
+			if (ModCharset.INDEV || Loader.isModLoaded("binniecore")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterMediaWiki("binniemods", "Binnie's Mods Wiki", "binnie.mods.wiki/w"));
+			} */
+			if (ModCharset.INDEV || Loader.isModLoaded("rustic")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("the-realest-stu/Rustic", "rustic"));
+				TabletAPI.INSTANCE.addBook("Rustic Wiki", "wiki://rustic/Home");
+			}
+			if (ModCharset.INDEV || Loader.isModLoaded("morebees")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("Tencao/MoreBees", "morebees"));
+				TabletAPI.INSTANCE.addBook("More Bees Wiki", "wiki://morebees/Home");
+			}
+			if (ModCharset.INDEV || Loader.isModLoaded("calculator")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("SonarSonic/Calculator", "calculator"));
+				TabletAPI.INSTANCE.addBook("Calculator Wiki", "wiki://calculator/Home");
+			}
+			if (ModCharset.INDEV || Loader.isModLoaded("extraalchemy")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("zabi94/ExtraAlchemyIssues", "extraalchemy"));
+				TabletAPI.INSTANCE.addBook("Extra Alchemy Wiki", "wiki://extraalchemy/Home");
+			}
+			if (ModCharset.INDEV || Loader.isModLoaded("modularrouters")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("desht/ModularRouters", "modularrouters"));
+				TabletAPI.INSTANCE.addBook("Modular Routers Wiki", "wiki://modularrouters/Home");
+			}
+/*			if (ModCharset.INDEV || Loader.isModLoaded("toughasnails")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("Glitchfiend/ToughAsNails", "toughasnails"));
+				TabletAPI.INSTANCE.addBook("Tough As Nails Wiki", "wiki://toughasnails/_Sidebar");
+			}
+			if (ModCharset.INDEV || Loader.isModLoaded("vampirism")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("TeamLapen/Vampirism", "vampirism"));
+				TabletAPI.INSTANCE.addBook("Vampirism Wiki", "wiki://vampirism/Home");
 			} */
 
 			// WIP: it's a tad ugly

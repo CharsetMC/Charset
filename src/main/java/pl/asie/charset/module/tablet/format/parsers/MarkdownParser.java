@@ -19,11 +19,23 @@
 
 package pl.asie.charset.module.tablet.format.parsers;
 
+import org.apache.commons.lang3.tuple.Pair;
+import pl.asie.charset.lib.utils.ThreeState;
+import pl.asie.charset.module.tablet.TabletUtil;
+
+import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MarkdownParser {
+public class MarkdownParser extends ParserBase {
 	public MarkdownParser() {
+		Pattern.compile("<!--(.+)-->");
+		replacers.add(Pair.of(Pattern.compile("\\[([^]]+)]\\(([^)]+)\\)", Pattern.DOTALL), this::urlHandler));
+		replace("<!--(.+)-->", Pattern.DOTALL | Pattern.MULTILINE, "");
+	}
 
+	protected String urlHandler(Matcher m) {
+		return "\\\\urlmissing{" + m.group(1) + "}";
 	}
 
 	public String parse(String text) {
@@ -49,17 +61,29 @@ public class MarkdownParser {
 			}
 
 			line = line
+					.replaceAll("\\\\", "\\\\")
 					.replaceAll("\\*\\*([^\\*]+)\\*\\*", "\\\\b{$1}")
 					.replaceAll("__([^\\*]+)__", "\\\\i{$1}")
-					.replaceAll("^\\s*\\*(\\s)", "\\\\-$1")
-					.replaceAll("^\\s*#+\\s+(.+)", "\\\\header{$1}\n")
+					.replaceAll("^(\\s*)\\*(\\s)", "$1\\\\-$2")
+					.replaceAll("^(\\s*)\\+(\\s)", "$1\\\\-$2")
+					.replaceAll("^(\\s*)-(\\s)", "$1\\\\-$2")
+					.replaceAll("^\\s*#+\\s+([^#]+)\\s*#*", "\\\\header{$1}\n")
 					.replaceAll("<([^>]+)>", "");
 
 			builder.append(line).append('\n');
 		}
 
-		String result = builder.toString().trim();
-		result = Pattern.compile("\\[([^]]+)]\\(([^)]+)\\)", Pattern.DOTALL).matcher(result).replaceAll("\\\\url{$2}{$1}");
-		return result;
+		String out = builder.toString().trim();
+		for (Pair<Pattern, Function<Matcher, String>> pair : replacers) {
+			StringBuffer result = new StringBuffer();
+			Matcher matcher = pair.getLeft().matcher(out);
+			while (matcher.find()) {
+				matcher.appendReplacement(result, pair.getRight().apply(matcher));
+			}
+			matcher.appendTail(result);
+			out = result.toString();
+		}
+
+		return out;
 	}
 }
