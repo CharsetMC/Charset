@@ -229,6 +229,7 @@ public class TweakCarryEventHandler {
                 if (transformer.insert(entity, state, tile, true)) {
                     carryHandler.empty();
                     transformer.insert(entity, state, tile, false);
+                    CharsetTweakBlockCarrying.wrapForgeData(tile.getTileData(), entity.getEntityData(), CharsetTweakBlockCarrying.KEY_FORGEDATA_WRAPPED_TILE, CharsetTweakBlockCarrying.KEY_FORGEDATA_WRAPPED_ENTITY);
                     CharsetTweakBlockCarrying.syncCarryWithAllClients(player);
                     return;
                 }

@@ -24,6 +24,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -35,6 +37,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.Mod;
@@ -62,6 +65,9 @@ import java.util.Set;
     profile = ModuleProfile.STABLE
 )
 public class CharsetTweakBlockCarrying {
+    protected static final String KEY_FORGEDATA_WRAPPED_ENTITY = "$_wrapped_entity";
+    protected static final String KEY_FORGEDATA_WRAPPED_TILE = "$_wrapped_tile";
+
     public static final ResourceLocation CAP_IDENTIFIER = new ResourceLocation("charsettweaks:carry");
 
     @CapabilityInject(CarryHandler.class)
@@ -227,6 +233,21 @@ public class CharsetTweakBlockCarrying {
         }
     }
 
+    protected static void wrapForgeData(NBTTagCompound from, NBTTagCompound to, String source, String target) {
+        if (!from.hasNoTags()) {
+            NBTTagCompound wrap = from.copy();
+
+            if (from.hasKey(target, Constants.NBT.TAG_COMPOUND)) {
+                NBTTagCompound prevWrap = from.getCompoundTag(target);
+                for (String s : prevWrap.getKeySet()) {
+                    to.setTag(s, prevWrap.getTag(s));
+                }
+            }
+
+            to.setTag(source, wrap);
+        }
+    }
+
     public static void grabEntity(EntityPlayer player, World world, Entity entity) {
         if (!(player instanceof EntityPlayerMP)) {
             packet.sendToServer(new PacketCarryGrab(world, entity));
@@ -238,6 +259,7 @@ public class CharsetTweakBlockCarrying {
                 for (ICarryTransformer<Entity> transformer : CarryTransformerRegistry.INSTANCE.getEntityTransformers()) {
                     if (transformer.extract(entity, true) != null) {
                         Pair<IBlockState, TileEntity> pair = transformer.extract(entity, false);
+                        wrapForgeData(entity.getEntityData(), pair.getRight().getTileData(), KEY_FORGEDATA_WRAPPED_ENTITY, KEY_FORGEDATA_WRAPPED_TILE);
                         carryHandler.put(pair.getLeft(), pair.getRight());
                         syncCarryWithAllClients(player);
                         return;
