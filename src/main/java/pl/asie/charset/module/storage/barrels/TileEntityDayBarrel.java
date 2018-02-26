@@ -929,7 +929,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         if (upgrades.contains(BarrelUpgrade.INFINITE)) {
-            if (player.isSneaking()) {
+            if (player.isSneaking() && player.capabilities.isCreativeMode) {
                 item = ItemStack.EMPTY;
                 onItemChange(true);
             } else {
