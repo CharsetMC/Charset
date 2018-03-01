@@ -219,7 +219,7 @@ task apiJar(type: Jar) {
 }
 
 artifacts {
-	archives apiJar, charsetJar, simplelogicJar
+	archives apiJar, simplelogicJar
 }
 
 if (file('private.gradle').exists()) {
