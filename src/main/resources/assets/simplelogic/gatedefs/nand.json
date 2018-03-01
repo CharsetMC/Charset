@@ -1,0 +1,42 @@
+{
+    "textures": {
+        "top": "simplelogic:blocks/nand/top"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "texture": "simplelogic:blocks/nand/layer_top"
+        },
+        {
+            "type": "color",
+            "texture": "simplelogic:blocks/nand/layer_left"
+        },
+        {
+            "type": "color",
+            "texture": "simplelogic:blocks/nand/layer_right"
+        },
+        {
+            "type": "color",
+            "texture": "simplelogic:blocks/nand/layer_bottom"
+        },
+        {
+            "type": "color",
+            "texture": "simplelogic:blocks/nand/layer_out"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [4, 6]
+        },
+        {
+            "pos": [8, 6]
+        },
+        {
+            "pos": [12, 6]
+        },
+        {
+            "pos": [8, 2],
+            "inverter": "north"
+        }
+    ]
+}

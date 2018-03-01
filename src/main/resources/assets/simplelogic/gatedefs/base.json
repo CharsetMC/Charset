@@ -1,0 +1,13 @@
+{
+    "models": {
+        "base": "simplelogic:block/gate_base",
+        "layer": "simplelogic:block/gate_layer",
+        "torch_off": "simplelogic:block/gate_torch_off",
+        "torch_on": "simplelogic:block/gate_torch_on"
+    },
+    "colors": {
+        "off": "381000",
+        "on": "E03502",
+        "disabled": "707070"
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "conditions": {
+    "module_loaded": "pl.asie.charset.lib.recipe.ConditionModuleLoadedFactory"
+  },
+  "recipes": {
+    "shaped": "pl.asie.charset.lib.recipe.RecipeCharset$Factory",
+    "shapeless": "pl.asie.charset.lib.recipe.RecipeCharset$Factory"
+  }
+}

@@ -1,0 +1,11 @@
+tile.simplelogic.gate.nand.name=NAND Gate
+tile.simplelogic.gate.nand.i.name=AND Gate
+tile.simplelogic.gate.nor.name=NOR Gate
+tile.simplelogic.gate.nor.i.name=OR Gate
+tile.simplelogic.gate.xor.name=XOR Gate
+tile.simplelogic.gate.xor.i.name=XNOR Gate
+tile.simplelogic.gate.buffer.name=Inverted Buffer Gate
+tile.simplelogic.gate.buffer.i.name=Buffer Gate
+tile.simplelogic.gate.pulse_former.name=Pulse Former
+tile.simplelogic.gate.multiplexer.name=Multiplexer
+tile.simplelogic.gate.rs_latch.name=RS Latch

@@ -1,0 +1,23 @@
+{
+    "textures": {
+        "top": "simplelogic:blocks/rs_latch/top"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "texture": "simplelogic:blocks/rs_latch/layer_1"
+        },
+        {
+            "type": "color",
+            "texture": "simplelogic:blocks/rs_latch/layer_2"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [5.5, 3.5]
+        },
+        {
+            "pos": [9.5, 12.5]
+        }
+    ]
+}

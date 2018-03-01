@@ -155,6 +155,25 @@ public final class RotationUtils {
 	}
 
 	@Deprecated
+	public static Vec3d rotateVec(Vec3d vec, EnumFacing facing) {
+		switch (facing) {
+			case DOWN:
+			default:
+				return vec;
+			case UP:
+				return new Vec3d(vec.x, 1 - vec.y, vec.z);
+			case NORTH:
+				return new Vec3d(vec.x, vec.z, vec.y);
+			case SOUTH:
+				return new Vec3d(vec.x, vec.z, 1 - vec.y);
+			case WEST:
+				return new Vec3d(vec.y, vec.z, vec.x);
+			case EAST:
+				return new Vec3d(1 - vec.y, vec.z, vec.x);
+		}
+	}
+
+	@Deprecated
 	public static AxisAlignedBB rotateFace(AxisAlignedBB box, EnumFacing facing) {
 		switch (facing) {
 			case DOWN:
