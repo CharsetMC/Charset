@@ -17,24 +17,19 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates.modcompat.jei;
+package pl.asie.simplelogic.gates;
 
-import mezz.jei.api.IModPlugin;
-import mezz.jei.api.ISubtypeRegistry;
-import net.minecraftforge.common.util.Constants;
-import pl.asie.charset.lib.modcompat.jei.CharsetJEIPlugin;
-import pl.asie.simplelogic.gates.SimpleLogicGates;
+import mcmultipart.api.container.IMultipartContainer;
+import mcmultipart.api.multipart.MultipartHelper;
+import mcmultipart.api.multipart.MultipartRedstoneHelper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 
-@CharsetJEIPlugin("simplelogic.gates")
-public class JEIPluginGates implements IModPlugin {
-	@Override
-	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
-		subtypeRegistry.registerSubtypeInterpreter(SimpleLogicGates.itemGate, (stack) -> {
-			if (stack.hasTagCompound() && stack.getTagCompound().hasKey("logic", Constants.NBT.TAG_STRING)) {
-				return stack.getTagCompound().getString("logic");
-			} else {
-				return "dummy";
-			}
-		});
+import java.util.Optional;
+
+public class ProxyMultipart {
+	public int getWeakPower(IBlockAccess w, BlockPos p, EnumFacing real) {
+		return -1;
 	}
 }

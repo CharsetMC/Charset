@@ -16,9 +16,9 @@ buildscript {
 	}
 }
 
+apply plugin: 'maven'
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'maven'
 apply plugin: 'net.minecrell.licenser'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -159,7 +159,12 @@ processResources {
 jar.dependsOn shadowJar
 jar.enabled = false
 
+jar {
+	classifier = "full"
+}
+
 shadowJar {
+	classifier = "full"
 	archiveName = tasks.jar.archiveName
 	configurations = [project.configurations.shadow]
 	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.module.audio.storage.libresample4j'
@@ -170,6 +175,41 @@ reobfJar {
 }
 reobfJar.dependsOn shadowJar
 
+task charsetJar(type: Jar) {
+	baseName = "Charset"
+	classifier = ""
+	from(sourceSets.main.output) {
+		include "META-INF/**"
+		include "assets/charset/**"
+		include "licenses/**"
+		include "pl/asie/charset/**"
+		include "mcmod.info"
+		include "pack.mcmeta"
+	}
+}
+
+task simplelogicJar(type: Jar) {
+	baseName = "SimpleLogic"
+	classifier = ""
+	from(sourceSets.main.output) {
+		include "META-INF/MANIFEST.MF"
+		include "assets/simplelogic/**"
+		include "licenses/**"
+		include "pl/asie/simplelogic/**"
+		include "pack.mcmeta"
+	}
+}
+
+reobf {
+	charsetJar {}
+	simplelogicJar {
+		classpath += sourceSets.main.output
+	}
+}
+
+charsetJar.dependsOn reobfJar
+simplelogicJar.dependsOn reobfJar
+
 task apiJar(type: Jar) {
 	classifier = "api"
 	from(sourceSets.main.output) {
@@ -179,7 +219,7 @@ task apiJar(type: Jar) {
 }
 
 artifacts {
-	archives apiJar
+	archives apiJar, charsetJar, simplelogicJar
 }
 
 if (file('private.gradle').exists()) {

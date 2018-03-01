@@ -117,7 +117,8 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
             TileTank tank = (TileTank) tankEntity;
             FluidStack contents = tank.getContents();
             if (contents != null) {
-                return this.blockHardness * (2.5f + (contents.amount * 5.0f / ((TileTank) tankEntity).getCapacity()));
+                // TODO: Somehow work around isToolEffective instead of this ugly hack
+                return this.blockHardness * 45.0f;
             } else {
                 return this.blockHardness;
             }

@@ -34,6 +34,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -67,6 +68,8 @@ public class SimpleLogicGates {
 	@CharsetModule.Instance(SimpleLogicGates.MODID)
 	public static SimpleLogicGates INSTANCE;
 
+	public static ProxyMultipart proxyMultipart = new ProxyMultipart();
+
 	@CharsetModule.Configuration
 	public static Configuration config;
 	@CharsetModule.PacketRegistry
@@ -97,6 +100,10 @@ public class SimpleLogicGates {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		if (Loader.isModLoaded("mcmultipart")) {
+			proxyMultipart = new ProxyMultipartPresent();
+		}
+
 		blockGate = new BlockGate();
 		itemGate = new ItemGate(blockGate);
 
@@ -152,9 +159,10 @@ public class SimpleLogicGates {
 	}
 
 	public void registerGate(ResourceLocation name, Class<? extends GateLogic> clazz, ResourceLocation gdLoc, String unl) {
-		if (!config.getBoolean(name.toString(), "gates", true,"Enable/disable gate.")) {
+		// TODO: Make this config work
+		/* if (!config.getBoolean(name.toString(), "gates", true,"Enable/disable gate.")) {
 			return;
-		}
+		} */
 
 		logicClasses.put(name, clazz);
 		logicDefinitions.put(name, gdLoc);

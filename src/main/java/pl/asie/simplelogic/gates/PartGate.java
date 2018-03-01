@@ -223,9 +223,9 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 					EnumFacing real = gateToReal(facing);
 					World w = getWorld();
 					BlockPos p = getPos().offset(real);
-					Optional<IMultipartContainer> container = MultipartHelper.getContainer(w, p);
-					if (container.isPresent()) {
-						values[i] = (byte) MultipartRedstoneHelper.getWeakPower(container.get(), real.getOpposite());
+					int mpValue = SimpleLogicGates.proxyMultipart.getWeakPower(w, p, real);
+					if (mpValue >= 0) {
+						values[i] = (byte) mpValue;
 					} else {
 						TileEntity tile = w.getTileEntity(p);
 						if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
