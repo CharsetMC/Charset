@@ -1,0 +1,37 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "simplelogic.gates"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:gate_xor",
+  "pattern": [
+    "w w",
+    "cwc",
+    "scs"
+  ],
+  "key": {
+    "w": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    },
+    "s": {
+      "type": "charset:material",
+      "material": ["stone", "slab"]
+    },
+    "c": {
+      "item": "minecraft:redstone_torch"
+    }
+  },
+  "result": {
+    "type": "minecraft:item_nbt",
+    "item": "charset:logic_gate",
+    "data": 0,
+    "count": 1,
+    "nbt": {
+      "logic": "simplelogic:xor"
+    }
+  }
+}

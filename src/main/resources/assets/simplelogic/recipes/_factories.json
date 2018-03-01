@@ -2,6 +2,9 @@
   "conditions": {
     "module_loaded": "pl.asie.charset.lib.recipe.ConditionModuleLoadedFactory"
   },
+  "ingredients": {
+    "material": "pl.asie.charset.lib.recipe.IngredientMaterial$Factory"
+  },
   "recipes": {
     "shaped": "pl.asie.charset.lib.recipe.RecipeCharset$Factory",
     "shapeless": "pl.asie.charset.lib.recipe.RecipeCharset$Factory"

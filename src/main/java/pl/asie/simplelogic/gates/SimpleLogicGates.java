@@ -118,14 +118,14 @@ public class SimpleLogicGates {
 		RegistryUtils.register(PartGate.class, "logic_gate");
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(itemGate));
 
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNOR()).setInvertedSides(0b0001)), "sts", "scs", "sss");
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNAND()).setInvertedSides(0b0001)), "wtw", "ccc", "sws");
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicXOR())), "w w", "cwc", "scs");
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNOR())), "s s", "scs", "sss");
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNAND())), "w w", "ccc", "sws");
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicXOR()).setInvertedSides(0b0001)), "wtw", "cwc", "scs");
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicMultiplexer())), "wcw", "csc", "wcw");
-		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicPulseFormer())), "wcw", "cwc", "wws");
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNOR()).setInvertedSides(0b0001)));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNAND()).setInvertedSides(0b0001)));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicXOR())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNOR())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNAND())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicXOR()).setInvertedSides(0b0001)));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicMultiplexer())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicPulseFormer())));
 //		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBuffer())));
 //		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBuffer()).setInvertedSides(0b0001)));
 //		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs"); */
@@ -140,29 +140,10 @@ public class SimpleLogicGates {
 	public void initClient(FMLInitializationEvent event) {
 	}
 
-	public void registerGateStack(ItemStack stack, Object... recipe) {
-		// TODO
-/*		if (recipe.length > 0) {
-			List<Object> data = new ArrayList<Object>();
-			for (Object o : recipe) {
-				data.add(o);
-			}
-
-			data.add('c');
-			data.add(new ItemStack(Blocks.REDSTONE_TORCH));
-			data.add('w');
-			data.add(Items.REDSTONE);
-			data.add('s');
-			data.add(new ItemStack(Blocks.STONE_SLAB));
-			GameRegistry.addRecipe(RecipeCharset.Builder.create(stack).shaped(data.toArray(new Object[data.size()])).build());
-		} */
-
-		registerGateStack(stack);
-	}
-
 	public void registerGateStack(ItemStack stack) {
-		if (stack != null && (stack.getItem() instanceof ItemGate))
+		if (stack != null && (stack.getItem() instanceof ItemGate)) {
 			gateStacks.add(stack);
+		}
 	}
 
 	private void registerGate(ResourceLocation name, Class<? extends GateLogic> clazz) {
