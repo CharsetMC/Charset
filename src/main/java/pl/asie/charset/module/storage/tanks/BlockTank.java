@@ -118,7 +118,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
             FluidStack contents = tank.getContents();
             if (contents != null) {
                 // TODO: Somehow work around isToolEffective instead of this ugly hack
-                return this.blockHardness * 45.0f;
+                return this.blockHardness * 75.0f;
             } else {
                 return this.blockHardness;
             }
@@ -140,17 +140,34 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
-        BlockPos tankPos = pos;
-        TileEntity tankEntity = worldIn.getTileEntity(tankPos);
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        // Empty the fluid if player is in creative mode so that it doesn't spill
+        if (player.isCreative()) {
+            TileEntity tankEntity = world.getTileEntity(pos);
+            if (tankEntity instanceof TileTank) {
+                TileTank tank = (TileTank) tankEntity;
+                tank.fluidStack = null;
+            }
+        }
+        return super.removedByPlayer(state, world, pos, player, willHarvest);
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity tankEntity = worldIn.getTileEntity(pos);
         if (tankEntity instanceof TileTank) {
             TileTank tank = (TileTank) tankEntity;
-            if (tank.fluidStack != null && tank.fluidStack.amount >= 1000) {
-                float chance = (float) (tank.fluidStack.amount) / (TileTank.CAPACITY / 2);
-                if (worldIn.rand.nextFloat() <= chance) {
-                    worldIn.setBlockState(pos, tank.fluidStack.getFluid().getBlock().getDefaultState());
-                }
-            }
+            tank.spillFluid();
+        }
+        super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
+        TileEntity tankEntity = worldIn.getTileEntity(pos);
+        if (tankEntity instanceof TileTank) {
+            TileTank tank = (TileTank) tankEntity;
+            tank.spillFluid();
         }
     }
 

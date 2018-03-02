@@ -34,6 +34,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -53,9 +55,7 @@ import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutomationDetecting, IFluidTankProperties, IMovable, IDebuggable, IMultiblockStructure, ICacheable {
     public static class TankIterator implements Iterator<TileTank> {
@@ -163,6 +163,64 @@ public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutoma
         TileEntity belowEntity = world.getTileEntity(below);
         if (belowEntity instanceof TileTank) {
             ((TileTank) belowEntity).getBottomTank().onStackModified();
+        }
+    }
+
+    public void spillFluid() {
+        if (fluidStack != null && fluidStack.amount >= 1000) {
+            int buckets = fluidStack.amount / 1000;
+            int maxDistSq = 4*4;
+            Set<BlockPos> posHandled = new HashSet<>();
+            Queue<BlockPos> posQueue = new LinkedList<>();
+            Queue<BlockPos> posQueueUp = new LinkedList<>();
+            posQueue.add(getPos());
+            while (buckets > 0 && !posQueue.isEmpty()) {
+                BlockPos nextPos = posQueue.remove();
+                posHandled.add(nextPos);
+
+                boolean canDisplace = nextPos.equals(getPos());
+                Fluid f = null;
+                if (!canDisplace) {
+                    IBlockState state = world.getBlockState(nextPos);
+                    f = FluidRegistry.lookupFluidForBlock(state.getBlock());
+                    if (f != null) {
+                        canDisplace = false;
+                    } else {
+                        canDisplace = state.getBlock().isReplaceable(world, nextPos);
+                    }
+                }
+
+                if (canDisplace) {
+                    IBlockState fState = fluidStack.getFluid().getBlock().getDefaultState();
+                    world.setBlockState(nextPos, fState);
+                    buckets--;
+                    f = fluidStack.getFluid();
+                }
+
+                for (EnumFacing facing : EnumFacing.VALUES) {
+                    if (f == fluidStack.getFluid() || facing != EnumFacing.UP) {
+                        BlockPos nPos = nextPos.offset(facing);
+                        if (!posHandled.contains(nPos) && (nPos.distanceSq(getPos()) <= maxDistSq)) {
+                            if (facing == EnumFacing.UP) {
+                                posQueueUp.add(nPos);
+                            } else {
+                                posQueue.add(nPos);
+                            }
+                        }
+                    }
+                }
+
+                if (posQueue.isEmpty() && !posQueueUp.isEmpty()) {
+                    posQueue.add(posQueueUp.remove());
+                }
+            }
+
+            for (BlockPos pos : posHandled) {
+                IBlockState state =  world.getBlockState(pos);
+                if (FluidRegistry.lookupFluidForBlock(state.getBlock()) != null) {
+                    world.scheduleUpdate(pos, state.getBlock(), 1);
+                }
+            }
         }
     }
 
