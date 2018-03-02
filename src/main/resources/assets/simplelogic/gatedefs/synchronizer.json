@@ -1,0 +1,50 @@
+{
+    "models": {
+        "redstone_blob_on": "simplelogic:block/gate_redstone_blob_on",
+        "redstone_blob_off": "simplelogic:block/gate_redstone_blob_off"
+    },
+    "textures": {
+        "top": "simplelogic:blocks/synchronizer/top"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "color_mask": "0000FF"
+        },
+        {
+            "type": "color",
+            "color_mask": "00FF00"
+        },
+        {
+            "type": "color",
+            "color_mask": "00FFFF"
+        },
+        {
+            "type": "color",
+            "color_mask": "FF8000"
+        },
+        {
+            "type": "color",
+            "color_mask": "FFFF00"
+        },
+        {
+            "type": "color",
+            "color_mask": "FF0000"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [5, 9],
+            "model_on": "redstone_blob_on",
+            "model_off": "redstone_blob_off"
+        },
+        {
+            "pos": [10, 9],
+            "model_on": "redstone_blob_on",
+            "model_off": "redstone_blob_off"
+        },
+        {
+            "pos": [7, 4]
+        }
+    ]
+}

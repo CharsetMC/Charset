@@ -130,6 +130,7 @@ public class SimpleLogicGates {
 		registerGate(new ResourceLocation("simplelogic:buffer"), GateLogicBuffer.class);
 		registerGate(new ResourceLocation("simplelogic:rs_latch"), GateLogicRSLatch.class);
 		registerGate(new ResourceLocation("simplelogic:randomizer"), GateLogicRandomizer.class);
+		registerGate(new ResourceLocation("simplelogic:synchronizer"), GateLogicSynchronizer.class);
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		if (config.hasChanged()) {
@@ -154,6 +155,7 @@ public class SimpleLogicGates {
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBuffer()).setInvertedSides(0b0001)));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRSLatch())));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRandomizer())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicSynchronizer())));
 
 		if (config.hasChanged()) {
 			config.save();
