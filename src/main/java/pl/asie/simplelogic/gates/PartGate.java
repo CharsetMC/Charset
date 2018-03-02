@@ -78,7 +78,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		@Override
 		public int getRedstoneSignal() {
 			GateLogic.Connection type = logic.getType(side);
-			return type.isOutput() && type.isRedstone() ? logic.getValueOutside(side) : 0;
+			return type.isOutput() && type.isRedstone() ? logic.getOutputValueOutside(side) : 0;
 		}
 
 		@Override
@@ -189,8 +189,9 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		if (getWorld() != null && !getWorld().isRemote && pendingTick > 0) {
 			pendingTick--;
 			if (pendingTick == 0) {
-				if (tick()) {
+				if (tick() || pendingChange) {
 					propagateOutputs();
+					pendingChange = false;
 				}
 			}
 		}
@@ -205,20 +206,18 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		markBlockForUpdate();
 	}
 
-	public boolean updateInputs() {
+	public boolean updateInputs(byte[] values) {
 		byte[] oldValues = new byte[4];
-		byte[] values = logic.getValues();
 
-		boolean changed = pendingChange;
+		boolean changed = false;
 		System.arraycopy(values, 0, oldValues, 0, 4);
-		pendingChange = false;
 
 		for (int i = 0; i <= 3; i++) {
 			EnumFacing facing = EnumFacing.getFront(i + 2);
 			GateLogic.Connection conn = logic.getType(facing);
-			if (conn.isInput() && conn.isRedstone()) {
-				values[i] = 0;
+			values[i] = 0;
 
+			if (conn.isInput() && conn.isRedstone()) {
 				if (logic.isSideOpen(facing)) {
 					EnumFacing real = gateToReal(facing);
 					World w = getWorld();
@@ -261,7 +260,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	}
 
 	public boolean getInverterState(EnumFacing facing) {
-		byte value = logic.getType(facing).isInput() ? logic.getValueOutside(facing) : logic.getValueInside(facing);
+		byte value = logic.getType(facing).isInput() ? logic.getInputValueOutside(facing) : logic.getOutputValueInside(facing);
 		return value == 0;
 	}
 
@@ -279,6 +278,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	public void validate() {
 		super.validate();
 		pendingTick = 1;
+		pendingChange = true;
 	}
 
 	public void onNeighborBlockChange(Block block) {
@@ -408,7 +408,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	public int getWeakSignal(EnumFacing facing) {
 		EnumFacing dir = realToGate(facing);
 		if (dir != null && logic.getType(dir).isOutput() && logic.getType(dir).isRedstone() && logic.isSideOpen(dir)) {
-			return logic.getValueOutside(dir);
+			return logic.getOutputValueOutside(dir);
 		} else {
 			return 0;
 		}
@@ -426,7 +426,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	public NBTTagCompound writeNBTData(NBTTagCompound tag, boolean isClient) {
 		if (!(logic instanceof GateLogicDummy)) {
 			tag.setString("logic", SimpleLogicGates.logicClasses.inverse().get(logic.getClass()).toString());
-			tag = logic.writeToNBT(tag);
+			tag = logic.writeToNBT(tag, isClient);
 		}
 		tag.setBoolean("m", mirrored);
 		tag.setByte("o", (byte) orientation.ordinal());
@@ -441,7 +441,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		if (tag.hasKey("logic", Constants.NBT.TAG_STRING)) {
 			logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
 		}
-		logic.readFromNBT(tag);
+		logic.readFromNBT(tag, false);
 	}
 
 	public NBTTagCompound writeItemNBT(NBTTagCompound tag, boolean silky) {
@@ -458,16 +458,16 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		if (tag.hasKey("logic", Constants.NBT.TAG_STRING)) {
 			logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
 		}
-		logic.readFromNBT(tag);
+		logic.readFromNBT(tag, isClient);
 		if (tag.hasKey("m")) {
 			mirrored = tag.getBoolean("m");
 		}
-
 		if (tag.hasKey("p")) {
 			pendingTick = tag.getByte("p");
 			pendingChange = tag.getBoolean("pch");
 		}
 		orientation = Orientation.getOrientation(tag.getByte("o"));
+
 		if (isClient) {
 			markBlockForRenderUpdate();
 		}
@@ -545,7 +545,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	}
 
 	private int getUniqueSideRenderID(EnumFacing side) {
-		return (logic.isSideInverted(side) ? 16 : 0) | (logic.isSideOpen(side) ? 32 : 0) | logic.getValueInside(side);
+		return (logic.isSideInverted(side) ? 16 : 0) | (logic.isSideOpen(side) ? 32 : 0) | (logic.getInputValueInside(side) << 6) | logic.getOutputValueInside(side);
 	}
 
 	@Override
@@ -571,5 +571,10 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	public int renderHashCode() {
 		return Objects.hash(logic.getClass(), this.orientation, this.mirrored,
 				getUniqueSideRenderID(EnumFacing.NORTH), getUniqueSideRenderID(EnumFacing.SOUTH), getUniqueSideRenderID(EnumFacing.WEST), getUniqueSideRenderID(EnumFacing.EAST));
+	}
+
+	@Override
+	public boolean hasFastRenderer() {
+		return true;
 	}
 }

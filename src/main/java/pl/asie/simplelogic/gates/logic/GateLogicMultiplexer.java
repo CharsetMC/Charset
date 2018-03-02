@@ -29,48 +29,48 @@ public class GateLogicMultiplexer extends GateLogic {
 
 	@Override
 	public State getLayerState(int id) {
-		boolean isWest = getValueInside(EnumFacing.SOUTH) != 0;
-		boolean westOn = getValueInside(EnumFacing.WEST) != 0;
-		boolean eastOn = getValueInside(EnumFacing.EAST) != 0;
+		boolean isWest = getInputValueInside(EnumFacing.SOUTH) != 0;
+		boolean westOn = getInputValueInside(EnumFacing.WEST) != 0;
+		boolean eastOn = getInputValueInside(EnumFacing.EAST) != 0;
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.SOUTH));
+				return State.input(getInputValueInside(EnumFacing.SOUTH));
 			case 1:
-				return State.input(getValueInside(EnumFacing.WEST));
+				return State.input(getInputValueInside(EnumFacing.WEST));
 			case 2:
-				return State.input(getValueInside(EnumFacing.EAST));
+				return State.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
 				return State.bool(isWest && !westOn);
 			case 4:
 				return State.bool(!isWest && !eastOn);
 			case 5:
-				return State.input(getValueInside(EnumFacing.SOUTH)).invert();
+				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 		}
 		return State.OFF;
 	}
 
 	@Override
 	public State getTorchState(int id) {
-		boolean isWest = getValueInside(EnumFacing.SOUTH) != 0;
-		boolean westOn = getValueInside(EnumFacing.WEST) != 0;
-		boolean eastOn = getValueInside(EnumFacing.EAST) != 0;
+		boolean isWest = getInputValueInside(EnumFacing.SOUTH) != 0;
+		boolean westOn = getInputValueInside(EnumFacing.WEST) != 0;
+		boolean eastOn = getInputValueInside(EnumFacing.EAST) != 0;
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.SOUTH)).invert();
+				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 			case 1:
 				return (!isWest || westOn) ? State.OFF : State.ON;
 			case 2:
 				return (isWest || eastOn) ? State.OFF : State.ON;
 			case 3:
-				return State.input(getValueOutside(EnumFacing.SOUTH)).invert();
+				return State.input(getInputValueOutside(EnumFacing.SOUTH)).invert();
 		}
 		return State.ON;
 	}
 
 	@Override
 	protected byte calculateOutputInside(EnumFacing side) {
-		boolean isWest = getValueInside(EnumFacing.SOUTH) != 0;
-		return isWest ? getValueInside(EnumFacing.WEST) : getValueInside(EnumFacing.EAST);
+		boolean isWest = getInputValueInside(EnumFacing.SOUTH) != 0;
+		return isWest ? getInputValueInside(EnumFacing.WEST) : getInputValueInside(EnumFacing.EAST);
 	}
 
 	@Override

@@ -27,6 +27,8 @@ import java.util.Set;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -34,6 +36,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -52,6 +55,7 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.simplelogic.gates.render.FastTESRGate;
 
 @CharsetModule(
 		name = "simplelogic.gates",
@@ -67,6 +71,17 @@ public class SimpleLogicGates {
 	public static ProxyCommon proxy;
 	@CharsetModule.Instance(SimpleLogicGates.MODID)
 	public static SimpleLogicGates INSTANCE;
+
+	public static CreativeTabs simpleLogicTab = new CreativeTabs("simplelogic") {
+		@Override
+		public ItemStack getTabIconItem() {
+			if (gateStacks.size() > 0) {
+				return gateStacks.iterator().next();
+			} else {
+				return new ItemStack(Items.REDSTONE);
+			}
+		}
+	};
 
 	public static ProxyMultipart proxyMultipart = new ProxyMultipart();
 
@@ -90,12 +105,12 @@ public class SimpleLogicGates {
 
 	@SubscribeEvent
 	public void onRegisterBlock(RegistryEvent.Register<Block> event) {
-		RegistryUtils.register(event.getRegistry(), blockGate, "logic_gate");
+		RegistryUtils.register(event.getRegistry(), blockGate, "logic_gate", simpleLogicTab);
 	}
 
 	@SubscribeEvent
 	public void onRegisterItem(RegistryEvent.Register<Item> event) {
-		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate");
+		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate", simpleLogicTab);
 	}
 
 	@EventHandler
@@ -111,8 +126,9 @@ public class SimpleLogicGates {
 		registerGate(new ResourceLocation("simplelogic:nor"), GateLogicNOR.class);
 		registerGate(new ResourceLocation("simplelogic:xor"), GateLogicXOR.class);
 		registerGate(new ResourceLocation("simplelogic:multiplexer"), GateLogicMultiplexer.class);
-		registerGate(new ResourceLocation("simplelogic:buffer"), GateLogicBuffer.class);
 		registerGate(new ResourceLocation("simplelogic:pulse_former"), GateLogicPulseFormer.class);
+		registerGate(new ResourceLocation("simplelogic:buffer"), GateLogicBuffer.class);
+		registerGate(new ResourceLocation("simplelogic:rs_latch"), GateLogicRSLatch.class);
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		if (config.hasChanged()) {
@@ -133,9 +149,9 @@ public class SimpleLogicGates {
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicXOR()).setInvertedSides(0b0001)));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicMultiplexer())));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicPulseFormer())));
-//		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBuffer())));
-//		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBuffer()).setInvertedSides(0b0001)));
-//		registerGateStack(ItemGate.getStack(new PartGateRSLatch()), "scs", "wsw", "scs"); */
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBuffer())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBuffer()).setInvertedSides(0b0001)));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRSLatch())));
 
 		if (config.hasChanged()) {
 			config.save();
@@ -145,6 +161,7 @@ public class SimpleLogicGates {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
+		ClientRegistry.bindTileEntitySpecialRenderer(PartGate.class, new FastTESRGate());
 	}
 
 	public void registerGateStack(ItemStack stack) {

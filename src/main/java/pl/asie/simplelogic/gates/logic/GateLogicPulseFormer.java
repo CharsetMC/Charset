@@ -38,27 +38,27 @@ public class GateLogicPulseFormer extends GateLogic {
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
+	public NBTTagCompound writeToNBT(NBTTagCompound tag, boolean isClient) {
+		tag = super.writeToNBT(tag, isClient);
 		tag.setByte("pl", pulse);
 		return tag;
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound tag) {
+	public void readFromNBT(NBTTagCompound tag, boolean isClient) {
 		pulse = tag.getByte("pl");
-		super.readFromNBT(tag);
+		super.readFromNBT(tag, isClient);
 	}
 
 	public void onChanged(PartGate parent) {
 		if (pulse == 0) {
-			boolean changed = parent.updateInputs();
+			boolean changed = parent.updateInputs(inputValues);
 			if (changed) {
-				pulse = getValueInside(EnumFacing.SOUTH);
+				pulse = getInputValueInside(EnumFacing.SOUTH);
 				if (pulse != 0) {
 					parent.scheduleTick();
 				}
-				parent.updateInputs();
+				parent.updateInputs(inputValues);
 				parent.propagateOutputs();
 			}
 		}
@@ -85,17 +85,17 @@ public class GateLogicPulseFormer extends GateLogic {
 
 	@Override
 	public State getLayerState(int id) {
-		boolean hasSignal = getValueInside(EnumFacing.SOUTH) != 0;
+		boolean hasSignal = getInputValueInside(EnumFacing.SOUTH) != 0;
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.SOUTH));
+				return State.input(getInputValueInside(EnumFacing.SOUTH));
 			case 1:
 			case 2:
 				return State.bool(!hasSignal);
 			case 3:
 				return State.bool(hasSignal);
 			case 4:
-				return State.input(getValueOutside(EnumFacing.NORTH));
+				return State.input(getOutputValueOutside(EnumFacing.NORTH));
 		}
 		return State.OFF;
 	}
@@ -104,11 +104,11 @@ public class GateLogicPulseFormer extends GateLogic {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.SOUTH)).invert();
+				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 			case 1:
-				return State.input(getValueInside(EnumFacing.SOUTH));
+				return State.input(getInputValueInside(EnumFacing.SOUTH));
 			case 2:
-				return State.input(getValueInside(EnumFacing.NORTH)).invert();
+				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 		}
 		return State.ON;
 	}

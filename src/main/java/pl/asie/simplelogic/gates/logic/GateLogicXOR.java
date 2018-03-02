@@ -35,13 +35,13 @@ public class GateLogicXOR extends GateLogic {
 	public State getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.NORTH));
+				return State.input(getOutputValueInside(EnumFacing.NORTH));
 			case 1:
-				return State.input(getValueInside(EnumFacing.WEST));
+				return State.input(getInputValueInside(EnumFacing.WEST));
 			case 2:
-				return State.input(getValueInside(EnumFacing.EAST));
+				return State.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
-				return State.bool(getValueInside(EnumFacing.WEST) == 0 && getValueInside(EnumFacing.EAST) == 0);
+				return State.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0);
 		}
 		return State.OFF;
 	}
@@ -50,11 +50,11 @@ public class GateLogicXOR extends GateLogic {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.WEST)).invert();
+				return State.input(getInputValueInside(EnumFacing.WEST)).invert();
 			case 1:
-				return State.input(getValueInside(EnumFacing.EAST)).invert();
+				return State.input(getInputValueInside(EnumFacing.EAST)).invert();
 			case 2:
-				return State.bool(getValueInside(EnumFacing.WEST) == 0 && getValueInside(EnumFacing.EAST) == 0).invert();
+				return State.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0).invert();
 		}
 		return State.ON;
 	}
@@ -62,7 +62,7 @@ public class GateLogicXOR extends GateLogic {
 	@Override
 	public byte calculateOutputInside(EnumFacing facing) {
 		if (facing == EnumFacing.NORTH) {
-			return digiToRs(rsToDigi(getValueInside(EnumFacing.WEST)) ^ rsToDigi(getValueInside(EnumFacing.EAST)));
+			return digiToRs(rsToDigi(getInputValueInside(EnumFacing.WEST)) ^ rsToDigi(getInputValueInside(EnumFacing.EAST)));
 		} else {
 			return 0;
 		}

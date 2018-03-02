@@ -44,16 +44,16 @@ public class GateLogicBuffer extends GateLogic {
 				if (!isSideOpen(EnumFacing.WEST)) {
 					return State.DISABLED;
 				}
-				return State.input(getValueInside(EnumFacing.WEST));
+				return State.input(getOutputValueInside(EnumFacing.WEST));
 			case 1:
 				if (!isSideOpen(EnumFacing.EAST)) {
 					return State.DISABLED;
 				}
-				return State.input(getValueInside(EnumFacing.EAST));
+				return State.input(getOutputValueInside(EnumFacing.EAST));
 			case 2:
-				return State.input(getValueInside(EnumFacing.NORTH)).invert();
+				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 			case 3:
-				return State.input(getValueInside(EnumFacing.NORTH));
+				return State.input(getOutputValueInside(EnumFacing.NORTH));
 		}
 		return State.OFF;
 	}
@@ -62,9 +62,9 @@ public class GateLogicBuffer extends GateLogic {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.NORTH));
+				return State.input(getOutputValueInside(EnumFacing.NORTH));
 			case 1:
-				return State.input(getValueInside(EnumFacing.NORTH)).invert();
+				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 		}
 		return State.ON;
 	}
@@ -73,13 +73,13 @@ public class GateLogicBuffer extends GateLogic {
 	protected byte calculateOutputInside(EnumFacing side) {
 		switch (side) {
 			case NORTH:
-				return getValueInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
+				return getInputValueInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
 			case WEST:
 			case EAST:
 				if (isSideInverted(EnumFacing.NORTH)) {
-					return getValueInside(EnumFacing.SOUTH);
+					return getInputValueInside(EnumFacing.SOUTH);
 				} else {
-					return getValueInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
+					return getInputValueInside(EnumFacing.SOUTH) > 0 ? 0 : (byte) 15;
 				}
 			default:
 				return 0;

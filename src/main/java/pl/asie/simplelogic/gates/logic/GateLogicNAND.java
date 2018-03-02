@@ -26,24 +26,24 @@ public class GateLogicNAND extends GateLogic {
 	public State getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.NORTH));
+				return State.input(getOutputValueInside(EnumFacing.NORTH));
 			case 1:
 				if (!isSideOpen(EnumFacing.WEST)) {
 					return State.DISABLED;
 				}
-				return State.input(getValueInside(EnumFacing.WEST));
+				return State.input(getInputValueInside(EnumFacing.WEST));
 			case 2:
 				if (!isSideOpen(EnumFacing.EAST)) {
 					return State.DISABLED;
 				}
-				return State.input(getValueInside(EnumFacing.EAST));
+				return State.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
 				if (!isSideOpen(EnumFacing.SOUTH)) {
 					return State.DISABLED;
 				}
-				return State.input(getValueInside(EnumFacing.SOUTH));
+				return State.input(getInputValueInside(EnumFacing.SOUTH));
 			case 4:
-				return State.input(getValueOutside(EnumFacing.NORTH));
+				return State.input(getOutputValueOutside(EnumFacing.NORTH));
 		}
 		return State.OFF;
 	}
@@ -52,13 +52,13 @@ public class GateLogicNAND extends GateLogic {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getValueInside(EnumFacing.WEST)).invert();
+				return State.input(getInputValueInside(EnumFacing.WEST)).invert();
 			case 1:
-				return State.input(getValueInside(EnumFacing.SOUTH)).invert();
+				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 			case 2:
-				return State.input(getValueInside(EnumFacing.EAST)).invert();
+				return State.input(getInputValueInside(EnumFacing.EAST)).invert();
 			case 3:
-				return State.input(getValueInside(EnumFacing.NORTH)).invert();
+				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 		}
 		return State.ON;
 	}
@@ -68,7 +68,7 @@ public class GateLogicNAND extends GateLogic {
 		if (side == EnumFacing.NORTH) {
 			for (EnumFacing facing : EnumFacing.HORIZONTALS) {
 				if (isSideOpen(facing) && facing != EnumFacing.NORTH) {
-					if (getValueInside(facing) == 0) {
+					if (getInputValueInside(facing) == 0) {
 						return 15;
 					}
 				}

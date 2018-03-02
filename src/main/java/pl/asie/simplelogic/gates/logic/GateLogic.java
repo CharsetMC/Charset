@@ -87,16 +87,18 @@ public abstract class GateLogic {
 	}
 	
 	public byte enabledSides, invertedSides;
-	private byte[] values = new byte[4];
+	protected byte[] inputValues = new byte[4];
+	protected byte[] outputValues = new byte[4];
 
 	public GateLogic() {
 		enabledSides = getSideMask();
 	}
 
-	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(NBTTagCompound tag, boolean isClient) {
 		tag.setByte("le", enabledSides);
 		tag.setByte("li", invertedSides);
-		tag.setByteArray("lv", values);
+		tag.setByteArray("lvi", inputValues);
+		tag.setByteArray("lvo", outputValues);
 		return tag;
 	}
 
@@ -108,40 +110,60 @@ public abstract class GateLogic {
 		return tag;
 	}
 
-	public void readFromNBT(NBTTagCompound compound) {
-		if (compound.hasKey("lv", Constants.NBT.TAG_BYTE_ARRAY)) {
-			values = compound.getByteArray("lv");
-		}
-		if (values == null || values.length != 4) {
-			values = new byte[4];
-		}
-
+	public void readFromNBT(NBTTagCompound compound, boolean isClient) {
 		if (compound.hasKey("le", Constants.NBT.TAG_ANY_NUMERIC)) {
 			enabledSides = compound.getByte("le");
 		}
 		if (compound.hasKey("li", Constants.NBT.TAG_ANY_NUMERIC)) {
 			invertedSides = compound.getByte("li");
 		}
-	}
 
-	public byte[] getValues() {
-		return values;
+		if (compound.hasKey("lvi", Constants.NBT.TAG_BYTE_ARRAY)) {
+			inputValues = compound.getByteArray("lvi");
+		}
+		if (compound.hasKey("lvo", Constants.NBT.TAG_BYTE_ARRAY)) {
+			outputValues = compound.getByteArray("lvo");
+		}
+
+		if (inputValues == null || inputValues.length != 4) {
+			inputValues = new byte[4];
+		}
+		if (outputValues == null || outputValues.length != 4) {
+			outputValues = new byte[4];
+		}
+
+		if (compound.hasKey("lv", Constants.NBT.TAG_BYTE_ARRAY)) {
+			// Compat code
+			byte[] values = compound.getByteArray("lv");
+			for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+				Connection c = getType(facing);
+				if (c.isOutput()) {
+					inputValues[facing.ordinal() - 2] = 0;
+					outputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
+				} else {
+					inputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
+					outputValues[facing.ordinal() - 2] = 0;
+				}
+			}
+		}
 	}
 
 	public boolean updateOutputs() {
 		byte[] oldValues = new byte[4];
 		boolean changed = false;
 
-		System.arraycopy(values, 0, oldValues, 0, 4);
+		System.arraycopy(outputValues, 0, oldValues, 0, 4);
 
 		for (int i = 0; i <= 3; i++) {
 			EnumFacing facing = EnumFacing.getFront(i + 2);
 			GateLogic.Connection conn = getType(facing);
 			if (conn.isOutput() && conn.isRedstone()) {
-				values[i] = calculateOutputInside(facing);
+				outputValues[i] = calculateOutputInside(facing);
+			} else {
+				outputValues[i] = 0;
 			}
 
-			if (values[i] != oldValues[i]) {
+			if (outputValues[i] != oldValues[i]) {
 				changed = true;
 			}
 		}
@@ -185,15 +207,27 @@ public abstract class GateLogic {
 		return (invertedSides & (1 << (side.ordinal() - 2))) != 0;
 	}
 
-	public final byte getValueInside(EnumFacing side) {
-		return values[side.ordinal() - 2];
+	public final byte getInputValueOutside(EnumFacing side) {
+		if (isSideInverted(side) && isSideOpen(side)) {
+			return inputValues[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
+		} else {
+			return inputValues[side.ordinal() - 2];
+		}
 	}
 
-	public final byte getValueOutside(EnumFacing side) {
+	public final byte getInputValueInside(EnumFacing side) {
+		return inputValues[side.ordinal() - 2];
+	}
+
+	public final byte getOutputValueInside(EnumFacing side) {
+		return outputValues[side.ordinal() - 2];
+	}
+
+	public final byte getOutputValueOutside(EnumFacing side) {
 		if (isSideInverted(side) && isSideOpen(side)) {
-			return values[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
+			return outputValues[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
 		} else {
-			return values[side.ordinal() - 2];
+			return outputValues[side.ordinal() - 2];
 		}
 	}
 
@@ -202,7 +236,7 @@ public abstract class GateLogic {
 	}
 
 	public boolean tick(PartGate parent) {
-		return parent.updateInputs();
+		return parent.updateInputs(inputValues);
 	}
 
 	// Utility methods

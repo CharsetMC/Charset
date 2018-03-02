@@ -1,3 +1,5 @@
+itemGroup.simplelogic=SimpleLogic
+
 tile.simplelogic.gate.nand.name=NAND Gate
 tile.simplelogic.gate.nand.i.name=AND Gate
 tile.simplelogic.gate.nor.name=NOR Gate
