@@ -187,7 +187,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 			}
 
 			result.addModel(
-					definition.getModel(state == GateLogic.State.ON ? "torch_on" : "torch_off")
+					definition.getModel(state == GateLogic.State.ON ? (torch.model_on == null ? "torch_on" : torch.model_on) : (torch.model_off == null ? "torch_off" : torch.model_off))
 							.bake(new ModelStateComposition(
 									transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f, 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter())
 			);
@@ -208,6 +208,8 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 	@Override
 	public PartGate fromItemStack(ItemStack stack) {
-		return ItemGate.getPartGate(stack);
+		PartGate g = ItemGate.getPartGate(stack);
+		g.logic.updateOutputs();
+		return g;
 	}
 }

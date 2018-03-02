@@ -83,6 +83,15 @@ public class GateRenderDefinitions {
 			}
 		}
 
+		public void postInit() {
+			for (Layer layer : layers) {
+				if (layer.texture == null && layer.color_mask != null) {
+					layer.texture = textures.get("top");
+				}
+				layer.textureBase = layer.texture;
+			}
+		}
+
 		public IModel getModel(String name) {
 			if (modelObjs.containsKey(name)) {
 				return modelObjs.get(name);
@@ -122,13 +131,14 @@ public class GateRenderDefinitions {
 	}
 
 	public class Layer {
-		public String type, texture;
+		public String type, texture, textureBase, color_mask;
 		public Map<String, String> textures;
 		public int height = 0;
 	}
 
 	public class Torch {
 		public final float[] pos = new float[2];
+		public String model_on, model_off;
 		public String inverter;
 	}
 
@@ -160,6 +170,7 @@ public class GateRenderDefinitions {
 					), Definition.class);
 					def.init();
 					def.merge(base);
+					def.postInit();
 					definitionMap.put(s, def);
 				} catch (IOException e) {
 					e.printStackTrace();

@@ -41,10 +41,13 @@ public class GateLogicRSLatch extends GateLogic {
 				toggled = true;
 				break;
 			case 3:
-				burnt = true;
-				BlockPos pos = parent.getPos();
-				parent.getWorld().playSound(pos.getX() + 0.5F, pos.getY() + 0.1F, pos.getZ() + 0.5F,
-						new SoundEvent(new ResourceLocation("random.fizz")), SoundCategory.BLOCKS, 0.5F, 2.6F + (parent.getWorld().rand.nextFloat() - parent.getWorld().rand.nextFloat()) * 0.8F, true);
+				//burnt = true;
+				//BlockPos pos = parent.getPos();
+				//parent.getWorld().playSound(pos.getX() + 0.5F, pos.getY() + 0.1F, pos.getZ() + 0.5F,
+				//		new SoundEvent(new ResourceLocation("random.fizz")), SoundCategory.BLOCKS, 0.5F, 2.6F + (parent.getWorld().rand.nextFloat() - parent.getWorld().rand.nextFloat()) * 0.8F, true);
+
+				// haha, JK
+				toggled = !toggled;
 				break;
 		}
 

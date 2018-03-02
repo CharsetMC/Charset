@@ -5,19 +5,19 @@
     "layers": [
         {
             "type": "color",
-            "texture": "simplelogic:blocks/xor/layer_top"
+            "color_mask": "FF0000"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/xor/layer_left"
+            "color_mask": "00FF00"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/xor/layer_right"
+            "color_mask": "0000FF"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/xor/layer_middle"
+            "color_mask": "00FFFF"
         }
     ],
     "torches": [

@@ -5,11 +5,11 @@
     "layers": [
         {
             "type": "color",
-            "texture": "simplelogic:blocks/rs_latch/layer_1"
+            "color_mask": "FF0000"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/rs_latch/layer_2"
+            "color_mask": "0000FF"
         }
     ],
     "torches": [

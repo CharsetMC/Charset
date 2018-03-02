@@ -1,0 +1,6 @@
+{
+    "parent": "simplelogic:block/gate_randomizer",
+    "textures": {
+        "glowstone": "simplelogic:blocks/randomizer/glowstone_off"
+    }
+}

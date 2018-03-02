@@ -1,0 +1,44 @@
+{
+    "models": {
+        "randomizer_on": "simplelogic:block/gate_randomizer_on",
+        "randomizer_off": "simplelogic:block/gate_randomizer_off"
+    },
+    "textures": {
+        "top": "simplelogic:blocks/randomizer/top"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "color_mask": "0000FF"
+        },
+        {
+            "type": "color",
+            "color_mask": "FF0000"
+        },
+        {
+            "type": "color",
+            "color_mask": "FFFF00"
+        },
+        {
+            "type": "color",
+            "color_mask": "00FF00"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [3, 7],
+            "model_on": "randomizer_on",
+            "model_off": "randomizer_off"
+        },
+        {
+            "pos": [7, 3],
+            "model_on": "randomizer_on",
+            "model_off": "randomizer_off"
+        },
+        {
+            "pos": [12, 7],
+            "model_on": "randomizer_on",
+            "model_off": "randomizer_off"
+        }
+    ]
+}

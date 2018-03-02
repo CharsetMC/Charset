@@ -10,4 +10,5 @@ tile.simplelogic.gate.buffer.name=Inverted Buffer Gate
 tile.simplelogic.gate.buffer.i.name=Buffer Gate
 tile.simplelogic.gate.pulse_former.name=Pulse Former
 tile.simplelogic.gate.multiplexer.name=Multiplexer
-tile.simplelogic.gate.rs_latch.name=RS Latch
+tile.simplelogic.gate.rs_latch.name=Set-Reset Latch
+tile.simplelogic.gate.randomizer.name=Randomizer

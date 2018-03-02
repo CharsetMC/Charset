@@ -256,7 +256,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 			}
 		}
 
-		return logic.updateOutputs() || changed;
+		return changed;
 	}
 
 	public boolean getInverterState(EnumFacing facing) {

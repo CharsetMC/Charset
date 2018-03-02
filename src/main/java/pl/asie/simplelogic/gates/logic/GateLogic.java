@@ -236,7 +236,7 @@ public abstract class GateLogic {
 	}
 
 	public boolean tick(PartGate parent) {
-		return parent.updateInputs(inputValues);
+		return parent.updateInputs(inputValues) || updateOutputs();
 	}
 
 	// Utility methods

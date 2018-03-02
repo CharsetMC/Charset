@@ -80,6 +80,9 @@ public class CharsetTablet {
 		TabletAPI.INSTANCE.registerRouter(new RouterIndex());
 		TabletAPI.INSTANCE.registerRouter(new RouterSearch());
 		TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("charset", "Book of Charset"));
+		if (Loader.isModLoaded("simplelogic")) {
+			TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("simplelogic", "The Rules of SimpleLogic"));
+		}
 
 		TabletAPI.INSTANCE.registerCommand("\\", spaceCommand);
 		TabletAPI.INSTANCE.registerCommand("\\ ", spaceCommand);

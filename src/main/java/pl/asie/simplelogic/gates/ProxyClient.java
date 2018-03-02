@@ -19,9 +19,13 @@
 
 package pl.asie.simplelogic.gates;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
@@ -33,13 +37,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.simplelogic.gates.render.GateRenderDefinitions;
 import pl.asie.simplelogic.gates.render.RendererGate;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 public class ProxyClient extends ProxyCommon {
-	private final Set<ResourceLocation> textures = new HashSet<ResourceLocation>();
-
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onModelRegister(ModelRegistryEvent event) {
@@ -56,24 +59,59 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		textures.clear();
-
 		GateRenderDefinitions.INSTANCE.load("simplelogic:gatedefs/base.json", SimpleLogicGates.logicDefinitions);
 
-		for (ResourceLocation rs : SimpleLogicGates.logicUns.keySet()) {
+		for (ResourceLocation rs : SimpleLogicGates.logicClasses.keySet()) {
+			Set<ResourceLocation> textures = new HashSet<>();
+			Map<String, TIntObjectMap<String>> colorMasks = new HashMap<>();
+
+			// step 1: gather colormasks
+			int i = 0;
+			for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(rs).layers) {
+				if (layer.color_mask != null) {
+					layer.texture = rs.getResourceDomain() + ":blocks/" + rs.getResourcePath() + "/layer_" + i;
+					colorMasks.computeIfAbsent(layer.textureBase, (k) -> new TIntObjectHashMap<>())
+						.put(Integer.parseInt(layer.color_mask, 16), layer.texture);
+				}
+				i++;
+			}
+
+			// step 2: gather textures
 			GateRenderDefinitions.Definition def = GateRenderDefinitions.INSTANCE.getGateDefinition(rs);
 			for (IModel model : def.getAllModels()) {
 				textures.addAll(model.getTextures());
 			}
+
 			for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(rs).layers) {
 				if (layer.texture != null) {
-					event.getMap().registerSprite(new ResourceLocation(layer.texture));
+					textures.add(new ResourceLocation(layer.texture));
 				}
 			}
-		}
 
-		for (ResourceLocation r : textures) {
-			event.getMap().registerSprite(r);
+			// step 3: add colormasked textures
+			for (String baseTexture : colorMasks.keySet()) {
+				TIntObjectMap<String> resultingTextures = colorMasks.get(baseTexture);
+				resultingTextures.forEachEntry((color, resultingTexture) -> {
+					event.getMap().setTextureEntry(new PixelOperationSprite(resultingTexture, new ResourceLocation(baseTexture),
+							((getter, x, y, value) -> (value & 0xFFFFFF) == color ? -1 : 0)));
+					textures.remove(new ResourceLocation(resultingTexture));
+					return true;
+				});
+				event.getMap().setTextureEntry(new PixelOperationSprite(baseTexture, new ResourceLocation(baseTexture),
+						(((getter, x, y, value) -> {
+							if (resultingTextures.containsKey(value & 0xFFFFFF)) {
+								return 0;
+							} else {
+								return value;
+							}
+						}))));
+				textures.remove(new ResourceLocation(baseTexture));
+			}
+
+			// step 4: add non-colormasked textures
+			for (ResourceLocation location : textures) {
+				event.getMap().registerSprite(location);
+			}
 		}
 	}
 }
