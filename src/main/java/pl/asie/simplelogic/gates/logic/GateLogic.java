@@ -149,14 +149,6 @@ public abstract class GateLogic {
 		return changed;
 	}
 
-	protected boolean rsToDigi(byte v) {
-		return v > 0;
-	}
-
-	protected byte digiToRs(boolean v) {
-		return v ? (byte) 15 : 0;
-	}
-
 	public Connection getType(EnumFacing dir) {
 		return dir == EnumFacing.NORTH ? Connection.OUTPUT : Connection.INPUT;
 	}
@@ -173,7 +165,7 @@ public abstract class GateLogic {
 		return getType(side).isDigital();
 	}
 
-	protected byte getSideMask() {
+	protected final byte getSideMask() {
 		byte j = 0;
 		for (int i = 0; i <= 3; i++) {
 			if (getType(EnumFacing.getFront(i + 2)) != Connection.NONE) {
@@ -185,19 +177,19 @@ public abstract class GateLogic {
 
 	protected abstract byte calculateOutputInside(EnumFacing side);
 
-	public boolean isSideOpen(EnumFacing side) {
+	public final boolean isSideOpen(EnumFacing side) {
 		return (enabledSides & (1 << (side.ordinal() - 2))) != 0;
 	}
 
-	public boolean isSideInverted(EnumFacing side) {
+	public final boolean isSideInverted(EnumFacing side) {
 		return (invertedSides & (1 << (side.ordinal() - 2))) != 0;
 	}
 
-	public byte getValueInside(EnumFacing side) {
+	public final byte getValueInside(EnumFacing side) {
 		return values[side.ordinal() - 2];
 	}
 
-	public byte getValueOutside(EnumFacing side) {
+	public final byte getValueOutside(EnumFacing side) {
 		if (isSideInverted(side) && isSideOpen(side)) {
 			return values[side.ordinal() - 2] != 0 ? 0 : (byte) 15;
 		} else {
@@ -211,5 +203,15 @@ public abstract class GateLogic {
 
 	public boolean tick(PartGate parent) {
 		return parent.updateInputs();
+	}
+
+	// Utility methods
+
+	protected final boolean rsToDigi(byte v) {
+		return v > 0;
+	}
+
+	protected final byte digiToRs(boolean v) {
+		return v ? (byte) 15 : 0;
 	}
 }
