@@ -60,7 +60,7 @@ import pl.asie.simplelogic.gates.render.FastTESRGate;
 
 @CharsetModule(
 		name = "simplelogic.gates",
-		profile = ModuleProfile.EXPERIMENTAL,
+		profile = ModuleProfile.STABLE,
 		description = "Simple logic gates."
 )
 public class SimpleLogicGates {
