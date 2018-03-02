@@ -96,8 +96,10 @@ public class ItemGate extends ItemBlockBase {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
-		for (ItemStack stack : SimpleLogicGates.gateStacks) {
-			items.add(stack);
+		if (this.isInCreativeTab(tab)) {
+			for (ItemStack stack : SimpleLogicGates.gateStacks) {
+				items.add(stack);
+			}
 		}
 	}
 
