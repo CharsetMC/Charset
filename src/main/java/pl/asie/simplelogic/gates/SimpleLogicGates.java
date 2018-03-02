@@ -49,6 +49,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 import pl.asie.simplelogic.gates.logic.*;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -90,8 +91,10 @@ public class SimpleLogicGates {
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
+	public static boolean onlyBottomFace;
 	public static BlockGate blockGate;
 	public static ItemGate itemGate;
+	public static Set<String> inversionSensitiveLogics = new HashSet<>();
 
 	static final BiMap<ResourceLocation, Class<? extends GateLogic>> logicClasses = HashBiMap.create();
 	static final Map<ResourceLocation, String> logicUns = new HashMap<>();
@@ -101,6 +104,11 @@ public class SimpleLogicGates {
 
 	public static ResourceLocation getId(GateLogic logic) {
 		return logicClasses.inverse().get(logic.getClass());
+	}
+
+	@EventHandler
+	public void onLoadConfig(CharsetLoadConfigEvent event) {
+		onlyBottomFace = config.getBoolean("gatesOnlyBottomFace", "general", false, "Set to true if you wish that gates only be placed on the bottom face of a block - this is great for vanilla-plus style modpacks!");
 	}
 
 	@SubscribeEvent
@@ -170,6 +178,9 @@ public class SimpleLogicGates {
 
 	public void registerGateStack(ItemStack stack) {
 		if (stack != null && (stack.getItem() instanceof ItemGate)) {
+			if (stack.hasTagCompound() && stack.getTagCompound().getByte("li") > 0) {
+				inversionSensitiveLogics.add(stack.getTagCompound().getString("logic"));
+			}
 			gateStacks.add(stack);
 		}
 	}

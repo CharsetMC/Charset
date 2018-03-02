@@ -22,6 +22,6 @@ package pl.asie.simplelogic;
 import net.minecraftforge.fml.common.Mod;
 import pl.asie.charset.ModCharset;
 
-@Mod(modid = "simplelogic", version = "@VERSION@", updateJSON = ModCharset.UPDATE_URL, dependencies = "required-after:charset")
+@Mod(modid = "simplelogic", name = "SimpleLogic", version = "@VERSION@", dependencies = "required-after:charset")
 public class ModSimpleLogic {
 }

@@ -144,8 +144,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		return this;
 	}
 
-	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing direction) {
+	private boolean hasRedstoneCapability(Capability<?> capability, EnumFacing direction) {
 		if (direction != null && direction.getAxis() != orientation.facing.getAxis()) {
 			EnumFacing dir = realToGate(direction);
 			if (logic.isSideOpen(dir)) {
@@ -165,16 +164,66 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	}
 
 	@Override
+	public void rotate(Rotation rotationIn) {
+		super.rotate(rotationIn);
+		for (int i = 0; i < rotationIn.ordinal(); i++) {
+			orientation = orientation.rotateAround(EnumFacing.UP);
+		}
+		onChanged();
+		pendingChange = true;
+		markBlockForUpdate();
+	}
+
+	@Override
+	public void mirror(Mirror mirror) {
+		super.mirror(mirror);
+		if (orientation.facing.getAxis() == EnumFacing.Axis.Y) {
+			switch (mirror) {
+				case LEFT_RIGHT:
+					if (orientation.top.getAxis() == EnumFacing.Axis.Z) {
+						mirrored = !mirrored;
+					} else {
+						orientation = orientation.getNextRotationOnFace().getNextRotationOnFace();
+						mirrored = !mirrored;
+					}
+					break;
+				case FRONT_BACK:
+					if (orientation.top.getAxis() == EnumFacing.Axis.X) {
+						mirrored = !mirrored;
+					} else {
+						orientation = orientation.getNextRotationOnFace().getNextRotationOnFace();
+						mirrored = !mirrored;
+					}
+					break;
+			}
+			onChanged();
+			pendingChange = true;
+			markBlockForUpdate();
+		} else {
+			orientation = orientation.mirror(mirror);
+			onChanged();
+			pendingChange = true;
+			markBlockForUpdate();
+		}
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing direction) {
+		return hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, EnumFacing enumFacing) {
-		if (!hasCapability(capability, enumFacing)) {
-			return null;
-		}
-		EnumFacing dir = realToGate(enumFacing);
-		if (dir.ordinal() >= 2) {
-			return (T) COMMS[dir.ordinal() - 2];
+		if (hasRedstoneCapability(capability, enumFacing)) {
+			EnumFacing dir = realToGate(enumFacing);
+			if (dir.ordinal() >= 2) {
+				return (T) COMMS[dir.ordinal() - 2];
+			} else {
+				return null;
+			}
 		} else {
-			return null;
+			return super.getCapability(capability, enumFacing);
 		}
 	}
 
@@ -343,7 +392,12 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		Vec3d vec = new Vec3d(hitX, hitY, hitZ);
 
 		if (!stack.isEmpty()) {
-			if (stack.getItem() instanceof ItemBlock) {
+			if (stack.getItem().getToolClasses(stack).contains("wrench")) {
+				if (playerIn.isSneaking()) {
+					mirrored = !mirrored;
+					changed = true;
+				}
+			} else if (stack.getItem() instanceof ItemBlock) {
 				Block block = Block.getBlockFromItem(stack.getItem());
 				if (block == Blocks.REDSTONE_TORCH || block == Blocks.UNLIT_REDSTONE_TORCH) {
 					EnumFacing closestFace = getClosestFace(vec);
@@ -373,13 +427,11 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 					}
 					changed = true;
 				} else if (playerIn.isSneaking()) {
-					if (closestFace != null) {
-						if (logic.canBlockSide(closestFace)) {
-							if (!remote) {
-								logic.enabledSides ^= (1 << (closestFace.ordinal() - 2));
-							}
-							changed = true;
+					if (logic.canBlockSide(closestFace)) {
+						if (!remote) {
+							logic.enabledSides ^= (1 << (closestFace.ordinal() - 2));
 						}
+						changed = true;
 					}
 				}
 			}
@@ -424,7 +476,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		super.onPlacedBy(placer, face, stack, hitX, hitY, hitZ);
 		readItemNBT(stack.getTagCompound());
-		orientation = Orientation.fromDirection(face);
+		orientation = Orientation.fromDirection(SimpleLogicGates.onlyBottomFace ? EnumFacing.UP : face);
 		orientation = orientation.pointTopTo(gateToReal(getClosestFace(new Vec3d(hitX, hitY, hitZ))));
 	}
 
@@ -508,7 +560,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 			{EnumFacing.UP, EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH}
 	};
 
-	public EnumFacing gateToReal(EnumFacing dir) {
+	protected EnumFacing gateToReal(EnumFacing dir) {
 		if (dir.getAxis() == EnumFacing.Axis.Y) {
 			return null;
 		}
@@ -526,7 +578,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		return CONNECTION_DIRS[getSide().ordinal()][dir.ordinal() - 2];
 	}
 
-	public EnumFacing realToGate(EnumFacing rdir) {
+	protected EnumFacing realToGate(EnumFacing rdir) {
 		if (rdir.getAxis() == orientation.facing.getAxis()) {
 			return null;
 		}

@@ -209,7 +209,9 @@ public class RendererGate extends ModelFactory<PartGate> {
 	@Override
 	public PartGate fromItemStack(ItemStack stack) {
 		PartGate g = ItemGate.getPartGate(stack);
-		g.logic.updateOutputs();
+		if (g != null) {
+			g.logic.updateOutputs();
+		}
 		return g;
 	}
 }

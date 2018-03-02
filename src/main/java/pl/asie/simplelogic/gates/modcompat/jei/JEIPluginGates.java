@@ -30,10 +30,14 @@ public class JEIPluginGates implements IModPlugin {
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry) {
 		subtypeRegistry.registerSubtypeInterpreter(SimpleLogicGates.itemGate, (stack) -> {
+			String logicName = "dummy";
 			if (stack.hasTagCompound() && stack.getTagCompound().hasKey("logic", Constants.NBT.TAG_STRING)) {
-				return stack.getTagCompound().getString("logic");
+				logicName = stack.getTagCompound().getString("logic");
+			}
+			if (SimpleLogicGates.inversionSensitiveLogics.contains(logicName)) {
+				return logicName + ";" + stack.getTagCompound().getByte("li");
 			} else {
-				return "dummy";
+				return logicName;
 			}
 		});
 	}
