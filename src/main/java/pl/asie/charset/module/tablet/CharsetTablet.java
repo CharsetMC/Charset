@@ -79,9 +79,12 @@ public class CharsetTablet {
 
 		TabletAPI.INSTANCE.registerRouter(new RouterIndex());
 		TabletAPI.INSTANCE.registerRouter(new RouterSearch());
-		TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("charset", "Book of Charset"));
+		TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("charset", "Book - Charset"));
+		TabletAPI.INSTANCE.addBook("Book of Charset", "mod://charset/index");
+
 		if (Loader.isModLoaded("simplelogic")) {
-			TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("simplelogic", "The Rules of SimpleLogic"));
+			TabletAPI.INSTANCE.registerRouter(new RouterModDocumentation("simplelogic", "Book - SimpleLogic"));
+			TabletAPI.INSTANCE.addBook("The Rules of SimpleLogic", "mod://simplelogic/index");
 		}
 
 		TabletAPI.INSTANCE.registerCommand("\\", spaceCommand);
@@ -147,8 +150,6 @@ public class CharsetTablet {
 		}
 
 		TabletAPI.INSTANCE.registerPrinterText(TextPrinterFormat.HTML, WordText.class, (c, w) -> ((WordText) w).getText());
-
-		TabletAPI.INSTANCE.addBook("Book of Charset", "mod://charset/index");
 	}
 
 	@Mod.EventHandler

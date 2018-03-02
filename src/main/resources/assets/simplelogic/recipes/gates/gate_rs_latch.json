@@ -6,10 +6,11 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "charset:gate_nor",
+  "group": "charset:gate_rs_latch",
   "pattern": [
-    "scs",
-    "sss"
+    "scw",
+    "w w",
+    "wcs"
   ],
   "key": {
     "w": {
@@ -30,7 +31,7 @@
     "data": 0,
     "count": 1,
     "nbt": {
-      "logic": "simplelogic:nor"
+      "logic": "simplelogic:rs_latch"
     }
   }
 }

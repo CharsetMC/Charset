@@ -122,6 +122,10 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 	private Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
 
+	public Orientation getOrientation() {
+		return orientation;
+	}
+
 	public PartGate(GateLogic logic) {
 		this.logic = logic;
 
@@ -283,7 +287,9 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 	public void onNeighborBlockChange(Block block) {
 		if (!getWorld().isSideSolid(getPos().offset(getSide()), getSide().getOpposite())) {
-			// TODO: Harvest me!
+			IBlockState state = world.getBlockState(pos);
+			state.getBlock().dropBlockAsItem(world, pos, state, 0);
+			world.setBlockToAir(pos);
 			return;
 		}
 

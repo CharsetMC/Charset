@@ -1,0 +1,7 @@
+\title{SimpleLogic}
+
+\checkmods{any}{charset:simplelogic.gates}{\b{Gates}
+
+TODO}
+
+Join us in #charset on irc.esper.net!

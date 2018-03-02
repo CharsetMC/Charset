@@ -6,15 +6,20 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "charset:gate_nor",
+  "group": "charset:gate_randomizer",
   "pattern": [
-    "scs",
-    "sss"
+    " g ",
+    "gwg",
+    "sws"
   ],
   "key": {
     "w": {
       "type": "forge:ore_dict",
       "ore": "dustRedstone"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "dustGlowstone"
     },
     "s": {
       "type": "charset:material",
@@ -30,7 +35,7 @@
     "data": 0,
     "count": 1,
     "nbt": {
-      "logic": "simplelogic:nor"
+      "logic": "simplelogic:randomizer"
     }
   }
 }

@@ -6,10 +6,10 @@
     }
   ],
   "type": "charset:shaped",
-  "group": "charset:gate_nor",
+  "group": "charset:gate_buffer_inv",
   "pattern": [
-    "scs",
-    "sss"
+    "wcw",
+    "sws"
   ],
   "key": {
     "w": {
@@ -30,7 +30,7 @@
     "data": 0,
     "count": 1,
     "nbt": {
-      "logic": "simplelogic:nor"
+      "logic": "simplelogic:buffer"
     }
   }
 }

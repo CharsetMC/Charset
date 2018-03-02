@@ -24,6 +24,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,6 +55,17 @@ public class BlockGate extends BlockBase implements ITileEntityProvider {
 		setOpaqueCube(false);
 		setFullCube(false);
 		setSoundType(SoundType.STONE);
+	}
+
+	@Override
+	public BlockFaceShape getBlockFaceShape(IBlockAccess source, IBlockState state, BlockPos pos, EnumFacing facing) {
+		TileEntity tile = source.getTileEntity(pos);
+		if (tile instanceof PartGate) {
+			if (((PartGate) tile).getOrientation().facing == facing.getOpposite()) {
+				return BlockFaceShape.SOLID;
+			}
+		}
+		return BlockFaceShape.UNDEFINED;
 	}
 
 	@Override
