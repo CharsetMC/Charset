@@ -121,6 +121,8 @@ public class CharsetTweakBonemeal {
 		} else if (block instanceof BlockDoublePlant || block instanceof BlockTallGrass) {
 			// do nothing, they already grow instantly
 			return;
+		} else if (block instanceof BlockGrass) {
+			return;
 		} else if (block instanceof IGrowable && heuristicEnabled) { // heuristic
 			int i = 128;
 			boolean canGrow = true;
