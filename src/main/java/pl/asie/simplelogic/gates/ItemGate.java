@@ -41,6 +41,7 @@ import pl.asie.charset.lib.item.ItemBlockBase;
 public class ItemGate extends ItemBlockBase {
 	public ItemGate(Block block) {
 		super(block);
+		setCreativeTab(SimpleLogicGates.simpleLogicTab);
 		setHasSubtypes(true);
 	}
 

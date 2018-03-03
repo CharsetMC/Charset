@@ -23,6 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -50,6 +51,7 @@ import pl.asie.charset.api.lib.IMultiblockStructure;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.misc.DoubleClickHandler;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
@@ -110,6 +112,8 @@ public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutoma
         }
     }
 
+    protected final DoubleClickHandler doubleClickInsertion = new DoubleClickHandler();
+    protected final DoubleClickHandler doubleClickExtraction = new DoubleClickHandler();
     protected TileTank bottomTank, aboveTank;
     protected static final int CAPACITY = 16000;
     protected FluidStack fluidStack;
@@ -239,12 +243,15 @@ public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutoma
         }
         // TODO: Maybe send less often than every *change*?
         markBlockForUpdate();
+        markChunkDirty();
     }
 
     @Override
     public void invalidate(InvalidationType type) {
         super.invalidate(type);
-        world.notifyNeighborsRespectDebug(getPos(), CharsetStorageTanks.tankBlock, false);
+        if (world != null && pos != null) {
+            world.notifyNeighborsRespectDebug(getPos(), CharsetStorageTanks.tankBlock, false);
+        }
     }
 
     @Override

@@ -49,12 +49,14 @@ import pl.asie.charset.api.lib.IAxisRotatable;
 import pl.asie.charset.api.lib.ICacheable;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IBarrel;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.block.ITileWrenchRotatable;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.CapabilityCache;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.misc.DoubleClickHandler;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
@@ -198,10 +200,6 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     public TileEntityDayBarrel() {
         woodLog = getLog(null);
         woodSlab = getSlab(null);
-    }
-
-    private void markChunkDirty() {
-        world.markChunkDirty(pos, this);
     }
 
     public static void populateUpgrades(Set<BarrelUpgrade> upgrades, NBTTagCompound compound) {
@@ -738,7 +736,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     }
 
     // Interaction
-    private final WeakHashMap<EntityPlayer, Long> lastClickMap = new WeakHashMap<>();
+    private final DoubleClickHandler doubleClickHandler = new DoubleClickHandler();
 
     public EnumActionResult insertFromItemHandler(EntityPlayer player, boolean addAll) {
         boolean hadNoItem = item.isEmpty();
@@ -802,12 +800,11 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             return true;
         }
 
-        Long lastClick = lastClickMap.get(player);
-        if (lastClick != null && world.getTotalWorldTime() - lastClick < 10 && !item.isEmpty()) {
+        if (doubleClickHandler.isDoubleClick(player) && !item.isEmpty()) {
             addAllItems(player, hand);
             return true;
         }
-        lastClickMap.put(player, world.getTotalWorldTime());
+        doubleClickHandler.markLastClick(player);
 
         // right click: put an item
         if (held.isEmpty()) {

@@ -106,6 +106,7 @@ public class CharsetLib {
 	public static boolean alwaysDropDroppablesGivenToPlayer;
 	public static boolean enableDebugInfo;
 	public static boolean showAllItemTypes;
+	public static int doubleClickDuration;
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
@@ -141,6 +142,8 @@ public class CharsetLib {
 		alwaysDropDroppablesGivenToPlayer = ConfigUtils.getBoolean(config, "general", "alwaysDropDroppablesGivenToPlayer", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).", true);
 		enableDebugInfo = ConfigUtils.getBoolean(config, "expert","enableDebugInfo", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.", false);
 		FastRecipeLookup.ENABLED = !ConfigUtils.getBoolean(config, "general", "disableRecipeOptimizations", false, "Set to true to disable recipe optimizations. Use only if weird behaviour exhibited, and always contact the developer first!", false);
+
+		doubleClickDuration = ConfigUtils.getInt(config, "general", "doubleClickDuration", 10, 0, 60*20, "The duration of ticks that can pass between two clicks to be registered as a double-click.", false);
 
 		boolean oldShowAllItemTypes = showAllItemTypes;
 		showAllItemTypes = ConfigUtils.getBoolean(config, "general","showAllItemTypes", ModCharset.INDEV, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.", false);

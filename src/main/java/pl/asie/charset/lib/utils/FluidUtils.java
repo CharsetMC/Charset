@@ -27,6 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -138,36 +139,86 @@ public final class FluidUtils {
     }
 
     public static boolean handleTank(IFluidHandler tank, FluidStack fluidContained, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand) {
-        ItemStack stack = playerIn.getHeldItem(hand);
-        if (stack.isEmpty()) {
-            return false;
-        } else if (stack.getCount() == 1) {
-            Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stack, playerIn.isCreative(), true, true);
-            if (result.isPresent()) {
-                ItemStack resultStack = result.get();
-                if (resultStack != stack) {
-                    playerIn.setHeldItem(hand, resultStack);
+        return handleTank(tank, fluidContained, worldIn, pos, playerIn, hand, false, false);
+    }
+
+    public static boolean handleTank(IFluidHandler tank, FluidStack fluidContained, World worldIn, BlockPos pos, EntityPlayer playerIn, EnumHand hand, boolean iterateAllDrain, boolean iterateAllFill) {
+	    // ugly repetition
+	    if (iterateAllDrain || iterateAllFill) {
+	        boolean changed = false;
+	        for (int i = 0; i < playerIn.inventory.mainInventory.size(); i++) {
+                if (!iterateAllFill && tank.drain(1, false) == null) {
+                    break;
                 }
 
-                return true;
-            } else {
-                return false;
+                ItemStack stack = playerIn.inventory.mainInventory.get(i);
+                if (!stack.isEmpty()) {
+                    if (stack.getCount() == 1) {
+                        Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stack, playerIn.isCreative(), iterateAllDrain, iterateAllFill);
+                        if (result.isPresent()) {
+                            ItemStack resultStack = result.get();
+                            if (resultStack != stack) {
+                                playerIn.inventory.mainInventory.set(i, resultStack);
+                            }
+
+                            changed = true;
+                        }
+                    } else {
+                        ItemStack stackOne = stack.splitStack(1);
+
+                        Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stackOne, playerIn.isCreative(), iterateAllDrain, iterateAllFill);
+                        if (result.isPresent()) {
+                            ItemStack resultStack = result.get();
+                            if (resultStack != stackOne) {
+                                if (!playerIn.inventory.addItemStackToInventory(resultStack)) {
+                                    ItemUtils.spawnItemEntity(worldIn, playerIn.getPositionVector(), resultStack, 0, 0, 0, 0);
+                                    // no more!
+                                    return changed;
+                                }
+                            } else {
+                                stackOne.grow(1);
+                            }
+
+                            changed = true;
+                        }
+                    }
+                }
             }
+            return changed;
         } else {
-            ItemStack stackOne = stack.splitStack(1);
-
-            Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stackOne, playerIn.isCreative(), true, true);
-            if (result.isPresent()) {
-                ItemStack resultStack = result.get();
-                if (resultStack != stackOne) {
-                    playerIn.inventory.addItemStackToInventory(resultStack);
-                } else {
-                    stackOne.grow(1);
-                }
-
-                return true;
-            } else {
+            ItemStack stack = playerIn.getHeldItem(hand);
+            if (stack.isEmpty()) {
                 return false;
+            } else if (stack.getCount() == 1) {
+                Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stack, playerIn.isCreative(), true, true);
+                if (result.isPresent()) {
+                    ItemStack resultStack = result.get();
+                    if (resultStack != stack) {
+                        playerIn.setHeldItem(hand, resultStack);
+                    }
+
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                ItemStack stackOne = stack.splitStack(1);
+
+                Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stackOne, playerIn.isCreative(), true, true);
+                if (result.isPresent()) {
+                    ItemStack resultStack = result.get();
+                    if (resultStack != stackOne) {
+                        if (!playerIn.inventory.addItemStackToInventory(resultStack)) {
+                            ItemUtils.spawnItemEntity(worldIn, playerIn.getPositionVector(), resultStack, 0, 0, 0, 0);
+                        }
+                    } else {
+                        stackOne.grow(1);
+                    }
+
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
     }

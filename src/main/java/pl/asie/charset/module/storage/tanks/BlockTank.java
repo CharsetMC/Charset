@@ -43,10 +43,14 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
@@ -222,6 +226,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
         TileEntity tankEntity = worldIn.getTileEntity(pos);
         if (tankEntity instanceof TileTank) {
+            TileTank tank = (TileTank) tankEntity;
             ItemStack held = playerIn.getHeldItem(hand);
             if (held.isEmpty()) {
                 notice(worldIn, tankEntity, playerIn,
@@ -231,7 +236,27 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
                 return true;
             }
 
-            if (FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileTank) tankEntity).getContents(), worldIn, pos, playerIn, hand)) {
+            IFluidHandlerItem handlerHeld = CapabilityHelper.get(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, held, null);
+            boolean hasFluid = false;
+            if (handlerHeld != null) {
+            	IFluidTankProperties[] properties = handlerHeld.getTankProperties();
+            	hasFluid = (properties.length > 0 && properties[0].getContents() != null) || (handlerHeld.drain(1, false) != null);
+            }
+
+            if (tank.doubleClickInsertion.isDoubleClick(playerIn)) {
+                if (FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileTank) tankEntity).getContents(), worldIn, pos, playerIn, hand, false, true)) {
+                    return true;
+                }
+            } else if (tank.doubleClickExtraction.isDoubleClick(playerIn)) {
+                if (FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileTank) tankEntity).getContents(), worldIn, pos, playerIn, hand, true, false)) {
+                    return true;
+                }
+            } else if (FluidUtils.handleTank((IFluidHandler) tankEntity, ((TileTank) tankEntity).getContents(), worldIn, pos, playerIn, hand)) {
+                if (hasFluid) {
+                    tank.doubleClickInsertion.markLastClick(playerIn);
+                } else {
+                    tank.doubleClickExtraction.markLastClick(playerIn);
+                }
                 return true;
             }
 
