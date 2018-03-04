@@ -87,7 +87,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		}
 	}
 
-	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
+	public static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
 	private static final Vec3d[][] HIT_VECTORS = new Vec3d[6][];
 	private final RedstoneCommunications[] COMMS = new RedstoneCommunications[4];
 

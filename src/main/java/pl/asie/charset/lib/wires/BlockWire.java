@@ -53,12 +53,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.modcompat.mcmultipart.IMultipartBase;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class BlockWire extends BlockBase implements IMultipart, ITileEntityProvider {
+public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityProvider {
     protected static final PropertyBool REDSTONE = PropertyBool.create("redstone");
 
     public BlockWire() {

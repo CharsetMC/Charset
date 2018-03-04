@@ -19,7 +19,7 @@
 
 package pl.asie.simplelogic.gates.modcompat.mcmultipart;
 
-import mcmultipart.api.multipart.IMultipart;
+import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.slot.EnumCenterSlot;
 import mcmultipart.api.slot.EnumFaceSlot;
 import mcmultipart.api.slot.IPartSlot;
@@ -28,21 +28,36 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import pl.asie.charset.lib.modcompat.mcmultipart.IMultipartBase;
 import pl.asie.simplelogic.gates.PartGate;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 
-public class MultipartGate implements IMultipart {
+import java.util.Collections;
+import java.util.List;
+
+public class MultipartGate implements IMultipartBase {
 	@Override
 	public Block getBlock() {
 		return SimpleLogicGates.blockGate;
 	}
 
 	@Override
+	public List<AxisAlignedBB> getOcclusionBoxes(IPartInfo part) {
+		IPartSlot slot = part.getSlot();
+		if (slot instanceof EnumFaceSlot) {
+			return Collections.singletonList(PartGate.BOXES[((EnumFaceSlot) slot).getFacing().ordinal()]);
+		} else {
+			return Collections.singletonList(Block.FULL_BLOCK_AABB);
+		}
+	}
+
+	@Override
 	public IPartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState state, EnumFacing facing, float hitX, float hitY, float hitZ, EntityLivingBase placer) {
-		return EnumFaceSlot.fromFace(facing);
+		return EnumFaceSlot.fromFace(facing.getOpposite());
 	}
 
 	@Override

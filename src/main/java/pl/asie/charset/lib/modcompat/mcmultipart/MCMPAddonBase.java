@@ -69,7 +69,9 @@ public class MCMPAddonBase implements IMCMPAddon {
     }
 
     protected IWrappedBlock registerStackWrapper(IMultipartRegistry registry) {
-        return registry.registerStackWrapper(item, (stack) -> true, block);
+        IWrappedBlock b = registry.registerStackWrapper(item, (stack) -> true, block);
+        b.setPartPlacementLogic(MCMPUtils::placePartAt);
+        return b;
     }
 
     @SubscribeEvent

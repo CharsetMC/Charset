@@ -34,6 +34,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
 import pl.asie.charset.lib.modcompat.mcmultipart.MCMPAddonBase;
+import pl.asie.charset.lib.modcompat.mcmultipart.MultipartTile;
 import pl.asie.charset.module.misc.scaffold.CharsetMiscScaffold;
 import pl.asie.charset.module.misc.scaffold.TileScaffold;
 import pl.asie.charset.module.misc.scaffold.modcompat.mcmultipart.MultipartScaffold;
@@ -45,7 +46,7 @@ import javax.annotation.Nullable;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-// @CharsetMCMPAddon("simplelogic.gates")
+@CharsetMCMPAddon("simplelogic.gates")
 public class MCMPAddonGates extends MCMPAddonBase {
 	private static final ResourceLocation LOC = new ResourceLocation("simplelogic:mcmp");
 
@@ -59,12 +60,7 @@ public class MCMPAddonGates extends MCMPAddonBase {
 	public void onAttachCaps(AttachCapabilitiesEvent<TileEntity> event) {
 		if (event.getObject() instanceof PartGate) {
 			final PartGate gate = (PartGate) event.getObject();
-			final IMultipartTile mpartTile = new IMultipartTile() {
-				@Override
-				public TileEntity getTileEntity() {
-					return gate;
-				}
-			};
+			final IMultipartTile mpartTile = new MultipartTile<>(gate);
 
 			event.addCapability(LOC, new ICapabilityProvider() {
 				@Override
