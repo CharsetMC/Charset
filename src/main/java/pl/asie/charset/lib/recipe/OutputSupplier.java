@@ -51,7 +51,7 @@ public class OutputSupplier {
 
         @Override
         public ItemStack getCraftingResult(RecipeCharset recipe, IngredientMatcher matcher, InventoryCrafting inv) {
-            return stack;
+            return stack.copy();
         }
 
         @Override
