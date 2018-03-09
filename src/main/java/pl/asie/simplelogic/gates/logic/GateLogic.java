@@ -19,8 +19,10 @@
 
 package pl.asie.simplelogic.gates.logic;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.simplelogic.gates.PartGate;
 
@@ -179,6 +181,10 @@ public abstract class GateLogic {
 
 	public abstract State getTorchState(int id);
 
+	public boolean canMirror() {
+		return getType(EnumFacing.WEST) != Connection.NONE || getType(EnumFacing.EAST) != Connection.NONE;
+	}
+
 	public boolean canBlockSide(EnumFacing side) {
 		return getType(side).isInput();
 	}
@@ -198,6 +204,10 @@ public abstract class GateLogic {
 	}
 
 	protected abstract byte calculateOutputInside(EnumFacing side);
+
+	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, EnumHand hand) {
+		return false;
+	}
 
 	public final boolean isSideOpen(EnumFacing side) {
 		return (enabledSides & (1 << (side.ordinal() - 2))) != 0;
@@ -236,7 +246,17 @@ public abstract class GateLogic {
 	}
 
 	public boolean tick(PartGate parent) {
-		return parent.updateInputs(inputValues) || updateOutputs();
+		boolean inputChange = parent.updateInputs(inputValues);
+		boolean outputChange = updateOutputs();
+		return inputChange || outputChange;
+	}
+
+	public boolean renderEquals(GateLogic other) {
+		return true;
+	}
+
+	public int renderHashCode(int hash) {
+		return hash;
 	}
 
 	// Utility methods
