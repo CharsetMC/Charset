@@ -57,7 +57,6 @@ public class BlockGate extends BlockBase implements ITileEntityProvider {
 		setHardness(0.5f);
 		setOpaqueCube(false);
 		setFullCube(false);
-		setSoundType(SoundType.STONE);
 		setCreativeTab(SimpleLogicGates.simpleLogicTab);
 	}
 

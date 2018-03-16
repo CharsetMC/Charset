@@ -180,7 +180,7 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 		}
 
 		float rotation = te.getWorld().getTotalWorldTime() + partialTicks;
-		rotation *= 16;
+		rotation *= te.rotSpeedClient*4.5f;
 
 		/* boolean direction = EnumFacing.SOUTH.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE;
 		if (direction) {

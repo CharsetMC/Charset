@@ -17,10 +17,26 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.power.api;
+package pl.asie.charset.module.power.mechanical.render;
 
-public interface IPowerConsumer {
-	boolean isAcceptingForce();
-	double getDesiredForce();
-	void setForce(double val);
+import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.render.model.ModelColorHandler;
+import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.utils.RenderUtils;
+
+public class GearboxColorHandler extends ModelColorHandler<GearboxCacheInfo> {
+	public static final GearboxColorHandler INSTANCE = new GearboxColorHandler();
+
+	public GearboxColorHandler() {
+		super(ModelGearbox.INSTANCE);
+	}
+
+	@Override
+	public int colorMultiplier(GearboxCacheInfo info, int tintIndex) {
+		if (tintIndex != 0) {
+			return -1;
+		}
+
+		return RenderUtils.getAverageColor(info.plank, RenderUtils.AveragingMode.FULL);
+	}
 }

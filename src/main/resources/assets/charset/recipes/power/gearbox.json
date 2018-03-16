@@ -1,0 +1,30 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "power"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:gearbox",
+  "pattern": [
+    "ppp",
+    "s s",
+    "ppp"
+  ],
+  "key": {
+    "p": {
+      "type": "charset:material",
+      "material": ["plank", "block"],
+      "nbtKey": "wood"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    }
+  },
+  "result": {
+    "item": "charset:gearbox",
+    "count": 1
+  }
+}

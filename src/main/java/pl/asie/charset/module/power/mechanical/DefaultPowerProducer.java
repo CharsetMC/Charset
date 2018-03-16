@@ -17,11 +17,9 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.power.api;
+package pl.asie.charset.module.power.mechanical;
 
-import pl.asie.charset.api.energy.EnergyCategory;
+import pl.asie.charset.module.power.api.IPowerProducer;
 
-public interface IPowerConnectable {
-	boolean canProvide(EnergyCategory category);
-	boolean canConsume(EnergyCategory category);
+public class DefaultPowerProducer implements IPowerProducer {
 }

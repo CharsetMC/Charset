@@ -19,10 +19,20 @@
 
 package pl.asie.charset.module.power;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.statemap.IStateMapper;
+import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -37,8 +47,13 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.modcompat.crafttweaker.Registry;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.power.mechanical.*;
+import pl.asie.charset.module.power.mechanical.render.GearboxColorHandler;
+import pl.asie.charset.module.power.mechanical.render.ModelGearbox;
 import pl.asie.charset.module.power.mechanical.render.TileAxleRenderer;
+
+import java.util.Map;
 
 @CharsetModule(
 		name = "power",
@@ -54,13 +69,15 @@ public class CharsetPower {
 
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
+		PowerCapabilities.preInit();
+
 		blockAxle = new BlockAxle();
 		blockCreativeGenerator = new BlockCreativeGenerator();
 		blockGearbox = new BlockGearbox();
 		blockSocket = new BlockSocket();
 		itemAxle = new ItemBlockAxle(blockAxle);
 		itemCreativeGenerator = new ItemBlockBase(blockCreativeGenerator);
-		itemGearbox = new ItemBlockBase(blockGearbox);
+		itemGearbox = new ItemBlockGearbox(blockGearbox);
 		itemSocket = new ItemBlockBase(blockSocket);
 	}
 
@@ -91,6 +108,37 @@ public class CharsetPower {
 		RegistryUtils.registerModel(itemCreativeGenerator, 0, "charset:gen_creative");
 		RegistryUtils.registerModel(itemGearbox, 0, "charset:gearbox");
 		RegistryUtils.registerModel(itemSocket, 0, "charset:socket");
+
+		ModelLoader.setCustomStateMapper(blockGearbox, new StateMapperBase() {
+			@Override
+			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
+				return new ModelResourceLocation("charset:gearbox", "inventory");
+			}
+		});
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		ModelGearbox.INSTANCE.model = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox"), event.getMap());
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onModelBake(ModelBakeEvent event) {
+		event.getModelRegistry().putObject(new ModelResourceLocation("charset:gearbox", "inventory"), ModelGearbox.INSTANCE);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onBlockColor(ColorHandlerEvent.Block event) {
+		event.getBlockColors().registerBlockColorHandler(GearboxColorHandler.INSTANCE, blockGearbox);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onItemColor(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(GearboxColorHandler.INSTANCE, itemGearbox);
 	}
 
 	@SubscribeEvent

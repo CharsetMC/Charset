@@ -111,6 +111,13 @@ tile.charset.projector.name=Projector
 item.charset.gemQuartz.name=Quartz
 tile.charset.oreQuartz.name=Quartz Ore
 
+# power.mechanical
+
+tile.charset.axle.name=Axle
+tile.charset.axle.format=%s Axle
+tile.charset.gearbox.name=Gearbox
+tile.charset.gearbox.format=%s Gearbox
+
 # storage.barrels
 
 config.charset.storage.barrels.features.name=Toggle Features

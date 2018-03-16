@@ -51,9 +51,13 @@ public class TileCache {
         tile = null;
     }
 
+    public boolean isValid() {
+        return state != null && (!hasTile || !tile.isInvalid());
+    }
+
     @Nonnull
     public IBlockState getBlock() {
-        if (state == null || (hasTile && tile.isInvalid())) {
+        if (!isValid()) {
             reload();
         }
 
@@ -62,7 +66,7 @@ public class TileCache {
 
     @Nullable
     public TileEntity getTile() {
-        if (state == null || (tile != null && tile.isInvalid())) {
+        if (!isValid()) {
             reload();
         }
 

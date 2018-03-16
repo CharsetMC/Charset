@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.power.mechanical;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -65,8 +66,18 @@ public class BlockAxle extends BlockBase implements ITileEntityProvider {
 		super(Material.WOOD);
 		setHardness(1.0F);
 		setHarvestLevel("axe", 0);
+		setUnlocalizedName("charset.axle");
 		setOpaqueCube(false);
 		setFullCube(false);
+	}
+
+	@Override
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if (tile instanceof TileAxle) {
+			((TileAxle) tile).onNeighborChanged(fromPos);
+		}
 	}
 
 	@Override

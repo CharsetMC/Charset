@@ -19,7 +19,46 @@
 
 package pl.asie.charset.module.power.mechanical;
 
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.module.power.PowerCapabilities;
+import pl.asie.charset.module.power.api.IPowerConsumer;
 
-public class TileSocket extends TileBase {
+import javax.annotation.Nullable;
+
+public class TileSocket extends TileBase implements IPowerConsumer {
+	@Override
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+		if (capability == PowerCapabilities.POWER_CONSUMER) {
+			return facing != null;
+		}
+
+		return super.hasCapability(capability, facing);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+		if (capability == PowerCapabilities.POWER_CONSUMER) {
+			return (T) this;
+		} else {
+			return super.getCapability(capability, facing);
+		}
+	}
+
+	@Override
+	public boolean isAcceptingForce() {
+		return true;
+	}
+
+	@Override
+	public double getDesiredForce() {
+		return 1.0D;
+	}
+
+	@Override
+	public void setForce(double val) {
+		//System.out.println(pos + " " + val);
+	}
 }

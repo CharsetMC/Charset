@@ -38,60 +38,22 @@ import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.module.power.PowerCapabilities;
 
-public class ItemBlockAxle extends ItemBlockBase {
-	public ItemBlockAxle(Block block) {
+public class ItemBlockGearbox extends ItemBlockBase {
+	public ItemBlockGearbox(Block block) {
 		super(block);
 	}
 
 	@Override
 	public String getItemStackDisplayName(ItemStack is) {
-		ItemMaterial mat = ItemMaterialRegistry.INSTANCE.getMaterial(is.getTagCompound(), "material");
+		ItemMaterial mat = ItemMaterialRegistry.INSTANCE.getMaterial(is.getTagCompound(), "wood");
 		if (mat != null && mat.getRelated("log") != null) {
 			mat = mat.getRelated("log");
 		}
 
 		if (mat != null) {
-			return I18n.translateToLocalFormatted("tile.charset.axle.format", mat.getStack().getDisplayName());
+			return I18n.translateToLocalFormatted("tile.charset.gearbox.format", mat.getStack().getDisplayName());
 		} else {
-			return I18n.translateToLocalFormatted("tile.charset.axle.name");
+			return I18n.translateToLocalFormatted("tile.charset.gearbox.name");
 		}
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-		Block block = worldIn.getBlockState(pos).getBlock();
-
-		if (block == Blocks.SNOW_LAYER && block.isReplaceable(worldIn, pos)) {
-			side = EnumFacing.UP;
-		} else if (!block.isReplaceable(worldIn, pos)) {
-			pos = pos.offset(side);
-		}
-
-		TileEntity tile = worldIn.getTileEntity(pos.offset(side.getOpposite()));
-		if (tile instanceof TileAxle) {
-			IBlockState state = worldIn.getBlockState(pos.offset(side.getOpposite()));
-			if (state.getBlock() instanceof BlockAxle) {
-				EnumFacing.Axis axis = state.getValue(Properties.AXIS);
-				ItemMaterial other = ((TileAxle) tile).getMaterial();
-				if (axis == side.getAxis() && other == ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material", "plank")) {
-					// pass
-				} else {
-					return false;
-				}
-			}
-		} else if (tile != null) {
-			if (tile.hasCapability(PowerCapabilities.POWER_PRODUCER, side)) {
-				// pass
-			} else if (tile.hasCapability(PowerCapabilities.POWER_CONSUMER, side)) {
-				// pass
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-
-		return worldIn.mayPlace(this.block, pos, false, side, (Entity)null);
 	}
 }
