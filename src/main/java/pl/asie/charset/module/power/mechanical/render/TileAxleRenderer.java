@@ -29,9 +29,6 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -40,10 +37,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.material.ItemMaterial;
-import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.module.power.CharsetPower;
+import pl.asie.charset.module.power.mechanical.CharsetPowerMechanical;
 import pl.asie.charset.module.power.mechanical.TileAxle;
 
 import java.util.concurrent.ExecutionException;
@@ -105,7 +101,7 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 		float factor = (float) (key.position * Math.PI / (ACCURACY * 2));
 
 		return ModelTransformer.transform(bakedModels[key.axis],
-				CharsetPower.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
+				CharsetPowerMechanical.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
 					float factorf = 0.0f;
 
 					if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {

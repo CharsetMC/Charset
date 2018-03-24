@@ -45,11 +45,7 @@ import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.item.SubItemSetHelper;
 import pl.asie.charset.lib.material.ItemMaterial;
-import pl.asie.charset.lib.utils.Orientation;
-import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
-import pl.asie.charset.module.misc.scaffold.CharsetMiscScaffold;
-import pl.asie.charset.module.power.CharsetPower;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -82,7 +78,7 @@ public class BlockAxle extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	protected ISubItemProvider createSubItemProvider() {
-		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetPower.itemAxle) {
+		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetPowerMechanical.itemAxle) {
 			@Override
 			protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
 				return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("material", SubItemSetHelper::sortByItem));

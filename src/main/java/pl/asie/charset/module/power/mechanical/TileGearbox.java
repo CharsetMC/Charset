@@ -31,9 +31,8 @@ import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitMaterial;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
-import pl.asie.charset.module.power.PowerCapabilities;
-import pl.asie.charset.module.power.api.IPowerConsumer;
-import pl.asie.charset.module.power.api.IPowerProducer;
+import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
+import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
 
 import javax.annotation.Nullable;
 
@@ -77,9 +76,9 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
 		EnumFacing facingIn = getInputSide();
-		if (capability == PowerCapabilities.POWER_PRODUCER) {
+		if (capability == CharsetPowerMechanical.POWER_PRODUCER) {
 			return facing != null && facing != facingIn;
-		} else if (capability == PowerCapabilities.POWER_CONSUMER) {
+		} else if (capability == CharsetPowerMechanical.POWER_CONSUMER) {
 			return facing == facingIn;
 		}
 
@@ -89,7 +88,7 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == PowerCapabilities.POWER_PRODUCER || capability == PowerCapabilities.POWER_CONSUMER) {
+		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
 			if (facing != null) {
 				return (T) this;
 			} else {
@@ -123,9 +122,9 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 			if (facing == facingIn) continue;
 
 			TileEntity tile = world.getTileEntity(pos.offset(facing));
-			if (tile != null && tile.hasCapability(PowerCapabilities.POWER_CONSUMER, facing.getOpposite())) {
-				IPowerConsumer consumer = tile.getCapability(PowerCapabilities.POWER_CONSUMER, facing.getOpposite());
-				if (consumer != null && consumer.isAcceptingForce()) {
+			if (tile != null && tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite())) {
+				IPowerConsumer consumer = tile.getCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite());
+				if (consumer != null && consumer.isAcceptingPower()) {
 					consumers[facing.ordinal()] = consumer;
 					acceptingForce = true;
 					forceOut += consumer.getDesiredForce();
@@ -166,7 +165,7 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 	}
 
 	@Override
-	public boolean isAcceptingForce() {
+	public boolean isAcceptingPower() {
 		return !isRedstonePowered && acceptingForce;
 	}
 

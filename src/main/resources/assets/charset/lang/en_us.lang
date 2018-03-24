@@ -115,8 +115,10 @@ tile.charset.oreQuartz.name=Quartz Ore
 
 tile.charset.axle.name=Axle
 tile.charset.axle.format=%s Axle
+tile.charset.gen_creative_mechanical.name=Creative Mechanical Generator
 tile.charset.gearbox.name=Gearbox
 tile.charset.gearbox.format=%s Gearbox
+tile.charset.socket.name=Socket
 
 # storage.barrels
 

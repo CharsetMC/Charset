@@ -24,22 +24,21 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.block.TileBase;
-import pl.asie.charset.module.power.PowerCapabilities;
-import pl.asie.charset.module.power.api.IPowerProducer;
-import pl.asie.charset.module.power.api.IPowerConsumer;
+import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
+import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
 
 import javax.annotation.Nullable;
 
 public class TileCreativeGenerator extends TileBase implements ITickable, IPowerProducer {
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		return (capability == PowerCapabilities.POWER_PRODUCER && facing != null) || super.hasCapability(capability, facing);
+		return (capability == CharsetPowerMechanical.POWER_PRODUCER && facing != null) || super.hasCapability(capability, facing);
 	}
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == PowerCapabilities.POWER_PRODUCER) {
-			return PowerCapabilities.POWER_PRODUCER.cast(this);
+		if (capability == CharsetPowerMechanical.POWER_PRODUCER) {
+			return CharsetPowerMechanical.POWER_PRODUCER.cast(this);
 		} else {
 			return super.getCapability(capability, facing);
 		}
@@ -52,9 +51,9 @@ public class TileCreativeGenerator extends TileBase implements ITickable, IPower
 		if (!world.isRemote) {
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				TileEntity tile = world.getTileEntity(pos.offset(facing.getOpposite()));
-				if (tile != null && tile.hasCapability(PowerCapabilities.POWER_CONSUMER, facing)) {
-					IPowerConsumer output = tile.getCapability(PowerCapabilities.POWER_CONSUMER, facing);
-					if (output.isAcceptingForce()) {
+				if (tile != null && tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, facing)) {
+					IPowerConsumer output = tile.getCapability(CharsetPowerMechanical.POWER_CONSUMER, facing);
+					if (output.isAcceptingPower()) {
 						output.setForce(1.0);
 					}
 				}

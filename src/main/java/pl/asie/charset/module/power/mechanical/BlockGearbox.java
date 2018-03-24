@@ -45,7 +45,6 @@ import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.item.SubItemSetHelper;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
-import pl.asie.charset.module.power.CharsetPower;
 import pl.asie.charset.module.power.mechanical.render.GearboxCacheInfo;
 
 import javax.annotation.Nullable;
@@ -60,7 +59,7 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	protected ISubItemProvider createSubItemProvider() {
-		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetPower.itemGearbox) {
+		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetPowerMechanical.itemGearbox) {
 			@Override
 			protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
 				return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("wood", SubItemSetHelper::sortByItem));

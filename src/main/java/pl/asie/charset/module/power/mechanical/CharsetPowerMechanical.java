@@ -17,13 +17,11 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.power;
+package pl.asie.charset.module.power.mechanical;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.block.statemap.IStateMapper;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -34,6 +32,9 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -42,34 +43,39 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.capability.DummyCapabilityStorage;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
-import pl.asie.charset.lib.modcompat.crafttweaker.Registry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.module.power.mechanical.*;
+import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
+import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
 import pl.asie.charset.module.power.mechanical.render.GearboxColorHandler;
 import pl.asie.charset.module.power.mechanical.render.ModelGearbox;
 import pl.asie.charset.module.power.mechanical.render.TileAxleRenderer;
 
-import java.util.Map;
-
 @CharsetModule(
-		name = "power",
-		description = "Mechanical power! And steam power!",
+		name = "power.mechanical",
+		description = "Mechanical power system",
 		profile = ModuleProfile.INDEV
 )
-public class CharsetPower {
+public class CharsetPowerMechanical {
 	public static BlockAxle blockAxle;
 	public static BlockCreativeGenerator blockCreativeGenerator;
 	public static BlockGearbox blockGearbox;
 	public static BlockSocket blockSocket;
 	public static ItemBlock itemAxle, itemCreativeGenerator, itemGearbox, itemSocket;
 
+	@CapabilityInject(IPowerProducer.class)
+	public static Capability<IPowerProducer> POWER_PRODUCER;
+	@CapabilityInject(IPowerConsumer.class)
+	public static Capability<IPowerConsumer> POWER_CONSUMER;
+
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
-		PowerCapabilities.preInit();
+		CapabilityManager.INSTANCE.register(IPowerProducer.class, DummyCapabilityStorage.get(), DefaultPowerProducer::new);
+		CapabilityManager.INSTANCE.register(IPowerConsumer.class, DummyCapabilityStorage.get(), DefaultPowerConsumer::new);
 
 		blockAxle = new BlockAxle();
 		blockCreativeGenerator = new BlockCreativeGenerator();
@@ -84,9 +90,9 @@ public class CharsetPower {
 	@Mod.EventHandler
 	public void onInit(FMLInitializationEvent event) {
 		RegistryUtils.register(TileAxle.class, "axle");
-		RegistryUtils.register(TileCreativeGenerator.class, "creative_generator");
+		RegistryUtils.register(TileCreativeGenerator.class, "creative_generator_mechanical");
 		RegistryUtils.register(TileGearbox.class, "gearbox");
-		RegistryUtils.register(TileSocket.class, "socket");
+		RegistryUtils.register(TileSocket.class, "socket_mechanical");
 	}
 
 	@Mod.EventHandler
@@ -105,9 +111,9 @@ public class CharsetPower {
 	@SideOnly(Side.CLIENT)
 	public void onModelRegistry(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(itemAxle, 0, "charset:axle");
-		RegistryUtils.registerModel(itemCreativeGenerator, 0, "charset:gen_creative");
+		RegistryUtils.registerModel(itemCreativeGenerator, 0, "charset:creative_generator_mechanical");
 		RegistryUtils.registerModel(itemGearbox, 0, "charset:gearbox");
-		RegistryUtils.registerModel(itemSocket, 0, "charset:socket");
+		RegistryUtils.registerModel(itemSocket, 0, "charset:socket_mechanical");
 
 		ModelLoader.setCustomStateMapper(blockGearbox, new StateMapperBase() {
 			@Override
@@ -144,16 +150,16 @@ public class CharsetPower {
 	@SubscribeEvent
 	public void onRegisterBlocks(RegistryEvent.Register<Block> event) {
 		RegistryUtils.register(event.getRegistry(), blockAxle, "axle");
-		RegistryUtils.register(event.getRegistry(), blockCreativeGenerator, "creative_generator");
+		RegistryUtils.register(event.getRegistry(), blockCreativeGenerator, "creative_generator_mechanical");
 		RegistryUtils.register(event.getRegistry(), blockGearbox, "gearbox");
-		RegistryUtils.register(event.getRegistry(), blockSocket, "socket");
+		RegistryUtils.register(event.getRegistry(), blockSocket, "socket_mechanical");
 	}
 
 	@SubscribeEvent
 	public void onRegisterItems(RegistryEvent.Register<Item> event) {
 		RegistryUtils.register(event.getRegistry(), itemAxle, "axle");
-		RegistryUtils.register(event.getRegistry(), itemCreativeGenerator, "creative_generator");
+		RegistryUtils.register(event.getRegistry(), itemCreativeGenerator, "creative_generator_mechanical");
 		RegistryUtils.register(event.getRegistry(), itemGearbox, "gearbox");
-		RegistryUtils.register(event.getRegistry(), itemSocket, "socket");
+		RegistryUtils.register(event.getRegistry(), itemSocket, "socket_mechanical");
 	}
 }

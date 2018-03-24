@@ -52,6 +52,7 @@ public class BlockSocket extends BlockBase implements ITileEntityProvider {
 
 	public BlockSocket() {
 		super(Material.WOOD);
+		setUnlocalizedName("charset.socket");
 		setOpaqueCube(false);
 		setFullCube(false);
 	}

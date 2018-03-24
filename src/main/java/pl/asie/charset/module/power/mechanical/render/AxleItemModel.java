@@ -26,16 +26,13 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.module.power.CharsetPower;
+import pl.asie.charset.module.power.mechanical.CharsetPowerMechanical;
 
 import javax.annotation.Nullable;
 
@@ -76,7 +73,7 @@ public class AxleItemModel extends ModelFactory<AxleItemModel.Key> {
 		TextureAtlasSprite replacementSprite = RenderUtils.getItemSprite(object.material.getStack());
 
 		return ModelTransformer.transform(parent,
-				CharsetPower.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
+				CharsetPowerMechanical.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
 					if (element.getUsage() == VertexFormatElement.EnumUsage.UV) {
 						float u = quad.getSprite().getUnInterpolatedU(data[0]);
 						float v = quad.getSprite().getUnInterpolatedV(data[1]);

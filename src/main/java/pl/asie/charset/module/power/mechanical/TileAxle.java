@@ -33,10 +33,8 @@ import pl.asie.charset.lib.capability.TileCache;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.module.power.CharsetPower;
-import pl.asie.charset.module.power.PowerCapabilities;
-import pl.asie.charset.module.power.api.IPowerProducer;
-import pl.asie.charset.module.power.api.IPowerConsumer;
+import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
+import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
 
 import javax.annotation.Nullable;
 
@@ -56,14 +54,14 @@ public class TileAxle extends TileBase {
 		}
 
 		@Override
-		public boolean isAcceptingForce() {
+		public boolean isAcceptingPower() {
 			if (powerOutputs[i ^ 1] != null && powerOutputs[i ^ 1].forceReceived != 0.0) return false;
 
 			IPowerConsumer output = CapabilityHelper.get(
-					PowerCapabilities.POWER_CONSUMER, cache.getTile(), facing
+					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
 			);
 
-			return output != null && output.isAcceptingForce();
+			return output != null && output.isAcceptingPower();
 		}
 
 		@Override
@@ -71,7 +69,7 @@ public class TileAxle extends TileBase {
 			if (powerOutputs[i ^ 1] != null && powerOutputs[i ^ 1].forceReceived != 0.0) return 0;
 
 			IPowerConsumer output = CapabilityHelper.get(
-					PowerCapabilities.POWER_CONSUMER, cache.getTile(), facing
+					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
 			);
 
 			return output != null ? output.getDesiredForce() : 0;
@@ -80,7 +78,7 @@ public class TileAxle extends TileBase {
 		@Override
 		public void setForce(double val) {
 			IPowerConsumer output = CapabilityHelper.get(
-					PowerCapabilities.POWER_CONSUMER, cache.getTile(), facing
+					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
 			);
 
 			if (output != null) {
@@ -89,18 +87,16 @@ public class TileAxle extends TileBase {
 
 			double ds = getDesiredForce();
 			if (forceReceived != val || lastDesiredForce != ds) {
-				System.out.println(lastDesiredForce + " -> " + ds);
 				forceReceived = val;
 				lastDesiredForce = ds;
+				if (forceReceived == 0.0) world.neighborChanged(pos.offset(facing), CharsetPowerMechanical.blockAxle, pos);
 				markBlockForUpdate();
 			}
 		}
 
 		public void onNeighborChanged(BlockPos pos) {
-			if (pos.equals(TileAxle.this.pos.offset(facing))) {
-				setForce(0.0);
-				markBlockForUpdate();
-			}
+			cache.neighborChanged(pos);
+			setForce(0.0);
 		}
 	}
 
@@ -133,7 +129,7 @@ public class TileAxle extends TileBase {
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		if (capability == PowerCapabilities.POWER_PRODUCER || capability == PowerCapabilities.POWER_CONSUMER) {
+		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
 			EnumFacing.Axis axis = EnumFacing.Axis.values()[getBlockMetadata()];
 			return facing != null && facing.getAxis() == axis;
 		}
@@ -144,7 +140,7 @@ public class TileAxle extends TileBase {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == PowerCapabilities.POWER_PRODUCER || capability == PowerCapabilities.POWER_CONSUMER) {
+		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
 			EnumFacing.Axis axis = EnumFacing.Axis.values()[getBlockMetadata()];
 			if (facing != null && facing.getAxis() == axis) {
 				EnumFacing.AxisDirection direction = facing.getAxisDirection();
@@ -169,7 +165,7 @@ public class TileAxle extends TileBase {
 
 	@Override
 	public ItemStack getDroppedBlock(IBlockState state) {
-		ItemStack stack = new ItemStack(CharsetPower.itemAxle, 1, 0);
+		ItemStack stack = new ItemStack(CharsetPowerMechanical.itemAxle, 1, 0);
 		saveMaterialToNBT(ItemUtils.getTagCompound(stack, true));
 		return stack;
 	}
@@ -201,8 +197,6 @@ public class TileAxle extends TileBase {
 			if (ds1 != 0.0) {
 				ds1 = powerOutputs[1].forceReceived / ds1;
 			}
-
-			System.out.println(pos + " " + Math.max(ds0, ds1));
 
 			compound.setFloat("rs", (float) Math.max(ds0, ds1));
 		}

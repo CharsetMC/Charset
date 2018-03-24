@@ -19,11 +19,11 @@
 
 package pl.asie.charset.module.power.mechanical;
 
-import pl.asie.charset.module.power.api.IPowerConsumer;
+import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
 
 public class DefaultPowerConsumer implements IPowerConsumer {
 	@Override
-	public boolean isAcceptingForce() {
+	public boolean isAcceptingPower() {
 		return false;
 	}
 

@@ -20,23 +20,11 @@
 package pl.asie.charset.module.power.mechanical;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
-import pl.asie.charset.module.power.PowerCapabilities;
 
 public class ItemBlockGearbox extends ItemBlockBase {
 	public ItemBlockGearbox(Block block) {

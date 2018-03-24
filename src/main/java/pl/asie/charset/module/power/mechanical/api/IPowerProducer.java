@@ -17,10 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.power.api;
+package pl.asie.charset.module.power.mechanical.api;
 
-public interface IPowerConsumer {
-	boolean isAcceptingForce();
-	double getDesiredForce();
-	void setForce(double val);
+public interface IPowerProducer {
 }

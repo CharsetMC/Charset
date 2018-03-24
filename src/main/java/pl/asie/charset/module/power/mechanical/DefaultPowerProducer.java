@@ -19,7 +19,7 @@
 
 package pl.asie.charset.module.power.mechanical;
 
-import pl.asie.charset.module.power.api.IPowerProducer;
+import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
 
 public class DefaultPowerProducer implements IPowerProducer {
 }

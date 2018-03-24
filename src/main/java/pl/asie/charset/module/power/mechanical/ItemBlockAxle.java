@@ -36,7 +36,6 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
-import pl.asie.charset.module.power.PowerCapabilities;
 
 public class ItemBlockAxle extends ItemBlockBase {
 	public ItemBlockAxle(Block block) {
@@ -81,9 +80,9 @@ public class ItemBlockAxle extends ItemBlockBase {
 				}
 			}
 		} else if (tile != null) {
-			if (tile.hasCapability(PowerCapabilities.POWER_PRODUCER, side)) {
+			if (tile.hasCapability(CharsetPowerMechanical.POWER_PRODUCER, side)) {
 				// pass
-			} else if (tile.hasCapability(PowerCapabilities.POWER_CONSUMER, side)) {
+			} else if (tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, side)) {
 				// pass
 			} else {
 				return false;
