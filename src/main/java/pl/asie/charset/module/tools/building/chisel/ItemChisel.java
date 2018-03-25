@@ -109,7 +109,7 @@ public class ItemChisel extends ItemCharsetTool {
                         }
                     }
 
-                    ItemStack result = FastRecipeLookup.getCraftingResult(worldIn, 3, 3, inputStacks);
+                    ItemStack result = FastRecipeLookup.getCraftingResult(RecipeUtils.getCraftingInventory(3, 3, RecipeUtils.defaultContainer(playerIn), inputStacks), worldIn);
                     if (result != null && !result.isEmpty() && !(result.getItem() instanceof ItemBlock && ((ItemBlock) result.getItem()).getBlock() instanceof BlockButton)) {
                         if (result.getItem() instanceof ItemBlock) {
                             Block block = ((ItemBlock) result.getItem()).getBlock();

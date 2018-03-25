@@ -32,11 +32,14 @@ public class CharsetPowerSteam {
 	}
 
 	@SubscribeEvent
+	@SuppressWarnings("ConstantConditions")
 	public void onAttachCapabilitiesChunk(AttachCapabilitiesEvent<Chunk> event) {
-		if (factory == null) {
-			factory = new CapabilityProviderFactory<>(chunkContainerCapability);
-		}
+		if (event.getObject().getWorld() != null) {
+			if (factory == null) {
+				factory = new CapabilityProviderFactory<>(chunkContainerCapability);
+			}
 
-		event.addCapability(SCC_LOCATION, factory.create(new SteamChunkContainer()));
+			event.addCapability(SCC_LOCATION, factory.create(new SteamChunkContainer(event.getObject())));
+		}
 	}
 }

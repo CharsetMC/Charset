@@ -35,17 +35,38 @@ public final class RecipeUtils {
 
     }
 
-    public static InventoryCrafting getCraftingInventory(int width, int height) {
-        return new InventoryCrafting(new Container() {
+    public static Container defaultContainer() {
+        return new Container() {
             @Override
             public boolean canInteractWith(EntityPlayer playerIn) {
                 return false;
             }
-        }, width, height);
+        };
+    }
+
+    public static Container defaultContainer(EntityPlayer player) {
+        return new Container() {
+            @Override
+            public boolean canInteractWith(EntityPlayer playerIn) {
+                return playerIn == player;
+            }
+        };
+    }
+
+    public static InventoryCrafting getCraftingInventory(int width, int height) {
+        return getCraftingInventory(width, height, defaultContainer());
     }
 
     public static InventoryCrafting getCraftingInventory(int width, int height, ItemStack... stacks) {
-        InventoryCrafting crafting = getCraftingInventory(width, height);
+        return getCraftingInventory(width, height, defaultContainer(), stacks);
+    }
+
+    public static InventoryCrafting getCraftingInventory(int width, int height, Container container) {
+        return new InventoryCrafting(container, width, height);
+    }
+
+    public static InventoryCrafting getCraftingInventory(int width, int height, Container container, ItemStack... stacks) {
+        InventoryCrafting crafting = getCraftingInventory(width, height, container);
         for (int i = 0; i < Math.min(width * height, stacks.length); i++) {
             crafting.setInventorySlotContents(i, (stacks[i] == null || stacks[i].isEmpty()) ? ItemStack.EMPTY : stacks[i].copy());
         }

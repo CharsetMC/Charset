@@ -52,12 +52,7 @@ public class TileSocket extends TileBase implements IPowerConsumer {
 	}
 
 	@Override
-	public double getDesiredForce() {
-		return 1.0D;
-	}
-
-	@Override
-	public void setForce(double val) {
+	public void setForce(double speed, double torque) {
 		//System.out.println(pos + " " + val);
 	}
 }

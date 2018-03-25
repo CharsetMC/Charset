@@ -32,4 +32,9 @@ public class ContainerRecordPlayer extends ContainerBase {
 		this.addSlotToContainer(new SlotItemHandler(owner.getHandler(), 0, 80, 34));
 		this.bindPlayerInventory(inventoryPlayer, 8, 84);
 	}
+
+	@Override
+	public boolean isOwnerPresent() {
+		return !owner.isInvalid();
+	}
 }

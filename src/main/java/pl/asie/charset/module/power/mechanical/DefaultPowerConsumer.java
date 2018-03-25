@@ -28,12 +28,7 @@ public class DefaultPowerConsumer implements IPowerConsumer {
 	}
 
 	@Override
-	public double getDesiredForce() {
-		return 0;
-	}
-
-	@Override
-	public void setForce(double val) {
+	public void setForce(double speed, double torque) {
 
 	}
 }

@@ -221,6 +221,12 @@ public class ContainerPocketTable extends ContainerBase {
     }
 
     @Override
+    public boolean isOwnerPresent() {
+        // TODO
+        return true;
+    }
+
+    @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
         Slot slot = inventorySlots.get(slotId);
 

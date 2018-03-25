@@ -21,6 +21,5 @@ package pl.asie.charset.module.power.mechanical.api;
 
 public interface IPowerConsumer {
 	boolean isAcceptingPower();
-	double getDesiredForce();
-	void setForce(double val);
+	void setForce(double speed, double torque);
 }

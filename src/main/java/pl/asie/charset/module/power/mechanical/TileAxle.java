@@ -43,7 +43,7 @@ public class TileAxle extends TileBase {
 		protected final EnumFacing facing;
 		protected final int i;
 		protected final TileCache cache;
-		protected double forceReceived, lastDesiredForce;
+		protected double speedReceived, torqueReceived;
 
 		public AxleSide(int i, EnumFacing facing) {
 			this.i = i;
@@ -55,7 +55,7 @@ public class TileAxle extends TileBase {
 
 		@Override
 		public boolean isAcceptingPower() {
-			if (powerOutputs[i ^ 1] != null && powerOutputs[i ^ 1].forceReceived != 0.0) return false;
+			if (powerOutputs[i ^ 1] != null && powerOutputs[i ^ 1].torqueReceived != 0.0) return false;
 
 			IPowerConsumer output = CapabilityHelper.get(
 					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
@@ -65,42 +65,30 @@ public class TileAxle extends TileBase {
 		}
 
 		@Override
-		public double getDesiredForce() {
-			if (powerOutputs[i ^ 1] != null && powerOutputs[i ^ 1].forceReceived != 0.0) return 0;
-
-			IPowerConsumer output = CapabilityHelper.get(
-					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
-			);
-
-			return output != null ? output.getDesiredForce() : 0;
-		}
-
-		@Override
-		public void setForce(double val) {
+		public void setForce(double speed, double torque) {
 			IPowerConsumer output = CapabilityHelper.get(
 					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
 			);
 
 			if (output != null) {
-				output.setForce(val);
+				output.setForce(speed, torque);
 			}
 
-			double ds = getDesiredForce();
-			if (forceReceived != val || lastDesiredForce != ds) {
-				forceReceived = val;
-				lastDesiredForce = ds;
-				if (forceReceived == 0.0) world.neighborChanged(pos.offset(facing), CharsetPowerMechanical.blockAxle, pos);
+			if (speedReceived != speed || torqueReceived != torque) {
+				speedReceived = speed;
+				torqueReceived = torque;
+				if (torqueReceived == 0.0) world.neighborChanged(pos.offset(facing), CharsetPowerMechanical.blockAxle, pos);
 				markBlockForUpdate();
 			}
 		}
 
 		public void onNeighborChanged(BlockPos pos) {
 			cache.neighborChanged(pos);
-			setForce(0.0);
+			setForce(0.0, 0.0);
 		}
 	}
 
-	public double rotSpeedClient;
+	public double rotSpeedClient, rotTorqueClient;
 	protected AxleSide[] powerOutputs = new AxleSide[2];
 	protected ItemMaterial material = ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank");
 	protected boolean rendered;
@@ -180,6 +168,7 @@ public class TileAxle extends TileBase {
 		boolean r = loadMaterialFromNBT(compound);
 		if (/*(r || !rendered) && */isClient) {
 			rotSpeedClient = compound.getFloat("rs");
+			rotTorqueClient = compound.getFloat("rt");
 			markBlockForRenderUpdate();
 			rendered = true;
 		}
@@ -189,16 +178,13 @@ public class TileAxle extends TileBase {
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		saveMaterialToNBT(compound);
 		if (isClient) {
-			double ds0 = powerOutputs[0] != null ? powerOutputs[0].getDesiredForce() : 0.0;
-			double ds1 = powerOutputs[1] != null ? powerOutputs[1].getDesiredForce() : 0.0;
-			if (ds0 != 0.0) {
-				ds0 = powerOutputs[0].forceReceived / ds0;
-			}
-			if (ds1 != 0.0) {
-				ds1 = powerOutputs[1].forceReceived / ds1;
-			}
+			double ds0 = powerOutputs[0] != null ? powerOutputs[0].speedReceived : 0.0;
+			double dt0 = powerOutputs[0] != null ? powerOutputs[0].torqueReceived : 0.0;
+			double ds1 = powerOutputs[1] != null ? powerOutputs[1].speedReceived : 0.0;
+			double dt1 = powerOutputs[1] != null ? powerOutputs[1].torqueReceived : 0.0;
 
 			compound.setFloat("rs", (float) Math.max(ds0, ds1));
+			compound.setFloat("rt", (float) Math.max(dt0, dt1));
 		}
 		return compound;
 	}

@@ -34,4 +34,10 @@ public class ContainerChisel extends ContainerBase {
         this.playerInv = player.inventory;
         heldPos = this.playerInv.currentItem;
     }
+
+    @Override
+    public boolean isOwnerPresent() {
+        // TODO
+        return true;
+    }
 }

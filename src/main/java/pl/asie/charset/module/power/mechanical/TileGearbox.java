@@ -36,17 +36,48 @@ import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
 
 import javax.annotation.Nullable;
 
-public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsumer, ITickable {
+public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
+	private class Consumer implements IPowerConsumer {
+		protected TileEntity receiver;
+		protected double speedIn, torqueIn;
+		private final EnumFacing facing;
+
+		private Consumer(EnumFacing facing) {
+			this.facing = facing;
+		}
+
+		public void verifyReceiver() {
+			if (receiver == null || receiver.isInvalid()) {
+				receiver = null;
+				speedIn = torqueIn = 0.0D;
+			}
+		}
+
+		@Override
+		public boolean isAcceptingPower() {
+			return !isRedstonePowered;
+		}
+
+		@Override
+		public void setForce(double speed, double torque) {
+			this.receiver = world.getTileEntity(pos.offset(facing));
+			this.speedIn = speed;
+			this.torqueIn = torque;
+		}
+	}
+
+	protected Consumer[] consumerHandlers;
+	protected double speedIn, torqueIn;
 	protected boolean isRedstonePowered;
 	protected boolean acceptingForce;
-	protected double desiredForce;
 	protected TraitMaterial material;
 
-	protected TileEntity receiver;
-	protected double forceIn;
-
 	public TileGearbox() {
+		consumerHandlers = new Consumer[6];
 		registerTrait("wood", material = new TraitMaterial("wood", ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank")));
+		for (int i = 0; i < 6; i++) {
+			consumerHandlers[i] = new Consumer(EnumFacing.getFront(i));
+		}
 	}
 
 	public EnumFacing getInputSide() {
@@ -76,10 +107,8 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
 		EnumFacing facingIn = getInputSide();
-		if (capability == CharsetPowerMechanical.POWER_PRODUCER) {
+		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
 			return facing != null && facing != facingIn;
-		} else if (capability == CharsetPowerMechanical.POWER_CONSUMER) {
-			return facing == facingIn;
 		}
 
 		return super.hasCapability(capability, facing);
@@ -88,9 +117,15 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
+		if (capability == CharsetPowerMechanical.POWER_PRODUCER) {
 			if (facing != null) {
-				return (T) this;
+				return CharsetPowerMechanical.POWER_PRODUCER.cast(this);
+			} else {
+				return null;
+			}
+		} else if (capability == CharsetPowerMechanical.POWER_CONSUMER) {
+			if (facing != null) {
+				return CharsetPowerMechanical.POWER_CONSUMER.cast(consumerHandlers[facing.ordinal()]);
 			} else {
 				return null;
 			}
@@ -107,37 +142,49 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 			return;
 		}
 
-		double forceOut = 0.0D;
 		IPowerConsumer[] consumers = new IPowerConsumer[6];
 		acceptingForce = false;
 
-		if (receiver == null || receiver.isInvalid()) {
-			receiver = null;
-			forceIn = 0.0D;
-		}
+		double modifier = 1.0;
+		speedIn = torqueIn = 0.0D;
+		int producerCount = 0;
+		int consumerCount = 0;
 
 		EnumFacing facingIn = getInputSide();
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (facing == facingIn) continue;
 
-			TileEntity tile = world.getTileEntity(pos.offset(facing));
-			if (tile != null && tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite())) {
-				IPowerConsumer consumer = tile.getCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite());
-				if (consumer != null && consumer.isAcceptingPower()) {
-					consumers[facing.ordinal()] = consumer;
-					acceptingForce = true;
-					forceOut += consumer.getDesiredForce();
+			consumerHandlers[facing.ordinal()].verifyReceiver();
+			if (consumerHandlers[facing.ordinal()].torqueIn != 0.0) {
+				producerCount++;
+				if (producerCount > 1) {
+					speedIn = 0.0D;
+					torqueIn = 0.0D;
+					break;
+				} else {
+					speedIn = consumerHandlers[facing.ordinal()].speedIn;
+					torqueIn = consumerHandlers[facing.ordinal()].torqueIn;
+				}
+			} else {
+				TileEntity tile = world.getTileEntity(pos.offset(facing));
+				if (tile != null && tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite())) {
+					IPowerConsumer consumer = tile.getCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite());
+					if (consumer != null && consumer.isAcceptingPower()) {
+						consumers[facing.ordinal()] = consumer;
+						consumerCount++;
+						acceptingForce = true;
+					}
 				}
 			}
 		}
 
-		desiredForce = forceOut;
+		System.out.println(consumerCount + " " + producerCount + " " + speedIn + " " + torqueIn);
 
-		if (acceptingForce && desiredForce != 0.0) {
+		if (acceptingForce) {
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				if (consumers[facing.ordinal()] != null) {
-					consumers[facing.ordinal()].setForce(isRedstonePowered ? 0.0 : (forceIn * consumers[facing.ordinal()].getDesiredForce() / forceOut));
+					consumers[facing.ordinal()].setForce(speedIn * modifier / consumerCount, torqueIn / modifier);
 				}
 			}
 		}
@@ -162,21 +209,5 @@ public class TileGearbox extends TileBase implements IPowerProducer, IPowerConsu
 			compound.setBoolean("rs", isRedstonePowered);
 		}
 		return compound;
-	}
-
-	@Override
-	public boolean isAcceptingPower() {
-		return !isRedstonePowered && acceptingForce;
-	}
-
-	@Override
-	public double getDesiredForce() {
-		return desiredForce;
-	}
-
-	@Override
-	public void setForce(double val) {
-		receiver = world.getTileEntity(pos.offset(getInputSide()));
-		forceIn = val;
 	}
 }

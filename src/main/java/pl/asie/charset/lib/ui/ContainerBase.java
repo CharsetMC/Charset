@@ -32,6 +32,7 @@ import java.util.Collection;
 public abstract class ContainerBase extends Container {
 	protected final Collection<Slot> SLOTS_PLAYER = new ArrayList<>(36);
 	protected final Collection<Slot> SLOTS_INVENTORY = new ArrayList<>();
+	protected final EntityPlayer owner;
 	private final IContainerHandler containerHandler;
 
 	public ContainerBase(InventoryPlayer inventoryPlayer) {
@@ -39,15 +40,18 @@ public abstract class ContainerBase extends Container {
 	}
 
 	public ContainerBase(InventoryPlayer inventoryPlayer, IContainerHandler listener) {
+		this.owner = inventoryPlayer.player;
 		this.containerHandler = listener;
 		if (listener != null) {
 			listener.onOpenedBy(inventoryPlayer.player);
 		}
 	}
 
+	public abstract boolean isOwnerPresent();
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		return containerHandler != null ? containerHandler.isUsableByPlayer(player) : true;
+		return isOwnerPresent() && containerHandler != null ? containerHandler.isUsableByPlayer(player) : (owner == player);
 	}
 
 	@Override

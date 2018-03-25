@@ -41,13 +41,18 @@ public class ContainerKeyring extends ContainerBase {
         held = inventoryPlayer.getStackInSlot(heldPos);
         bindPlayerInventory(inventoryPlayer, 8, 50);
 
-        ItemStack held = inventoryPlayer.getStackInSlot(heldPos);
         IItemHandler handler = held.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         for (int i = 0; i < 9; i++) {
             addSlotToContainer(new SlotItemHandler(handler, i, 8 + (18 * i), 18));
         }
 
         detectAndSendChanges();
+    }
+
+    @Override
+    public boolean isOwnerPresent() {
+        ItemStack heldNow = inventoryPlayer.getStackInSlot(heldPos);
+        return ItemStack.areItemStacksEqual(held, heldNow);
     }
 
     @Override

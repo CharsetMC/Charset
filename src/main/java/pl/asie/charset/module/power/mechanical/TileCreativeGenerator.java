@@ -54,7 +54,7 @@ public class TileCreativeGenerator extends TileBase implements ITickable, IPower
 				if (tile != null && tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, facing)) {
 					IPowerConsumer output = tile.getCapability(CharsetPowerMechanical.POWER_CONSUMER, facing);
 					if (output.isAcceptingPower()) {
-						output.setForce(1.0);
+						output.setForce(1.0, 1.0);
 					}
 				}
 			}

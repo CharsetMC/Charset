@@ -62,7 +62,7 @@ public class RecipeDyeItem implements ICauldronRecipe {
 				}
 			}
 
-			ItemStack result = FastRecipeLookup.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
+			ItemStack result = FastRecipeLookup.getCraftingResult(RecipeUtils.getCraftingInventory(3, 3, stacks), cauldron.getCauldronWorld());
 			if (!result.isEmpty() && !ItemUtils.canMerge(stacks[0], result)) {
 				return Optional.of(new CauldronContents(
 						new FluidStack(stack, stack.amount - 125),

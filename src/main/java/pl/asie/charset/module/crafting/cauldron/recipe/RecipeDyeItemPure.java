@@ -62,7 +62,7 @@ public class RecipeDyeItemPure implements ICauldronRecipe {
 			}
 			stacks[4] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
 
-			ItemStack result = FastRecipeLookup.getCraftingResult(cauldron.getCauldronWorld(), 3, 3, stacks);
+			ItemStack result = FastRecipeLookup.getCraftingResult(RecipeUtils.getCraftingInventory(3, 3, stacks), cauldron.getCauldronWorld());
 			int expectedCount = 8;
 
 			if (result.isEmpty()) {
@@ -71,7 +71,7 @@ public class RecipeDyeItemPure implements ICauldronRecipe {
 				stacks[0].setCount(1);
 				stacks[1] = new ItemStack(Items.DYE, 1, 15 - ((NBTPrimitive) dyes.get(0)).getByte());
 
-				result = FastRecipeLookup.getCraftingResult(cauldron.getCauldronWorld(), 2, 1, stacks);
+				result = FastRecipeLookup.getCraftingResult(RecipeUtils.getCraftingInventory(2, 1, stacks), cauldron.getCauldronWorld());
 				expectedCount = 1;
 			}
 
