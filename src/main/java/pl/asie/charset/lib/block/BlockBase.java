@@ -117,6 +117,11 @@ public abstract class BlockBase extends Block {
 
 	protected BlockBase setOpaqueCube(boolean value) {
 		opaqueCube = value;
+
+		// update affected variables
+		this.fullBlock = this.getDefaultState().isOpaqueCube();
+		this.lightOpacity = this.fullBlock ? 255 : 0;
+
 		return this;
 	}
 
@@ -267,7 +272,7 @@ public abstract class BlockBase extends Block {
 
 	@Override
 	public final void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-		getDrops(drops, world, pos, state, null, fortune, false);
+		getDrops(drops, world, pos, state, world.getTileEntity(pos), fortune, false);
 	}
 
 	public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {

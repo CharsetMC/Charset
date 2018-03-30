@@ -225,7 +225,19 @@ public final class ItemMaterialHeuristics {
                     stack, stack, stack,
                     stack, stack, stack,
                     stack, stack, stack);
-            if (!block.isEmpty() && containsOreDict(block, "block" + suffixU)) {
+            if (!block.isEmpty()) {
+                // Fancy heuristics for non-oredict-reg'd variants (Base Metals obsidian, redstone ingots)
+                boolean isBlockVariant = containsOreDict(block, "block" + suffixU);
+                if (!isBlockVariant) {
+                    isBlockVariant = (block.getItem() instanceof ItemBlock);
+                    if (isBlockVariant) {
+                        ItemStack reverse = FastRecipeLookup.getCraftingResultQuickly(false, 1, null, 1, 1, block.copy());
+                        if (!reverse.isEmpty() && ItemUtils.equals(reverse, stack, false, true, true) && reverse.getCount() == 9) {
+                            isBlockVariant = true;
+                        }
+                    }
+                }
+
                 ItemMaterial blockMat = reg.getOrCreateMaterial(block);
                 reg.registerTypes(blockMat, suffix, "block");
                 reg.registerRelation(ingotMat, blockMat, "block", prefix);
