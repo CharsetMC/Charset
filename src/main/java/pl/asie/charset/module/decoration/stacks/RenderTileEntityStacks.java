@@ -39,6 +39,7 @@ import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.lib.utils.colorspace.Colorspaces;
@@ -95,7 +96,13 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 			Vec3d[] base;
 			int y = (i >> 2) & (~1);
 			int x, z;
+			int target_i = i;
+
 			if ((y & 2) == 2) {
+				if ((i & 7) >= 2 && (i & 7) <= 5) {
+					// swap 2..3 with 4..5
+					target_i = (i & 1) | (6 - (i & 6)) | (i & (~7));
+				}
 				base = INGOT_POSITIONS_Z;
 				z = ((i & 1) | ((i >> 1) & 2)) * 4;
 				x = (i & 2) * 4;
@@ -104,9 +111,9 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 				x = ((i & 1) | ((i >> 1) & 2)) * 4;
 				z = (i & 2) * 4;
 			}
-			INGOT_POSITIONS[i] = new Vec3d[8];
+			INGOT_POSITIONS[target_i] = new Vec3d[8];
 			for (int j = 0; j < 8; j++) {
-				INGOT_POSITIONS[i][j] = base[j].addVector(x, y, z);
+				INGOT_POSITIONS[target_i][j] = base[j].addVector(x, y, z);
 			}
 		}
 
@@ -163,24 +170,28 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 		}
 
 		TileEntityStacks stacks = ((IExtendedBlockState) state).getValue(BlockStacks.PROPERTY_TILE);
-		if (stacks == null || stacks.stacks.isEmpty()) {
+		if (stacks == null) {
 			return Collections.emptyList();
 		}
 
 		List<BakedQuad> list = new ArrayList<>();
 
-		int i = 0;
-		for (ItemMaterial material : stacks.stacks) {
+		for (int i = 0; i < 64; i++) {
+			ItemStack stack = stacks.stacks[i];
+			if (stack == null) {
+				continue;
+			}
+
 			Vec3d[] vecs = INGOT_POSITIONS[i];
 
-			ItemMaterial blockMaterial = material.getRelated("block");
+			ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
+			ItemMaterial blockMaterial = material != null ? material.getRelated("block") : null;
 			TextureAtlasSprite sprite;
 			int c;
 
 			if (blockMaterial == null) {
-				ItemStack ingotStack = material.getStack();
 				sprite = RenderUtils.getItemSprite(new ItemStack(Blocks.IRON_BLOCK));
-				c = ColorLookupHandler.INSTANCE.getColor(ingotStack, RenderUtils.AveragingMode.FULL) | 0xFF000000;
+				c = ColorLookupHandler.INSTANCE.getColor(stack, RenderUtils.AveragingMode.FULL) | 0xFF000000;
 			} else {
 				sprite = RenderUtils.getItemSprite(blockMaterial.getStack());
 				c = Minecraft.getMinecraft().getItemColors().colorMultiplier(blockMaterial.getStack(), 0);
@@ -237,8 +248,6 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 				list.add(builder.build());
 				j++;
 			}
-
-			i++;
 		}
 
 		return list;
@@ -274,9 +283,14 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 		TextureAtlasSprite sprite = null;
 
 		TileEntityStacks stacks = ((IExtendedBlockState) state).getValue(BlockStacks.PROPERTY_TILE);
-		if (stacks != null && !stacks.stacks.isEmpty()) {
-			ItemMaterial material = stacks.stacks.get(stacks.stacks.size() - 1);
-			sprite = RenderUtils.getItemSprite(material.getStack());
+		if (stacks != null) {
+			for (int i = 63; i >= 0; i--) {
+				ItemStack stack = stacks.stacks[i];
+				if (stack != null && !stack.isEmpty()) {
+					sprite = RenderUtils.getItemSprite(stack);
+					break;
+				}
+			}
 		}
 
 		return sprite != null ? sprite : getParticleTexture();

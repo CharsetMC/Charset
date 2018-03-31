@@ -43,7 +43,7 @@ import pl.asie.charset.module.power.mechanical.render.ModelGearbox;
 @CharsetModule(
 		name = "decoration.stacks",
 		description = "Place things! In the world! And they stack!",
-		profile = ModuleProfile.INDEV
+		profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetDecorationStacks {
 	public BlockStacks blockStacks;
@@ -73,9 +73,7 @@ public class CharsetDecorationStacks {
 	public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
 		ItemStack stack = event.getItemStack();
 		if (!stack.isEmpty()) {
-			ItemStack stackOffered = stack.copy();
-			stackOffered.setCount(1);
-			if (!TileEntityStacks.canAcceptStackType(stackOffered)) {
+			if (!TileEntityStacks.canAcceptStackType(stack)) {
 				return;
 			}
 
@@ -91,7 +89,7 @@ public class CharsetDecorationStacks {
 				if (state.getBlock() instanceof BlockStacks) {
 					TileEntity tile = event.getWorld().getTileEntity(pos);
 					if (tile instanceof TileEntityStacks) {
-						if (((TileEntityStacks) tile).stacks.size() >= 64) {
+						if (((TileEntityStacks) tile).isFull()) {
 							pos = pos.up();
 						} else {
 							break;
@@ -107,15 +105,20 @@ public class CharsetDecorationStacks {
 				event.getWorld().setBlockState(pos, state);
 			}
 
-			if (state.getBlock() instanceof BlockStacks) {
-				TileEntity tile = event.getWorld().getTileEntity(pos);
-				if (tile instanceof TileEntityStacks) {
-					if (((TileEntityStacks) tile).offerStack(stackOffered)) {
-						if (!event.getEntityPlayer().isCreative()) {
-							stack.shrink(stackOffered.getCount());
+			for (int i = 0; i < (event.getEntityPlayer().isSneaking() ? stack.getCount() : 1); i++) {
+				ItemStack stackOffered = stack.copy();
+				stackOffered.setCount(1);
+
+				if (state.getBlock() instanceof BlockStacks) {
+					TileEntity tile = event.getWorld().getTileEntity(pos);
+					if (tile instanceof TileEntityStacks) {
+						if (((TileEntityStacks) tile).offerStack(stackOffered, event.getHitVec(), event.getEntityPlayer().isSneaking())) {
+							if (!event.getEntityPlayer().isCreative()) {
+								stack.shrink(stackOffered.getCount());
+							}
+							event.setCanceled(true);
+							event.setCancellationResult(EnumActionResult.SUCCESS);
 						}
-						event.setCanceled(true);
-						event.setCancellationResult(EnumActionResult.SUCCESS);
 					}
 				}
 			}

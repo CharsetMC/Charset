@@ -38,6 +38,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -48,6 +49,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.utils.OcclusionUtils;
+import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nullable;
@@ -81,7 +85,13 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		TileEntity tile = source.getTileEntity(pos);
 		if (tile instanceof TileEntityStacks) {
-			int count = ((TileEntityStacks) tile).stacks.size();
+			int count = 0;
+			for (int i = 63; i > 0; i--) {
+				if (((TileEntityStacks) tile).stacks[i] != null) {
+					count = i;
+					break;
+				}
+			}
 			float height = ((count + 7) / 8) * 0.125f;
 			return new AxisAlignedBB(
 					0, 0, 0,
@@ -96,8 +106,11 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 	public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
 		if (te instanceof TileEntityStacks) {
 			TObjectIntMap<ItemMaterial> materials = new TObjectIntHashMap<>();
-			for (ItemMaterial material : ((TileEntityStacks) te).stacks) {
-				materials.adjustOrPutValue(material, 1, 1);
+			for (ItemStack stack : ((TileEntityStacks) te).stacks) {
+				if (stack != null) {
+					// TODO: use an ItemStackHashSet
+					materials.adjustOrPutValue(ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stack), 1, 1);
+				}
 			}
 
 			for (ItemMaterial material : materials.keySet()) {
@@ -154,7 +167,10 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 			} else {
 				cooldownMap.put(player, worldIn.getTotalWorldTime() + 1);
 
-				ItemStack stackRemoved = ((TileEntityStacks) te).removeStack(false);
+				RayTraceResult result = RayTraceUtils.getCollision(worldIn, pos, player, getBoundingBox(state, worldIn, pos));
+				Vec3d hitPos = result != null ? result.hitVec : null;
+
+				ItemStack stackRemoved = ((TileEntityStacks) te).removeStack(false, hitPos);
 				if (!stackRemoved.isEmpty()) {
 					if (stackRemoved.getCount() > 1) {
 						stackRemoved = stackRemoved.copy();
@@ -162,7 +178,7 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 					}
 					spawnAsEntity(worldIn, pos, stackRemoved);
 				}
-				if (((TileEntityStacks) te).stacks.isEmpty()) {
+				if (((TileEntityStacks) te).isEmpty()) {
 					worldIn.setBlockToAir(pos);
 				}
 			}

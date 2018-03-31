@@ -19,31 +19,33 @@
 
 package pl.asie.charset.module.decoration.stacks;
 
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.Trait;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public class TileEntityStacks extends TileBase {
-	protected final NonNullList<ItemMaterial> stacks = NonNullList.create();
+	protected final ItemStack[] stacks = new ItemStack[64];
 
 	public TileEntityStacks() {
 
 	}
 
 	public static boolean canAcceptStackType(ItemStack stack) {
-		if (stack.getCount() != 1) {
-			return false;
-		}
-
 		ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
 		if (material == null || !(material.getTypes().contains("ingot"))) {
 			return false;
@@ -52,23 +54,91 @@ public class TileEntityStacks extends TileBase {
 		return true;
 	}
 
-	public boolean offerStack(ItemStack stack) {
-		if (!canAcceptStackType(stack) || stacks.size() >= 64) {
+	private Vec3d getCenter(int i) {
+		int y = (i >> 2) & (~1);
+		int x, z;
+		if ((y & 2) == 2) {
+			if ((i & 7) >= 2 && (i & 7) <= 5) {
+				// swap 2..3 with 4..5
+				i = (i & 1) | (6 - (i & 6)) | (i & (~7));
+			}
+
+			z = (((i & 1) | ((i >> 1) & 2)) * 4) + 2;
+			x = ((i & 2) * 4) + 4;
+		} else {
+			x = (((i & 1) | ((i >> 1) & 2)) * 4) + 2;
+			z = ((i & 2) * 4) + 4;
+		}
+		return new Vec3d(x / 16f, y / 16f, z / 16f);
+	}
+
+	protected boolean canPlace(int i) {
+		return i < 8 || (stacks[i - 8] != null && stacks[(i ^ 1) - 8] != null);
+	}
+
+	protected boolean canRemove(int i) {
+		return i >= 56 || (stacks[i + 8] == null && stacks[(i ^ 1) + 8] == null);
+	}
+
+	private void sort(IntList list, @Nullable Vec3d hitPos) {
+		if (hitPos != null) {
+			final Vec3d hitPosReal = hitPos.subtract(pos.getX(), pos.getY(), pos.getZ());
+			list.sort((a, b) -> {
+				double aDist = hitPosReal.squareDistanceTo(getCenter(a));
+				double bDist = hitPosReal.squareDistanceTo(getCenter(b));
+				return Double.compare(aDist, bDist);
+			});
+		}
+	}
+
+	public boolean offerStack(ItemStack stack, @Nullable Vec3d hitPos, boolean fillLayerFirst) {
+		if (!canAcceptStackType(stack) || stack.getCount() != 1) {
 			return false;
 		}
 
-		ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
-		stacks.add(material);
+		IntList freePositions = new IntArrayList();
+		int firstPos = -1;
+		for (int i = 0; i < 64; i++) {
+			if (stacks[i] == null && canPlace(i)) {
+				freePositions.add(i);
+				if (firstPos < 0) {
+					firstPos = i;
+				}
+			}
+
+			if (fillLayerFirst && firstPos >= 0 && (i & 7) == 7) {
+				break;
+			}
+		}
+
+		if (freePositions.isEmpty()) {
+			return false;
+		}
+
+		sort(freePositions, hitPos);
+		stacks[freePositions.getInt(0)] = stack;
 		markBlockForUpdate();
 		return true;
 	}
 
-	public ItemStack removeStack(boolean simulate) {
+	public ItemStack removeStack(boolean simulate, @Nullable Vec3d hitPos) {
+		IntList remPositions = new IntArrayList();
+		for (int i = 0; i < 64; i++) {
+			if (stacks[i] != null && canRemove(i)) {
+				remPositions.add(i);
+			}
+		}
+
+		if (remPositions.isEmpty()) {
+			return ItemStack.EMPTY;
+		}
+
+		sort(remPositions, hitPos);
 		if (simulate) {
-			return stacks.get(stacks.size() - 1).getStack();
+			return stacks[remPositions.getInt(0)];
 		} else {
-			ItemStack stack = stacks.get(stacks.size() - 1).getStack();
-			stacks.remove(stacks.size() - 1);
+			ItemStack stack = stacks[remPositions.getInt(0)];
+			stacks[remPositions.getInt(0)] = null;
 			markBlockForUpdate();
 			return stack;
 		}
@@ -77,11 +147,13 @@ public class TileEntityStacks extends TileBase {
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		super.readNBTData(compound, isClient);
-		stacks.clear();
-		NBTTagList list = compound.getTagList("stacks", Constants.NBT.TAG_COMPOUND);
-		for (int i = 0; i < list.tagCount(); i++) {
-			NBTTagCompound cpd = list.getCompoundTagAt(i);
-			stacks.add(ItemMaterialRegistry.INSTANCE.getMaterial(cpd, "material"));
+
+		for (int i = 0; i < 64; i++) {
+			if (compound.hasKey("s" + i, Constants.NBT.TAG_COMPOUND)) {
+				stacks[i] = new ItemStack(compound.getCompoundTag("s" + i));
+			} else {
+				stacks[i] = null;
+			}
 		}
 		if (isClient) {
 			markBlockForRenderUpdate();
@@ -91,13 +163,33 @@ public class TileEntityStacks extends TileBase {
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		compound = super.writeNBTData(compound, isClient);
-		NBTTagList list = new NBTTagList();
-		for (ItemMaterial stack : stacks) {
-			NBTTagCompound cpd = new NBTTagCompound();
-			stack.writeToNBT(cpd, "material");
-			list.appendTag(cpd);
+		for (int i = 0; i < 64; i++) {
+			if (stacks[i] != null) {
+				NBTTagCompound cpd = new NBTTagCompound();
+				stacks[i].writeToNBT(cpd);
+				compound.setTag("s" + i, cpd);
+			}
 		}
-		compound.setTag("stacks", list);
 		return compound;
+	}
+
+	public boolean isFull() {
+		for (int i = 0; i < 64; i++) {
+			if (stacks[i] == null) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public boolean isEmpty() {
+		for (int i = 0; i < 64; i++) {
+			if (stacks[i] != null) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
