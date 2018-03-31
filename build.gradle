@@ -11,7 +11,7 @@ buildscript {
 	}
 	dependencies {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-		classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.3'
 		classpath "gradle.plugin.net.minecrell:licenser:0.3"
 	}
 }
@@ -163,6 +163,10 @@ jar {
 	classifier = "full"
 }
 
+task charsetJar(type: Jar) {
+	baseName = "Charset"
+	classifier = ""
+}
 shadowJar {
 	classifier = "full"
 	archiveName = tasks.jar.archiveName
@@ -170,14 +174,13 @@ shadowJar {
 	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.module.audio.storage.libresample4j'
 }
 
-reobfJar {
-	setJar(tasks.shadowJar.archivePath)
-}
-reobfJar.dependsOn shadowJar
+task shadowJarNonFull(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+        baseName = "Charset"
+        classifier = ""
+	archiveName = tasks.charsetJar.archiveName
+	configurations = [project.configurations.shadow]
+	relocate 'com.laszlosystems.libresample4j', 'pl.asie.charset.module.audio.storage.libresample4j'
 
-task charsetJar(type: Jar) {
-	baseName = "Charset"
-	classifier = ""
 	from(sourceSets.main.output) {
 		include "META-INF/**"
 		include "assets/charset/**"
@@ -201,14 +204,23 @@ task simplelogicJar(type: Jar) {
 }
 
 reobf {
-	charsetJar {}
+	charsetJar {
+	}
 	simplelogicJar {
 		classpath += sourceSets.main.output
 	}
 }
 
-charsetJar.dependsOn reobfJar
-simplelogicJar.dependsOn reobfJar
+reobfJar {
+	setJar(tasks.shadowJar.archivePath)
+}
+
+reobfCharsetJar {
+	setJar(tasks.shadowJarNonFull.archivePath)
+}
+
+reobfJar.dependsOn shadowJar
+reobfCharsetJar.dependsOn shadowJarNonFull
 
 task apiJar(type: Jar) {
 	classifier = "api"
