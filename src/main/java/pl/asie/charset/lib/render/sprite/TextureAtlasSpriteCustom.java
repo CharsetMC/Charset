@@ -70,7 +70,7 @@ public class TextureAtlasSpriteCustom extends TextureAtlasSprite {
 						throw new RuntimeException("invalid frameindex " + index);
 					}
 
-					while (framesTextureData.size() < index) {
+					while (framesTextureData.size() <= index) {
 						framesTextureData.add(null);
 					}
 

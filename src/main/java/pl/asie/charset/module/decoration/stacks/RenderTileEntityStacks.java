@@ -51,72 +51,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedModel {
-	private static final Vec3d[] INGOT_POSITIONS_X, INGOT_POSITIONS_Z;
-	private static final Vec3d[][] INGOT_POSITIONS;
 	private static final int[][][] QUAD_ORDERS;
 	private static final EnumFacing[][] QUAD_FACES;
 	private static final int[][] QUAD_UVS;
 
 	static {
-		double TOTAL_WIDTH = 4;
-		double TOTAL_HEIGHT = 8;
-		double Y_SIZE = 2;
-		double TRAPEZOID_WIDTH_BOTTOM = 3.5;
-		double TRAPEZOID_WIDTH_TOP = 3;
-		double TRAPEZOID_HEIGHT_BOTTOM = 8;
-		double TRAPEZOID_HEIGHT_TOP = 7;
-
-		double TRAPEZOID_X_NEG_BOT = (TOTAL_WIDTH - TRAPEZOID_WIDTH_BOTTOM) / 2;
-		double TRAPEZOID_Y_NEG_BOT = (TOTAL_HEIGHT - TRAPEZOID_HEIGHT_BOTTOM) / 2;
-		double TRAPEZOID_X_NEG_TOP = (TOTAL_WIDTH - TRAPEZOID_WIDTH_TOP) / 2;
-		double TRAPEZOID_Y_NEG_TOP = (TOTAL_HEIGHT - TRAPEZOID_HEIGHT_TOP) / 2;
-
-		double TRAPEZOID_X_POS_BOT = TRAPEZOID_X_NEG_BOT + TRAPEZOID_WIDTH_BOTTOM;
-		double TRAPEZOID_Y_POS_BOT = TRAPEZOID_Y_NEG_BOT + TRAPEZOID_HEIGHT_BOTTOM;
-		double TRAPEZOID_X_POS_TOP = TRAPEZOID_X_NEG_TOP + TRAPEZOID_WIDTH_TOP;
-		double TRAPEZOID_Y_POS_TOP = TRAPEZOID_Y_NEG_TOP + TRAPEZOID_HEIGHT_TOP;
-
-		INGOT_POSITIONS_X = new Vec3d[]{
-				new Vec3d(TRAPEZOID_X_NEG_BOT, 0, TRAPEZOID_Y_NEG_BOT),
-				new Vec3d(TRAPEZOID_X_POS_BOT, 0, TRAPEZOID_Y_NEG_BOT),
-				new Vec3d(TRAPEZOID_X_POS_BOT, 0, TRAPEZOID_Y_POS_BOT),
-				new Vec3d(TRAPEZOID_X_NEG_BOT, 0, TRAPEZOID_Y_POS_BOT),
-				new Vec3d(TRAPEZOID_X_NEG_TOP, Y_SIZE, TRAPEZOID_Y_NEG_TOP),
-				new Vec3d(TRAPEZOID_X_POS_TOP, Y_SIZE, TRAPEZOID_Y_NEG_TOP),
-				new Vec3d(TRAPEZOID_X_POS_TOP, Y_SIZE, TRAPEZOID_Y_POS_TOP),
-				new Vec3d(TRAPEZOID_X_NEG_TOP, Y_SIZE, TRAPEZOID_Y_POS_TOP)
-		};
-		INGOT_POSITIONS_Z = new Vec3d[8];
-		for (int i = 0; i < 8; i++) {
-			INGOT_POSITIONS_Z[i] = new Vec3d(INGOT_POSITIONS_X[i].z, INGOT_POSITIONS_X[i].y, INGOT_POSITIONS_X[i].x);
-		}
-
-		INGOT_POSITIONS = new Vec3d[64][];
-		for (int i = 0; i < 64; i++) {
-			Vec3d[] base;
-			int y = (i >> 2) & (~1);
-			int x, z;
-			int target_i = i;
-
-			if ((y & 2) == 2) {
-				if ((i & 7) >= 2 && (i & 7) <= 5) {
-					// swap 2..3 with 4..5
-					target_i = (i & 1) | (6 - (i & 6)) | (i & (~7));
-				}
-				base = INGOT_POSITIONS_Z;
-				z = ((i & 1) | ((i >> 1) & 2)) * 4;
-				x = (i & 2) * 4;
-			} else {
-				base = INGOT_POSITIONS_X;
-				x = ((i & 1) | ((i >> 1) & 2)) * 4;
-				z = (i & 2) * 4;
-			}
-			INGOT_POSITIONS[target_i] = new Vec3d[8];
-			for (int j = 0; j < 8; j++) {
-				INGOT_POSITIONS[target_i][j] = base[j].addVector(x, y, z);
-			}
-		}
-
 		QUAD_ORDERS = new int[][][] {
 				{
 						{0, 4, 5, 1},
@@ -182,7 +121,7 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 				continue;
 			}
 
-			Vec3d[] vecs = INGOT_POSITIONS[i];
+			Vec3d[] vecs = StackShapes.INGOT_POSITIONS[i];
 
 			ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
 			ItemMaterial blockMaterial = material != null ? material.getRelated("block") : null;

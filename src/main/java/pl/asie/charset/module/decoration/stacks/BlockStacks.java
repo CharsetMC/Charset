@@ -27,8 +27,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
@@ -55,6 +57,7 @@ import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.WeakHashMap;
 
 public class BlockStacks extends BlockBase implements ITileEntityProvider {
@@ -67,6 +70,58 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 		setSoundType(SoundType.METAL);
 		setHardness(0.0F);
 		setUnlocalizedName("charset.stacks");
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+		RayTraceResult result = collisionRayTrace(state, worldIn, pos, RayTraceUtils.getStart(Minecraft.getMinecraft().player), RayTraceUtils.getEnd(Minecraft.getMinecraft().player));
+		if (result != null) {
+			return StackShapes.getIngotBox(result.subHit & 63).offset(pos);
+		}
+
+		return state.getBoundingBox(worldIn, pos).offset(pos);
+	}
+
+	@Override
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if (tile instanceof TileEntityStacks) {
+			for (int i = 0; i < 64; i++) {
+				if (((TileEntityStacks) tile).stacks[i] != null) {
+					addCollisionBoxToList(pos, entityBox, collidingBoxes, StackShapes.getIngotBox(i));
+				}
+			}
+		} else {
+			addCollisionBoxToList(pos, entityBox, collidingBoxes, FULL_BLOCK_AABB);
+		}
+	}
+
+	@Override
+	public RayTraceResult collisionRayTrace(IBlockState blockState, World worldIn, BlockPos pos, Vec3d start, Vec3d end) {
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if (tile instanceof TileEntityStacks) {
+			double distance = Double.MAX_VALUE;
+			RayTraceResult resultOut = null;
+
+			for (int i = 0; i < 64; i++) {
+				if (((TileEntityStacks) tile).stacks[i] != null) {
+					RayTraceResult result = this.rayTrace(pos, start, end, StackShapes.getIngotBox(i));
+					if (result != null) {
+						double dist = result.hitVec.squareDistanceTo(start);
+						if (dist < distance) {
+							resultOut = result;
+							resultOut.subHit = i;
+							distance = dist;
+						}
+					}
+				}
+			}
+
+			return resultOut;
+		} else {
+			return this.rayTrace(pos, start, end, FULL_BLOCK_AABB);
+		}
 	}
 
 	@Override
@@ -167,7 +222,7 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 			} else {
 				cooldownMap.put(player, worldIn.getTotalWorldTime() + 1);
 
-				RayTraceResult result = RayTraceUtils.getCollision(worldIn, pos, player, getBoundingBox(state, worldIn, pos));
+				RayTraceResult result = collisionRayTrace(state, worldIn, pos, RayTraceUtils.getStart(player), RayTraceUtils.getEnd(player));
 				Vec3d hitPos = result != null ? result.hitVec : null;
 
 				ItemStack stackRemoved = ((TileEntityStacks) te).removeStack(false, hitPos);

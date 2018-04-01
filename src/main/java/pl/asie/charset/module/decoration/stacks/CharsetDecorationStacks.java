@@ -19,13 +19,19 @@
 
 package pl.asie.charset.module.decoration.stacks;
 
+import mcmultipart.api.container.IPartInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -38,6 +44,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.lib.wires.Wire;
+import pl.asie.charset.lib.wires.WireUtils;
 import pl.asie.charset.module.power.mechanical.render.ModelGearbox;
 
 @CharsetModule(
@@ -105,7 +114,12 @@ public class CharsetDecorationStacks {
 				event.getWorld().setBlockState(pos, state);
 			}
 
-			for (int i = 0; i < (event.getEntityPlayer().isSneaking() ? stack.getCount() : 1); i++) {
+			int count = stack.getCount();
+			for (int i = 0; i < (event.getEntityPlayer().isSneaking() ? count : 1); i++) {
+				if (stack.isEmpty()) {
+					break;
+				}
+				
 				ItemStack stackOffered = stack.copy();
 				stackOffered.setCount(1);
 
