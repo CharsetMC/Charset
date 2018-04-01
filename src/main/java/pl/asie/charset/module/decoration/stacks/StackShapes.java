@@ -24,8 +24,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.utils.ThreeState;
 
 public class StackShapes {
 	private static final Vec3d[] INGOT_POSITIONS_X, INGOT_POSITIONS_Z;
@@ -102,11 +104,20 @@ public class StackShapes {
 	}
 
 	public static boolean isGearPlate(ItemStack stack) {
+		ThreeState state = CharsetIMC.INSTANCE.allows("decorationStackLikePlate", stack.getItem().getRegistryName());
+		if (state == ThreeState.YES) {
+			return true;
+		} else if (state == ThreeState.NO) {
+			return false;
+		}
+
 		int[] ids = OreDictionary.getOreIDs(stack);
 		for (int id : ids) {
 			String name = OreDictionary.getOreName(id);
-			if (name.startsWith("gear") || name.startsWith("plate")) {
+			if (name.startsWith("gear") || name.startsWith("plate") || name.startsWith("coin")) {
 				return true;
+			} else if (name.startsWith("ingot")) {
+				return false;
 			}
 		}
 
