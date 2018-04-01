@@ -36,6 +36,7 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -77,7 +78,11 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 	public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
 		RayTraceResult result = collisionRayTrace(state, worldIn, pos, RayTraceUtils.getStart(Minecraft.getMinecraft().player), RayTraceUtils.getEnd(Minecraft.getMinecraft().player));
 		if (result != null) {
-			return StackShapes.getIngotBox(result.subHit & 63).offset(pos);
+			TileEntity tile = worldIn.getTileEntity(pos);
+			if (tile instanceof TileEntityStacks) {
+				int id = result.subHit & 63;
+				return StackShapes.getIngotBox(id, ((TileEntityStacks) tile).stacks[id]).offset(pos);
+			}
 		}
 
 		return state.getBoundingBox(worldIn, pos).offset(pos);
@@ -89,7 +94,7 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 		if (tile instanceof TileEntityStacks) {
 			for (int i = 0; i < 64; i++) {
 				if (((TileEntityStacks) tile).stacks[i] != null) {
-					addCollisionBoxToList(pos, entityBox, collidingBoxes, StackShapes.getIngotBox(i));
+					addCollisionBoxToList(pos, entityBox, collidingBoxes, StackShapes.getIngotBox(i, ((TileEntityStacks) tile).stacks[i]));
 				}
 			}
 		} else {
@@ -106,7 +111,7 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 
 			for (int i = 0; i < 64; i++) {
 				if (((TileEntityStacks) tile).stacks[i] != null) {
-					RayTraceResult result = this.rayTrace(pos, start, end, StackShapes.getIngotBox(i));
+					RayTraceResult result = this.rayTrace(pos, start, end, StackShapes.getIngotBox(i, ((TileEntityStacks) tile).stacks[i]));
 					if (result != null) {
 						double dist = result.hitVec.squareDistanceTo(start);
 						if (dist < distance) {
@@ -134,6 +139,13 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 	@SideOnly(Side.CLIENT)
 	public boolean isTranslucent(IBlockState state) {
 		return true;
+	}
+
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT;
 	}
 
 	@Override

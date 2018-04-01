@@ -32,6 +32,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.ModelLoader;
@@ -41,6 +42,7 @@ import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
+import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.lib.utils.colorspace.Colorspaces;
 
@@ -102,6 +104,51 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 		};
 	}
 
+	public ModelTransformer.IVertexTransformer createTransformer(int i, ItemStack stack, long rand) {
+		int c = Minecraft.getMinecraft().getItemColors().colorMultiplier(stack, 0);
+		AxisAlignedBB box = StackShapes.getIngotBox(i, stack);
+
+		float[] color = new float[]{
+				MathHelper.clamp(((c >> 16) & 0xFF) / 255.0f, 0, 1),
+				MathHelper.clamp(((c >> 8) & 0xFF) / 255.0f, 0, 1),
+				MathHelper.clamp(((c) & 0xFF) / 255.0f, 0, 1),
+				1.0f
+		};
+
+		rand += i * 17237;
+
+		float offsetX = ((rand & 7) - 3.5f) / 256.0f;
+		float offsetZ = (((rand >> 3) & 7) - 3.5f) / 256.0f;
+
+		return (quad, element, data) -> {
+			switch (element.getUsage()) {
+				case POSITION:
+					return new float[] {
+							data[1] * 0.5f + offsetX + (float) box.minX,
+							data[2] - 0.5f + 0.03125f + (float) box.minY,
+							data[0] * 0.5f + offsetZ + (float) box.minZ,
+							data[3]
+					};
+				case NORMAL:
+					return new float[] {
+							data[1],
+							data[2],
+							data[0],
+							data[3]
+					};
+				case COLOR:
+					return new float[] {
+							data[0] * color[0],
+							data[1] * color[1],
+							data[2] * color[2],
+							data[3] * color[3]
+					};
+				default:
+					return data;
+			}
+		};
+	}
+
 	@Override
 	public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
 		if (side != null || !(state instanceof IExtendedBlockState)) {
@@ -121,71 +168,85 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 				continue;
 			}
 
-			Vec3d[] vecs = StackShapes.INGOT_POSITIONS[i];
+			if (StackShapes.isIngot(stack)) {
+				Vec3d[] vecs = StackShapes.INGOT_POSITIONS[i];
 
-			ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
-			ItemMaterial blockMaterial = material != null ? material.getRelated("block") : null;
-			TextureAtlasSprite sprite;
-			int c;
+				ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
+				ItemMaterial blockMaterial = material != null ? material.getRelated("block") : null;
+				TextureAtlasSprite sprite;
+				int c;
 
-			if (blockMaterial == null) {
-				sprite = RenderUtils.getItemSprite(new ItemStack(Blocks.IRON_BLOCK));
-				c = ColorLookupHandler.INSTANCE.getColor(stack, RenderUtils.AveragingMode.FULL) | 0xFF000000;
-			} else {
-				sprite = RenderUtils.getItemSprite(blockMaterial.getStack());
-				c = Minecraft.getMinecraft().getItemColors().colorMultiplier(blockMaterial.getStack(), 0);
-			}
-
-			float[] color = new float[] {
-					MathHelper.clamp(((c >> 16) & 0xFF) / 255.0f, 0, 1),
-					MathHelper.clamp(((c >> 8) & 0xFF) / 255.0f, 0, 1),
-					MathHelper.clamp(((c) & 0xFF) / 255.0f, 0, 1),
-					1.0f
-			};
-
-			int j = 0;
-			int yOff = (i >> 3) & 1;
-
-			for (int[] vecOrder : QUAD_ORDERS[yOff]) {
-				UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);
-				EnumFacing face = QUAD_FACES[yOff][j];
-
-				builder.setTexture(sprite);
-				builder.setApplyDiffuseLighting(isAmbientOcclusion());
-				builder.setContractUVs(false);
-				builder.setQuadOrientation(face);
-
-				int uv_offset = j < 4 ? 1 : 0;
-				if (yOff == 1) uv_offset = 1 - uv_offset;
-
-				for (int k = 0; k < vecOrder.length; k++) {
-					Vec3d vec = vecs[vecOrder[k]];
-					int[] uv = QUAD_UVS[(k + uv_offset) & 3];
-					for (int e = 0; e < builder.getVertexFormat().getElementCount(); e++) {
-						VertexFormatElement el = builder.getVertexFormat().getElement(e);
-						switch (el.getUsage()) {
-							case POSITION:
-								builder.put(e, (float) vec.x / 16f, (float) vec.y / 16f, (float) vec.z / 16f, 1);
-								break;
-							case COLOR:
-								builder.put(e, color);
-								break;
-							case NORMAL:
-								builder.put(e, face.getFrontOffsetX(), face.getFrontOffsetY(), face.getFrontOffsetZ(), 0);
-								break;
-							case UV:
-								float u = sprite.getInterpolatedU(uv[0]);
-								float v = sprite.getInterpolatedV(uv[1]);
-								builder.put(e, u, v, 0, 1);
-								break;
-							default:
-								builder.put(e);
-						}
-					}
+				if (blockMaterial == null) {
+					sprite = RenderUtils.getItemSprite(new ItemStack(Blocks.IRON_BLOCK));
+					c = ColorLookupHandler.INSTANCE.getColor(stack, RenderUtils.AveragingMode.FULL) | 0xFF000000;
+				} else {
+					sprite = RenderUtils.getItemSprite(blockMaterial.getStack());
+					c = Minecraft.getMinecraft().getItemColors().colorMultiplier(blockMaterial.getStack(), 0);
 				}
 
-				list.add(builder.build());
-				j++;
+				float[] color = new float[]{
+						MathHelper.clamp(((c >> 16) & 0xFF) / 255.0f, 0, 1),
+						MathHelper.clamp(((c >> 8) & 0xFF) / 255.0f, 0, 1),
+						MathHelper.clamp(((c) & 0xFF) / 255.0f, 0, 1),
+						1.0f
+				};
+
+				int j = 0;
+				int yOff = (i >> 3) & 1;
+
+				for (int[] vecOrder : QUAD_ORDERS[yOff]) {
+					UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);
+					EnumFacing face = QUAD_FACES[yOff][j];
+
+					builder.setTexture(sprite);
+					builder.setApplyDiffuseLighting(isAmbientOcclusion());
+					builder.setContractUVs(false);
+					builder.setQuadOrientation(face);
+
+					int uv_offset = j < 4 ? 1 : 0;
+					if (yOff == 1) uv_offset = 1 - uv_offset;
+
+					for (int k = 0; k < vecOrder.length; k++) {
+						Vec3d vec = vecs[vecOrder[k]];
+						int[] uv = QUAD_UVS[(k + uv_offset) & 3];
+						for (int e = 0; e < builder.getVertexFormat().getElementCount(); e++) {
+							VertexFormatElement el = builder.getVertexFormat().getElement(e);
+							switch (el.getUsage()) {
+								case POSITION:
+									builder.put(e, (float) vec.x / 16f, (float) vec.y / 16f, (float) vec.z / 16f, 1);
+									break;
+								case COLOR:
+									builder.put(e, color);
+									break;
+								case NORMAL:
+									builder.put(e, face.getFrontOffsetX(), face.getFrontOffsetY(), face.getFrontOffsetZ(), 0);
+									break;
+								case UV:
+									float u = sprite.getInterpolatedU(uv[0]);
+									float v = sprite.getInterpolatedV(uv[1]);
+									builder.put(e, u, v, 0, 1);
+									break;
+								default:
+									builder.put(e);
+							}
+						}
+					}
+
+					list.add(builder.build());
+					j++;
+				}
+			} else if (StackShapes.isGearPlate(stack)) {
+				// renderer the second
+				IBakedModel model = RenderUtils.getItemModel(stack, stacks.getWorld(), Minecraft.getMinecraft().player);
+				ModelTransformer.IVertexTransformer transformer = createTransformer(i, stack, rand);
+				for (BakedQuad quad : model.getQuads(state, null, 0)) {
+					list.add(ModelTransformer.transform(quad, transformer));
+				}
+				for (EnumFacing facing : EnumFacing.VALUES) {
+					for (BakedQuad quad : model.getQuads(state, facing, 0)) {
+						list.add(ModelTransformer.transform(quad, transformer));
+					}
+				}
 			}
 		}
 

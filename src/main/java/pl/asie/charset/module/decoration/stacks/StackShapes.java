@@ -19,13 +19,18 @@
 
 package pl.asie.charset.module.decoration.stacks;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 
 public class StackShapes {
 	private static final Vec3d[] INGOT_POSITIONS_X, INGOT_POSITIONS_Z;
 	protected static final Vec3d[][] INGOT_POSITIONS;
+	protected static final Vec3d[] STACK_POSITIONS;
 
 	static {
 		double TOTAL_WIDTH = 4;
@@ -86,16 +91,56 @@ public class StackShapes {
 				INGOT_POSITIONS[target_i][j] = base[j].addVector(x, y, z);
 			}
 		}
+
+		STACK_POSITIONS = new Vec3d[64];
+		for (int i = 0; i < 64; i++) {
+			int y = (i & 1) + ((i >> 2) & (~1));
+			int x = (i & 4) * 2;
+			int z = (i & 2) * 4;
+			STACK_POSITIONS[i] = new Vec3d(x, y, z);
+		}
 	}
 
-	public static AxisAlignedBB getIngotBox(int i) {
-		return new AxisAlignedBB(
-				INGOT_POSITIONS[i][0].x / 16f,
-				INGOT_POSITIONS[i][0].y / 16f,
-				INGOT_POSITIONS[i][0].z / 16f,
-				INGOT_POSITIONS[i][6].x / 16f,
-				INGOT_POSITIONS[i][6].y / 16f,
-				INGOT_POSITIONS[i][6].z / 16f
-		);
+	public static boolean isGearPlate(ItemStack stack) {
+		int[] ids = OreDictionary.getOreIDs(stack);
+		for (int id : ids) {
+			String name = OreDictionary.getOreName(id);
+			if (name.startsWith("gear") || name.startsWith("plate")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean isIngot(ItemStack stack) {
+		ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
+		if (material == null || !(material.getTypes().contains("ingot"))) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public static AxisAlignedBB getIngotBox(int i, ItemStack stack) {
+		if (stack != null && isIngot(stack)) {
+			return new AxisAlignedBB(
+					INGOT_POSITIONS[i][0].x / 16f,
+					INGOT_POSITIONS[i][0].y / 16f,
+					INGOT_POSITIONS[i][0].z / 16f,
+					INGOT_POSITIONS[i][2].x / 16f,
+					INGOT_POSITIONS[i][6].y / 16f,
+					INGOT_POSITIONS[i][2].z / 16f
+			);
+		} else {
+			return new AxisAlignedBB(
+					STACK_POSITIONS[i].x / 16f,
+					STACK_POSITIONS[i].y / 16f,
+					STACK_POSITIONS[i].z / 16f,
+					(STACK_POSITIONS[i].x + 8) / 16f,
+					(STACK_POSITIONS[i].y + 1) / 16f,
+					(STACK_POSITIONS[i].z + 8) / 16f
+			);
+		}
 	}
 }

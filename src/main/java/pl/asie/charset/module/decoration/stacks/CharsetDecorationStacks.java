@@ -119,7 +119,7 @@ public class CharsetDecorationStacks {
 				if (stack.isEmpty()) {
 					break;
 				}
-				
+
 				ItemStack stackOffered = stack.copy();
 				stackOffered.setCount(1);
 
