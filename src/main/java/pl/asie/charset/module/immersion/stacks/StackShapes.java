@@ -103,13 +103,33 @@ public class StackShapes {
 		}
 	}
 
-	public static boolean isGearPlate(ItemStack stack) {
-		ThreeState state = CharsetIMC.INSTANCE.allows("decorationStackLikePlate", stack.getItem().getRegistryName());
+	public enum FlatRenderMode {
+		OFFSET,
+		ROTATE
+	};
+
+	public static FlatRenderMode getRenderMode(ItemStack stack) {
+		ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
+
+		if (material != null && material.getTypes().contains("stick")) {
+			return FlatRenderMode.ROTATE;
+		} else {
+			return FlatRenderMode.OFFSET;
+		}
+	}
+
+	public static boolean isFlatPlaced(ItemStack stack) {
+		ThreeState state = CharsetIMC.INSTANCE.allows("immersionStacksFlat", stack.getItem().getRegistryName());
 		if (state == ThreeState.YES) {
 			return true;
 		} else if (state == ThreeState.NO) {
 			return false;
 		}
+
+		/* ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
+		if (material != null && material.getTypes().contains("stick")) {
+			return true;
+		} */
 
 		int[] ids = OreDictionary.getOreIDs(stack);
 		for (int id : ids) {

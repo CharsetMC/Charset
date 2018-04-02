@@ -104,6 +104,7 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 	public ModelTransformer.IVertexTransformer createTransformer(int i, ItemStack stack, long rand) {
 		int c = Minecraft.getMinecraft().getItemColors().colorMultiplier(stack, 0);
 		AxisAlignedBB box = StackShapes.getIngotBox(i, stack);
+		StackShapes.FlatRenderMode renderMode = StackShapes.getRenderMode(stack);
 
 		float[] color = new float[]{
 				MathHelper.clamp(((c >> 16) & 0xFF) / 255.0f, 0, 1),
@@ -116,14 +117,32 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 
 		float offsetX = ((rand & 7) - 3.5f) / 256.0f;
 		float offsetZ = (((rand >> 3) & 7) - 3.5f) / 256.0f;
+		float rotation = ((rand & 15) - 7.5f) * 0.05f;
 
 		return (quad, element, data) -> {
 			switch (element.getUsage()) {
 				case POSITION:
+					float x = data[1] * 0.5f - 0.25f;
+					float y = data[2] - 0.5f;
+					float z = data[0] * 0.5f - 0.25f;
+
+					switch (renderMode) {
+						case OFFSET:
+							x += offsetX;
+							z += offsetZ;
+							break;
+						case ROTATE:
+							float xp = x;
+							float zp = z;
+							x = zp*MathHelper.sin(rotation) + xp*MathHelper.cos(rotation);
+							z = zp*MathHelper.cos(rotation) - xp*MathHelper.sin(rotation);
+							break;
+					}
+
 					return new float[] {
-							data[1] * 0.5f + offsetX + (float) box.minX,
-							data[2] - 0.5f + 0.03125f + (float) box.minY,
-							data[0] * 0.5f + offsetZ + (float) box.minZ,
+							x + 0.25f + (float) box.minX,
+							y + 0.03125f + (float) box.minY,
+							z + 0.25f + (float) box.minZ,
 							data[3]
 					};
 				case NORMAL:
@@ -232,7 +251,7 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 					list.add(builder.build());
 					j++;
 				}
-			} else if (StackShapes.isGearPlate(stack)) {
+			} else if (StackShapes.isFlatPlaced(stack)) {
 				// renderer the second
 				IBakedModel model = RenderUtils.getItemModel(stack, stacks.getWorld(), Minecraft.getMinecraft().player);
 				ModelTransformer.IVertexTransformer transformer = createTransformer(i, stack, rand);

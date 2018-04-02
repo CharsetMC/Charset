@@ -39,7 +39,7 @@ public class TileEntityStacks extends TileBase {
 	}
 
 	public static boolean canAcceptStackType(ItemStack stack) {
-		return StackShapes.isIngot(stack) || StackShapes.isGearPlate(stack);
+		return StackShapes.isIngot(stack) || StackShapes.isFlatPlaced(stack);
 	}
 
 	private Vec3d getCenter(int i) {
@@ -56,12 +56,12 @@ public class TileEntityStacks extends TileBase {
 			if (StackShapes.isIngot(opponent) && !StackShapes.isIngot(stack)) {
 				return false;
 			}
-			if (StackShapes.isGearPlate(opponent) && !StackShapes.isGearPlate(stack)) {
+			if (StackShapes.isFlatPlaced(opponent) && !StackShapes.isFlatPlaced(stack)) {
 				return false;
 			}
 		}
 
-		if (StackShapes.isGearPlate(stack) && ((i & 1) == 1) && stacks[i & (~1)] == null) {
+		if (StackShapes.isFlatPlaced(stack) && ((i & 1) == 1) && stacks[i & (~1)] == null) {
 			return false;
 		}
 
@@ -82,7 +82,7 @@ public class TileEntityStacks extends TileBase {
 			return false;
 		}
 
-		if (((i & 1) == 0) && stacks[i | 1] != null && StackShapes.isGearPlate(stacks[i | 1])) {
+		if (((i & 1) == 0) && stacks[i | 1] != null && StackShapes.isFlatPlaced(stacks[i | 1])) {
 			return false;
 		}
 
