@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.decoration.stacks;
+package pl.asie.charset.module.immersion.stacks;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;

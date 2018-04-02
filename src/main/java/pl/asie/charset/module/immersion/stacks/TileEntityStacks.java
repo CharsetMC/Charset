@@ -17,27 +17,19 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.decoration.stacks;
+package pl.asie.charset.module.immersion.stacks;
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.NonNullList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.block.TileBase;
-import pl.asie.charset.lib.block.Trait;
-import pl.asie.charset.lib.material.ItemMaterial;
-import pl.asie.charset.lib.material.ItemMaterialRegistry;
 
 import javax.annotation.Nullable;
-import java.util.Map;
 
 public class TileEntityStacks extends TileBase {
 	protected final ItemStack[] stacks = new ItemStack[64];
@@ -73,7 +65,16 @@ public class TileEntityStacks extends TileBase {
 			return false;
 		}
 
-		return i < 8 || (stacks[i - 8] != null && stacks[(i ^ 1) - 8] != null);
+		if (i >= 8) {
+			return (stacks[i - 8] != null && stacks[(i ^ 1) - 8] != null);
+		} else {
+			TileEntity bottom = world.getTileEntity(pos.down());
+			if (bottom instanceof TileEntityStacks) {
+				return (((TileEntityStacks) bottom).stacks[i + 56] != null && ((TileEntityStacks) bottom).stacks[(i ^ 1) + 56] != null);
+			} else {
+				return world.isSideSolid(pos.down(), EnumFacing.UP, false);
+			}
+		}
 	}
 
 	protected boolean canRemove(int i) {
@@ -85,7 +86,16 @@ public class TileEntityStacks extends TileBase {
 			return false;
 		}
 
-		return i >= 56 || (stacks[i + 8] == null && stacks[(i ^ 1) + 8] == null);
+		if (i < 56) {
+			return (stacks[i + 8] == null && stacks[(i ^ 1) + 8] == null);
+		} else {
+			TileEntity top = world.getTileEntity(pos.up());
+			if (top instanceof TileEntityStacks) {
+				return (((TileEntityStacks) top).stacks[i - 56] == null && ((TileEntityStacks) top).stacks[(i ^ 1) - 56] == null);
+			} else {
+				return true;
+			}
+		}
 	}
 
 	private void sort(IntList list, @Nullable Vec3d hitPos) {
