@@ -41,6 +41,14 @@ public final class SpaceUtils {
     public static final byte GET_POINT_MIN = 0x0;
     public static final byte GET_POINT_MAX = 0x7;
 
+    public static Vec3d getCenter(AxisAlignedBB bb) {
+        return new Vec3d(
+                bb.minX + ((bb.maxX - bb.minX) / 2.0),
+                bb.minY + ((bb.maxY - bb.minY) / 2.0),
+                bb.minZ + ((bb.maxZ - bb.minZ) / 2.0)
+        );
+    }
+
     public static EnumFacing determineOrientation(EntityLivingBase player) {
         if (player.rotationPitch > 75) {
             return EnumFacing.DOWN;

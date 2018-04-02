@@ -116,7 +116,7 @@ public class CharsetImmersionStacks {
 				if (state.getBlock() instanceof BlockStacks) {
 					TileEntity tile = event.getWorld().getTileEntity(pos);
 					if (tile instanceof TileEntityStacks) {
-						if (((TileEntityStacks) tile).offerStack(stackOffered, event.getHitVec(), event.getEntityPlayer().isSneaking())) {
+						if (((TileEntityStacks) tile).offerStack(false, stackOffered, event.getHitVec(), event.getEntityPlayer().isSneaking())) {
 							if (!event.getEntityPlayer().isCreative()) {
 								stack.shrink(stackOffered.getCount());
 							}

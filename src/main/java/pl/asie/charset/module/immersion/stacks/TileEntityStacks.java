@@ -25,9 +25,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.lib.utils.SpaceUtils;
 
 import javax.annotation.Nullable;
 
@@ -42,8 +44,8 @@ public class TileEntityStacks extends TileBase {
 		return StackShapes.isIngot(stack) || StackShapes.isFlatPlaced(stack);
 	}
 
-	private Vec3d getCenter(int i) {
-		return StackShapes.getIngotBox(i, stacks[i]).getCenter();
+	private Vec3d getCenter(int i, ItemStack stack) {
+		return SpaceUtils.getCenter(StackShapes.getIngotBox(i, stack));
 	}
 
 	protected boolean canPlace(int i, ItemStack stack) {
@@ -98,18 +100,18 @@ public class TileEntityStacks extends TileBase {
 		}
 	}
 
-	private void sort(IntList list, @Nullable Vec3d hitPos) {
+	private void sort(IntList list, @Nullable Vec3d hitPos, @Nullable ItemStack stack) {
 		if (hitPos != null) {
 			final Vec3d hitPosReal = hitPos.subtract(pos.getX(), pos.getY(), pos.getZ());
 			list.sort((a, b) -> {
-				double aDist = hitPosReal.squareDistanceTo(getCenter(a));
-				double bDist = hitPosReal.squareDistanceTo(getCenter(b));
+				double aDist = hitPosReal.squareDistanceTo(getCenter(a, stack != null ? stack : stacks[a]));
+				double bDist = hitPosReal.squareDistanceTo(getCenter(b, stack != null ? stack : stacks[b]));
 				return Double.compare(aDist, bDist);
 			});
 		}
 	}
 
-	public boolean offerStack(ItemStack stack, @Nullable Vec3d hitPos, boolean fillLayerFirst) {
+	public boolean offerStack(boolean simulate, ItemStack stack, @Nullable Vec3d hitPos, boolean fillLayerFirst) {
 		if (!canAcceptStackType(stack) || stack.getCount() != 1) {
 			return false;
 		}
@@ -133,10 +135,12 @@ public class TileEntityStacks extends TileBase {
 			return false;
 		}
 
-		sort(freePositions, hitPos);
-		stacks[freePositions.getInt(0)] = stack;
-		markChunkDirty();
-		markBlockForUpdate();
+		if (!simulate) {
+			sort(freePositions, hitPos, stack);
+			stacks[freePositions.getInt(0)] = stack;
+			markChunkDirty();
+			markBlockForUpdate();
+		}
 		return true;
 	}
 
@@ -152,7 +156,7 @@ public class TileEntityStacks extends TileBase {
 			return ItemStack.EMPTY;
 		}
 
-		sort(remPositions, hitPos);
+		sort(remPositions, hitPos, null);
 		if (simulate) {
 			return stacks[remPositions.getInt(0)];
 		} else {
@@ -168,9 +172,11 @@ public class TileEntityStacks extends TileBase {
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		super.readNBTData(compound, isClient);
 
+		int offset = 0;
 		for (int i = 0; i < 32; i++) {
+			stacks[i * 2] = null;
+			stacks[i * 2 + 1] = null;
 			if (compound.hasKey("s" + i, Constants.NBT.TAG_COMPOUND)) {
-				int offset = i * 2;
 				NBTTagCompound cpd = compound.getCompoundTag("s" + i);
 				if (cpd.hasKey("a", Constants.NBT.TAG_COMPOUND)) {
 					stacks[offset] = new ItemStack(cpd.getCompoundTag("a"));
@@ -178,18 +184,19 @@ public class TileEntityStacks extends TileBase {
 						stacks[offset] = null;
 					}
 				}
-				offset += 1;
+				offset++;
 				if (cpd.hasKey("b", Constants.NBT.TAG_COMPOUND)) {
 					stacks[offset] = new ItemStack(cpd.getCompoundTag("b"));
 					if (stacks[offset].isEmpty()) {
 						stacks[offset] = null;
 					}
 				}
+				offset++;
 			} else {
-				stacks[i * 2] = null;
-				stacks[i * 2 + 1] = null;
+				offset+=2;
 			}
 		}
+
 		if (isClient) {
 			markBlockForRenderUpdate();
 		}
@@ -199,15 +206,18 @@ public class TileEntityStacks extends TileBase {
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		compound = super.writeNBTData(compound, isClient);
 		for (int i = 0; i < 64; i+=2) {
-			if (stacks[i] != null || stacks[i + 1] != null) {
-				NBTTagCompound cpd1 = new NBTTagCompound();
-				if (stacks[i] != null) {
-					stacks[i].writeToNBT(cpd1);
-				}
-				NBTTagCompound cpd2 = new NBTTagCompound();
-				if (stacks[i + 1] != null) {
-					stacks[i + 1].writeToNBT(cpd2);
-				}
+			boolean write = false;
+			NBTTagCompound cpd1 = new NBTTagCompound();
+			if (stacks[i] != null) {
+				write = true;
+				stacks[i].writeToNBT(cpd1);
+			}
+			NBTTagCompound cpd2 = new NBTTagCompound();
+			if (stacks[i + 1] != null) {
+				write = true;
+				stacks[i + 1].writeToNBT(cpd2);
+			}
+			if (write) {
 				NBTTagCompound cpd = new NBTTagCompound();
 				if (!cpd1.hasNoTags()) {
 					cpd.setTag("a", cpd1);
