@@ -425,7 +425,7 @@ public class Quaternion {
     public AxisAlignedBB applyRotation(AxisAlignedBB p) {
         Vec3d rotatedOne = applyRotation(new Vec3d(p.minX, p.minY, p.minZ));
         Vec3d rotatedTwo = applyRotation(new Vec3d(p.maxX, p.maxY, p.maxZ));
-        return new AxisAlignedBB(rotatedOne, rotatedTwo);
+        return SpaceUtils.from(rotatedOne, rotatedTwo);
     }
 
     public Vec3d applyRotation(Vec3d p) {

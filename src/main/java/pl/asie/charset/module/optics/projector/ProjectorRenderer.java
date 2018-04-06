@@ -263,7 +263,7 @@ public class ProjectorRenderer {
 						continue;
 					}
 
-					if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(surface.cornerStart, surface.cornerEnd))) {
+					if (!camera.isBoundingBoxInFrustum(SpaceUtils.from(surface.cornerStart, surface.cornerEnd))) {
 						continue;
 					}
 

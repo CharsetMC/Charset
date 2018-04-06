@@ -462,13 +462,14 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		return "base";
 	}
 
-	public boolean canConnectRedstone(EnumFacing direction) {
-		if (orientation.facing.getAxis() != direction.getAxis()) {
+	public boolean canConnectRedstone(@Nullable EnumFacing direction) {
+		if (direction != null && orientation.facing.getAxis() != direction.getAxis()) {
 			EnumFacing dir = realToGate(direction);
 			if (dir != null && logic.isSideOpen(dir)) {
 				return logic.getType(dir).isRedstone();
 			}
 		}
+
 		return false;
 	}
 

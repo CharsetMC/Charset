@@ -118,7 +118,7 @@ public class BlockGate extends BlockBase implements ITileEntityProvider {
 	public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side) {
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile instanceof PartGate) {
-			return ((PartGate) tile).canConnectRedstone(side.getOpposite());
+			return ((PartGate) tile).canConnectRedstone(side != null ? side.getOpposite() : null);
 		} else {
 			return false;
 		}

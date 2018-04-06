@@ -185,7 +185,7 @@ public final class SpaceUtils {
         byte high = hghs[face.ordinal()];
         assert low != high;
         assert (~low & 0x7) != high;
-        return new AxisAlignedBB(getVertex(box, low), getVertex(box, high));
+        return SpaceUtils.from(getVertex(box, low), getVertex(box, high));
     }
 
     public static double getDiagonalLength(AxisAlignedBB ab) {
@@ -208,8 +208,12 @@ public final class SpaceUtils {
         return Math.acos(div);
     }
 
+    public static AxisAlignedBB from(Vec3d min, Vec3d max) {
+        return new AxisAlignedBB(min.x, min.y, min.z, max.x, max.y, max.z);
+    }
+
     public static AxisAlignedBB withPoints(Vec3d[] parts) {
-        return new AxisAlignedBB(getLowest(parts), getHighest(parts));
+        return SpaceUtils.from(getLowest(parts), getHighest(parts));
     }
 
     public static Vec3d scale(Vec3d base, double s) {

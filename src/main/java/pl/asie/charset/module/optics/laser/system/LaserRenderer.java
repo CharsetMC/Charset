@@ -39,6 +39,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import pl.asie.charset.lib.utils.EntityUtils;
 import pl.asie.charset.lib.utils.MathUtils;
+import pl.asie.charset.lib.utils.SpaceUtils;
 import pl.asie.charset.module.optics.laser.CharsetLaser;
 
 import java.util.*;
@@ -126,7 +127,7 @@ public class LaserRenderer {
 				endVec = endVec.addVector(0, 0, t / 16.0);
 			}
 
-			if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(startVec, endVec))) {
+			if (!camera.isBoundingBoxInFrustum(SpaceUtils.from(startVec, endVec))) {
 				continue;
 			}
 
