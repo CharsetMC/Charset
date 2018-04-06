@@ -19,25 +19,39 @@
 
 package pl.asie.charset.module.immersion.stacks;
 
+import gnu.trove.map.TObjectByteMap;
+import gnu.trove.map.hash.TObjectByteHashMap;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.utils.MethodHandleHelper;
 import pl.asie.charset.lib.utils.RegistryUtils;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 @CharsetModule(
 		name = "immersion.stacks",
@@ -68,8 +82,14 @@ public class CharsetImmersionStacks {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:stacks_decorative", "normal"), new RenderTileEntityStacks());
 	}
 
-	@SubscribeEvent
+	private static final Map<Class, Boolean> overridesOnBlockActivated = new HashMap<>();
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+		if (event.getUseItem() == Event.Result.DENY) {
+			return;
+		}
+
 		ItemStack stack = event.getItemStack();
 		if (!stack.isEmpty()) {
 			if (!TileEntityStacks.canAcceptStackType(stack)) {
@@ -78,6 +98,25 @@ public class CharsetImmersionStacks {
 
 			IBlockState state = event.getWorld().getBlockState(event.getPos());
 			BlockPos pos = event.getPos();
+
+			Boolean o = overridesOnBlockActivated.computeIfAbsent(state.getBlock().getClass(),
+					(c) -> {
+						Method m = MethodHandleHelper.reflectMethodRecurse(c, "onBlockActivated", "func_180639_a",
+								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
+								EnumHand.class, EnumFacing.class,
+								float.class, float.class, float.class);
+						return m.getDeclaringClass() != Block.class;
+					}
+			);
+
+			boolean fullStack = event.getEntityPlayer().isSneaking();
+			if (o) {
+				if (fullStack) {
+					fullStack = false;
+				} else {
+					return;
+				}
+			}
 
 			if (!(state.getBlock() instanceof BlockStacks) && !state.getBlock().isReplaceable(event.getWorld(), event.getPos()) && event.getFace() != null) {
 				pos = pos.offset(event.getFace());
@@ -105,7 +144,7 @@ public class CharsetImmersionStacks {
 			}
 
 			int count = stack.getCount();
-			for (int i = 0; i < (event.getEntityPlayer().isSneaking() ? count : 1); i++) {
+			for (int i = 0; i < (fullStack ? count : 1); i++) {
 				if (stack.isEmpty()) {
 					break;
 				}
@@ -116,7 +155,7 @@ public class CharsetImmersionStacks {
 				if (state.getBlock() instanceof BlockStacks) {
 					TileEntity tile = event.getWorld().getTileEntity(pos);
 					if (tile instanceof TileEntityStacks) {
-						if (((TileEntityStacks) tile).offerStack(false, stackOffered, event.getHitVec(), event.getEntityPlayer().isSneaking())) {
+						if (((TileEntityStacks) tile).offerStack(false, stackOffered, event.getHitVec(), fullStack)) {
 							if (!event.getEntityPlayer().isCreative()) {
 								stack.shrink(stackOffered.getCount());
 							}
