@@ -201,24 +201,26 @@ public final class FluidUtils {
                 } else {
                     return false;
                 }
-            } else {
-                ItemStack stackOne = stack.splitStack(1);
+            } else if (stack.getCount() > 1) {
+                ItemStack stackOne = stack.copy();
+                stackOne.setCount(1);
 
                 Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stackOne, playerIn.isCreative(), true, true);
                 if (result.isPresent()) {
                     ItemStack resultStack = result.get();
                     if (resultStack != stackOne) {
+                        stackOne.shrink(1);
                         if (!playerIn.inventory.addItemStackToInventory(resultStack)) {
                             ItemUtils.spawnItemEntity(worldIn, playerIn.getPositionVector(), resultStack, 0, 0, 0, 0);
                         }
-                    } else {
-                        stackOne.grow(1);
                     }
 
                     return true;
                 } else {
                     return false;
                 }
+            } else {
+                return false;
             }
         }
     }

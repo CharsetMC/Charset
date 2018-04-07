@@ -99,7 +99,7 @@ public class CharsetImmersionStacks {
 			IBlockState state = event.getWorld().getBlockState(event.getPos());
 			BlockPos pos = event.getPos();
 
-			Boolean o = overridesOnBlockActivated.computeIfAbsent(state.getBlock().getClass(),
+			Boolean overridesOBA = overridesOnBlockActivated.computeIfAbsent(state.getBlock().getClass(),
 					(c) -> {
 						Method m = MethodHandleHelper.reflectMethodRecurse(c, "onBlockActivated", "func_180639_a",
 								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
@@ -109,8 +109,9 @@ public class CharsetImmersionStacks {
 					}
 			);
 
-			boolean fullStack = event.getEntityPlayer().isSneaking();
-			if (o) {
+			boolean sneaking = event.getEntityPlayer().isSneaking();
+			boolean fullStack = sneaking;
+			if (overridesOBA) {
 				if (fullStack) {
 					fullStack = false;
 				} else {
@@ -119,6 +120,10 @@ public class CharsetImmersionStacks {
 			}
 
 			if (!(state.getBlock() instanceof BlockStacks) && !state.getBlock().isReplaceable(event.getWorld(), event.getPos()) && event.getFace() != null) {
+				if (!sneaking && event.getFace() != EnumFacing.UP) {
+					return;
+				}
+
 				pos = pos.offset(event.getFace());
 			}
 
