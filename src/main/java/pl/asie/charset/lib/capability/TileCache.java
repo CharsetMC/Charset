@@ -45,14 +45,29 @@ public class TileCache {
         }
     }
 
-    public void reload() {
+    protected void reload() {
         state = world.getBlockState(pos);
         hasTile = state.getBlock().hasTileEntity(state);
         tile = null;
     }
 
-    public boolean isValid() {
-        return state != null && (!hasTile || !tile.isInvalid());
+    protected boolean isValid() {
+        if (state == null) {
+            return false;
+        }
+
+        if (hasTile) {
+            if (tile == null) {
+                tile = world.getTileEntity(pos);
+                if (tile == null) {
+                    return false;
+                }
+            }
+
+            return !tile.isInvalid();
+        }
+
+        return true;
     }
 
     @Nonnull
