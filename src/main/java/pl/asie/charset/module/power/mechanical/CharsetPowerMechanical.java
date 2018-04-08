@@ -43,6 +43,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -54,6 +55,7 @@ import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
 import pl.asie.charset.module.power.mechanical.render.GearboxColorHandler;
 import pl.asie.charset.module.power.mechanical.render.ModelGearbox;
 import pl.asie.charset.module.power.mechanical.render.TileAxleRenderer;
+import pl.asie.charset.module.power.mechanical.render.TileGearboxRenderer;
 
 @CharsetModule(
 		name = "power.mechanical",
@@ -72,6 +74,10 @@ public class CharsetPowerMechanical {
 	@CapabilityInject(IPowerConsumer.class)
 	public static Capability<IPowerConsumer> POWER_CONSUMER;
 
+	private static final int[] GEAR_VALUES = new int[] { 1, 2, 3, 5 };
+	private static final String[] GEAR_TYPES = new String[] { "Wood", "Stone", "Iron", "Gold" };
+	private static ItemGear[] GEAR_ITEMS;
+
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
 		CapabilityManager.INSTANCE.register(IPowerProducer.class, DummyCapabilityStorage.get(), DefaultPowerProducer::new);
@@ -85,6 +91,12 @@ public class CharsetPowerMechanical {
 		itemCreativeGenerator = new ItemBlockBase(blockCreativeGenerator);
 		itemGearbox = new ItemBlockGearbox(blockGearbox);
 		itemSocket = new ItemBlockBase(blockSocket);
+
+		GEAR_ITEMS = new ItemGear[GEAR_VALUES.length];
+		for (int i = 0; i < GEAR_VALUES.length; i++) {
+			GEAR_ITEMS[i] = new ItemGear(GEAR_VALUES[i]);
+			GEAR_ITEMS[i].setUnlocalizedName("charset.gear." + GEAR_VALUES[i]);
+		}
 	}
 
 	@Mod.EventHandler
@@ -93,18 +105,24 @@ public class CharsetPowerMechanical {
 		RegistryUtils.register(TileCreativeGenerator.class, "creative_generator_mechanical");
 		RegistryUtils.register(TileGearbox.class, "gearbox");
 		RegistryUtils.register(TileSocket.class, "socket_mechanical");
+
+		for (int i = 0; i < GEAR_VALUES.length; i++) {
+			OreDictionary.registerOre("gear" + GEAR_TYPES[i], GEAR_ITEMS[i]);
+		}
 	}
 
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void onPreInitClient(FMLPreInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(TileAxleRenderer.INSTANCE);
+		MinecraftForge.EVENT_BUS.register(TileGearboxRenderer.INSTANCE);
 	}
 
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void onInitClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileAxle.class, TileAxleRenderer.INSTANCE);
+		ClientRegistry.bindTileEntitySpecialRenderer(TileGearbox.class, TileGearboxRenderer.INSTANCE);
 	}
 
 	@SubscribeEvent
@@ -114,6 +132,11 @@ public class CharsetPowerMechanical {
 		RegistryUtils.registerModel(itemCreativeGenerator, 0, "charset:creative_generator_mechanical");
 		RegistryUtils.registerModel(itemGearbox, 0, "charset:gearbox");
 		RegistryUtils.registerModel(itemSocket, 0, "charset:socket_mechanical");
+
+		for (int i = 0; i < GEAR_VALUES.length; i++) {
+			RegistryUtils.registerModel(GEAR_ITEMS[i], 0, "charset:gear#inventory_" + GEAR_VALUES[i]);
+		}
+
 
 		ModelLoader.setCustomStateMapper(blockGearbox, new StateMapperBase() {
 			@Override
@@ -126,7 +149,9 @@ public class CharsetPowerMechanical {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		ModelGearbox.INSTANCE.model = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox"), event.getMap());
+		event.getMap().registerSprite(new ResourceLocation("charset:items/mechanical/gear"));
+		ModelGearbox.INSTANCE.modelOuter = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_outer"), event.getMap());
+		ModelGearbox.INSTANCE.modelInner = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_inner"), event.getMap());
 	}
 
 	@SubscribeEvent
@@ -161,5 +186,9 @@ public class CharsetPowerMechanical {
 		RegistryUtils.register(event.getRegistry(), itemCreativeGenerator, "creative_generator_mechanical");
 		RegistryUtils.register(event.getRegistry(), itemGearbox, "gearbox");
 		RegistryUtils.register(event.getRegistry(), itemSocket, "socket_mechanical");
+
+		for (int i = 0; i < GEAR_VALUES.length; i++) {
+			RegistryUtils.register(event.getRegistry(), GEAR_ITEMS[i], "gear_mechanical_" + GEAR_VALUES[i]);
+		}
 	}
 }

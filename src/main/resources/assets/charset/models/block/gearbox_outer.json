@@ -1,0 +1,27 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down":  { "texture": "#out", "cullface": "down", "tintindex": 0 },
+                "up":    { "texture": "#out", "cullface": "up", "tintindex": 0 },
+                "north": { "texture": "#border", "cullface": "north", "tintindex": 0 },
+                "south": { "texture": "#out", "cullface": "south", "tintindex": 0 },
+                "west":  { "texture": "#out", "cullface": "west", "tintindex": 0 },
+                "east":  { "texture": "#out", "cullface": "east", "tintindex": 0 }
+            }
+        },
+        {   "from": [ 0, 0, 0.02 ],
+            "to": [ 16, 16, 15.98 ],
+            "faces": {
+                "north": { "texture": "#in", "cullface": "north", "tintindex": 0 }
+            }
+        }
+    ],
+    "textures": {
+        "in": "charset:blocks/mechanical/gearbox_window",
+        "border": "charset:blocks/mechanical/gearbox_border_rounded",
+        "out": "charset:blocks/mechanical/gearbox_out"
+    }
+}

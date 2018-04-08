@@ -1,0 +1,19 @@
+{
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down":  { "texture": "#plank", "cullface": "down" },
+                "up":    { "texture": "#plank", "cullface": "up" },
+                "south": { "texture": "#plank", "cullface": "south" },
+                "west":  { "texture": "#plank", "cullface": "west" },
+                "east":  { "texture": "#plank", "cullface": "east" }
+            }
+        }
+    ],
+    "textures": {
+        "in": "charset:blocks/mechanical/gearbox_window",
+        "out": "charset:blocks/mechanical/gearbox_out"
+    }
+}

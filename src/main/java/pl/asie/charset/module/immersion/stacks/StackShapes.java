@@ -105,7 +105,8 @@ public class StackShapes {
 
 	public enum FlatRenderMode {
 		OFFSET,
-		ROTATE
+		ROTATE,
+		OFFSET_ROTATE
 	};
 
 	public static FlatRenderMode getRenderMode(ItemStack stack) {
@@ -114,6 +115,14 @@ public class StackShapes {
 		if (material != null && material.getTypes().contains("stick")) {
 			return FlatRenderMode.ROTATE;
 		} else {
+			int[] ids = OreDictionary.getOreIDs(stack);
+			for (int id : ids) {
+				String name = OreDictionary.getOreName(id);
+				if (name.startsWith("gear")) {
+					return FlatRenderMode.OFFSET;
+				}
+			}
+
 			return FlatRenderMode.OFFSET;
 		}
 	}

@@ -1,0 +1,29 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "forge:item-layer",
+        "transform": "forge:default-item"
+    },
+    "variants": {
+        "inventory_1": [{
+            "textures": {
+                "layer0": "charset:items/mechanical/gear_1"
+            }
+        }],
+        "inventory_2": [{
+            "textures": {
+                "layer0": "charset:items/mechanical/gear_2"
+            }
+        }],
+        "inventory_3": [{
+            "textures": {
+                "layer0": "charset:items/mechanical/gear_3"
+            }
+        }],
+        "inventory_5": [{
+            "textures": {
+                "layer0": "charset:items/mechanical/gear_5"
+            }
+        }]
+    }
+}

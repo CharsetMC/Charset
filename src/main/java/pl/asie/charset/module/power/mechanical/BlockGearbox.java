@@ -23,14 +23,18 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -44,6 +48,7 @@ import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.item.SubItemSetHelper;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 import pl.asie.charset.module.power.mechanical.render.GearboxCacheInfo;
 
@@ -51,6 +56,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlockGearbox extends BlockBase implements ITileEntityProvider {
+	public static final IProperty<Orientation> ORIENTATION = PropertyEnum.create("orientation", Orientation.class,
+			(o) -> o.facing.getAxis() == EnumFacing.Axis.Y || o.top == EnumFacing.UP);
 	public static final IUnlistedProperty<GearboxCacheInfo> PROPERTY = new UnlistedPropertyGeneric<>("property", GearboxCacheInfo.class);
 
 	public BlockGearbox() {
@@ -69,7 +76,7 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new ExtendedBlockState(this, new IProperty[]{Properties.FACING}, new IUnlistedProperty[]{PROPERTY});
+		return new ExtendedBlockState(this, new IProperty[]{ORIENTATION}, new IUnlistedProperty[]{PROPERTY});
 	}
 
 
@@ -79,6 +86,20 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 		TileEntity tile = worldIn.getTileEntity(pos);
 		if (tile instanceof TileGearbox) {
 			((TileGearbox) tile).neighborChanged();
+		}
+	}
+
+	@Override
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) {
+			return true;
+		}
+
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if (tile instanceof TileGearbox) {
+			return ((TileGearbox) tile).activate(playerIn, facing, hand, new Vec3d(hitX, hitY, hitZ));
+		} else {
+			return false;
 		}
 	}
 
@@ -94,23 +115,55 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(Properties.FACING).ordinal();
+		Orientation o = state.getValue(ORIENTATION);
+		if (o.facing.getAxis() == EnumFacing.Axis.Y) {
+			return o.ordinal();
+		} else {
+			return o.facing.ordinal() + 6;
+		}
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(Properties.FACING, EnumFacing.getFront(meta % 6));
+		Orientation o = Orientation.FACE_NORTH_POINT_UP;
+		if (meta >= 8 && meta < 12) {
+			o = Orientation.fromDirection(EnumFacing.getFront(meta - 6)).pointTopTo(EnumFacing.UP);
+		} else if (meta >= 0 && meta < 8) {
+			o = Orientation.getOrientation(meta);
+		}
+
+		return getDefaultState().withProperty(ORIENTATION, o);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public BlockRenderLayer getBlockLayer() {
-		return BlockRenderLayer.CUTOUT_MIPPED;
+		return BlockRenderLayer.CUTOUT;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+		return layer == BlockRenderLayer.SOLID || layer == BlockRenderLayer.CUTOUT;
 	}
 
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-		return this.getDefaultState().withProperty(Properties.FACING, EnumFacing.getDirectionFromEntityLiving(pos, placer));
+		EnumFacing direction = EnumFacing.getDirectionFromEntityLiving(pos, placer);
+		Orientation o;
+
+		if (direction.getAxis() == EnumFacing.Axis.Y) {
+			EnumFacing horizFace = placer.getHorizontalFacing().getOpposite();
+			o = Orientation.fromDirection(direction).pointTopTo(horizFace);
+		} else {
+			o = Orientation.fromDirection(direction).pointTopTo(EnumFacing.UP);
+		}
+
+		if (o != null) {
+			return this.getDefaultState().withProperty(ORIENTATION, o);
+		} else {
+			return this.getDefaultState().withProperty(ORIENTATION, Orientation.FACE_NORTH_POINT_UP);
+		}
 	}
 
 	@Nullable

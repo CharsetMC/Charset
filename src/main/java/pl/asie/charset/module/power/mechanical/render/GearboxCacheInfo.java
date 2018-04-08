@@ -25,37 +25,39 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.render.model.IRenderComparable;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.misc.shelf.BlockShelf;
 import pl.asie.charset.module.misc.shelf.TileShelf;
+import pl.asie.charset.module.power.mechanical.BlockGearbox;
 import pl.asie.charset.module.power.mechanical.TileGearbox;
 
 public class GearboxCacheInfo implements IRenderComparable<GearboxCacheInfo> {
 	public final TextureAtlasSprite plank;
-	public final EnumFacing facing;
+	public final Orientation orientation;
 
-	private GearboxCacheInfo(TextureAtlasSprite plank, EnumFacing facing) {
+	private GearboxCacheInfo(TextureAtlasSprite plank, Orientation orientation) {
 		this.plank = plank;
-		this.facing = facing;
+		this.orientation = orientation;
 	}
 
 	public static GearboxCacheInfo from(IBlockState state, TileGearbox tile) {
-		return new GearboxCacheInfo(RenderUtils.getItemSprite(tile.getMaterial().getStack()), state.getValue(Properties.FACING));
+		return new GearboxCacheInfo(RenderUtils.getItemSprite(tile.getMaterial().getStack()), state.getValue(BlockGearbox.ORIENTATION));
 	}
 
 	public static GearboxCacheInfo from(ItemStack stack) {
 		TileGearbox tile = new TileGearbox();
 		tile.loadFromStack(stack);
-		return new GearboxCacheInfo(RenderUtils.getItemSprite(tile.getMaterial().getStack()), EnumFacing.NORTH);
+		return new GearboxCacheInfo(RenderUtils.getItemSprite(tile.getMaterial().getStack()), Orientation.FACE_NORTH_POINT_UP);
 	}
 
 	@Override
 	public boolean renderEquals(GearboxCacheInfo other) {
-		return other.plank == plank && other.facing == facing;
+		return other.plank == plank && other.orientation == orientation;
 	}
 
 	@Override
 	public int renderHashCode() {
-		return plank.hashCode() * 5 + facing.ordinal();
+		return plank.hashCode() * 11 + orientation.ordinal();
 	}
 }

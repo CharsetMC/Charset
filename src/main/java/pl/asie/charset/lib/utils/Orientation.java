@@ -73,12 +73,12 @@ public enum Orientation implements IStringSerializable {
      */
     public final EnumFacing top;
     
-    private Orientation[] rotations = new Orientation[EnumFacing.VALUES.length];
+    private final Orientation[] rotations = new Orientation[EnumFacing.VALUES.length];
     private int rotation;
     private Orientation swapped;
-    private EnumFacing[] dirRotations = new EnumFacing[EnumFacing.VALUES.length]; // Admitedly we could just use values() here. But that's ugly.
+    private final EnumFacing[] dirRotations = new EnumFacing[EnumFacing.VALUES.length]; // Admitedly we could just use values() here. But that's ugly.
     
-    private static Orientation[] valuesCache = values();
+    private static final Orientation[] valuesCache = values();
 
     Orientation(EnumFacing facing, EnumFacing top) {
         this.facing = facing;
@@ -109,7 +109,7 @@ public enum Orientation implements IStringSerializable {
         }
 
         if (valuesCache.length == 0) {
-            throw new RuntimeException("lolwut");
+            throw new RuntimeException("this is weird");
         }
     }
 
@@ -297,8 +297,12 @@ public enum Orientation implements IStringSerializable {
         return rotation;
     }
     
-    public Vec3d getDiagonalVector(Vec3d vec) {
-        return new Vec3d(facing.getDirectionVec()).add(new Vec3d(top.getDirectionVec()));
+    public Vec3d getDiagonalVector() {
+        return new Vec3d(
+                facing.getDirectionVec().getX() + top.getDirectionVec().getX(),
+                facing.getDirectionVec().getY() + top.getDirectionVec().getY(),
+                facing.getDirectionVec().getZ() + top.getDirectionVec().getZ()
+        );
     }
 
     public Orientation getSwapped() {

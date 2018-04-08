@@ -21,16 +21,27 @@ package pl.asie.charset.module.power.mechanical;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitMaterial;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.Orientation;
+import pl.asie.charset.lib.utils.Quaternion;
+import pl.asie.charset.module.power.mechanical.api.IItemGear;
 import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
 import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
 
@@ -55,7 +66,7 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 
 		@Override
 		public boolean isAcceptingPower() {
-			return !isRedstonePowered;
+			return true;
 		}
 
 		@Override
@@ -66,8 +77,15 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 		}
 	}
 
+	protected ItemStack[] inv = new ItemStack[] {
+		ItemStack.EMPTY,
+		ItemStack.EMPTY,
+		ItemStack.EMPTY
+	};
+
 	protected Consumer[] consumerHandlers;
-	protected double speedIn, torqueIn;
+	protected double speedIn, torqueIn, modifier;
+	protected int consumerCount;
 	protected boolean isRedstonePowered;
 	protected boolean acceptingForce;
 	protected TraitMaterial material;
@@ -80,8 +98,40 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 		}
 	}
 
-	public EnumFacing getInputSide() {
-		return EnumFacing.getFront(getBlockMetadata() & 7);
+	public ItemStack getInventoryStack(int i) {
+		if (i < 0 || i >= inv.length) {
+			return ItemStack.EMPTY;
+		} else {
+			return inv[i];
+		}
+	}
+
+	public int getConsumerCount() {
+		return consumerCount;
+	}
+
+	public double getTorqueIn() {
+		return torqueIn;
+	}
+
+	public double getSpeedIn() {
+		return speedIn;
+	}
+
+	public double getSpeedModifier() {
+		return modifier;
+	}
+
+	public boolean isRedstonePowered() {
+		return isRedstonePowered;
+	}
+
+	public Orientation getOrientation() {
+		return world.getBlockState(pos).getValue(BlockGearbox.ORIENTATION);
+	}
+
+	public EnumFacing getConfigurationSide() {
+		return getOrientation().facing;
 	}
 
 	public ItemMaterial getMaterial() {
@@ -106,7 +156,7 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		EnumFacing facingIn = getInputSide();
+		EnumFacing facingIn = getConfigurationSide();
 		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
 			return facing != null && facing != facingIn;
 		}
@@ -145,12 +195,25 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 		IPowerConsumer[] consumers = new IPowerConsumer[6];
 		acceptingForce = false;
 
-		double modifier = 1.0;
+		double oldSpeedIn = speedIn;
+		double oldTorqueIn = torqueIn;
+		double oldModifier = modifier;
+		int oldConsumerCount = consumerCount;
+
+		modifier = 0.0;
 		speedIn = torqueIn = 0.0D;
 		int producerCount = 0;
-		int consumerCount = 0;
+		consumerCount = 0;
 
-		EnumFacing facingIn = getInputSide();
+		ItemStack gearOne = inv[isRedstonePowered() ? 2 : 0];
+		ItemStack gearTwo = inv[1];
+		if (gearOne.isEmpty() || gearTwo.isEmpty() || !(gearOne.getItem() instanceof IItemGear) || !(gearTwo.getItem() instanceof IItemGear)) {
+			modifier = 0.0;
+		} else {
+			modifier = (double) ((IItemGear) gearOne.getItem()).getGearValue(gearOne) / ((IItemGear) gearTwo.getItem()).getGearValue(gearTwo);
+		}
+
+		EnumFacing facingIn = getConfigurationSide();
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (facing == facingIn) continue;
@@ -179,34 +242,124 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 			}
 		}
 
-		System.out.println(consumerCount + " " + producerCount + " " + speedIn + " " + torqueIn);
-
 		if (acceptingForce) {
-			for (EnumFacing facing : EnumFacing.VALUES) {
-				if (consumers[facing.ordinal()] != null) {
-					consumers[facing.ordinal()].setForce(speedIn * modifier / consumerCount, torqueIn / modifier);
+			if (modifier > 0.0) {
+				for (EnumFacing facing : EnumFacing.VALUES) {
+					if (consumers[facing.ordinal()] != null) {
+						consumers[facing.ordinal()].setForce(speedIn * modifier / consumerCount, torqueIn / modifier);
+					}
+				}
+			} else {
+				for (EnumFacing facing : EnumFacing.VALUES) {
+					if (consumers[facing.ordinal()] != null) {
+						consumers[facing.ordinal()].setForce(0,0);
+					}
 				}
 			}
+		}
+
+		if (oldSpeedIn != speedIn || oldModifier != modifier || oldTorqueIn != torqueIn || oldConsumerCount != consumerCount) {
+			markBlockForUpdate();
 		}
 	}
 
 	public void neighborChanged() {
+		boolean oldIRP = isRedstonePowered;
 		isRedstonePowered = world.isBlockPowered(pos);
+		if (isRedstonePowered != oldIRP) {
+			markChunkDirty();
+			markBlockForUpdate();
+		}
+	}
+
+	private int getGearHit(Vec3d hitPos) {
+		hitPos = hitPos.subtract(0.5, 0.5, 0.5);
+
+		Orientation o = getOrientation();
+		Quaternion quat = Quaternion.fromOrientation(o);
+
+		Vec3d gearPos1 = quat.applyRotation(new Vec3d( 10/32f - 0.5f, 0.5, 0.5f - 21/32f));
+		Vec3d gearPos2 = quat.applyRotation(new Vec3d( 16/32f - 0.5f, 0.5, 0.5f - 10/32f));
+		Vec3d gearPos3 = quat.applyRotation(new Vec3d( 22/32f - 0.5f, 0.5, 0.5f - 21/32f));
+
+		double[] distances = new double[] {
+				hitPos.squareDistanceTo(gearPos1),
+				hitPos.squareDistanceTo(gearPos2),
+				hitPos.squareDistanceTo(gearPos3)
+		};
+		double lowestD = distances[0];
+		int i = 0;
+		if (distances[1] < lowestD) {
+			lowestD = distances[1];
+			i = 1;
+		}
+
+		return distances[2] < lowestD ? 2 : i;
+	}
+
+	public boolean activate(EntityPlayer player, EnumFacing side, EnumHand hand, Vec3d hitPos) {
+		if (side != getConfigurationSide()) {
+			return false;
+		}
+
+		int i = getGearHit(hitPos);
+		ItemStack stack = player.getHeldItem(hand);
+
+		if (!inv[i].isEmpty() && (player.isCreative() || player.addItemStackToInventory(inv[i]))) {
+			inv[i] = ItemStack.EMPTY;
+			markChunkDirty();
+			markBlockForUpdate();
+			return true;
+		} else if (inv[i].isEmpty() && !stack.isEmpty() && stack.getItem() instanceof IItemGear) {
+			if (player.isCreative()) {
+				inv[i] = stack.copy();
+				inv[i].setCount(1);
+			} else {
+				inv[i] = stack.splitStack(1);
+			}
+			markChunkDirty();
+			markBlockForUpdate();
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		super.readNBTData(compound, isClient);
-		if (!isClient) {
-			isRedstonePowered = compound.getBoolean("rs");
+		for (int i = 0; i < inv.length; i++) {
+			if (compound.hasKey("inv" + i, Constants.NBT.TAG_COMPOUND)) {
+				inv[i] = new ItemStack(compound.getCompoundTag("inv" + i));
+			} else {
+				inv[i] = ItemStack.EMPTY;
+			}
+		}
+		isRedstonePowered = compound.getBoolean("rs");
+		if (isClient) {
+			modifier = compound.getFloat("md");
+			speedIn = compound.getFloat("sp");
+			torqueIn = compound.getFloat("to");
+			consumerCount = compound.getByte("cc");
+
+			markBlockForRenderUpdate();
 		}
 	}
 
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		compound = super.writeNBTData(compound, isClient);
-		if (!isClient) {
-			compound.setBoolean("rs", isRedstonePowered);
+		for (int i = 0; i < inv.length; i++) {
+			if (!inv[i].isEmpty()) {
+				ItemUtils.writeToNBT(inv[i], compound, "inv" + i);
+			}
+		}
+		compound.setBoolean("rs", isRedstonePowered);
+		if (isClient) {
+			compound.setFloat("md", (float) modifier);
+			compound.setFloat("sp", (float) speedIn);
+			compound.setFloat("to", (float) torqueIn);
+			compound.setByte("cc", (byte) consumerCount);
 		}
 		return compound;
 	}

@@ -2,7 +2,7 @@
   "conditions": [
     {
       "type": "charset:module_loaded",
-      "module": "power"
+      "module": "power.mechanical"
     }
   ],
   "type": "charset:shaped",

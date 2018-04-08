@@ -33,6 +33,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.misc.IConnectable;
+import pl.asie.charset.lib.render.CharsetFaceBakery;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.ArrayList;
@@ -141,37 +142,37 @@ public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedM
                 if (connections[neighbors[2].ordinal()]) {
                     from = new Vector3f(0, min, min);
                     to = new Vector3f(min, min, max);
-                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
 
                 if (connections[neighbors[0].ordinal()]) {
                     from = new Vector3f(min, min, 0);
                     to = new Vector3f(max, min, min);
-                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
 
                 if (connections[neighbors[3].ordinal()]) {
                     from = new Vector3f(max, min, min);
                     to = new Vector3f(16, min, max);
-                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
 
                 if (connections[neighbors[1].ordinal()]) {
                     from = new Vector3f(min, min, max);
                     to = new Vector3f(max, min, 16);
-                    if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
-                    if (RENDER_INNER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_OUTER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                    if (RENDER_INNER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
             } else {
                 // Not connected; render one quad.
                 from = new Vector3f(connections[neighbors[2].ordinal()] ? 0 : min, min, connections[neighbors[0].ordinal()] ? 0 : min);
                 to = new Vector3f(connections[neighbors[3].ordinal()] ? 16 : max, min, connections[neighbors[1].ordinal()] ? 16 : max);
-                if (RENDER_OUTER_FACES) quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
+                if (RENDER_OUTER_FACES) quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, outsideColor, sprite, EnumFacing.DOWN, ROTATIONS[facing.ordinal()], true));
                 if (RENDER_INNER_FACES && !isOpaque()) {
-                    quads.add(RenderUtils.BAKERY.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
+                    quads.add(CharsetFaceBakery.INSTANCE.makeBakedQuad(from, to, insideColor, sprite, EnumFacing.UP, ROTATIONS[facing.ordinal()], true));
                 }
             }
         }

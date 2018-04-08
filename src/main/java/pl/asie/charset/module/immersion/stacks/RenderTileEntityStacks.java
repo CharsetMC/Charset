@@ -117,7 +117,7 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 
 		float offsetX = ((rand & 7) - 3.5f) / 256.0f;
 		float offsetZ = (((rand >> 3) & 7) - 3.5f) / 256.0f;
-		float rotation = ((rand & 15) - 7.5f) * 0.05f;
+		float rotation = (((rand >> 6) & 15) - 7.5f) * 0.025f;
 
 		return (quad, element, data) -> {
 			switch (element.getUsage()) {
@@ -125,15 +125,19 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 					float x = data[1] * 0.5f - 0.25f;
 					float y = data[2] - 0.5f;
 					float z = data[0] * 0.5f - 0.25f;
+					float xp = x;
+					float zp = z;
 
 					switch (renderMode) {
+						case OFFSET_ROTATE:
+							x = zp*MathHelper.sin(rotation) + xp*MathHelper.cos(rotation);
+							z = zp*MathHelper.cos(rotation) - xp*MathHelper.sin(rotation);
+							// pass
 						case OFFSET:
 							x += offsetX;
 							z += offsetZ;
 							break;
 						case ROTATE:
-							float xp = x;
-							float zp = z;
 							x = zp*MathHelper.sin(rotation) + xp*MathHelper.cos(rotation);
 							z = zp*MathHelper.cos(rotation) - xp*MathHelper.sin(rotation);
 							break;

@@ -27,6 +27,12 @@ import org.lwjgl.util.vector.Vector3f;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 public class CharsetFaceBakery extends FaceBakery {
+    public static final CharsetFaceBakery INSTANCE = new CharsetFaceBakery();
+
+    private CharsetFaceBakery() {
+
+    }
+
     private static final float[] faceBrightness = new float[] {
             0.5f, 1.0f, 0.8f, 0.8f, 0.6f, 0.6f
     };
@@ -59,8 +65,8 @@ public class CharsetFaceBakery extends FaceBakery {
     }
 
     private BakedQuad recolorQuad(BakedQuad quad, int color) {
-        int c = DefaultVertexFormats.BLOCK.getColorOffset() / 4;
-        int v = DefaultVertexFormats.BLOCK.getIntegerSize() / 4;
+        int c = quad.getFormat().getColorOffset() / 4;
+        int v = 7;
         int[] vertexData = quad.getVertexData();
         for (int i = 0; i < 4; i++) {
             vertexData[v * i + c] = RenderUtils.multiplyColor(vertexData[v * i + c], color);

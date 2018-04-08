@@ -49,7 +49,7 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 	public static final TileAxleRenderer INSTANCE = new TileAxleRenderer();
 	protected static BlockModelRenderer renderer;
 
-	private static final int ACCURACY = 48;
+	private static final int ACCURACY = 96;
 	private static final String[] TAGS = new String[] { "axis=x", "axis=y", "axis=z" };
 
 	private static class Key {
@@ -175,8 +175,13 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 			renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 		}
 
-		float rotation = te.getWorld().getTotalWorldTime() + partialTicks;
+		long ticks = te.getWorld().getTotalWorldTime();
+		double rotation = ticks + partialTicks;
 		rotation *= te.rotSpeedClient*4.5f;
+
+		float offset = (float)te.rotTorqueClient * 0.5f;
+		rotation += ((ticks & 2) != 0) ? offset : -offset;
+		rotation = rotation % 360;
 
 		/* boolean direction = EnumFacing.SOUTH.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE;
 		if (direction) {
@@ -191,7 +196,7 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 				te.getMaterial(),
 				axis, axis,
 				MathHelper.getPositionRandom(pos),
-				rotation
+				(float) rotation
 		);
 
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());

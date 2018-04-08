@@ -59,8 +59,6 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class RenderUtils {
-	public static final CharsetFaceBakery BAKERY = new CharsetFaceBakery();
-
 	public enum AveragingMode {
 		FULL,
 		H_EDGES_ONLY,
@@ -90,7 +88,7 @@ public final class RenderUtils {
 				break;
 		}
 
-		return BAKERY.makeBakedQuad(fFrom, fTo, tintIndex, sprite, facing, ModelRotation.X0_Y0, true);
+		return CharsetFaceBakery.INSTANCE.makeBakedQuad(fFrom, fTo, tintIndex, sprite, facing, ModelRotation.X0_Y0, true);
 	}
 
 	public static int getAverageColor(TextureAtlasSprite sprite, AveragingMode mode) {

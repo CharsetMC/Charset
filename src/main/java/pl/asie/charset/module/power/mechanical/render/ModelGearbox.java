@@ -33,22 +33,15 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.TRSRTransformation;
 import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.render.model.SimpleBakedModel;
+import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.module.power.mechanical.BlockGearbox;
 
 import javax.annotation.Nullable;
 
 public class ModelGearbox extends ModelFactory<GearboxCacheInfo> {
-	private static final ModelRotation[] ROTATIONS = new ModelRotation[] {
-			ModelRotation.X180_Y0,
-			ModelRotation.X0_Y0,
-			ModelRotation.X90_Y0,
-			ModelRotation.X90_Y180,
-			ModelRotation.X90_Y270,
-			ModelRotation.X90_Y90
-	};
-
 	public static final ModelGearbox INSTANCE = new ModelGearbox();
-	public IModel model;
+	public IModel modelOuter, modelInner;
 
 	protected ModelGearbox() {
 		super(BlockGearbox.PROPERTY, new ResourceLocation("minecraft:blocks/planks_oak"));
@@ -56,10 +49,23 @@ public class ModelGearbox extends ModelFactory<GearboxCacheInfo> {
 
 	@Override
 	public IBakedModel bake(GearboxCacheInfo object, boolean isItem, BlockRenderLayer layer) {
-		return model.uvlock(true).retexture(ImmutableMap.of(
-				"#plank", object.plank.getIconName(),
-				"plank", object.plank.getIconName()
-		)).bake(ROTATIONS[object.facing.ordinal()], DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+		if (layer == BlockRenderLayer.SOLID) {
+			return modelInner.uvlock(true).retexture(ImmutableMap.of(
+					"#plank", object.plank.getIconName(),
+					"plank", object.plank.getIconName()
+			)).bake(object.orientation.toTransformation(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+		} else if (layer == BlockRenderLayer.CUTOUT) {
+			return modelOuter.uvlock(false).bake(object.orientation.toTransformation(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+		} else if (isItem) {
+			IBakedModel modelBakedFirst = bake(object, false, BlockRenderLayer.SOLID);
+			IBakedModel modelBakedSecond = bake(object, false, BlockRenderLayer.CUTOUT);
+			SimpleBakedModel sbm = new SimpleBakedModel(modelBakedFirst);
+			sbm.addModel(modelBakedFirst);
+			sbm.addModel(modelBakedSecond);
+			return sbm;
+		} else {
+			return null;
+		}
 	}
 
 	@Override

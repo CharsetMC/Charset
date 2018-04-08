@@ -21,11 +21,14 @@ package pl.asie.charset.module.immersion.stacks;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.block.TileBase;
@@ -229,6 +232,15 @@ public class TileEntityStacks extends TileBase {
 			}
 		}
 		return compound;
+	}
+
+	@Override
+	public ItemStack getPickedBlock(@Nullable EntityPlayer player, @Nullable RayTraceResult result, IBlockState state) {
+		if (result != null && result.subHit >= 0 && result.subHit < 64) {
+			return stacks[result.subHit] != null ? stacks[result.subHit] : ItemStack.EMPTY;
+		} else {
+			return ItemStack.EMPTY;
+		}
 	}
 
 	public boolean isFull() {

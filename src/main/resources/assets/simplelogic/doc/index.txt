@@ -2,6 +2,6 @@
 
 \checkmods{any}{charset:simplelogic.gates}{\b{Gates}
 
-TODO}
+TODO
 
 Join us in #charset on irc.esper.net!
