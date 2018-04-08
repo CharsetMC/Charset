@@ -62,7 +62,7 @@ import pl.asie.charset.module.power.mechanical.render.TileGearboxRenderer;
 @CharsetModule(
 		name = "power.mechanical",
 		description = "Mechanical power system",
-		profile = ModuleProfile.INDEV
+		profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetPowerMechanical {
 	public static BlockAxle blockAxle;

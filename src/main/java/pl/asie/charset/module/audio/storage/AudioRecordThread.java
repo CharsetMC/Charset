@@ -93,8 +93,9 @@ public class AudioRecordThread implements Runnable {
 	private int sampleRate = ItemQuartzDisc.DEFAULT_SAMPLE_RATE;
 	private String statusBar = "Encoding...";
 
-	public AudioRecordThread(File f, int maxSize) {
+	public AudioRecordThread(File f, int sampleRate, int maxSize) {
 		this.file = f;
+		this.sampleRate = sampleRate;
 		this.maxSize = maxSize;
 	}
 
@@ -114,7 +115,12 @@ public class AudioRecordThread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			String ext = FilenameUtils.getExtension(file.getName());
+			if (sampleRate <= 0) {
+				showError("Must provide power!");
+				return;
+			}
+
+			String ext = FilenameUtils.getExtension(file.getName()).toLowerCase();
 			SoundBuffer buffer;
 
 			statusBar = "Loading...";

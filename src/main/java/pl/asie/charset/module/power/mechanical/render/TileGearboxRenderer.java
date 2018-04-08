@@ -120,11 +120,11 @@ public class TileGearboxRenderer extends TileEntitySpecialRenderer<TileGearbox> 
 
 		if (te.isRedstonePowered()) {
 			drawGear(te, o, te.getInventoryStack(2), 2.5f, 3, 0.5f, -rotFI, 0xFFFFFFFF, 0f);
-			drawGear(te, o, te.getInventoryStack(1),-3, 0, 0.5f, rotFO + 37.5f, 0xFFFFFFFF, 0.005f);
+			drawGear(te, o, te.getInventoryStack(1),-3, 0, 0.5f, rotFO + 37.5f, 0xFFD0D0D0, 0.005f);
 			drawGear(te, o, te.getInventoryStack(0),2.5f, -3, 0.5f, 0, 0xFF7F7F7F, 0.01f);
 		} else {
 			drawGear(te, o, te.getInventoryStack(0),2.5f, -3, 0.5f, -rotFI, 0xFFFFFFFF, 0f);
-			drawGear(te, o, te.getInventoryStack(1),-3, 0, 0.5f, rotFO + 37.5f, 0xFFFFFFFF, 0.005f);
+			drawGear(te, o, te.getInventoryStack(1),-3, 0, 0.5f, rotFO + 37.5f, 0xFFD0D0D0, 0.005f);
 			drawGear(te, o, te.getInventoryStack(2),2.5f, 3, 0.5f, 0, 0xFF7F7F7F, 0.01f);
 		}
 

@@ -161,7 +161,8 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 		if (fileDialogThread != null && !fileDialogThread.isAlive()) {
 			if (fileDialog.result == JFileChooser.APPROVE_OPTION) {
 				if (fileDialog.chooser.getSelectedFile() != null) {
-					record = new AudioRecordThread(fileDialog.chooser.getSelectedFile(), CharsetAudioStorage.quartzDisc.getSize(owner.getStack()));
+					int rate = owner.getSampleRate();
+					record = new AudioRecordThread(fileDialog.chooser.getSelectedFile(), rate, CharsetAudioStorage.quartzDisc.getSize(owner.getStack()));
 					recordThread = new Thread(record);
 					recordThread.start();
 				}

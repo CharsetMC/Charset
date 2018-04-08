@@ -28,9 +28,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import pl.asie.charset.api.lib.IAxisRotatable;
+import pl.asie.charset.api.lib.IDebuggable;
+import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.block.ITileWrenchRotatable;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitMaterial;
 import pl.asie.charset.lib.capability.Capabilities;
@@ -44,8 +52,9 @@ import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
-public class TileGearbox extends TileBase implements IMechanicalPowerProducer, ITickable {
+public class TileGearbox extends TileBase implements IMechanicalPowerProducer, ITickable, IAxisRotatable, ITileWrenchRotatable {
 	private class Consumer implements IMechanicalPowerConsumer {
 		protected TileEntity receiver;
 		protected double speedIn, torqueIn;
@@ -360,5 +369,47 @@ public class TileGearbox extends TileBase implements IMechanicalPowerProducer, I
 			compound.setByte("cc", (byte) consumerCount);
 		}
 		return compound;
+	}
+
+	// TODO merge with TileEntityDayBarrel
+
+	private boolean changeOrientation(Orientation newOrientation, boolean simulate) {
+		Orientation orientation = getOrientation();
+		if (orientation != newOrientation && BlockGearbox.ORIENTATION.getAllowedValues().contains(newOrientation)) {
+			if (!simulate) {
+				getWorld().setBlockState(pos, world.getBlockState(pos).withProperty(BlockGearbox.ORIENTATION, newOrientation));
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public void mirror(Mirror mirror) {
+		changeOrientation(getOrientation().mirror(mirror), false);
+	}
+
+	@Override
+	public boolean rotateAround(EnumFacing axis, boolean simulate) {
+		return changeOrientation(getOrientation().rotateAround(axis), simulate);
+	}
+
+	@Override
+	public boolean rotateWrench(EnumFacing axis) {
+		Orientation newOrientation;
+		if (axis == getOrientation().facing) {
+			newOrientation = getOrientation().getNextRotationOnFace();
+		} else {
+			newOrientation = Orientation.fromDirection(axis.getOpposite());
+		}
+
+		changeOrientation(newOrientation, false);
+		return true;
+	}
+
+	@Override
+	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+		return oldState.getBlock() != newState.getBlock();
 	}
 }

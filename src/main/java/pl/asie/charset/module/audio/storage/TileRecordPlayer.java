@@ -30,15 +30,20 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitItemHolder;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 
-public class TileRecordPlayer extends TileBase implements ITickable {
+import javax.annotation.Nullable;
+
+public class TileRecordPlayer extends TileBase implements ITickable, IMechanicalPowerConsumer {
 	protected float progressClient;
 	private TraitItemHolder holder;
 	private TraitRecordPlayer player;
@@ -78,6 +83,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		super.readNBTData(compound, isClient);
 		spinLocation = compound.getFloat("dr");
 		if (isClient) {
+			player.speedIn = compound.getFloat("sr");
 			progressClient = compound.getFloat("pc");
 		}
 	}
@@ -87,6 +93,7 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 		compound = super.writeNBTData(compound, isClient);
 		compound.setFloat("dr", spinLocation);
 		if (isClient) {
+			compound.setFloat("sr", (float) player.speedIn);
 			compound.setFloat("pc", progressClient);
 		}
 		return compound;
@@ -285,5 +292,45 @@ public class TileRecordPlayer extends TileBase implements ITickable {
 
 	public IDataStorage getStorage() {
 		return player.getStorage();
+	}
+
+	@Override
+	public boolean isAcceptingPower() {
+		return true;
+	}
+
+	@Override
+	public void setForce(double speed, double torque) {
+		double oldSpeed = player.speedIn;
+		player.speedIn = speed;
+		if (oldSpeed != speed) {
+			markBlockForUpdate();
+		}
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+		if (ModCharset.isModuleLoaded("power.mechanical") && capability == Capabilities.MECHANICAL_CONSUMER) {
+			return facing != EnumFacing.UP;
+		}
+
+		return super.hasCapability(capability, facing);
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+		if (ModCharset.isModuleLoaded("power.mechanical") && capability == Capabilities.MECHANICAL_CONSUMER) {
+			if (facing != EnumFacing.UP) {
+				return Capabilities.MECHANICAL_CONSUMER.cast(this);
+			} else {
+				return null;
+			}
+		}
+
+		return super.getCapability(capability, facing);
+	}
+
+	public int getSampleRate() {
+		return player.getSampleRate();
 	}
 }

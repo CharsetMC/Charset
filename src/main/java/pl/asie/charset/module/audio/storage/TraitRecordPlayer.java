@@ -30,6 +30,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 
 import net.minecraftforge.items.IItemHandler;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.audio.*;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.audio.*;
@@ -57,6 +58,16 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 	private DFPWM recordDFPWM;
 	private List<AudioPacket> receivedPacket = new ArrayList<>();
 
+	protected double speedIn;
+
+	public double getSpeed() {
+		if (ModCharset.isModuleLoaded("power.mechanical")) {
+			return Math.min(speedIn, 9.0D);
+		} else {
+			return 3.0D;
+		}
+	}
+
 	public TraitRecordPlayer(IItemHandler handler) {
 		this.inventory = handler;
 	}
@@ -81,18 +92,15 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (rand.nextFloat() <= noiseThreshold) {
-					if (rand.nextBoolean()) {
-						data[i] |= 1 << j;
-					} else {
-						data[i] &= ~(1 << j);
-					}
+					data[i] ^= 1 << j;
 				}
 			}
 		}
 	}
 
 	public int getSampleRate() {
-		return ItemQuartzDisc.DEFAULT_SAMPLE_RATE;
+		int s = (int) (ItemQuartzDisc.DEFAULT_SAMPLE_RATE * getSpeed() / 480);
+		return s * 160;
 	}
 
 	public void stopAudioPlayback() {
@@ -103,7 +111,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 	}
 
 	public void update(World world, BlockPos blockPos) {
-		if (state != State.STOPPED && state != State.PAUSED) {
+		if (state != State.STOPPED && state != State.PAUSED && getSpeed() >= 0.01D) {
 			if (sourceId == null) {
 				sourceId = AudioUtils.start();
 			}
@@ -118,6 +126,10 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 						int sampleRate = getSampleRate();
 						byte[] data = new byte[sampleRate / (20 * 8)];
 						int len = storage.read(data, false);
+
+						if (world.isRainingAt(blockPos.up())) {
+							applyNoise(world, data, 0.008f);
+						}
 
 						AudioPacket packet = new AudioPacket(new AudioDataDFPWM(data, 50).setSourceId(sourceId), 1.0F);
 						boolean received = false;

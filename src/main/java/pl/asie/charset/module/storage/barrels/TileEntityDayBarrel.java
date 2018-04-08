@@ -1119,7 +1119,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         if (axis == orientation.facing) {
             newOrientation = orientation.getNextRotationOnFace();
         } else {
-            newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis).ordinal() & (~3) | (orientation.ordinal() & 3));
+            newOrientation = Orientation.getOrientation(Orientation.fromDirection(axis).ordinal() & (~3));
         }
 
         changeOrientation(newOrientation, false);
