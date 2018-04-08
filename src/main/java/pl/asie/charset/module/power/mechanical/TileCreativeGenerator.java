@@ -24,21 +24,22 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.block.TileBase;
-import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
-import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
+import pl.asie.charset.lib.capability.Capabilities;
 
 import javax.annotation.Nullable;
 
-public class TileCreativeGenerator extends TileBase implements ITickable, IPowerProducer {
+public class TileCreativeGenerator extends TileBase implements ITickable, IMechanicalPowerProducer {
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		return (capability == CharsetPowerMechanical.POWER_PRODUCER && facing != null) || super.hasCapability(capability, facing);
+		return (capability == Capabilities.MECHANICAL_PRODUCER && facing != null) || super.hasCapability(capability, facing);
 	}
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == CharsetPowerMechanical.POWER_PRODUCER) {
-			return CharsetPowerMechanical.POWER_PRODUCER.cast(this);
+		if (capability == Capabilities.MECHANICAL_PRODUCER) {
+			return Capabilities.MECHANICAL_PRODUCER.cast(this);
 		} else {
 			return super.getCapability(capability, facing);
 		}
@@ -51,10 +52,10 @@ public class TileCreativeGenerator extends TileBase implements ITickable, IPower
 		if (!world.isRemote) {
 			for (EnumFacing facing : EnumFacing.VALUES) {
 				TileEntity tile = world.getTileEntity(pos.offset(facing.getOpposite()));
-				if (tile != null && tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, facing)) {
-					IPowerConsumer output = tile.getCapability(CharsetPowerMechanical.POWER_CONSUMER, facing);
+				if (tile != null && tile.hasCapability(Capabilities.MECHANICAL_CONSUMER, facing)) {
+					IMechanicalPowerConsumer output = tile.getCapability(Capabilities.MECHANICAL_CONSUMER, facing);
 					if (output.isAcceptingPower()) {
-						output.setForce(1.0, 1.0);
+						output.setForce(1.0, 3.0);
 					}
 				}
 			}

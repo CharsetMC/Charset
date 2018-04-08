@@ -45,13 +45,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
+import pl.asie.charset.lib.capability.mechanical.DefaultMechanicalPowerConsumer;
+import pl.asie.charset.lib.capability.mechanical.DefaultMechanicalPowerProducer;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
-import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
 import pl.asie.charset.module.power.mechanical.render.GearboxColorHandler;
 import pl.asie.charset.module.power.mechanical.render.ModelGearbox;
 import pl.asie.charset.module.power.mechanical.render.TileAxleRenderer;
@@ -69,20 +71,12 @@ public class CharsetPowerMechanical {
 	public static BlockSocket blockSocket;
 	public static ItemBlock itemAxle, itemCreativeGenerator, itemGearbox, itemSocket;
 
-	@CapabilityInject(IPowerProducer.class)
-	public static Capability<IPowerProducer> POWER_PRODUCER;
-	@CapabilityInject(IPowerConsumer.class)
-	public static Capability<IPowerConsumer> POWER_CONSUMER;
-
 	private static final int[] GEAR_VALUES = new int[] { 1, 2, 3, 5 };
 	private static final String[] GEAR_TYPES = new String[] { "Wood", "Stone", "Iron", "Gold" };
 	private static ItemGear[] GEAR_ITEMS;
 
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
-		CapabilityManager.INSTANCE.register(IPowerProducer.class, DummyCapabilityStorage.get(), DefaultPowerProducer::new);
-		CapabilityManager.INSTANCE.register(IPowerConsumer.class, DummyCapabilityStorage.get(), DefaultPowerConsumer::new);
-
 		blockAxle = new BlockAxle();
 		blockCreativeGenerator = new BlockCreativeGenerator();
 		blockGearbox = new BlockGearbox();

@@ -113,6 +113,11 @@ tile.charset.oreQuartz.name=Quartz Ore
 
 # power.mechanical
 
+item.charset.gear.1.name=Wooden Gear
+item.charset.gear.2.name=Stone Gear
+item.charset.gear.3.name=Iron Gear
+item.charset.gear.5.name=Gold Gear
+
 tile.charset.axle.name=Axle
 tile.charset.axle.format=%s Axle
 tile.charset.gen_creative_mechanical.name=Creative Mechanical Generator

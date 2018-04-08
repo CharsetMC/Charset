@@ -28,27 +28,25 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitMaterial;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.Quaternion;
-import pl.asie.charset.module.power.mechanical.api.IItemGear;
-import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
-import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
+import pl.asie.charset.api.experimental.mechanical.IItemGear;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
 
 import javax.annotation.Nullable;
 
-public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
-	private class Consumer implements IPowerConsumer {
+public class TileGearbox extends TileBase implements IMechanicalPowerProducer, ITickable {
+	private class Consumer implements IMechanicalPowerConsumer {
 		protected TileEntity receiver;
 		protected double speedIn, torqueIn;
 		private final EnumFacing facing;
@@ -157,7 +155,7 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
 		EnumFacing facingIn = getConfigurationSide();
-		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
+		if (capability == Capabilities.MECHANICAL_PRODUCER || capability == Capabilities.MECHANICAL_CONSUMER) {
 			return facing != null && facing != facingIn;
 		}
 
@@ -167,15 +165,15 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == CharsetPowerMechanical.POWER_PRODUCER) {
+		if (capability == Capabilities.MECHANICAL_PRODUCER) {
 			if (facing != null) {
-				return CharsetPowerMechanical.POWER_PRODUCER.cast(this);
+				return Capabilities.MECHANICAL_PRODUCER.cast(this);
 			} else {
 				return null;
 			}
-		} else if (capability == CharsetPowerMechanical.POWER_CONSUMER) {
+		} else if (capability == Capabilities.MECHANICAL_CONSUMER) {
 			if (facing != null) {
-				return CharsetPowerMechanical.POWER_CONSUMER.cast(consumerHandlers[facing.ordinal()]);
+				return Capabilities.MECHANICAL_CONSUMER.cast(consumerHandlers[facing.ordinal()]);
 			} else {
 				return null;
 			}
@@ -192,7 +190,7 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 			return;
 		}
 
-		IPowerConsumer[] consumers = new IPowerConsumer[6];
+		IMechanicalPowerConsumer[] consumers = new IMechanicalPowerConsumer[6];
 		acceptingForce = false;
 
 		double oldSpeedIn = speedIn;
@@ -231,8 +229,8 @@ public class TileGearbox extends TileBase implements IPowerProducer, ITickable {
 				}
 			} else {
 				TileEntity tile = world.getTileEntity(pos.offset(facing));
-				if (tile != null && tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite())) {
-					IPowerConsumer consumer = tile.getCapability(CharsetPowerMechanical.POWER_CONSUMER, facing.getOpposite());
+				if (tile != null && tile.hasCapability(Capabilities.MECHANICAL_CONSUMER, facing.getOpposite())) {
+					IMechanicalPowerConsumer consumer = tile.getCapability(Capabilities.MECHANICAL_CONSUMER, facing.getOpposite());
 					if (consumer != null && consumer.isAcceptingPower()) {
 						consumers[facing.ordinal()] = consumer;
 						consumerCount++;

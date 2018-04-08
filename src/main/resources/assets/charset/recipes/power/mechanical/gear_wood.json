@@ -1,0 +1,29 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "power.mechanical"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:gear",
+  "pattern": [
+    " a ",
+    "asa",
+    " a "
+  ],
+  "key": {
+    "a": {
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    }
+  },
+  "result": {
+    "item": "charset:gear_mechanical_1",
+    "count": 1
+  }
+}

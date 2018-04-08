@@ -28,18 +28,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.capability.TileCache;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.module.power.mechanical.api.IPowerProducer;
-import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 
 import javax.annotation.Nullable;
 
 public class TileAxle extends TileBase {
-	protected class AxleSide implements IPowerProducer, IPowerConsumer {
+	protected class AxleSide implements IMechanicalPowerProducer, IMechanicalPowerConsumer {
 		protected final EnumFacing facing;
 		protected final int i;
 		protected final TileCache cache;
@@ -57,8 +58,8 @@ public class TileAxle extends TileBase {
 		public boolean isAcceptingPower() {
 			if (powerOutputs[i ^ 1] != null && powerOutputs[i ^ 1].torqueReceived != 0.0) return false;
 
-			IPowerConsumer output = CapabilityHelper.get(
-					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
+			IMechanicalPowerConsumer output = CapabilityHelper.get(
+					Capabilities.MECHANICAL_CONSUMER, cache.getTile(), facing
 			);
 
 			return output != null && output.isAcceptingPower();
@@ -66,8 +67,8 @@ public class TileAxle extends TileBase {
 
 		@Override
 		public void setForce(double speed, double torque) {
-			IPowerConsumer output = CapabilityHelper.get(
-					CharsetPowerMechanical.POWER_CONSUMER, cache.getTile(), facing
+			IMechanicalPowerConsumer output = CapabilityHelper.get(
+					Capabilities.MECHANICAL_CONSUMER, cache.getTile(), facing
 			);
 
 			if (output != null) {
@@ -117,7 +118,7 @@ public class TileAxle extends TileBase {
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
+		if (capability == Capabilities.MECHANICAL_PRODUCER || capability == Capabilities.MECHANICAL_CONSUMER) {
 			EnumFacing.Axis axis = EnumFacing.Axis.values()[getBlockMetadata()];
 			return facing != null && facing.getAxis() == axis;
 		}
@@ -128,7 +129,7 @@ public class TileAxle extends TileBase {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == CharsetPowerMechanical.POWER_PRODUCER || capability == CharsetPowerMechanical.POWER_CONSUMER) {
+		if (capability == Capabilities.MECHANICAL_PRODUCER || capability == Capabilities.MECHANICAL_CONSUMER) {
 			EnumFacing.Axis axis = EnumFacing.Axis.values()[getBlockMetadata()];
 			if (facing != null && facing.getAxis() == axis) {
 				EnumFacing.AxisDirection direction = facing.getAxisDirection();

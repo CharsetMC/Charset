@@ -38,8 +38,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
@@ -116,6 +119,20 @@ public class BlockAxle extends BlockBase implements ITileEntityProvider {
 			return BlockFaceShape.MIDDLE_POLE;
 		} else {
 			return BlockFaceShape.UNDEFINED;
+		}
+	}
+
+	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		super.breakBlock(worldIn, pos, state);
+		for (EnumFacing facing : EnumFacing.VALUES) {
+			if (facing.getAxis() == state.getValue(Properties.AXIS)) {
+				IMechanicalPowerConsumer consumer = CapabilityHelper.get(worldIn, pos.offset(facing), Capabilities.MECHANICAL_CONSUMER, facing.getOpposite(),
+						false, true, false);
+				if (consumer != null) {
+					consumer.setForce(0, 0);
+				}
+			}
 		}
 	}
 

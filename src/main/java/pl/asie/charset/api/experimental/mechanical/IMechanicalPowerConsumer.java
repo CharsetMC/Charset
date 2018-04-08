@@ -17,9 +17,9 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.power.mechanical.api;
+package pl.asie.charset.api.experimental.mechanical;
 
-public interface IPowerConsumer {
+public interface IMechanicalPowerConsumer {
 	boolean isAcceptingPower();
 	void setForce(double speed, double torque);
 }

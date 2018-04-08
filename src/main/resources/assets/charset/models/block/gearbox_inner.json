@@ -10,6 +10,12 @@
                 "west":  { "texture": "#plank", "cullface": "west" },
                 "east":  { "texture": "#plank", "cullface": "east" }
             }
+        },
+        {   "from": [ 0, 0, 0.02 ],
+            "to": [ 16, 16, 15.98 ],
+            "faces": {
+                "north": { "texture": "#plank", "cullface": "north", "tintindex": 1 }
+            }
         }
     ],
     "textures": {

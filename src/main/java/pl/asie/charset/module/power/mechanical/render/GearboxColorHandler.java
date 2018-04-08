@@ -33,10 +33,12 @@ public class GearboxColorHandler extends ModelColorHandler<GearboxCacheInfo> {
 
 	@Override
 	public int colorMultiplier(GearboxCacheInfo info, int tintIndex) {
-		if (tintIndex != 0) {
+		if (tintIndex == 0) {
+			return RenderUtils.getAverageColor(info.plank, RenderUtils.AveragingMode.FULL);
+		} else if (tintIndex == 1) {
+			return 0xFF404040;
+		} else {
 			return -1;
 		}
-
-		return RenderUtils.getAverageColor(info.plank, RenderUtils.AveragingMode.FULL);
 	}
 }

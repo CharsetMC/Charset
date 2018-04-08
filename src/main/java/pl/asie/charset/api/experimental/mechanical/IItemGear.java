@@ -1,4 +1,4 @@
-package pl.asie.charset.module.power.mechanical.api;
+package pl.asie.charset.api.experimental.mechanical;
 
 import net.minecraft.item.ItemStack;
 

@@ -26,20 +26,25 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.misc.IItemInsertionEmitter;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.utils.ItemUtils;
 
+import javax.annotation.Nullable;
+
 // todo: make it less ITickable
-public class TileCompressionCrafter extends TileBase implements ITickable, IItemInsertionEmitter {
+public class TileCompressionCrafter extends TileBase implements ITickable, IItemInsertionEmitter, IMechanicalPowerConsumer {
 	private final NonNullList<ItemStack> buffer = NonNullList.create();
+	private double speedIn, torqueIn;
 	protected CompressionShape shape;
 	private boolean redstoneLevel, backstuffedClient;
 
@@ -137,19 +142,49 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 		shape.craftBegin(this, state.getValue(Properties.FACING));
 	}
 
+	public boolean isCraftingReady() {
+		if (ModCharset.isModuleLoaded("power.mechanical")) {
+			return torqueIn > 0.0;
+		} else {
+			return redstoneLevel;
+		}
+	}
+
+	public double getSpeed() {
+		if (ModCharset.isModuleLoaded("power.mechanical")) {
+			return speedIn;
+		} else {
+			return redstoneLevel ? 1.0 : 0.0;
+		}
+	}
+
+	public double getTorque() {
+		if (ModCharset.isModuleLoaded("power.mechanical")) {
+			return torqueIn;
+		} else {
+			return redstoneLevel ? 1.0 : 0.0;
+		}
+	}
+
+	private void startCrafting(IBlockState state) {
+		if (isCraftingReady()) {
+			getShape(true);
+			if (shape != null) {
+				craft(state);
+			}
+		} else {
+			getShape(false);
+			if (shape != null) {
+				shape.checkPowerLevels(true);
+			}
+		}
+	}
+
 	public void onNeighborChange(IBlockState state) {
 		if (!world.isRemote) {
 			redstoneLevel = world.getRedstonePower(pos, state.getValue(Properties.FACING)) > 0;
-			if (redstoneLevel) {
-				getShape(true);
-				if (shape != null) {
-					craft(state);
-				}
-			} else {
-				getShape(false);
-				if (shape != null) {
-					shape.checkRedstoneLevels(true);
-				}
+			if (!ModCharset.isModuleLoaded("power.mechanical")) {
+				startCrafting(state);
 			}
 		}
 	}
@@ -169,7 +204,42 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 		}
 	}
 
-	public boolean isPowered() {
+	public boolean isRedstonePowered() {
 		return redstoneLevel;
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+		if (ModCharset.isModuleLoaded("power.mechanical") && capability == Capabilities.MECHANICAL_CONSUMER) {
+			return true;
+		}
+
+		return super.hasCapability(capability, facing);
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+		if (ModCharset.isModuleLoaded("power.mechanical") && capability == Capabilities.MECHANICAL_CONSUMER) {
+			return Capabilities.MECHANICAL_CONSUMER.cast(this);
+		}
+
+		return super.getCapability(capability, facing);
+	}
+
+	@Override
+	public boolean isAcceptingPower() {
+		getShape(false);
+		return shape != null;
+	}
+
+	@Override
+	public void setForce(double speed, double torque) {
+		double oldTorque = torqueIn;
+		this.speedIn = speed;
+		this.torqueIn = torque;
+
+		if (ModCharset.isModuleLoaded("power.mechanical")) {
+			startCrafting(world.getBlockState(pos));
+		}
 	}
 }

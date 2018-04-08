@@ -11,16 +11,9 @@
                 "west":  { "texture": "#out", "cullface": "west", "tintindex": 0 },
                 "east":  { "texture": "#out", "cullface": "east", "tintindex": 0 }
             }
-        },
-        {   "from": [ 0, 0, 0.02 ],
-            "to": [ 16, 16, 15.98 ],
-            "faces": {
-                "north": { "texture": "#in", "cullface": "north", "tintindex": 0 }
-            }
         }
     ],
     "textures": {
-        "in": "charset:blocks/mechanical/gearbox_window",
         "border": "charset:blocks/mechanical/gearbox_border_rounded",
         "out": "charset:blocks/mechanical/gearbox_out"
     }

@@ -32,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IItemInsertionHandler;
 import pl.asie.charset.lib.Properties;
@@ -44,7 +45,6 @@ import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RecipeUtils;
 import pl.asie.charset.module.crafting.compression.grid.GridEntry;
 import pl.asie.charset.module.crafting.compression.grid.GridEntryBarrel;
-import pl.asie.charset.module.storage.barrels.BarrelUpgrade;
 import pl.asie.charset.module.storage.barrels.TileEntityDayBarrel;
 
 import javax.annotation.Nullable;
@@ -66,8 +66,10 @@ public class CompressionShape {
 	private boolean invalid = false;
 	private final boolean[] lastRedstoneLevels = new boolean[6];
 
+	protected long lastTickChecked = -1;
 	protected long craftingTickStart = -1;
 	protected long craftingTickEnd = -1;
+	protected int craftingCount = 0;
 	protected Set<EnumFacing> craftingDirections;
 	protected BlockPos craftingSourcePos;
 	protected EnumFacing craftingSourceDir;
@@ -95,27 +97,31 @@ public class CompressionShape {
 		return progress * (((width + height) / 2f) + 1) * 0.06f;
 	}
 
-	protected Set<EnumFacing> checkRedstoneLevels(boolean clearOnly) {
+	protected Set<EnumFacing> checkPowerLevels(boolean clearOnly) {
 		EnumSet<EnumFacing> set = EnumSet.noneOf(EnumFacing.class);
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			boolean lastLevel = lastRedstoneLevels[facing.ordinal()];
-			boolean currLevel = getRedstoneLevel(facing);
+			boolean currLevel = isFacePowered(facing);
 			if (currLevel && !lastLevel) {
 				set.add(facing);
 			}
 			if (!clearOnly || !currLevel) {
-				lastRedstoneLevels[facing.ordinal()] = currLevel;
+				if (!ModCharset.isModuleLoaded("power.mechanical")) {
+					lastRedstoneLevels[facing.ordinal()] = currLevel;
+				} else {
+					lastRedstoneLevels[facing.ordinal()] = false;
+				}
 			}
 		}
 
 		return set;
 	}
 
-	private boolean getRedstoneLevel(EnumFacing side) {
+	private boolean isFacePowered(EnumFacing side) {
 		for (TileCompressionCrafter tile : compressionCrafters) {
 			if (expectedFacings.get(side).contains(tile.getPos())) {
-				if (tile.isPowered()) {
+				if (tile.isCraftingReady()) {
 					return true;
 				}
 			}
@@ -131,6 +137,22 @@ public class CompressionShape {
 	public boolean isInvalid() {
 		if (invalid) {
 			return true;
+		}
+
+		if (!world.isRemote) {
+			boolean hasPower = false;
+
+			for (TileCompressionCrafter crafter : compressionCrafters) {
+				if (crafter.isCraftingReady()) {
+					hasPower = true;
+					break;
+				}
+			}
+
+			if (!hasPower) {
+				// don't set invalid=true here, we can recover and the check's cheap enough
+				return true;
+			}
 		}
 
 		for (Map.Entry<EnumFacing, BlockPos> entry : expectedFacings.entries()) {
@@ -221,19 +243,25 @@ public class CompressionShape {
 			return false;
 		}
 
-		Set<EnumFacing> validSides = checkRedstoneLevels(false);
+		Set<EnumFacing> validSides = checkPowerLevels(false);
 		if (validSides.isEmpty()) {
 			return false;
 		}
 
-		boolean isBackstuffed = false;
+		double speed = 0;
+		double torque = 0;
+
 		for (TileCompressionCrafter crafter : compressionCrafters) {
 			if (crafter.isBackstuffed()) {
 				new Notice(crafter, new TextComponentTranslation("notice.charset.compression.backstuffed"));
-				isBackstuffed = true;
+				return false;
 			}
+
+			speed = Math.max(speed, crafter.getSpeed());
+			torque += crafter.getTorque();
 		}
-		if (isBackstuffed) {
+
+		if (speed <= 0 || torque < 1) {
 			return false;
 		}
 
@@ -243,7 +271,8 @@ public class CompressionShape {
 		Optional<String> error = craftEnd(true);
 		if (!error.isPresent()) {
 			craftingTickStart = world.getTotalWorldTime();
-			craftingTickEnd = world.getTotalWorldTime() + 20;
+			craftingTickEnd = world.getTotalWorldTime() + Math.round(20 / speed);
+			craftingCount = (int) Math.floor(torque);
 			CharsetCraftingCompression.proxy.markShapeRender(sender, this);
 			return true;
 		} else {
@@ -256,28 +285,7 @@ public class CompressionShape {
 
 	public Optional<String> craftEnd(boolean simulate) {
 		InventoryCrafting crafting = RecipeUtils.getCraftingInventory(width, height);
-		boolean hasNonEmpty = false;
-
-		for (int i = 0; i < width * height; i++) {
-			ItemStack stack = grid.get(i).getCraftingStack();
-			if (!stack.isEmpty()) {
-				hasNonEmpty = true;
-			}
-			crafting.setInventorySlotContents(i, stack);
-		}
-
-		if (!hasNonEmpty) {
-			return Optional.of("");
-		}
-
-		IRecipe recipe = FastRecipeLookup.findMatchingRecipe(crafting, world);
-		if (recipe == null) {
-			return Optional.of("notice.charset.compression.cannot_craft");
-		}
-		ItemStack stack = recipe.getCraftingResult(crafting);
-		if (stack.isEmpty()) {
-			return Optional.of("notice.charset.compression.cannot_craft");
-		}
+		IRecipe recipe = null;
 
 		Set<EnumFacing> validSides = craftingDirections;
 
@@ -290,17 +298,49 @@ public class CompressionShape {
 			return Optional.of("notice.charset.compression.need_output");
 		}
 
-		if (!outputStack(stack.copy(), outputs, simulate)) {
-			return Optional.of("notice.charset.compression.need_output_room");
-		}
+		for (int c = 0; c < craftingCount; c++) {
+			boolean hasNonEmpty = false;
 
-		NonNullList<ItemStack> remainingItems = recipe.getRemainingItems(crafting);
-		for (int i = 0; i < width * height; i++) {
-			ItemStack rem = grid.get(i).mergeRemainingItem(remainingItems.get(i), simulate);
-			if (!rem.isEmpty()) {
-				if (!outputStack(rem, outputs, simulate)) {
-					if (simulate) {
-						return Optional.of("notice.charset.compression.need_output_room");
+			for (int i = 0; i < width * height; i++) {
+				ItemStack stack = grid.get(i).getCraftingStack();
+				if (!stack.isEmpty()) {
+					hasNonEmpty = true;
+				}
+				crafting.setInventorySlotContents(i, stack);
+			}
+
+			if (!hasNonEmpty) {
+				return Optional.of("");
+			}
+
+			if (c == 0) {
+				recipe = FastRecipeLookup.findMatchingRecipe(crafting, world);
+				if (recipe == null) {
+					return Optional.of("notice.charset.compression.cannot_craft");
+				}
+			}
+
+			ItemStack stack = recipe.getCraftingResult(crafting);
+			if (stack.isEmpty()) {
+				if (c == 0) {
+					return Optional.of("notice.charset.compression.cannot_craft");
+				} else {
+					return Optional.empty();
+				}
+			}
+
+			if (!outputStack(stack.copy(), outputs, simulate)) {
+				return Optional.of("notice.charset.compression.need_output_room");
+			}
+
+			NonNullList<ItemStack> remainingItems = recipe.getRemainingItems(crafting);
+			for (int i = 0; i < width * height; i++) {
+				ItemStack rem = grid.get(i).mergeRemainingItem(remainingItems.get(i), simulate);
+				if (!rem.isEmpty()) {
+					if (!outputStack(rem, outputs, simulate)) {
+						if (simulate) {
+							return Optional.of("notice.charset.compression.need_output_room");
+						}
 					}
 				}
 			}
@@ -452,14 +492,18 @@ public class CompressionShape {
 	}
 
 	public void tick() {
+		long time = world.getTotalWorldTime();
+		if (lastTickChecked == time) {
+			return;
+		}
+
 		if (craftingTickStart >= 0) {
 			if (isInvalid()) {
 				craftingTickStart = craftingTickEnd = -1;
 			}
 
-			long time = world.getTotalWorldTime();
 			if (time >= craftingTickStart && time < craftingTickEnd) {
-				checkRedstoneLevels(true);
+				checkPowerLevels(true);
 			} else if (time >= craftingTickEnd) {
 				craftingTickStart = craftingTickEnd = -1;
 				if (!world.isRemote) {
@@ -467,5 +511,7 @@ public class CompressionShape {
 				}
 			}
 		}
+
+		lastTickChecked = time;
 	}
 }

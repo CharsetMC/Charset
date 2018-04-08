@@ -17,18 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.power.mechanical;
+package pl.asie.charset.api.experimental.mechanical;
 
-import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
-
-public class DefaultPowerConsumer implements IPowerConsumer {
-	@Override
-	public boolean isAcceptingPower() {
-		return false;
-	}
-
-	@Override
-	public void setForce(double speed, double torque) {
-
-	}
+public interface IMechanicalPowerProducer {
 }

@@ -45,6 +45,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import pl.asie.charset.api.audio.IAudioReceiver;
 import pl.asie.charset.api.audio.IAudioSource;
 import pl.asie.charset.api.carry.CustomCarryHandler;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
 import pl.asie.charset.api.laser.ILaserReceiver;
 import pl.asie.charset.api.lib.*;
 import pl.asie.charset.api.locks.Lockable;
@@ -63,6 +65,8 @@ import pl.asie.charset.lib.capability.inventory.ItemInsertionHandlerCombiner;
 import pl.asie.charset.lib.capability.laser.DummyLaserReceiver;
 import pl.asie.charset.lib.capability.laser.LaserReceiverCombiner;
 import pl.asie.charset.lib.capability.lib.*;
+import pl.asie.charset.lib.capability.mechanical.DefaultMechanicalPowerConsumer;
+import pl.asie.charset.lib.capability.mechanical.DefaultMechanicalPowerProducer;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.redstone.*;
 import pl.asie.charset.lib.capability.storage.DummyBarrel;
@@ -89,6 +93,11 @@ public class Capabilities {
 	public static Capability<IItemInsertionHandler> ITEM_INSERTION_HANDLER;
 	@CapabilityInject(IPipeView.class)
 	public static Capability<IPipeView> PIPE_VIEW;
+
+	@CapabilityInject(IMechanicalPowerProducer.class)
+	public static Capability<IMechanicalPowerProducer> MECHANICAL_PRODUCER;
+	@CapabilityInject(IMechanicalPowerConsumer.class)
+	public static Capability<IMechanicalPowerConsumer> MECHANICAL_CONSUMER;
 
 	@CapabilityInject(IBundledEmitter.class)
 	public static Capability<IBundledEmitter> BUNDLED_EMITTER;
@@ -140,6 +149,9 @@ public class Capabilities {
 
 		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, DummyCapabilityStorage.get(), DefaultItemInsertionHandler::new);
 		CapabilityManager.INSTANCE.register(IPipeView.class, DummyCapabilityStorage.get(), DefaultPipeView::new);
+
+		CapabilityManager.INSTANCE.register(IMechanicalPowerProducer.class, DummyCapabilityStorage.get(), DefaultMechanicalPowerProducer::new);
+		CapabilityManager.INSTANCE.register(IMechanicalPowerConsumer.class, DummyCapabilityStorage.get(), DefaultMechanicalPowerConsumer::new);
 
 		CapabilityManager.INSTANCE.register(IBundledEmitter.class, new DefaultBundledEmitterStorage(), DefaultBundledEmitter::new);
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter::new);

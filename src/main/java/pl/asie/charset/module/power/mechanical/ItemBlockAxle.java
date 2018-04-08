@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.Properties;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -80,9 +81,9 @@ public class ItemBlockAxle extends ItemBlockBase {
 				}
 			}
 		} else if (tile != null) {
-			if (tile.hasCapability(CharsetPowerMechanical.POWER_PRODUCER, side)) {
+			if (tile.hasCapability(Capabilities.MECHANICAL_PRODUCER, side)) {
 				// pass
-			} else if (tile.hasCapability(CharsetPowerMechanical.POWER_CONSUMER, side)) {
+			} else if (tile.hasCapability(Capabilities.MECHANICAL_CONSUMER, side)) {
 				// pass
 			} else {
 				return false;

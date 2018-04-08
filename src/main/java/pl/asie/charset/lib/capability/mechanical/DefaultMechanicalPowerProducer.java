@@ -17,7 +17,9 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.power.mechanical.api;
+package pl.asie.charset.lib.capability.mechanical;
 
-public interface IPowerProducer {
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
+
+public class DefaultMechanicalPowerProducer implements IMechanicalPowerProducer {
 }

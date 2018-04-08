@@ -22,14 +22,15 @@ package pl.asie.charset.module.power.mechanical;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.lib.block.TileBase;
-import pl.asie.charset.module.power.mechanical.api.IPowerConsumer;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
+import pl.asie.charset.lib.capability.Capabilities;
 
 import javax.annotation.Nullable;
 
-public class TileSocket extends TileBase implements IPowerConsumer {
+public class TileSocket extends TileBase implements IMechanicalPowerConsumer {
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		if (capability == CharsetPowerMechanical.POWER_CONSUMER) {
+		if (capability == Capabilities.MECHANICAL_CONSUMER) {
 			return facing != null;
 		}
 
@@ -39,7 +40,7 @@ public class TileSocket extends TileBase implements IPowerConsumer {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-		if (capability == CharsetPowerMechanical.POWER_CONSUMER) {
+		if (capability == Capabilities.MECHANICAL_CONSUMER) {
 			return (T) this;
 		} else {
 			return super.getCapability(capability, facing);

@@ -42,8 +42,11 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
@@ -72,6 +75,20 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 				return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("wood", SubItemSetHelper::sortByItem));
 			}
 		});
+	}
+
+	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		super.breakBlock(worldIn, pos, state);
+		for (EnumFacing facing : EnumFacing.VALUES) {
+			if (facing != state.getValue(ORIENTATION).facing) {
+				IMechanicalPowerConsumer consumer = CapabilityHelper.get(worldIn, pos.offset(facing), Capabilities.MECHANICAL_CONSUMER, facing.getOpposite(),
+						false, true, false);
+				if (consumer != null) {
+					consumer.setForce(0, 0);
+				}
+			}
+		}
 	}
 
 	@Override
