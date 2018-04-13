@@ -57,13 +57,13 @@ public class WireHighlightHandler {
                     if (wire.connectsAny(face)) {
                         int lineMask = 0xfff;
                         lineMask &= ~RenderUtils.getSelectionMask(face.getOpposite());
-                        RenderUtils.drawSelectionBoundingBox(wire.getFactory().getSelectionBox(wire.getLocation(), i + 1), lineMask);
+                        RenderUtils.drawSelectionBoundingBox(wire.getProvider().getSelectionBox(wire.getLocation(), i + 1), lineMask);
                         lineMaskCenter &= ~RenderUtils.getSelectionMask(face);
                     }
                 }
 
                 if (lineMaskCenter != 0) {
-                    RenderUtils.drawSelectionBoundingBox(wire.getFactory().getSelectionBox(wire.getLocation(), 0), lineMaskCenter);
+                    RenderUtils.drawSelectionBoundingBox(wire.getProvider().getSelectionBox(wire.getLocation(), 0), lineMaskCenter);
                 }
 
                 GlStateManager.popMatrix();

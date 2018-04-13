@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.datafix.FixTypes;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -33,10 +34,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.GameData;
 import net.minecraftforge.registries.RegistryBuilder;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -52,7 +56,6 @@ public class CharsetLibWires {
 	public static CharsetLibWires instance;
 
 	public static BlockWire blockWire;
-	public static ItemWire itemWire;
 
 	@SideOnly(Side.CLIENT)
 	private RendererWire rendererWire;
@@ -60,30 +63,29 @@ public class CharsetLibWires {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		blockWire = new BlockWire();
-		itemWire = new ItemWire(blockWire);
 
 		WireManager.REGISTRY = (ForgeRegistry<WireProvider>) new RegistryBuilder<WireProvider>()
 				.setName(new ResourceLocation("charset:wire"))
 				.setIDRange(1, WireManager.MAX_ID)
 				.setType(WireProvider.class)
 				.create();
+
+		ModCharset.dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new FixCharsetWireItemSeparation());
 	}
 
 	@SubscribeEvent
 	public void registerModels(ModelRegistryEvent event) {
-		for (int i = 0; i < WireManager.MAX_ID * 2; i++) {
-			RegistryUtils.registerModel(itemWire, i, "charset:wire");
+		for (Item i : ForgeRegistries.ITEMS) {
+			if (i instanceof ItemWire) {
+				RegistryUtils.registerModel(i, 0, "charset:wire");
+				RegistryUtils.registerModel(i, 1, "charset:wire");
+			}
 		}
 	}
 
 	@SubscribeEvent
 	public void registerBlocks(RegistryEvent.Register<Block> event) {
 		RegistryUtils.register(event.getRegistry(), blockWire, "wire");
-	}
-
-	@SubscribeEvent
-	public void registerItems(RegistryEvent.Register<Item> event) {
-		RegistryUtils.register(event.getRegistry(), itemWire, "wire");
 	}
 
 	@SubscribeEvent

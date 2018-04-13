@@ -128,7 +128,7 @@ public class BarrelModel extends ModelFactory<BarrelCacheInfo> {
             textures.put("#hopping", ""); textures.put("hopping", "");
         }
 
-        IModelState state = info.orientation.toTransformation();
+        IModelState state = info.orientation;
         IModel retexture = template.retexture(textures.build());
         return new WrappedBakedModel(retexture.bake(state, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()), log).addDefaultBlockTransforms();
     }

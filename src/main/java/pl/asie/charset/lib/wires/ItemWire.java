@@ -35,10 +35,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.CharsetLib;
 
 public class ItemWire extends ItemBlockMultipart {
-    public ItemWire(Block block) {
-        super(block, (IMultipart) block);
+    private final WireProvider provider;
+
+    public ItemWire(WireProvider provider) {
+        super(CharsetLibWires.blockWire, CharsetLibWires.blockWire);
+        this.provider = provider;
+        this.provider.setItemWire(this);
         setHasSubtypes(true);
     }
 
@@ -54,17 +59,16 @@ public class ItemWire extends ItemBlockMultipart {
     }
 
     public Wire fromStack(IWireContainer container, ItemStack stack, EnumFacing facing) {
-        WireProvider factory = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
-        if (factory != null) {
+        if (provider != null) {
             WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing);
-            return factory.create(container, location);
+            return provider.create(container, location);
         } else {
             return null;
         }
     }
 
-    public ItemStack toStack(WireProvider provider, boolean freestanding, int amount) {
-        return new ItemStack(this, amount, (WireManager.REGISTRY.getID(provider) << 1) | (freestanding ? 1 : 0));
+    public ItemStack toStack(boolean freestanding, int amount) {
+        return new ItemStack(this, amount, (freestanding ? 1 : 0));
     }
 
     @Override
@@ -76,9 +80,8 @@ public class ItemWire extends ItemBlockMultipart {
 
     public boolean placeWirePartAt(ItemStack stack, EntityPlayer player, EnumHand hand, World world, BlockPos pos, EnumFacing facing,
                                       float hitX, float hitY, float hitZ, IMultipart multipartBlock, IBlockState state) {
-        WireProvider factory = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
         WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing.getOpposite());
-        if (!factory.canPlace(world, pos, location)) {
+        if (!provider.canPlace(world, pos, location)) {
             return false;
         }
 
@@ -88,13 +91,12 @@ public class ItemWire extends ItemBlockMultipart {
     @Override
     public boolean placeBlockAtTested(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing facing, float hitX,
                                       float hitY, float hitZ, IBlockState newState) {
-        WireProvider factory = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
         WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing.getOpposite());
-        if (!factory.canPlace(world, pos, location)) {
+        if (!provider.canPlace(world, pos, location)) {
             return false;
         }
 
-        if (factory.canProvidePower()) {
+        if (provider.canProvidePower()) {
             newState = newState.withProperty(BlockWire.REDSTONE, true);
         }
 
@@ -112,15 +114,16 @@ public class ItemWire extends ItemBlockMultipart {
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems) {
         if (this.isInCreativeTab(tab)) {
-            for (WireProvider provider : WireManager.REGISTRY.getValues()) {
-                int id = WireManager.REGISTRY.getID(provider);
-                if (provider.hasSidedWire()) {
-                    subItems.add(new ItemStack(this, 1, id * 2));
-                }
-                if (provider.hasFreestandingWire()) {
-                    subItems.add(new ItemStack(this, 1, id * 2 + 1));
-                }
+            if (provider.hasSidedWire()) {
+                subItems.add(new ItemStack(this, 1, 0));
+            }
+            if (provider.hasFreestandingWire()) {
+                subItems.add(new ItemStack(this, 1, 1));
             }
         }
+    }
+
+    public WireProvider getWireProvider() {
+        return provider;
     }
 }

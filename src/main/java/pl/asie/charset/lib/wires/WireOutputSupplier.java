@@ -52,7 +52,7 @@ public class WireOutputSupplier implements IOutputSupplier {
 			return ItemStack.EMPTY;
 		}
 
-		return CharsetLibWires.itemWire.toStack(WireManager.REGISTRY.getValue(id), freestanding, amount);
+		return WireManager.REGISTRY.getValue(id).getItemWire().toStack(freestanding, amount);
 	}
 
 	public static class Factory implements IOutputSupplierFactory {

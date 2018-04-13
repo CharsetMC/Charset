@@ -35,6 +35,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.utils.OcclusionUtils;
@@ -79,6 +80,15 @@ public final class WireUtils {
         boolean result = tile != null && tile.hasCapability(capability, face);
         TileWire.isWireCheckingForCaps = false;
         return result;
+    }
+
+    public static ICapabilityProvider getCapabilityProvider(Wire searcher, BlockPos pos, boolean ignoreWires) {
+        TileEntity tile = searcher.getContainer().world().getTileEntity(pos);
+        if (tile != null) {
+            return tile;
+        } else {
+            return null;
+        }
     }
 
     public static <T> T getCapability(Wire searcher, BlockPos pos, Capability<T> capability, EnumFacing face, boolean ignoreWires) {
@@ -135,7 +145,7 @@ public final class WireUtils {
             return false;
         }
 
-        AxisAlignedBB mask = wire.getFactory().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
+        AxisAlignedBB mask = wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
         if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos)) {
             return false;
         }

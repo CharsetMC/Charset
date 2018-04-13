@@ -19,12 +19,14 @@
 
 package pl.asie.charset.module.power.electric;
 
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -32,6 +34,10 @@ import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.wires.ItemWire;
+import pl.asie.charset.lib.wires.WireProvider;
+import pl.asie.charset.module.audio.transport.WireProviderAudioCable;
 import pl.asie.charset.module.power.steam.SteamChunkContainer;
 
 @CharsetModule(
@@ -41,7 +47,22 @@ import pl.asie.charset.module.power.steam.SteamChunkContainer;
 		profile = ModuleProfile.INDEV
 )
 public class CharsetPowerElectric {
+	private WireProviderElectric electricWire;
+	private ItemWire electricWireWire;
+
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
+		electricWire = new WireProviderElectric();
+		electricWireWire = new ItemWire(electricWire);
+	}
+
+	@SubscribeEvent
+	public void registerItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), electricWireWire, "electric_wire");
+	}
+
+	@SubscribeEvent
+	public void registerWires(RegistryEvent.Register<WireProvider> event) {
+		RegistryUtils.register(event.getRegistry(), electricWire, "electric_wire");
 	}
 }

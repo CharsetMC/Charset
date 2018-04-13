@@ -35,8 +35,8 @@ public class RecipeWireConversion extends RecipeCharset {
     private static List<ItemStack> getMatchingStacks(int offset) {
         List<ItemStack> stacks = new ArrayList<>();
         for (WireProvider provider : WireManager.REGISTRY) {
-            if (provider.hasSidedWire() && provider.hasFreestandingWire()) {
-                stacks.add(new ItemStack(CharsetLibWires.itemWire, 1, (WireManager.REGISTRY.getID(provider) << 1) | offset));
+            if (provider.hasItemWire() && provider.hasSidedWire() && provider.hasFreestandingWire()) {
+                stacks.add(new ItemStack(provider.getItemWire(), 1, offset));
             }
         }
         return stacks;
@@ -72,8 +72,8 @@ public class RecipeWireConversion extends RecipeCharset {
 
         @Override
         public boolean matches(ItemStack stack, IRecipeResultBuilder builder) {
-            if (!stack.isEmpty() && stack.getItem() == CharsetLibWires.itemWire && ((stack.getMetadata() & 1) == offset)) {
-                WireProvider provider = WireManager.REGISTRY.getValue(stack.getMetadata() >> 1);
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemWire && ((stack.getMetadata() & 1) == offset)) {
+                WireProvider provider = ((ItemWire) stack.getItem()).getWireProvider();
                 return provider.hasFreestandingWire() && provider.hasSidedWire();
             } else {
                 return false;

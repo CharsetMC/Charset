@@ -74,7 +74,7 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     @Override
     public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
         if (wire != null) {
-            nbt.setByte("f", (byte) WireManager.REGISTRY.getID(wire.getFactory()));
+            nbt.setByte("f", (byte) WireManager.REGISTRY.getID(wire.getProvider()));
             nbt.setByte("l", (byte) wire.getLocation().ordinal());
             nbt = wire.writeNBTData(nbt, isClient);
         }
@@ -84,14 +84,14 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     @Override
     public ItemStack getDroppedBlock(IBlockState state) {
         if (wire != null) {
-            return CharsetLibWires.itemWire.toStack(wire.getFactory(), wire.getLocation() == WireFace.CENTER, 1);
+            return wire.getProvider().getItemWire().toStack(wire.getLocation() == WireFace.CENTER, 1);
         } else {
             return ItemStack.EMPTY;
         }
     }
 
     public void onPlacedBy(WireFace facing, ItemStack stack) {
-        wire = CharsetLibWires.itemWire.fromStack(this, stack, facing.facing);
+        wire = ((ItemWire) stack.getItem()).fromStack(this, stack, facing.facing);
         wire.onChanged(true);
         markBlockForUpdate();
     }

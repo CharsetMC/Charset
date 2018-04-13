@@ -53,9 +53,9 @@ public class ModelGearbox extends ModelFactory<GearboxCacheInfo> {
 			return modelInner.uvlock(true).retexture(ImmutableMap.of(
 					"#plank", object.plank.getIconName(),
 					"plank", object.plank.getIconName()
-			)).bake(object.orientation.toTransformation(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			)).bake(object.orientation, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 		} else if (layer == BlockRenderLayer.CUTOUT) {
-			return modelOuter.uvlock(false).bake(object.orientation.toTransformation(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			return modelOuter.uvlock(false).bake(object.orientation, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 		} else if (isItem) {
 			IBakedModel modelBakedFirst = bake(object, false, BlockRenderLayer.SOLID);
 			IBakedModel modelBakedSecond = bake(object, false, BlockRenderLayer.CUTOUT);

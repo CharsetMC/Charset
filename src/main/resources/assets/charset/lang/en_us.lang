@@ -111,6 +111,11 @@ tile.charset.projector.name=Projector
 item.charset.gemQuartz.name=Quartz
 tile.charset.oreQuartz.name=Quartz Ore
 
+# power.electric
+
+tile.charset.electricWire.name=Electric Wire
+tile.charset.electricWire.freestanding.name=Hovering Electric Wire
+
 # power.mechanical
 
 item.charset.gear.1.name=Wooden Gear

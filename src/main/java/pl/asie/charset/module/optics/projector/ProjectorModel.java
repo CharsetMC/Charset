@@ -42,7 +42,7 @@ public class ProjectorModel extends ModelFactory<ProjectorCacheInfo> {
 
     @Override
     public IBakedModel bake(ProjectorCacheInfo info, boolean isItem, BlockRenderLayer layer) {
-        IModelState state = info.orientation.toTransformation();
+        IModelState state = info.orientation;
         return new WrappedBakedModel(template.bake(state, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter())).addDefaultBlockTransforms();
     }
 

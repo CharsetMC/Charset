@@ -21,10 +21,21 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.vecmath.Matrix4f;
 
 public final class MathUtils {
     private MathUtils() {
 
+    }
+
+    public static Matrix4f newJavaxIdentityMat() {
+        Matrix4f ret = new Matrix4f();
+        ret.setIdentity();
+        return ret;
     }
 
     public static float interpolate(float a, float b, float amount) {

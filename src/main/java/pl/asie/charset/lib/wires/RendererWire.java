@@ -19,8 +19,6 @@
 
 package pl.asie.charset.lib.wires;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelRotation;
@@ -36,7 +34,6 @@ import pl.asie.charset.lib.render.CharsetFaceBakery;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.charset.lib.render.sprite.SpritesheetFactory;
-import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -77,7 +74,6 @@ public class RendererWire extends ModelFactory<Wire> {
             ModelRotation.X270_Y90
     };
 
-    private final TIntObjectMap<Wire> stackMap = new TIntObjectHashMap<>();
     private final Map<WireProvider, WireSheet> sheetMap = new HashMap<>();
 
     public RendererWire() {
@@ -121,8 +117,8 @@ public class RendererWire extends ModelFactory<Wire> {
             h = 0;
         }
 
-        if (!wc(wire, side.facing) && wire.getFactory() != null) {
-            h = 8.0f - (sheetMap.get(wire.getFactory()).width / 2); // TODO: Replace with WireProvider call?
+        if (!wc(wire, side.facing) && wire.getProvider() != null) {
+            h = 8.0f - (sheetMap.get(wire.getProvider()).width / 2); // TODO: Replace with WireProvider call?
         }
 
         return side.facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;
@@ -200,7 +196,7 @@ public class RendererWire extends ModelFactory<Wire> {
     }
 
     public void addCorner(Wire wire, WireSheet sheet, EnumFacing dir, int renderColor, List<BakedQuad> quads) {
-        if (wire.getFactory().isFlat()) {
+        if (wire.getProvider().isFlat()) {
             return;
         }
 
@@ -422,7 +418,7 @@ public class RendererWire extends ModelFactory<Wire> {
                 )
         );
 
-        if (!wire.getFactory().isFlat()) {
+        if (!wire.getProvider().isFlat()) {
             from.setY(0.0F);
             to.setY(0.0F);
             quads.add(
@@ -549,9 +545,14 @@ public class RendererWire extends ModelFactory<Wire> {
     public IBakedModel bake(Wire wire, boolean isItem, BlockRenderLayer layer) {
         SimpleBakedModel model = new SimpleBakedModel(this);
         if (wire != null) {
-            WireSheet sheet = sheetMap.get(wire.getFactory());
+            WireSheet sheet = sheetMap.get(wire.getProvider());
             if (sheet != null) {
-                model.setParticle(sheet.particle);
+                //if (sheet.particle.getIconName().endsWith("missingno")) {
+
+                //} else {
+                //    model.setParticle(sheet.particle);
+                //}
+                model.setParticle(sheet.top[sheet.top.length - 1]);
                 addWire(wire, sheet, model.getQuads(null, null, 0));
             }
         }
@@ -561,19 +562,10 @@ public class RendererWire extends ModelFactory<Wire> {
 
     @Override
     public Wire fromItemStack(ItemStack stack) {
-        int md = stack.getItemDamage();
-        if (stackMap.containsKey(md)) {
-            return stackMap.get(md);
-        } else {
-            Wire wire = CharsetLibWires.itemWire.fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
-            if (wire != null) {
-                wire.setConnectionsForItemRender();
-
-                stackMap.put(md, wire);
-                return wire;
-            } else {
-                return null;
-            }
+        Wire wire = ((ItemWire) stack.getItem()).fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
+        if (wire != null) {
+            wire.setConnectionsForItemRender();
         }
+        return wire;
     }
 }

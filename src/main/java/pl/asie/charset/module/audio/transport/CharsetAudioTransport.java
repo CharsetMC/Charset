@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.audio.transport;
 
+import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.wires.ItemWire;
 import pl.asie.charset.lib.wires.WireProvider;
 
 @CharsetModule(
@@ -35,12 +37,22 @@ import pl.asie.charset.lib.wires.WireProvider;
         profile = ModuleProfile.TESTING
 )
 public class CharsetAudioTransport {
+    private WireProviderAudioCable audioCable;
+    private ItemWire audioCableWire;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        audioCable = new WireProviderAudioCable();
+        audioCableWire = new ItemWire(audioCable);
+    }
+
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        RegistryUtils.register(event.getRegistry(), audioCableWire, "audio_cable");
     }
 
     @SubscribeEvent
     public void registerWires(RegistryEvent.Register<WireProvider> event) {
-        RegistryUtils.register(event.getRegistry(), new WireProviderAudioCable(), "audio_cable");
+        RegistryUtils.register(event.getRegistry(), audioCable, "audio_cable");
     }
 }

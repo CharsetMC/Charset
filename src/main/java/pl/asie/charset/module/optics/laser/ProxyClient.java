@@ -99,7 +99,7 @@ public class ProxyClient extends ProxyCommon {
 		if (prismModel != null) {
 			for (Orientation o : Orientation.values()) {
 				ModelResourceLocation location = new ModelResourceLocation("charset:laser_prism", "orientation=" + o.name().toLowerCase());
-				IBakedModel model = prismModel.bake(o.toTransformation(), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
+				IBakedModel model = prismModel.bake(o, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
 				event.getModelRegistry().putObject(location, model);
 			}
 		}

@@ -137,7 +137,7 @@ public class ModCharset {
 
 		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 
-		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 4);
+		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 5);
 		dataFixes.registerFix(FixTypes.ENTITY, new FixCharsetUnifyModId.Entity(oldPrefixes));
 
 		charsetIconItem = new IconCharset();
@@ -233,6 +233,11 @@ public class ModCharset {
 	@SubscribeEvent
 	public void onMissingMappingsItem(RegistryEvent.MissingMappings<Item> event) {
 		for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getAllMappings()) {
+			if (mapping.key.toString().equals("charset:wire")) {
+				mapping.ignore();
+				continue;
+			}
+
 			if (oldPrefixes.contains(mapping.key.getResourceDomain())) {
 				ResourceLocation newName = new ResourceLocation("charset", mapping.key.getResourcePath());
 				Item i = Item.getByNameOrId(newName.toString());

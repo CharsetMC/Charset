@@ -30,6 +30,7 @@ import net.minecraftforge.common.capabilities.CapabilityDispatcher;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.OcclusionUtils;
@@ -64,6 +65,23 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         connectionCheckDirty = true;
     }
 
+    private ICapabilityProvider getCapabilityProviderRemoteBlock(BlockPos pos) {
+        return WireUtils.getCapabilityProvider(this, pos, true);
+    }
+
+    private ICapabilityProvider getCapabilityProviderRemote(BlockPos pos, WireFace face, boolean blocks) {
+        Wire wire = WireUtils.getWire(getContainer().world(), pos, face);
+        if (wire != null) {
+            return wire;
+        } else {
+            if (blocks) {
+                return getCapabilityProviderRemoteBlock(pos);
+            } else {
+                return null;
+            }
+        }
+    }
+
     private <T> T getCapabilityRemoteBlock(BlockPos pos, EnumFacing facing, Capability<T> capability) {
         return WireUtils.getCapability(this, pos, capability, facing, true);
     }
@@ -79,6 +97,82 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                 return null;
             }
         }
+    }
+
+    protected final Iterable<Pair<ICapabilityProvider, EnumFacing>> connectedIterator(boolean connectsBelowWire) {
+        return () -> new Iterator<Pair<ICapabilityProvider, EnumFacing>>() {
+            private final BlockPos pos = getContainer().pos();
+            private final WireFace loc = getLocation();
+            private Pair<ICapabilityProvider, EnumFacing> queued = find();
+            private int i = 0;
+
+            private Pair<ICapabilityProvider, EnumFacing> find() {
+                ICapabilityProvider result = null;
+                EnumFacing resultFace = null;
+                while (result == null && i < 20) {
+                    switch (i) {
+                        case 0: {
+                            if (getLocation() != WireFace.CENTER && connectsBelowWire) {
+                                result = getCapabilityProviderRemoteBlock(pos.offset(loc.facing));
+                                resultFace = loc.facing.getOpposite();
+                            }
+                        } break;
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7: {
+                            WireFace face = WireFace.VALUES[i - 1];
+                            if (face != loc && connectsInternal(face)) {
+                                result = getCapabilityProviderRemote(pos, face, false);
+                                resultFace = getLocation().facing;
+                            }
+                        } break;
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 11:
+                        case 12:
+                        case 13: {
+                            EnumFacing facing = EnumFacing.getFront(i - 8);
+                            if (connectsExternal(facing)) {
+                                result = getCapabilityProviderRemote(pos.offset(facing), loc, true);
+                                resultFace = facing.getOpposite();
+                            }
+                        } break;
+                        case 14:
+                        case 15:
+                        case 16:
+                        case 17:
+                        case 18:
+                        case 19: {
+                            EnumFacing facing = EnumFacing.getFront(i - 14);
+                            if (connectsCorner(facing)) {
+                                result = getCapabilityProviderRemote(pos.offset(facing).offset(loc.facing), WireFace.get(facing.getOpposite()), false);
+                                resultFace = loc.facing.getOpposite();
+                            }
+                        } break;
+                    }
+
+                    i++;
+                }
+                return result != null ? Pair.of(result, resultFace) : null;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return queued != null;
+            }
+
+            @Override
+            public Pair<ICapabilityProvider, EnumFacing> next() {
+                Pair<ICapabilityProvider, EnumFacing> current = queued;
+                queued = find();
+                return current;
+            }
+        };
     }
 
     protected final <T> Iterable<T> connectedIterator(Capability<T> capability, boolean connectsBelowWire) {
@@ -205,7 +299,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         return container;
     }
 
-    public final WireProvider getFactory() {
+    public final WireProvider getProvider() {
         return factory;
     }
 
@@ -339,7 +433,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
     }
 
     protected boolean canConnectWire(Wire wire) {
-        return wire.getFactory() == getFactory();
+        return wire.getProvider() == getProvider();
     }
 
     public boolean canConnectRedstone(EnumFacing side) {

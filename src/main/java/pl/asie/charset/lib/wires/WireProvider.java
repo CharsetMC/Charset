@@ -32,8 +32,23 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     private final AxisAlignedBB[] boxes = new AxisAlignedBB[43];
     private final AxisAlignedBB[] cornerBoxes = new AxisAlignedBB[24];
     private ResourceLocation name;
+    private ItemWire iw;
 
     public WireProvider() {
+    }
+
+    public final boolean hasItemWire() {
+        return iw != null;
+    }
+
+    public final ItemWire getItemWire() {
+        return iw;
+    }
+
+    final void setItemWire(ItemWire i) {
+        if (iw == null) {
+            iw = i;
+        }
     }
 
     protected final void generateBoxes() {
@@ -108,8 +123,8 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
         return cornerBoxes[location.ordinal() * 4 + i];
     }
 
-    public abstract float getWidth();
-    public abstract float getHeight();
+    public abstract float getWidth(); /* 0...1 */
+    public abstract float getHeight(); /* 0...1 */
     public abstract ResourceLocation getTexturePrefix();
 
     public boolean hasSidedWire() {

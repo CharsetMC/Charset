@@ -23,16 +23,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.model.IModelPart;
+import net.minecraftforge.common.model.IModelState;
+import net.minecraftforge.common.model.ITransformation;
 import net.minecraftforge.common.model.TRSRTransformation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import java.util.Optional;
 
-public enum Orientation implements IStringSerializable {
+public enum Orientation implements IModelState, IStringSerializable, ITransformation {
     FACE_DOWN_POINT_SOUTH(EnumFacing.DOWN, EnumFacing.SOUTH),
     FACE_DOWN_POINT_NORTH(EnumFacing.DOWN, EnumFacing.NORTH),
     FACE_DOWN_POINT_EAST(EnumFacing.DOWN, EnumFacing.EAST),
@@ -223,34 +225,53 @@ public enum Orientation implements IStringSerializable {
         return valuesCache[dir.ordinal()*4];
     }
 
-    @SideOnly(Side.CLIENT)
-    private static Matrix4f newMat() {
-        Matrix4f ret = new Matrix4f();
-        ret.setIdentity();
-        return ret;
-    }
-
-    @SideOnly(Side.CLIENT)
+    @Deprecated
     public TRSRTransformation toTransformation() {
-        Quaternion quat = Quaternion.fromOrientation(this.getSwapped());
-        Matrix4f trans = newMat();
-        Matrix4f rot = newMat();
-        Matrix4f r90 = newMat();
-
-        r90.setRotation(new AxisAngle4f(0, 1, 0, (float) Math.PI / 2));
-
-        trans.setTranslation(new Vector3f(0.5F, 0.5F, 0.5F));
-        Matrix4f iTrans = new Matrix4f(trans);
-        iTrans.invert();
-        rot.setRotation(quat.toJavax());
-        rot.mul(r90);
-
-        trans.mul(rot);
-        trans.mul(iTrans);
-
-        return new TRSRTransformation(trans);
+        return new TRSRTransformation(getMatrix());
     }
-    
+
+    private Matrix4f _matrix_cache;
+
+    @Override
+    public Matrix4f getMatrix() {
+        if (_matrix_cache == null) {
+            Quaternion quat = Quaternion.fromOrientation(this.getSwapped());
+            Matrix4f trans = MathUtils.newJavaxIdentityMat();
+            Matrix4f rot = MathUtils.newJavaxIdentityMat();
+            Matrix4f r90 = MathUtils.newJavaxIdentityMat();
+
+            r90.setRotation(new AxisAngle4f(0, 1, 0, (float) Math.PI / 2));
+
+            trans.setTranslation(new Vector3f(0.5F, 0.5F, 0.5F));
+            Matrix4f iTrans = new Matrix4f(trans);
+            iTrans.invert();
+            rot.setRotation(quat.toJavax());
+            rot.mul(r90);
+
+            trans.mul(rot);
+            trans.mul(iTrans);
+            _matrix_cache = trans;
+        }
+
+        return (Matrix4f) _matrix_cache.clone();
+    }
+
+    @Override
+    public Optional<TRSRTransformation> apply(Optional<? extends IModelPart> part) {
+        return part.isPresent() ? Optional.empty() : Optional.of(new TRSRTransformation(getMatrix()));
+    }
+
+    @Override
+    public EnumFacing rotate(EnumFacing facing) {
+        return TRSRTransformation.rotate(getMatrix(), facing);
+    }
+
+    @Override
+    public int rotate(EnumFacing facing, int vertexIndex) {
+        // FIXME see TRSRTransformation
+        return vertexIndex;
+    }
+
     /**
      * @param newTop
      * @return {@link Orientation} with the same direction, but facing newTop. If the top can't be change to that direction because it is already facing that direction, it returns UNKNOWN.

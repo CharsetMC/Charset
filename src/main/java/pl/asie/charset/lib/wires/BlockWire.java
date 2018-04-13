@@ -20,14 +20,12 @@
 package pl.asie.charset.lib.wires;
 
 import mcmultipart.api.container.IPartInfo;
-import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.slot.EnumCenterSlot;
 import mcmultipart.api.slot.EnumFaceSlot;
 import mcmultipart.api.slot.IPartSlot;
 import mcmultipart.api.world.IMultipartWorld;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -176,7 +174,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
     public List<AxisAlignedBB> getOcclusionBoxes(IPartInfo part) {
         Wire wire = WireUtils.getAnyWire(part.getPartWorld(), part.getPartPos());
         if (wire != null) {
-            return Collections.singletonList(wire.getFactory().getSelectionBox(wire.getLocation(), 0));
+            return Collections.singletonList(wire.getProvider().getSelectionBox(wire.getLocation(), 0));
         } else {
             return Collections.emptyList();
         }
@@ -186,7 +184,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
     public RayTraceResult collisionRayTrace(IPartInfo part, Vec3d start, Vec3d end) {
         Wire wire = WireUtils.getAnyWire(part.getTile().getTileEntity());
         if (wire != null) {
-            RayTraceResult result = rayTrace(part.getPartPos(), start, end, wire.getFactory().getSelectionBox(wire.getLocation(), 0));
+            RayTraceResult result = rayTrace(part.getPartPos(), start, end, wire.getProvider().getSelectionBox(wire.getLocation(), 0));
             if (result != null) {
                 result.hitInfo = part;
                 return result;
@@ -196,7 +194,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
             for (int i = 0; i < faces.length; i++) {
                 EnumFacing face = faces[i];
                 if (wire.connectsAny(face)) {
-                    result = rayTrace(part.getPartPos(), start, end, wire.getFactory().getSelectionBox(wire.getLocation(), i + 1));
+                    result = rayTrace(part.getPartPos(), start, end, wire.getProvider().getSelectionBox(wire.getLocation(), i + 1));
                     if (result != null) {
                         result.hitInfo = part;
                         return result;
@@ -212,7 +210,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         Wire wire = WireUtils.getAnyWire(source, pos);
         if (wire != null) {
-            return wire.getFactory().getSelectionBox(wire.getLocation(), 0);
+            return wire.getProvider().getSelectionBox(wire.getLocation(), 0);
         } else {
             return FULL_BLOCK_AABB;
         }
