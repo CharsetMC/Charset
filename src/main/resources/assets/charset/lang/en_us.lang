@@ -130,6 +130,10 @@ tile.charset.gearbox.name=Gearbox
 tile.charset.gearbox.format=%s Gearbox
 tile.charset.socket.name=Socket
 
+# power.steam
+
+tile.charset.solar_mirror.name=Mirror
+
 # storage.barrels
 
 config.charset.storage.barrels.features.name=Toggle Features

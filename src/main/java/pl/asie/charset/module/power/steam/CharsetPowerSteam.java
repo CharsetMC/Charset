@@ -19,19 +19,33 @@
 
 package pl.asie.charset.module.power.steam;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
+import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.modcompat.crafttweaker.Registry;
+import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.module.power.steam.render.RenderMirror;
 
 @CharsetModule(
 		name = "power.steam",
@@ -45,9 +59,56 @@ public class CharsetPowerSteam {
 	public static Capability<SteamChunkContainer> chunkContainerCapability;
 	private static CapabilityProviderFactory<SteamChunkContainer> factory;
 
+	private static Fluid steam;
+
+	public static BlockMirror blockMirror;
+	public static ItemBlockBase itemMirror;
+
+	public static BlockWaterBoiler blockWaterBoiler;
+	public static ItemBlockBase itemWaterBoiler;
+
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
 		CapabilityManager.INSTANCE.register(SteamChunkContainer.class, DummyCapabilityStorage.get(), SteamChunkContainer::new);
+		FluidRegistry.registerFluid(steam = new Fluid("steam", new ResourceLocation("charset:blocks/steam"), new ResourceLocation("charset:blocks/steam"))
+				.setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("charset.steam").setTemperature(273 + 110));
+
+		blockMirror = new BlockMirror();
+		itemMirror = new ItemBlockBase(blockMirror);
+
+		blockWaterBoiler = new BlockWaterBoiler();
+		itemWaterBoiler = new ItemBlockBase(blockWaterBoiler);
+	}
+
+	@Mod.EventHandler
+	public void onInit(FMLInitializationEvent event) {
+		RegistryUtils.register(TileMirror.class, "solar_mirror");
+		RegistryUtils.register(TileWaterBoiler.class, "water_boiler");
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void onPreInitClient(FMLPreInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(new RenderMirror());
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onModelRegistry(ModelRegistryEvent event) {
+		RegistryUtils.registerModel(itemMirror, 0, "charset:solar_mirror");
+		RegistryUtils.registerModel(itemWaterBoiler, 0, "charset:water_boiler");
+	}
+
+	@SubscribeEvent
+	public void onRegisterBlocks(RegistryEvent.Register<Block> event) {
+		RegistryUtils.register(event.getRegistry(), blockMirror, "solar_mirror");
+		RegistryUtils.register(event.getRegistry(), blockWaterBoiler, "water_boiler");
+	}
+
+	@SubscribeEvent
+	public void onRegisterItems(RegistryEvent.Register<Item> event) {
+		RegistryUtils.register(event.getRegistry(), itemMirror, "solar_mirror");
+		RegistryUtils.register(event.getRegistry(), itemWaterBoiler, "water_boiler");
 	}
 
 	@SubscribeEvent

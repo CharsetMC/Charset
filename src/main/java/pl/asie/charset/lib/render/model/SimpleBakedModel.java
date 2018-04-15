@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.model.TRSRTransformation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -33,7 +34,7 @@ import javax.vecmath.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleBakedModel implements IBakedModel {
+public class SimpleBakedModel extends BaseBakedModel {
     private final List<BakedQuad>[] quads = new List[7];
     private final IBakedModel parent;
     private TextureAtlasSprite particle;
@@ -54,12 +55,24 @@ public class SimpleBakedModel implements IBakedModel {
     }
 
     public void addQuad(EnumFacing side, BakedQuad quad) {
-        quads[side == null ? 6 : side.ordinal()].add(quad);
+        addQuads(side, quad);
+    }
+
+    public void addQuads(EnumFacing side, BakedQuad... quads) {
+        for (BakedQuad quad : quads) {
+            this.quads[side == null ? 6 : side.ordinal()].add(quad);
+        }
     }
 
     public void addModel(IBakedModel model) {
-        for (int i = 0; i < 7; i++) {
-            quads[i].addAll(model.getQuads(null, i == 6 ? null : EnumFacing.getFront(i), 0));
+        addModels(model);
+    }
+
+    public void addModels(IBakedModel... models) {
+        for (IBakedModel model : models) {
+            for (int i = 0; i < 7; i++) {
+                quads[i].addAll(model.getQuads(null, i == 6 ? null : EnumFacing.getFront(i), 0));
+            }
         }
     }
 
@@ -70,17 +83,12 @@ public class SimpleBakedModel implements IBakedModel {
 
     @Override
     public boolean isAmbientOcclusion() {
-        return parent != null ? parent.isAmbientOcclusion() : true;
+        return parent == null || parent.isAmbientOcclusion();
     }
 
     @Override
     public boolean isGui3d() {
-        return parent != null ? parent.isGui3d() : true;
-    }
-
-    @Override
-    public boolean isBuiltInRenderer() {
-        return false;
+        return parent == null || parent.isGui3d();
     }
 
     @Override
@@ -92,13 +100,20 @@ public class SimpleBakedModel implements IBakedModel {
         }
     }
 
+    private boolean overridesTFs = false;
+
     @Override
-    public ItemOverrideList getOverrides() {
-        return ItemOverrideList.NONE;
+    public void addTransformation(ItemCameraTransforms.TransformType type, TRSRTransformation transformation) {
+        overridesTFs = true;
+        super.addTransformation(type, transformation);
     }
 
     @Override
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
+        if (overridesTFs) {
+            return super.handlePerspective(cameraTransformType);
+        }
+
         Pair<? extends IBakedModel, Matrix4f> pair = parent.handlePerspective(cameraTransformType);
         if (pair.getLeft() != parent) {
             return pair;

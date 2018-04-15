@@ -1,0 +1,31 @@
+{
+    "elements": [
+        {
+            "from": [  4, 0,  4 ],
+            "to":   [ 12, 2, 12 ],
+            "faces": {
+                "down":  { "texture": "#metal", "tintindex": 0, "cullface": "down" },
+                "up":    { "texture": "#metal", "tintindex": 0 },
+                "north": { "texture": "#metal", "tintindex": 0 },
+                "south": { "texture": "#metal", "tintindex": 0 },
+                "west":  { "texture": "#metal", "tintindex": 0 },
+                "east":  { "texture": "#metal", "tintindex": 0 }
+            }
+        },
+        {
+            "from": [  7,  0,  7 ],
+            "to":   [  9,  8,  9 ],
+            "faces": {
+                "up":    { "texture": "#metal", "tintindex": 0 },
+                "north": { "texture": "#metal", "tintindex": 0 },
+                "south": { "texture": "#metal", "tintindex": 0 },
+                "west":  { "texture": "#metal", "tintindex": 0 },
+                "east":  { "texture": "#metal", "tintindex": 0 }
+            }
+        }
+    ],
+    "textures": {
+        "metal": "minecraft:blocks/iron_block",
+        "particle": "minecraft:blocks/iron_block"
+    }
+}

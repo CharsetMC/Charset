@@ -26,9 +26,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import net.minecraftforge.common.model.ITransformation;
+import org.lwjgl.util.vector.Vector3f;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -113,26 +116,52 @@ public final class ModelTransformer {
 
      public interface IVertexTransformer {
          float[] transform(BakedQuad quad, VertexFormatElement element, float... data);
-     }
 
-     public class Tinter implements IVertexTransformer {
-         private float[] color;
-
-         public Tinter(int color) {
-             this.color = new float[4];
-             this.color[0] = ((color >> 24) & 0xFF) / 255.0f;
-             this.color[1] = ((color >> 16) & 0xFF) / 255.0f;
-             this.color[2] = ((color >> 8) & 0xFF) / 255.0f;
-             this.color[3] = ((color >> 0) & 0xFF) / 255.0f;
+         static IVertexTransformer transform(ITransformation transformation) {
+             return (quad, element, data) -> {
+                 switch (element.getUsage()) {
+                     case POSITION:
+                     case NORMAL:
+                         Vector3f vec = new Vector3f(data[0], data[1], data[2]);
+                         ForgeHooksClient.transform(vec, transformation.getMatrix());
+                         if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
+                             vec.normalise();
+                         }
+                         return new float[] { vec.x, vec.y, vec.z, data[3] };
+                     default:
+                         return data;
+                 }
+             };
          }
 
-         @Override
-         public float[] transform(BakedQuad quad, VertexFormatElement element, float... data) {
-             if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
-                 return new float[] { data[0]*color[0], data[1]*color[1], data[2]*color[2], data[3]*color[3] };
-             } else {
+         static IVertexTransformer tint(int color) {
+             float[] c = new float[] {
+                     ((color >> 24) & 0xFF) / 255.0f,
+                     ((color >> 16) & 0xFF) / 255.0f,
+                     ((color >> 8) & 0xFF) / 255.0f,
+                     ((color) & 0xFF) / 255.0f
+             };
+             return tint(c);
+         }
+
+         static IVertexTransformer tint(float[] color) {
+             return (quad, element, data) -> {
+                 switch (element.getUsage()) {
+                     case COLOR:
+                         return new float[]{data[0] * color[0], data[1] * color[1], data[2] * color[2], data[3] * color[3]};
+                     default:
+                         return data;
+                 }
+             };
+         }
+
+         static IVertexTransformer compose(IVertexTransformer... ts) {
+             return (quad, element, data) -> {
+                 for (IVertexTransformer t : ts) {
+                     data = t.transform(quad, element, data);
+                 }
                  return data;
-             }
+             };
          }
      }
 }

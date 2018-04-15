@@ -103,7 +103,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
 
         IBlockState state = worldIn.getBlockState(pos);
 
-        RayTraceResult result = RayTraceUtils.getCollision(worldIn, pos, playerIn, getBoundingBox(state, worldIn, pos));
+        RayTraceResult result = RayTraceUtils.getCollision(worldIn, pos, playerIn, getBoundingBox(state, worldIn, pos), true);
         if (result != null && result.typeOfHit == RayTraceResult.Type.BLOCK && result.sideHit == state.getValue(Properties.FACING4).getOpposite()) {
             TileShelf bookshelf = (TileShelf) worldIn.getTileEntity(pos);
             if (bookshelf != null) {

@@ -40,12 +40,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.2.2627"
+	version = "1.12.2-14.23.3.2665"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20180315"
+	mappings = "snapshot_20180414"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -111,12 +111,12 @@ configurations {
 }
 
 dependencies {
-	deobfCompile "com.mod-buildcraft:buildcraft-api:7.99.15"
+	deobfCompile "com.mod-buildcraft:buildcraft-api:7.99.16"
 	deobfCompile name: "theoneprobe", version: "1.12-1.4.19-api"
 	deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.6.457"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12:api"
 	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.4.1_59"
-	deobfCompile "mezz.jei:jei_1.12.2:4.8.5.159"
+	deobfCompile "mezz.jei:jei_1.12.2:4.8.6.161"
 	deobfCompile name: "chiselsandbits", version: "14.16"
 	deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-1.4.0-174"
 	deobfCompile name: "Baubles", version: "1.12-1.5.2"

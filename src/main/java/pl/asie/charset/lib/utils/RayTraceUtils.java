@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,7 +31,10 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public final class RayTraceUtils {
 	public static class Result {
@@ -51,6 +55,38 @@ public final class RayTraceUtils {
 
 	}
 
+	public static Result getCollision(World world, Vec3d from, Vec3d to, Predicate<BlockPos> ignoreCheck) {
+		int steps = (int) Math.ceil(from.distanceTo(to));
+		if (steps <= 0) {
+			return new Result(null, null);
+		}
+
+		double xd = (to.x - from.x) / steps;
+		double yd = (to.y - from.y) / steps;
+		double zd = (to.z - from.z) / steps;
+
+		BlockPos lastPos = new BlockPos(from);
+		Vec3d vecPos = from.addVector(xd, yd, zd);
+
+		for (int i = 1; i <= steps; i++) {
+			BlockPos pos = new BlockPos(vecPos);
+			if (!pos.equals(lastPos) && !ignoreCheck.test(pos)) {
+				IBlockState state = world.getBlockState(pos);
+				List<AxisAlignedBB> list = new ArrayList<>();
+				state.addCollisionBoxToList(world, pos, new AxisAlignedBB(pos), list, null, false);
+				Result result = getCollision(world, pos, from, to, list, false);
+				if (result.valid()) {
+					return result;
+				}
+			}
+
+			vecPos = vecPos.addVector(xd, yd, zd);
+			lastPos = pos;
+		}
+
+		return new Result(null, null);
+	}
+
 	public static Vec3d getStart(EntityLivingBase player) {
 		return new Vec3d(player.posX, player.posY + player.getEyeHeight(), player.posZ);
 	}
@@ -63,26 +99,26 @@ public final class RayTraceUtils {
 		return getStart(player).addVector(lookVec.x * reachDistance, lookVec.y * reachDistance, lookVec.z * reachDistance);
 	}
 
-	public static Result getCollision(World world, BlockPos pos, EntityLivingBase player, List<AxisAlignedBB> list) {
+	public static Result getCollision(World world, BlockPos pos, EntityLivingBase player, List<AxisAlignedBB> list, boolean adjust) {
 		Vec3d origin = getStart(player);
 		Vec3d direction = getEnd(player);
 
-		return getCollision(world, pos, origin, direction, list);
+		return getCollision(world, pos, origin, direction, list, adjust);
 	}
 
-	public static RayTraceResult getCollision(World world, BlockPos pos, EntityLivingBase player, AxisAlignedBB aabb) {
+	public static RayTraceResult getCollision(World world, BlockPos pos, EntityLivingBase player, AxisAlignedBB aabb, boolean adjust) {
 		Vec3d origin = getStart(player);
 		Vec3d direction = getEnd(player);
 
-		return getCollision(pos, origin, direction, aabb);
+		return getCollision(pos, origin, direction, aabb, adjust);
 	}
 
-	public static Result getCollision(World world, BlockPos pos, Vec3d origin, Vec3d direction, List<AxisAlignedBB> list) {
+	public static Result getCollision(World world, BlockPos pos, Vec3d origin, Vec3d direction, List<AxisAlignedBB> list, boolean adjust) {
 		double minDistance = Double.POSITIVE_INFINITY;
 		RayTraceResult hit = null;
 
-		Vec3d origin0 = origin.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
-		Vec3d direction0 = direction.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+		Vec3d origin0 = !adjust ? origin : origin.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+		Vec3d direction0 = !adjust ? direction : direction.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
 
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i) == null) {
@@ -102,9 +138,11 @@ public final class RayTraceUtils {
 		return new Result(hit, hit != null ? list.get(hit.subHit) : null);
 	}
 
-	public static RayTraceResult getCollision(BlockPos pos, Vec3d start, Vec3d end, AxisAlignedBB aabb) {
-		start = start.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
-		end = end.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+	public static RayTraceResult getCollision(BlockPos pos, Vec3d start, Vec3d end, AxisAlignedBB aabb, boolean adjust) {
+		if (adjust) {
+			start = start.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+			end = end.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+		}
 
 		return getCollisionPreAdjusted(pos, start, end, aabb, 0);
 	}

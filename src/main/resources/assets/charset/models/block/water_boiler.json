@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/cube_bottom_top", 
+    "textures": {
+        "top": "charset:blocks/water_boiler/top",
+        "side": "charset:blocks/water_boiler/side",
+        "bottom": "charset:blocks/water_boiler/side"
+    }
+}

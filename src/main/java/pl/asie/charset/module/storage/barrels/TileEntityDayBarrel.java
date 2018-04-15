@@ -918,7 +918,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         BlockPos dropPos = getPos();
-        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), player, Block.FULL_BLOCK_AABB);
+        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), player, Block.FULL_BLOCK_AABB, true);
         if (result != null && result.sideHit != null) {
             dropPos = dropPos.offset(result.sideHit);
         } else {
