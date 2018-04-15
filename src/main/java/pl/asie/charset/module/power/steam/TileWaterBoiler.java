@@ -162,8 +162,7 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 			}
 		}
 
-		//int heat = getHeat();
-		int heat = 20;
+		int heat = getHeat();
 		if (heat > 0) {
 			applyHeat(heat);
 		}
