@@ -6,14 +6,24 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.item.ISubItemProvider;
+import pl.asie.charset.lib.item.SubItemProviderCache;
+import pl.asie.charset.lib.item.SubItemProviderRecipes;
+import pl.asie.charset.lib.item.SubItemSetHelper;
+import pl.asie.charset.module.power.mechanical.CharsetPowerMechanical;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -29,6 +39,22 @@ public class BlockMirror extends BlockBase implements ITileEntityProvider {
 		setTickRandomly(true);
 		setUnlocalizedName("charset.solar_mirror");
 		setDefaultState(getDefaultState().withProperty(ROT_PROP, ROTATIONS));
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT;
+	}
+
+	@Override
+	protected ISubItemProvider createSubItemProvider() {
+		return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetPowerSteam.itemMirror) {
+			@Override
+			protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
+				return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("material", SubItemSetHelper::sortByItem));
+			}
+		});
 	}
 
 	@Override

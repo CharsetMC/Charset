@@ -11,6 +11,8 @@ import javax.annotation.Nullable;
 public class BlockWaterBoiler extends BlockBase implements ITileEntityProvider {
     public BlockWaterBoiler() {
         super(Material.IRON);
+        setFullCube(true);
+        setOpaqueCube(true);
         setUnlocalizedName("charset.water_boiler");
     }
 

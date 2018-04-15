@@ -1,0 +1,29 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "power.steam"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:water_boiler",
+  "pattern": [
+    "pbp",
+    "p p",
+    "ppp"
+  ],
+  "key": {
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "b": {
+      "item": "minecraft:iron_bars",
+      "data": 0
+    }
+  },
+  "result": {
+    "item": "charset:water_boiler",
+    "count": 1
+  }
+}

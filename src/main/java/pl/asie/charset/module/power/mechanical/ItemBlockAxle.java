@@ -45,16 +45,9 @@ public class ItemBlockAxle extends ItemBlockBase {
 
 	@Override
 	public String getItemStackDisplayName(ItemStack is) {
-		ItemMaterial mat = ItemMaterialRegistry.INSTANCE.getMaterial(is.getTagCompound(), "material");
-		if (mat != null && mat.getRelated("log") != null) {
-			mat = mat.getRelated("log");
-		}
-
-		if (mat != null) {
-			return I18n.translateToLocalFormatted("tile.charset.axle.format", mat.getStack().getDisplayName());
-		} else {
-			return I18n.translateToLocalFormatted("tile.charset.axle.name");
-		}
+		return ItemMaterialRegistry.INSTANCE.getLocalizedNameFor(
+				"tile.charset.axle", ItemMaterialRegistry.INSTANCE.getMaterial(is.getTagCompound(), "material")
+		);
 	}
 
 	@Override

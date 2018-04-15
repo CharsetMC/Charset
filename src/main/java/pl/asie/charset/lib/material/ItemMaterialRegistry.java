@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.text.translation.I18n;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.*;
@@ -36,6 +37,33 @@ public class ItemMaterialRegistry {
 
 	protected ItemMaterialRegistry() {
 
+	}
+
+	public String getLocalizedNameFor(String prefix, ItemMaterial material) {
+		if (material != null) {
+			String mDispName = null;
+			for (String s : material.getTypes()) {
+				if (I18n.canTranslate("charset.material." + s)) {
+					mDispName = I18n.translateToLocal("charset.material." + s);
+					break;
+				}
+			}
+
+			if (mDispName == null) {
+				if (material.getTypes().contains("plank")) {
+					ItemMaterial alt = material.getRelated("log");
+					if (alt != null) {
+						material = alt;
+					}
+				}
+
+				mDispName = material.getStack().getDisplayName();
+			}
+
+			return I18n.translateToLocalFormatted(prefix + ".format", mDispName);
+		} else {
+			return I18n.translateToLocal(prefix + ".name");
+		}
 	}
 
 	private ItemMaterial getMaterialIfPresent(NBTTagCompound tag, String name) {

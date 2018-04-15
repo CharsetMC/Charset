@@ -1,0 +1,30 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "power.steam"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:solar_mirror",
+  "pattern": [
+    "ppp",
+    "pgp",
+    "ppp"
+  ],
+  "key": {
+    "p": {
+      "type": "charset:material",
+      "material": [["silver", "ingot"], ["copper", "ingot"], ["gold", "ingot"]],
+      "nbtKey": "material"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "paneGlassColorless"
+    }
+  },
+  "result": {
+    "item": "charset:solar_mirror",
+    "count": 1
+  }
+}

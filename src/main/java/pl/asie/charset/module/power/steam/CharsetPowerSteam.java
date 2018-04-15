@@ -30,6 +30,7 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -45,6 +46,8 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.modcompat.crafttweaker.Registry;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.module.power.steam.api.IMirror;
+import pl.asie.charset.module.power.steam.api.IMirrorTarget;
 import pl.asie.charset.module.power.steam.render.RenderMirror;
 
 @CharsetModule(
@@ -53,11 +56,19 @@ import pl.asie.charset.module.power.steam.render.RenderMirror;
 		profile = ModuleProfile.INDEV
 )
 public class CharsetPowerSteam {
-	private static final ResourceLocation SCC_LOCATION = new ResourceLocation("charset", "steam_chunk_container");
+	private static final ResourceLocation SCC_LOCATION = new ResourceLocation("charset", "steam_container");
+	private static final ResourceLocation MCC_LOCATION = new ResourceLocation("charset", "mirror_container");
 
 	@CapabilityInject(SteamChunkContainer.class)
-	public static Capability<SteamChunkContainer> chunkContainerCapability;
-	private static CapabilityProviderFactory<SteamChunkContainer> factory;
+	public static Capability<SteamChunkContainer> steamContainerCap;
+	private static CapabilityProviderFactory<SteamChunkContainer> steamCapFactory;
+
+	@CapabilityInject(MirrorChunkContainer.class)
+	public static Capability<MirrorChunkContainer> mirrorContainerCap;
+	private static CapabilityProviderFactory<MirrorChunkContainer> mirrorCapFactory;
+
+	@CapabilityInject(IMirrorTarget.class)
+	public static Capability<IMirrorTarget> MIRROR_TARGET;
 
 	private static Fluid steam;
 
@@ -70,11 +81,14 @@ public class CharsetPowerSteam {
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
 		CapabilityManager.INSTANCE.register(SteamChunkContainer.class, DummyCapabilityStorage.get(), SteamChunkContainer::new);
+		CapabilityManager.INSTANCE.register(MirrorChunkContainer.class, DummyCapabilityStorage.get(), MirrorChunkContainer::new);
+		CapabilityManager.INSTANCE.register(IMirrorTarget.class, DummyCapabilityStorage.get(), DummyMirrorTarget::new);
+
 		FluidRegistry.registerFluid(steam = new Fluid("steam", new ResourceLocation("charset:blocks/steam"), new ResourceLocation("charset:blocks/steam"))
 				.setDensity(-500).setGaseous(true).setViscosity(100).setUnlocalizedName("charset.steam").setTemperature(273 + 110));
 
 		blockMirror = new BlockMirror();
-		itemMirror = new ItemBlockBase(blockMirror);
+		itemMirror = new ItemBlockMirror(blockMirror);
 
 		blockWaterBoiler = new BlockWaterBoiler();
 		itemWaterBoiler = new ItemBlockBase(blockWaterBoiler);
@@ -112,14 +126,23 @@ public class CharsetPowerSteam {
 	}
 
 	@SubscribeEvent
+	public void onWorldLoad(WorldEvent.Load event) {
+		if (!event.getWorld().isRemote) {
+			event.getWorld().addEventListener(new SteamWorldEventListener(event.getWorld()));
+		}
+	}
+
+	@SubscribeEvent
 	@SuppressWarnings("ConstantConditions")
 	public void onAttachCapabilitiesChunk(AttachCapabilitiesEvent<Chunk> event) {
 		if (event.getObject().getWorld() != null) {
-			if (factory == null) {
-				factory = new CapabilityProviderFactory<>(chunkContainerCapability);
+			if (steamCapFactory == null) {
+				steamCapFactory = new CapabilityProviderFactory<>(steamContainerCap);
+				mirrorCapFactory = new CapabilityProviderFactory<>(mirrorContainerCap);
 			}
 
-			event.addCapability(SCC_LOCATION, factory.create(new SteamChunkContainer(event.getObject())));
+			event.addCapability(SCC_LOCATION, steamCapFactory.create(new SteamChunkContainer(event.getObject())));
+			event.addCapability(MCC_LOCATION, mirrorCapFactory.create(new MirrorChunkContainer(event.getObject())));
 		}
 	}
 }

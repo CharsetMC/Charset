@@ -18,6 +18,7 @@
  */
 
 package pl.asie.charset.lib.recipe;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -36,6 +37,7 @@ import pl.asie.charset.lib.utils.ItemUtils;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class IngredientMaterial extends IngredientCharset {
@@ -44,16 +46,33 @@ public class IngredientMaterial extends IngredientCharset {
         @Override
         public Ingredient parse(JsonContext jsonContext, JsonObject jsonObject) {
             String tag = jsonObject.has("nbtKey") ? JsonUtils.getString(jsonObject, "nbtKey") : null;
-            String[] material;
+            Collection<String[]> material;
 
             JsonElement oreElem = jsonObject.get("material");
             if (oreElem instanceof JsonArray) {
+                ImmutableList.Builder<String[]> builder = new ImmutableList.Builder<>();
+                List<String> singleton = new ArrayList<>();
                 JsonArray array = oreElem.getAsJsonArray();
-                material = new String[array.size()];
-                for (int i = 0; i < array.size(); i++)
-                    material[i] = array.get(i).getAsString();
+                for (int i = 0; i < array.size(); i++) {
+                    JsonElement arrayElem = array.get(i);
+                    if (arrayElem instanceof JsonArray) {
+                        JsonArray array2 = (JsonArray) arrayElem;
+                        ImmutableList.Builder<String> singleton2 = new ImmutableList.Builder<>();
+                        for (int j = 0; j < array2.size(); j++) {
+                            singleton2.add(array2.get(j).getAsString());
+                        }
+                        builder.add(singleton2.build().toArray(new String[0]));
+                    } else {
+                        singleton.add(array.get(i).getAsString());
+                    }
+                }
+
+                if (!singleton.isEmpty()) {
+                    builder.add(singleton.toArray(new String[0]));
+                }
+                material = builder.build();
             } else {
-                material = new String[]{ JsonUtils.getString(jsonObject, "material") };
+                material = Collections.singletonList(new String[]{ JsonUtils.getString(jsonObject, "material")});
             }
 
             IngredientMaterial result;
@@ -73,12 +92,12 @@ public class IngredientMaterial extends IngredientCharset {
 
     private final String[] chain;
     private final TCharSet dependencies;
-    private final String[] types;
+    private final Collection<String[]> types;
     private final String nbtTag;
     private boolean matchStack;
     private Ingredient dependency;
 
-    protected IngredientMaterial(String nbtTag, String... types) {
+    protected IngredientMaterial(String nbtTag, Collection<String[]> types) {
         super();
         this.types = types;
         this.nbtTag = nbtTag;
@@ -86,7 +105,7 @@ public class IngredientMaterial extends IngredientCharset {
         this.dependencies = null;
     }
 
-    protected IngredientMaterial(String nbtTag, String chain, boolean dummy, String... types) {
+    protected IngredientMaterial(String nbtTag, String chain, boolean dummy, Collection<String[]> types) {
         super();
         this.types = types;
         this.nbtTag = nbtTag;
@@ -140,7 +159,12 @@ public class IngredientMaterial extends IngredientCharset {
             return false;
         } else {
             if (!stack.isEmpty()) {
-                return ItemMaterialRegistry.INSTANCE.matches(stack, types);
+                for (String[] typeSet : types) {
+                    if (ItemMaterialRegistry.INSTANCE.matches(stack, typeSet)) {
+                        return true;
+                    }
+                }
+                return false;
             } else {
                 return false;
             }
@@ -172,7 +196,18 @@ public class IngredientMaterial extends IngredientCharset {
             }
             return stackArrays;
         } else {
-            Collection<ItemMaterial> mats = ItemMaterialRegistry.INSTANCE.getMaterialsByTypes(types);
+            Collection<ItemMaterial> mats;
+            if (types.size() == 1) {
+                mats = ItemMaterialRegistry.INSTANCE.getMaterialsByTypes(types.iterator().next());
+            } else if (types.size() <= 0) {
+                mats = Collections.emptyList();
+            } else {
+                mats = new ArrayList<>();
+                for (String[] t : types) {
+                    mats.addAll(ItemMaterialRegistry.INSTANCE.getMaterialsByTypes(t));
+                }
+            }
+
             ItemStack[][] stacks = new ItemStack[mats.size()][1];
             int idx = 0;
             for (ItemMaterial material : mats) {

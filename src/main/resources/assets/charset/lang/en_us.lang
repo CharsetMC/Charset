@@ -5,6 +5,17 @@ config.charset.profile.name=Profile
 config.charset.categories.name=Toggle Module Categories
 config.charset.overrides.name=Toggle Individual Modules
 
+# materials
+
+charset.material.copper=Copper
+charset.material.diamond=Diamond
+charset.material.emerald=Emerald
+charset.material.gold=Gold
+charset.material.iron=Iron
+charset.material.lapis=Lapis Lazuli
+charset.material.redstone=Redstone
+charset.material.silver=Silver
+
 # audio.storage
 
 item.charset.quartz_disc.blank.name=Blank Quartz Disc
@@ -132,7 +143,9 @@ tile.charset.socket.name=Socket
 
 # power.steam
 
+tile.charset.solar_mirror.format=%s Mirror
 tile.charset.solar_mirror.name=Mirror
+tile.charset.water_boiler.name=Water Boiler
 
 # storage.barrels
 

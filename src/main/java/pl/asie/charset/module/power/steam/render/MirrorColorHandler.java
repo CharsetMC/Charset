@@ -5,9 +5,14 @@ import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import pl.asie.charset.lib.material.ColorLookupHandler;
+import pl.asie.charset.lib.material.ItemMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.module.power.steam.TileMirror;
 
 import javax.annotation.Nullable;
 
@@ -18,11 +23,16 @@ public class MirrorColorHandler implements IBlockColor, IItemColor {
 
     }
 
-    private int colorMultiplier(@Nullable ItemStack sourceStack) {
-        sourceStack = new ItemStack(Blocks.IRON_BLOCK);
+    private int colorMultiplier(@Nullable ItemMaterial material) {
+        if (material != null) {
+            if (!material.getTypes().contains("block")) {
+                ItemMaterial materialBlock = material.getRelated("block");
+                if (materialBlock != null) {
+                    material = materialBlock;
+                }
+            }
 
-        if (sourceStack != null) {
-            return 0xFF000000 | RenderUtils.getAverageColor(RenderUtils.getItemSprite(sourceStack), RenderUtils.AveragingMode.FULL);
+            return 0xFF000000 | ColorLookupHandler.INSTANCE.getColor(material.getStack(), RenderUtils.AveragingMode.FULL);
         } else {
             return 0xFFFFFFFF;
         }
@@ -31,7 +41,12 @@ public class MirrorColorHandler implements IBlockColor, IItemColor {
     @Override
     public int colorMultiplier(IBlockState state, @Nullable IBlockAccess worldIn, @Nullable BlockPos pos, int tintIndex) {
         if (tintIndex == 0) {
-            return colorMultiplier(null);
+            TileEntity tile = worldIn.getTileEntity(pos);
+            if (tile instanceof TileMirror) {
+                return colorMultiplier(((TileMirror) tile).getMaterial());
+            } else {
+                return colorMultiplier(null);
+            }
         } else {
             return -1;
         }
@@ -40,7 +55,7 @@ public class MirrorColorHandler implements IBlockColor, IItemColor {
     @Override
     public int colorMultiplier(ItemStack stack, int tintIndex) {
         if (tintIndex == 0) {
-            return colorMultiplier(null);
+            return colorMultiplier(ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), "material"));
         } else {
             return -1;
         }

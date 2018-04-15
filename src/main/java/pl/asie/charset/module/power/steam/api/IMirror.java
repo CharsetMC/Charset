@@ -7,6 +7,12 @@ import java.util.Optional;
 
 public interface IMirror {
 	boolean isMirrorValid();
+	boolean isMirrorActive();
+	BlockPos getMirrorPos();
 	Optional<BlockPos> getMirrorTargetPos();
 	void requestMirrorTargetRefresh();
+
+	default int getMirrorStrength() {
+		return 1;
+	}
 }

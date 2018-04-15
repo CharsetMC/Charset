@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.model.TRSRTransformation;
@@ -47,5 +48,13 @@ public final class MathUtils {
         Vec3d second = lineEnd.subtract(point);
 
         return MathHelper.sqrt(first.crossProduct(second).lengthSquared() / second.lengthSquared());
+    }
+
+    public static Vec3d interpolate(Vec3d one, Vec3d two, float amount) {
+        return new Vec3d(
+                one.x + (two.x - one.x) * amount,
+                one.y + (two.y - one.y) * amount,
+                one.z + (two.z - one.z) * amount
+        );
     }
 }
