@@ -66,6 +66,8 @@ public class RenderMirror {
 
 	@SubscribeEvent
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+		event.getMap().registerSprite(new ResourceLocation("charset:blocks/steam"));
+
 		modelBase = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/mirror_base"), event.getMap());
 		modelFace = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/mirror_face"), event.getMap());
 		beamSprite = event.getMap().registerSprite(new ResourceLocation("charset:blocks/mirror/beam"));

@@ -19,7 +19,14 @@
 
 package pl.asie.charset.module.power.steam.api;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public interface ISteamParticle extends ITickable {
+public interface ISteamParticle extends INBTSerializable<NBTTagCompound>, ITickable {
+	World getWorld();
+	Vec3d getPosition(float partialTicks);
+	int getValue();
 }

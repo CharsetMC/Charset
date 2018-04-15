@@ -1,0 +1,18 @@
+{
+    "elements": [
+        {   "from": [ -0.01, -0.01, -0.01 ],
+            "to": [ 16.01, 16.01, 16.01 ],
+            "faces": {
+                "down":  { "texture": "#heat", "cullface": "down", "tintindex": 0 },
+                "up":    { "texture": "#heat", "cullface": "up", "tintindex": 0 },
+                "north": { "texture": "#heat", "cullface": "north", "tintindex": 0 },
+                "south": { "texture": "#heat", "cullface": "south", "tintindex": 0 },
+                "west":  { "texture": "#heat", "cullface": "west", "tintindex": 0 },
+                "east":  { "texture": "#heat", "cullface": "east", "tintindex": 0 }
+            }
+        }
+    ],
+    "textures": {
+        "heat": "charset:blocks/water_boiler/heat"
+    }
+}

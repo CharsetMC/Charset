@@ -20,8 +20,10 @@
 package pl.asie.charset.module.power.steam;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,13 +32,17 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
@@ -45,10 +51,15 @@ import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.modcompat.crafttweaker.Registry;
+import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.power.steam.api.IMirror;
 import pl.asie.charset.module.power.steam.api.IMirrorTarget;
 import pl.asie.charset.module.power.steam.render.RenderMirror;
+import pl.asie.charset.module.power.steam.render.RenderSteamParticle;
+import pl.asie.charset.module.power.steam.render.RenderWaterBoiler;
+
+import java.util.Objects;
 
 @CharsetModule(
 		name = "power.steam",
@@ -63,12 +74,19 @@ public class CharsetPowerSteam {
 	public static Capability<SteamChunkContainer> steamContainerCap;
 	private static CapabilityProviderFactory<SteamChunkContainer> steamCapFactory;
 
+	@CapabilityInject(SteamWorldContainer.class)
+	public static Capability<SteamWorldContainer> steamWorldCap;
+	private static CapabilityProviderFactory<SteamWorldContainer> steamWorldCapFactory;
+
 	@CapabilityInject(MirrorChunkContainer.class)
 	public static Capability<MirrorChunkContainer> mirrorContainerCap;
 	private static CapabilityProviderFactory<MirrorChunkContainer> mirrorCapFactory;
 
 	@CapabilityInject(IMirrorTarget.class)
 	public static Capability<IMirrorTarget> MIRROR_TARGET;
+
+	@CharsetModule.PacketRegistry
+	public static PacketRegistry packet;
 
 	private static Fluid steam;
 
@@ -80,7 +98,8 @@ public class CharsetPowerSteam {
 
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
-		CapabilityManager.INSTANCE.register(SteamChunkContainer.class, DummyCapabilityStorage.get(), SteamChunkContainer::new);
+		CapabilityManager.INSTANCE.register(SteamChunkContainer.class, new SteamChunkContainerStorage(), SteamChunkContainer::new);
+		CapabilityManager.INSTANCE.register(SteamWorldContainer.class, DummyCapabilityStorage.get(), SteamWorldContainer::new);
 		CapabilityManager.INSTANCE.register(MirrorChunkContainer.class, DummyCapabilityStorage.get(), MirrorChunkContainer::new);
 		CapabilityManager.INSTANCE.register(IMirrorTarget.class, DummyCapabilityStorage.get(), DummyMirrorTarget::new);
 
@@ -98,12 +117,22 @@ public class CharsetPowerSteam {
 	public void onInit(FMLInitializationEvent event) {
 		RegistryUtils.register(TileMirror.class, "solar_mirror");
 		RegistryUtils.register(TileWaterBoiler.class, "water_boiler");
+
+		packet.registerPacket(0x01, PacketSpawnParticle.class);
 	}
 
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void onPreInitClient(FMLPreInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new RenderMirror());
+		MinecraftForge.EVENT_BUS.register(new RenderSteamParticle());
+		MinecraftForge.EVENT_BUS.register(RenderWaterBoiler.INSTANCE);
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void onInitClient(FMLInitializationEvent event){
+		ClientRegistry.bindTileEntitySpecialRenderer(TileWaterBoiler.class, RenderWaterBoiler.INSTANCE);
 	}
 
 	@SubscribeEvent
@@ -126,10 +155,57 @@ public class CharsetPowerSteam {
 	}
 
 	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onClientTick(TickEvent.ClientTickEvent event) {
+		if (event.phase == TickEvent.Phase.END && Minecraft.getMinecraft().world != null) {
+			Objects.requireNonNull(Minecraft.getMinecraft().world.getCapability(steamWorldCap, null)).getAllContainers().forEach(SteamChunkContainer::update);
+		}
+	}
+
+	@SubscribeEvent
+	public void onWorldTick(TickEvent.WorldTickEvent event) {
+		if (event.phase == TickEvent.Phase.END && event.side == Side.SERVER) {
+			Objects.requireNonNull(event.world.getCapability(steamWorldCap, null)).getAllContainers().forEach(SteamChunkContainer::update);
+		}
+	}
+
+	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
 		if (!event.getWorld().isRemote) {
 			event.getWorld().addEventListener(new SteamWorldEventListener(event.getWorld()));
 		}
+	}
+
+	@SubscribeEvent
+	public void onStartWatching(ChunkWatchEvent.Watch event) {
+		SteamChunkContainer c = event.getChunkInstance().getCapability(steamContainerCap, null);
+		for (SteamParticle p : c.getParticles()) {
+			if (!p.isInvalid()) {
+				packet.sendTo(new PacketSpawnParticle(p), event.getPlayer());
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onChunkLoad(ChunkEvent.Load event) {
+		Objects.requireNonNull(event.getChunk().getWorld().getCapability(steamWorldCap, null))
+				.onChunkLoaded(event.getChunk());
+	}
+
+	@SubscribeEvent
+	public void onChunkUnload(ChunkEvent.Unload event) {
+		Objects.requireNonNull(event.getChunk().getWorld().getCapability(steamWorldCap, null))
+				.onChunkUnloaded(event.getChunk());
+	}
+
+	@SubscribeEvent
+	@SuppressWarnings("ConstantConditions")
+	public void onAttachCapabilitiesWorld(AttachCapabilitiesEvent<World> event) {
+		if (steamWorldCapFactory == null) {
+			steamWorldCapFactory = new CapabilityProviderFactory<>(steamWorldCap);
+		}
+
+		event.addCapability(SCC_LOCATION, steamWorldCapFactory.create(new SteamWorldContainer()));
 	}
 
 	@SubscribeEvent

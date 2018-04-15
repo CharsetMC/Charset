@@ -205,5 +205,6 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 		} catch (ExecutionException e) {
 			ModCharset.logger.error("Axle rendering error!", e);
 		}
+		buffer.setTranslation(0, 0, 0);
 	}
 }

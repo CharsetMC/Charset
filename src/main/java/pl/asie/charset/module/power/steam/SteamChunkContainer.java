@@ -19,10 +19,19 @@
 
 package pl.asie.charset.module.power.steam;
 
+import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-public class SteamChunkContainer {
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+public class SteamChunkContainer implements ITickable {
 	private final Chunk c;
+	private final List<SteamParticle> particleList = new LinkedList<>();
 
 	public SteamChunkContainer(Chunk c) {
 		this.c = c;
@@ -31,5 +40,32 @@ public class SteamChunkContainer {
 	@SuppressWarnings("ConstantConditions")
 	public SteamChunkContainer() {
 		this(new Chunk(null, 0, 0));
+	}
+
+	public void spawnParticle(SteamParticle particle) {
+		particleList.add(particle);
+		if (!c.getWorld().isRemote) {
+			CharsetPowerSteam.packet.sendToWatching(new PacketSpawnParticle(particle), particle.world, new BlockPos((int) particle.x, (int) particle.y, (int) particle.z), null);
+		}
+	}
+
+	@Override
+	public void update() {
+		Iterator<SteamParticle> iterator = particleList.iterator();
+		while (iterator.hasNext()) {
+			SteamParticle particle = iterator.next();
+			particle.update();
+			if (particle.isInvalid()) {
+				iterator.remove();
+			}
+		}
+	}
+
+	public Collection<SteamParticle> getParticles() {
+		return particleList;
+	}
+
+	public Chunk getChunk() {
+		return c;
 	}
 }

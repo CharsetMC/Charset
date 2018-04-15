@@ -141,7 +141,7 @@ public class MirrorChunkContainer {
 		int chunkZ = pos.getZ() >> 4;
 		for (int ix = chunkX - 1; ix <= chunkX + 1; ix++) {
 			for (int iz = chunkZ - 1; iz <= chunkZ + 1; iz++) {
-				Chunk c = world.getChunkFromChunkCoords(chunkX, chunkZ);
+				Chunk c = world.getChunkFromChunkCoords(ix, iz);
 				if (c != null && c.hasCapability(CharsetPowerSteam.mirrorContainerCap, null)) {
 					MirrorChunkContainer box = c.getCapability(CharsetPowerSteam.mirrorContainerCap, null);
 					for (Collection<IMirror> collection : box.mirrorsByHeight.valueCollection()) {
@@ -157,7 +157,7 @@ public class MirrorChunkContainer {
 		int chunkZ = pos.getZ() >> 4;
 		for (int ix = chunkX - 1; ix <= chunkX + 1; ix++) {
 			for (int iz = chunkZ - 1; iz <= chunkZ + 1; iz++) {
-				Chunk c = world.getChunkFromChunkCoords(chunkX, chunkZ);
+				Chunk c = world.getChunkFromChunkCoords(ix, iz);
 				if (c != null && c.hasCapability(CharsetPowerSteam.mirrorContainerCap, null)) {
 					MirrorChunkContainer box = c.getCapability(CharsetPowerSteam.mirrorContainerCap, null);
 					box.getMirrors(pos).forEach(consumer);
