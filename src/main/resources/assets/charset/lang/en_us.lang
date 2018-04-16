@@ -143,6 +143,8 @@ tile.charset.socket.name=Socket
 
 # power.steam
 
+fluid.charset.steam.name=Steam
+
 tile.charset.solar_mirror.format=%s Mirror
 tile.charset.solar_mirror.name=Mirror
 tile.charset.water_boiler.name=Water Boiler

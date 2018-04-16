@@ -77,7 +77,7 @@ public class RenderSteamParticle {
 					continue;
 				}
 
-				float size = 0.08f * (float) Math.log10(particle.getValue());
+				float size = 0.1f * (float) Math.log10(particle.getValue());
 				float alpha = 0.25f;
 
 				Vec3d pos = particle.getPosition(Minecraft.getMinecraft().getRenderPartialTicks());

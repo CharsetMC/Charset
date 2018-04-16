@@ -147,6 +147,9 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 
 		if (waterTank.getFluidAmount() < 1000) {
 			BlockPos below = pos.down();
+			while (world.getTileEntity(below) instanceof TileWaterBoiler) {
+				below = pos.down();
+			}
 			FluidStack desiredAmount = new FluidStack(FluidRegistry.WATER, 1000);
 
 			// IBlockState state = world.getBlockState(below);
@@ -169,7 +172,6 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 	}
 
 	public void applyHeat(int heat) {
-		heat *= 5;
 		givenHeat += heat;
 
 		int toBoil = Math.min(heat, waterTank.getFluidAmount());
@@ -187,13 +189,18 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 		FluidStack wFluid = waterTank.getFluid();
 		waterTank.setFluid(wFluid.amount == waterToRemove ? null : new FluidStack(FluidRegistry.WATER, wFluid.amount - waterToRemove));
 
+		BlockPos ppos = pos.up();
+		while (world.getTileEntity(ppos) instanceof TileWaterBoiler) {
+			ppos = pos.up();
+		}
+
 		//steamTank.setFluid(new FluidStack(FluidRegistry.getFluid("steam"), steamTank.getFluidAmount() + toBoil));
 		world.getCapability(CharsetPowerSteam.steamWorldCap, null).spawnParticle(
 				new SteamParticle(
 						world,
-						pos.getX() + 0.25f + (world.rand.nextFloat() * 0.5f),
-						pos.getY() + 0.99f,
-						pos.getZ() + 0.25f + (world.rand.nextFloat() * 0.5f),
+						ppos.getX() + 0.25f + (world.rand.nextFloat() * 0.5f),
+						ppos.getY() - 0.01f,
+						ppos.getZ() + 0.25f + (world.rand.nextFloat() * 0.5f),
 						(world.rand.nextFloat() * 0.02f) - 0.01f,
 						0.05f,
 						(world.rand.nextFloat() * 0.02f) - 0.01f,
