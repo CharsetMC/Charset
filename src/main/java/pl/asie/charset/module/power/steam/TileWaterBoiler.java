@@ -29,18 +29,11 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 	private final Set<IMirror> mirrors = new HashSet<>();
 
 	private final FluidTank waterTank = new FluidTank(2000);
-	private final FluidTank steamTank = new FluidTank(1000);
-	private final FluidHandlerFluidMap fluidHandler = new FluidHandlerFluidMap();
 	private int givenHeat, givenHeatClient;
 
 	public TileWaterBoiler() {
-		fluidHandler.addHandler(FluidRegistry.WATER, waterTank);
-		fluidHandler.addHandler(FluidRegistry.getFluid("steam"), steamTank);
-
 		waterTank.setCanDrain(false);
 		waterTank.setCanFill(true);
-		steamTank.setCanDrain(true);
-		steamTank.setCanFill(false);
 	}
 
 	public float getGivenHeatClient() {
@@ -68,12 +61,6 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 			} else {
 				waterTank.setFluid(null);
 			}
-
-			if (compound.hasKey("steam", Constants.NBT.TAG_COMPOUND)) {
-				steamTank.readFromNBT(compound.getCompoundTag("steam"));
-			} else {
-				steamTank.setFluid(null);
-			}
 		}
 
 		givenHeat = compound.getInteger("heat");
@@ -84,13 +71,10 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 		compound = super.writeNBTData(compound, isClient);
 		if (!isClient) {
 			NBTTagCompound waterCpd = new NBTTagCompound();
-			NBTTagCompound steamCpd = new NBTTagCompound();
 
 			waterTank.writeToNBT(waterCpd);
-			steamTank.writeToNBT(steamCpd);
 
 			compound.setTag("water", waterCpd);
-			compound.setTag("steam", steamCpd);
 		}
 
 		compound.setInteger("heat", isClient ? givenHeatClient : givenHeat);
@@ -99,7 +83,7 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && facing != EnumFacing.UP) {
 			return true;
 		} else if (capability == CharsetPowerSteam.MIRROR_TARGET) {
 			return true;
@@ -112,11 +96,7 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 	@Override
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-			if (facing == null) {
-				return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluidHandler);
-			} else if (facing == EnumFacing.UP) {
-				return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(steamTank);
-			} else {
+			if (facing != EnumFacing.UP) {
 				return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(waterTank);
 			}
 		} else if (capability == CharsetPowerSteam.MIRROR_TARGET) {
@@ -175,7 +155,6 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 		givenHeat += heat;
 
 		int toBoil = Math.min(heat, waterTank.getFluidAmount());
-		//toBoil = Math.min(steamTank.getCapacity() - steamTank.getFluidAmount(), toBoil);
 		if (toBoil <= 0) {
 			return;
 		}
@@ -194,7 +173,11 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 			ppos = pos.up();
 		}
 
-		//steamTank.setFluid(new FluidStack(FluidRegistry.getFluid("steam"), steamTank.getFluidAmount() + toBoil));
+		toBoil *= CharsetPowerSteam.BOILER_OUTPUT_MULTIPLIER;
+		if (toBoil <= 0) {
+			return;
+		}
+
 		world.getCapability(CharsetPowerSteam.steamWorldCap, null).spawnParticle(
 				new SteamParticle(
 						world,
@@ -202,7 +185,7 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 						ppos.getY() - 0.01f,
 						ppos.getZ() + 0.25f + (world.rand.nextFloat() * 0.5f),
 						(world.rand.nextFloat() * 0.02f) - 0.01f,
-						0.05f,
+						0.03f * Math.sqrt(toBoil),
 						(world.rand.nextFloat() * 0.02f) - 0.01f,
 						100,
 						toBoil

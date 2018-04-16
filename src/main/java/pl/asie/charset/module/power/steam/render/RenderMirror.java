@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
@@ -119,10 +120,13 @@ public class RenderMirror {
 		World world = mc.world;
 		Minecraft.getMinecraft().mcProfiler.startSection("sunbeams");
 
+		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
 		GlStateManager.enableAlpha();
+		GlStateManager.enableTexture2D();
 		GlStateManager.disableLighting();
 
 		Tessellator tessellator = Tessellator.getInstance();

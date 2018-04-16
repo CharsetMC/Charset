@@ -229,7 +229,7 @@ public class TileMirror extends TileBase implements IMirror {
 
 	@Override
 	public int getMirrorStrength() {
-		return material.getTypes().contains("silver") ? 2 : 1;
+		return 1;
 	}
 
 	private ScheduledEvent event;

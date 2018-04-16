@@ -30,6 +30,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.ChunkEvent;
@@ -47,6 +48,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
@@ -64,7 +67,7 @@ import java.util.Objects;
 @CharsetModule(
 		name = "power.steam",
 		description = "Steam power system",
-		profile = ModuleProfile.INDEV
+		profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetPowerSteam {
 	private static final ResourceLocation SCC_LOCATION = new ResourceLocation("charset", "steam_container");
@@ -85,6 +88,11 @@ public class CharsetPowerSteam {
 	@CapabilityInject(IMirrorTarget.class)
 	public static Capability<IMirrorTarget> MIRROR_TARGET;
 
+	@CharsetModule.Configuration
+	public static Configuration config;
+
+	public static float BOILER_OUTPUT_MULTIPLIER;
+
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
@@ -95,6 +103,11 @@ public class CharsetPowerSteam {
 
 	public static BlockWaterBoiler blockWaterBoiler;
 	public static ItemBlockBase itemWaterBoiler;
+
+	@Mod.EventHandler
+	public void onLoadConfig(CharsetLoadConfigEvent event) {
+		BOILER_OUTPUT_MULTIPLIER = ConfigUtils.getFloat(config, "balance", "waterBoilerSteamMultiplier", 1.0f, 0.001f, 1000f, "The multiplier for the water boiler's steam output.", false);
+	}
 
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
