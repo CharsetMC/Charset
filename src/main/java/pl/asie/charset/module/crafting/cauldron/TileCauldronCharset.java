@@ -26,6 +26,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -73,7 +74,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 	public void rebuildFromStack(boolean emitUpdate) {
 		IBlockState currState = world.getBlockState(pos);
 		IBlockState state = CharsetCraftingCauldron.blockCauldron.getDefaultState()
-				.withProperty(BlockCauldron.LEVEL, isEmptyOrWater() ? getComparatorValue() : 0);
+				.withProperty(BlockCauldron.LEVEL, isEmptyOrWater() ? getVanillaLevelValue() : 0);
 		if (currState != state) {
 			world.setBlockState(pos, state, 0);
 			if (!world.isRemote && emitUpdate) {
@@ -82,7 +83,27 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 		}
 	}
 
+	private int getVanillaLevelValue() {
+		if (CharsetCraftingCauldron.waterBottleSize == 0) {
+			return getComparatorValue();
+		} else {
+			int maxBottles = 1000 / CharsetCraftingCauldron.waterBottleSize;
+			int bottles = stack != null ? (stack.amount / CharsetCraftingCauldron.waterBottleSize) : 0;
+			if (bottles <= 2) {
+				return bottles;
+			} else if (bottles == maxBottles) {
+				return 3;
+			} else {
+				return 2;
+			}
+		}
+	}
+
 	private int levelToAmount(int level) {
+		if (CharsetCraftingCauldron.waterBottleSize != 0) {
+			return level * CharsetCraftingCauldron.waterBottleSize;
+		}
+
 		switch (level) {
 			case 0:
 			default:
@@ -100,7 +121,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 		if (isEmptyOrWater()) {
 			FluidStack oldStack = stack;
 			int oldAmount = oldStack != null ? oldStack.amount : 0;
-			int oldLAmount = levelToAmount(getComparatorValue());
+			int oldLAmount = levelToAmount(getVanillaLevelValue());
 			int newLAmount = levelToAmount(state.getValue(BlockCauldron.LEVEL));
 			int newAmount = oldAmount + newLAmount - oldLAmount;
 
@@ -112,15 +133,24 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 			else if (newAmount > getCapacity()) stack = new FluidStack(FluidRegistry.WATER, getCapacity());
 			else stack = new FluidStack(FluidRegistry.WATER, newAmount);
 
-			if (oldStack != stack && (stack == null || oldStack == null || !stack.isFluidEqual(oldStack))) {
-				world.updateComparatorOutputLevel(pos, CharsetCraftingCauldron.blockCauldron);
-				markBlockForUpdate();
+			int currLevel = state.getValue(BlockCauldron.LEVEL);
+			int desiredLevel = getVanillaLevelValue();
+			if (currLevel != desiredLevel) {
+				world.setBlockState(pos, state.withProperty(BlockCauldron.LEVEL, desiredLevel), 0);
 			}
+
+			world.updateComparatorOutputLevel(pos, CharsetCraftingCauldron.blockCauldron);
+			markBlockForUpdate();
 		}
 	}
 
 	@Override
 	public int getComparatorValue() {
+		if (CharsetCraftingCauldron.waterBottleSize != 0) {
+			int v = stack == null ? 0 : ((stack.amount + (CharsetCraftingCauldron.waterBottleSize - 1)) / CharsetCraftingCauldron.waterBottleSize);
+			return MathHelper.clamp(v, 0, 15);
+		}
+
 		if (stack == null) {
 			return 0;
 		} else if (stack.amount <= 333) {

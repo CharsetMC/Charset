@@ -536,6 +536,12 @@ public class ModuleLoader {
 
 		passEvent(new CharsetLoadConfigEvent(true));
 
+		for (Configuration c : moduleConfigs.values()) {
+			if (c.hasChanged()) {
+				c.save();
+			}
+		}
+
 		if (ModCharset.configModules.hasChanged() || configDirty) {
 			ModCharset.configModules.save();
 			configDirty = false;

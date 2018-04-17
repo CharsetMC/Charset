@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -36,6 +37,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -57,10 +60,14 @@ import java.util.Optional;
 		antidependencies = "mod:inspirations"
 )
 public class CharsetCraftingCauldron {
+	public static int waterBottleSize = 0;
 	public static int waterAlpha = 180;
 	public static BlockCauldronCharset blockCauldron;
 	public static FluidDyedWater dyedWater;
 	private static List<ICauldronRecipe> recipeList = new ArrayList<>();
+
+	@CharsetModule.Configuration
+	public static Configuration config;
 
 	public static void add(ICauldronRecipe recipe) {
 		recipeList.add(recipe);
@@ -79,6 +86,11 @@ public class CharsetCraftingCauldron {
 		}
 
 		return Optional.empty();
+	}
+
+	@Mod.EventHandler
+	public void onLoadConfig(CharsetLoadConfigEvent event) {
+		waterBottleSize = ConfigUtils.getInt(config, "balance", "waterBottleSize", 0, 0, 1000, "Set the amount of water contained in one water bottle for Cauldron usage. The default, 0, will approximate between 333 and 334 mB to mimic vanilla. A recommended value is 250.", true);
 	}
 
 	@Mod.EventHandler
