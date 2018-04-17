@@ -12,7 +12,7 @@ public interface IMirror {
 	Optional<BlockPos> getMirrorTargetPos();
 	void requestMirrorTargetRefresh();
 
-	default int getMirrorStrength() {
-		return 1;
+	default float getMirrorStrength() {
+		return 1f;
 	}
 }

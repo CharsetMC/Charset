@@ -5,14 +5,21 @@
             "model": "forge:item-layer",
             "transform": "forge:default-item",
             "textures": {
-                "layer0": "charset:items/glass_shard"
+                "layer0": "charset:items/materials/gem_shard"
             }
         },
-        "inventory_colored": {
+        "inventory_glass": {
             "model": "forge:item-layer",
             "transform": "forge:default-item",
             "textures": {
-                "layer0": "charset:items/glass_shard_colored"
+                "layer0": "charset:items/materials/glass_shard"
+            }
+        },
+        "inventory_stained_glass": {
+            "model": "forge:item-layer",
+            "transform": "forge:default-item",
+            "textures": {
+                "layer0": "charset:items/materials/glass_shard_colored"
             }
         }
     }

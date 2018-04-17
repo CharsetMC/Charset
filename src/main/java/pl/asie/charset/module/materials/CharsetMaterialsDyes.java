@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.misc;
+package pl.asie.charset.module.materials;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -30,11 +30,12 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
-		name = "misc.graphite",
-		description= "Adds a black dye replacement created from charcoal",
-		profile = ModuleProfile.STABLE
+		name = "materials.dyes",
+		description= "Adds alternate ways to gather dyes, such as graphite created from charcoal.",
+        dependencies = {"materials"},
+        profile = ModuleProfile.STABLE
 )
-public class CharsetMiscGraphite {
+public class CharsetMaterialsDyes {
 	private Item graphite = new Item().setUnlocalizedName("charset.graphite");
 
 	@SubscribeEvent

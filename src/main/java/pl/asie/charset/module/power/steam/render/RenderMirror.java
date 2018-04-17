@@ -186,8 +186,8 @@ public class RenderMirror {
 			byte[] as = new byte[] { 2, 1, 0, 3 };
 			byte[] bs = new byte[] { 0, 3, 1, 2 };
 			// default opacity: 38 / 0xFF
-			float min_opacity = 24F / 255F;
-			float opacity_per_power = 8F / 255F;
+			float min_opacity = 12F / 255F;
+			float opacity_per_power = 30F / 255F;
 			float alpha = min_opacity + mirror.getMirrorStrength() * opacity_per_power;
 
 			Vec3d point;

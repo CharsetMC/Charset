@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.common.util.Constants;
@@ -135,7 +136,7 @@ public class TileMirror extends TileBase implements IMirror {
 
 					RayTraceUtils.Result resultTmp = RayTraceUtils.getCollision(world, new Vec3d(pos).addVector(0.5, 0.5, 0.5), new Vec3d(targetPos).addVector(0.5, 0.5, 0.5), (checkPos) -> {
 						IBlockState cstate = world.getBlockState(checkPos);
-						return cstate.getLightOpacity(world, checkPos) <= 0;
+						return !(cstate.getBlock() instanceof BlockMirror) && cstate.getLightOpacity(world, checkPos) <= 0;
 					});
 
 					if (resultTmp.valid()) {
@@ -228,8 +229,41 @@ public class TileMirror extends TileBase implements IMirror {
 	}
 
 	@Override
-	public int getMirrorStrength() {
-		return 1;
+	public float getMirrorStrength() {
+		float avg = 0.75f;
+		float diff = 0.25f;
+		float val = avg;
+		if (targetPos != null) {
+			double mirrorRotation = MathHelper.atan2(
+					targetPos.getX() - pos.getX(),
+					targetPos.getZ() - pos.getZ()
+			);
+			double celestialAngle = world.getCelestialAngleRadians(0);
+			double targetCelestialAngle = 0;
+			double mul = 0;
+
+			if (mirrorRotation >= 0) {
+				// half PI = east-facing
+				diff *= ((1 - Math.abs(mirrorRotation - (Math.PI / 2)) / (Math.PI / 2)));
+				targetCelestialAngle = Math.PI * 1.75;
+
+			} else {
+				// half PI = west-facing
+				diff *= ((1 - Math.abs(mirrorRotation + (Math.PI / 2)) / (Math.PI / 2)));
+				targetCelestialAngle = Math.PI * 0.25;
+			}
+
+			double range = Math.PI * 0.5;
+			double tcDiff = Math.abs(celestialAngle - targetCelestialAngle);
+			if (tcDiff >= range) {
+				mul = -1;
+			} else {
+				mul = 1 - ((tcDiff / range) * 2);
+			}
+
+			val += diff*mul;
+		}
+		return val;
 	}
 
 	private ScheduledEvent event;

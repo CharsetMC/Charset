@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.misc.shards;
+package pl.asie.charset.module.materials;
 
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.creativetab.CreativeTabs;
@@ -30,14 +30,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.utils.ColorUtils;
 
-public class ItemShard extends ItemBase {
+public class ItemGlassShard extends ItemBase {
 	@SideOnly(Side.CLIENT)
 	public static class Color implements IItemColor {
 		@Override
 		public int colorMultiplier(ItemStack stack, int tintIndex) {
 			int md = stack.getItemDamage();
 			if (md == 0 || md > MAX_SHARD) {
-				return 16777215;
+				return -1;
 			} else {
 				return ColorUtils.toIntColor(EnumDyeColor.byMetadata(md - 1));
 			}
@@ -46,7 +46,7 @@ public class ItemShard extends ItemBase {
 
 	public static final int MAX_SHARD = 16;
 
-	public ItemShard() {
+	public ItemGlassShard() {
 		super();
 		setHasSubtypes(true);
 	}

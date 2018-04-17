@@ -25,9 +25,7 @@ import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickable {
-	private final Set<IMirror> mirrors = new HashSet<>();
-
+public class TileWaterBoiler extends TileMirrorTargetBase implements ITickable {
 	private final FluidTank waterTank = new FluidTank(2000);
 	private int givenHeat, givenHeatClient;
 
@@ -44,12 +42,12 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 		return givenHeat;
 	}
 
-	int getReflectorStrength() {
-		return mirrors.stream().filter(IMirror::isMirrorActive).map(IMirror::getMirrorStrength).reduce(0, (a, b) -> a + b);
+	float getReflectorStrength() {
+		return mirrors.stream().filter(IMirror::isMirrorActive).map(IMirror::getMirrorStrength).reduce(0f, (a, b) -> a + b);
 	}
 
 	int getHeat() {
-		return Math.max(getReflectorStrength() - 3, 0);
+		return Math.max((int) (getReflectorStrength() - 3), 0);
 	}
 
 	@Override
@@ -85,8 +83,6 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
 		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && facing != EnumFacing.UP) {
 			return true;
-		} else if (capability == CharsetPowerSteam.MIRROR_TARGET) {
-			return true;
 		}
 
 		return super.hasCapability(capability, facing);
@@ -99,10 +95,7 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 			if (facing != EnumFacing.UP) {
 				return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(waterTank);
 			}
-		} else if (capability == CharsetPowerSteam.MIRROR_TARGET) {
-			return CharsetPowerSteam.MIRROR_TARGET.cast(this);
 		}
-
 		return super.getCapability(capability, facing);
 	}
 
@@ -194,26 +187,8 @@ public class TileWaterBoiler extends TileBase implements IMirrorTarget, ITickabl
 	}
 
 	@Override
-	public void invalidate(InvalidationType type) {
-		super.invalidate(type);
-		if (type == InvalidationType.REMOVAL) {
-			mirrors.forEach(IMirror::requestMirrorTargetRefresh);
-		}
-	}
-
-	@Override
-	public void registerMirror(IMirror mirror) {
-		mirrors.add(mirror);
-	}
-
-	@Override
-	public void unregisterMirror(IMirror mirror) {
-		mirrors.remove(mirror);
-	}
-
-	@Override
 	public boolean hasFastRenderer() {
-		return false;
+		return true;
 	}
 
 	@Override

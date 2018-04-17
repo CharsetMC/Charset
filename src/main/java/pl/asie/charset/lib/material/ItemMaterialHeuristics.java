@@ -238,9 +238,11 @@ public final class ItemMaterialHeuristics {
                     }
                 }
 
-                ItemMaterial blockMat = reg.getOrCreateMaterial(block);
-                reg.registerTypes(blockMat, suffix, "block");
-                reg.registerRelation(ingotMat, blockMat, "block", prefix);
+                if (isBlockVariant) {
+                    ItemMaterial blockMat = reg.getOrCreateMaterial(block);
+                    reg.registerTypes(blockMat, suffix, "block");
+                    reg.registerRelation(ingotMat, blockMat, "block", prefix);
+                }
             }
         }
     }

@@ -131,7 +131,6 @@ public class CharsetPowerMechanical {
 			RegistryUtils.registerModel(GEAR_ITEMS[i], 0, "charset:gear#inventory_" + GEAR_VALUES[i]);
 		}
 
-
 		ModelLoader.setCustomStateMapper(blockGearbox, new StateMapperBase() {
 			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {

@@ -87,23 +87,23 @@ itemGroup.charset=The Charset Project
 
 item.charset.icon.name=a
 
+# materials.dyes
+
+item.charset.graphite.name=Graphite
+
+# materials.shards
+
+item.charset.shard.colored.name=%s Glass Shard
+item.charset.shard.name=Glass Shard
+
 # misc.drama
 
 item.charset.dramaInABottle.name=Drama in a Bottle
-
-# misc.graphite
-
-item.charset.graphite.name=Graphite
 
 # misc.scaffold
 
 tile.charset.scaffold.name=Scaffold
 tile.charset.scaffold.format=%s Scaffold
-
-# misc.shards
-
-item.charset.shard.colored.name=%s Glass Shard
-item.charset.shard.name=Glass Shard
 
 # optics.laser
 

@@ -19,13 +19,31 @@
 
 package pl.asie.charset.module.materials;
 
+import net.minecraft.init.Blocks;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 @CharsetModule(
 		name = "materials",
-		description = "Materials and world generation for Charset's more content-filled modules.",
-		profile = ModuleProfile.INDEV
+		description = "Base module for Charset's material submods.",
+		profile = ModuleProfile.STABLE
 )
 public class CharsetMaterials {
+    protected static final Collection<String> metals = new HashSet<>();
+    protected static final Collection<String> gems = new HashSet<>();
+
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        OreDictionary.registerOre("blockIce", Blocks.ICE);
+        OreDictionary.registerOre("blockIce", Blocks.FROSTED_ICE);
+
+        gems.add("gemEmerald");
+        gems.add("gemDiamond");
+    }
 }

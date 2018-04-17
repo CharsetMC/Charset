@@ -17,10 +17,11 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.misc.shards;
+package pl.asie.charset.module.materials;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
@@ -46,56 +47,64 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @CharsetModule(
-		name = "misc.shards",
-		description = "Adds glowstone-esque shards to glass",
+		name = "materials.shards",
+		description = "Adds shards to glass.",
+		dependencies = {"materials"},
 		profile = ModuleProfile.STABLE
 )
-public class CharsetMiscShards {
-	public static ItemShard shardItem;
+public class CharsetMaterialsShards {
+	private static ItemGlassShard glassShardItem;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		shardItem = new ItemShard();
+		glassShardItem = new ItemGlassShard();
 	}
 
 	@SubscribeEvent
 	public void registerModels(ModelRegistryEvent event) {
-		RegistryUtils.registerModel(shardItem, 0, "charset:shard");
-		for (int i = 1; i <= ItemShard.MAX_SHARD; i++) {
-			RegistryUtils.registerModel(shardItem, i, "charset:shard#inventory_colored");
+		RegistryUtils.registerModel(glassShardItem, 0, "charset:shard#inventory_glass");
+		for (int i = 1; i <= ItemGlassShard.MAX_SHARD; i++) {
+			RegistryUtils.registerModel(glassShardItem, i, "charset:shard#inventory_stained_glass");
 		}
 	}
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
-		RegistryUtils.register(event.getRegistry(), shardItem, "shard");
+		RegistryUtils.register(event.getRegistry(), glassShardItem, "shard");
 	}
 
 	@SubscribeEvent
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-		event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(shardItem, 1, 0)).setRegistryName(new ResourceLocation("charset:glassShard")));
+		event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(glassShardItem, 1, 0)).setRegistryName(new ResourceLocation("charset:glassShard")));
 
 		for (int i = 0; i < 16; i++) {
-			event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(shardItem, 1, i + 1)).setRegistryName(new ResourceLocation("charset:glassShard_" + i)));
+			event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(glassShardItem, 1, i + 1)).setRegistryName(new ResourceLocation("charset:glassShard_" + i)));
 		}
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		ItemMaterialRegistry imr = ItemMaterialRegistry.INSTANCE;
-		ItemStack shard = new ItemStack(shardItem, 1, 0);
+		ItemStack shard = new ItemStack(glassShardItem, 1, 0);
 
-		OreDictionary.registerOre("shardGlass", new ItemStack(shardItem, 1, OreDictionary.WILDCARD_VALUE));
+		OreDictionary.registerOre("shardGlass", new ItemStack(glassShardItem, 1, OreDictionary.WILDCARD_VALUE));
 		OreDictionary.registerOre("shardGlassColorless", shard);
 
-		imr.registerRelation(imr.getOrCreateMaterial(new ItemStack(Blocks.GLASS)),
-				imr.getOrCreateMaterial(shard), "shard", "block");
+		for (ItemStack stack : OreDictionary.getOres("blockGlassColorless")) {
+			imr.registerRelation(imr.getOrCreateMaterial(stack),
+					imr.getOrCreateMaterial(shard), "shard", "block");
+		}
 
 		for (int i = 0; i < 16; i++) {
-			ItemStack shardColored = new ItemStack(shardItem, 1, i + 1);
-			imr.registerRelation(imr.getOrCreateMaterial(new ItemStack(Blocks.STAINED_GLASS, 1, i)),
-				imr.getOrCreateMaterial(shardColored), "shard", "block");
+			ItemStack shardColored = new ItemStack(glassShardItem, 1, i + 1);
+			for (ItemStack stack : OreDictionary.getOres(ColorUtils.getOreDictEntry("blockGlass", EnumDyeColor.byMetadata(i)))) {
+				imr.registerRelation(imr.getOrCreateMaterial(stack),
+						imr.getOrCreateMaterial(shardColored), "shard", "block");
+			}
 
 			OreDictionary.registerOre(ColorUtils.getOreDictEntry("shardGlass", EnumDyeColor.byMetadata(i)), shardColored);
 		}
@@ -104,7 +113,7 @@ public class CharsetMiscShards {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void registerColorItem(ColorHandlerEvent.Item event) {
-		event.getItemColors().registerItemColorHandler(new ItemShard.Color(), CharsetMiscShards.shardItem);
+		event.getItemColors().registerItemColorHandler(new ItemGlassShard.Color(), CharsetMaterialsShards.glassShardItem);
 	}
 
 	@SubscribeEvent
@@ -115,6 +124,7 @@ public class CharsetMiscShards {
 
 		// WORKAROUND: Some mods seem to like event.getDrops() being null.
 		// This is not what Forge does.
+
 		if (event.getDrops() == null) {
 			ModCharset.logger.error("Block " + event.getState().getBlock().getRegistryName() + " provides a null getDrops() list, against Forge's original method behaviour! This is a bug in the mod providing it!");
 			return;
@@ -124,6 +134,7 @@ public class CharsetMiscShards {
 			return;
 		}
 
+//		ItemStack pickBlockVariant = event.getState().getBlock().getItem(event.getWorld(), event.getPos(), event.getState());
 		Block block = event.getState().getBlock();
 		boolean isPane = false;
 		int md = 0;
@@ -148,11 +159,11 @@ public class CharsetMiscShards {
 		if (isPane) {
 			float rand = event.getWorld().rand.nextFloat();
 			if (rand >= 0.5f) {
-				event.getDrops().add(new ItemStack(shardItem, 1, md));
+				event.getDrops().add(new ItemStack(glassShardItem, 1, md));
 			}
 		} else {
 			int rand = event.getWorld().rand.nextInt(4) + 1;
-			event.getDrops().add(new ItemStack(shardItem, rand, md));
+			event.getDrops().add(new ItemStack(glassShardItem, rand, md));
 		}
 	}
 }
