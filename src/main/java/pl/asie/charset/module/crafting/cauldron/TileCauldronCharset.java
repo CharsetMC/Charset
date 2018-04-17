@@ -120,10 +120,19 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 	public void rebuildFromVanillaLevel(IBlockState state) {
 		if (isEmptyOrWater()) {
 			FluidStack oldStack = stack;
+			int oldLevel = getVanillaLevelValue();
+			int newLevel = state.getValue(BlockCauldron.LEVEL);
+
 			int oldAmount = oldStack != null ? oldStack.amount : 0;
-			int oldLAmount = levelToAmount(getVanillaLevelValue());
-			int newLAmount = levelToAmount(state.getValue(BlockCauldron.LEVEL));
+			int oldLAmount = levelToAmount(oldLevel);
+			int newLAmount = levelToAmount(newLevel);
 			int newAmount = oldAmount + newLAmount - oldLAmount;
+
+			if (oldLevel == 0 && newLevel == 3) {
+				newAmount = getCapacity();
+			} else if (oldLevel == 3 && newLevel == 0) {
+				newAmount = 0;
+			}
 
 			if (newAmount == oldAmount) {
 				return;
@@ -133,7 +142,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 			else if (newAmount > getCapacity()) stack = new FluidStack(FluidRegistry.WATER, getCapacity());
 			else stack = new FluidStack(FluidRegistry.WATER, newAmount);
 
-			int currLevel = state.getValue(BlockCauldron.LEVEL);
+			int currLevel = newLevel;
 			int desiredLevel = getVanillaLevelValue();
 			if (currLevel != desiredLevel) {
 				world.setBlockState(pos, state.withProperty(BlockCauldron.LEVEL, desiredLevel), 0);
