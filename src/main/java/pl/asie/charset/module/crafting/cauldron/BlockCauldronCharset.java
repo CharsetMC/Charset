@@ -51,6 +51,12 @@ import java.util.Optional;
 public class BlockCauldronCharset extends BlockCauldron implements ITileEntityProvider {
 	protected static final AxisAlignedBB AABB_INSIDE = new AxisAlignedBB(0.125D, 0.3125D, 0.125D, 0.875D, 1.0D, 0.875D);
 
+	public BlockCauldronCharset() {
+		super();
+		setUnlocalizedName("cauldron");
+		setHardness(2.0F);
+	}
+
 	private boolean isEmptyOrWater(IBlockAccess access, BlockPos pos) {
 		TileEntity tile = access.getTileEntity(pos);
 		if (tile instanceof TileCauldronCharset) {
