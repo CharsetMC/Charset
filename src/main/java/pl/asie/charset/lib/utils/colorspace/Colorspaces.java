@@ -159,6 +159,8 @@ public class Colorspaces {
 			conversionGraph.putEdgeValue(Colorspace.LAB, Colorspace.XYZ, ColorspaceFunctions::LABtoXYZ);
 
 			conversionGraph.putEdgeValue(Colorspace.sRGB, Colorspace.YUV, ColorspaceFunctions::sRGBtoYUV);
+			conversionGraph.putEdgeValue(Colorspace.YUV, Colorspace.sRGB, ColorspaceFunctions::YUVtosRGB);
+
 			conversionGraph.putEdgeValue(Colorspace.sRGB, Colorspace.YIQ, ColorspaceFunctions::sRGBtoYIQ);
 
 			conversionTable = Tables.newCustomTable(new EnumMap<>(Colorspace.class), () -> new EnumMap<>(Colorspace.class));

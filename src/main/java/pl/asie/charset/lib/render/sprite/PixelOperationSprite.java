@@ -19,6 +19,8 @@
 
 package pl.asie.charset.lib.render.sprite;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResourceManager;
@@ -34,11 +36,35 @@ import java.util.function.Function;
 public class PixelOperationSprite extends TextureAtlasSpriteCustom {
     @FunctionalInterface
     public interface Operator {
-        int apply(Function<ResourceLocation, TextureAtlasSprite> getter, int x, int y, int value);
+        void apply(int[] pixels, int width, Function<ResourceLocation, TextureAtlasSprite> getter);
     }
 
-    public static Operator multiply(int color) {
-        return (getter, x, y, value) -> RenderUtils.multiplyColor(value, color);
+    @FunctionalInterface
+    public interface OperatorForEach {
+        int apply(int x, int y, int value);
+    }
+
+    public static Operator combine(Operator... ops) {
+        return ((pixels, width, getter) -> {
+            for (Operator o : ops) {
+                o.apply(pixels, width, getter);
+            }
+        });
+    }
+
+    public static Operator forEach(OperatorForEach op) {
+        return ((pixels, width, getter) -> {
+            int i = 0;
+            for (int y = 0; y < pixels.length/width; y++) {
+                for (int x = 0; x < width; x++, i++) {
+                    pixels[i] = op.apply(x, y, pixels[i]);
+                }
+            }
+        });
+    }
+
+    public static OperatorForEach multiply(int color) {
+        return (x, y, value) -> RenderUtils.multiplyColor(value, color);
     }
 
     private final ResourceLocation location;
@@ -49,7 +75,14 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
         super(entry);
         this.location = location;
         this.operator = operator;
-        this.deps = Arrays.asList(deps);
+        ImmutableSet.Builder<ResourceLocation> depBuilder = new ImmutableSet.Builder<>();
+        if (!entry.equals(location.toString())) {
+            depBuilder.add(location);
+        }
+        for (ResourceLocation dep : deps) {
+            depBuilder.add(dep);
+        }
+        this.deps = depBuilder.build();
     }
 
     @Override
@@ -59,23 +92,45 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
 
     @Override
     public boolean load(IResourceManager manager, ResourceLocation loc, Function<ResourceLocation, TextureAtlasSprite> getter) {
-        BufferedImage image = RenderUtils.getTextureImage(location);
-        if (image == null) {
-            return false;
+        int[] pixels = null;
+        int width = 0, height = 0;
+
+        if (deps.contains(location)) {
+            TextureAtlasSprite sprite = getter.apply(location);
+            try {
+                if (sprite != null) {
+                    int frameSize = sprite.getIconWidth() * sprite.getIconHeight();
+                    pixels = new int[frameSize * sprite.getFrameCount()];
+                    for (int i = 0; i < sprite.getFrameCount(); i++) {
+                        System.arraycopy(sprite.getFrameTextureData(i)[0], 0, pixels, i * frameSize, frameSize);
+                    }
+                    width = sprite.getIconWidth();
+                    height = sprite.getIconHeight() * sprite.getFrameCount();
+                }
+            } catch (Exception e) {
+                pixels = null;
+            }
         }
 
-        int[] pixels = new int[image.getWidth() * image.getHeight()];
+        if (pixels == null) {
+            BufferedImage image = RenderUtils.getTextureImage(location, getter);
+            if (image == null) {
+                return false;
+            }
 
-        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
-        for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = operator.apply(getter, i % image.getWidth(), i / image.getWidth(), pixels[i]);
+            pixels = new int[image.getWidth() * image.getHeight()];
+            image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
+            width = image.getWidth();
+            height = image.getHeight();
         }
+
+        operator.apply(pixels, width, getter);
 
         try {
-            this.addFrameTextureData(image.getWidth(), image.getHeight(), pixels, manager.getResource(RenderUtils.toTextureFilePath(location)));
+            this.addFrameTextureData(width, height, pixels, manager.getResource(RenderUtils.toTextureFilePath(location)));
         } catch (IOException e) {
             e.printStackTrace();
-            this.addFrameTextureData(image.getWidth(), image.getHeight(), pixels);
+            this.addFrameTextureData(width, height, pixels);
         }
 
         return false;

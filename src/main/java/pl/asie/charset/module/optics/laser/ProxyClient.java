@@ -83,14 +83,17 @@ public class ProxyClient extends ProxyCommon {
 		ResourceLocation torchOnLoc = new ResourceLocation("minecraft:blocks/torch_on");
 		ResourceLocation torchCenterLoc = new ResourceLocation("charset:items/beam_torch_center");
 
-		event.getMap().setTextureEntry(new PixelOperationSprite("charset:blocks/torch_base_generated", torchOnLoc, (getter, x, y, value) -> {
+		event.getMap().setTextureEntry(new PixelOperationSprite("charset:blocks/torch_base_generated", torchOnLoc, (pixels, width, getter) -> {
 			TextureAtlasSprite torchOnSprite = getter.apply(torchOnLoc);
 			TextureAtlasSprite torchCenterSprite = getter.apply(torchCenterLoc);
-			int tcx = x * torchCenterSprite.getIconWidth() / torchOnSprite.getIconWidth();
-			int tcy = y * torchCenterSprite.getIconHeight() / torchOnSprite.getIconHeight();
-			int alpha = (torchCenterSprite.getFrameTextureData(0)[0][tcy * torchCenterSprite.getIconWidth() + tcx] >> 24) & 0xFF;
-			return alpha > 0 ? 0 : value;
-		}, torchOnLoc, torchCenterLoc));
+
+			PixelOperationSprite.forEach((x, y, value) -> {
+				int tcx = x * torchCenterSprite.getIconWidth() / torchOnSprite.getIconWidth();
+				int tcy = y * torchCenterSprite.getIconHeight() / torchOnSprite.getIconHeight();
+				int alpha = (torchCenterSprite.getFrameTextureData(0)[0][tcy * torchCenterSprite.getIconWidth() + tcx] >> 24) & 0xFF;
+				return alpha > 0 ? 0 : value;
+			}).apply(pixels, width, getter);
+		}, torchCenterLoc));
 	}
 
 	@SubscribeEvent

@@ -52,6 +52,7 @@ import pl.asie.charset.module.misc.scaffold.ModelScaffold;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -162,7 +163,28 @@ public final class RenderUtils {
 		return pngLocation;
 	}
 
-	public static BufferedImage getTextureImage(ResourceLocation location) {
+	public static BufferedImage getTextureImage(ResourceLocation location, @Nullable Function<ResourceLocation, TextureAtlasSprite> getter) {
+		if (getter != null) {
+			TextureAtlasSprite sprite = getter.apply(location);
+			if (sprite != null && sprite.getFrameCount() > 0 && sprite.getIconWidth() > 0 && sprite.getIconHeight() > 0) {
+				int width, height;
+				try {
+					int frameSize = sprite.getIconWidth() * sprite.getIconHeight();
+					width = sprite.getIconWidth();
+					height = sprite.getIconHeight() * sprite.getFrameCount();
+
+					BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+					int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+					for (int i = 0; i < sprite.getFrameCount(); i++) {
+						System.arraycopy(sprite.getFrameTextureData(i)[0], 0, pixels, i * frameSize, frameSize);
+					}
+					return img;
+				} catch (Exception e) {
+					// eat
+				}
+			}
+		}
+
 		try {
 			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(toTextureFilePath(location));
 			return TextureUtil.readBufferedImage(resource.getInputStream());

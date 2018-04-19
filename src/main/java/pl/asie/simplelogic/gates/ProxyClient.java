@@ -93,12 +93,12 @@ public class ProxyClient extends ProxyCommon {
 				TIntObjectMap<String> resultingTextures = colorMasks.get(baseTexture);
 				resultingTextures.forEachEntry((color, resultingTexture) -> {
 					event.getMap().setTextureEntry(new PixelOperationSprite(resultingTexture, new ResourceLocation(baseTexture),
-							((getter, x, y, value) -> (value & 0xFFFFFF) == color ? -1 : 0)));
+							PixelOperationSprite.forEach((x, y, value) -> (value & 0xFFFFFF) == color ? -1 : 0)));
 					textures.remove(new ResourceLocation(resultingTexture));
 					return true;
 				});
 				event.getMap().setTextureEntry(new PixelOperationSprite(baseTexture, new ResourceLocation(baseTexture),
-						(((getter, x, y, value) -> {
+						(PixelOperationSprite.forEach((x, y, value) -> {
 							if (resultingTextures.containsKey(value & 0xFFFFFF)) {
 								return 0;
 							} else {

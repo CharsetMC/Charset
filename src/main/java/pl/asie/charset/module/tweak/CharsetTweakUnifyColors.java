@@ -102,13 +102,14 @@ public class CharsetTweakUnifyColors {
 		return out;
 	}
 
+	// TODO: Rewrite to use PixelOperationSprite improvements properly
 	private void recolorTextures(TextureMap map, String prefix) {
 		ResourceLocation source = new ResourceLocation(prefix + "white");
 		for (int i = 0; i < 16; i++) {
 			String s = ColorUtils.getUnderscoredSuffix(EnumDyeColor.byMetadata(i));
 			ResourceLocation target = new ResourceLocation(prefix + s);
 			if (prefix.contains("hardened_clay")) {
-				BufferedImage image = RenderUtils.getTextureImage(new ResourceLocation("minecraft:blocks/hardened_clay"));
+				BufferedImage image = RenderUtils.getTextureImage(new ResourceLocation("minecraft:blocks/hardened_clay"), null);
 				BufferedImage imageGrayscale = toGrayscale(image);
 				int[] imageData = computeMinMaxData(image);
 				int[] imageGrayData = computeMinMaxData(imageGrayscale);
@@ -116,7 +117,7 @@ public class CharsetTweakUnifyColors {
 				final float divisor = delta > 5 ? (float) delta / 5.0f : 1.0f;
 				final int value2 = colorMultiplier(prefix, EnumDyeColor.byMetadata(i));
 
-				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, (getter, x, y, value) -> {
+				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, PixelOperationSprite.forEach((x, y, value) -> {
 					int out = 0xFF000000;
 					for (int coff = 0; coff < 24; coff += 8) {
 						int v1 = (((imageGrayscale.getRGB(x, y) >> coff) & 0xFF) * 255 / imageGrayData[coff >> 3]) - 0xFF;
@@ -129,9 +130,10 @@ public class CharsetTweakUnifyColors {
 						out |= Math.round((nonTintedOut + tintedOut + (tintedOut / 2)) / 2.5f) << coff;
 					}
 					return out;
-				}));
+				})));
 			} else if (i > 0) { // skip white for non-clay
-				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, PixelOperationSprite.multiply(colorMultiplier(prefix, EnumDyeColor.byMetadata(i)))));
+				map.setTextureEntry(new PixelOperationSprite(target.toString(), source, PixelOperationSprite.forEach(
+						PixelOperationSprite.multiply(colorMultiplier(prefix, EnumDyeColor.byMetadata(i))))));
 			}
 		}
 	}

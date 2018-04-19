@@ -37,13 +37,12 @@ public class FluidTextureGenerator {
 	private static final ResourceLocation WATER_STILL = new ResourceLocation("minecraft:blocks/water_still");
 	private static final ResourceLocation WATER_FLOWING = new ResourceLocation("minecraft:blocks/water_flow");
 
-	private float calcLuma(ResourceLocation oldLoc) {
-		BufferedImage image = RenderUtils.getTextureImage(oldLoc);
+	private float calcLuma(BufferedImage image) {
 		float luma = 0.0f;
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
-				float[] vals = Colorspaces.convertFromRGB(image.getRGB(x, y), Colorspace.LAB);
+				float[] vals = Colorspaces.convertFromRGB(image.getRGB(x, y), Colorspace.YUV);
 				if (luma < vals[0]) {
 					luma = vals[0];
 				}
@@ -53,8 +52,7 @@ public class FluidTextureGenerator {
 		return luma;
 	}
 
-	private int calcAlpha(ResourceLocation oldLoc) {
-		BufferedImage image = RenderUtils.getTextureImage(oldLoc);
+	private int calcAlpha(BufferedImage image) {
 		int alpha = 0;
 
 		for (int y = 0; y < image.getHeight(); y++) {
@@ -70,22 +68,23 @@ public class FluidTextureGenerator {
 	}
 
 	private void remap(TextureMap map, ResourceLocation oldLoc, ResourceLocation newLoc, float luma, int a) {
-		map.setTextureEntry(new PixelOperationSprite(newLoc.toString(), oldLoc, (getter, x, y, value) -> {
-			float[] vals = Colorspaces.convertFromRGB(value, Colorspace.LAB);
+		map.setTextureEntry(new PixelOperationSprite(newLoc.toString(), oldLoc, PixelOperationSprite.forEach((x, y, value) -> {
+			float[] vals = Colorspaces.convertFromRGB(value, Colorspace.YUV);
 			vals[0] *= 100.0f / luma;
 			vals[1] = 0.0f;
 			vals[2] = 0.0f;
 			int alpha = ((value >> 24) & 0xFF);
 			alpha = (int) ((float) alpha * 255.0f / (float) a);
-			return (alpha << 24) | (Colorspaces.convertToRGB(vals, Colorspace.LAB) & 0xFFFFFF);
-		}));
+			return (alpha << 24) | (Colorspaces.convertToRGB(vals, Colorspace.YUV) & 0xFFFFFF);
+		})));
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
-		float luma = calcLuma(WATER_STILL);
-		int alpha = calcAlpha(WATER_STILL);
+		BufferedImage img = RenderUtils.getTextureImage(WATER_STILL, null);
+		float luma = calcLuma(img);
+		int alpha = calcAlpha(img);
 		CharsetCraftingCauldron.waterAlpha = alpha;
 
 		remap(event.getMap(), WATER_STILL, FluidDyedWater.TEXTURE_STILL, luma, alpha);

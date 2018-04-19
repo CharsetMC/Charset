@@ -51,7 +51,7 @@ public final class CTMTextureFactory {
         public boolean load(IResourceManager manager, ResourceLocation loc, Function<ResourceLocation, TextureAtlasSprite> getter) {
             BufferedImage sheet = null;
             if (sheet == null) {
-                sheet = RenderUtils.getTextureImage(location);
+                sheet = RenderUtils.getTextureImage(location, null);
                 if (sheet == null) {
                     ModCharset.logger.warn("Could not find texture sheet " + location + "!");
                     return false;
