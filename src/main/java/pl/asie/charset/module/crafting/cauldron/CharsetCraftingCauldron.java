@@ -22,7 +22,9 @@ package pl.asie.charset.module.crafting.cauldron;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
@@ -41,11 +43,11 @@ import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.render.sprite.TextureWhitener;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.crafting.cauldron.api.CauldronContents;
 import pl.asie.charset.module.crafting.cauldron.api.ICauldronRecipe;
 import pl.asie.charset.module.crafting.cauldron.fluid.FluidDyedWater;
-import pl.asie.charset.module.crafting.cauldron.fluid.FluidTextureGenerator;
 import pl.asie.charset.module.crafting.cauldron.recipe.*;
 import pl.asie.charset.module.crafting.cauldron.api.ICauldron;
 
@@ -101,12 +103,6 @@ public class CharsetCraftingCauldron {
 	}
 
 	@Mod.EventHandler
-	@SideOnly(Side.CLIENT)
-	public void preInitClient(FMLPreInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(new FluidTextureGenerator());
-	}
-
-	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		recipeList.add(new RecipeDyeWater());
 		recipeList.add(new RecipeDyeItem());
@@ -122,6 +118,16 @@ public class CharsetCraftingCauldron {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileCauldronCharset.class, new TileRendererCauldronCharset());
+	}
+
+	private static final ResourceLocation WATER_STILL = new ResourceLocation("minecraft:blocks/water_still");
+	private static final ResourceLocation WATER_FLOWING = new ResourceLocation("minecraft:blocks/water_flow");
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+		TextureWhitener.INSTANCE.remap(event.getMap(), WATER_STILL, FluidDyedWater.TEXTURE_STILL, WATER_STILL);
+		TextureWhitener.INSTANCE.remap(event.getMap(), WATER_FLOWING, FluidDyedWater.TEXTURE_FLOWING, WATER_STILL);
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOW)
