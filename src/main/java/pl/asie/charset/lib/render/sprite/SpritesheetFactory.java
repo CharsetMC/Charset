@@ -53,13 +53,10 @@ public final class SpritesheetFactory {
 
         @Override
         public boolean load(IResourceManager manager, ResourceLocation loc, Function<ResourceLocation, TextureAtlasSprite> getter) {
-            BufferedImage sheet = null;
+            BufferedImage sheet = RenderUtils.getTextureImage(location, getter);
             if (sheet == null) {
-                sheet = RenderUtils.getTextureImage(location);
-                if (sheet == null) {
-                    ModCharset.logger.warn("Could not find texture sheet " + location + "!");
-                    return false;
-                }
+                ModCharset.logger.warn("Could not find texture sheet " + location + "!");
+                return false;
             }
 
             int pieceWidth = sheet.getWidth() / width;

@@ -88,6 +88,14 @@ final class ColorspaceFunctions {
 		};
 	}
 
+	public static float[] YUVtosRGB(float[] v) {
+		return new float[] {
+				v[0] + 1.140f * v[2],
+				v[0] - 0.395f * v[1] - 0.581f * v[2],
+				v[0] + 2.032f * v[1]
+		};
+	}
+
 	public static float[] sRGBtoYIQ(float[] v) {
 		return new float[] {
 			0.299f * v[0] + 0.587f * v[1] + 0.114f * v[2],

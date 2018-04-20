@@ -29,17 +29,16 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.module.crafting.cauldron.CharsetCraftingCauldron;
 
 import javax.annotation.Nullable;
 
 public class FluidDyedWater extends Fluid {
 	public static final ResourceLocation TEXTURE_STILL = new ResourceLocation("charset:blocks/dyed_water_still");
-	public static final ResourceLocation TEXTURE_FLOW = new ResourceLocation("charset:blocks/dyed_water_flow");
+	public static final ResourceLocation TEXTURE_FLOWING = new ResourceLocation("charset:blocks/dyed_water_flow");
 
 	public FluidDyedWater(String fluidName) {
-		super(fluidName, TEXTURE_STILL, TEXTURE_FLOW);
+		super(fluidName, TEXTURE_STILL, TEXTURE_FLOWING);
 	}
 
 	@Override
