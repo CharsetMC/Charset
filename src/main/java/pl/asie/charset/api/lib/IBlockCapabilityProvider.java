@@ -28,6 +28,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+/**
+ * Implement this interface for usage with CharsetAPI.registerBlockCapabilityProvider.
+ * That way, you can instantiate Capabilities for supported mods (such as Charset)
+ * without requiring a TileEntity.
+ * @param <T> The capability provided.
+ */
 @FunctionalInterface
 public interface IBlockCapabilityProvider<T> {
     T create(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing facing);

@@ -73,6 +73,7 @@ import pl.asie.charset.lib.capability.storage.DummyBarrel;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInventory;
+import pl.asie.charset.api.lib.IDyeableItem;
 
 import javax.annotation.Nullable;
 
@@ -88,6 +89,9 @@ public class Capabilities {
 	public static Capability<IDebuggable> DEBUGGABLE;
 	@CapabilityInject(IMovable.class)
 	public static Capability<IMovable> MOVABLE;
+
+	@CapabilityInject(IDyeableItem.class)
+	public static Capability<IDyeableItem> DYEABLE_ITEM;
 
 	@CapabilityInject(IItemInsertionHandler.class)
 	public static Capability<IItemInsertionHandler> ITEM_INSERTION_HANDLER;
@@ -146,6 +150,8 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IAxisRotatable.class, DummyCapabilityStorage.get(), DefaultAxisRotatable::new);
 		CapabilityManager.INSTANCE.register(IDebuggable.class, DummyCapabilityStorage.get(), DefaultDebuggable::new);
 		CapabilityManager.INSTANCE.register(IMovable.class, DummyCapabilityStorage.get(), DefaultMovable::new);
+
+		CapabilityManager.INSTANCE.register(IDyeableItem.class, new DyeableItemStorage(), DyeableItem::new);
 
 		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, DummyCapabilityStorage.get(), DefaultItemInsertionHandler::new);
 		CapabilityManager.INSTANCE.register(IPipeView.class, DummyCapabilityStorage.get(), DefaultPipeView::new);

@@ -27,12 +27,12 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IRecipeFactory;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.oredict.OreDictionary;
-import pl.asie.charset.lib.item.IDyeableItem;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.api.lib.IDyeableItem;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
 import pl.asie.charset.lib.utils.ColorUtils;
 
@@ -81,11 +81,11 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 
 		protected int[] getColor(ItemStack stack) {
 			if (!stack.isEmpty()) {
-				if (stack.getItem() instanceof IDyeableItem) {
-					IDyeableItem targetItem = (IDyeableItem) stack.getItem();
+				if (stack.hasCapability(Capabilities.DYEABLE_ITEM, null)) {
+					IDyeableItem targetItem = stack.getCapability(Capabilities.DYEABLE_ITEM, null);
 
-					if (targetItem.hasColor(stack)) {
-						int c = targetItem.getColor(stack);
+					if (targetItem.hasColor(0)) {
+						int c = targetItem.getColor(0);
 						return new int[]{(c >> 16) & 255, (c >> 8) & 255, c & 255};
 					}
 				} else {
@@ -184,10 +184,10 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			for (int i = 0; i < inv.getSizeInventory(); i++) {
 				ItemStack source = inv.getStackInSlot(i);
 				if (!source.isEmpty()) {
-					if (source.getItem() instanceof IDyeableItem) {
-						targetItem = (IDyeableItem) source.getItem();
+					if (source.hasCapability(Capabilities.DYEABLE_ITEM, null)) {
 						target = source.copy();
 						target.setCount(1);
+						targetItem = target.getCapability(Capabilities.DYEABLE_ITEM, null);
 					}
 				}
 			}
@@ -195,7 +195,7 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 			if (targetItem != null) {
 				Optional<Integer> result = getMixedColor(inv, target, null);
 				if (result.isPresent()) {
-					targetItem.setColor(target, result.get());
+					targetItem.setColor(0, result.get());
 					return target;
 				}
 			}
@@ -205,7 +205,7 @@ public class DyeableItemRecipeFactory implements IRecipeFactory {
 
 		@Override
 		protected ItemStack toRemainingItem(ItemStack from) {
-			if (!from.isEmpty() && from.getItem() instanceof IDyeableItem) {
+			if (!from.isEmpty() && from.hasCapability(Capabilities.DYEABLE_ITEM, null)) {
 				return ItemStack.EMPTY;
 			}
 

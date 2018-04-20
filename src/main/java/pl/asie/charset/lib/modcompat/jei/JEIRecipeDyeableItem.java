@@ -24,7 +24,8 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import pl.asie.charset.lib.item.IDyeableItem;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.api.lib.IDyeableItem;
 import pl.asie.charset.lib.recipe.DyeableItemRecipeFactory;
 import pl.asie.charset.lib.utils.ColorUtils;
 
@@ -50,10 +51,10 @@ public class JEIRecipeDyeableItem implements IRecipeWrapper {
 
         ArrayList<ItemStack> stacks = new ArrayList<>();
         for (ItemStack stack : recipe.input.getMatchingStacks()) {
-            IDyeableItem item = (IDyeableItem) stack.getItem();
+            IDyeableItem item = stack.getCapability(Capabilities.DYEABLE_ITEM, null);
             for (EnumDyeColor color : EnumDyeColor.values()) {
                 ItemStack stackColored = stack.copy();
-                item.setColor(stackColored, ColorUtils.toIntColor(color));
+                stackColored.getCapability(Capabilities.DYEABLE_ITEM, null).setColor(0, ColorUtils.toIntColor(color));
                 stacks.add(stackColored);
             }
         }

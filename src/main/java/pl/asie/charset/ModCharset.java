@@ -67,6 +67,7 @@ public class ModCharset {
 	public static final String NAME = "Charset";
 	public static final String VERSION = "@VERSION@";
 	public static final String DEP_LIB = "after:forge@[14.23.1.2571,);before:jei@[4.7.8,);before:betterwithmods;before:mcmultipart";
+	public static final int DATA_FIXER_VER = 5;
 
 	public static final boolean INDEV = ("@version@".equals(VERSION.toLowerCase()));
 
@@ -137,7 +138,7 @@ public class ModCharset {
 
 		ModuleLoader.INSTANCE.preInit(event.getAsmData());
 
-		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, 5);
+		dataFixes = FMLCommonHandler.instance().getDataFixer().init(ModCharset.MODID, DATA_FIXER_VER);
 		dataFixes.registerFix(FixTypes.ENTITY, new FixCharsetUnifyModId.Entity(oldPrefixes));
 
 		charsetIconItem = new IconCharset();

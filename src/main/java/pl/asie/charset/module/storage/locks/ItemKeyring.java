@@ -43,7 +43,8 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.storage.IKeyItem;
-import pl.asie.charset.lib.item.IDyeableItem;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.api.lib.IDyeableItem;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.ui.ItemHandlerCharset;
@@ -73,8 +74,9 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
                 for (int i = 0; i < getSlots(); i++) {
                     ItemStack stackSlot = getStackInSlot(i);
                     if (!stackSlot.isEmpty()) {
-                        if (stackSlot.getItem() instanceof IDyeableItem) {
-                            ItemUtils.getTagCompound(stack, true).setInteger("color" + (n++), ((IDyeableItem) stackSlot.getItem()).getColor(stackSlot));
+                        if (stackSlot.hasCapability(Capabilities.DYEABLE_ITEM, null)) {
+                            IDyeableItem item = stackSlot.getCapability(Capabilities.DYEABLE_ITEM, null);
+                            ItemUtils.getTagCompound(stack, true).setInteger("color" + (n++), item.getColor(0));
                         } else {
                             ItemUtils.getTagCompound(stack, true).setInteger("color" + (n++), -1);
                         }
@@ -86,13 +88,16 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
             }
         };
 
-        public CapabilityProvider(ItemStack stack) {
+        private final ICapabilityProvider parent;
+
+        public CapabilityProvider(ItemStack stack, ICapabilityProvider parent) {
             this.stack = stack;
+            this.parent = parent;
         }
 
         @Override
         public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-            return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY;
+            return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || (parent != null && parent.hasCapability(capability, facing));
         }
 
         @Nullable
@@ -100,7 +105,7 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
         public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
             return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
                     ? CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(handler)
-                    : null;
+                    : (parent != null ? parent.getCapability(capability, facing) : null);
         }
 
         @Override
@@ -141,7 +146,7 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
 
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
-        return new CapabilityProvider(stack);
+        return new CapabilityProvider(stack, super.initCapabilities(stack, nbt));
     }
 
     @Override
@@ -153,27 +158,23 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
             NBTTagCompound compound = stack.getTagCompound();
             StringBuilder builder = new StringBuilder();
             int count = 0;
-            int cCount = 0;
-            while (compound.hasKey("color" + count)) {
+            while (compound.hasKey("color" + count, Constants.NBT.TAG_ANY_NUMERIC)) {
                 int color = compound.getInteger("color" + count);
-                if (color >= 0) {
-                    if (cCount > 0) {
-                        if ((cCount % 5) == 0) {
-                            builder.append(',');
-                            tooltip.add(builder.toString());
-                            builder = new StringBuilder();
-                        } else {
-                            builder.append(", ");
-                        }
+                if (count > 0) {
+                    if ((count % 5) == 0) {
+                        builder.append(',');
+                        tooltip.add(builder.toString());
+                        builder = new StringBuilder();
+                    } else {
+                        builder.append(", ");
                     }
-                    builder.append(LockEventHandler.getColorDyed(color));
-                    cCount++;
                 }
 
+                builder.append(LockEventHandler.getColorDyed(color));
                 count++;
             }
 
-            if (cCount > 0) {
+            if (count > 0) {
                 tooltip.add(builder.toString());
             }
         }
@@ -215,10 +216,7 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
         @Override
         public int colorMultiplier(ItemStack stack, int tintIndex) {
             if (tintIndex > 0 && stack.hasTagCompound() && stack.getTagCompound().hasKey("color" + (tintIndex - 1))) {
-                int c = stack.getTagCompound().getInteger("color" + (tintIndex - 1));
-                if (c >= 0) {
-                    return c;
-                }
+                return stack.getTagCompound().getInteger("color" + (tintIndex - 1)) | 0xFF000000;
             }
 
             return CharsetStorageLocks.DEFAULT_LOCKING_COLOR;

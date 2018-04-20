@@ -28,7 +28,6 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.crafting.JsonContext;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import pl.asie.charset.lib.item.IDyeableItem;
 import pl.asie.charset.lib.utils.ThreeState;
 
 public abstract class RecipeBase extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {

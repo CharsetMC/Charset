@@ -17,18 +17,21 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.item;
+package pl.asie.charset.api.lib;
 
-import net.minecraft.item.ItemStack;
-
+/**
+ * This capability is provided by Charset items which are dyeable, but you are
+ * welcome to utilize it yourself. For said items, Charset provides a simple
+ * recipe framework (one .json to add a color-mixing, dyeing recipe, as well
+ * as cauldron-based washing).
+ */
 public interface IDyeableItem {
-	int getColor(ItemStack stack);
-
-	default boolean hasColor(ItemStack stack) {
-		return getColor(stack) >= 0;
+	default int getColorSlotCount() {
+		return 1;
 	}
 
-	boolean removeColor(ItemStack stack);
-
-	boolean setColor(ItemStack stack, int color);
+	int getColor(int slot);
+	boolean hasColor(int slot);
+	boolean removeColor(int slot);
+	boolean setColor(int slot, int color);
 }

@@ -22,41 +22,26 @@ package pl.asie.charset.module.storage.locks;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pl.asie.charset.lib.item.IDyeableItem;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.lib.DyeableItemStack;
+import pl.asie.charset.api.lib.IDyeableItem;
 import pl.asie.charset.lib.item.ItemBase;
-import pl.asie.charset.lib.utils.ItemUtils;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemLockingDyeable extends ItemBase implements IDyeableItem {
-    @Override
-    public int getColor(ItemStack stack) {
-        return stack.hasTagCompound() && stack.getTagCompound().hasKey("color") ? stack.getTagCompound().getInteger("color") : -1;
-    }
-
-    @Override
-    public boolean setColor(ItemStack stack, int color) {
-        ItemUtils.getTagCompound(stack, true).setInteger("color", color);
-        return true;
-    }
-
-    @Override
-    public boolean removeColor(ItemStack stack) {
-        if (stack.hasTagCompound()) {
-            stack.getTagCompound().removeTag("color");
-        }
-        return true;
-    }
-
+public class ItemLockingDyeable extends ItemBase {
     @SideOnly(Side.CLIENT)
     public static class Color implements IItemColor {
         @Override
         public int colorMultiplier(ItemStack stack, int tintIndex) {
-            if (tintIndex > 0 && stack.hasTagCompound() && stack.getTagCompound().hasKey("color")) {
-                return stack.getTagCompound().getInteger("color");
+            IDyeableItem item = stack.getCapability(Capabilities.DYEABLE_ITEM, null);
+            if (tintIndex > 0 && item.hasColor(0)) {
+                return 0xFF000000 | item.getColor(0);
             }
 
             return CharsetStorageLocks.DEFAULT_LOCKING_COLOR;
@@ -67,8 +52,14 @@ public class ItemLockingDyeable extends ItemBase implements IDyeableItem {
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        if (hasColor(stack)) {
-            tooltip.add(LockEventHandler.getColorDyed(getColor(stack)));
+        IDyeableItem item = stack.getCapability(Capabilities.DYEABLE_ITEM, null);
+        if (item.hasColor(0)) {
+            tooltip.add(LockEventHandler.getColorDyed(item.getColor(0)));
         }
+    }
+
+    @Override
+    public net.minecraftforge.common.capabilities.ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
+        return new DyeableItemStack(stack, 1, false);
     }
 }
