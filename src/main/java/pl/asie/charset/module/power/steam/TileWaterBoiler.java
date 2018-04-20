@@ -47,7 +47,8 @@ public class TileWaterBoiler extends TileMirrorTargetBase implements ITickable {
 	}
 
 	int getHeat() {
-		return Math.max((int) (getReflectorStrength() - 3), 0);
+		int v = Math.max((int) (getReflectorStrength() - 3), 0);
+		return (v + 1) >> 1; // divide by two, rounding up
 	}
 
 	@Override

@@ -15,7 +15,7 @@
   "key": {
     "p": {
       "type": "charset:material",
-      "material": [["silver", "ingot"], ["copper", "ingot"], ["gold", "ingot"]],
+      "material": [["silver", "ingot"], ["gold", "ingot"]],
       "nbtKey": "material"
     },
     "g": {

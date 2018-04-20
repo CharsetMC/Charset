@@ -49,7 +49,7 @@ public final class FluidUtils {
         } else if (stack.getFluid() == FluidRegistry.LAVA) {
 	        return "tile.lava.name";
         } else {
-	        return stack.getUnlocalizedName() + ".name";
+	        return stack.getLocalizedName();
         }
 	}
 

@@ -230,7 +230,8 @@ public class TileMirror extends TileBase implements IMirror {
 
 	@Override
 	public float getMirrorStrength() {
-		float avg = 0.75f;
+		return 1;
+		/* float avg = 0.75f;
 		float diff = 0.25f;
 		float val = avg;
 		if (targetPos != null) {
@@ -263,7 +264,7 @@ public class TileMirror extends TileBase implements IMirror {
 
 			val += diff*mul;
 		}
-		return val;
+		return val; */
 	}
 
 	private ScheduledEvent event;

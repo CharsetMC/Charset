@@ -221,7 +221,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 
 	@Override
 	public boolean canFillFluidType(FluidStack fluidStack) {
-		return true;
+		return !fluidStack.getFluid().isGaseous(fluidStack);
 	}
 
 	@Override
@@ -236,7 +236,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 
 	@Override
 	public int fill(FluidStack resource, boolean doFill) {
-		if (resource == null) {
+		if (resource == null || !canFillFluidType(resource)) {
 			return 0;
 		}
 
