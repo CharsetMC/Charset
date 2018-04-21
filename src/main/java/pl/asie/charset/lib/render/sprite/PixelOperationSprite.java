@@ -70,6 +70,12 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
     private final ResourceLocation location;
     private final Operator operator;
     private final Collection<ResourceLocation> deps;
+    private boolean forceReadFromFile;
+
+    public PixelOperationSprite forceReadFromFile() {
+        this.forceReadFromFile = true;
+        return this;
+    }
 
     public PixelOperationSprite(String entry, ResourceLocation location, Operator operator, ResourceLocation... deps) {
         super(entry);
@@ -83,6 +89,7 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
             depBuilder.add(dep);
         }
         this.deps = depBuilder.build();
+        this.forceReadFromFile = false;
     }
 
     @Override
@@ -95,7 +102,7 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
         int[] pixels = null;
         int width = 0, height = 0;
 
-        if (deps.contains(location)) {
+        if (deps.contains(location) && !forceReadFromFile) {
             TextureAtlasSprite sprite = getter.apply(location);
             try {
                 if (sprite != null) {
@@ -113,7 +120,7 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
         }
 
         if (pixels == null) {
-            BufferedImage image = RenderUtils.getTextureImage(location, getter);
+            BufferedImage image = RenderUtils.getTextureImage(location, !forceReadFromFile ? getter : null);
             if (image == null) {
                 return false;
             }

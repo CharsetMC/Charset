@@ -14,6 +14,8 @@ public class BlockWaterBoiler extends BlockBase implements ITileEntityProvider {
         setFullCube(true);
         setOpaqueCube(true);
         setUnlocalizedName("charset.water_boiler");
+        setHardness(4.0F);
+        setResistance(10.0F);
     }
 
     @Nullable
