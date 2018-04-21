@@ -49,7 +49,6 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-// TODO: Add support for smelting? Brewing?
 public class RecipeReplacement {
     public static final RecipeReplacement PRIMARY = new RecipeReplacement();
     private static final MethodHandle ORES_GETTER = MethodHandleHelper.findFieldGetter(OreIngredient.class, "ores");
@@ -62,6 +61,10 @@ public class RecipeReplacement {
 
     public RecipeReplacement() {
 
+    }
+
+    public void register() {
+        RecipeIngredientPatcher.PRIMARY.add(this::replaceIngredient);
     }
 
     private void checkTo(Object to) {
@@ -178,46 +181,5 @@ public class RecipeReplacement {
         }
 
         return null;
-    }
-
-    public void process(Collection<IRecipe> registry) {
-        for (IRecipe recipe : registry) {
-            ResourceLocation recipeName = recipe.getRegistryName();
-            boolean dirty = false;
-
-            if (recipe instanceof ShapedRecipes || recipe instanceof ShapelessRecipes || recipe instanceof ShapedOreRecipe || recipe instanceof ShapelessOreRecipe) {
-                NonNullList<Ingredient> ingredients = recipe.getIngredients();
-                for (int i = 0; i < ingredients.size(); i++) {
-                    Ingredient ing = ingredients.get(i);
-                    Ingredient ingNew = replaceIngredient(ing);
-                    if (ingNew != null) {
-                        ingredients.set(i, ingNew);
-                        dirty = true;
-                    }
-                }
-            } else if (recipe instanceof RecipeCharset) {
-                TCharObjectMap<Ingredient> charToIngredient = ((RecipeCharset) recipe).charToIngredient;
-                NonNullList<Ingredient> ingredients = recipe.getIngredients();
-                for (int i = 0; i < ingredients.size(); i++) {
-                    Ingredient ing = ingredients.get(i);
-                    Ingredient ingNew = replaceIngredient(ing);
-                    if (ingNew != null) {
-                        ingredients.set(i, ingNew);
-                        TCharIterator iterator = charToIngredient.keySet().iterator();
-                        while (iterator.hasNext()) {
-                            char c = iterator.next();
-                            if (charToIngredient.get(c) == ing) {
-                                charToIngredient.put(c, ing);
-                            }
-                        }
-                        dirty = true;
-                    }
-                }
-            }
-
-            if (dirty) {
-                ModCharset.logger.info("Successfully edited " + recipeName + "!");
-            }
-        }
     }
 }

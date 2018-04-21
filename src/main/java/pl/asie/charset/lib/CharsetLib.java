@@ -65,6 +65,7 @@ import pl.asie.charset.lib.notify.NotifyImplementation;
 import pl.asie.charset.lib.notify.PacketNotification;
 import pl.asie.charset.lib.notify.PacketPoint;
 import pl.asie.charset.lib.recipe.IngredientGroup;
+import pl.asie.charset.lib.recipe.RecipeIngredientPatcher;
 import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
@@ -173,7 +174,8 @@ public class CharsetLib {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-		RecipeReplacement.PRIMARY.process(event.getRegistry().getValues());
+		RecipeReplacement.PRIMARY.register();
+		RecipeIngredientPatcher.PRIMARY.process(event.getRegistry().getValuesCollection());
 	}
 
 	@Mod.EventHandler
