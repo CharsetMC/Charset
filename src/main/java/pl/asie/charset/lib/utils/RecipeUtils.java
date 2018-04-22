@@ -29,10 +29,25 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import pl.asie.charset.ModCharset;
+
+import java.lang.invoke.MethodHandle;
 
 public final class RecipeUtils {
+    private static final MethodHandle EVENT_HANDLER_GETTER = MethodHandleHelper.findFieldGetter(InventoryCrafting.class, "eventHandler", "field_70465_c");
+
     private RecipeUtils() {
 
+    }
+
+    public static Container getContainer(InventoryCrafting crafting) {
+        try {
+            return (Container) EVENT_HANDLER_GETTER.invokeExact(crafting);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            ModCharset.logger.warn("RecipeUtils.getContainer crashed! Stability/functionality may no longer be promised.");
+            return defaultContainer();
+        }
     }
 
     public static Container defaultContainer() {

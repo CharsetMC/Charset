@@ -363,7 +363,7 @@ public class FastRecipeLookup {
 			}
 			return findMatchingRecipeQuickly(false, nonEmptyStacks, craftMatrix, craftMatrix, worldIn);
 		} else {
-			InventoryCrafting craftingTrimmed = RecipeUtils.getCraftingInventory(width, height, craftMatrix.eventHandler);
+			InventoryCrafting craftingTrimmed = RecipeUtils.getCraftingInventory(width, height, RecipeUtils.getContainer(craftMatrix));
 			int nonEmptyStacks = 0;
 			for (int iy = 0; iy < height; iy++) {
 				for (int ix = 0; ix < width; ix++) {
