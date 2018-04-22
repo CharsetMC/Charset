@@ -27,6 +27,11 @@ public class NotificationComponentUnknown extends NotificationComponent {
 	}
 
 	@Override
+	public boolean equals(Object other) {
+		return this == other;
+	}
+
+	@Override
 	public String toString() {
 		return "null";
 	}

@@ -43,6 +43,30 @@ public class NotificationComponentString extends NotificationComponent {
 	}
 
 	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof NotificationComponentString)) {
+			return false;
+		} else {
+			NotificationComponentString ncs = (NotificationComponentString) other;
+			if (this.format != ncs.format || !this.string.equals(ncs.string)) {
+				return false;
+			}
+
+			if (this.components.length != ncs.components.length) {
+				return false;
+			}
+
+			for (int i = 0; i < components.length; i++) {
+				if (!this.components[i].equals(ncs.components[i])) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+	}
+
+	@Override
 	public String toString() {
 		if (format) {
 			String[] strings = new String[components.length];

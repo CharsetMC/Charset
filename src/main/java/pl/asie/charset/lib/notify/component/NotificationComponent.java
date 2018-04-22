@@ -21,5 +21,7 @@ package pl.asie.charset.lib.notify.component;
 
 public abstract class NotificationComponent {
 	@Override
+	public abstract boolean equals(Object other);
+	@Override
 	public abstract String toString();
 }

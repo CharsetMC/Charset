@@ -20,6 +20,7 @@
 package pl.asie.charset.lib.notify.component;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
@@ -41,6 +42,30 @@ public class NotificationComponentFluidStack extends NotificationComponent {
 		this.stack = stack;
 		this.showInfo = showInfo;
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof NotificationComponentFluidStack)) {
+			return false;
+		} else {
+			NotificationComponentFluidStack ncs = (NotificationComponentFluidStack) other;
+			if (this.showInfo != ncs.showInfo) {
+				return false;
+			}
+
+			if (this.stack == ncs.stack) {
+				return true;
+			}
+
+			if (this.stack != null && ncs.stack != null) {
+				return this.stack.isFluidStackIdentical(ncs.stack);
+			} else {
+				// only one is null
+				return false;
+			}
+		}
+	}
+
 
 	@Override
 	public String toString() {

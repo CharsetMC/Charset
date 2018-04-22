@@ -36,6 +36,15 @@ public class NotificationComponentTextComponent extends NotificationComponent {
 		return component.getFormattedText();
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof NotificationComponentTextComponent)) {
+			return false;
+		} else {
+			return this.component.equals(((NotificationComponentTextComponent) other).component);
+		}
+	}
+
 	public static class Factory implements NotificationComponentFactory<NotificationComponentTextComponent> {
 		@Override
 		public Class<NotificationComponentTextComponent> getComponentClass() {

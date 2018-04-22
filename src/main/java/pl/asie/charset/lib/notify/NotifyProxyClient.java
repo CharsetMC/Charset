@@ -74,7 +74,7 @@ public class NotifyProxyClient extends NotifyProxy {
         ClientMessage msg = new ClientMessage(player.world, locus, style, cmsg);
         if (msg.style.contains(NoticeStyle.CLEAR)) {
             messages.clear();
-            if (msg.msg == null || msg.msg.equals("")) return;
+            if (msg.getMessage() == null || msg.getMessage().toString().equals("")) return;
         }
         if (msg.style.contains(NoticeStyle.UPDATE) || msg.style.contains(NoticeStyle.UPDATE_SAME_ITEM)) {
             updateMessage(msg);
@@ -95,7 +95,7 @@ public class NotifyProxyClient extends NotifyProxy {
                 m.creationTime = 0;
             }
         }
-        if (msg.msg == null || msg.msgRendered.trim().length() == 0) {
+        if (msg.getMessage() == null || msg.msgRendered.trim().length() == 0) {
             /* if (!(msg.show_item && msg.item != null)) {
                 return;
             } */
@@ -115,13 +115,7 @@ public class NotifyProxyClient extends NotifyProxy {
             if (!msg.locus.equals(update.locus)) {
                 continue;
             }
-            if (!update.style.contains(NoticeStyle.UPDATE_SAME_ITEM)) {
-                /*
-                msg.item = update.item;
-                */
-                // TODO
-            }
-            msg.msg = update.msg;
+            msg.setMessage(update.getMessage());
             return;
         }
         // Otherwise it's an UPDATE to a non-existing message.

@@ -43,7 +43,7 @@ import java.util.EnumSet;
 class ClientMessage {
     World world;
     Object locus;
-    NotificationComponent msg;
+    private NotificationComponent msg;
     String msgRendered;
     Collection<NoticeStyle> style;
     
@@ -70,7 +70,12 @@ class ClientMessage {
         show_item = style.contains(NoticeStyle.DRAWITEM);
         translate();
     }
-    
+
+    void setMessage(NotificationComponent msg) {
+        this.msg = msg;
+        translate();
+    }
+
     void translate() {
         msgRendered = msg.toString().replace("\\n", "\n");
     }
@@ -122,5 +127,9 @@ class ClientMessage {
             return new NotificationCoord(((NotificationCoord) locus).getWorld(), ((NotificationCoord) locus).getPos());
         }
         return null;
+    }
+
+    public NotificationComponent getMessage() {
+        return msg;
     }
 }

@@ -26,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
+import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +39,20 @@ public class NotificationComponentItemStack extends NotificationComponent {
 		this.stack = stack;
 		this.showName = showName;
 		this.showInfo = showInfo;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof NotificationComponentItemStack)) {
+			return false;
+		} else {
+			NotificationComponentItemStack ncs = (NotificationComponentItemStack) other;
+			if (this.showName != ncs.showName || this.showInfo != ncs.showInfo) {
+				return false;
+			}
+
+			return ItemStack.areItemStacksEqual(this.stack, ncs.stack);
+		}
 	}
 
 	@Override
