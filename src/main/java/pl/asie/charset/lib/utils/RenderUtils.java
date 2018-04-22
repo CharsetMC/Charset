@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -34,6 +35,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -208,6 +210,30 @@ public final class RenderUtils {
 
 	public static TextureAtlasSprite getItemSprite(ItemStack stack) {
 		return getItemModel(stack).getParticleTexture();
+	}
+
+	public static TextureAtlasSprite getItemSprite(ItemStack stack, @Nullable EnumFacing facing) {
+		if (facing == null) {
+			return getItemSprite(stack);
+		} else {
+			try {
+				if (stack.getItem() instanceof ItemBlock) {
+					IBlockState state = ItemUtils.getBlockState(stack);
+					IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+					if (model != Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel()) {
+						List<BakedQuad> faceQuads = model.getQuads(state, facing, 0L);
+						if (faceQuads.size() == 1) {
+							return faceQuads.get(0).getSprite();
+						}
+					}
+				}
+			} catch (Exception e) {
+
+			}
+
+			// fallback
+			return getItemSprite(stack);
+		}
 	}
 
 	public static int asMcIntColor(float[] data) {

@@ -1,0 +1,15 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "forge:item-layer",
+        "transform": "forge:default-item"
+    },
+    "variants": {
+        "inventory": [{
+            "textures": {
+                "layer0": "charset:items/tape_measure_item",
+                "layer1": "charset:items/tape_measure_overlay"
+            }
+        }]
+    }
+}

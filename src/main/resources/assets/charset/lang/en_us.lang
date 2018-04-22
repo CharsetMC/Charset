@@ -193,6 +193,17 @@ tile.charset.tank.creative.name=Infinite Tank
 
 item.charset.tablet.name=Tablet
 
+# tools.building
+
+item.charset.chisel.name=Chisel
+item.charset.chisel.large.name=Large Chisel
+item.charset.wrench.name=Wrench
+
+# tools.tapemeasure
+
+item.charset.tapeMeasure.name=Tape Measure
+notice.charset.tapeMeasure.length=%1$s m
+
 # transport.rails
 
 tile.charset.rail_cross.name=Crossing Rail
@@ -204,12 +215,6 @@ config.charset.tweak.carry.general.name=General
 # tweak.chat
 
 chat.charset.shout=%1$s %2$s
-
-# tools.building
-
-item.charset.chisel.name=Chisel
-item.charset.chisel.large.name=Large Chisel
-item.charset.wrench.name=Wrench
 
 # abandoned (but may be returned to)
 

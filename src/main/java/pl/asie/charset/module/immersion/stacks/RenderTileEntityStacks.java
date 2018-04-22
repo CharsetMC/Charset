@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.immersion.stacks;
 
+import akka.japi.Function;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -193,14 +194,14 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 
 				ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(stack);
 				ItemMaterial blockMaterial = material != null ? material.getRelated("block") : null;
-				TextureAtlasSprite sprite;
+				Function<EnumFacing, TextureAtlasSprite> getter;
 				int c;
 
 				if (blockMaterial == null) {
-					sprite = RenderUtils.getItemSprite(new ItemStack(Blocks.IRON_BLOCK));
+					getter = (f) -> RenderUtils.getItemSprite(new ItemStack(Blocks.IRON_BLOCK), f);
 					c = ColorLookupHandler.INSTANCE.getColor(stack, RenderUtils.AveragingMode.FULL) | 0xFF000000;
 				} else {
-					sprite = RenderUtils.getItemSprite(blockMaterial.getStack());
+					getter = (f) -> RenderUtils.getItemSprite(blockMaterial.getStack(), f);
 					c = Minecraft.getMinecraft().getItemColors().colorMultiplier(blockMaterial.getStack(), 0);
 				}
 
@@ -217,6 +218,17 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 				for (int[] vecOrder : QUAD_ORDERS[yOff]) {
 					UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);
 					EnumFacing face = QUAD_FACES[yOff][j];
+					TextureAtlasSprite sprite;
+
+					try {
+						sprite = getter.apply(face);
+					} catch (Exception e) {
+						try {
+							sprite = getter.apply(null);
+						} catch (Exception ee) {
+							throw new RuntimeException(ee);
+						}
+					}
 
 					builder.setTexture(sprite);
 					builder.setApplyDiffuseLighting(isAmbientOcclusion());
