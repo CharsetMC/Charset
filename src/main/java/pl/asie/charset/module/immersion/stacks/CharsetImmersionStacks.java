@@ -148,18 +148,18 @@ public class CharsetImmersionStacks {
 				event.getWorld().setBlockState(pos, state);
 			}
 
-			int count = stack.getCount();
-			for (int i = 0; i < (fullStack ? count : 1); i++) {
-				if (stack.isEmpty()) {
-					break;
-				}
+			if (state.getBlock() instanceof BlockStacks) {
+				TileEntity tile = event.getWorld().getTileEntity(pos);
+				if (tile instanceof TileEntityStacks) {
+					int count = stack.getCount();
+					for (int i = 0; i < (fullStack ? count : 1); i++) {
+						if (stack.isEmpty()) {
+							break;
+						}
 
-				ItemStack stackOffered = stack.copy();
-				stackOffered.setCount(1);
+						ItemStack stackOffered = stack.copy();
+						stackOffered.setCount(1);
 
-				if (state.getBlock() instanceof BlockStacks) {
-					TileEntity tile = event.getWorld().getTileEntity(pos);
-					if (tile instanceof TileEntityStacks) {
 						if (((TileEntityStacks) tile).offerStack(false, stackOffered, event.getHitVec(), fullStack)) {
 							if (!event.getEntityPlayer().isCreative()) {
 								stack.shrink(stackOffered.getCount());
@@ -167,6 +167,10 @@ public class CharsetImmersionStacks {
 							event.setCanceled(true);
 							event.setCancellationResult(EnumActionResult.SUCCESS);
 						}
+					}
+
+					if (((TileEntityStacks) tile).isEmpty()) {
+						event.getWorld().setBlockToAir(pos);
 					}
 				}
 			}
