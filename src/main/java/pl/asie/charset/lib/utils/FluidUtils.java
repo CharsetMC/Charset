@@ -28,6 +28,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -43,11 +44,11 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public final class FluidUtils {
-	public static String getCorrectUnlocalizedName(FluidStack stack) {
+	public static String getCorrectLocalizedName(FluidStack stack) {
 	    if (stack.getFluid() == FluidRegistry.WATER) {
-	        return "tile.water.name";
+	        return I18n.translateToLocal("tile.water.name");
         } else if (stack.getFluid() == FluidRegistry.LAVA) {
-	        return "tile.lava.name";
+	        return I18n.translateToLocal("tile.lava.name");
         } else {
 	        return stack.getLocalizedName();
         }

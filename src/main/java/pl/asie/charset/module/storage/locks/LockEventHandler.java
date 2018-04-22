@@ -52,6 +52,8 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
+import pl.asie.charset.lib.notify.component.NotificationComponentTextComponent;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.ThreeState;
 import pl.asie.charset.lib.utils.colorspace.Colorspace;
@@ -117,7 +119,7 @@ public class LockEventHandler {
             if (displayName == null) {
                 displayName = new TextComponentTranslation(tile.getBlockType().getUnlocalizedName() + ".name");
             }
-            new Notice(tile, new TextComponentTranslation("container.isLocked", displayName)).sendTo(player);
+            new Notice(tile,NotificationComponentString.translated("container.isLocked", new NotificationComponentTextComponent(displayName))).sendTo(player);
             player.getEntityWorld().playSound(player, tile.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
 

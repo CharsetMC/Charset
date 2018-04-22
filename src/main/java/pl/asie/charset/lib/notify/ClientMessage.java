@@ -32,6 +32,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
+import pl.asie.charset.lib.notify.component.NotificationComponent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -41,8 +43,7 @@ import java.util.EnumSet;
 class ClientMessage {
     World world;
     Object locus;
-    ItemStack item;
-    ITextComponent msg;
+    NotificationComponent msg;
     String msgRendered;
     Collection<NoticeStyle> style;
     
@@ -53,10 +54,9 @@ class ClientMessage {
     
     static final int SHORT_TIME = 6, LONG_TIME = 11, VERY_LONG_TIME = 60;
 
-    public ClientMessage(World world, Object locus, ItemStack item, Collection<NoticeStyle> styles, ITextComponent msg) {
+    public ClientMessage(World world, Object locus, Collection<NoticeStyle> styles, NotificationComponent msg) {
         this.world = world;
         this.locus = locus;
-        this.item = item;
         this.msg = msg;
         this.style = styles;
         
@@ -67,41 +67,12 @@ class ClientMessage {
             lifeTime = 1000 * SHORT_TIME;
         }
         position_important = style.contains(NoticeStyle.EXACTPOSITION);
-        show_item = style.contains(NoticeStyle.DRAWITEM) && !item.isEmpty();
+        show_item = style.contains(NoticeStyle.DRAWITEM);
         translate();
     }
     
     void translate() {
-        msgRendered = msg.getFormattedText();
-        msgRendered = msgRendered.replace("\\n", "\n");
-        
-        String item_name = "null";StringBuilder item_info = new StringBuilder();
-        if (item != null) {
-            item_name = item.getDisplayName();
-            EntityPlayer player = Minecraft.getMinecraft().player;
-            ArrayList<String> bits = new ArrayList<String>();
-            try {
-                item.getItem().addInformation(item, player.getEntityWorld(), bits, ITooltipFlag.TooltipFlags.NORMAL);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                bits.add("" + TextFormatting.RED + TextFormatting.BOLD + "ERROR");
-            }
-            boolean tail = false;
-            for (String s : bits) {
-                if (tail) {
-                    item_info.append("\n");
-                } else {
-                    tail = true;
-                }
-                item_info.append(s);
-            }
-        }
-
-        String infoStr = item_info.toString();
-
-        msgRendered = msgRendered.replace("{ITEM_NAME}", item_name);
-        msgRendered = msgRendered.replace("{ITEM_INFOS}", infoStr);
-        msgRendered = msgRendered.replace("{ITEM_INFOS_NL}", infoStr.length() > 0 ? "\n"+infoStr : "");
+        msgRendered = msg.toString().replace("\\n", "\n");
     }
     
     static double interp(double old, double new_, float partial) {

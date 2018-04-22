@@ -28,6 +28,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import pl.asie.charset.lib.notify.component.NotificationComponent;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
+import pl.asie.charset.lib.notify.component.NotificationComponentUnknown;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.CheckReturnValue;
@@ -37,15 +40,13 @@ import java.util.EnumSet;
 
 public class Notice {
     final Object where;
-    private ITextComponent message;
-    private ItemStack item = ItemStack.EMPTY;
+    private NotificationComponent message;
     private EnumSet<NoticeStyle> style = EnumSet.noneOf(NoticeStyle.class);
     private INoticeUpdater updater;
 
     private boolean isUpdating = false;
     private int age = 0;
     private boolean changed = false;
-    private boolean changedItem = false;
     private boolean addedToRecurList = false;
     EntityPlayer targetPlayer = null;
     World world;
@@ -56,7 +57,7 @@ public class Notice {
     /**
      * Creates an in-world notification message, which is sent using
      * {@link #sendTo(EntityPlayer)} or {@link #sendToAll()}. Additional options can be
-     * provided using {@link #withItem(ItemStack)} m}, {@link #withStyle(NoticeStyle...)}, {@link #withWorld(World)},
+     * provided using {@link #withStyle(NoticeStyle...)}, {@link #withWorld(World)},
      * and {@link #withUpdater(INoticeUpdater)}. <br>
      * <b>Remember to send the Notice!</b><br>
      * <code><pre>
@@ -71,7 +72,7 @@ public class Notice {
      */
 
     @CheckReturnValue
-    public Notice(Object where, ITextComponent message) {
+    public Notice(Object where, NotificationComponent message) {
         this.where = where;
         this.message = message;
         if (where instanceof NotificationCoord) {
@@ -109,41 +110,6 @@ public class Notice {
         this.where = where;
         withUpdater(updater);
         updater.update(this);
-    }
-    
-    /**
-     * <p>
-     * Sets a single item to be sent along with the message. It can be used in
-     * two ways.
-     * </p>
-     * 
-     * <p>
-     * If {@link #withStyle(NoticeStyle...)} is used, then the item will
-     * be drawn in the notification.
-     * </p>
-     * 
-     * <p>
-     * The item's name can be inserted in the message's text using the format
-     * codes <code>{ITEM_NAME}</code>, <code>{ITEM_INFOS}</code>, or <code>{ITEM_INFOS_NEWLINE}</code>.
-     * </p>
-     * <p>
-     * <code>{ITEM_NAME}</code>
-     * will be replaced with the name of the item, and is gotten by calling
-     * {@link ItemStack#getDisplayName}. <code>{ITEM_INFOS}</code> and <code>{ITEM_INFOS_NEWLINE</code> are
-     * gotten via Item.addInformation. ITEM_INFOS_NEWLINE is prefixed
-     * with a newline, unless the information list is empty.
-     * </p>
-     */
-    @CheckReturnValue
-    public Notice withItem(ItemStack item) {
-        if (isUpdating && !changed) {
-            cmpIs(this.item, item);
-            changedItem |= changed;
-        }
-        this.item = item.isEmpty() ? ItemStack.EMPTY : item.copy();
-        if (this.item.getCount() > this.item.getMaxStackSize())
-            this.item.setCount(item.getMaxStackSize());
-        return this;
     }
 
     /**
@@ -197,7 +163,7 @@ public class Notice {
     /**
      * Changes the message. This goes with the {@link INoticeUpdater} constructor.
      */
-    public Notice setMessage(ITextComponent newMessage) {
+    public Notice setMessage(NotificationComponent newMessage) {
         cmp(this.message, newMessage);
         this.message = newMessage;
         return this;
@@ -267,9 +233,8 @@ public class Notice {
         if (world == null && player != null) {
             world = player.world;
         }
-        NotifyImplementation.instance.doSend(player, where, world, style, item, message);
+        NotifyImplementation.instance.doSend(player, where, world, style, message);
         changed = false;
-        changedItem = false;
         if (updater != null && !addedToRecurList) {
             NotifyImplementation.instance.addRecuringNotification(this);
             targetPlayer = player;
@@ -290,7 +255,7 @@ public class Notice {
      */
     public static void clear(EntityPlayer player) {
         NotificationCoord at = new NotificationCoord(player.world, new BlockPos(player));
-        NotifyImplementation.instance.doSend(player, at, player.world, EnumSet.of(NoticeStyle.CLEAR), null, new TextComponentString(""));
+        NotifyImplementation.instance.doSend(player, at, player.world, EnumSet.of(NoticeStyle.CLEAR), NotificationComponentUnknown.INSTANCE);
     }
 
     /**
@@ -301,17 +266,17 @@ public class Notice {
      * @param player
      *            The player to be notified
      */
-    public static void onscreen(EntityPlayer player, Collection<NoticeStyle> styles, ITextComponent msg) {
+    public static void onscreen(EntityPlayer player, Collection<NoticeStyle> styles, NotificationComponent msg) {
         NotifyImplementation.instance.doSendOnscreenMessage(player, styles, msg);
     }
 
     public static void title(EntityPlayer player, String title, String subtitle) {
         // NORELEASE: Implement. Just needs a little packet?
-        onscreen(player, Collections.emptySet(), new TextComponentString(title + "\n" + subtitle));
+        onscreen(player, Collections.emptySet(), NotificationComponentString.raw(title + "\n" + subtitle));
     }
 
     public static void title(EntityPlayer player, String title) {
-        onscreen(player, Collections.emptySet(), new TextComponentString(title));
+        onscreen(player, Collections.emptySet(), NotificationComponentString.raw(title));
     }
 
     boolean updateNotice() {
@@ -325,16 +290,10 @@ public class Notice {
         updater.update(this);
         isUpdating = false;
         if (changed) {
-            if (changedItem) {
-                style.add(NoticeStyle.UPDATE);
-                sendTo(targetPlayer);
-                style.remove(NoticeStyle.UPDATE);
-            } else {
-                style.add(NoticeStyle.UPDATE_SAME_ITEM);
-                sendTo(targetPlayer);
-                style.remove(NoticeStyle.UPDATE_SAME_ITEM);
-            }
-            changed = changedItem = false;
+            style.add(NoticeStyle.UPDATE);
+            sendTo(targetPlayer);
+            style.remove(NoticeStyle.UPDATE);
+            changed = false;
         }
         return true;
     }

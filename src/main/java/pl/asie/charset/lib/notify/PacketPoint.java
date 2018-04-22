@@ -28,6 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.lib.network.Packet;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
 
 public class PacketPoint extends Packet {
 	enum Type {
@@ -88,10 +89,10 @@ public class PacketPoint extends Packet {
 
 		switch (type) {
 			case COORD:
-				notice = new Notice(new NotificationCoord(player.world, pos), new TextComponentString(message));
+				notice = new Notice(new NotificationCoord(player.world, pos), NotificationComponentString.raw(message));
 				break;
 			case ENTITY:
-				notice = new Notice(entity, new TextComponentString(message));
+				notice = new Notice(entity, NotificationComponentString.raw(message));
 				break;
 		}
 

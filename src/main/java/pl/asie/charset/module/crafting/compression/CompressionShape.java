@@ -40,6 +40,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.RecipeUtils;
@@ -253,7 +254,7 @@ public class CompressionShape {
 
 		for (TileCompressionCrafter crafter : compressionCrafters) {
 			if (crafter.isBackstuffed()) {
-				new Notice(crafter, new TextComponentTranslation("notice.charset.compression.backstuffed"));
+				new Notice(crafter, NotificationComponentString.translated("notice.charset.compression.backstuffed"));
 				return false;
 			}
 
@@ -277,7 +278,7 @@ public class CompressionShape {
 			return true;
 		} else {
 			if (error.get().length() > 0) {
-				new Notice(sender, new TextComponentTranslation(error.get())).sendToAll();
+				new Notice(sender, NotificationComponentString.translated(error.get())).sendToAll();
 			}
 			return false;
 		}

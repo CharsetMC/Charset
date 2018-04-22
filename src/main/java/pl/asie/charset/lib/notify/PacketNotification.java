@@ -32,6 +32,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import pl.asie.charset.lib.network.Packet;
+import pl.asie.charset.lib.notify.component.NotificationComponent;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
+import pl.asie.charset.lib.notify.component.NotificationComponentUnknown;
+import pl.asie.charset.lib.notify.component.NotificationComponentUtil;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -51,9 +55,8 @@ public class PacketNotification extends Packet {
 	private Type type;
 	private BlockPos pos;
 	private Object target;
-	private ItemStack item;
 	private Collection<NoticeStyle> style;
-	private ITextComponent msg;
+	private NotificationComponent msg;
 
 	private EntityPlayer me;
 
@@ -61,7 +64,7 @@ public class PacketNotification extends Packet {
 
 	}
 
-	public static PacketNotification createOnscreen(Collection<NoticeStyle> style, ITextComponent message) {
+	public static PacketNotification createOnscreen(Collection<NoticeStyle> style, NotificationComponent message) {
 		PacketNotification n = new PacketNotification();
 		n.type = Type.ONSCREEN;
 		n.style = style;
@@ -69,7 +72,7 @@ public class PacketNotification extends Packet {
 		return n;
 	}
 
-	public static PacketNotification createNotify(Object where, ItemStack item, Collection<NoticeStyle> style, ITextComponent message) {
+	public static PacketNotification createNotify(Object where, Collection<NoticeStyle> style, NotificationComponent message) {
 		PacketNotification n = new PacketNotification();
 
 		if (where instanceof NotificationCoord) {
@@ -90,7 +93,6 @@ public class PacketNotification extends Packet {
 			return null;
 		}
 
-		n.item = item;
 		n.style = style;
 		n.msg = message;
 		return n;
@@ -113,10 +115,10 @@ public class PacketNotification extends Packet {
 
 	private void readMsg(PacketBuffer input) {
 		try {
-			msg = input.readTextComponent();
-		} catch (IOException e) {
+			msg = NotificationComponentUtil.deserialize(input);
+		} catch (Exception e) {
 			e.printStackTrace();
-			msg = new TextComponentString("#ERR");
+			msg = NotificationComponentString.raw("#ERR");
 		}
 	}
 
@@ -159,7 +161,6 @@ public class PacketNotification extends Packet {
 			return;
 		}
 
-		item = ByteBufUtils.readItemStack(input);
 		readStyles(input);
 		readMsg(input);
 	}
@@ -171,7 +172,7 @@ public class PacketNotification extends Packet {
 				NotifyImplementation.proxy.onscreen(style, msg);
 				break;
 			default:
-				NotifyImplementation.recieve(me, target, item, style, msg);
+				NotifyImplementation.recieve(me, target, style, msg);
 				break;
 		}
 	}
@@ -205,13 +206,12 @@ public class PacketNotification extends Packet {
 				break;
 			case ONSCREEN:
 				writeStyles(output);
-				output.writeTextComponent(msg);
+				NotificationComponentUtil.serialize(msg, output);
 				return;
 		}
 
-		ByteBufUtils.writeItemStack(output, item);
 		writeStyles(output);
-		output.writeTextComponent(msg);
+		NotificationComponentUtil.serialize(msg, output);
 	}
 
 	@Override

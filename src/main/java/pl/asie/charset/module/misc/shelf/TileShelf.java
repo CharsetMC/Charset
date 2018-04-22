@@ -37,6 +37,7 @@ import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.notify.INoticeUpdater;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponentItemStack;
 import pl.asie.charset.lib.ui.ItemHandlerCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
@@ -92,7 +93,7 @@ public class TileShelf extends TileBase {
 
 			if (!handler.getStackInSlot(slotId).isEmpty()) {
 				final int sentSlotId = slotId;
-				new Notice(new Vec3d(pos).addVector(hitX, hitY, hitZ), msg -> msg.withItem(handler.getStackInSlot(sentSlotId)).setMessage(new TextComponentString("{ITEM_NAME}{ITEM_INFOS_NEWLINE}"))).sendTo(player);
+				new Notice(new Vec3d(pos).addVector(hitX, hitY, hitZ), msg -> msg.setMessage(new NotificationComponentItemStack(handler.getStackInSlot(sentSlotId), true, true))).sendTo(player);
 
 				return true;
 			} else {

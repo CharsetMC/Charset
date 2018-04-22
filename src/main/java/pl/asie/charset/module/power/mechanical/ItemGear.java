@@ -19,9 +19,22 @@
 
 package pl.asie.charset.module.power.mechanical;
 
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.api.experimental.mechanical.IItemGear;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ItemGear extends ItemBase implements IItemGear {
 	private final int value;
@@ -34,5 +47,14 @@ public class ItemGear extends ItemBase implements IItemGear {
 	@Override
 	public int getGearValue(ItemStack stack) {
 		return value;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		super.addInformation(stack, worldIn, tooltip, flagIn);
+		if (GuiScreen.isShiftKeyDown()) {
+			tooltip.add(TextFormatting.GRAY + I18n.translateToLocalFormatted("tip.charset.gear.ratio", Integer.toString(getGearValue(stack))));
+		}
 	}
 }

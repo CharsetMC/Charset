@@ -17,24 +17,9 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.notify;
+package pl.asie.charset.lib.notify.component;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import pl.asie.charset.lib.notify.component.NotificationComponent;
-
-import java.util.Collection;
-
-public class NotifyProxy {
-    public void init() {
-
-    }
-
-    public void addMessage(Object locus, Collection<NoticeStyle> style, NotificationComponent message) {
-
-    }
-
-    public void onscreen(Collection<NoticeStyle> style, NotificationComponent message) {
-
-    }
+public abstract class NotificationComponent {
+	@Override
+	public abstract String toString();
 }

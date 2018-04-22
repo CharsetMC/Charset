@@ -17,24 +17,25 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.notify;
+package pl.asie.charset.lib.misc;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import pl.asie.charset.lib.notify.component.NotificationComponent;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 
-import java.util.Collection;
+public abstract class FluidBase extends Fluid {
+	public FluidBase(String fluidName, ResourceLocation still, ResourceLocation flowing, int color) {
+		super(fluidName, still, flowing, color);
+	}
 
-public class NotifyProxy {
-    public void init() {
+	public FluidBase(String fluidName, ResourceLocation still, ResourceLocation flowing) {
+		super(fluidName, still, flowing);
+	}
 
-    }
-
-    public void addMessage(Object locus, Collection<NoticeStyle> style, NotificationComponent message) {
-
-    }
-
-    public void onscreen(Collection<NoticeStyle> style, NotificationComponent message) {
-
-    }
+	@Override
+	public String getLocalizedName(FluidStack stack) {
+		String s = this.getUnlocalizedName(stack);
+		return s == null ? "" : I18n.translateToLocal(s);
+	}
 }

@@ -63,6 +63,10 @@ public class UtilProxyCommon implements IThreadListener {
 		return DimensionManager.getWorld(dim);
 	}
 
+	public EntityPlayer getLocalPlayer() {
+		return null;
+	}
+
 	public EntityPlayer getPlayer(INetHandler handler) {
 		return handler instanceof NetHandlerPlayServer ? ((NetHandlerPlayServer) handler).player : null;
 	}

@@ -35,6 +35,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -42,6 +43,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.notify.component.NotificationComponent;
 import pl.asie.charset.lib.utils.EntityUtils;
 
 import java.lang.reflect.Field;
@@ -58,18 +60,18 @@ public class NotifyProxyClient extends NotifyProxy {
     }
 
     @Override
-    public void addMessage(Object locus, ItemStack item, Collection<NoticeStyle> style, ITextComponent msg) {
+    public void addMessage(Object locus, Collection<NoticeStyle> style, NotificationComponent msg) {
         synchronized (messages) {
-            addMessage0(locus, item, style, msg);
+            addMessage0(locus, style, msg);
         }
     }
 
-    private void addMessage0(Object locus, ItemStack item, Collection<NoticeStyle> style, ITextComponent cmsg) {
+    private void addMessage0(Object locus, Collection<NoticeStyle> style, NotificationComponent cmsg) {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player == null || player.world == null) {
             return;
         }
-        ClientMessage msg = new ClientMessage(player.world, locus, item, style, cmsg);
+        ClientMessage msg = new ClientMessage(player.world, locus, style, cmsg);
         if (msg.style.contains(NoticeStyle.CLEAR)) {
             messages.clear();
             if (msg.msg == null || msg.msg.equals("")) return;
@@ -94,9 +96,10 @@ public class NotifyProxyClient extends NotifyProxy {
             }
         }
         if (msg.msg == null || msg.msgRendered.trim().length() == 0) {
-            if (!(msg.show_item && msg.item != null)) {
+            /* if (!(msg.show_item && msg.item != null)) {
                 return;
-            }
+            } */
+            // TODO
         }
         messages.add(msg);
     }
@@ -113,7 +116,10 @@ public class NotifyProxyClient extends NotifyProxy {
                 continue;
             }
             if (!update.style.contains(NoticeStyle.UPDATE_SAME_ITEM)) {
+                /*
                 msg.item = update.item;
+                */
+                // TODO
             }
             msg.msg = update.msg;
             return;
@@ -292,7 +298,7 @@ public class NotifyProxyClient extends NotifyProxy {
             }
         }
         {
-            if (m.show_item) {
+            /* if (m.show_item) {
                 // TODO: Add transparency support
                 GlStateManager.translate(0, -centeringOffset, 0);
 
@@ -300,16 +306,17 @@ public class NotifyProxyClient extends NotifyProxy {
                 renderItem.zLevel -= 100; // Undoes the effects of setupGuiTransform
                 renderItem.renderItemIntoGUI(m.item, 0, 0);
                 renderItem.zLevel += 100;
-            }
+            } */
+            // TODO
         }
 
         GlStateManager.popMatrix();
     }
 
     @Override
-    public void onscreen(Collection<NoticeStyle> style, ITextComponent msg) {
+    public void onscreen(Collection<NoticeStyle> style, NotificationComponent msg) {
         Minecraft mc = Minecraft.getMinecraft();
-        mc.ingameGUI.setOverlayMessage(msg, false);
+        mc.ingameGUI.setOverlayMessage(new TextComponentString(msg.toString()), false);
         // TODO: Implement some NoticeStyles (such as LONG)
     }
 }

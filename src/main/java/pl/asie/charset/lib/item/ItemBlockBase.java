@@ -81,6 +81,12 @@ public class ItemBlockBase extends ItemBlock {
 	}
 
 	@Override
+	public String getUnlocalizedNameInefficiently(ItemStack stack) {
+		// We don't need to be inefficient!
+		return this.getUnlocalizedName(stack);
+	}
+
+	@Override
 	@SideOnly(Side.CLIENT)
 	@Nullable
 	public FontRenderer getFontRenderer(ItemStack stack) {

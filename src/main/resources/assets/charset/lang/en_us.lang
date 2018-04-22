@@ -34,12 +34,12 @@ tile.charset.audioCable.freestanding.name=Hovering Audio Cable
 # crafting.cauldron
 
 fluid.charset.dyed_water.name=Dyed Water
-fluid.charset.dyed_water.pure.name=Pure Dyed Water
+tip.charset.dyed_water.element.1=%2$s part %1$s
+tip.charset.dyed_water.element=%2$s parts %1$s
+tip.charset.dyed_water.pure=Pure %s
 
 notice.charset.cauldron.dye_impure=Must use pure dyed water!
 notice.charset.cauldron.no_dye=Cannot mix more dye!
-notice.charset.cauldron.empty=Empty
-notice.charset.cauldron.fluid=%1$s mB of %2$s
 
 # crafting.compression
 
@@ -76,6 +76,11 @@ charset.color.orange=Orange
 charset.color.white=White
 
 charset.point.toofar=You can't point that far!
+
+charset.text.nothing=Nothing
+
+notice.charset.fluid=%1$s mB of %2$s
+notice.charset.fluid.empty=Empty
 
 config.charset.lib.expert.name=Expert Settings
 config.charset.lib.functionalityregistry.name=Functionality Registry
@@ -133,6 +138,7 @@ item.charset.gear.1.name=Wooden Gear
 item.charset.gear.2.name=Stone Gear
 item.charset.gear.3.name=Iron Gear
 item.charset.gear.5.name=Gold Gear
+tip.charset.gear.ratio=Ratio: %s
 
 tile.charset.axle.name=Axle
 tile.charset.axle.format=%s Axle

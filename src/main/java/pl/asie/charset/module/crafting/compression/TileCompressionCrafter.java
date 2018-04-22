@@ -37,6 +37,7 @@ import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.misc.IItemInsertionEmitter;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
@@ -133,7 +134,7 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 		if (shape == null) {
 			shape = CompressionShape.build(world, pos);
 			if (shape == null && warn) {
-				new Notice(this, new TextComponentTranslation("notice.charset.compression.invalid_shape")).sendToAll();
+				new Notice(this, NotificationComponentString.translated("notice.charset.compression.invalid_shape")).sendToAll();
 			}
 		}
 	}

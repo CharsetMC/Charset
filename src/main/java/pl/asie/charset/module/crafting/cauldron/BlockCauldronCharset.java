@@ -31,18 +31,18 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponentFluidStack;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
+import pl.asie.charset.lib.notify.component.NotificationComponentTextComponent;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.module.crafting.cauldron.api.CauldronContents;
-import pl.asie.charset.module.crafting.cauldron.api.ICauldronRecipe;
 import pl.asie.charset.module.crafting.cauldron.api.ICauldron;
 
 import javax.annotation.Nullable;
@@ -115,7 +115,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 							if (contentsNew.isPresent()) {
 								CauldronContents cc = contentsNew.get();
 								if (cc.hasResponse()) {
-									new Notice(tile, cc.getResponse()).sendToAll();
+									new Notice(tile, new NotificationComponentTextComponent(cc.getResponse())).sendToAll();
 								} else {
 									if (cc.getHeldItem().isEmpty()) {
 										heldItem.shrink(1);
@@ -145,14 +145,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 		if (!worldIn.isRemote) {
 			if (tankEntity instanceof TileCauldronCharset) {
 				FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
-				if (stack == null) {
-					new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.empty")).sendTo(playerIn);
-				} else {
-					new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.fluid",
-							new TextComponentString(Integer.toString(stack.amount)),
-							new TextComponentTranslation(FluidUtils.getCorrectUnlocalizedName(stack))
-					)).sendTo(playerIn);
-				}
+				new Notice(tankEntity, new NotificationComponentFluidStack(stack, true)).sendTo(playerIn);
 			}
 		}
 	}
@@ -193,7 +186,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 						boolean success = false;
 						CauldronContents cc = contentsNew.get();
 						if (cc.hasResponse()) {
-							new Notice(tankEntity, cc.getResponse()).sendTo(playerIn);
+							new Notice(tankEntity, new NotificationComponentTextComponent(cc.getResponse())).sendTo(playerIn);
 						} else {
 							if (cc.getHeldItem().isEmpty()) {
 								if (!playerIn.isCreative()) {

@@ -37,8 +37,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -52,6 +50,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponentFluidStack;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
 
@@ -206,15 +206,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         if (!worldIn.isRemote) {
             if (tankEntity instanceof TileTank) {
                 FluidStack stack = ((TileTank) tankEntity).getContents();
-                if (stack == null) {
-                    new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.empty"))
-                            .sendTo(playerIn);
-                } else {
-                    new Notice(tankEntity, new TextComponentTranslation("notice.charset.cauldron.fluid",
-                            new TextComponentString(Integer.toString(stack.amount)),
-                            new TextComponentTranslation(FluidUtils.getCorrectUnlocalizedName(stack))
-                    )).sendTo(playerIn);
-                }
+	            new Notice(tankEntity, new NotificationComponentFluidStack(stack, true)).sendTo(playerIn);
             }
         }
     }

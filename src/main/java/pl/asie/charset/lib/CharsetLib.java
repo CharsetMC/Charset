@@ -59,6 +59,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.material.ItemMaterialHeuristics;
+import pl.asie.charset.lib.handlers.FluidExtraInformationHandler;
 import pl.asie.charset.lib.misc.Todokete;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.notify.NotifyImplementation;
@@ -181,6 +182,7 @@ public class CharsetLib {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(new FluidExtraInformationHandler());
 		MinecraftForge.EVENT_BUS.register(new SplashTextHandler());
 
 		ClientCommandHandler.instance.registerCommand(CommandCharset.CLIENT);

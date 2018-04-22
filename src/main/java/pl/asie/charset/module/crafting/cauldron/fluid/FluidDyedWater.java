@@ -19,21 +19,32 @@
 
 package pl.asie.charset.module.crafting.cauldron.fluid;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import pl.asie.charset.api.lib.IFluidExtraInformation;
+import pl.asie.charset.lib.misc.FluidBase;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.module.crafting.cauldron.CharsetCraftingCauldron;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
-public class FluidDyedWater extends Fluid {
+public class FluidDyedWater extends FluidBase implements IFluidExtraInformation {
 	public static final ResourceLocation TEXTURE_STILL = new ResourceLocation("charset:blocks/dyed_water_still");
 	public static final ResourceLocation TEXTURE_FLOWING = new ResourceLocation("charset:blocks/dyed_water_flow");
 
@@ -42,16 +53,8 @@ public class FluidDyedWater extends Fluid {
 	}
 
 	@Override
-	public String getUnlocalizedName(FluidStack stack) {
-		NBTTagCompound tag = stack.tag;
-		if (tag != null && tag.hasKey("dyes", Constants.NBT.TAG_LIST)) {
-			NBTTagList dyes = ((NBTTagList) stack.tag.getTag("dyes"));
-			if (dyes.tagCount() == 1) {
-				return "fluid.charset.dyed_water.pure";
-			}
-		}
-
-		return "fluid.charset.dyed_water";
+	public String getUnlocalizedName() {
+		return "fluid.charset.dyed_water.name";
 	}
 
 	@Nullable
@@ -73,6 +76,10 @@ public class FluidDyedWater extends Fluid {
 		NBTTagList dyes = newStack.tag.hasKey("dyes", Constants.NBT.TAG_LIST) ? ((NBTTagList) newStack.tag.getTag("dyes")) : new NBTTagList();
 		if (dyes.tagCount() >= 8) {
 			return null;
+		}
+
+		if (dyes.tagCount() == 1 && ((NBTPrimitive) dyes.get(0)).getByte() == color.getMetadata()) {
+			return stack;
 		}
 
 		dyes.appendTag(new NBTTagByte((byte) color.getMetadata()));
@@ -125,11 +132,48 @@ public class FluidDyedWater extends Fluid {
 		if (tag == null || !tag.hasKey("dyes", Constants.NBT.TAG_LIST)) {
 			return -1;
 		} else {
-			NBTTagList dyes = tag.getTagList("dyes", Constants.NBT.TAG_ANY_NUMERIC);
+			NBTTagList dyes = tag.getTagList("dyes", Constants.NBT.TAG_BYTE);
 			int c = dyes.tagCount();
 			int alpha = CharsetCraftingCauldron.waterAlpha;
 			alpha = alpha + ((255 - alpha) * c / 8);
 			return (getDyeColor(stack) & 0xFFFFFF) | (alpha << 24);
+		}
+	}
+
+	private String toString(int c) {
+		EnumDyeColor color = EnumDyeColor.byMetadata(c);
+		return I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", color));
+	}
+
+	@Override
+	public void addInformation(FluidStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		int[] dyeCount = new int[EnumDyeColor.values().length];
+
+		NBTTagCompound tag = stack.tag;
+		if (tag != null && tag.hasKey("dyes", Constants.NBT.TAG_LIST)) {
+			NBTTagList dyes = tag.getTagList("dyes", Constants.NBT.TAG_BYTE);
+			int c = dyes.tagCount();
+			if (c == 1) {
+				tooltip.add(TextFormatting.GRAY + I18n.translateToLocalFormatted("tip.charset.dyed_water.pure", toString(((NBTPrimitive) dyes.get(0)).getByte())));
+				return;
+			}
+
+			for (int i = 0; i < c; i++) {
+				int v = ((NBTPrimitive) dyes.get(i)).getByte();
+				dyeCount[v]++;
+			}
+
+			for (int i = 0; i < dyeCount.length; i++) {
+				int v = dyeCount[i];
+				if (v > 0) {
+					String key = "tip.charset.dyed_water.element." + v;
+					if (!I18n.canTranslate(key)) {
+						key = "tip.charset.dyed_water.element";
+					}
+
+					tooltip.add(TextFormatting.GRAY + I18n.translateToLocalFormatted(key, toString(i), v));
+				}
+			}
 		}
 	}
 }

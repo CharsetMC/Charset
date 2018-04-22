@@ -31,9 +31,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentString;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
 
 import java.util.EnumSet;
 
+// TODO: Restore --show-item
 public class CommandMutter extends CommandBase {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
@@ -60,7 +62,7 @@ public class CommandMutter extends CommandBase {
         }
         String msg = Joiner.on(" ").skipNulls().join(args);
         msg = msg.replace("\\n", "\n");
-        new Notice(sender, new TextComponentString(msg)).withStyle(theStyle).withItem(sendItem).sendToAll();
+        new Notice(sender, NotificationComponentString.raw(msg)).withStyle(theStyle)/* .withItem(sendItem)*/.sendToAll();
     }
     
     @Override

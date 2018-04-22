@@ -39,6 +39,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.loader.CharsetModule;
+import pl.asie.charset.lib.notify.component.NotificationComponent;
 import pl.asie.charset.lib.utils.EntityUtils;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class NotifyImplementation {
         event.registerServerCommand(new CommandMutter());
     }
     
-    void doSend(EntityPlayer player, Object where, World world, EnumSet<NoticeStyle> style, ItemStack item, ITextComponent message) {
+    void doSend(EntityPlayer player, Object where, World world, EnumSet<NoticeStyle> style, NotificationComponent message) {
         if (where == null) {
             return;
         }
@@ -70,7 +71,7 @@ public class NotifyImplementation {
             player = null;
         }
         if ((player != null && player.world.isRemote) || (world != null && world.isRemote)) {
-            proxy.addMessage(where, item, style, message);
+            proxy.addMessage(where, style, message);
         } else {
             TargetPoint target = null;
             if (player == null) {
@@ -113,18 +114,18 @@ public class NotifyImplementation {
                 }
             }
             if (player != null) {
-                CharsetLib.packet.sendTo(PacketNotification.createNotify(where, item, style, message), player);
+                CharsetLib.packet.sendTo(PacketNotification.createNotify(where, style, message), player);
             } else {
-                CharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, item, style, message), target);
+                CharsetLib.packet.sendToAllAround(PacketNotification.createNotify(where, style, message), target);
             }
         }
     }
     
-    public static void recieve(EntityPlayer player, Object where, ItemStack item, Collection<NoticeStyle> style, ITextComponent msg) {
+    public static void recieve(EntityPlayer player, Object where, Collection<NoticeStyle> style, NotificationComponent msg) {
         if (where == null) {
             return;
         }
-        proxy.addMessage(where, item, style, msg);
+        proxy.addMessage(where, style, msg);
     }
     
     private static final ArrayList<Notice> recuring_notifications = new ArrayList<Notice>();
@@ -156,7 +157,7 @@ public class NotifyImplementation {
         }
     }
     
-    void doSendOnscreenMessage(EntityPlayer player, Collection<NoticeStyle> styles, ITextComponent msg) {
+    void doSendOnscreenMessage(EntityPlayer player, Collection<NoticeStyle> styles, NotificationComponent msg) {
         if (player.world.isRemote) {
             proxy.onscreen(styles, msg);
         } else {

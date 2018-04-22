@@ -58,6 +58,8 @@ import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.misc.DoubleClickHandler;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponentItemStack;
+import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.*;
 import pl.asie.charset.lib.utils.Orientation;
@@ -796,13 +798,17 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
         ItemStack held = player.getHeldItem(hand);
         if (!world.isRemote && isNested(held) && (item.isEmpty() || itemMatch(held))) {
-            new Notice(notice_target, new TextComponentTranslation("notice.charset.barrel.no")).sendTo(player);
+            new Notice(notice_target, NotificationComponentString.translated("notice.charset.barrel.no")).sendTo(player);
             return true;
         }
 
         if (doubleClickHandler.isDoubleClick(player) && !item.isEmpty()) {
-            addAllItems(player, hand);
-            return true;
+            if (addAllItems(player, hand)) {
+                return true;
+            } else {
+                info(player);
+                return true;
+            }
         }
         doubleClickHandler.markLastClick(player);
 
@@ -853,15 +859,15 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         return true;
     }
 
-    void addAllItems(EntityPlayer entityplayer, EnumHand hand) {
+    boolean addAllItems(EntityPlayer entityplayer, EnumHand hand) {
         switch (insertFromItemHandler(entityplayer, true)) {
             case PASS:
                 break;
             case SUCCESS:
-                return;
+                return true;
             case FAIL:
                 info(entityplayer);
-                return;
+                return false;
         }
 
         ItemStack held = entityplayer.getHeldItem(hand);
@@ -888,6 +894,9 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             item.grow(total_delta);
             onItemChange(false);
             entityplayer.inventory.markDirty();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -958,7 +967,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     void info(final EntityPlayer entityplayer) {
         new Notice(notice_target, msg -> {
             if (item.isEmpty()) {
-                msg.setMessage(new TextComponentTranslation("notice.charset.barrel.empty"));
+                msg.setMessage(NotificationComponentString.translated("notice.charset.barrel.empty"));
             } else {
                 String countMsg;
                 if (upgrades.contains(BarrelUpgrade.INFINITE)) {
@@ -971,7 +980,13 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                         countMsg = "" + count;
                     }
                 }
-                msg.withItem(item).setMessage(new TextComponentTranslation("%1$s %2$s", new TextComponentTranslation(countMsg), new TextComponentString("{ITEM_NAME}{ITEM_INFOS_NL}")));
+                msg.setMessage(
+                        NotificationComponentString.translated(
+                                "%1$s %2$s",
+                                NotificationComponentString.translated(countMsg),
+                                new NotificationComponentItemStack(item, true, true)
+                        )
+                );
             }
         }).sendTo(entityplayer);
     }

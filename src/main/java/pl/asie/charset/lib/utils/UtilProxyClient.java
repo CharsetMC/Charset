@@ -115,7 +115,12 @@ public class UtilProxyClient extends UtilProxyCommon {
 	@Override
 	public EntityPlayer getPlayer(INetHandler handler) {
 		return (handler instanceof INetHandlerPlayClient || handler instanceof INetHandlerLoginClient)
-				? Minecraft.getMinecraft().player : super.getPlayer(handler);
+				? getLocalPlayer() : super.getPlayer(handler);
+	}
+
+	@Override
+	public EntityPlayer getLocalPlayer() {
+		return Minecraft.getMinecraft().player;
 	}
 
 	@Override
