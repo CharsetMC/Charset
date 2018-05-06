@@ -262,4 +262,9 @@ public class UtilProxyClient extends UtilProxyCommon {
 			}
 		}
 	}
+
+	@Override
+	public World getLocalWorld() {
+		return Minecraft.getMinecraft().world;
+	}
 }

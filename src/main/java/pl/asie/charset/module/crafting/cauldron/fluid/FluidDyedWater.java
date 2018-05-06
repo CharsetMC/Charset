@@ -36,6 +36,8 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.lib.IFluidExtraInformation;
 import pl.asie.charset.lib.misc.FluidBase;
 import pl.asie.charset.lib.utils.ColorUtils;
@@ -146,6 +148,7 @@ public class FluidDyedWater extends FluidBase implements IFluidExtraInformation 
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void addInformation(FluidStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		int[] dyeCount = new int[EnumDyeColor.values().length];
 

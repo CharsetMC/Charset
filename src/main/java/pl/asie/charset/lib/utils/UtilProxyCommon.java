@@ -153,4 +153,8 @@ public class UtilProxyCommon implements IThreadListener {
 	public World getServerWorldOrDefault(World def) {
 		return def;
 	}
+
+	public World getLocalWorld() {
+		return null;
+	}
 }

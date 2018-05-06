@@ -30,6 +30,8 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.lib.IFluidExtraInformation;
 import pl.asie.charset.lib.utils.ThreeState;
 import pl.asie.charset.lib.utils.UtilProxyCommon;
@@ -38,6 +40,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class FluidExtraInformationHandler {
+    @SideOnly(Side.CLIENT)
     public static void addInformation(FluidStack stack, List<String> tooltip, ITooltipFlag flag) {
         if (stack != null) {
             World world = Minecraft.getMinecraft().world;
@@ -60,11 +63,13 @@ public class FluidExtraInformationHandler {
         ItemStack stack = event.getItemStack();
         if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
             IFluidHandlerItem handler = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null);
-            IFluidTankProperties[] properties = handler.getTankProperties();
-            if (properties.length == 1 && properties[0] != null) {
-                FluidStack contents = properties[0].getContents();
-                if (contents != null) {
-                    UtilProxyCommon.proxy.addInformation(contents, UtilProxyCommon.proxy.getLocalPlayer().world, event.getToolTip(), ThreeState.MAYBE);
+            if (handler != null) {
+                IFluidTankProperties[] properties = handler.getTankProperties();
+                if (properties != null && properties.length == 1 && properties[0] != null) {
+                    FluidStack contents = properties[0].getContents();
+                    if (contents != null) {
+                        UtilProxyCommon.proxy.addInformation(contents, UtilProxyCommon.proxy.getLocalWorld(), event.getToolTip(), ThreeState.MAYBE);
+                    }
                 }
             }
         }

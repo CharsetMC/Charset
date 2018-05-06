@@ -79,7 +79,7 @@ public class NotificationComponentFluidStack extends NotificationComponent {
 				builder.append('\n');
 				ArrayList<String> bits = new ArrayList<>();
 
-				UtilProxyCommon.proxy.addInformation(stack, UtilProxyCommon.proxy.getLocalPlayer().world, bits, ThreeState.NO);
+				UtilProxyCommon.proxy.addInformation(stack, UtilProxyCommon.proxy.getLocalWorld(), bits, ThreeState.NO);
 
 				boolean tail = false;
 				for (String s : bits) {
