@@ -28,6 +28,8 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fluids.FluidStack;
 import pl.asie.charset.lib.handlers.FluidExtraInformationHandler;
 import pl.asie.charset.lib.utils.FluidUtils;
+import pl.asie.charset.lib.utils.ThreeState;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -77,15 +79,7 @@ public class NotificationComponentFluidStack extends NotificationComponent {
 				builder.append('\n');
 				ArrayList<String> bits = new ArrayList<>();
 
-				boolean oldAIT = Minecraft.getMinecraft().gameSettings.advancedItemTooltips;
-				Minecraft.getMinecraft().gameSettings.advancedItemTooltips = false;
-				try {
-					FluidExtraInformationHandler.addInformation(stack, bits);
-				} catch (Throwable t) {
-					t.printStackTrace();
-					bits.add("" + TextFormatting.RED + TextFormatting.BOLD + "ERROR");
-				}
-				Minecraft.getMinecraft().gameSettings.advancedItemTooltips = oldAIT;
+				UtilProxyCommon.proxy.addInformation(stack, UtilProxyCommon.proxy.getLocalPlayer().world, bits, ThreeState.NO);
 
 				boolean tail = false;
 				for (String s : bits) {

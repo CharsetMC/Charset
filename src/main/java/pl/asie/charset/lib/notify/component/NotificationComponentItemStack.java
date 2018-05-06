@@ -27,6 +27,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.ThreeState;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,12 +72,7 @@ public class NotificationComponentItemStack extends NotificationComponent {
 
 			if (showInfo) {
 				ArrayList<String> bits = new ArrayList<>();
-				try {
-					stack.getItem().addInformation(stack, Minecraft.getMinecraft().world, bits, ITooltipFlag.TooltipFlags.NORMAL);
-				} catch (Throwable t) {
-					t.printStackTrace();
-					bits.add("" + TextFormatting.RED + TextFormatting.BOLD + "ERROR");
-				}
+				UtilProxyCommon.proxy.addInformation(stack, UtilProxyCommon.proxy.getLocalPlayer().world, bits, ThreeState.NO);
 				boolean tail = false;
 				for (String s : bits) {
 					if (tail) {

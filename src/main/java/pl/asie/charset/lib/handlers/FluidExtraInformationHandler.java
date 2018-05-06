@@ -31,15 +31,16 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pl.asie.charset.api.lib.IFluidExtraInformation;
+import pl.asie.charset.lib.utils.ThreeState;
+import pl.asie.charset.lib.utils.UtilProxyCommon;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class FluidExtraInformationHandler {
-    public static void addInformation(FluidStack stack, List<String> tooltip) {
+    public static void addInformation(FluidStack stack, List<String> tooltip, ITooltipFlag flag) {
         if (stack != null) {
             World world = Minecraft.getMinecraft().world;
-            ITooltipFlag flag = Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
 
             if (stack.getFluid() instanceof IFluidExtraInformation) {
                 ((IFluidExtraInformation) stack.getFluid()).addInformation(stack, world, tooltip, flag);
@@ -63,7 +64,7 @@ public class FluidExtraInformationHandler {
             if (properties.length == 1 && properties[0] != null) {
                 FluidStack contents = properties[0].getContents();
                 if (contents != null) {
-                    addInformation(contents, event.getToolTip());
+                    UtilProxyCommon.proxy.addInformation(contents, UtilProxyCommon.proxy.getLocalPlayer().world, event.getToolTip(), ThreeState.MAYBE);
                 }
             }
         }

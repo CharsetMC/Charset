@@ -52,6 +52,7 @@ import pl.asie.charset.lib.render.ParticleBlockDustCharset;
 import pl.asie.charset.lib.render.model.IStateParticleBakedModel;
 
 import java.lang.invoke.MethodHandle;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -111,6 +112,10 @@ public class UtilProxyCommon implements IThreadListener {
 	@Override
 	public ListenableFuture<Object> addScheduledTask(Runnable runnable) {
 		return FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
+	}
+
+	public void addInformation(Object o, World world, List<String> list, ThreeState isAdvanced) {
+
 	}
 
 	public boolean isClient() {

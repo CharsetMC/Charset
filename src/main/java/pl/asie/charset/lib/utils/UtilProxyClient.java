@@ -30,27 +30,34 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.login.INetHandlerLoginClient;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.lib.IFluidExtraInformation;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.block.PacketCustomBlockDust;
+import pl.asie.charset.lib.handlers.FluidExtraInformationHandler;
 import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.render.ParticleBlockDustCharset;
 import pl.asie.charset.lib.render.ParticleDiggingCharset;
@@ -78,6 +85,34 @@ public class UtilProxyClient extends UtilProxyCommon {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	@Override
+	public void addInformation(Object o, World world, List<String> list, ThreeState isAdvanced) {
+		ITooltipFlag flag;
+		switch (isAdvanced) {
+			case NO:
+			default:
+				flag = ITooltipFlag.TooltipFlags.NORMAL;
+				break;
+			case YES:
+				flag = ITooltipFlag.TooltipFlags.ADVANCED;
+				break;
+			case MAYBE:
+				flag = Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+				break;
+		}
+
+		try {
+			if (o instanceof ItemStack) {
+				((ItemStack) o).getItem().addInformation((ItemStack) o, world, list, flag);
+			} else if (o instanceof FluidStack) {
+				FluidExtraInformationHandler.addInformation((FluidStack) o, list, flag);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+			list.add("" + TextFormatting.RED + TextFormatting.BOLD + "ERROR");
 		}
 	}
 
