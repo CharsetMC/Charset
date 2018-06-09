@@ -20,6 +20,7 @@
 package pl.asie.charset.module.audio.storage;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -37,6 +38,7 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.tape.IDataStorage;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitItemHolder;
@@ -349,6 +351,18 @@ public class TileRecordPlayer extends TileBase implements ITickable, IMechanical
 	public void addDebugInformation(List<String> stringList, Side side) {
 		if (player.getState() == TraitRecordPlayer.State.PLAYING && side == Side.SERVER) {
 			stringList.add("Playing at " + getSampleRate() + " Hz");
+		}
+	}
+
+	public void reactToFall(Entity entityIn, float fallDistance) {
+		if (entityIn instanceof EntityPlayer && (((EntityPlayer) entityIn).isCreative() || ((EntityPlayer) entityIn).isSpectator())) {
+			return;
+		}
+
+		IDataStorage storage = getStorage();
+		if (storage != null) {
+			float amount = Math.min(fallDistance / 4000f, 0.05f);
+			storage.seek((int) ((world.rand.nextFloat() * 2F - 1F) * amount * storage.getSize()));
 		}
 	}
 }

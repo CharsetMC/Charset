@@ -24,6 +24,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -87,6 +88,18 @@ public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider 
 		}
 
 		return false;
+	}
+
+	@Override
+	public void onFallenUpon(World world, BlockPos pos, Entity entityIn, float fallDistance) {
+		if (world != null && !world.isRemote) {
+			TileEntity tile = world.getTileEntity(pos);
+			if (tile instanceof TileRecordPlayer) {
+				((TileRecordPlayer) tile).reactToFall(entityIn, fallDistance);
+			}
+		}
+
+		super.onFallenUpon(world, pos, entityIn, fallDistance);
 	}
 
 	@Nullable

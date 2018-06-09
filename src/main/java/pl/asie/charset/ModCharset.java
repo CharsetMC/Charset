@@ -74,7 +74,7 @@ public class ModCharset {
 	@Mod.Instance(value = ModCharset.MODID)
 	public static ModCharset instance;
 
-	private static Item charsetIconItem;
+    private static Item charsetIconItem;
 	private static ItemStack charsetIconStack;
 	public static ModuleProfile profile;
 
