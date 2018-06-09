@@ -19,17 +19,13 @@
 
 package pl.asie.simplelogic.gates;
 
-import mcmultipart.api.container.IMultipartContainer;
-import mcmultipart.api.multipart.MultipartHelper;
-import mcmultipart.api.multipart.MultipartRedstoneHelper;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
-import java.util.Optional;
+import java.util.OptionalInt;
 
-public class ProxyMultipart {
-	public int getWeakPower(IBlockAccess w, BlockPos p, EnumFacing real) {
-		return -1;
-	}
+public interface IRedstoneGetter {
+    // -1 = don't use, 0-15 = value
+    int get(IBlockAccess world, BlockPos pos, EnumFacing face, EnumFacing edge);
 }

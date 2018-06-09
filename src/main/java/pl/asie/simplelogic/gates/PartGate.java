@@ -21,9 +21,6 @@ package pl.asie.simplelogic.gates;
 
 import java.util.*;
 
-import mcmultipart.api.container.IMultipartContainer;
-import mcmultipart.api.multipart.MultipartHelper;
-import mcmultipart.api.multipart.MultipartRedstoneHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
@@ -277,7 +274,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 					EnumFacing real = gateToReal(facing);
 					World w = getWorld();
 					BlockPos p = getPos().offset(real);
-					int mpValue = SimpleLogicGates.proxyMultipart.getWeakPower(w, p, real);
+					int mpValue = RedstoneGetterHandler.getWeakPower(w, p, real, getSide());
 					if (mpValue >= 0) {
 						values[i] = (byte) mpValue;
 					} else {

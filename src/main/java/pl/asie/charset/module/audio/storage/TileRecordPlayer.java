@@ -31,9 +31,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
+import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
@@ -42,8 +44,9 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.ui.GuiHandlerCharset;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
-public class TileRecordPlayer extends TileBase implements ITickable, IMechanicalPowerConsumer {
+public class TileRecordPlayer extends TileBase implements ITickable, IMechanicalPowerConsumer, IDebuggable {
 	protected float progressClient;
 	private TraitItemHolder holder;
 	private TraitRecordPlayer player;
@@ -314,6 +317,10 @@ public class TileRecordPlayer extends TileBase implements ITickable, IMechanical
 			return facing != EnumFacing.UP;
 		}
 
+		if (capability == Capabilities.DEBUGGABLE) {
+			return true;
+		}
+
 		return super.hasCapability(capability, facing);
 	}
 
@@ -327,10 +334,21 @@ public class TileRecordPlayer extends TileBase implements ITickable, IMechanical
 			}
 		}
 
+		if (capability == Capabilities.DEBUGGABLE) {
+			return Capabilities.DEBUGGABLE.cast(this);
+		}
+
 		return super.getCapability(capability, facing);
 	}
 
 	public int getSampleRate() {
 		return player.getSampleRate();
+	}
+
+	@Override
+	public void addDebugInformation(List<String> stringList, Side side) {
+		if (player.getState() == TraitRecordPlayer.State.PLAYING && side == Side.SERVER) {
+			stringList.add("Playing at " + getSampleRate() + " Hz");
+		}
 	}
 }

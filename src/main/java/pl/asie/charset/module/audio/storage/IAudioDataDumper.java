@@ -17,25 +17,18 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates;
+package pl.asie.charset.module.audio.storage;
 
-import mcmultipart.api.container.IMultipartContainer;
-import mcmultipart.api.multipart.MultipartHelper;
-import mcmultipart.api.multipart.MultipartRedstoneHelper;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Optional;
+import javax.sound.sampled.AudioFormat;
+import java.io.File;
+import java.net.URL;
 
-public class ProxyMultipartPresent extends ProxyMultipart {
-	@Override
-	public int getWeakPower(IBlockAccess w, BlockPos p, EnumFacing real) {
-		Optional<IMultipartContainer> container = MultipartHelper.getContainer(w, p);
-		if (container.isPresent()) {
-			return MultipartRedstoneHelper.getWeakPower(container.get(), real.getOpposite());
-		} else {
-			return -1;
-		}
-	}
+public interface IAudioDataDumper {
+    Pair<byte[], AudioFormat> getAudioData(long maxSizeMs);
+
+    void initialize(File f);
+
+    boolean initialized();
 }

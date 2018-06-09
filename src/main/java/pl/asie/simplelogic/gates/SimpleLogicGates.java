@@ -39,9 +39,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -84,8 +82,6 @@ public class SimpleLogicGates {
 		}
 	};
 
-	public static ProxyMultipart proxyMultipart = new ProxyMultipart();
-
 	@CharsetModule.Configuration
 	public static Configuration config;
 	@CharsetModule.PacketRegistry
@@ -124,7 +120,7 @@ public class SimpleLogicGates {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		if (Loader.isModLoaded("mcmultipart")) {
-			proxyMultipart = new ProxyMultipartPresent();
+			RedstoneGetterHandler.GETTERS.add(new RedstoneGetterMultipart());
 		}
 
 		blockGate = new BlockGate();

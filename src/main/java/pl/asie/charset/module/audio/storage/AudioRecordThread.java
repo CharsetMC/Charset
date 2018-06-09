@@ -21,6 +21,7 @@ package pl.asie.charset.module.audio.storage;
 
 import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import paulscode.sound.ICodec;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.codecs.CodecIBXM;
@@ -60,27 +61,37 @@ public class AudioRecordThread implements Runnable {
 		return exts;
 	}
 
-	private static ICodec getCodec(String ext) {
+	private static IAudioDataDumper getCodec(String ext) {
 		try {
-			ICodec codec = null;
+			IAudioDataDumper dumper = null;
 
-			if ("ogg".equals(ext)) {
-				codec = new CodecJOrbis();
-			} else if ("wav".equals(ext)) {
-				codec = new CodecWav();
-			} else if ("mod".equals(ext) || "s3m".equals(ext) || "xm".equals(ext)) {
-				codec = new CodecIBXM();
-			} else if ("mp3".equals(ext)) {
-				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
-			} else if ("mp4".equals(ext) || "m4a".equals(ext)) {
-				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
-			} else if ("aac".equals(ext)) {
-				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecADTS").newInstance();
-			} else if ("flac".equals(ext)) {
-				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecFLAC").newInstance();
+			if (0 == 1) {
+				// TODO
+			} else {
+				ICodec codec = null;
+
+				if ("ogg".equals(ext)) {
+					codec = new CodecJOrbis();
+				} else if ("wav".equals(ext)) {
+					codec = new CodecWav();
+				} else if ("mod".equals(ext) || "s3m".equals(ext) || "xm".equals(ext)) {
+					codec = new CodecIBXM();
+				} else if ("mp3".equals(ext)) {
+					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
+				} else if ("mp4".equals(ext) || "m4a".equals(ext)) {
+					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
+				} else if ("aac".equals(ext)) {
+					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecADTS").newInstance();
+				} else if ("flac".equals(ext)) {
+					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecFLAC").newInstance();
+				}
+
+				if (codec != null) {
+					dumper = new AudioDataDumperPaul(codec);
+				}
 			}
 
-			return codec;
+			return dumper;
 		} catch (Exception e) {
 			return null;
 		}
@@ -90,7 +101,7 @@ public class AudioRecordThread implements Runnable {
 	private static final DFPWM CODEC = new DFPWM();
 	private final File file;
 	private final int maxSize;
-	private int sampleRate = ItemQuartzDisc.DEFAULT_SAMPLE_RATE;
+	private int sampleRate;
 	private String statusBar = "Encoding...";
 
 	public AudioRecordThread(File f, int sampleRate, int maxSize) {
@@ -125,46 +136,30 @@ public class AudioRecordThread implements Runnable {
 
 			statusBar = "Loading...";
 
-			ICodec codec = getCodec(ext);
+			IAudioDataDumper codec = getCodec(ext);
 
 			if (codec == null) {
 				showError("Unsupported format!");
 				return;
 			}
 
-			codec.initialize(file.toURI().toURL());
+			codec.initialize(file);
 			if (!codec.initialized()) {
 				showError("Failed to load!");
 				return;
 			}
 
-			byte[] data = null;
+			byte[] data;
 			AudioFormat format;
 
-			if (codec instanceof CodecIBXM) {
-				format = codec.getAudioFormat();
-				long maxLength = (long) maxSize * format.getSampleSizeInBits() / 8 * format.getChannels() * (int) format.getSampleRate() / sampleRate;
-				while (!codec.endOfStream() && (data == null || data.length < maxLength)) {
-					buffer = codec.read();
-					if (buffer == null) {
-						showError("Failed to load!");
-						return;
-					}
-
-					if (data == null) {
-						data = buffer.audioData;
-					} else {
-						byte[] oldData = data;
-						data = new byte[oldData.length + buffer.audioData.length];
-						System.arraycopy(oldData, 0, data, 0, oldData.length);
-						System.arraycopy(buffer.audioData, 0, data, oldData.length, buffer.audioData.length);
-					}
-				}
-			} else {
-				buffer = codec.readAll();
-				data = buffer.audioData;
-				format = buffer.audioFormat;
+			Pair<byte[], AudioFormat> pair = codec.getAudioData((long) maxSize * 8 * 1000 / sampleRate);
+			if (pair == null) {
+				showError("Failed to load!");
+				return;
 			}
+
+			data = pair.getKey();
+			format = pair.getValue();
 
 			statusBar = "Reticulating splines...";
 
