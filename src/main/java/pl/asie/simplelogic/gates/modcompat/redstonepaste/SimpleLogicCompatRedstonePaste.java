@@ -92,8 +92,6 @@ public class SimpleLogicCompatRedstonePaste {
 
             TileEntity tile = world.getTileEntity(pos);
             if (tile != null && TileEntity.getKey(tile.getClass()).getResourcePath().equals("redstonepastete")) {
-                System.out.println(face + " " + edge);
-
                 NBTTagCompound tag = tile.writeToNBT(new NBTTagCompound());
                 if (
                     tag.hasKey("facetype", Constants.NBT.TAG_INT_ARRAY) &&
@@ -110,7 +108,7 @@ public class SimpleLogicCompatRedstonePaste {
                                 return 0;
                             }
 
-                            return facedata[0];
+                            return facedata[idx];
                         } else if (facetype[idx] == 2 || facetype[idx] == 3) {
                             // Call it manually here. For reasons.
                             return world.getBlockState(pos).getWeakPower(
