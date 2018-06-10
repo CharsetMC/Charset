@@ -1,0 +1,15 @@
+itemGroup.simplelogic=SimpleLogic
+
+tile.simplelogic.gate.nand.name=NAND KapÄ±sÄ±
+tile.simplelogic.gate.nand.i.name=AND KapÄ±sÄ±
+tile.simplelogic.gate.nor.name=NOR KapÄ±sÄ±
+tile.simplelogic.gate.nor.i.name=OR KapÄ±sÄ±
+tile.simplelogic.gate.xor.name=XOR KapÄ±sÄ±
+tile.simplelogic.gate.xor.i.name=XNOR KapÄ±sÄ±
+tile.simplelogic.gate.buffer.name=Ters Tampon KapÄ±sÄ±
+tile.simplelogic.gate.buffer.i.name=Tampon KapÄ±sÄ±
+tile.simplelogic.gate.pulse_former.name=Gelgit BiÃ§imlendirici
+tile.simplelogic.gate.multiplexer.name=Ã‡oklayÄ±cÄ±
+tile.simplelogic.gate.rs_latch.name=Set-Reset MandalÄ±
+tile.simplelogic.gate.randomizer.name=RastgeleleÅŸtirici
+tile.simplelogic.gate.synchronizer.name=SenkronizÃ¶r
