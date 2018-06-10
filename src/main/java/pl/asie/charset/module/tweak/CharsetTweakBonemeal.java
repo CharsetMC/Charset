@@ -86,14 +86,8 @@ public class CharsetTweakBonemeal {
 		Block block = state.getBlock();
 		IBlockState stateNew = null;
 
-		ThreeState instantGrowth = CharsetIMC.INSTANCE.allows("instantBonemeal", block.getRegistryName());
-		ThreeState growth = CharsetIMC.INSTANCE.allows("bonemeal", block.getRegistryName());
-		if (instantGrowth == ThreeState.MAYBE) {
-			instantGrowth = ThreeState.from(instantGrowthDefault);
-		}
-		if (growth == ThreeState.MAYBE) {
-			growth = growthWhitelist ? ThreeState.NO : ThreeState.YES;
-		}
+		ThreeState instantGrowth = CharsetIMC.INSTANCE.allows("instantBonemeal", block.getRegistryName()).otherwise(ThreeState.from(instantGrowthDefault));
+		ThreeState growth = CharsetIMC.INSTANCE.allows("bonemeal", block.getRegistryName()).otherwise(growthWhitelist ? ThreeState.NO : ThreeState.YES);
 
 		if (growth == ThreeState.NO) {
 			event.setCanceled(true);

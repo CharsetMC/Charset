@@ -24,13 +24,8 @@ public enum ThreeState {
     MAYBE,
     NO;
 
-    public ThreeState or(ThreeState other) {
-        if (this == YES || other == YES)
-            return YES;
-        else if (this == NO || other == NO)
-            return NO;
-        else
-            return MAYBE;
+    public ThreeState otherwise(ThreeState other) {
+        return this == MAYBE ? other : this;
     }
 
     public boolean hasResult() {
