@@ -22,6 +22,7 @@ package pl.asie.charset.module.tweak;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
@@ -93,7 +94,9 @@ public class CharsetTweakRightClickHarvest {
 						Vec3d hVec = event.getHitVec().subtract(pos.getX(), pos.getY(), pos.getZ());
 
 						world.setBlockToAir(pos);
-						plantable.onItemUse(event.getEntityPlayer(), world, pos.down(), event.getHand(), EnumFacing.UP, (float) hVec.x, (float) hVec.y, (float) hVec.z);
+						if (plantable.onItemUse(event.getEntityPlayer(), world, pos.down(), event.getHand(), EnumFacing.UP, (float) hVec.x, (float) hVec.y, (float) hVec.z) == EnumActionResult.SUCCESS) {
+							plantable.shrink(1);
+						}
 
 						for (ItemStack stack : drops) {
 							if (!stack.isEmpty()) {
