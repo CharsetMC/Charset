@@ -1,27 +1,27 @@
 {
     "textures": {
-        "top": "simplelogic:blocks/nand/top"
+        "top": "simplelogic:blocks/gate_nand"
     },
     "layers": [
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nand/layer_top"
+            "color_mask": "FFFF00"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nand/layer_left"
+            "color_mask": "FF0000"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nand/layer_right"
+            "color_mask": "0000FF"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nand/layer_bottom"
+            "color_mask": "00FF00"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nand/layer_out"
+            "color_mask": "00FFFF"
         }
     ],
     "torches": [

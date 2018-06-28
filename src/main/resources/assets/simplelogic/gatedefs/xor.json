@@ -1,6 +1,6 @@
 {
     "textures": {
-        "top": "simplelogic:blocks/xor/top"
+        "top": "simplelogic:blocks/gate_xor"
     },
     "layers": [
         {

@@ -4,7 +4,7 @@
         "randomizer_off": "simplelogic:block/gate_randomizer_off"
     },
     "textures": {
-        "top": "simplelogic:blocks/randomizer/top"
+        "top": "simplelogic:blocks/gate_randomizer"
     },
     "layers": [
         {

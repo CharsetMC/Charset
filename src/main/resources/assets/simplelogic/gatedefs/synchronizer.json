@@ -4,7 +4,7 @@
         "redstone_blob_off": "simplelogic:block/gate_redstone_blob_off"
     },
     "textures": {
-        "top": "simplelogic:blocks/synchronizer/top"
+        "top": "simplelogic:blocks/gate_synchronizer"
     },
     "layers": [
         {

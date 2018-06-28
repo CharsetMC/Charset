@@ -1,31 +1,31 @@
 {
     "textures": {
-        "top": "simplelogic:blocks/multiplexer/top"
+        "top": "simplelogic:blocks/gate_multiplexer"
     },
     "layers": [
         {
             "type": "color",
-            "texture": "simplelogic:blocks/multiplexer/layer_bottom_in"
+            "color_mask": "7F00FF"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/multiplexer/layer_left_in"
+            "color_mask": "FFFF00"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/multiplexer/layer_right_in"
+            "color_mask": "00FFFF"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/multiplexer/layer_left_out"
+            "color_mask": "FF0000"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/multiplexer/layer_right_out"
+            "color_mask": "0000FF"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/multiplexer/layer_1"
+            "color_mask": "00FF00"
         }
     ],
     "torches": [

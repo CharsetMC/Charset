@@ -1,6 +1,6 @@
 {
     "textures": {
-        "top": "simplelogic:blocks/buffer/top"
+        "top": "simplelogic:blocks/gate_buffer"
     },
     "layers": [
         {

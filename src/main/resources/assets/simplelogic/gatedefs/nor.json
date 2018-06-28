@@ -1,6 +1,6 @@
 {
     "textures": {
-        "top": "simplelogic:blocks/nor/top"
+        "top": "simplelogic:blocks/gate_nor"
     },
     "layers": [
         {

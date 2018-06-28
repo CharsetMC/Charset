@@ -1,6 +1,6 @@
 {
     "textures": {
-        "top": "simplelogic:blocks/rs_latch/top"
+        "top": "simplelogic:blocks/gate_rs_latch"
     },
     "layers": [
         {
