@@ -100,7 +100,15 @@ public class NotificationComponentItemStack extends NotificationComponent {
 		public void serialize(NotificationComponentItemStack component, PacketBuffer buffer) {
 			buffer.writeBoolean(component.showName);
 			buffer.writeBoolean(component.showInfo);
-			buffer.writeItemStack(component.stack);
+
+			if (component.stack.getCount() > 127) {
+				// work around size limitations in writeItemStack
+				ItemStack stack1 = component.stack.copy();
+				stack1.setCount(127);
+				buffer.writeItemStack(stack1);
+			} else {
+				buffer.writeItemStack(component.stack);
+			}
 		}
 
 		@Override

@@ -804,6 +804,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
         if (doubleClickHandler.isDoubleClick(player) && !item.isEmpty()) {
             if (addAllItems(player, hand)) {
+                playSound(player, true);
                 return true;
             } else {
                 info(player);
@@ -822,6 +823,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             case PASS:
                 break;
             case SUCCESS:
+                playSound(player, true);
                 return true;
             case FAIL:
                 info(player);
@@ -845,9 +847,11 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         if (take > 0) {
             ItemStack toInsert = held.copy();
             toInsert.setCount(take);
+            // v calls onItemChange
             ItemStack leftover = insertionView.insertItem(0, toInsert, false);
             take -= leftover.getCount();
             if (take > 0) {
+                playSound(player, true);
                 held.shrink(take);
                 if (hadNoItem) {
                     markBlockForUpdate();
@@ -856,22 +860,23 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                 info(player);
             }
         }
+
         return true;
     }
 
-    boolean addAllItems(EntityPlayer entityplayer, EnumHand hand) {
-        switch (insertFromItemHandler(entityplayer, true)) {
+    boolean addAllItems(EntityPlayer player, EnumHand hand) {
+        switch (insertFromItemHandler(player, true)) {
             case PASS:
                 break;
             case SUCCESS:
                 return true;
             case FAIL:
-                info(entityplayer);
+                info(player);
                 return false;
         }
 
-        ItemStack held = entityplayer.getHeldItem(hand);
-        InventoryPlayer inv = entityplayer.inventory;
+        ItemStack held = player.getHeldItem(hand);
+        InventoryPlayer inv = player.inventory;
         int total_delta = 0;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             int free_space = getMaxItemCount() - (getItemCount() + total_delta);
@@ -893,7 +898,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         if (total_delta > 0) {
             item.grow(total_delta);
             onItemChange(false);
-            entityplayer.inventory.markDirty();
+            player.inventory.markDirty();
             return true;
         } else {
             return false;
@@ -926,25 +931,41 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
             removeCount--;
         }
 
-        BlockPos dropPos = getPos();
-        RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), player, Block.FULL_BLOCK_AABB, true);
-        if (result != null && result.sideHit != null) {
-            dropPos = dropPos.offset(result.sideHit);
-        } else {
-            dropPos = dropPos.offset(orientation.facing);
-        }
+        if (removeCount > 0) {
+            BlockPos dropPos = getPos();
+            RayTraceResult result = RayTraceUtils.getCollision(getWorld(), getPos(), player, Block.FULL_BLOCK_AABB, true);
+            if (result != null && result.sideHit != null) {
+                dropPos = dropPos.offset(result.sideHit);
+            } else {
+                dropPos = dropPos.offset(orientation.facing);
+            }
 
-        if (upgrades.contains(BarrelUpgrade.INFINITE)) {
-            if (player.isSneaking() && player.capabilities.isCreativeMode) {
-                item = ItemStack.EMPTY;
-                onItemChange(true);
+            if (upgrades.contains(BarrelUpgrade.INFINITE)) {
+                if (player.isSneaking() && player.capabilities.isCreativeMode) {
+                    item = ItemStack.EMPTY;
+                    onItemChange(true);
+                } else {
+                    giveOrSpawnItem(player, dropPos, removeCount);
+                }
             } else {
                 giveOrSpawnItem(player, dropPos, removeCount);
+                item.shrink(removeCount);
+                onItemChange(false);
             }
-        } else {
-            giveOrSpawnItem(player, dropPos, removeCount);
-            item.shrink(removeCount);
-            onItemChange(false);
+
+            // Left-click plays the sound anyway
+        }
+    }
+
+    protected void playSound(EntityPlayer player, boolean isPlace) {
+        if (!world.isRemote) {
+            SoundUtils.playSoundRemote(
+                    player, new Vec3d(pos).addVector(0.5, 0.5, 0.5), getMaxRenderDistanceSquared(),
+                    isPlace ? getSoundType().getHitSound() : getSoundType().getBreakSound(),
+                    SoundCategory.BLOCKS,
+                    (getSoundType().getVolume() + 1F) / 2F,
+                    getSoundType().getPitch() * 0.8f
+            );
         }
     }
 
