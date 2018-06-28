@@ -48,6 +48,8 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.crafting.cauldron.api.CauldronContents;
 import pl.asie.charset.module.crafting.cauldron.api.ICauldronRecipe;
 import pl.asie.charset.module.crafting.cauldron.fluid.FluidDyedWater;
+import pl.asie.charset.module.crafting.cauldron.fluid.FluidPotion;
+import pl.asie.charset.module.crafting.cauldron.fluid.PotionFluidContainerItem;
 import pl.asie.charset.module.crafting.cauldron.recipe.*;
 import pl.asie.charset.module.crafting.cauldron.api.ICauldron;
 
@@ -66,6 +68,8 @@ public class CharsetCraftingCauldron {
 	public static int waterAlpha = 180;
 	public static BlockCauldronCharset blockCauldron;
 	public static FluidDyedWater dyedWater;
+	public static FluidPotion liquidPotion;
+	public static boolean enableLiquidPotions;
 	private static List<ICauldronRecipe> recipeList = new ArrayList<>();
 
 	@CharsetModule.Configuration
@@ -92,7 +96,8 @@ public class CharsetCraftingCauldron {
 
 	@Mod.EventHandler
 	public void onLoadConfig(CharsetLoadConfigEvent event) {
-		waterBottleSize = ConfigUtils.getInt(config, "balance", "waterBottleSize", 0, 0, 1000, "Set the amount of water contained in one water bottle for Cauldron usage. The default, 0, will approximate between 333 and 334 mB to mimic vanilla. A recommended value is 250.", true);
+		waterBottleSize = ConfigUtils.getInt(config, "balance", "waterBottleSize", 250, 0, 1000, "Set the amount of water contained in one water bottle for Cauldron usage. Setting to 0 will approximate between 333 and 334 mB to mimic vanilla. A recommended value is 250. (Please note that setting this value to 0 will DISABLE liquid potions. You have been warned.)", true);
+		enableLiquidPotions = ConfigUtils.getBoolean(config, "general", "enableLiquidPotions", true, "Enable liquid potions and glass bottles as fluid containers. Requires a non-zero waterBottleSize. Disable if you encounter compatibility issues.", true);
 	}
 
 	@Mod.EventHandler
@@ -100,6 +105,13 @@ public class CharsetCraftingCauldron {
 		blockCauldron = new BlockCauldronCharset();
 		FluidRegistry.registerFluid(dyedWater = new FluidDyedWater("dyed_water"));
 		dyedWater.setUnlocalizedName("charset.dyed_water");
+
+		if (waterBottleSize > 0 && enableLiquidPotions) {
+			FluidRegistry.registerFluid(liquidPotion = new FluidPotion("charset_potion"));
+			liquidPotion.setUnlocalizedName("charset.potion");
+
+			MinecraftForge.EVENT_BUS.register(new PotionFluidContainerItem.Provider());
+		}
 	}
 
 	@Mod.EventHandler

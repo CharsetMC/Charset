@@ -51,10 +51,11 @@ public class ProxyClient extends ProxyCommon {
 		ArrowHighlightHandler.register((world, orientation, stack, trace) -> world.isSideSolid(trace.getBlockPos(), trace.sideHit),
 				(player, trace, stack) -> {
 					PartGate gate = new PartGate();
-					Vec3d hit = trace.hitVec.subtract(new Vec3d(trace.getBlockPos()));
 					gate.onPlacedBy(
 							player, trace.sideHit, stack,
-							(float) hit.x, (float) hit.y, (float) hit.z
+							(float) (trace.hitVec.x - trace.getBlockPos().getX()),
+							(float) (trace.hitVec.y - trace.getBlockPos().getY()),
+							(float) (trace.hitVec.z - trace.getBlockPos().getZ())
 					);
 					return gate.getOrientation();
 				},
