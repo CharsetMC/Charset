@@ -67,9 +67,14 @@ public class GateLogicPulseFormer extends GateLogic {
 	@Override
 	public boolean tick(PartGate parent) {
 		boolean changed = pulse != 0;
-		pulse = 0;
-		changed |= super.tick(parent);
-		return changed;
+		if (changed) {
+			super.tick(parent);
+			pulse = 0;
+			parent.scheduleTick();
+			return true;
+		} else {
+			return super.tick(parent);
+		}
 	}
 
 	@Override
