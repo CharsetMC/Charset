@@ -150,6 +150,54 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 		}
 	}
 
+	private boolean craft(World worldIn, TileEntity tankEntity, EntityPlayer playerIn, EnumHand hand) {
+		ItemStack heldItem = playerIn.getHeldItem(hand);
+
+		if (!heldItem.isEmpty()) {
+			FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
+			ItemStack heldItemOne = heldItem.copy();
+			heldItemOne.setCount(1);
+			Optional<CauldronContents> contentsNew = CharsetCraftingCauldron.craft((ICauldron) tankEntity, new CauldronContents(CauldronContents.Source.HAND, stack, heldItemOne));
+
+			if (contentsNew.isPresent()) {
+				if (!worldIn.isRemote) {
+					boolean success = false;
+					CauldronContents cc = contentsNew.get();
+					if (cc.hasResponse()) {
+						new Notice(tankEntity, new NotificationComponentTextComponent(cc.getResponse())).sendTo(playerIn);
+					} else {
+						if (cc.getHeldItem().isEmpty()) {
+							if (!playerIn.isCreative()) {
+								heldItem.shrink(1);
+							}
+							success = true;
+						} else if (cc.getHeldItem().getCount() == 1 && ItemUtils.canMerge(cc.getHeldItem(), heldItem)) {
+							success = true;
+						} else if (heldItem.getCount() > 1) {
+							if (playerIn.inventory.addItemStackToInventory(cc.getHeldItem())) {
+								heldItem.shrink(1);
+								success = true;
+							}
+						} else if (heldItem.getCount() == 1) {
+							playerIn.setHeldItem(hand, cc.getHeldItem());
+							success = true;
+						}
+
+						if (success) {
+							((TileCauldronCharset) tankEntity).setContents(cc.getFluidStack());
+						}
+					}
+
+					return success;
+				} else {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		TileEntity tankEntity = worldIn.getTileEntity(pos);
@@ -175,42 +223,22 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 				return true;
 			}
 
-			if (!heldItem.isEmpty()) {
-				FluidStack stack = ((TileCauldronCharset) tankEntity).getContents();
-				ItemStack heldItemOne = heldItem.copy();
-				heldItemOne.setCount(1);
-				Optional<CauldronContents> contentsNew = CharsetCraftingCauldron.craft((ICauldron) tankEntity, new CauldronContents(CauldronContents.Source.HAND, stack, heldItemOne));
-
-				if (contentsNew.isPresent()) {
-					if (!worldIn.isRemote) {
-						boolean success = false;
-						CauldronContents cc = contentsNew.get();
-						if (cc.hasResponse()) {
-							new Notice(tankEntity, new NotificationComponentTextComponent(cc.getResponse())).sendTo(playerIn);
-						} else {
-							if (cc.getHeldItem().isEmpty()) {
-								if (!playerIn.isCreative()) {
-									heldItem.shrink(1);
-								}
-								success = true;
-							} else if (cc.getHeldItem().getCount() == 1 && ItemUtils.canMerge(cc.getHeldItem(), heldItem)) {
-								success = true;
-							} else if (heldItem.getCount() > 1) {
-								if (playerIn.inventory.addItemStackToInventory(cc.getHeldItem())) {
-									heldItem.shrink(1);
-									success = true;
-								}
-							} else if (heldItem.getCount() == 1) {
-								playerIn.setHeldItem(hand, cc.getHeldItem());
-								success = true;
-							}
-
-							if (success) {
-								((TileCauldronCharset) tankEntity).setContents(cc.getFluidStack());
-							}
-						}
+			if (playerIn.isSneaking() && !worldIn.isRemote) {
+				int i = heldItem.getCount();
+				boolean success = false;
+				while (craft(worldIn, tankEntity, playerIn, hand)) {
+					success = true;
+					i--;
+					if (i < 0) {
+						break;
 					}
+				}
 
+				if (success) {
+					return true;
+				}
+			} else {
+				if (craft(worldIn, tankEntity, playerIn, hand)) {
 					return true;
 				}
 			}

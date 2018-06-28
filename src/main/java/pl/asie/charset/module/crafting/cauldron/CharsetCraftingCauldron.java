@@ -20,6 +20,7 @@
 package pl.asie.charset.module.crafting.cauldron;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCauldron;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Items;
@@ -29,6 +30,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -36,6 +38,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -168,6 +171,13 @@ public class CharsetCraftingCauldron {
 	@SubscribeEvent
 	public void registerBlocks(RegistryEvent.Register<Block> event) {
 		event.getRegistry().register(blockCauldron.setRegistryName("minecraft:cauldron"));
+	}
+
+	@SubscribeEvent
+	public void patchSneakClick(PlayerInteractEvent.RightClickBlock event) {
+		if (event.getWorld().getBlockState(event.getPos()).getBlock() instanceof BlockCauldronCharset) {
+			event.setUseBlock(Event.Result.ALLOW);
+		}
 	}
 
 	@SubscribeEvent

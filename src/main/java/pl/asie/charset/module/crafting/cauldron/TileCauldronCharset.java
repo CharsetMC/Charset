@@ -72,6 +72,8 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 	}
 
 	public void rebuildFromStack(boolean emitUpdate) {
+		markDirty();
+
 		IBlockState currState = world.getBlockState(pos);
 		IBlockState state = CharsetCraftingCauldron.blockCauldron.getDefaultState()
 				.withProperty(BlockCauldron.LEVEL, isEmptyOrWater() ? getVanillaLevelValue() : 0);
