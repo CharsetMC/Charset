@@ -28,15 +28,14 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -54,6 +53,7 @@ import pl.asie.charset.lib.notify.component.NotificationComponentFluidStack;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.SoundUtils;
 
 public class BlockTank extends BlockBase implements ITileEntityProvider {
     public static final int VARIANTS = 18;
@@ -260,7 +260,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
     @Override
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
-        // People may not place an empty tank between two tanks which differ only in liquid
+        // Must not place an empty tank between two tanks which differ only in liquid
         return !TileTank.checkPlacementConflict(worldIn.getTileEntity(pos.down()), worldIn.getTileEntity(pos.up()), -1);
     }
 

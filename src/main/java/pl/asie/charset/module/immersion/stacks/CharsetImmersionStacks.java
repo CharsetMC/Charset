@@ -26,11 +26,13 @@ import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -49,6 +51,7 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.MethodHandleHelper;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.utils.SoundUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -168,6 +171,15 @@ public class CharsetImmersionStacks {
 						stackOffered.setCount(1);
 
 						if (((TileEntityStacks) tile).offerStack(false, stackOffered, event.getHitVec(), fullStack)) {
+							SoundUtils.playSoundRemote(
+									event.getEntityPlayer(), event.getHitVec(),
+									64.0D,
+									SoundEvents.BLOCK_METAL_PLACE,
+									SoundCategory.BLOCKS,
+									0.5f,
+									1.0f
+							);
+
 							if (!event.getEntityPlayer().isCreative()) {
 								stack.shrink(stackOffered.getCount());
 							}

@@ -136,6 +136,8 @@ public class CharsetCraftingCauldron {
 			recipeList.add(new RecipeTipArrow());
 		}
 
+		recipeList.add(new RecipeWashTippedArrow());
+
 		RegistryUtils.register(TileCauldronCharset.class, "improved_cauldron");
 		FMLInterModComms.sendMessage("charset", "addLock", "minecraft:cauldron");
 	}

@@ -106,7 +106,7 @@ public final class FluidUtils {
                                 fluidExtracted.amount = amount;
                                 fluidExtracted = drain(tank, fluidExtracted, true, false);
                                 if (fluidExtracted != null) {
-                                    handler.fill(fluidExtracted, true);
+                                    handler.fill(fluidExtracted, !isCreative);
                                     changed = true;
                                 }
                             }
