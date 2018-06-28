@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.utils;
 
+import com.google.common.collect.Sets;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -56,9 +57,7 @@ import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 public final class RenderUtils {
@@ -205,34 +204,77 @@ public final class RenderUtils {
 			renderItem = Minecraft.getMinecraft().getRenderItem();
 		}
 
-		return renderItem.getItemModelWithOverrides(stack, null, null);
+		return renderItem.getItemModelWithOverrides(stack, world, entity);
 	}
 
 	public static TextureAtlasSprite getItemSprite(ItemStack stack) {
-		return getItemModel(stack).getParticleTexture();
+		return getItemSprite(stack, null);
 	}
 
 	public static TextureAtlasSprite getItemSprite(ItemStack stack, @Nullable EnumFacing facing) {
+		return getItemSprite(stack, null, null, facing);
+	}
+
+	public static TextureAtlasSprite getItemSprite(ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity, @Nullable EnumFacing facing) {
 		if (facing == null) {
-			return getItemSprite(stack);
+			IBakedModel model = getItemModel(stack, world, entity);
+			TextureAtlasSprite sprite = model.getParticleTexture();
+
+			if ("missingno".equals(sprite.getIconName())) {
+				try {
+					// TODO: I probably should try to find the matching IBlockState, but it's hard.
+					// TODO: Thus, let's get clever-er.
+					Set<TextureAtlasSprite> foundTextures = Sets.newIdentityHashSet();
+					for (EnumFacing f : EnumFacing.VALUES) {
+						for (BakedQuad q : model.getQuads(null, f, 0L)) {
+							foundTextures.add(q.getSprite());
+						}
+					}
+
+					for (BakedQuad q : model.getQuads(null, null, 0L)) {
+						foundTextures.add(q.getSprite());
+					}
+
+					// We already have missingno, so let's just remove it to make sure.
+					foundTextures.remove(sprite);
+
+					if (foundTextures.size() == 1) {
+						return foundTextures.iterator().next();
+					}
+				} catch (Exception e) {
+					// pass
+				}
+			}
+
+			return sprite;
 		} else {
 			try {
+				IBakedModel missingModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
+				IBakedModel model;
+				IBlockState state = null;
 				if (stack.getItem() instanceof ItemBlock) {
-					IBlockState state = ItemUtils.getBlockState(stack);
-					IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
-					if (model != Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel()) {
-						List<BakedQuad> faceQuads = model.getQuads(state, facing, 0L);
-						if (faceQuads.size() == 1) {
-							return faceQuads.get(0).getSprite();
-						}
+					state = ItemUtils.getBlockState(stack);
+					model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+
+					if (model == missingModel) {
+						model = getItemModel(stack, world, entity);
+					}
+				} else {
+					model = getItemModel(stack, world, entity);
+				}
+
+				if (model != Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel()) {
+					List<BakedQuad> faceQuads = model.getQuads(state, facing, 0L);
+					if (faceQuads.size() == 1) {
+						return faceQuads.get(0).getSprite();
 					}
 				}
 			} catch (Exception e) {
-
+				// pass
 			}
 
 			// fallback
-			return getItemSprite(stack);
+			return getItemSprite(stack, world, entity, null);
 		}
 	}
 
