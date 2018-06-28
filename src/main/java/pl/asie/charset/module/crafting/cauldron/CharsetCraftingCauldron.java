@@ -22,6 +22,7 @@ package pl.asie.charset.module.crafting.cauldron;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.init.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -68,8 +69,9 @@ public class CharsetCraftingCauldron {
 	public static int waterAlpha = 180;
 	public static BlockCauldronCharset blockCauldron;
 	public static FluidDyedWater dyedWater;
-	public static FluidPotion liquidPotion;
+	public static FluidPotion liquidPotion, liquidSplashPotion, liquidLingeringPotion;
 	public static boolean enableLiquidPotions;
+	public static int maxArrowTipMultiplier;
 	private static List<ICauldronRecipe> recipeList = new ArrayList<>();
 
 	@CharsetModule.Configuration
@@ -98,6 +100,7 @@ public class CharsetCraftingCauldron {
 	public void onLoadConfig(CharsetLoadConfigEvent event) {
 		waterBottleSize = ConfigUtils.getInt(config, "balance", "waterBottleSize", 250, 0, 1000, "Set the amount of water contained in one water bottle for Cauldron usage. Setting to 0 will approximate between 333 and 334 mB to mimic vanilla. A recommended value is 250. (Please note that setting this value to 0 will DISABLE liquid potions. You have been warned.)", true);
 		enableLiquidPotions = ConfigUtils.getBoolean(config, "general", "enableLiquidPotions", true, "Enable liquid potions and glass bottles as fluid containers. Requires a non-zero waterBottleSize. Disable if you encounter compatibility issues.", true);
+		maxArrowTipMultiplier = ConfigUtils.getInt(config, "balance", "maxArrowTipDivisor", 10, 1, 100, "waterBottleSize / maxArrowTipDivisor = the amount of mB of lingering potion required to tip an arrow. Has to actually be divisible.", false);
 	}
 
 	@Mod.EventHandler
@@ -107,8 +110,12 @@ public class CharsetCraftingCauldron {
 		dyedWater.setUnlocalizedName("charset.dyed_water");
 
 		if (waterBottleSize > 0 && enableLiquidPotions) {
-			FluidRegistry.registerFluid(liquidPotion = new FluidPotion("charset_potion"));
+			FluidRegistry.registerFluid(liquidPotion = new FluidPotion("charset_potion", "item.potion.name"));
 			liquidPotion.setUnlocalizedName("charset.potion");
+			FluidRegistry.registerFluid(liquidSplashPotion = new FluidPotion("charset_potion_splash", "item.splash_potion.name"));
+			liquidSplashPotion.setUnlocalizedName("charset.potion_splash");
+			FluidRegistry.registerFluid(liquidLingeringPotion = new FluidPotion("charset_potion_lingering", "item.lingering_potion.name"));
+			liquidLingeringPotion.setUnlocalizedName("charset.potion_lingering");
 
 			MinecraftForge.EVENT_BUS.register(new PotionFluidContainerItem.Provider());
 		}
@@ -121,6 +128,10 @@ public class CharsetCraftingCauldron {
 		recipeList.add(new RecipeDyeItemPure()); // has to go after RecipeDyeItem to emit error on impure dye after handling impure dye recipes
 		recipeList.add(new RecipeWashDyedWater());
 		recipeList.add(new RecipeBucketCraft());
+
+		if (liquidLingeringPotion != null) {
+			recipeList.add(new RecipeTipArrow());
+		}
 
 		RegistryUtils.register(TileCauldronCharset.class, "improved_cauldron");
 		FMLInterModComms.sendMessage("charset", "addLock", "minecraft:cauldron");

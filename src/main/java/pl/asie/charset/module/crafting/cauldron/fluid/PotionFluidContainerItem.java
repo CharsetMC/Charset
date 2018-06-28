@@ -2,6 +2,7 @@ package pl.asie.charset.module.crafting.cauldron.fluid;
 
 import net.minecraft.init.Items;
 import net.minecraft.init.PotionTypes;
+import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.EnumFacing;
@@ -9,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.*;
@@ -27,7 +29,8 @@ public class PotionFluidContainerItem implements IFluidHandlerItem, ICapabilityP
 
 		@SubscribeEvent
 		public void onAttachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-			if (event.getObject().getItem() == Items.GLASS_BOTTLE || event.getObject().getItem() == Items.POTIONITEM) {
+			if (event.getObject().getItem() == Items.GLASS_BOTTLE || event.getObject().getItem() == Items.POTIONITEM
+					|| event.getObject().getItem() == Items.SPLASH_POTION || event.getObject().getItem() == Items.LINGERING_POTION) {
 				if (PROVIDER == null) {
 					PROVIDER = new CapabilityProviderFactory<>(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY);
 				}
@@ -67,12 +70,23 @@ public class PotionFluidContainerItem implements IFluidHandlerItem, ICapabilityP
 	}
 
 	public FluidStack getFluid() {
-		if (container.getItem() == Items.POTIONITEM) {
+		if (container.getItem() instanceof ItemPotion) {
 			if (PotionUtils.getPotionFromItem(container) == PotionTypes.WATER) {
 				return new FluidStack(FluidRegistry.WATER, CharsetCraftingCauldron.waterBottleSize);
 			}
 
-			FluidStack stack = new FluidStack(CharsetCraftingCauldron.liquidPotion, CharsetCraftingCauldron.waterBottleSize);
+			Fluid fluid;
+			if (container.getItem() == Items.POTIONITEM) {
+				fluid = CharsetCraftingCauldron.liquidPotion;
+			} else if (container.getItem() == Items.SPLASH_POTION) {
+				fluid = CharsetCraftingCauldron.liquidSplashPotion;
+			} else if (container.getItem() == Items.LINGERING_POTION) {
+				fluid = CharsetCraftingCauldron.liquidLingeringPotion;
+			} else {
+				return null;
+			}
+
+			FluidStack stack = new FluidStack(fluid, CharsetCraftingCauldron.waterBottleSize);
 			FluidPotion.copyFromPotionItem(stack, container);
 			return stack;
 		} else {
@@ -101,12 +115,12 @@ public class PotionFluidContainerItem implements IFluidHandlerItem, ICapabilityP
 				}
 
 				return CharsetCraftingCauldron.waterBottleSize;
-			} else if (resource.getFluid() == CharsetCraftingCauldron.liquidPotion) {
+			} else if (resource.getFluid() instanceof FluidPotion) {
 				if (doFill) {
 					FluidStack newStack = resource.copy();
 					newStack.amount = CharsetCraftingCauldron.waterBottleSize;
 					resource.amount -= newStack.amount;
-					container = new ItemStack(Items.POTIONITEM);
+					container = new ItemStack(FluidPotion.getPotionItem(newStack.getFluid()));
 					FluidPotion.copyToPotionItem(container, newStack);
 				}
 

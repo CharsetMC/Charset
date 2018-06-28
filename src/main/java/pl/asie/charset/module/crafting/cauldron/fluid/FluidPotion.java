@@ -3,6 +3,7 @@ package pl.asie.charset.module.crafting.cauldron.fluid;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.init.Items;
 import net.minecraft.init.PotionTypes;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
@@ -11,10 +12,12 @@ import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import pl.asie.charset.api.lib.IFluidExtraInformation;
 import pl.asie.charset.lib.misc.FluidBase;
+import pl.asie.charset.module.crafting.cauldron.CharsetCraftingCauldron;
 import scala.xml.dtd.EMPTY;
 
 import javax.annotation.Nullable;
@@ -25,13 +28,16 @@ public class FluidPotion extends FluidBase implements IFluidExtraInformation {
 	public static final ResourceLocation TEXTURE_STILL = new ResourceLocation("charset:blocks/dyed_water_still");
 	public static final ResourceLocation TEXTURE_FLOWING = new ResourceLocation("charset:blocks/dyed_water_flow");
 
-	public FluidPotion(String fluidName) {
+	private final String unlName;
+
+	public FluidPotion(String fluidName, String unlName) {
 		super(fluidName, TEXTURE_STILL, TEXTURE_FLOWING);
+		this.unlName = unlName;
 	}
 
 	@Override
 	public String getUnlocalizedName() {
-		return "item.potion.name";
+		return unlName;
 	}
 
 	public static List<PotionEffect> getEffectsFromStack(FluidStack stack) {
@@ -52,6 +58,18 @@ public class FluidPotion extends FluidBase implements IFluidExtraInformation {
 			if (itemStack.getTagCompound().hasKey("CustomPotionEffects", Constants.NBT.TAG_LIST)) {
 				stack.tag.setTag("CustomPotionEffects", itemStack.getTagCompound().getTag("CustomPotionEffects"));
 			}
+		}
+	}
+
+	public static Item getPotionItem(Fluid fluid) {
+		if (fluid == CharsetCraftingCauldron.liquidPotion) {
+			return Items.POTIONITEM;
+		} else if (fluid == CharsetCraftingCauldron.liquidSplashPotion) {
+			return Items.SPLASH_POTION;
+		} else if (fluid == CharsetCraftingCauldron.liquidLingeringPotion) {
+			return Items.LINGERING_POTION;
+		} else {
+			return Items.POTIONITEM;
 		}
 	}
 
