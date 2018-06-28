@@ -44,6 +44,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.MethodHandleHelper;
@@ -101,11 +102,17 @@ public class CharsetImmersionStacks {
 
 			Boolean overridesOBA = overridesOnBlockActivated.computeIfAbsent(state.getBlock().getClass(),
 					(c) -> {
-						Method m = MethodHandleHelper.reflectMethodRecurse(c, "onBlockActivated", "func_180639_a",
-								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
-								EnumHand.class, EnumFacing.class,
-								float.class, float.class, float.class);
-						return m.getDeclaringClass() != Block.class;
+						try {
+							Method m = MethodHandleHelper.reflectMethodRecurse(c, "onBlockActivated", "func_180639_a",
+									World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
+									EnumHand.class, EnumFacing.class,
+									float.class, float.class, float.class);
+							return m.getDeclaringClass() != Block.class;
+						} catch (Exception e) {
+							ModCharset.logger.warn("Exception during recursive method check on " + c + "!");
+							e.printStackTrace();
+							return true; // The safer of the two assumptions.
+						}
 					}
 			);
 

@@ -5,23 +5,23 @@
     "layers": [
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nor/layer_top"
+            "color_mask": "7F00FF"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nor/layer_left"
+            "color_mask": "00FF00"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nor/layer_right"
+            "color_mask": "0000FF"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nor/layer_bottom"
+            "color_mask": "FFFF00"
         },
         {
             "type": "color",
-            "texture": "simplelogic:blocks/nor/layer_middle"
+            "color_mask": "00FFFF"
         }
     ],
     "torches": [
