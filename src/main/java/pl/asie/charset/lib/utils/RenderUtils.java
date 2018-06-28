@@ -263,10 +263,27 @@ public final class RenderUtils {
 					model = getItemModel(stack, world, entity);
 				}
 
-				if (model != Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel()) {
-					List<BakedQuad> faceQuads = model.getQuads(state, facing, 0L);
-					if (faceQuads.size() == 1) {
-						return faceQuads.get(0).getSprite();
+				if (model != missingModel) {
+					// Step one: Try to find a texture on the facing side.
+					Set<TextureAtlasSprite> foundTextures = Sets.newIdentityHashSet();
+
+					for (BakedQuad quad : model.getQuads(state, facing, 0L)) {
+						foundTextures.add(quad.getSprite());
+					}
+
+					if (foundTextures.size() == 1) {
+						return foundTextures.iterator().next();
+					} else if (foundTextures.isEmpty()) {
+						// Step two: Try to find a general texture with the facing side.
+						for (BakedQuad quad : model.getQuads(state, null, 0L)) {
+							if (quad.getFace() == facing) {
+								foundTextures.add(quad.getSprite());
+							}
+						}
+
+						if (foundTextures.size() == 1) {
+							return foundTextures.iterator().next();
+						}
 					}
 				}
 			} catch (Exception e) {
