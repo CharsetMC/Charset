@@ -21,6 +21,8 @@ package pl.asie.charset.lib.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,6 +31,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -39,26 +42,49 @@ import pl.asie.charset.lib.utils.EntityUtils;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.SpaceUtils;
 
-import java.util.Collections;
 import java.util.IdentityHashMap;
-import java.util.Set;
+import java.util.Map;
 
 public class ArrowHighlightHandler {
-    public static Set<Item> eligibleItems = Collections.newSetFromMap(new IdentityHashMap<>());
+    @FunctionalInterface
+    public interface Checker {
+        boolean shouldRender(World world, Orientation orientation, ItemStack stack, RayTraceResult trace);
+    }
+
+    @FunctionalInterface
+    public interface OrientationGetter {
+        Orientation get(EntityPlayer player, RayTraceResult trace, ItemStack stack);
+    }
+
+    public static Map<Item, Checker> eligibleItems = new IdentityHashMap<>();
+    public static Map<Item, OrientationGetter> orientationGetters = new IdentityHashMap<>();
+
+    public static boolean defaultChecker(World world, Orientation orientation, ItemStack stack, RayTraceResult trace) {
+        return trace.sideHit != EnumFacing.UP;
+    }
+
+    public static Orientation defaultOrientationGetter(EntityPlayer player, RayTraceResult trace, ItemStack stack) {
+        return SpaceUtils.getOrientation(trace.getBlockPos(), player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
+    }
 
     public static void register(Item... i) {
+        register(ArrowHighlightHandler::defaultChecker, ArrowHighlightHandler::defaultOrientationGetter, i);
+    }
+
+    public static void register(Checker check, OrientationGetter getter, Item... i) {
         if (eligibleItems.isEmpty() && i.length > 0) {
             MinecraftForge.EVENT_BUS.register(new ArrowHighlightHandler());
         }
         for (Item item : i) {
-            eligibleItems.add(item);
+            eligibleItems.put(item, check);
+            orientationGetters.put(item, getter);
         }
     }
 
-    private void drawArrowHighlight(EntityPlayer player, RayTraceResult trace, Vec3d cameraPos) {
-        Orientation orientation = SpaceUtils.getOrientation(trace.getBlockPos(), player, trace.sideHit, trace.hitVec.subtract(new Vec3d(trace.getBlockPos())));
+    private void drawArrowHighlight(EntityPlayer player, RayTraceResult trace, Vec3d cameraPos, ItemStack stack, Checker check, OrientationGetter orientationGetter) {
+        Orientation orientation = orientationGetter.get(player, trace, stack);
 
-        if (orientation.top.getAxis() == trace.sideHit.getAxis() || trace.sideHit == EnumFacing.UP) {
+        if (orientation.top.getAxis() == trace.sideHit.getAxis() || !check.shouldRender(player.getEntityWorld(), orientation, stack, trace)) {
             return;
         }
 
@@ -139,10 +165,14 @@ public class ArrowHighlightHandler {
             EntityPlayer player = mc.player;
             if (player != null) {
                 ItemStack is = player.getHeldItem(EnumHand.MAIN_HAND);
-                if (!is.isEmpty() && eligibleItems.contains(is.getItem())) {
+                if (!is.isEmpty() && eligibleItems.containsKey(is.getItem())) {
                     RayTraceResult mop = mc.objectMouseOver;
                     if (mop != null && mop.hitVec != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
-                        drawArrowHighlight(player, mop, EntityUtils.interpolate(Minecraft.getMinecraft().getRenderViewEntity(), event.getPartialTicks()));
+                        Entity rve = Minecraft.getMinecraft().getRenderViewEntity();
+                        if (rve == null) {
+                            rve = player;
+                        }
+                        drawArrowHighlight(player, mop, EntityUtils.interpolate(rve, event.getPartialTicks()), is, eligibleItems.get(is.getItem()), orientationGetters.get(is.getItem()));
                     }
                 }
             }

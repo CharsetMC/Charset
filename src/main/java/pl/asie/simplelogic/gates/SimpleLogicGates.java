@@ -161,6 +161,8 @@ public class SimpleLogicGates {
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRandomizer())));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicSynchronizer())));
 
+		proxy.init();
+
 		if (config.hasChanged()) {
 			config.save();
 		}

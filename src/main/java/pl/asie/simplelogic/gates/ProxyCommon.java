@@ -20,4 +20,7 @@
 package pl.asie.simplelogic.gates;
 
 public class ProxyCommon {
+	public void init() {
+
+	}
 }

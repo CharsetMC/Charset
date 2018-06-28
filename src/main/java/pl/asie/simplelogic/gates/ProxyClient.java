@@ -29,6 +29,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -37,12 +38,29 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.simplelogic.gates.render.GateRenderDefinitions;
 import pl.asie.simplelogic.gates.render.RendererGate;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 public class ProxyClient extends ProxyCommon {
+	@Override
+	public void init() {
+		super.init();
+		ArrowHighlightHandler.register((world, orientation, stack, trace) -> world.isSideSolid(trace.getBlockPos(), trace.sideHit),
+				(player, trace, stack) -> {
+					PartGate gate = new PartGate();
+					Vec3d hit = trace.hitVec.subtract(new Vec3d(trace.getBlockPos()));
+					gate.onPlacedBy(
+							player, trace.sideHit, stack,
+							(float) hit.x, (float) hit.y, (float) hit.z
+					);
+					return gate.getOrientation();
+				},
+				SimpleLogicGates.itemGate);
+	}
+
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onModelRegister(ModelRegistryEvent event) {
