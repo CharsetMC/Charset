@@ -171,6 +171,11 @@ public class CarryHandler implements ICacheable, ICarryHandler {
             return true;
         }
 
+        // Check hardness (bedrock etc.)
+        if (block.getBlockHardness(world, pos) <= -1.0f) {
+            return false;
+        }
+
         // Check TileEntityLockable
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityLockable && ((TileEntityLockable) tile).isLocked()) {
