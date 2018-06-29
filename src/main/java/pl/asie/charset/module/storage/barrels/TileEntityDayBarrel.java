@@ -960,7 +960,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     protected void playSound(EntityPlayer player, boolean isPlace) {
         if (!world.isRemote) {
             SoundUtils.playSoundRemote(
-                    player, new Vec3d(pos).addVector(0.5, 0.5, 0.5), getMaxRenderDistanceSquared(),
+                    player, new Vec3d(pos).addVector(0.5, 0.5, 0.5), 64.0D,
                     getSoundType().getBreakSound(),
                     SoundCategory.BLOCKS,
                     (getSoundType().getVolume() + 1) / (isPlace ? 3f : 2f),
