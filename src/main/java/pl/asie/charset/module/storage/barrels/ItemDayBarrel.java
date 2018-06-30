@@ -93,13 +93,14 @@ public class ItemDayBarrel extends ItemBlockBase {
             TileEntityDayBarrel db = new TileEntityDayBarrel();
             db.loadFromStack(is);
             int count = db.getItemCount();
-            if (count > 0 && !db.item.isEmpty()) {
-                if (db.item.getItem() == this) {
+            ItemStack item = db.getItemUnsafe();
+            if (count > 0 && !item.isEmpty()) {
+                if (item.getItem() == this) {
                     list.add("?");
                     return;
                 }
-                List<String> sub = db.item.getTooltip/* Client-only */(Minecraft.getMinecraft().player, ITooltipFlag.TooltipFlags.NORMAL /* Propagating verbose would be natural, but let's keep the tool-tip short */);
-                db.item.getItem().addInformation(db.item, world, sub, verbose);
+                List<String> sub = item.getTooltip/* Client-only */(Minecraft.getMinecraft().player, ITooltipFlag.TooltipFlags.NORMAL /* Propagating verbose would be natural, but let's keep the tool-tip short */);
+                item.getItem().addInformation(item, world, sub, verbose);
                 if (!sub.isEmpty()) {
                     Object first = sub.get(0);
                     sub.set(0, count + " " + first);

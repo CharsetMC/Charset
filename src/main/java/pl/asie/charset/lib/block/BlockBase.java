@@ -226,7 +226,7 @@ public abstract class BlockBase extends Block {
 		boolean silkTouch = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, stack) > 0;
 
 		NonNullList<ItemStack> items = NonNullList.create();
-		getDrops(items, worldIn, pos, state, te, 0, false);
+		getDrops(items, worldIn, pos, state, te, fortuneLevel, silkTouch);
 		float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, worldIn, pos, state, fortuneLevel, 1.0f, silkTouch, player);
 
 		harvesters.set(player);

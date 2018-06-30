@@ -195,7 +195,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         super.entityInit();
         createBarrel();
 
-        dataManager.register(BARREL_ITEM, barrel.item);
+        dataManager.register(BARREL_ITEM, barrel.getItemSafe());
         dataManager.register(BARREL_ITEM_COUNT, barrel.getItemCount());
         dataManager.register(BARREL_LOG, barrel.woodLog.getId());
         dataManager.register(BARREL_SLAB, barrel.woodSlab.getId());
@@ -205,7 +205,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
     private void updateDataWatcher(boolean full) {
         if (!world.isRemote) {
-            dataManager.set(BARREL_ITEM, barrel.item);
+            dataManager.set(BARREL_ITEM, barrel.getItemSafe());
             dataManager.set(BARREL_ITEM_COUNT, barrel.getItemCount());
             if (full) {
                 dataManager.set(BARREL_LOG, barrel.woodLog.getId());
@@ -228,8 +228,9 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
         super.onUpdate();
 
         if (world.isRemote && dataManager.isDirty()) {
-            barrel.item = dataManager.get(BARREL_ITEM);
-            barrel.item.setCount(dataManager.get(BARREL_ITEM_COUNT));
+            ItemStack item = dataManager.get(BARREL_ITEM);
+            item.setCount(dataManager.get(BARREL_ITEM_COUNT));
+            barrel.setItemUnsafe(item);
             barrel.woodLog = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_LOG));
             barrel.woodSlab = ItemMaterialRegistry.INSTANCE.getMaterial(dataManager.get(BARREL_SLAB));
             barrel.orientation = Orientation.getOrientation(dataManager.get(BARREL_ORIENTATION));
