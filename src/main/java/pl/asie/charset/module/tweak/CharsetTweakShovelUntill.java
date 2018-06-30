@@ -30,6 +30,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -41,6 +42,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -130,8 +132,8 @@ public class CharsetTweakShovelUntill {
 	}
 
 	@SubscribeEvent
-	public void onRightClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-		if (event.getHand() != EnumHand.MAIN_HAND) {
+	public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+		if (event.getHand() != EnumHand.MAIN_HAND || event.getFace() != EnumFacing.UP) {
 			return;
 		}
 
@@ -144,6 +146,14 @@ public class CharsetTweakShovelUntill {
 			IBlockState state = event.getWorld().getBlockState(event.getPos());
 			// if (state.getBlock().isFertile(event.getWorld(), event.getPos())) {
 			if (state.getBlock() == Blocks.FARMLAND) {
+				BlockEvent.BreakEvent fakeBreakEvent = new BlockEvent.BreakEvent(
+						event.getWorld(), event.getPos(), state, event.getEntityPlayer()
+				);
+
+				if (MinecraftForge.EVENT_BUS.post(fakeBreakEvent)) {
+					return;
+				}
+
 				Objects.requireNonNull(event.getEntityPlayer().getCapability(capability, null))
 						.addBlock(event.getWorld(), event.getPos(), 3 /* 150 ms */);
 
