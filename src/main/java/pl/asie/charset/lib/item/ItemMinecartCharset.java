@@ -72,7 +72,6 @@ public abstract class ItemMinecartCharset extends ItemMinecart implements IMinec
 
     public ItemMinecartCharset() {
         super(EntityMinecart.Type.RIDEABLE); // yeah, right
-        setCreativeTab(ModCharset.CREATIVE_TAB);
         setHasSubtypes(true);
         BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(this, MINECART_DISPENSER_BEHAVIOR);
         subItemProvider = createSubItemProvider();

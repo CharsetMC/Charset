@@ -37,7 +37,6 @@ public class ItemBase extends Item {
 
 	public ItemBase() {
 		super();
-		setCreativeTab(ModCharset.CREATIVE_TAB);
 		subItemProvider = createSubItemProvider();
 	}
 

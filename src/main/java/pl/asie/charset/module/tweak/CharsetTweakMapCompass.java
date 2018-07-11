@@ -185,6 +185,7 @@ public class CharsetTweakMapCompass {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SideOnly(Side.CLIENT)
     public void onRegisterItems(RegistryEvent.Register<Item> event) {
         for (Item item : event.getRegistry()) {
             if (item instanceof ItemCompass) {

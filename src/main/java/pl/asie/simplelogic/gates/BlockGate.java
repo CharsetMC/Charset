@@ -58,7 +58,6 @@ public class BlockGate extends BlockBase implements ITileEntityProvider {
 		setSoundType(SoundType.WOOD);
 		setOpaqueCube(false);
 		setFullCube(false);
-		setCreativeTab(SimpleLogicGates.simpleLogicTab);
 	}
 
 	@Override

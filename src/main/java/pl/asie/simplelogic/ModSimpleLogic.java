@@ -19,9 +19,30 @@
 
 package pl.asie.simplelogic;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import pl.asie.charset.ModCharset;
+import pl.asie.simplelogic.gates.SimpleLogicGates;
+import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 @Mod(modid = "simplelogic", name = "SimpleLogic", version = "@VERSION@", dependencies = "required-after:charset")
 public class ModSimpleLogic {
+	public static CreativeTabs CREATIVE_TAB = new CreativeTabs("simplelogic") {
+		@Override
+		public ItemStack getTabIconItem() {
+			if (SimpleLogicWires.wireItems[17] != null) {
+				return new ItemStack(SimpleLogicWires.wireItems[17]);
+			} else if (SimpleLogicWires.wireItems[1] != null) {
+				return new ItemStack(SimpleLogicWires.wireItems[1]);
+			} else if (SimpleLogicWires.wireItems[0] != null) {
+				return new ItemStack(SimpleLogicWires.wireItems[1]);
+			} else if (SimpleLogicGates.gateStacks.size() > 0) {
+				return SimpleLogicGates.gateStacks.iterator().next();
+			} else {
+				return new ItemStack(Items.REDSTONE);
+			}
+		}
+	};
 }

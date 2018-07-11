@@ -25,6 +25,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
@@ -37,8 +38,11 @@ import net.minecraft.world.World;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.CharsetLib;
 
+import javax.annotation.Nullable;
+
 public class ItemWire extends ItemBlockMultipart {
     private final WireProvider provider;
+    private CreativeTabs wireTab;
 
     public ItemWire(WireProvider provider) {
         super(CharsetLibWires.blockWire, CharsetLibWires.blockWire);
@@ -48,12 +52,23 @@ public class ItemWire extends ItemBlockMultipart {
     }
 
     @Override
+    @Nullable
+    public CreativeTabs getCreativeTab() {
+        return wireTab;
+    }
+
+    @Override
+    public Item setCreativeTab(CreativeTabs tab) {
+        this.wireTab = tab;
+        return this;
+    }
+
+    @Override
     public String getItemStackDisplayName(ItemStack stack) {
         Wire wire = fromStack(new IWireContainer.Dummy(), stack, EnumFacing.DOWN);
         String tr = "tile.wire.null";
         if (wire != null) {
-            String name = wire.getDisplayName();
-            tr = "tile." + (wire.getLocation() == WireFace.CENTER ? name + ".freestanding" : name) + ".name";
+            tr = wire.getDisplayName();
         }
         return I18n.translateToLocal(tr);
     }

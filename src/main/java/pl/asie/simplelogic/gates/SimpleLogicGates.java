@@ -27,8 +27,6 @@ import java.util.Set;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -49,6 +47,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
+import pl.asie.simplelogic.ModSimpleLogic;
 import pl.asie.simplelogic.gates.logic.*;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
@@ -71,17 +70,6 @@ public class SimpleLogicGates {
 	@CharsetModule.Instance(SimpleLogicGates.MODID)
 	public static SimpleLogicGates INSTANCE;
 
-	public static CreativeTabs simpleLogicTab = new CreativeTabs("simplelogic") {
-		@Override
-		public ItemStack getTabIconItem() {
-			if (gateStacks.size() > 0) {
-				return gateStacks.iterator().next();
-			} else {
-				return new ItemStack(Items.REDSTONE);
-			}
-		}
-	};
-
 	@CharsetModule.Configuration
 	public static Configuration config;
 	@CharsetModule.PacketRegistry
@@ -96,7 +84,7 @@ public class SimpleLogicGates {
 	static final Map<ResourceLocation, String> logicUns = new HashMap<>();
 	static final Map<ResourceLocation, ResourceLocation> logicDefinitions = new HashMap<>();
 
-	static final Set<ItemStack> gateStacks = new HashSet<ItemStack>();
+	public static final Set<ItemStack> gateStacks = new HashSet<ItemStack>();
 
 	public static ResourceLocation getId(GateLogic logic) {
 		return logicClasses.inverse().get(logic.getClass());
@@ -109,12 +97,12 @@ public class SimpleLogicGates {
 
 	@SubscribeEvent
 	public void onRegisterBlock(RegistryEvent.Register<Block> event) {
-		RegistryUtils.register(event.getRegistry(), blockGate, "logic_gate", simpleLogicTab);
+		RegistryUtils.register(event.getRegistry(), blockGate, "logic_gate", ModSimpleLogic.CREATIVE_TAB);
 	}
 
 	@SubscribeEvent
 	public void onRegisterItem(RegistryEvent.Register<Item> event) {
-		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate", simpleLogicTab);
+		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate", ModSimpleLogic.CREATIVE_TAB);
 	}
 
 	@EventHandler

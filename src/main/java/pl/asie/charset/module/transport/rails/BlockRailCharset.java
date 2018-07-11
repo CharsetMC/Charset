@@ -39,7 +39,6 @@ public class BlockRailCharset extends BlockRailBase {
 
 	protected BlockRailCharset() {
 		super(false);
-		setCreativeTab(ModCharset.CREATIVE_TAB);
 		setHardness(0.7F);
 		setSoundType(SoundType.METAL);
 		setUnlocalizedName("charset.rail_charset");

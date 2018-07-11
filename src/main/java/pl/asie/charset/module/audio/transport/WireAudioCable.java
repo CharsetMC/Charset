@@ -89,6 +89,6 @@ public class WireAudioCable extends Wire implements IAudioReceiver {
 
     @Override
     public String getDisplayName() {
-        return "charset.audioCable";
+        return getLocation() == WireFace.CENTER ? "tile.charset.audioCable.freestanding.name" : "tile.charset.audioCable.name";
     }
 }

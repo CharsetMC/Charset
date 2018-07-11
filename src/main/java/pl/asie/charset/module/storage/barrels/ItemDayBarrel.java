@@ -39,7 +39,6 @@ public class ItemDayBarrel extends ItemBlockBase {
     public ItemDayBarrel(BlockBase block) {
         super(block);
         setUnlocalizedName("charset.barrel");
-        setCreativeTab(ModCharset.CREATIVE_TAB);
     }
 
     @Override
