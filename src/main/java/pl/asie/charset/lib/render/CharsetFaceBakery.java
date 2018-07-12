@@ -49,6 +49,10 @@ public class CharsetFaceBakery extends FaceBakery {
 
     public BakedQuad makeBakedQuad(Vector3f min, Vector3f max, int tintIndex, float[] uv,
                                    TextureAtlasSprite icon, EnumFacing facing, ITransformation rot, boolean uvLocked) {
+        if (icon == null) {
+            return null;
+        }
+
         boolean hasColorIndex = tintIndex != -1 && ((tintIndex & 0xFF000000) == 0);
         boolean hasColor = tintIndex != -1 && ((tintIndex & 0xFF000000) != 0);
 

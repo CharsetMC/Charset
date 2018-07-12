@@ -1,0 +1,30 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "simplelogic.wires"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:logic_wire_bundled",
+  "pattern": [
+    "sws",
+    "www",
+    "sws"
+  ],
+  "key": {
+    "w": {
+      "type": "forge:ore_dict",
+      "ore": "wireLogicInsulatedFreestanding"
+    },
+    "s": {
+      "item": "minecraft:string",
+      "data": 0
+    }
+  },
+  "result": {
+    "item": "charset:logic_wire_b",
+    "data": 1,
+    "count": 1
+  }
+}

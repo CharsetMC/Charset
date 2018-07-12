@@ -17,28 +17,39 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates;
+package pl.asie.charset.lib.modcompat.mcmultipart;
 
 import mcmultipart.api.container.IMultipartContainer;
+import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import mcmultipart.api.multipart.MultipartHelper;
 import mcmultipart.api.multipart.MultipartRedstoneHelper;
 import mcmultipart.api.slot.EnumEdgeSlot;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.utils.redstone.IRedstoneGetter;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class RedstoneGetterMultipart implements IRedstoneGetter {
 	@Override
-	public int get(IBlockAccess world, BlockPos pos, EnumFacing face, EnumFacing edge) {
+	public int get(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge) {
 		Optional<IMultipartContainer> container = MultipartHelper.getContainer(world, pos);
+		//noinspection OptionalIsPresent
 		if (container.isPresent()) {
-			if (edge != null) {
-				return MultipartRedstoneHelper.getWeakPower(container.get(), EnumEdgeSlot.fromFaces(face.getOpposite(), edge), face.getOpposite());
-			} else {
-				return MultipartRedstoneHelper.getWeakPower(container.get(), face.getOpposite());
-			}
+			return MCMPUtils.streamParts(container.get(), edge, face.getOpposite()).map(
+					(info) -> {
+						if (info.getTile().hasPartCapability(Capabilities.REDSTONE_EMITTER, face.getOpposite())) {
+							return info.getTile().getPartCapability(Capabilities.REDSTONE_EMITTER, face.getOpposite()).getRedstoneSignal();
+						} else if (info.getState().canProvidePower()) {
+							return info.getPart().getWeakPower(info.getPartWorld(), info.getPartPos(), info, face);
+						} else {
+							return -1;
+						}
+					}
+			).filter((a) -> a >= 0).findFirst().orElse(0);
 		} else {
 			return -1;
 		}

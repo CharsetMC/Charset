@@ -35,6 +35,7 @@ import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireUtils;
 import pl.asie.simplelogic.wires.logic.PartWireSignalBase;
@@ -107,33 +108,35 @@ public final class LogicWireUtils {
 
 	// IGNORES WIRES.
 	public static int getWeakRedstoneLevel(Wire wire, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face) {
-		EnumFacing facingOpposite = facing == null ? null : facing.getOpposite();
-		int power = 0;
+		World world = wire.getContainer().world();
 
+		// Step 1: Check with mods.
+		int power = RedstoneUtils.getModdedWeakPower(world, pos, facing, face.facing);
+		if (power >= 0) {
+			return power;
+		}
+
+		// Step 2: Check IRedstoneEmitter.
+		EnumFacing facingOpposite = facing == null ? null : facing.getOpposite();
 		if (WireUtils.hasCapability(wire, pos, Capabilities.REDSTONE_EMITTER, facingOpposite, false)) {
 			IRedstoneEmitter emitter = WireUtils.getCapability(wire, pos, Capabilities.REDSTONE_EMITTER, facingOpposite, true);
 			if (emitter instanceof PartWireSignalBase) {
 				return 0;
 			} else {
-				power = Math.max(power, emitter.getRedstoneSignal());
+				return emitter.getRedstoneSignal();
 			}
 		}
 
-		World world = wire.getContainer().world();
+		// Step 3: Check vanilla.
 		Block block = state.getBlock();
 
-		// TODO: Use Gates for Redstone Paste handlingage
-		if (power == 0) {
-			if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
-				return state.getValue(BlockRedstoneWire.POWER);
-			}
-
-			return block.shouldCheckWeakPower(state, world, pos, facing)
-					? state.getStrongPower(world, pos, facing)
-					: state.getWeakPower(world, pos, facing);
-		} else {
-			return power;
+		if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
+			return state.getValue(BlockRedstoneWire.POWER);
 		}
+
+		return block.shouldCheckWeakPower(state, world, pos, facing)
+				? state.getStrongPower(world, pos, facing)
+				: state.getWeakPower(world, pos, facing);
 	}
 
 	public static int width(WireType type) {

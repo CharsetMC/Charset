@@ -59,27 +59,26 @@ public class ShiftScrollHandler {
 		private final Set<Item> items;
 
 		public ItemGroup(Collection c) {
-			ImmutableSet.Builder<Item> builder = new ImmutableSet.Builder<>();
+			items = new LinkedHashSet<>();
 			for (Object o : c) {
 				if (o instanceof Block) {
-					builder.add(Item.getItemFromBlock((Block) o));
+					items.add(Item.getItemFromBlock((Block) o));
 				} else if (o instanceof Item) {
-					builder.add((Item) o);
+					items.add((Item) o);
 				}
 			}
-			this.items = builder.build();
 		}
 
 		public ItemGroup(Block... blocks) {
-			ImmutableSet.Builder<Item> builder = new ImmutableSet.Builder<>();
+			items = new LinkedHashSet<>();
 			for (Block b : blocks) {
-				builder.add(Item.getItemFromBlock(b));
+				items.add(Item.getItemFromBlock(b));
 			}
-			this.items = builder.build();
 		}
 
-		public ItemGroup(Item... items) {
-			this.items = ImmutableSet.copyOf(items);
+		public ItemGroup(Item... its) {
+			items = new LinkedHashSet<>();
+			items.addAll(Arrays.asList(its));
 		}
 
 		@Override

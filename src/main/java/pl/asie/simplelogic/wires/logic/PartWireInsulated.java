@@ -23,8 +23,11 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.IWireInsulated;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.wires.IWireContainer;
 import pl.asie.charset.lib.wires.WireProvider;
@@ -35,6 +38,13 @@ import javax.annotation.Nonnull;
 public class PartWireInsulated extends PartWireNormal implements IWireInsulated {
 	public PartWireInsulated(@Nonnull IWireContainer container, @Nonnull WireProvider factory, @Nonnull WireFace location) {
 		super(container, factory, location);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getRenderColor() {
+		int c = 0xFF000000 | EnumDyeColor.byMetadata(getColor()).getColorValue();
+		return (c & 0xFF00FF00) | ((c >> 16) & 0xFF) | ((c << 16) & 0xFF0000);
 	}
 
 	@Override

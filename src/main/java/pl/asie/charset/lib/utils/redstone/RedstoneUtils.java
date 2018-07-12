@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.utils;
+package pl.asie.charset.lib.utils.redstone;
 
 import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.multipart.MultipartHelper;
@@ -31,6 +31,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,6 +41,23 @@ import java.util.Optional;
 public final class RedstoneUtils {
 	private RedstoneUtils() {
 
+	}
+
+	private static final List<IRedstoneGetter> GETTERS = new ArrayList<>();
+
+	public static void addRedstoneGetter(IRedstoneGetter getter) {
+		GETTERS.add(getter);
+	}
+
+	public static int getModdedWeakPower(IBlockAccess w, BlockPos p, EnumFacing face, EnumFacing edge) {
+		for (IRedstoneGetter getter : GETTERS) {
+			int v = getter.get(w, p, face, edge);
+			if (v >= 0) {
+				return v;
+			}
+		}
+
+		return -1;
 	}
 
 	// TODO: Evaluate me

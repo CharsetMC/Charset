@@ -45,6 +45,7 @@ import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
+import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.simplelogic.gates.logic.GateLogicDummy;
 import pl.asie.charset.lib.block.TileBase;
@@ -274,7 +275,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 					EnumFacing real = gateToReal(facing);
 					World w = getWorld();
 					BlockPos p = getPos().offset(real);
-					int mpValue = RedstoneGetterHandler.getWeakPower(w, p, real, getSide());
+					int mpValue = RedstoneUtils.getModdedWeakPower(w, p, real, getSide());
 					if (mpValue >= 0) {
 						values[i] = (byte) mpValue;
 					} else {

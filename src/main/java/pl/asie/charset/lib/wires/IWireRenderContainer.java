@@ -17,32 +17,33 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.capability.redstone;
+package pl.asie.charset.lib.wires;
 
-import pl.asie.charset.api.wires.IBundledReceiver;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
+public interface IWireRenderContainer {
+	final class Simple implements IWireRenderContainer {
+		private final WireRenderHandler handler;
 
-public class BundledReceiverWrapper implements Function<List<IBundledReceiver>, IBundledReceiver> {
-	private class WrappedReceiver implements IBundledReceiver {
-		private final Collection<IBundledReceiver> receiverSet;
-
-		public WrappedReceiver(Collection<IBundledReceiver> receiverSet) {
-			this.receiverSet = receiverSet;
+		public Simple(WireRenderHandler handler) {
+			this.handler = handler;
 		}
 
 		@Override
-		public void onBundledInputChange() {
-			for (IBundledReceiver r : receiverSet) {
-				r.onBundledInputChange();
-			}
+		public int getLayerCount() {
+			return 1;
+		}
+
+		@Override
+		public WireRenderHandler get(int layer) {
+			return handler;
 		}
 	}
 
-	@Override
-	public IBundledReceiver apply(List<IBundledReceiver> iBundledReceivers) {
-		return new WrappedReceiver(iBundledReceivers);
-	}
+	@SideOnly(Side.CLIENT)
+	int getLayerCount();
+
+	@SideOnly(Side.CLIENT)
+	WireRenderHandler get(int layer);
 }

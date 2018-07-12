@@ -17,32 +17,34 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.capability.redstone;
+package pl.asie.simplelogic.wires;
 
-import pl.asie.charset.api.wires.IRedstoneReceiver;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
+import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
-public class RedstoneReceiverWrapper implements Function<List<IRedstoneReceiver>, IRedstoneReceiver> {
-	@Override
-	public IRedstoneReceiver apply(List<IRedstoneReceiver> iRedstoneReceivers) {
-		return new WrappedReceiver(iRedstoneReceivers);
+public class ShiftScrollProviderWire implements ShiftScrollHandler.Provider {
+	private final Collection<Item> wires;
+	private final boolean freestanding;
+
+	public ShiftScrollProviderWire(Collection<Item> wires, boolean freestanding) {
+		this.wires = wires;
+		this.freestanding = freestanding;
 	}
 
-	private class WrappedReceiver implements IRedstoneReceiver {
-		private final Collection<IRedstoneReceiver> receiverSet;
+	@Override
+	public boolean matches(ItemStack stack) {
+		return wires.contains(stack.getItem()) && stack.getMetadata() == (freestanding ? 1 : 0);
+	}
 
-		public WrappedReceiver(Collection<IRedstoneReceiver> receiverSet) {
-			this.receiverSet = receiverSet;
-		}
-
-		@Override
-		public void onRedstoneInputChange() {
-			for (IRedstoneReceiver r : receiverSet) {
-				r.onRedstoneInputChange();
-			}
+	@Override
+	public void addAllMatching(NonNullList<ItemStack> list) {
+		for (Item i : wires) {
+			list.add(new ItemStack(i, 1, freestanding ? 1 : 0));
 		}
 	}
 }

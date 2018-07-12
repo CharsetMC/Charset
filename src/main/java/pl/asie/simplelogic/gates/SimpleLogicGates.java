@@ -48,6 +48,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
+import pl.asie.charset.lib.modcompat.mcmultipart.RedstoneGetterMultipart;
 import pl.asie.charset.shared.SimpleLogicShared;
 import pl.asie.simplelogic.gates.logic.*;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -108,10 +109,6 @@ public class SimpleLogicGates {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		if (Loader.isModLoaded("mcmultipart")) {
-			RedstoneGetterHandler.GETTERS.add(new RedstoneGetterMultipart());
-		}
-
 		blockGate = new BlockGate();
 		itemGate = new ItemGate(blockGate);
 

@@ -35,12 +35,15 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.IIngredientFactory;
 import net.minecraftforge.common.crafting.JsonContext;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.recipe.ingredient.IngredientCharset;
 import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
@@ -74,16 +77,17 @@ public class IngredientGroup extends IngredientCharset {
     }
 
     private static final Map<String, Entry> entryMap = new HashMap<>();
-    private final String type, nbtTag;
+    private final String type, nbtTag, itemPrefix;
     private final TIntSet blacklistedIds;
     private final boolean modifyMeta;
     private char dependencyChar;
     private Ingredient dependency;
 
-    public IngredientGroup(String type, String nbtTag, boolean modifyMeta, TIntSet blacklistedIds, char depChar) {
+    public IngredientGroup(String type, String nbtTag, String itemPrefix, boolean modifyMeta, TIntSet blacklistedIds, char depChar) {
         super();
         this.type = type;
         this.nbtTag = nbtTag;
+        this.itemPrefix = itemPrefix;
         this.modifyMeta = modifyMeta;
         this.blacklistedIds = blacklistedIds;
         this.dependencyChar = depChar;
@@ -201,6 +205,19 @@ public class IngredientGroup extends IngredientCharset {
             } else {
                 ItemUtils.getTagCompound(stack, true).setInteger(nbtTag, id);
             }
+        } else if (itemPrefix != null) {
+            int id = getId(source);
+            Entry e = entryMap.get(type);
+            if (e != null && !e.isStringBased()) {
+                Item it = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemPrefix + id));
+                if (it == null) {
+                    throw new RuntimeException("Could not find item " + itemPrefix + id + "!");
+                }
+
+                ItemStack newStack = new ItemStack(it, stack.getCount(), stack.getItemDamage());
+                newStack.setTagCompound(stack.getTagCompound());
+                stack = newStack;
+            }
         } else if (modifyMeta) {
             int id = getId(source);
             Entry e = entryMap.get(type);
@@ -291,6 +308,7 @@ public class IngredientGroup extends IngredientCharset {
         public Ingredient parse(JsonContext context, JsonObject json) {
             String type = JsonUtils.getString(json, "group");
             String tag = json.has("nbtKey") ? JsonUtils.getString(json, "nbtKey") : null;
+            String itPref = json.has("itemPrefix") ? JsonUtils.getString(json, "itemPrefix") : null;
 
             TIntSet blacklistedIds = new TIntHashSet();
             if (JsonUtils.hasField(json, "blacklist")) {
@@ -306,7 +324,7 @@ public class IngredientGroup extends IngredientCharset {
                 dep = JsonUtils.getString(json, "depends").charAt(0);
             }
 
-            return IngredientCharset.wrap(new IngredientGroup(type, tag, json.has("modifyMeta"), blacklistedIds, dep));
+            return IngredientCharset.wrap(new IngredientGroup(type, tag, itPref, json.has("modifyMeta"), blacklistedIds, dep));
         }
     }
 }

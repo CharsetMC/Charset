@@ -19,8 +19,10 @@
 
 package pl.asie.charset.lib.wires;
 
+import com.google.common.collect.ImmutableSet;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.slot.EnumCenterSlot;
+import mcmultipart.api.slot.EnumEdgeSlot;
 import mcmultipart.api.slot.EnumFaceSlot;
 import mcmultipart.api.slot.IPartSlot;
 import mcmultipart.api.world.IMultipartWorld;
@@ -37,6 +39,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -56,6 +59,7 @@ import pl.asie.charset.lib.modcompat.mcmultipart.IMultipartBase;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityProvider {
     protected static final PropertyBool REDSTONE = PropertyBool.create("redstone");
@@ -65,6 +69,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
         setHardness(0.0f);
         setOpaqueCube(false);
         setFullCube(false);
+        setDefaultState(getDefaultState().withProperty(REDSTONE, false));
     }
 
     @Override
@@ -249,6 +254,20 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
         if (wire != null) {
             wire.onChanged(true);
         }
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        IBlockState state = getDefaultState();
+        ItemStack stack = placer.getHeldItem(hand);
+        if (stack.getItem() instanceof ItemWire) {
+            WireProvider provider = ((ItemWire) stack.getItem()).getWireProvider();
+            if (provider != null && provider.canProvidePower()) {
+                state = state.withProperty(REDSTONE, true);
+            }
+        }
+
+        return state;
     }
 
     @Override

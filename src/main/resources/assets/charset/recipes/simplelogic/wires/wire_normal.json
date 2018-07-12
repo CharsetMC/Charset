@@ -1,0 +1,30 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "simplelogic.wires"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:logic_wire_normal",
+  "pattern": [
+    " r ",
+    "rir",
+    " r "
+  ],
+  "key": {
+    "r": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    }
+  },
+  "result": {
+    "item": "charset:logic_wire_n",
+    "data": 0,
+    "count": 4
+  }
+}

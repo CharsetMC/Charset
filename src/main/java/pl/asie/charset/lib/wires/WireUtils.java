@@ -38,6 +38,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.modcompat.mcmultipart.MCMPUtils;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 
 import javax.annotation.Nullable;
@@ -70,7 +71,7 @@ public final class WireUtils {
         if (wire.getLocation() != WireFace.CENTER) {
             Optional<IMultipartContainer> container = MultipartHelper.getContainer(wire.getContainer().world(), pos);
             if (container.isPresent()) {
-                boolean result = MultipartCapabilityHelper.hasCapability(container.get(), capability, EnumEdgeSlot.fromFaces(wire.getLocation().facing, face), face);
+            	boolean result = MCMPUtils.streamParts(container.get(), wire.getLocation().facing, face).anyMatch((info) -> info.getTile().hasPartCapability(capability, face));
                 TileWire.isWireCheckingForCaps = false;
                 return result;
             }
@@ -98,13 +99,15 @@ public final class WireUtils {
         if (searcher.getLocation() != WireFace.CENTER) {
             Optional<IMultipartContainer> container = MultipartHelper.getContainer(searcher.getContainer().world(), pos);
             if (container.isPresent()) {
-                T result = MultipartCapabilityHelper.getCapability(container.get(), capability, EnumEdgeSlot.fromFaces(searcher.getLocation().facing, face), face);
+                T result = MCMPUtils.streamParts(container.get(), searcher.getLocation().facing, face).filter((info) -> info.getTile().hasPartCapability(capability, face))
+		                .map((info) -> info.getTile().getPartCapability(capability, face)).findFirst().orElse(null);
                 TileWire.isWireCheckingForCaps = false;
                 return result;
             }
         }
 
-        T result = CapabilityHelper.get(searcher.getContainer().world(), pos, capability, face, true, true, false);
+        TileEntity tile = searcher.getContainer().world().getTileEntity(pos);
+        T result = tile != null ? tile.getCapability(capability, face) : null;
         TileWire.isWireCheckingForCaps = false;
         return result;
     }
@@ -184,7 +187,7 @@ public final class WireUtils {
         }
 
         TileEntity tile = access.getTileEntity(pos);
-        if (tile != null && tile instanceof TileWire && ((TileWire) tile).wire != null && ((TileWire) tile).wire.getLocation() == face) {
+        if (tile instanceof TileWire && ((TileWire) tile).wire != null && ((TileWire) tile).wire.getLocation() == face) {
             return ((TileWire) tile).wire;
         } else {
             return null;
@@ -193,11 +196,13 @@ public final class WireUtils {
 
     public static @Nullable Wire getAnyWire(IBlockAccess access, BlockPos pos) {
         if (access instanceof IMultipartBlockAccess) {
-            TileWire tileWire = (TileWire) ((IMultipartBlockAccess) access).getPartInfo().getTile().getTileEntity();
-            return tileWire.wire;
-        } else {
-            return getAnyWire(access.getTileEntity(pos));
+            IPartInfo info = ((IMultipartBlockAccess) access).getPartInfo();
+            if (info.getPartPos().equals(pos)) {
+                return getAnyWire(info.getTile().getTileEntity());
+            }
         }
+
+        return getAnyWire(access.getTileEntity(pos));
     }
 
     public static Collection<Wire> getAllWires(IBlockAccess access, BlockPos pos) {

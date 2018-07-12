@@ -23,21 +23,18 @@ import java.util.*;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.utils.ColorUtils;
-import pl.asie.charset.lib.utils.RedstoneUtils;
+import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.*;
 
 import javax.annotation.Nonnull;
@@ -100,7 +97,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 			case NORMAL:
 				return sWire.getWireType() != WireType.BUNDLED;
 			case INSULATED:
-				return sWire.getWireType() != WireType.INSULATED;
+				return true;
 			case BUNDLED:
 				return sWire.getWireType() != WireType.NORMAL;
 		}
@@ -169,7 +166,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 	}
 
 	@Override
-	protected final void updateConnections() {
+	protected void updateConnections() {
 		for (int j = 0; j < 6; j++) {
 			EnumFacing facing = EnumFacing.getFront(j);
 			TileEntity tile = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
@@ -284,17 +281,6 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 		} else {
 			return 0;
 		}
-	}
-
-	@Override
-	public boolean renderEquals(Wire other) {
-		return super.renderEquals(other)
-				&& (getWireType() != WireType.NORMAL || ((PartWireSignalBase) other).getRedstoneLevel() == getRedstoneLevel());
-	}
-
-	@Override
-	public int renderHashCode() {
-		return Objects.hash(super.renderHashCode(), getWireType() != WireType.NORMAL ? 0 : getRedstoneLevel());
 	}
 
 	@Override

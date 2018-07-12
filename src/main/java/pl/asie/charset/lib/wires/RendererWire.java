@@ -33,38 +33,13 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.render.CharsetFaceBakery;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
-import pl.asie.charset.lib.render.sprite.SpritesheetFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RendererWire extends ModelFactory<Wire> {
-    public static class WireSheet {
-        @Nonnull final TextureAtlasSprite[] top;
-        @Nullable final TextureAtlasSprite side;
-        @Nullable final TextureAtlasSprite edge;
-        @Nonnull final TextureAtlasSprite particle;
-        final int width, height;
-
-        private WireSheet(TextureMap map, String domain, String path, WireProvider type) {
-            top = SpritesheetFactory.register(map, new ResourceLocation(domain, path + "top"), 4, 4);
-            particle = map.registerSprite(new ResourceLocation(domain, path + "particle"));
-            if (!type.isFlat()) {
-                edge = map.registerSprite(new ResourceLocation(domain, path + "edge"));
-                side = map.registerSprite(new ResourceLocation(domain, path + "side"));
-            } else {
-                edge = null;
-                side = null;
-            }
-
-            width = (int) (type.getWidth() * 16);
-            height = (int) (type.getHeight() * 16);
-        }
-    }
-
     private final ModelRotation[] ROTATIONS = new ModelRotation[]{
             ModelRotation.X0_Y0,
             ModelRotation.X180_Y0,
@@ -74,28 +49,21 @@ public class RendererWire extends ModelFactory<Wire> {
             ModelRotation.X270_Y90
     };
 
-    private final Map<WireProvider, WireSheet> sheetMap = new HashMap<>();
+    private final Map<WireProvider, IWireRenderContainer> containerMap = new HashMap<>();
 
     public RendererWire() {
-        super(Wire.PROPERTY, new ResourceLocation("minecraft:blocks/stone"));
+        super(Wire.PROPERTY, TextureMap.LOCATION_MISSING_TEXTURE);
         addDefaultBlockTransforms();
     }
 
-    public WireSheet getSheet(WireProvider type) {
-        return sheetMap.get(type);
+    private <T> void addNonNull(Collection<T> coll, T object) {
+    	if (object != null) {
+    		coll.add(object);
+	    }
     }
 
-    public void registerSheet(TextureMap map, WireProvider type) {
-        ResourceLocation location = type.getTexturePrefix();
-        String domain = location.getResourceDomain();
-        String path = location.getResourcePath();
-
-        if (!path.endsWith("/")) {
-            path += "_";
-        }
-
-        WireSheet sheet = new WireSheet(map, domain, path, type);
-        sheetMap.put(type, sheet);
+    public IWireRenderContainer getContainer(WireProvider type) {
+        return containerMap.get(type);
     }
 
     private boolean wc(Wire wire, EnumFacing facing) {
@@ -108,7 +76,7 @@ public class RendererWire extends ModelFactory<Wire> {
         return false;
     }
 
-    private float getCL(Wire wire, WireFace side) {
+    private float getCL(WireRenderHandler handler, Wire wire, WireFace side) {
         // TODO
         //float h = wire != null && wire.hasWire(side) ? wire.getWireKind(side).height() : 0;
         float h = 0;
@@ -117,95 +85,149 @@ public class RendererWire extends ModelFactory<Wire> {
             h = 0;
         }
 
-        if (!wc(wire, side.facing) && wire.getProvider() != null) {
-            h = 8.0f - (sheetMap.get(wire.getProvider()).width / 2); // TODO: Replace with WireProvider call?
+        if (!wc(wire, side.facing)) {
+            h = 8.0f - (handler.getWidth() * 8);
         }
 
         return side.facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;
     }
 
-    public void addWireFreestanding(Wire wire, WireSheet sheet, int renderColor, List<BakedQuad> quads) {
-        float min = 8.0f - (sheet.width / 2);
-        float max = 8.0f + (sheet.width / 2);
-        Vector3f minX = new Vector3f(min, getCL(wire, WireFace.DOWN), getCL(wire, WireFace.NORTH));
-        Vector3f maxX = new Vector3f(min, getCL(wire, WireFace.UP), getCL(wire, WireFace.SOUTH));
-        Vector3f minY = new Vector3f(getCL(wire, WireFace.WEST), min, getCL(wire, WireFace.NORTH));
-        Vector3f maxY = new Vector3f(getCL(wire, WireFace.EAST), min, getCL(wire, WireFace.SOUTH));
-        Vector3f minZ = new Vector3f(getCL(wire, WireFace.WEST), getCL(wire, WireFace.DOWN), min);
-        Vector3f maxZ = new Vector3f(getCL(wire, WireFace.EAST), getCL(wire, WireFace.UP), min);
+    // NORTH SOUTH WEST EAST
+    protected void addTopFaceCplxInner(WireRenderHandler handler, Wire wire, EnumFacing facing, EnumFacing renderFace, EnumFacing[] dirs, int dirI, Vector3f from, Vector3f to, List<BakedQuad> quads, int connMask, ModelRotation rot) {
+    	float minX = 8.0f - (handler.getWidth() * 8);
+    	float maxX = 16.0f - minX;
+    	float minZ = minX;
+    	float maxZ = maxX;
+
+    	int dirP = dirI;
+	    switch (dirP) {
+		    case 0:
+			    minZ = 0.0f;
+			    maxZ = minX;
+			    break;
+		    case 1:
+			    minZ = maxZ;
+			    maxZ = 16.0f;
+			    break;
+		    case 2:
+			    minX = 0.0f;
+			    maxX = minZ;
+			    break;
+		    case 3:
+			    minX = maxX;
+			    maxX = 16.0f;
+			    break;
+		    default:
+		        break;
+	    }
+
+	    switch (renderFace.getAxis()) {
+		    case X:
+			    from = new Vector3f(from.x, minX, minZ);
+			    to = new Vector3f(to.x, maxX, maxZ);
+			    break;
+		    case Y:
+			    from = new Vector3f(minX, from.y, minZ);
+			    to = new Vector3f(maxX, to.y, maxZ);
+			    break;
+		    case Z:
+			    from = new Vector3f(minX, minZ, from.z);
+			    to = new Vector3f(maxX, maxZ, to.z);
+			    break;
+	    }
+
+	    addNonNull(quads,
+			    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+					    from, to, handler.getColor(WireRenderHandler.TextureType.TOP, wire, dirI < 0 ? null : dirs[dirI]),
+					    new float[] { minX, minZ, maxX, maxZ },
+					    handler.getTexture(WireRenderHandler.TextureType.TOP, wire, dirI < 0 ? null : dirs[dirI], connMask),
+					    renderFace, rot, true
+			    )
+	    );
+    }
+
+    protected void makeTopFace(List<BakedQuad> quads, WireRenderHandler handler, Wire wire, Vector3f from, Vector3f to, int connMask, EnumFacing facing, EnumFacing renderFacing, ModelRotation rot) {
+    	if (!handler.isTopSimple()) {
+    		// Render the top face as up to five quads
+		    EnumFacing[] dirs = WireUtils.getConnectionsForRender(WireFace.get(EnumFacing.getFront(facing.ordinal() & (~1))));
+		    addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, -1, from, to, quads, connMask, rot);
+		    if ((connMask & 8) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 0, from, to, quads, connMask, rot);
+		    if ((connMask & 4) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 1, from, to, quads, connMask, rot);
+		    if ((connMask & 2) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 2, from, to, quads, connMask, rot);
+		    if ((connMask & 1) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 3, from, to, quads, connMask, rot);
+		    return;
+	    }
+
+	    addNonNull(quads,
+			    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+					    from, to, handler.getColor(WireRenderHandler.TextureType.TOP, wire, null),
+					    handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, connMask),
+						renderFacing, rot, true
+			    )
+	    );
+    }
+
+    public void addWireFreestanding(WireRenderHandler handler, Wire wire, List<BakedQuad> quads) {
+        float min = 8.0f - (handler.getWidth() * 8);
+        float max = 16.0f - min;
+        Vector3f minX = new Vector3f(min, getCL(handler, wire, WireFace.DOWN), getCL(handler, wire, WireFace.NORTH));
+        Vector3f maxX = new Vector3f(min, getCL(handler, wire, WireFace.UP), getCL(handler, wire, WireFace.SOUTH));
+        Vector3f minY = new Vector3f(getCL(handler, wire, WireFace.WEST), min, getCL(handler, wire, WireFace.NORTH));
+        Vector3f maxY = new Vector3f(getCL(handler, wire, WireFace.EAST), min, getCL(handler, wire, WireFace.SOUTH));
+        Vector3f minZ = new Vector3f(getCL(handler, wire, WireFace.WEST), getCL(handler, wire, WireFace.DOWN), min);
+        Vector3f maxZ = new Vector3f(getCL(handler, wire, WireFace.EAST), getCL(handler, wire, WireFace.UP), min);
 
         int cmcX = (wc(wire, EnumFacing.UP) ? 8 : 0) | (wc(wire, EnumFacing.DOWN) ? 4 : 0) | (wc(wire, EnumFacing.NORTH) ? 2 : 0) | (wc(wire, EnumFacing.SOUTH) ? 1 : 0);
         int cmcY = (wc(wire, EnumFacing.NORTH) ? 4 : 0) | (wc(wire, EnumFacing.SOUTH) ? 8 : 0) | (wc(wire, EnumFacing.WEST) ? 2 : 0) | (wc(wire, EnumFacing.EAST) ? 1 : 0);
         int cmcZ = (wc(wire, EnumFacing.UP) ? 8 : 0) | (wc(wire, EnumFacing.DOWN) ? 4 : 0) | (wc(wire, EnumFacing.WEST) ? 1 : 0) | (wc(wire, EnumFacing.EAST) ? 2 : 0);
 
-        for (int i = 0; i < 2; i++) {
-            quads.add(
-                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                            minX, maxX, renderColor,
-                            sheet.top[cmcX], i == 0 ? EnumFacing.WEST : EnumFacing.EAST,
-                            ModelRotation.X0_Y0, true
-                    )
-            );
+	    makeTopFace(quads, handler, wire, minX, maxX, cmcX, EnumFacing.WEST, EnumFacing.WEST, ModelRotation.X0_Y0);
+	    makeTopFace(quads, handler, wire, minY, maxY, cmcY, EnumFacing.DOWN, EnumFacing.DOWN, ModelRotation.X0_Y0);
+	    makeTopFace(quads, handler, wire, minZ, maxZ, cmcZ, EnumFacing.NORTH, EnumFacing.NORTH, ModelRotation.X0_Y0);
 
-            quads.add(
-                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                            minY, maxY, renderColor,
-                            sheet.top[cmcY], i == 0 ? EnumFacing.DOWN : EnumFacing.UP,
-                            ModelRotation.X0_Y0, true
-                    )
-            );
+        // set to max
+        minX.setX(max);
+        maxX.setX(max);
+        minY.setY(max);
+        maxY.setY(max);
+        minZ.setZ(max);
+        maxZ.setZ(max);
 
-            quads.add(
-                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                            minZ, maxZ, renderColor,
-                            sheet.top[cmcZ], i == 0 ? EnumFacing.NORTH : EnumFacing.SOUTH,
-                            ModelRotation.X0_Y0, true
-                    )
-            );
+        // swap
+	    cmcY = (cmcY & 0x3) | ((cmcY & 0x8) >> 1) | ((cmcY & 0x4) << 1);
+        cmcZ = (cmcZ & 0xC) | ((cmcZ & 0x2) >> 1) | ((cmcZ & 0x1) << 1);
+        cmcX = (cmcX & 0xC) | ((cmcX & 0x2) >> 1) | ((cmcX & 0x1) << 1);
 
-            if (i == 0) {
-                // set to max
-                minX.setX(max);
-                maxX.setX(max);
-                minY.setY(max);
-                maxY.setY(max);
-                minZ.setZ(max);
-                maxZ.setZ(max);
+	    makeTopFace(quads, handler, wire, minX, maxX, cmcX, EnumFacing.EAST, EnumFacing.EAST, ModelRotation.X0_Y0);
+	    makeTopFace(quads, handler, wire, minY, maxY, cmcY, EnumFacing.UP, EnumFacing.UP, ModelRotation.X0_Y0);
+	    makeTopFace(quads, handler, wire, minZ, maxZ, cmcZ, EnumFacing.SOUTH, EnumFacing.SOUTH, ModelRotation.X0_Y0);
 
-                // swap
-                cmcY = (cmcY & 0x3) | ((cmcY & 0x8) >> 1) | ((cmcY & 0x4) << 1);
-                cmcZ = (cmcZ & 0xC) | ((cmcZ & 0x2) >> 1) | ((cmcZ & 0x1) << 1);
-                cmcX = (cmcX & 0xC) | ((cmcX & 0x2) >> 1) | ((cmcX & 0x1) << 1);
-            }
-        }
-
-        if (sheet.edge != null) {
-            for (EnumFacing f : EnumFacing.VALUES) {
-                if (wc(wire, f)) {
-                    quads.add(
-                            CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                    new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
-                                    renderColor,
-                                    f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[]{max, min, min, max} : new float[]{min, min, max, max},
-                                    sheet.edge, EnumFacing.DOWN, ROTATIONS[f.ordinal()], true
-                            )
-                    );
-                }
+        for (EnumFacing f : EnumFacing.VALUES) {
+            if (wc(wire, f)) {
+                addNonNull(quads,
+		                CharsetFaceBakery.INSTANCE.makeBakedQuad(
+				                new Vector3f(min, 0.0F, min), new Vector3f(max, 0.0f, max),
+				                handler.getColor(WireRenderHandler.TextureType.EDGE, wire, f),
+				                f.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? new float[]{max, min, min, max} : new float[]{min, min, max, max},
+				                handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, f, 15),
+				                EnumFacing.DOWN, ROTATIONS[f.ordinal()], true
+		                )
+                );
             }
         }
     }
 
-    public void addCorner(Wire wire, WireSheet sheet, EnumFacing dir, int renderColor, List<BakedQuad> quads) {
+    public void addCorner(WireRenderHandler handler, Wire wire, EnumFacing dir, List<BakedQuad> quads) {
         if (wire.getProvider().isFlat()) {
             return;
         }
 
-        int width = sheet.width;
-        int height = sheet.height;
+        int width = (int) (handler.getWidth() * 16.0f);
+        int height = (int) (handler.getHeight() * 16.0f);
 
         ModelRotation rot = ROTATIONS[wire.getLocation().ordinal()];
         float min = 8.0f - (width / 2);
-        float max = 8.0f + (width / 2);
+        float max = 16.0f - min;
 
         // Edge faces
 
@@ -215,186 +237,177 @@ public class RendererWire extends ModelFactory<Wire> {
         if (dir == EnumFacing.NORTH) {
             float[] topUV = new float[]{min, 16 - height, max, 16};
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(min, 0, -height), new Vector3f(max, height, -height),
-                            renderColor, edgeUVFlipped,
-                            sheet.top[15], EnumFacing.NORTH, rot, false
+                            handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.NORTH), edgeUVFlipped,
+		                    handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.NORTH, rot, false
                     )
             );
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(min, height, -height), new Vector3f(max, height, 0),
-                            renderColor, topUV,
-                            sheet.top[15], EnumFacing.UP, rot, false
+		                    handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.UP), topUV,
+		                    handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.UP, rot, false
                     )
             );
 
-            if (sheet.edge != null) {
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(min, 0, -height), new Vector3f(min, height, 0),
-                                renderColor, edgeUV,
-                                sheet.edge, EnumFacing.WEST, rot, false
-                        )
-                );
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(min, 0, -height), new Vector3f(min, height, 0),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUV,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.WEST, rot, false
+                    )
+            );
 
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(max, 0, -height), new Vector3f(max, height, 0),
-                                renderColor, edgeUVFlipped,
-                                sheet.edge, EnumFacing.EAST, rot, false
-                        )
-                );
-            }
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(max, 0, -height), new Vector3f(max, height, 0),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUVFlipped,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.EAST, rot, false
+                    )
+            );
         } else if (dir == EnumFacing.SOUTH) {
             float[] topUV = new float[]{min, 0, max, height};
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(min, 0, 16 + height), new Vector3f(max, height, 16 + height),
-                            renderColor, edgeUVFlipped,
-                            sheet.top[15], EnumFacing.SOUTH, rot, false
+		                    handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.SOUTH), edgeUVFlipped,
+                            handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.SOUTH, rot, false
                     )
             );
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(min, height, 16), new Vector3f(max, height, 16 + height),
-                            renderColor, topUV,
-                            sheet.top[15], EnumFacing.UP, rot, false
+		                    handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.UP), topUV,
+                            handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.UP, rot, false
                     )
             );
 
-            if (sheet.edge != null) {
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(min, 0, 16), new Vector3f(min, height, 16 + height),
-                                renderColor, edgeUV,
-                                sheet.edge, EnumFacing.WEST, rot, false
-                        )
-                );
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(min, 0, 16), new Vector3f(min, height, 16 + height),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUV,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.WEST, rot, false
+                    )
+            );
 
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(max, 0, 16), new Vector3f(max, height, 16 + height),
-                                renderColor, edgeUVFlipped,
-                                sheet.edge, EnumFacing.EAST, rot, false
-                        )
-                );
-            }
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(max, 0, 16), new Vector3f(max, height, 16 + height),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUVFlipped,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.EAST, rot, false
+                    )
+            );
         } else if (dir == EnumFacing.WEST) {
             float[] topUV = new float[]{16 - height, min, 16, max};
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(-height, height, min), new Vector3f(0, height, max),
-                            renderColor, topUV,
-                            sheet.top[15], EnumFacing.UP, rot, false
+		                    handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.UP), topUV,
+                            handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.UP, rot, false
                     )
             );
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(-height, 0, min), new Vector3f(-height, height, max),
-                            renderColor, edgeUV,
-                            sheet.top[15], EnumFacing.WEST, rot, false
+		                    handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.WEST), edgeUV,
+                            handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.WEST, rot, false
                     )
             );
 
-            if (sheet.edge != null) {
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(-height, 0, min), new Vector3f(0, height, min),
-                                renderColor, edgeUVFlipped,
-                                sheet.edge, EnumFacing.NORTH, rot, false
-                        )
-                );
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(-height, 0, min), new Vector3f(0, height, min),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUVFlipped,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.NORTH, rot, false
+                    )
+            );
 
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(-height, 0, max), new Vector3f(0, height, max),
-                                renderColor, edgeUV,
-                                sheet.edge, EnumFacing.SOUTH, rot, false
-                        )
-                );
-            }
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(-height, 0, max), new Vector3f(0, height, max),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUV,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.SOUTH, rot, false
+                    )
+            );
         } else if (dir == EnumFacing.EAST) {
             float[] topUV = new float[]{0, min, height, max};
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(16, height, min), new Vector3f(16 + height, height, max),
-                            renderColor, topUV,
-                            sheet.top[15], EnumFacing.UP, rot, false
+		                    handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.UP), topUV,
+                            handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.UP, rot, false
                     )
             );
 
-            quads.add(
+            addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(16 + height, 0, min), new Vector3f(16 + height, height, max),
-                            renderColor, edgeUV,
-                            sheet.top[15], EnumFacing.EAST, rot, false
+		                    handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.EAST), edgeUV,
+                            handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.EAST, rot, false
                     )
             );
 
-            if (sheet.edge != null) {
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(16, 0, min), new Vector3f(16 + height, height, min),
-                                renderColor, edgeUVFlipped,
-                                sheet.edge, EnumFacing.NORTH, rot, false
-                        )
-                );
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(16, 0, min), new Vector3f(16 + height, height, min),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUVFlipped,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.NORTH, rot, false
+                    )
+            );
 
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                new Vector3f(16, 0, max), new Vector3f(16 + height, height, max),
-                                renderColor, edgeUV,
-                                sheet.edge, EnumFacing.SOUTH, rot, false
-                        )
-                );
-            }
+            addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            new Vector3f(16, 0, max), new Vector3f(16 + height, height, max),
+                            handler.getColor(WireRenderHandler.TextureType.EDGE, wire, null), edgeUV,
+                            handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, null, 15), EnumFacing.SOUTH, rot, false
+                    )
+            );
         }
     }
 
-    public void addWire(Wire wire, WireSheet sheet, List<BakedQuad> quads) {
+    public void addWire(WireRenderHandler handler, Wire wire, List<BakedQuad> quads) {
         WireFace side = wire.getLocation();
-        int renderColor = wire.getRenderColor();
 
         if (side == WireFace.CENTER) {
-            addWireFreestanding(wire, sheet, renderColor, quads);
+            addWireFreestanding(handler, wire, quads);
             return;
         }
 
-        float min = 8.0f - (sheet.width / 2);
-        float max = 8.0f + (sheet.width / 2);
+        float min = 8.0f - (handler.getWidth() * 8f);
+        float max = 16.0f - min;
         float minH = 0.0f;
-        float maxH = sheet.height;
+        float maxH = handler.getHeight() * 16f;
         EnumFacing[] dirs = WireUtils.getConnectionsForRender(side);
 
         boolean[] connectionMatrix = new boolean[]{
-                wire == null || wire.connectsAny(dirs[0]),
-                wire == null || wire.connectsAny(dirs[1]),
-                wire == null || wire.connectsAny(dirs[2]),
-                wire == null || wire.connectsAny(dirs[3])
+                wire.connectsAny(dirs[0]),
+                wire.connectsAny(dirs[1]),
+		        wire.connectsAny(dirs[2]),
+		        wire.connectsAny(dirs[3])
         };
         int cmc = (connectionMatrix[0] ? 8 : 0) | (connectionMatrix[1] ? 4 : 0) | (connectionMatrix[2] ? 2 : 0) | (connectionMatrix[3] ? 1 : 0);
 
         boolean[] cornerConnectionMatrix = new boolean[]{
-                wire == null || wire.connectsCorner(dirs[0]),
-                wire == null || wire.connectsCorner(dirs[1]),
-                wire == null || wire.connectsCorner(dirs[2]),
-                wire == null || wire.connectsCorner(dirs[3])
+		        wire.connectsCorner(dirs[0]),
+		        wire.connectsCorner(dirs[1]),
+		        wire.connectsCorner(dirs[2]),
+		        wire.connectsCorner(dirs[3])
         };
 
         ModelRotation rot = ROTATIONS[side.ordinal()];
 
         // Center face
 
-        Vector3f from = new Vector3f(min, sheet.height, min);
-        Vector3f to = new Vector3f(max, sheet.height, max);
+        Vector3f from = new Vector3f(min, maxH, min);
+        Vector3f to = new Vector3f(max, maxH, max);
 
         if (connectionMatrix[0]) {
             from.setZ(0.0f);
@@ -409,56 +422,43 @@ public class RendererWire extends ModelFactory<Wire> {
             to.setX(16.0f);
         }
 
-        quads.add(
-                CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                        from, to,
-                        renderColor, new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
-                        sheet.top[cmc], EnumFacing.UP,
-                        rot, true
-                )
-        );
+        makeTopFace(quads, handler, wire, from, to, cmc, wire.getLocation().facing, EnumFacing.UP, rot);
 
         if (!wire.getProvider().isFlat()) {
             from.setY(0.0F);
             to.setY(0.0F);
-            quads.add(
-                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                            from, to,
-                            renderColor, new float[]{from.getX(), from.getZ(), to.getX(), to.getZ()},
-                            sheet.top[cmc], EnumFacing.DOWN, rot, true
-                    )
-            );
-
+	        makeTopFace(quads, handler, wire, from, to, cmc, wire.getLocation().facing, EnumFacing.DOWN, rot);
 
             // Side faces
             Vector3f fromZ = new Vector3f(from.getX(), 0.0f, min);
-            Vector3f toZ = new Vector3f(to.getX(), sheet.height, min);
+            Vector3f toZ = new Vector3f(to.getX(), maxH, min);
             Vector3f fromX = new Vector3f(min, 0.0f, from.getZ());
-            Vector3f toX = new Vector3f(min, sheet.height, to.getZ());
+            Vector3f toX = new Vector3f(min, maxH, to.getZ());
 
             // Should we render a faux side wire on this side? (For bundled)
             boolean crossroadsX = connectionMatrix[2] && !connectionMatrix[3];
             boolean crossroadsZ = connectionMatrix[0] && !connectionMatrix[1];
 
-            // getIcon(false, cmc == 1, crossroadsX, EnumFacing.WEST)
-            if (sheet.side != null) {
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                fromX, toX,
-                                renderColor, new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
-                                sheet.side, EnumFacing.WEST, rot, false
-                        )
-                );
+            boolean renderSideX = connectionMatrix[0] || connectionMatrix[1];
+	        boolean renderSideZ = connectionMatrix[2] || connectionMatrix[3];
 
-                // getIcon(false, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH)
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                fromZ, toZ,
-                                renderColor, new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
-                                sheet.side, EnumFacing.NORTH, rot, false
-                        )
-                );
-            }
+            // getIcon(false, cmc == 1, crossroadsX, EnumFacing.WEST)
+	        if (!connectionMatrix[2] || renderSideX) addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            fromX, toX,
+                            handler.getColor(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.WEST), new float[]{fromX.getZ(), fromX.getY(), toX.getZ(), toX.getY()},
+		                    handler.getTexture(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.WEST, cmc), EnumFacing.WEST, rot, false
+                    )
+            );
+
+            // getIcon(false, cmc == 0 || cmc == 4, crossroadsZ, EnumFacing.NORTH)
+	        if (!connectionMatrix[0] || renderSideZ) addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            fromZ, toZ,
+		                    handler.getColor(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.NORTH), new float[]{toZ.getX(), fromZ.getY(), fromZ.getX(), toZ.getY()},
+		                    handler.getTexture(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.NORTH, cmc), EnumFacing.NORTH, rot, false
+                    )
+            );
 
             fromX.setX(max);
             toX.setX(max);
@@ -466,94 +466,90 @@ public class RendererWire extends ModelFactory<Wire> {
             fromZ.setZ(max);
             toZ.setZ(max);
 
-            if (sheet.side != null) {
-                // getIcon(false, cmc == 2, crossroadsX, EnumFacing.EAST)
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                fromX, toX,
-                                renderColor, new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
-                                sheet.side, EnumFacing.EAST, rot, false
-                        )
-                );
+            // getIcon(false, cmc == 2, crossroadsX, EnumFacing.EAST)
+	        if (!connectionMatrix[3] || renderSideX) addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            fromX, toX,
+		                    handler.getColor(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.EAST), new float[]{toX.getZ(), fromX.getY(), fromX.getZ(), toX.getY()},
+                            handler.getTexture(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.EAST, cmc), EnumFacing.EAST, rot, false
+                    )
+            );
 
-                // getIcon(false, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH)
-                quads.add(
-                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                fromZ, toZ,
-                                renderColor, new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
-                                sheet.side, EnumFacing.SOUTH, rot, false
-                        )
-                );
-            }
+            // getIcon(false, cmc == 0 || cmc == 8, crossroadsZ, EnumFacing.SOUTH)
+	        if (!connectionMatrix[1] || renderSideZ) addNonNull(quads,
+                    CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                            fromZ, toZ,
+		                    handler.getColor(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.SOUTH), new float[]{fromZ.getX(), fromZ.getY(), toZ.getX(), toZ.getY()},
+		                    handler.getTexture(WireRenderHandler.TextureType.SIDE, wire, EnumFacing.SOUTH, cmc), EnumFacing.SOUTH, rot, false
+                    )
+            );
 
             // Edge faces
             float[] edgeUV = new float[]{min, minH, max, maxH};
             float[] edgeUVFlipped = new float[]{max, minH, min, maxH};
 
-            if (sheet.edge != null) {
-                if (connectionMatrix[0]) {
-                    quads.add(
-                            CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                    new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
-                                    renderColor, edgeUVFlipped,
-                                    sheet.edge, EnumFacing.NORTH, rot, false
-                            )
-                    );
-                }
+            if (connectionMatrix[0]) {
+                addNonNull(quads,
+                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                                new Vector3f(min, minH, 0.0F), new Vector3f(max, maxH, 0.0F),
+                                handler.getColor(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.NORTH), edgeUVFlipped,
+                                handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.NORTH, 15), EnumFacing.NORTH, rot, false
+                        )
+                );
+            }
 
-                if (connectionMatrix[1]) {
-                    quads.add(
-                            CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                    new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
-                                    renderColor, edgeUV,
-                                    sheet.edge, EnumFacing.SOUTH, rot, false
-                            )
-                    );
-                }
+            if (connectionMatrix[1]) {
+                addNonNull(quads,
+                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                                new Vector3f(min, minH, 16.0F), new Vector3f(max, maxH, 16.0F),
+                                handler.getColor(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.SOUTH), edgeUV,
+		                        handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.SOUTH, 15), EnumFacing.SOUTH, rot, false
+                        )
+                );
+            }
 
-                if (connectionMatrix[2]) {
-                    quads.add(
-                            CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                    new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
-                                    renderColor, edgeUV,
-                                    sheet.edge, EnumFacing.WEST, rot, false
-                            )
-                    );
-                }
+            if (connectionMatrix[2]) {
+                addNonNull(quads,
+                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                                new Vector3f(0.0F, minH, min), new Vector3f(0.0F, maxH, max),
+                                handler.getColor(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.WEST), edgeUV,
+		                        handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.WEST, 15), EnumFacing.WEST, rot, false
+                        )
+                );
+            }
 
-                if (connectionMatrix[3]) {
-                    quads.add(
-                            CharsetFaceBakery.INSTANCE.makeBakedQuad(
-                                    new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
-                                    renderColor, edgeUVFlipped,
-                                    sheet.edge, EnumFacing.EAST, rot, false
-                            )
-                    );
-                }
+            if (connectionMatrix[3]) {
+                addNonNull(quads,
+                        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+                                new Vector3f(16.0F, minH, min), new Vector3f(16.0F, maxH, max),
+                                handler.getColor(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.EAST), edgeUVFlipped,
+		                        handler.getTexture(WireRenderHandler.TextureType.EDGE, wire, EnumFacing.EAST, 15), EnumFacing.EAST, rot, false
+                        )
+                );
             }
 
             EnumFacing[] dirs0 = WireUtils.getConnectionsForRender(WireFace.DOWN);
             for (int i = 0; i < 4; i++) {
                 if (cornerConnectionMatrix[i]) {
-                    addCorner(wire, sheet, dirs0[i], renderColor, quads);
+                    addCorner(handler, wire, dirs0[i], quads);
                 }
             }
         }
     }
 
     @Override
-    public IBakedModel bake(Wire wire, boolean isItem, BlockRenderLayer layer) {
+    public IBakedModel bake(Wire wire, boolean isItem, BlockRenderLayer blockLayer) {
         SimpleBakedModel model = new SimpleBakedModel(this);
         if (wire != null) {
-            WireSheet sheet = sheetMap.get(wire.getProvider());
-            if (sheet != null) {
-                //if (sheet.particle.getIconName().endsWith("missingno")) {
-
-                //} else {
-                //    model.setParticle(sheet.particle);
-                //}
-                model.setParticle(sheet.top[sheet.top.length - 1]);
-                addWire(wire, sheet, model.getQuads(null, null, 0));
+            IWireRenderContainer container = containerMap.get(wire.getProvider());
+            if (container != null) {
+                for (int i = 0; i < container.getLayerCount(); i++) {
+                    WireRenderHandler handler = container.get(i);
+                    if (i == 0) {
+                        model.setParticle(handler.getTexture(WireRenderHandler.TextureType.PARTICLE, wire,null, 15));
+                    }
+                    addWire(handler, wire, model.getQuads(null, null, 0));
+                }
             }
         }
 
@@ -568,4 +564,17 @@ public class RendererWire extends ModelFactory<Wire> {
         }
         return wire;
     }
+
+	public void registerContainer(WireProvider provider, IWireRenderContainer container) {
+    	containerMap.put(provider, container);
+	}
+
+	protected void reloadTextures(TextureMap map) {
+    	for (IWireRenderContainer container : containerMap.values()) {
+    		for (int i = 0; i < container.getLayerCount(); i++) {
+    			WireRenderHandler handler = container.get(i);
+    			handler.refresh(map);
+		    }
+	    }
+	}
 }

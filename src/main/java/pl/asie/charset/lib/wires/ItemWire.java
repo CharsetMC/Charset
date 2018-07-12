@@ -37,6 +37,7 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.CharsetLib;
+import pl.asie.charset.lib.modcompat.mcmultipart.MCMPUtils;
 
 import javax.annotation.Nullable;
 
@@ -109,10 +110,6 @@ public class ItemWire extends ItemBlockMultipart {
         WireFace location = (stack.getMetadata() & 1) != 0 ? WireFace.CENTER : WireFace.get(facing.getOpposite());
         if (!provider.canPlace(world, pos, location)) {
             return false;
-        }
-
-        if (provider.canProvidePower()) {
-            newState = newState.withProperty(BlockWire.REDSTONE, true);
         }
 
         if (super.placeBlockAtTested(stack, player, world, pos, facing, hitX, hitY, hitZ, newState)) {

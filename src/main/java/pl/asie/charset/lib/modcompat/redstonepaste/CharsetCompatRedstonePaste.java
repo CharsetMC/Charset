@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates.modcompat.redstonepaste;
+package pl.asie.charset.lib.modcompat.redstonepaste;
 
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
@@ -31,8 +31,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
-import pl.asie.simplelogic.gates.IRedstoneGetter;
-import pl.asie.simplelogic.gates.RedstoneGetterHandler;
+import pl.asie.charset.lib.utils.redstone.IRedstoneGetter;
+import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 
 import java.util.EnumMap;
 
@@ -44,11 +44,11 @@ import java.util.EnumMap;
  * My apologies.
  */
 @CharsetModule(
-        name = "redstonepaste:simplelogic.gates",
+        name = "redstonepaste:lib",
         profile = ModuleProfile.COMPAT,
-        dependencies = {"mod:redstonepaste", "simplelogic.gates"}
+        dependencies = {"mod:redstonepaste"}
 )
-public class SimpleLogicCompatRedstonePaste {
+public class CharsetCompatRedstonePaste {
     private static final Table<EnumFacing, EnumFacing, Integer> faceEdgeBit = Tables.newCustomTable(
             new EnumMap<>(EnumFacing.class),
             () -> new EnumMap<>(EnumFacing.class)
@@ -125,6 +125,6 @@ public class SimpleLogicCompatRedstonePaste {
 
     @Mod.EventHandler
     public void onPostInit(FMLPostInitializationEvent event) {
-        RedstoneGetterHandler.GETTERS.add(new RedstoneGetterPaste());
+        RedstoneUtils.addRedstoneGetter(new RedstoneGetterPaste());
     }
 }

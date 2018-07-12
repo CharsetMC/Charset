@@ -25,6 +25,7 @@ import mcmultipart.api.multipart.IMultipartRegistry;
 import pl.asie.charset.lib.handlers.DebugInfoProvider;
 import pl.asie.charset.lib.loader.AnnotatedPluginHandler;
 import pl.asie.charset.lib.utils.OcclusionUtils;
+import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 
 @MCMPAddon
 public class MCMPAddonCharset extends AnnotatedPluginHandler<IMCMPAddon> implements IMCMPAddon {
@@ -36,6 +37,7 @@ public class MCMPAddonCharset extends AnnotatedPluginHandler<IMCMPAddon> impleme
     public void registerParts(IMultipartRegistry registry) {
         OcclusionUtils.INSTANCE = new OcclusionUtilsMultipart();
         DebugInfoProvider.registerHandler(new DebugInfoProviderMCMP());
+        RedstoneUtils.addRedstoneGetter(new RedstoneGetterMultipart());
 
         for (IMCMPAddon addon : getPlugins()) {
             addon.registerParts(registry);

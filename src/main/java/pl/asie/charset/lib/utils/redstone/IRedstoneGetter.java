@@ -17,15 +17,18 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates;
+package pl.asie.charset.lib.utils.redstone;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
+import javax.annotation.Nullable;
 import java.util.OptionalInt;
 
 public interface IRedstoneGetter {
-    // -1 = don't use, 0-15 = value
-    int get(IBlockAccess world, BlockPos pos, EnumFacing face, EnumFacing edge);
+    /**
+     * @return -1 = ignore result (use next handler), 0-15 - redstone signal value
+     */
+    int get(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge);
 }

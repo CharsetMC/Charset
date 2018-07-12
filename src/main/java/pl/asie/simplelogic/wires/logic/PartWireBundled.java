@@ -21,22 +21,23 @@ package pl.asie.simplelogic.wires.logic;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import pl.asie.charset.api.wires.IBundledEmitter;
-import pl.asie.charset.api.wires.IBundledReceiver;
-import pl.asie.charset.api.wires.IWire;
-import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.api.wires.*;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.wires.IWireContainer;
 import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireProvider;
@@ -46,11 +47,42 @@ import pl.asie.simplelogic.wires.LogicWireUtils;
 import javax.annotation.Nonnull;
 
 public class PartWireBundled extends PartWireSignalBase implements IBundledReceiver, IBundledEmitter {
+	private int[] insulatedColorCache = null;
 	private int[] signalLevel = new int[16];
 	private byte[] signalValue = new byte[16];
 
 	public PartWireBundled(@Nonnull IWireContainer container, @Nonnull WireProvider factory, @Nonnull WireFace location) {
 		super(container, factory, location);
+	}
+
+	protected int[] getInsulatedColorCache() {
+		if (getContainer().world() != null && getContainer().pos() != null) {
+			if (insulatedColorCache == null) {
+				insulatedColorCache = new int[6];
+
+				for (EnumFacing facing : EnumFacing.VALUES) {
+					BlockPos pos = getContainer().pos().offset(facing);
+					WireFace face = getLocation();
+
+					if (connectsCorner(facing)) {
+						pos = pos.offset(face.facing);
+						face = WireFace.get(facing.getOpposite());
+					} else if (!connectsExternal(facing)) {
+						insulatedColorCache[facing.ordinal()] = -1;
+						continue;
+					}
+
+					Wire targetWire = WireUtils.getWire(getContainer().world(), pos, face);
+					if (targetWire instanceof PartWireInsulated) {
+						insulatedColorCache[facing.ordinal()] = ((PartWireInsulated) targetWire).getWireColor();
+					} else {
+						insulatedColorCache[facing.ordinal()] = -1;
+					}
+				}
+			}
+		}
+
+		return insulatedColorCache;
 	}
 
 	@Override
@@ -60,8 +92,19 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 	}
 
 	@Override
+	public boolean renderEquals(Wire other) {
+		return super.renderEquals(other) && Arrays.equals(((PartWireBundled) other).getInsulatedColorCache(), getInsulatedColorCache());
+	}
+
+	@Override
+	public int renderHashCode() {
+		return Objects.hash(super.renderHashCode(), getInsulatedColorCache());
+	}
+
+	@Override
 	public void readNBTData(NBTTagCompound nbt, boolean isClient) {
 		super.readNBTData(nbt, isClient);
+
 		if (nbt.hasKey("s", Constants.NBT.TAG_INT_ARRAY)) {
 			signalLevel = nbt.getIntArray("s");
 			if (signalLevel.length != 16) {
@@ -70,9 +113,12 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		} else {
 			signalLevel = new int[16];
 		}
+
 		for (int i = 0; i < 16; i++) {
 			signalValue[i] = (byte) (signalLevel[i] >> 8);
 		}
+
+		insulatedColorCache = null;
 	}
 
 	@Override
@@ -101,7 +147,11 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
 				if (nValues[facing.ordinal()] != null) {
-					int v = nValues[facing.ordinal()][color] << 8;
+					int nv = nValues[facing.ordinal()][color];
+					// clamp nv
+					if (nv < 0 || nv > 0x0F) nv = 0x0F;
+
+					int v = nv << 8;
 					if (v != 0) {
 						neighborLevel[facing.ordinal()] = v | 0xFF;
 					}
@@ -219,8 +269,9 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 			if (connectsExternal(facing)) {
 				IBundledEmitter emitter = null;
 
-				if (WireUtils.hasCapability(this, getContainer().pos(), Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false)) {
-					emitter = WireUtils.getCapability(this, getContainer().pos(), Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false);
+				BlockPos pos = getContainer().pos().offset(facing);
+				if (WireUtils.hasCapability(this, pos, Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false)) {
+					emitter = WireUtils.getCapability(this, pos, Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false);
 				}
 
 				if (emitter != null && !(emitter instanceof PartWireSignalBase)) {
@@ -278,7 +329,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		if (capability == Capabilities.BUNDLED_EMITTER) {
 			return connects(face);
 		}
-		return false;
+		return super.hasCapability(capability, face);
 	}
 
 	@Override
@@ -289,7 +340,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		if (capability == Capabilities.BUNDLED_EMITTER) {
 			return Capabilities.BUNDLED_EMITTER.cast(this);
 		}
-		return null;
+		return super.getCapability(capability, face);
 	}
 
 	@Override
@@ -299,6 +350,14 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 	@Override
 	public void addDebugInformation(List<String> stringList, Side side) {
-		// TODO
+		if (side == Side.SERVER) {
+			StringBuilder builder = new StringBuilder(getLocation().name());
+			builder.append(' ');
+			for (int i = 0; i < 16; i++) {
+				builder.append(ColorUtils.getNearestTextFormatting(EnumDyeColor.byMetadata(i)));
+				builder.append(signalValue[i] <= 0 ? '_' : Integer.toHexString(signalValue[i]).toUpperCase());
+			}
+			stringList.add(builder.toString());
+		}
 	}
 }

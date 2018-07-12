@@ -33,6 +33,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
@@ -42,6 +43,7 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.simplelogic.wires.logic.WireRenderHandlerOverlay;
 
 import javax.annotation.Nullable;
 
@@ -112,14 +114,16 @@ public class CharsetLibWires {
 		rendererWire = new RendererWire();
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOW)
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
-		WireManager.REGISTRY.unfreeze();
-
 		for (WireProvider provider : WireManager.REGISTRY) {
-			rendererWire.registerSheet(event.getMap(), provider);
+			if (rendererWire.getContainer(provider) == null) {
+				rendererWire.registerContainer(provider, new IWireRenderContainer.Simple(new WireRenderHandlerDefault(provider)));
+			}
 		}
+
+		rendererWire.reloadTextures(event.getMap());
 	}
 
 	@SubscribeEvent
@@ -134,5 +138,9 @@ public class CharsetLibWires {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new WireHighlightHandler());
+	}
+
+	public void registerRenderer(WireProvider provider, IWireRenderContainer container) {
+		rendererWire.registerContainer(provider, container);
 	}
 }

@@ -19,9 +19,11 @@
 
 package pl.asie.simplelogic.wires;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -29,16 +31,30 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.recipe.IngredientGroup;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.wires.CharsetLibWires;
 import pl.asie.charset.lib.wires.ItemWire;
 import pl.asie.charset.lib.wires.WireProvider;
 import pl.asie.charset.shared.SimpleLogicShared;
 import pl.asie.simplelogic.wires.logic.LogicWireProvider;
+import pl.asie.simplelogic.wires.logic.WireRenderHandlerOverlay;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 @CharsetModule(
 		name = "simplelogic.wires",
@@ -55,11 +71,11 @@ public class SimpleLogicWires {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		wireProviders[0] = new LogicWireProvider(WireType.NORMAL, -1).setRegistryName(new ResourceLocation("charset:simplelogic_wire_n"));
+		wireProviders[0] = new LogicWireProvider(WireType.NORMAL, -1).setRegistryName(new ResourceLocation("charset:logic_wire_n"));
 		for (int i = 0; i < 16; i++) {
-			wireProviders[i + 1] = new LogicWireProvider(WireType.INSULATED, i).setRegistryName(new ResourceLocation("charset:simplelogic_wire_i" + i));
+			wireProviders[i + 1] = new LogicWireProvider(WireType.INSULATED, i).setRegistryName(new ResourceLocation("charset:logic_wire_i" + i));
 		}
-		wireProviders[17] = new LogicWireProvider(WireType.BUNDLED, -1).setRegistryName(new ResourceLocation("charset:simplelogic_wire_b"));
+		wireProviders[17] = new LogicWireProvider(WireType.BUNDLED, -1).setRegistryName(new ResourceLocation("charset:logic_wire_b"));
 
 		for (int i = 0; i < wireProviders.length; i++) {
 			wireItems[i] = new ItemWire(wireProviders[i]);
@@ -67,7 +83,11 @@ public class SimpleLogicWires {
 		}
 
 		// configure creative tab
-		SimpleLogicShared.TAB_ICON = new ItemStack(wireItems[17]);
+		SimpleLogicShared.TAB_ICON = new ItemStack(wireItems[0]);
+
+		for (int i = 0; i < 16; i++) {
+			IngredientGroup.register("simplelogic:wireInsulated", i, new ItemStack(wireItems[i + 1]));
+		}
 	}
 
 	@SubscribeEvent
@@ -84,28 +104,41 @@ public class SimpleLogicWires {
 		}
 	}
 
+	@SubscribeEvent(priority = EventPriority.HIGH)
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+		CharsetLibWires.instance.registerRenderer(wireProviders[17], new WireRenderHandlerOverlay(wireProviders[17]));
+	}
+
+	private void addWireOD(String name, Item i) {
+		ItemStack nonFreestanding = new ItemStack(i, 1, 0);
+		ItemStack freestanding = new ItemStack(i, 1, 1);
+
+		OreDictionary.registerOre("wireLogic", i);
+		OreDictionary.registerOre("wireLogicGrounded", nonFreestanding);
+		OreDictionary.registerOre("wireLogicFreestanding", freestanding);
+		OreDictionary.registerOre("wireLogic" + name, i);
+		OreDictionary.registerOre("wireLogic" + name + "Grounded", nonFreestanding);
+		OreDictionary.registerOre("wireLogic" + name + "Freestanding", freestanding);
+	}
+
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-/*		// Temporary recipes
-		GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[0], false, 8))
-				.shaped(" r ", "rir", " r ", 'r', "dustRedstone", 'i', "ingotIron")
-				.build());
-
+		Collection<Item> scrollableInsulated = new LinkedHashSet<>();
 		for (int i = 0; i < 16; i++) {
-			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[i + 1], false, 8))
-					.shaped("ddd", "dwd", "ddd", 'd', new RecipeObjectWire(wireFactories[0], false), 'w', new ItemStack(Blocks.WOOL, 1, i))
-					.build());
-			GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[i + 1], true, 8))
-					.shaped("ddd", "dwd", "ddd", 'd', new RecipeObjectWire(wireFactories[0], true), 'w', new ItemStack(Blocks.WOOL, 1, i))
-					.build());
+			scrollableInsulated.add(wireItems[i + 1]);
 		}
 
-		GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[17], false, 1))
-				.shaped("sws", "www", "sws", 'w', new RecipeObjectSignalWire(WireType.INSULATED, false), 's', Items.STRING)
-				.build());
-		GameRegistry.addRecipe(RecipeCharset.Builder.create(new RecipeResultWire(wireFactories[17], true, 1))
-				.shaped("sws", "www", "sws", 'w', new RecipeObjectSignalWire(WireType.INSULATED, true), 's', Items.STRING)
-				.build()); */
+		ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, false));
+		ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, true));
+
+		addWireOD("Redstone", wireItems[0]);
+		addWireOD("Bundled", wireItems[17]);
+
+		for (int i = 0; i < 16; i++) {
+			addWireOD("Insulated", wireItems[i + 1]);
+			addWireOD(ColorUtils.getOreDictEntry("Insulated", EnumDyeColor.byMetadata(i)), wireItems[i + 1]);
+		}
 	}
 
 	@EventHandler

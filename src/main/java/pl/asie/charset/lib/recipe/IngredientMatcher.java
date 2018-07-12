@@ -90,7 +90,7 @@ public class IngredientMatcher implements IRecipeResultBuilder {
                 }
 
                 // TODO: Implement for non-distinct ingredients.
-                (((IngredientWrapper) entry.getKey()).getIngredientCharset()).transform(stack, entry.getValue(), this);
+                stack = (((IngredientWrapper) entry.getKey()).getIngredientCharset()).transform(stack, entry.getValue(), this);
             }
         }
 

@@ -21,6 +21,7 @@ package pl.asie.simplelogic.wires.logic;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
@@ -28,6 +29,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -49,6 +51,8 @@ import pl.asie.simplelogic.wires.LogicWireUtils;
 import javax.annotation.Nonnull;
 
 public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitter, IRedstoneReceiver {
+	private static final ResourceLocation REDSTONE_PASTE_BLOCK = new ResourceLocation("redstonepaste:redstonepaste");
+
 	private int signalLevel;
 
 	public PartWireNormal(@Nonnull IWireContainer container, @Nonnull WireProvider factory, @Nonnull WireFace location) {
@@ -58,14 +62,9 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getRenderColor() {
-		if (getWireType() == WireType.INSULATED) {
-			int c = 0xFF000000 | EnumDyeColor.byMetadata(getColor()).getColorValue();
-			return (c & 0xFF00FF00) | ((c >> 16) & 0xFF) | ((c << 16) & 0xFF0000);
-		} else {
-			int signalValue = signalLevel >> 8;
-			int v = (signalValue > 0 ? 0x96 : 0x78) + (signalValue * 7);
-			return 0xFF000000 | (v << 16) | (v << 8) | v;
-		}
+		int signalValue = signalLevel >> 8;
+		int v = (signalValue > 0 ? 0x96 : 0x78) + (signalValue * 7);
+		return 0xFF000000 | (v << 16) | (v << 8) | v;
 	}
 
 	@Override
@@ -173,7 +172,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 					IBlockState state = getContainer().world().getBlockState(pos);
 					int power = LogicWireUtils.getWeakRedstoneLevel(this, pos, state, facing, getLocation());
 
-					if (state.getBlock() instanceof BlockRedstoneWire) {
+					if (state.getBlock() instanceof BlockRedstoneWire || state.getBlock().getRegistryName().equals(REDSTONE_PASTE_BLOCK)) {
 						isWire[facidx] = true;
 						power--;
 					}
@@ -259,22 +258,28 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 			}
 		} else {
 			for (WireFace nLoc : WireFace.VALUES) {
-				if (neighborLevel[nLoc.ordinal()] < signalLevel - 1 || neighborLevel[nLoc.ordinal()] > (signalLevel + 1)) {
-					if (connectsInternal(nLoc)) {
+				boolean nChanged = neighborLevel[nLoc.ordinal()] < (signalLevel - 1) || neighborLevel[nLoc.ordinal()] > (signalLevel + 1);
+				if (connectsInternal(nLoc)) {
+					if (nChanged) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos(), nLoc);
 						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(getColor());
-					} else if (nLoc != WireFace.CENTER) {
-						EnumFacing facing = nLoc.facing;
+					}
+				} else if (nLoc != WireFace.CENTER) {
+					EnumFacing facing = nLoc.facing;
 
-						if (connectsExternal(facing)) {
+					if (connectsExternal(facing)) {
+						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
+						if (!(wire instanceof PartWireSignalBase) || nChanged) {
 							propagateNotify(facing, getColor());
-						} else if (connectsCorner(facing)) {
+						}
+					} else if (connectsCorner(facing)) {
+						if (nChanged) {
 							propagateNotifyCorner(getLocation().facing, facing, getColor());
-						} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != getLocation().facing) {
-							TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
-							if (nt == null || !(nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()))) {
-								neighborChanged(getContainer().pos().offset(facing));
-							}
+						}
+					} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != getLocation().facing) {
+						TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
+						if (nt == null || !(nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()))) {
+							neighborChanged(getContainer().pos().offset(facing));
 						}
 					}
 				}
@@ -347,7 +352,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	@Override
 	@Deprecated
 	public int getRedstoneSignal() {
-		return PROPAGATING ? getRedstoneLevel() : 0;
+		return !PROPAGATING ? getRedstoneLevel() : 0;
 	}
 
 	@Override
@@ -360,5 +365,23 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		if (side == Side.SERVER) {
 			stringList.add(getLocation().name() + " R:" + (signalLevel >> 8) + " S:" + (signalLevel & 0xFF));
 		}
+	}
+
+	@Override
+	public boolean renderEquals(Wire other) {
+		if (getWireType() != WireType.NORMAL) {
+			return super.renderEquals(other);
+		}
+
+		return super.renderEquals(other) && (((PartWireSignalBase) other).getRedstoneLevel() == getRedstoneLevel());
+	}
+
+	@Override
+	public int renderHashCode() {
+		if (getWireType() != WireType.NORMAL) {
+			return super.renderHashCode();
+		}
+
+		return Objects.hash(super.renderHashCode(), getRedstoneLevel());
 	}
 }
