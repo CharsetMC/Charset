@@ -21,6 +21,7 @@ package pl.asie.charset.module.materials;
 
 import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -39,7 +40,7 @@ public class CharsetMaterials {
     protected static final Collection<String> gems = new HashSet<>();
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
+    public void init(FMLInitializationEvent event) {
         OreDictionary.registerOre("blockIce", Blocks.ICE);
         OreDictionary.registerOre("blockIce", Blocks.FROSTED_ICE);
 

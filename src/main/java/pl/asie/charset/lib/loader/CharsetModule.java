@@ -41,6 +41,8 @@ public @interface CharsetModule {
 	String[] dependencies() default {};
 	String[] antidependencies() default {};
 
+	String[] customAssets() default {};
+
 	@Retention(value = RUNTIME)
 	@Target(value = FIELD)
 	@interface SidedProxy {

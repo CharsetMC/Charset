@@ -90,14 +90,12 @@ public abstract class BlockBase extends Block {
 		super(materialIn);
 		isTileProvider = this instanceof ITileEntityProvider;
 		subItemProvider = createSubItemProvider();
-		setCreativeTab(ModCharset.CREATIVE_TAB);
 	}
 
 	public BlockBase(Material materialIn, MapColor color) {
 		super(materialIn, color);
 		isTileProvider = this instanceof ITileEntityProvider;
 		subItemProvider = createSubItemProvider();
-		setCreativeTab(ModCharset.CREATIVE_TAB);
 	}
 
 	public final ISubItemProvider getSubItemProvider() {

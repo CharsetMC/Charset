@@ -52,6 +52,10 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     }
 
     protected final void generateBoxes() {
+        if (boxes[0] != null) {
+            return;
+        }
+
         // Generate boxes
         float xMin = 0.5f - getWidth() / 2;
         float xMax = 0.5f + getWidth() / 2;

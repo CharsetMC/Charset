@@ -37,13 +37,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.registries.ForgeRegistry;
-import net.minecraftforge.registries.GameData;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.*;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
+
+import javax.annotation.Nullable;
 
 @CharsetModule(
 	name = "lib.wires",
@@ -64,10 +64,17 @@ public class CharsetLibWires {
 	public void preInit(FMLPreInitializationEvent event) {
 		blockWire = new BlockWire();
 
+		//noinspection Convert2Lambda
 		WireManager.REGISTRY = (ForgeRegistry<WireProvider>) new RegistryBuilder<WireProvider>()
 				.setName(new ResourceLocation("charset:wire"))
 				.setIDRange(1, WireManager.MAX_ID)
 				.setType(WireProvider.class)
+				.add(new IForgeRegistry.AddCallback<WireProvider>() {
+					@Override
+					public void onAdd(IForgeRegistryInternal<WireProvider> owner, RegistryManager stage, int id, WireProvider obj, @Nullable WireProvider oldObj) {
+						obj.generateBoxes();
+					}
+				})
 				.create();
 
 		ModCharset.dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new FixCharsetWireItemSeparation());
@@ -96,10 +103,6 @@ public class CharsetLibWires {
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		for (WireProvider provider : WireManager.REGISTRY) {
-			provider.generateBoxes();
-		}
-
 		RegistryUtils.register(TileWire.class, "wire");
 	}
 

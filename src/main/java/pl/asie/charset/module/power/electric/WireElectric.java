@@ -181,7 +181,7 @@ public class WireElectric extends Wire implements ITickable {
 
 	@Override
 	public String getDisplayName() {
-		return "charset.electricWire";
+		return getLocation() == WireFace.CENTER ? "tile.charset.electricWire.freestanding.name" : "tile.charset.electricWire.name";
 	}
 
 	@Override

@@ -22,9 +22,13 @@ package pl.asie.simplelogic.gates.render;
 import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -39,8 +43,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelStateComposition;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.simplelogic.gates.BlockGate;
 import pl.asie.simplelogic.gates.ItemGate;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
@@ -65,21 +72,40 @@ public class RendererGate extends ModelFactory<PartGate> {
 			ModelRotation.X0_Y270, ModelRotation.X0_Y90
 	};
 
+	private static final ModelStateComposition[] COMPOSITIONS;
 	private static final Map<String, IModel> layerModels = new HashMap<String, IModel>();
+	private final TRSRTransformation shiftGuiTransform;
+
+	static {
+		COMPOSITIONS = new ModelStateComposition[36];
+		for (int i = 0; i < 36; i++) {
+			COMPOSITIONS[i] = new ModelStateComposition(
+					TRSRTransformation.from(ROTATIONS_SIDE[i / 6]),
+					TRSRTransformation.from(ROTATIONS_TOP[i % 6])
+			);
+		}
+	}
 
 	public RendererGate() {
 		super(BlockGate.PROPERTY, new ResourceLocation("simplelogic:blocks/gate_bottom"));
 		addDefaultBlockTransforms();
 		addThirdPersonTransformation(getTransformation(0, 2.5f, 2.75f, 75, 45, 0, 0.375f));
+		shiftGuiTransform = getTransformation(0, -16, 0, 90, 0, 0, 1f);
+	}
+
+	@Override
+	public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
+		if (cameraTransformType == ItemCameraTransforms.TransformType.GUI && GuiScreen.isShiftKeyDown()) {
+			return ImmutablePair.of(this, shiftGuiTransform.getMatrix());
+		} else {
+			return super.handlePerspective(cameraTransformType);
+		}
 	}
 
 	@Override
 	public IBakedModel bake(PartGate gate, boolean isItem, BlockRenderLayer blockRenderLayer) {
 		SimpleBakedModel result = new SimpleBakedModel(this);
-		ModelStateComposition transform = new ModelStateComposition(
-				new TRSRTransformation(ROTATIONS_SIDE[gate.getSide().ordinal()]),
-				new TRSRTransformation(ROTATIONS_TOP[gate.getTop().ordinal()])
-		);
+		ModelStateComposition transform = COMPOSITIONS[gate.getSide().ordinal() * 6 + gate.getTop().ordinal()];
 
 		if (gate.mirrored) {
 			transform = new ModelStateComposition(

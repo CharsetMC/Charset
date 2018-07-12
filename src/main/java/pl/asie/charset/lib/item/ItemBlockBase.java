@@ -41,7 +41,6 @@ import javax.annotation.Nullable;
 public class ItemBlockBase extends ItemBlock {
 	public ItemBlockBase(Block block) {
 		super(block);
-		setCreativeTab(ModCharset.CREATIVE_TAB);
 	}
 
 	public final ISubItemProvider getSubItemProvider() {

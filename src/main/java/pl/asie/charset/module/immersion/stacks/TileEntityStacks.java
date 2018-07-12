@@ -222,10 +222,10 @@ public class TileEntityStacks extends TileBase {
 			}
 			if (write) {
 				NBTTagCompound cpd = new NBTTagCompound();
-				if (!cpd1.hasNoTags()) {
+				if (!cpd1.isEmpty()) {
 					cpd.setTag("a", cpd1);
 				}
-				if (!cpd2.hasNoTags()) {
+				if (!cpd2.isEmpty()) {
 					cpd.setTag("b", cpd2);
 				}
 				compound.setTag("s" + (i >> 1), cpd);

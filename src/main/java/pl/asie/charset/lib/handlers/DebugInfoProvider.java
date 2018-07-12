@@ -32,12 +32,38 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.modcompat.mcmultipart.DebugInfoProviderMCMP;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DebugInfoProvider {
-	private void addDebugInformation(RayTraceResult mouseOver, World world, List<String> info, Side side) {
+	private static final List<Handler> handlers = new ArrayList<>();
+
+	public interface Handler {
+		boolean addDebugInformation(RayTraceResult mouseOver, World world, List<String> info, Side side);
+	}
+
+	public static void registerHandler(Handler handler) {
+		handlers.add(handler);
+	}
+
+	public static void addDebugInformation(IDebuggable debug, World world, List<String> info, Side side) {
+		List<String> targetInfo = new ArrayList<>();
+		debug.addDebugInformation(targetInfo, side);
+		if (targetInfo.size() > 0) {
+			info.add("");
+			info.add(TextFormatting.AQUA + "" + TextFormatting.BOLD + "" + TextFormatting.UNDERLINE + "" + TextFormatting.ITALIC + side.name());
+			info.addAll(targetInfo);
+		}
+	}
+
+	private void addDebugInformationDefault(RayTraceResult mouseOver, World world, List<String> info, Side side) {
+		if (mouseOver.hitInfo instanceof IDebuggable) {
+			addDebugInformation((IDebuggable) mouseOver.hitInfo, world, info, side);
+			return;
+		}
+
 		ICapabilityProvider provider = null;
 		switch (mouseOver.typeOfHit) {
 			case BLOCK:
@@ -51,15 +77,19 @@ public class DebugInfoProvider {
 		if (provider != null) {
 			IDebuggable debug = CapabilityHelper.get(Capabilities.DEBUGGABLE, provider, mouseOver.sideHit);
 			if (debug != null) {
-				List<String> targetInfo = new ArrayList<>();
-				debug.addDebugInformation(targetInfo, side);
-				if (targetInfo.size() > 0) {
-					info.add("");
-					info.add(TextFormatting.AQUA + "" + TextFormatting.BOLD + "" + TextFormatting.UNDERLINE + "" + TextFormatting.ITALIC + side.name());
-					info.addAll(targetInfo);
-				}
+				addDebugInformation(debug, world, info, side);
 			}
 		}
+	}
+
+	private void addDebugInformation(RayTraceResult mouseOver, World world, List<String> info, Side side) {
+		for (Handler h : handlers) {
+			if (h.addDebugInformation(mouseOver, world, info, side)) {
+				return;
+			}
+		}
+
+		addDebugInformationDefault(mouseOver, world, info, side);
 	}
 
 	@SubscribeEvent

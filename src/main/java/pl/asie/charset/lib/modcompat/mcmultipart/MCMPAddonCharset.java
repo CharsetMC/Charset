@@ -22,6 +22,7 @@ package pl.asie.charset.lib.modcompat.mcmultipart;
 import mcmultipart.api.addon.IMCMPAddon;
 import mcmultipart.api.addon.MCMPAddon;
 import mcmultipart.api.multipart.IMultipartRegistry;
+import pl.asie.charset.lib.handlers.DebugInfoProvider;
 import pl.asie.charset.lib.loader.AnnotatedPluginHandler;
 import pl.asie.charset.lib.utils.OcclusionUtils;
 
@@ -34,6 +35,7 @@ public class MCMPAddonCharset extends AnnotatedPluginHandler<IMCMPAddon> impleme
     @Override
     public void registerParts(IMultipartRegistry registry) {
         OcclusionUtils.INSTANCE = new OcclusionUtilsMultipart();
+        DebugInfoProvider.registerHandler(new DebugInfoProviderMCMP());
 
         for (IMCMPAddon addon : getPlugins()) {
             addon.registerParts(registry);

@@ -80,7 +80,14 @@ public final class RegistryUtils {
 			return;
 		}
 
-		object.setRegistryName(new ResourceLocation(ModCharset.MODID, name));
+		if (object.getRegistryName() == null) {
+			if (name != null) {
+				object.setRegistryName(new ResourceLocation(ModCharset.MODID, name));
+			} else {
+				throw new RuntimeException("Unknown name for object!");
+			}
+		}
+
 		registry.register(object);
 		UtilProxyCommon.proxy.setTabAndNameIfNotPresent(object, name, tab);
 	}
