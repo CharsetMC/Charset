@@ -36,15 +36,15 @@ public class GridEntryBarrel extends GridEntry {
 	public GridEntryBarrel(TileEntityDayBarrel barrel) {
 		super(barrel.getWorld(), barrel.getPos());
 		this.barrel = barrel;
-		this.orientation = barrel.orientation;
+		this.orientation = barrel.getOrientation();
 	}
 
 	@Override
 	public ItemStack getCraftingStack() {
-		ItemStack stack = barrel.item;
+		ItemStack stack = barrel.getItemUnsafe();
 		if (!stack.isEmpty()) {
 			boolean copied = false;
-			if (barrel.upgrades.contains(BarrelUpgrade.STICKY)) {
+			if (barrel.getUpgrades().contains(BarrelUpgrade.STICKY)) {
 				stack = stack.copy();
 				stack.shrink(1);
 				copied = true;
@@ -64,10 +64,10 @@ public class GridEntryBarrel extends GridEntry {
 
 	@Override
 	public ItemStack mergeRemainingItem(ItemStack target, boolean simulate) {
-		ItemStack source = barrel.item;
+		ItemStack source = barrel.getItemUnsafe();
 		ItemStack sourceOrig = source;
 
-		if (!source.isEmpty() && !barrel.upgrades.contains(BarrelUpgrade.INFINITE)) {
+		if (!source.isEmpty() && !barrel.getUpgrades().contains(BarrelUpgrade.INFINITE)) {
 			sourceOrig = source.copy();
 			if (!simulate) {
 				source.shrink(1);
@@ -102,7 +102,7 @@ public class GridEntryBarrel extends GridEntry {
 
 	@Override
 	public boolean isInvalid() {
-		return barrel.isInvalid() || barrel.orientation != orientation;
+		return barrel.isInvalid() || barrel.getOrientation() != orientation;
 	}
 
 	@Override

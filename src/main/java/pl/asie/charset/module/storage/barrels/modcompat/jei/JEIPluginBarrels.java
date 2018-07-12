@@ -43,12 +43,12 @@ public class JEIPluginBarrels implements IModPlugin {
             TileEntityDayBarrel barrel = new TileEntityDayBarrel();
             barrel.loadFromStack(itemStack);
             List<String> upgradeStringSet = Lists.newArrayList();
-            for (BarrelUpgrade u : barrel.upgrades) {
+            for (BarrelUpgrade u : barrel.getUpgrades()) {
                 upgradeStringSet.add(u.name());
             }
             Collections.sort(upgradeStringSet);
 
-            return JOINER.join(upgradeStringSet) + ";" + barrel.woodLog.getId() + ";" + barrel.woodSlab.getId();
+            return JOINER.join(upgradeStringSet) + ";" + barrel.getSideMaterial().getId() + ";" + barrel.getTopMaterial().getId();
         }
     };
 

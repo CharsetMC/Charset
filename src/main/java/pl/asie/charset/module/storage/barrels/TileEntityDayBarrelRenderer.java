@@ -106,7 +106,7 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             return;
         }
 
-        ItemStack is = barrel.item;
+        ItemStack is = barrel.getItemUnsafe();
         if (barrel.getItemCount() <= 0) {
             return;
         }

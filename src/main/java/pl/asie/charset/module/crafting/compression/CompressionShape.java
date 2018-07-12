@@ -396,7 +396,7 @@ public class CompressionShape {
 		BlockPos firstBarrelPos = start.offset(firstBarrelFacing);
 		TileEntity tile = world.getTileEntity(firstBarrelPos);
 		if (tile instanceof TileEntityDayBarrel) {
-			shape.barrelOrientation = ((TileEntityDayBarrel) tile).orientation;
+			shape.barrelOrientation = ((TileEntityDayBarrel) tile).getOrientation();
 		} else {
 			return null;
 		}
@@ -467,7 +467,7 @@ public class CompressionShape {
 				if (barrel == null) {
 					ModCharset.logger.warn("Should never happen!", new Throwable());
 					return null;
-				} else if (barrel.orientation != shape.barrelOrientation) {
+				} else if (barrel.getOrientation() != shape.barrelOrientation) {
 					return null;
 				}
 				shape.grid.add(new GridEntryBarrel(barrel));
