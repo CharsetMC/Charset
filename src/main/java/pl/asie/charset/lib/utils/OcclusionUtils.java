@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.utils;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -27,6 +28,7 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class OcclusionUtils {
     public static OcclusionUtils INSTANCE = new OcclusionUtils();
@@ -43,7 +45,7 @@ public class OcclusionUtils {
         return boxes1.stream().anyMatch(box2::intersects);
     }
 
-    public boolean intersects(Collection<AxisAlignedBB> boxes1, IBlockAccess world, BlockPos pos) {
+    public boolean intersects(Collection<AxisAlignedBB> boxes1, IBlockAccess world, BlockPos pos, Predicate<IBlockState> checkPredicate) {
         if (boxes1.isEmpty()) {
             return false;
         }
@@ -60,7 +62,11 @@ public class OcclusionUtils {
             }
 
             // TODO: Is false right?
-            world.getBlockState(pos).addCollisionBoxToList((World) world, pos, collisionBox.offset(pos), boxes2, null, false);
+            IBlockState state = world.getBlockState(pos);
+            if (checkPredicate.test(state)) {
+                state.addCollisionBoxToList((World) world, pos, collisionBox.offset(pos), boxes2, null, false);
+            }
+
             if (boxes2.size() > 0) {
                 BlockPos negPos = new BlockPos(-pos.getX(), -pos.getY(), -pos.getZ());
                 for (int i = 0; i < boxes2.size(); i++) {
@@ -72,7 +78,8 @@ public class OcclusionUtils {
                 return false;
             }
         } else {
-            return intersects(boxes1, world.getBlockState(pos).getBoundingBox(world, pos));
+            IBlockState state = world.getBlockState(pos);
+            return checkPredicate.test(state) && intersects(boxes1, state.getBoundingBox(world, pos));
         }
     }
 }

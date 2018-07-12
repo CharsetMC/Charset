@@ -30,6 +30,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
+import pl.asie.charset.lib.modcompat.mcmultipart.MCMPUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +98,7 @@ public final class RedstoneUtils {
 	private static boolean canConnectRedstoneMultipart(IBlockState state, Block block, IBlockAccess world, BlockPos pos, EnumFacing side, EnumFacing face) {
 		Optional<IMultipartContainer> ui = MultipartHelper.getContainer(world, pos);
 		if (ui.isPresent()) {
-			return MultipartRedstoneHelper.canConnectRedstone(ui.get(), EnumEdgeSlot.fromFaces(side, face), side);
+			return MCMPUtils.streamParts(ui.get(), face, side.getOpposite()).anyMatch((info) -> info.getPart().canConnectRedstone(info.getPartWorld(), info.getPartPos(), info, side));
 		} else {
 			return block.canConnectRedstone(state, world, pos, side);
 		}

@@ -149,7 +149,7 @@ public final class WireUtils {
         }
 
         AxisAlignedBB mask = wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
-        if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos)) {
+        if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos, (state -> !(state.getBlock() instanceof BlockWire)))) {
             return false;
         }
 

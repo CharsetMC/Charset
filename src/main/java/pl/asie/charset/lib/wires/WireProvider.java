@@ -29,7 +29,7 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.utils.RotationUtils;
 
 public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> {
-    private final AxisAlignedBB[] boxes = new AxisAlignedBB[43];
+    private final AxisAlignedBB[] boxes = new AxisAlignedBB[37];
     private final AxisAlignedBB[] cornerBoxes = new AxisAlignedBB[24];
     private ResourceLocation name;
     private ItemWire iw;
@@ -83,9 +83,8 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
                     }
                 }
             }
-            boxes[j * 5 + 0] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, y, xMax), f);
-            boxes[31 + j] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, y, xMin, xMax, xMin, xMax), f);
-            boxes[37 + j] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, xMin, xMax), f);
+            boxes[j * 5] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, y, xMax), f);
+            boxes[31 + j] = RotationUtils.rotateFace(new AxisAlignedBB(xMin, 0, xMin, xMax, xMin, xMax), f);
         }
         boxes[30] = new AxisAlignedBB(xMin, xMin, xMin, xMax, xMax, xMax);
     }
@@ -109,7 +108,7 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     }
 
     public AxisAlignedBB getSelectionBox(WireFace location, int i) {
-        return getBox(location, (i > 0 && location == WireFace.CENTER) ? (i + 6) : i);
+        return getBox(location, i);
     }
 
     public AxisAlignedBB getCornerCollisionBox(WireFace location, EnumFacing facing) {
