@@ -27,7 +27,6 @@ package pl.asie.charset.api.wires;
  * receive signals from redstone cables. Keep in mind, however,
  * that this does not replace impl redstone APIs.
  */
-@Deprecated
 public interface IRedstoneReceiver {
 	/**
 	 * This function will be called when a connected redstone cable changes.

@@ -45,9 +45,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
-import pl.asie.simplelogic.ModSimpleLogic;
+import pl.asie.charset.shared.SimpleLogicShared;
 import pl.asie.simplelogic.gates.logic.*;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
@@ -84,7 +85,7 @@ public class SimpleLogicGates {
 	static final Map<ResourceLocation, String> logicUns = new HashMap<>();
 	static final Map<ResourceLocation, ResourceLocation> logicDefinitions = new HashMap<>();
 
-	public static final Set<ItemStack> gateStacks = new HashSet<ItemStack>();
+	static final Set<ItemStack> gateStacks = new HashSet<ItemStack>();
 
 	public static ResourceLocation getId(GateLogic logic) {
 		return logicClasses.inverse().get(logic.getClass());
@@ -97,12 +98,12 @@ public class SimpleLogicGates {
 
 	@SubscribeEvent
 	public void onRegisterBlock(RegistryEvent.Register<Block> event) {
-		RegistryUtils.register(event.getRegistry(), blockGate, "logic_gate", ModSimpleLogic.CREATIVE_TAB);
+		RegistryUtils.register(event.getRegistry(), blockGate, "logic_gate", SimpleLogicShared.getTab());
 	}
 
 	@SubscribeEvent
 	public void onRegisterItem(RegistryEvent.Register<Item> event) {
-		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate", ModSimpleLogic.CREATIVE_TAB);
+		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate", SimpleLogicShared.getTab());
 	}
 
 	@EventHandler
@@ -124,6 +125,11 @@ public class SimpleLogicGates {
 		registerGate(new ResourceLocation("simplelogic:randomizer"), GateLogicRandomizer.class);
 		registerGate(new ResourceLocation("simplelogic:synchronizer"), GateLogicSynchronizer.class);
 		MinecraftForge.EVENT_BUS.register(proxy);
+
+		// configure creative tab
+		if (!ModCharset.isModuleLoaded("simplelogic.wires") && !gateStacks.isEmpty()) {
+			SimpleLogicShared.TAB_ICON = gateStacks.iterator().next();
+		}
 
 		if (config.hasChanged()) {
 			config.save();

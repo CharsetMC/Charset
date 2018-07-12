@@ -22,7 +22,6 @@ package pl.asie.simplelogic.wires;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sun.xml.internal.ws.wsdl.writer.document.Part;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
@@ -32,6 +31,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
@@ -39,7 +39,7 @@ import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireUtils;
 import pl.asie.simplelogic.wires.logic.PartWireSignalBase;
 
-public final class OldWireUtils {
+public final class LogicWireUtils {
 	private static final Set<Block> WIRE_PLACEABLE = new HashSet<Block>();
 
 	static {
@@ -49,7 +49,7 @@ public final class OldWireUtils {
 		WIRE_PLACEABLE.add(Blocks.STICKY_PISTON);
 	}
 
-	private OldWireUtils() {
+	private LogicWireUtils() {
 
 	}
 
@@ -90,44 +90,47 @@ public final class OldWireUtils {
 		return 0;
 	}
 
-	public static int getRedstoneLevel(Wire wire, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face, boolean weak) {
+	// IGNORES WIRES.
+	public static int getStrongRedstoneLevel(Wire wire, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face) {
+		if (facing == null) {
+			return 0;
+		}
+
+		// If the block has a wire on it, ignore the strong redstone level altogether.
+		if (WireUtils.hasCapability(wire, pos, Capabilities.REDSTONE_EMITTER, facing.getOpposite(), false)) {
+			return 0;
+		}
+
+		World world = wire.getContainer().world();
+		return state.getStrongPower(world, pos, facing);
+	}
+
+	// IGNORES WIRES.
+	public static int getWeakRedstoneLevel(Wire wire, BlockPos pos, IBlockState state, EnumFacing facing, WireFace face) {
 		EnumFacing facingOpposite = facing == null ? null : facing.getOpposite();
 		int power = 0;
-/*
-		IMultipartContainer container = MultipartHelper.getPartContainer(world, pos);
-		if (container != null) {
-			if (getWire(container, face) != null || getWire(container, WireFace.get(facingOpposite)) != null) {
-				return 0;
-			}
 
-			for (IMultipart part : container.getParts()) {
-				if (!(part instanceof PartWireSignalBase)) {
-					if (part instanceof IRedstonePart) {
-						power = Math.max(power, ((IRedstonePart) part).getWeakSignal(facingOpposite));
-					}
-				}
-			}
-		}
-*/
 		if (WireUtils.hasCapability(wire, pos, Capabilities.REDSTONE_EMITTER, facingOpposite, false)) {
-			power = Math.max(power, WireUtils.getCapability(wire, pos, Capabilities.REDSTONE_EMITTER, facingOpposite, false).getRedstoneSignal());
+			IRedstoneEmitter emitter = WireUtils.getCapability(wire, pos, Capabilities.REDSTONE_EMITTER, facingOpposite, true);
+			if (emitter instanceof PartWireSignalBase) {
+				return 0;
+			} else {
+				power = Math.max(power, emitter.getRedstoneSignal());
+			}
 		}
 
 		World world = wire.getContainer().world();
 		Block block = state.getBlock();
 
+		// TODO: Use Gates for Redstone Paste handlingage
 		if (power == 0) {
-			if (weak) {
-				if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
-					return state.getValue(BlockRedstoneWire.POWER);
-				}
-
-				return block.shouldCheckWeakPower(state, world, pos, facing)
-						? state.getStrongPower(world, pos, facing)
-						: state.getWeakPower(world, pos, facing);
-			} else {
-				return state.getStrongPower(world, pos, facing);
+			if (block instanceof BlockRedstoneWire && face == WireFace.DOWN) {
+				return state.getValue(BlockRedstoneWire.POWER);
 			}
+
+			return block.shouldCheckWeakPower(state, world, pos, facing)
+					? state.getStrongPower(world, pos, facing)
+					: state.getWeakPower(world, pos, facing);
 		} else {
 			return power;
 		}

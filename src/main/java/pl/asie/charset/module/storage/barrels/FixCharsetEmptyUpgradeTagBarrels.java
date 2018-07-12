@@ -42,7 +42,7 @@ public class FixCharsetEmptyUpgradeTagBarrels implements IFixableData {
                 NBTTagCompound tag = compound.getCompoundTag("tag");
                 if (tag.hasKey("upgrades", Constants.NBT.TAG_LIST)) {
                     NBTTagList tagList = tag.getTagList("upgrades", Constants.NBT.TAG_STRING);
-                    if (tagList.hasNoTags()) {
+                    if (tagList.isEmpty()) {
                         tag.removeTag("upgrades");
                     }
                 }

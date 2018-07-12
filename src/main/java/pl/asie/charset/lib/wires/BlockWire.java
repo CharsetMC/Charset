@@ -180,11 +180,9 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
         }
     }
 
-    @Override
-    public RayTraceResult collisionRayTrace(IPartInfo part, Vec3d start, Vec3d end) {
-        Wire wire = WireUtils.getAnyWire(part.getTile().getTileEntity());
+    protected RayTraceResult collisionRayTrace(@Nullable Wire wire, BlockPos pos, @Nullable IPartInfo part, Vec3d start, Vec3d end) {
         if (wire != null) {
-            RayTraceResult result = rayTrace(part.getPartPos(), start, end, wire.getProvider().getSelectionBox(wire.getLocation(), 0));
+            RayTraceResult result = rayTrace(pos, start, end, wire.getProvider().getSelectionBox(wire.getLocation(), 0));
             if (result != null) {
                 result.hitInfo = part;
                 return result;
@@ -194,7 +192,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
             for (int i = 0; i < faces.length; i++) {
                 EnumFacing face = faces[i];
                 if (wire.connectsAny(face)) {
-                    result = rayTrace(part.getPartPos(), start, end, wire.getProvider().getSelectionBox(wire.getLocation(), i + 1));
+                    result = rayTrace(pos, start, end, wire.getProvider().getSelectionBox(wire.getLocation(), i + 1));
                     if (result != null) {
                         result.hitInfo = part;
                         return result;
@@ -204,6 +202,16 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
         }
 
         return null;
+    }
+
+    @Override
+    public final RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        return collisionRayTrace(WireUtils.getAnyWire(world, pos), pos, null, start, end);
+    }
+
+    @Override
+    public final RayTraceResult collisionRayTrace(IPartInfo part, Vec3d start, Vec3d end) {
+        return collisionRayTrace(WireUtils.getAnyWire(part.getTile().getTileEntity()), part.getPartPos(), part, start, end);
     }
 
     @Override

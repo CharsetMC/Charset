@@ -20,21 +20,21 @@
 package pl.asie.simplelogic.wires.logic;
 
 import java.util.Arrays;
-
-import io.netty.buffer.ByteBuf;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -44,7 +44,7 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.wires.*;
-import pl.asie.simplelogic.wires.OldWireUtils;
+import pl.asie.simplelogic.wires.LogicWireUtils;
 
 import javax.annotation.Nonnull;
 
@@ -71,7 +71,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	@Override
 	public void readNBTData(NBTTagCompound nbt, boolean isClient) {
 		super.readNBTData(nbt, isClient);
-		if (nbt.hasKey("s")) {
+		if (nbt.hasKey("s", Constants.NBT.TAG_ANY_NUMERIC)) {
 			signalLevel = nbt.getShort("s");
 		}
 	}
@@ -90,7 +90,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		}
 	}
 
-	protected int getRedstoneLevel(IBlockAccess world, BlockPos pos, WireFace location) {
+	protected int getWireRedstoneLevel(IBlockAccess world, BlockPos pos, WireFace location) {
 		Wire wire = WireUtils.getWire(world, pos, location);
 		return wire instanceof PartWireSignalBase ? ((PartWireSignalBase) wire).getSignalLevel() : 0;
 	}
@@ -101,15 +101,15 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 			System.out.println("--- PROPAGATE " + getContainer().pos().toString() + " " + getLocation().name() + " (" + getContainer().world().getTotalWorldTime() + ") ---");
 		}
 
+		boolean[] isWire = new boolean[7];
+		int[] neighborLevel = new int[7];
 
 		int maxSignal = 0;
 		int oldSignal = signalLevel;
-		int[] neighborLevel = new int[7];
-		boolean[] isWire = new boolean[7];
-		boolean hasRedstoneWire = false;
 
 		PartWireSignalBase.PROPAGATING = true;
 
+		// First, get the strength from the full block we're placed on, if any.
 		if (getWireType() == WireType.NORMAL) {
 			if (getLocation() != WireFace.CENTER) {
 				EnumFacing facing = getLocation().facing;
@@ -117,68 +117,64 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 				BlockPos pos = getContainer().pos().offset(facing);
 				IBlockState state = getContainer().world().getBlockState(pos);
 
-				int power = OldWireUtils.getRedstoneLevel(this, pos, state, facing, getLocation(), false);
+				// Weak power (on block)
+				int power = LogicWireUtils.getWeakRedstoneLevel(this, pos, state, facing, getLocation());
+
+				if (power < 15) {
+					// Strong power (on surrounding blocks)
+					for (EnumFacing enumfacing : EnumFacing.values()) {
+						if (enumfacing == facing.getOpposite()) {
+							continue;
+						}
+
+						state = getContainer().world().getBlockState(pos.offset(enumfacing));
+						Block block = state.getBlock();
+
+						if (!(block instanceof BlockRedstoneWire)) {
+							int currPower = LogicWireUtils.getStrongRedstoneLevel(this, pos.offset(enumfacing), state, enumfacing, getLocation());
+
+							if (currPower >= 15) {
+								power = 15;
+								break;
+							} else if (currPower > power) {
+								power = currPower;
+							}
+						}
+					}
+				}
 
 				if (power > 0) {
-					neighborLevel[facing.ordinal()] = Math.min(15, power) << 8 | 0xFF;
+					neighborLevel[facing.ordinal()] = (Math.min(power, 15) << 8) | 0xFF;
 				}
 			}
 		}
 
+		// Check for internal connections (wires only)
 		for (WireFace location : WireFace.VALUES) {
 			if (connectsInternal(location)) {
 				isWire[location.ordinal()] = true;
-				neighborLevel[location.ordinal()] = getRedstoneLevel(getContainer().world(), getContainer().pos(), location);
+				neighborLevel[location.ordinal()] = getWireRedstoneLevel(getContainer().world(), getContainer().pos(), location);
 			}
 		}
 
+		// Check for external connections (one block away)
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			int facidx = facing.ordinal();
 
-			if (facing == getLocation().facing && getWireType() == WireType.NORMAL) {
-				BlockPos pos = getContainer().pos().offset(facing);
-				int i = 0;
-
-				for (EnumFacing enumfacing : EnumFacing.values()) {
-					if (enumfacing == facing.getOpposite()) {
-						continue;
-					}
-
-					IBlockState state = getContainer().world().getBlockState(pos.offset(enumfacing));
-					Block block = state.getBlock();
-
-					if (!(block instanceof BlockRedstoneWire)) {
-						int power = OldWireUtils.getRedstoneLevel(this, pos.offset(enumfacing), state, enumfacing, getLocation(), true);
-
-						if (power >= 15) {
-							i = 15;
-							break;
-						}
-
-						if (power > i) {
-							i = power;
-						}
-					}
-				}
-
-				if (i > 0) {
-					neighborLevel[facidx] = (i << 8) | 0xFF;
-				}
-			} else if (connectsExternal(facing)) {
+			if (connectsExternal(facing)) {
 				BlockPos pos = getContainer().pos().offset(facing);
 				Wire wire = WireUtils.getWire(getContainer().world(), pos, getLocation());
 
+				// If we have a wire, treat it as a wire. If not, treat it as a block.
 				if (wire instanceof PartWireSignalBase) {
 					isWire[facidx] = true;
-					neighborLevel[facidx] = getRedstoneLevel(getContainer().world(), pos, getLocation());
+					neighborLevel[facidx] = getWireRedstoneLevel(getContainer().world(), pos, getLocation());
 				} else {
 					IBlockState state = getContainer().world().getBlockState(pos);
-
-					int power = OldWireUtils.getRedstoneLevel(this, pos, state, facing, getLocation(), true);
+					int power = LogicWireUtils.getWeakRedstoneLevel(this, pos, state, facing, getLocation());
 
 					if (state.getBlock() instanceof BlockRedstoneWire) {
 						isWire[facidx] = true;
-						hasRedstoneWire = true;
 						power--;
 					}
 
@@ -191,7 +187,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 				Wire wire = WireUtils.getWire(getContainer().world(), pos, WireFace.get(facing.getOpposite()));
 				if (wire instanceof PartWireSignalBase) {
 					isWire[facidx] = true;
-					neighborLevel[facidx] = getRedstoneLevel(getContainer().world(), pos, WireFace.get(facing.getOpposite()));
+					neighborLevel[facidx] = getWireRedstoneLevel(getContainer().world(), pos, WireFace.get(facing.getOpposite()));
 				}
 			}
 		}
@@ -210,7 +206,6 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		}
 
 		if (DEBUG) {
-// TODO			System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
 			System.out.println("Levels: " + Arrays.toString(neighborLevel));
 		}
 
@@ -223,6 +218,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 			signalLevel = maxSignalNonWire;
 		}
 
+		// If the signal level did not change, we don't need to update.
 		if (oldSignal == signalLevel) {
 			return;
 		}
@@ -232,6 +228,8 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		}
 
 		if (signalLevel == 0) {
+			// If we lost signal, propagate only to those which have a signal.
+			// This is an optimization.
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (connectsInternal(nLoc)) {
 					if (neighborLevel[nLoc.ordinal()] > 0) {
@@ -252,7 +250,8 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 						}
 					} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != getLocation().facing) {
 						TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
-						if (!(nt instanceof IRedstoneReceiver)) {
+						// Redstone receivers are handled elsewhere!
+						if (nt == null || !(nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()))) {
 							neighborChanged(getContainer().pos().offset(facing));
 						}
 					}
@@ -273,7 +272,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 							propagateNotifyCorner(getLocation().facing, facing, getColor());
 						} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != getLocation().facing) {
 							TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
-							if (!(nt instanceof IRedstoneReceiver)) {
+							if (nt == null || !(nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()))) {
 								neighborChanged(getContainer().pos().offset(facing));
 							}
 						}
@@ -282,22 +281,18 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 			}
 		}
 
-		if (getWireType() == WireType.NORMAL) {
-			if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
+		// Handle rendering updates.
+		if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
+			if (getWireType() == WireType.NORMAL) {
 				getContainer().requestRenderUpdate();
-
-				if (getLocation() != WireFace.CENTER) {
-					neighborChanged(getContainer().pos().offset(getLocation().facing));
-				}
 			}
-		} else {
-			if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
-				if (getLocation() != WireFace.CENTER) {
-					neighborChanged(getContainer().pos().offset(getLocation().facing));
-				}
+
+			if (getLocation() != WireFace.CENTER) {
+				neighborChanged(getContainer().pos().offset(getLocation().facing));
 			}
 		}
 
+		// Once we're done propagating, update emitters and receivers.
 		finishPropagation();
 	}
 
@@ -334,21 +329,36 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing enumFacing) {
 		if (capability == Capabilities.REDSTONE_RECEIVER) {
-			return (T) this;
+			return Capabilities.REDSTONE_RECEIVER.cast(this);
 		}
 		if (capability == Capabilities.REDSTONE_EMITTER) {
-			return (T) this;
+			return Capabilities.REDSTONE_EMITTER.cast(this);
 		}
 		return super.getCapability(capability, enumFacing);
 	}
 
 	@Override
+	public String getDisplayName() {
+		return I18n.translateToLocal("tile.simplelogic.wire" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name"));
+	}
+
+	// IRedstoneEmitter shenanigans, do not use directly
+
+	@Override
+	@Deprecated
 	public int getRedstoneSignal() {
-		return getRedstoneLevel();
+		return PROPAGATING ? getRedstoneLevel() : 0;
 	}
 
 	@Override
 	public void onRedstoneInputChange() {
 		scheduleLogicUpdate();
+	}
+
+	@Override
+	public void addDebugInformation(List<String> stringList, Side side) {
+		if (side == Side.SERVER) {
+			stringList.add(getLocation().name() + " R:" + (signalLevel >> 8) + " S:" + (signalLevel & 0xFF));
+		}
 	}
 }

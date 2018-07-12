@@ -20,13 +20,15 @@
 package pl.asie.simplelogic.wires.logic;
 
 import java.util.Arrays;
+import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -39,7 +41,7 @@ import pl.asie.charset.lib.wires.IWireContainer;
 import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireProvider;
 import pl.asie.charset.lib.wires.WireUtils;
-import pl.asie.simplelogic.wires.OldWireUtils;
+import pl.asie.simplelogic.wires.LogicWireUtils;
 
 import javax.annotation.Nonnull;
 
@@ -60,8 +62,12 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 	@Override
 	public void readNBTData(NBTTagCompound nbt, boolean isClient) {
 		super.readNBTData(nbt, isClient);
-		signalLevel = nbt.getIntArray("s");
-		if (signalLevel == null || signalLevel.length != 16) {
+		if (nbt.hasKey("s", Constants.NBT.TAG_INT_ARRAY)) {
+			signalLevel = nbt.getIntArray("s");
+			if (signalLevel.length != 16) {
+				signalLevel = new int[16];
+			}
+		} else {
 			signalLevel = new int[16];
 		}
 		for (int i = 0; i < 16; i++) {
@@ -77,16 +83,18 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 	}
 
 	private void propagate(int color, byte[][] nValues) {
-		int maxSignal = 0;
-		int[] neighborLevel = new int[7];
 		boolean[] isWire = new boolean[7];
+		int[] neighborLevel = new int[7];
+
+		int maxSignal = 0;
+		int oldSignal = signalLevel[color];
 
 		PartWireSignalBase.PROPAGATING = true;
 
 		for (WireFace location : WireFace.VALUES) {
 			if (connectsInternal(location)) {
 				isWire[location.ordinal()] = true;
-				neighborLevel[location.ordinal()] = OldWireUtils.getBundledWireLevel(getContainer().world(), getContainer().pos(), location, color);
+				neighborLevel[location.ordinal()] = LogicWireUtils.getBundledWireLevel(getContainer().world(), getContainer().pos(), location, color);
 			}
 		}
 
@@ -103,7 +111,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 					if (wire instanceof PartWireSignalBase) {
 						isWire[facing.ordinal()] = true;
-						neighborLevel[facing.ordinal()] = OldWireUtils.getBundledWireLevel(getContainer().world(), pos, getLocation(), color);
+						neighborLevel[facing.ordinal()] = LogicWireUtils.getBundledWireLevel(getContainer().world(), pos, getLocation(), color);
 					}
 				}
 			} else if (connectsCorner(facing)) {
@@ -112,21 +120,21 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 				if (wire instanceof PartWireSignalBase) {
 					isWire[facing.ordinal()] = true;
-					neighborLevel[facing.ordinal()] = OldWireUtils.getBundledWireLevel(getContainer().world(), cornerPos, WireFace.get(facing.getOpposite()), color);
+					neighborLevel[facing.ordinal()] = LogicWireUtils.getBundledWireLevel(getContainer().world(), cornerPos, WireFace.get(facing.getOpposite()), color);
 				}
 			}
 		}
 
 		PartWireSignalBase.PROPAGATING = false;
 
-		int newSignal = 0;
+		int maxSignalNonWire = 0;
 
 		for (int j = 0; j < 7; j++) {
 			if (neighborLevel[j] > maxSignal) {
 				maxSignal = neighborLevel[j];
 			}
-			if (!isWire[j] && neighborLevel[j] > newSignal) {
-				newSignal = neighborLevel[j];
+			if (!isWire[j] && neighborLevel[j] > maxSignalNonWire) {
+				maxSignalNonWire = neighborLevel[j];
 			}
 		}
 
@@ -134,14 +142,18 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 			System.out.println("[" + color + "] Levels: " + Arrays.toString(neighborLevel));
 		}
 
-		if (maxSignal > signalLevel[color] && maxSignal > 1) {
+		int newSignal;
+		if (maxSignal > oldSignal) {
 			newSignal = maxSignal - 1;
 			if ((newSignal & 0xFF) == 0 || (newSignal & 0xFF) == 0xFF) {
 				newSignal = 0;
 			}
+		} else {
+			newSignal = maxSignalNonWire;
 		}
 
-		if (newSignal == signalLevel[color]) {
+		// If the signal level did not change, we don't need to update.
+		if (oldSignal == newSignal) {
 			return;
 		}
 
@@ -149,6 +161,8 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		signalValue[color] = (byte) (newSignal >> 8);
 
 		if (newSignal == 0) {
+			// If we lost signal, propagate only to those which have a signal.
+			// This is an optimization.
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (connectsInternal(nLoc)) {
 					if (neighborLevel[nLoc.ordinal()] > 0) {
@@ -203,14 +217,13 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 		for (EnumFacing facing : EnumFacing.VALUES) {
 			if (connectsExternal(facing)) {
-				BlockPos posFacing = getContainer().pos().offset(facing);
 				IBundledEmitter emitter = null;
 
 				if (WireUtils.hasCapability(this, getContainer().pos(), Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false)) {
 					emitter = WireUtils.getCapability(this, getContainer().pos(), Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false);
 				}
 
-				if (emitter != null && !(emitter instanceof IWire)) {
+				if (emitter != null && !(emitter instanceof PartWireSignalBase)) {
 					nValues[facing.ordinal()] = emitter.getBundledSignal();
 				}
 			}
@@ -271,11 +284,21 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing face) {
 		if (capability == Capabilities.BUNDLED_RECEIVER) {
-			return (T) this;
+			return Capabilities.BUNDLED_RECEIVER.cast(this);
 		}
 		if (capability == Capabilities.BUNDLED_EMITTER) {
-			return (T) this;
+			return Capabilities.BUNDLED_EMITTER.cast(this);
 		}
 		return null;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return I18n.translateToLocal("tile.simplelogic.wire.bundled" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name"));
+	}
+
+	@Override
+	public void addDebugInformation(List<String> stringList, Side side) {
+		// TODO
 	}
 }

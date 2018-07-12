@@ -21,18 +21,17 @@ package pl.asie.simplelogic.wires.logic;
 
 import java.util.*;
 
-import io.netty.buffer.ByteBuf;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.common.capabilities.Capability;
+import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
@@ -40,12 +39,11 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RedstoneUtils;
 import pl.asie.charset.lib.wires.*;
-import pl.asie.simplelogic.wires.OldWireUtils;
 
 import javax.annotation.Nonnull;
 
-public abstract class PartWireSignalBase extends Wire implements IWire {
-	public static boolean DEBUG = true;
+public abstract class PartWireSignalBase extends Wire implements IWire, IDebuggable {
+	public static boolean DEBUG = false;
 	public static boolean PROPAGATING = false;
 	public static boolean WIRES_CONNECT_REDSTONE = true;
 	private final EnumSet<EnumFacing> propagationDirs = EnumSet.noneOf(EnumFacing.class);
@@ -64,11 +62,15 @@ public abstract class PartWireSignalBase extends Wire implements IWire {
 		this.color = color;
 	}
 
-	protected WireSignalFactory getSignalFactory() {
-		return (WireSignalFactory) getProvider();
+	protected LogicWireProvider getSignalFactory() {
+		return (LogicWireProvider) getProvider();
 	}
 
 	protected abstract void onSignalChanged(int color);
+
+	protected void scheduleLogicUpdate() {
+		logicUpdateNeeded = true;
+	}
 
 	@Override
 	public void update() {
@@ -80,30 +82,6 @@ public abstract class PartWireSignalBase extends Wire implements IWire {
 			}
 			logicUpdateNeeded = false;
 		}
-	}
-
-	protected void scheduleLogicUpdate() {
-		logicUpdateNeeded = true;
-	}
-
-	@Override
-	public String getDisplayName() {
-		String name = "";
-
-		switch (getWireType()) {
-			case NORMAL:
-				name = I18n.translateToLocal("tile.simplelogic.wire" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name"));
-				break;
-			case INSULATED:
-				name = String.format(I18n.translateToLocal("tile.simplelogic.wire.insulated" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name")),
-						I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", EnumDyeColor.byMetadata(color))));
-				break;
-			case BUNDLED:
-				name = I18n.translateToLocal("tile.simplelogic.wire.bundled" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name"));
-				break;
-		}
-
-		return name;
 	}
 
 	@Override
@@ -193,21 +171,19 @@ public abstract class PartWireSignalBase extends Wire implements IWire {
 	@Override
 	protected final void updateConnections() {
 		for (int j = 0; j < 6; j++) {
-			//if ((i & (1 << j)) != 0) {
-				EnumFacing facing = EnumFacing.getFront(j);
-				TileEntity tile = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
-				if (tile != null) {
-					if (getSignalFactory().type == WireType.BUNDLED) {
-						if (tile.hasCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite())) {
-							tile.getCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite()).onBundledInputChange();
-						}
-					} else {
-						if (tile.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite())) {
-							tile.getCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()).onRedstoneInputChange();
-						}
+			EnumFacing facing = EnumFacing.getFront(j);
+			TileEntity tile = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
+			if (tile != null) {
+				if (getSignalFactory().type == WireType.BUNDLED) {
+					if (tile.hasCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite())) {
+						tile.getCapability(Capabilities.BUNDLED_RECEIVER, facing.getOpposite()).onBundledInputChange();
+					}
+				} else {
+					if (tile.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite())) {
+						tile.getCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()).onRedstoneInputChange();
 					}
 				}
-			//}
+			}
 		}
 
 		super.updateConnections();
@@ -303,7 +279,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire {
 
 	@Override
 	public int getStrongPower(EnumFacing facing) {
-		if (getSignalFactory().type == WireType.NORMAL && getLocation().facing == facing) {
+		if (!PROPAGATING && getSignalFactory().type == WireType.NORMAL && getLocation().facing == facing) {
 			return getRedstoneLevel();
 		} else {
 			return 0;
@@ -313,11 +289,29 @@ public abstract class PartWireSignalBase extends Wire implements IWire {
 	@Override
 	public boolean renderEquals(Wire other) {
 		return super.renderEquals(other)
-				&& (getWireType() == WireType.INSULATED || ((PartWireSignalBase) other).getRedstoneLevel() == getRedstoneLevel());
+				&& (getWireType() != WireType.NORMAL || ((PartWireSignalBase) other).getRedstoneLevel() == getRedstoneLevel());
 	}
 
 	@Override
 	public int renderHashCode() {
-		return Objects.hash(super.renderHashCode(), getWireType() == WireType.INSULATED ? 0 : getRedstoneLevel());
+		return Objects.hash(super.renderHashCode(), getWireType() != WireType.NORMAL ? 0 : getRedstoneLevel());
+	}
+
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		if (capability == Capabilities.DEBUGGABLE) {
+			return true;
+		}
+
+		return super.hasCapability(capability, facing);
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if (capability == Capabilities.DEBUGGABLE) {
+			return Capabilities.DEBUGGABLE.cast(this);
+		}
+
+		return super.getCapability(capability, facing);
 	}
 }

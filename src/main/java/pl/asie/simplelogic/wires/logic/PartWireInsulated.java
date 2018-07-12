@@ -19,13 +19,16 @@
 
 package pl.asie.simplelogic.wires.logic;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import pl.asie.charset.api.wires.IWireInsulated;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.wires.IWireContainer;
 import pl.asie.charset.lib.wires.WireProvider;
-import pl.asie.simplelogic.wires.OldWireUtils;
+import pl.asie.simplelogic.wires.LogicWireUtils;
 
 import javax.annotation.Nonnull;
 
@@ -35,8 +38,8 @@ public class PartWireInsulated extends PartWireNormal implements IWireInsulated 
 	}
 
 	@Override
-	protected int getRedstoneLevel(IBlockAccess world, BlockPos pos, WireFace location) {
-		return OldWireUtils.getInsulatedWireLevel(world, pos, location, getColor());
+	protected int getWireRedstoneLevel(IBlockAccess world, BlockPos pos, WireFace location) {
+		return LogicWireUtils.getInsulatedWireLevel(world, pos, location, getColor());
 	}
 
 	@Override
@@ -51,5 +54,11 @@ public class PartWireInsulated extends PartWireNormal implements IWireInsulated 
 	@Override
 	public int getWireColor() {
 		return getColor();
+	}
+
+	@Override
+	public String getDisplayName() {
+		return String.format(I18n.translateToLocal("tile.simplelogic.wire.insulated" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name")),
+				I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", EnumDyeColor.byMetadata(getWireColor()))));
 	}
 }

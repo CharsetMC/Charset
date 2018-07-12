@@ -27,13 +27,13 @@ import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.wires.IWireContainer;
 import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireProvider;
-import pl.asie.simplelogic.wires.OldWireUtils;
+import pl.asie.simplelogic.wires.LogicWireUtils;
 
-public class WireSignalFactory extends WireProvider {
+public class LogicWireProvider extends WireProvider {
     public final WireType type;
     public final int color;
 
-    public WireSignalFactory(WireType type, int color) {
+    public LogicWireProvider(WireType type, int color) {
         this.type = type;
         this.color = color;
     }
@@ -64,17 +64,17 @@ public class WireSignalFactory extends WireProvider {
 
     @Override
     public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
-        return face == WireFace.CENTER || OldWireUtils.canPlaceWire(access, pos.offset(face.facing), face.facing != null ? face.facing.getOpposite() : null);
+        return face == WireFace.CENTER || LogicWireUtils.canPlaceWire(access, pos.offset(face.facing), face.facing != null ? face.facing.getOpposite() : null);
     }
 
     @Override
     public float getWidth() {
-        return OldWireUtils.width(type) / 16.0F;
+        return LogicWireUtils.width(type) / 16.0F;
     }
 
     @Override
     public float getHeight() {
-        return OldWireUtils.height(type) / 16.0F;
+        return LogicWireUtils.height(type) / 16.0F;
     }
 
     @Override

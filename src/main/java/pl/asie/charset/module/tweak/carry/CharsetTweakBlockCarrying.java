@@ -234,7 +234,7 @@ public class CharsetTweakBlockCarrying {
     }
 
     protected static void wrapForgeData(NBTTagCompound from, NBTTagCompound to, String source, String target) {
-        if (!from.hasNoTags()) {
+        if (!from.isEmpty()) {
             NBTTagCompound wrap = from.copy();
 
             if (from.hasKey(target, Constants.NBT.TAG_COMPOUND)) {

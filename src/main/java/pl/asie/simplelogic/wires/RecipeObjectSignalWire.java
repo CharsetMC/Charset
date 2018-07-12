@@ -19,16 +19,6 @@
 
 package pl.asie.simplelogic.wires;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import pl.asie.charset.api.wires.WireType;
-import pl.asie.charset.lib.wires.WireManager;
-import pl.asie.simplelogic.wires.logic.PartWireSignalBase;
-import pl.asie.simplelogic.wires.logic.WireSignalFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by asie on 6/13/16.
  */
