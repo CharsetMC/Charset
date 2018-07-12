@@ -102,7 +102,7 @@ public class RecipeCharset extends RecipeBase implements IRecipeView {
     public Collection<ItemStack> getAllRecipeOutputs() {
         InventoryCraftingIterator inventoryCrafting = new InventoryCraftingIterator(this, true);
         ItemStackHashSet stackSet = new ItemStackHashSet(true, true, true);
-        List<ItemStack> stacks = new ArrayList<>();
+        List<ItemStack> stacks = new ArrayList<>(); // preserve order
 
         InventoryCraftingIterator it = inventoryCrafting;
         while (it.hasNext()) {

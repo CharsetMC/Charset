@@ -21,22 +21,19 @@ package pl.asie.charset.lib.item;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
 
 import java.util.*;
 
-public class SubItemProviderSets implements ISubItemProvider {
-    protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
-        return 0;
-    }
+public abstract class SubItemProviderSets implements ISubItemProvider {
+    protected abstract int compareSets(List<ItemStack> first, List<ItemStack> second);
 
     protected List<ItemStack> createForcedItems() {
         return Collections.emptyList();
     }
 
-    protected List<List<ItemStack>> createItemSets() {
-        return Collections.emptyList();
-    }
+    protected abstract List<List<ItemStack>> createItemSets();
 
     protected int getVisibleSetAmount() {
         return 1;
@@ -50,15 +47,23 @@ public class SubItemProviderSets implements ISubItemProvider {
         if (sets.size() > 0) {
             if (all || getVisibleSetAmount() >= sets.size()) {
                 sets.sort(this::compareSets);
-                for (Collection<ItemStack> set : sets)
+                for (Collection<ItemStack> set : sets) {
+                    if (sets.isEmpty()) {
+                        ModCharset.logger.warn("Found empty set while running " + getClass().getName() + ".getItems()!");
+                    }
                     builder.addAll(set);
+                }
             } else {
                 Calendar cal = CharsetLib.calendar.get();
-                int doy = (cal.get(Calendar.YEAR) * 366) + cal.get(Calendar.DAY_OF_YEAR) - 1 /* start at 0, not 1 */;
+                int doy = cal != null ? ((cal.get(Calendar.YEAR) * 366) + cal.get(Calendar.DAY_OF_YEAR) - 1) : 0 /* start at 0, not 1 */;
                 Collections.shuffle(sets, new Random(doy));
                 sets.sort(this::compareSets);
-                for (int i = 0; i < Math.min(getVisibleSetAmount(), sets.size()); i++)
+                for (int i = 0; i < Math.min(getVisibleSetAmount(), sets.size()); i++) {
+                    if (sets.isEmpty()) {
+                        ModCharset.logger.warn("Found empty set while running " + getClass().getName() + ".getItems()!");
+                    }
                     builder.addAll(sets.get(i));
+                }
             }
         }
 

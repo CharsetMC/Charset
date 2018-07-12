@@ -23,16 +23,14 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import pl.asie.charset.lib.item.ISubItemProvider;
-import pl.asie.charset.lib.item.ItemBase;
-import pl.asie.charset.lib.item.SubItemProviderCache;
-import pl.asie.charset.lib.item.SubItemProviderRecipes;
+import pl.asie.charset.lib.item.*;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 
 public class ItemCharsetTool extends ItemBase {
     public ItemCharsetTool() {
@@ -72,7 +70,13 @@ public class ItemCharsetTool extends ItemBase {
 
     @Override
     protected ISubItemProvider createSubItemProvider() {
-        return new SubItemProviderCache(new SubItemProviderRecipes(() -> this));
+        return new SubItemProviderCache(new SubItemProviderRecipes(() -> this) {
+            @Override
+            protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
+                // TODO: Add correct sorting
+                return 0;
+            }
+        });
     }
 
     public enum MaterialSlot {

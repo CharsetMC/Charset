@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SubItemProviderRecipes extends SubItemProviderSets {
+public abstract class SubItemProviderRecipes extends SubItemProviderSets {
     private final Supplier<Item> itemSupplier;
     private String group;
 
@@ -70,14 +70,14 @@ public class SubItemProviderRecipes extends SubItemProviderSets {
                     for (ItemStack s : ((RecipeCharset) recipe).getAllRecipeOutputs()) {
                         if (stackSet.add(s)) {
                             List<ItemStack> stacks = createSetFor(s);
-                            if (stacks != null && stacks.size() > 0) list.add(stacks);
+                            if (stacks != null && !stacks.isEmpty()) list.add(stacks);
                         }
                     }
                 } else {
                     ItemStack s = recipe.getRecipeOutput();
                     if (stackSet.add(s)) {
                         List<ItemStack> stacks = createSetFor(s);
-                        if (stacks != null && stacks.size() > 0) list.add(stacks);
+                        if (stacks != null && !stacks.isEmpty()) list.add(stacks);
                     }
                 }
             }

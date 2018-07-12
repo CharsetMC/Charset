@@ -104,7 +104,6 @@ public abstract class BlockBase extends Block {
 		return subItemProvider;
 	}
 
-
 	protected BlockBase setComparatorInputOverride(boolean value) {
 		comparatorInputOverride = value;
 		return this;

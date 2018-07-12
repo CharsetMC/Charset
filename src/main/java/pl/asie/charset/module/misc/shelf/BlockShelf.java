@@ -49,12 +49,14 @@ import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
+import pl.asie.charset.lib.item.SubItemSetHelper;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 public class BlockShelf extends BlockBase implements ITileEntityProvider {
     public static final Collection<ItemMaterial> PLANKS = new HashSet<>();
@@ -125,7 +127,12 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
 
     @Override
     protected ISubItemProvider createSubItemProvider() {
-        return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetMiscShelf.shelfItem));
+        return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetMiscShelf.shelfItem) {
+            @Override
+            protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
+                return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("plank", SubItemSetHelper::sortByItem));
+            }
+        });
     }
 
     @Override
