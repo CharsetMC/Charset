@@ -1,0 +1,11 @@
+{
+	"crank": {
+		"category': "block",
+		"sounds": [
+			"block/crank1.ogg",
+			"block/crank2.ogg",
+			"block/crank3.ogg",
+			"block/crank4.ogg"
+		}
+	}
+}

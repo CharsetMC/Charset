@@ -54,10 +54,7 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
-import pl.asie.charset.module.power.mechanical.render.GearboxColorHandler;
-import pl.asie.charset.module.power.mechanical.render.ModelGearbox;
-import pl.asie.charset.module.power.mechanical.render.TileAxleRenderer;
-import pl.asie.charset.module.power.mechanical.render.TileGearboxRenderer;
+import pl.asie.charset.module.power.mechanical.render.*;
 
 @CharsetModule(
 		name = "power.mechanical",
@@ -68,8 +65,9 @@ public class CharsetPowerMechanical {
 	public static BlockAxle blockAxle;
 	public static BlockCreativeGenerator blockCreativeGenerator;
 	public static BlockGearbox blockGearbox;
+	public static BlockHandCrank blockHandCrank;
 	public static BlockSocket blockSocket;
-	public static ItemBlock itemAxle, itemCreativeGenerator, itemGearbox, itemSocket;
+	public static ItemBlock itemAxle, itemCreativeGenerator, itemGearbox, itemHandCrank, itemSocket;
 
 	private static final int[] GEAR_VALUES = new int[] { 1, 2, 3, 5 };
 	private static final String[] GEAR_TYPES = new String[] { "Wood", "Stone", "Iron", "Gold" };
@@ -80,10 +78,13 @@ public class CharsetPowerMechanical {
 		blockAxle = new BlockAxle();
 		blockCreativeGenerator = new BlockCreativeGenerator();
 		blockGearbox = new BlockGearbox();
+		blockHandCrank = new BlockHandCrank();
 		blockSocket = new BlockSocket();
+
 		itemAxle = new ItemBlockAxle(blockAxle);
 		itemCreativeGenerator = new ItemBlockBase(blockCreativeGenerator);
 		itemGearbox = new ItemBlockGearbox(blockGearbox);
+		itemHandCrank = new ItemBlockBase(blockHandCrank);
 		itemSocket = new ItemBlockBase(blockSocket);
 
 		GEAR_ITEMS = new ItemGear[GEAR_VALUES.length];
@@ -98,6 +99,7 @@ public class CharsetPowerMechanical {
 		RegistryUtils.register(TileAxle.class, "axle");
 		RegistryUtils.register(TileCreativeGenerator.class, "creative_generator_mechanical");
 		RegistryUtils.register(TileGearbox.class, "gearbox");
+		RegistryUtils.register(TileHandCrank.class, "hand_crank");
 		RegistryUtils.register(TileSocket.class, "socket_mechanical");
 
 		for (int i = 0; i < GEAR_VALUES.length; i++) {
@@ -117,6 +119,7 @@ public class CharsetPowerMechanical {
 	public void onInitClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileAxle.class, TileAxleRenderer.INSTANCE);
 		ClientRegistry.bindTileEntitySpecialRenderer(TileGearbox.class, TileGearboxRenderer.INSTANCE);
+		ClientRegistry.bindTileEntitySpecialRenderer(TileHandCrank.class, TileHandCrankRenderer.INSTANCE);
 	}
 
 	@SubscribeEvent
@@ -125,6 +128,7 @@ public class CharsetPowerMechanical {
 		RegistryUtils.registerModel(itemAxle, 0, "charset:axle");
 		RegistryUtils.registerModel(itemCreativeGenerator, 0, "charset:creative_generator_mechanical");
 		RegistryUtils.registerModel(itemGearbox, 0, "charset:gearbox");
+		RegistryUtils.registerModel(itemHandCrank, 0, "charset:hand_crank_mechanical");
 		RegistryUtils.registerModel(itemSocket, 0, "charset:socket_mechanical");
 
 		for (int i = 0; i < GEAR_VALUES.length; i++) {
@@ -142,6 +146,7 @@ public class CharsetPowerMechanical {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		TileHandCrankRenderer.INSTANCE.crankModel = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/hand_crank"), event.getMap());
 		ModelGearbox.INSTANCE.modelInner = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_inner"), event.getMap());
 		ModelGearbox.INSTANCE.modelOuter = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_outer"), event.getMap());
 		ModelGearbox.INSTANCE.modelOuterOutputs = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_outer_outputs"), event.getMap());
@@ -170,6 +175,7 @@ public class CharsetPowerMechanical {
 		RegistryUtils.register(event.getRegistry(), blockAxle, "axle");
 		RegistryUtils.register(event.getRegistry(), blockCreativeGenerator, "creative_generator_mechanical");
 		RegistryUtils.register(event.getRegistry(), blockGearbox, "gearbox");
+		RegistryUtils.register(event.getRegistry(), blockHandCrank, "hand_crank_mechanical");
 		RegistryUtils.register(event.getRegistry(), blockSocket, "socket_mechanical");
 	}
 
@@ -178,6 +184,7 @@ public class CharsetPowerMechanical {
 		RegistryUtils.register(event.getRegistry(), itemAxle, "axle");
 		RegistryUtils.register(event.getRegistry(), itemCreativeGenerator, "creative_generator_mechanical");
 		RegistryUtils.register(event.getRegistry(), itemGearbox, "gearbox");
+		RegistryUtils.register(event.getRegistry(), itemHandCrank, "hand_crank_mechanical");
 		RegistryUtils.register(event.getRegistry(), itemSocket, "socket_mechanical");
 
 		for (int i = 0; i < GEAR_VALUES.length; i++) {

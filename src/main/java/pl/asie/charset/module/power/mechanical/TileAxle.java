@@ -40,6 +40,8 @@ import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import javax.annotation.Nullable;
 
 public class TileAxle extends TileBase {
+	public static final float SPEED_MULTIPLIER = 4.5f;
+
 	protected class AxleSide implements IMechanicalPowerProducer, IMechanicalPowerConsumer {
 		protected final EnumFacing facing;
 		protected final int i;
@@ -166,6 +168,7 @@ public class TileAxle extends TileBase {
 
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
+		super.readNBTData(compound, isClient);
 		boolean r = loadMaterialFromNBT(compound);
 		if (/*(r || !rendered) && */isClient) {
 			rotSpeedClient = compound.getFloat("rs");
@@ -177,6 +180,7 @@ public class TileAxle extends TileBase {
 
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
+		compound = super.writeNBTData(compound, isClient);
 		saveMaterialToNBT(compound);
 		if (isClient) {
 			double ds0 = powerOutputs[0] != null ? powerOutputs[0].speedReceived : 0.0;

@@ -177,7 +177,7 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 
 		long ticks = te.getWorld().getTotalWorldTime();
 		double rotation = ticks + partialTicks;
-		rotation *= te.rotSpeedClient*4.5f;
+		rotation *= te.rotSpeedClient * TileAxle.SPEED_MULTIPLIER;
 
 		float offset = (float)te.rotTorqueClient * 0.5f;
 		rotation += ((ticks & 2) != 0) ? offset : -offset;

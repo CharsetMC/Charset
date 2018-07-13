@@ -142,9 +142,10 @@ tip.charset.gear.ratio=Ratio: %s
 
 tile.charset.axle.name=Axle
 tile.charset.axle.format=%s Axle
-tile.charset.gen_creative_mechanical.name=Creative Mechanical Generator
+tile.charset.creative_generator_mechanical.name=Creative Mechanical Generator
 tile.charset.gearbox.name=Gearbox
 tile.charset.gearbox.format=%s Gearbox
+tile.charset.hand_crank.name=Wooden Crank
 tile.charset.socket.name=Socket
 
 # power.steam

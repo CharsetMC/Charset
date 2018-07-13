@@ -22,7 +22,10 @@ package pl.asie.charset.module.power.mechanical;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 
 import javax.annotation.Nullable;
@@ -30,7 +33,13 @@ import javax.annotation.Nullable;
 public class BlockCreativeGenerator extends BlockBase implements ITileEntityProvider {
 	public BlockCreativeGenerator() {
 		super(Material.ROCK);
-		setUnlocalizedName("charset.gen_creative_mechanical");
+		setUnlocalizedName("charset.creative_generator_mechanical");
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 
 	@Nullable

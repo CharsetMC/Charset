@@ -1,0 +1,22 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "base": "minecraft:blocks/bedrock",
+      "ore": "charset:items/mechanical/gear",
+      "particle": "minecraft:blocks/bedrock"
+    },
+    "model": "charset:ore_overlay",
+    "uvlock": false
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {
+        "transform": "forge:default-block"
+      }
+    ]
+  }
+}

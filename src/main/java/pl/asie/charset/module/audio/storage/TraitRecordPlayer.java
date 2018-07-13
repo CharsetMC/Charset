@@ -99,7 +99,7 @@ public class TraitRecordPlayer extends Trait implements IAudioSource, IAudioRece
 	}
 
 	public int getSampleRate() {
-		int s = (int) (ItemQuartzDisc.DEFAULT_SAMPLE_RATE * getSpeed() / 480);
+		int s = (int) Math.round(ItemQuartzDisc.DEFAULT_SAMPLE_RATE * getSpeed() / 480f);
 		return s * 160;
 	}
 
