@@ -1,6 +1,7 @@
 {
   "conditions": {
     "module_loaded": "pl.asie.charset.lib.recipe.ConditionModuleLoadedFactory",
+    "simplelogic_gate_enabled": "pl.asie.charset.shared.ConditionSimplelogicGateEnabledFactory",
     "barrel_upgrade_enabled": "pl.asie.charset.shared.ConditionBarrelUpgradeEnabledFactory"
   },
   "ingredients": {

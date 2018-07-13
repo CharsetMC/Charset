@@ -166,7 +166,7 @@ public class SimpleLogicGates {
 	}
 
 	public void registerGateStack(ItemStack stack) {
-		if (stack != null && (stack.getItem() instanceof ItemGate)) {
+		if (!stack.isEmpty() && (stack.getItem() instanceof ItemGate)) {
 			if (stack.hasTagCompound() && stack.getTagCompound().getByte("li") > 0) {
 				inversionSensitiveLogics.add(stack.getTagCompound().getString("logic"));
 			}
@@ -180,10 +180,9 @@ public class SimpleLogicGates {
 	}
 
 	public void registerGate(ResourceLocation name, Class<? extends GateLogic> clazz, ResourceLocation gdLoc, String unl) {
-		// TODO: Make this config work
-		/* if (!config.getBoolean(name.toString(), "gates", true,"Enable/disable gate.")) {
+		if (!config.getBoolean(name.toString(), "gates", true,"Enable/disable the " + name.toString() + " gate.")) {
 			return;
-		} */
+		}
 
 		logicClasses.put(name, clazz);
 		logicDefinitions.put(name, gdLoc);

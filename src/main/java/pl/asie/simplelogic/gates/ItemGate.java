@@ -38,6 +38,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.charset.lib.item.ItemBlockBase;
 
+import java.util.Optional;
+
 public class ItemGate extends ItemBlockBase {
 	public ItemGate(Block block) {
 		super(block);
@@ -49,21 +51,23 @@ public class ItemGate extends ItemBlockBase {
 	}
 
 	public static ItemStack getStack(PartGate gate, boolean silky) {
+		if (!SimpleLogicGates.logicClasses.containsValue(gate.logic.getClass())) {
+			return ItemStack.EMPTY;
+		}
+
 		ItemStack stack = new ItemStack(SimpleLogicGates.itemGate);
 		stack.setTagCompound(new NBTTagCompound());
 		gate.writeItemNBT(stack.getTagCompound(), silky);
 		return stack;
 	}
 
-	public static PartGate getPartGate(ItemStack stack) {
+	public static Optional<PartGate> getPartGate(ItemStack stack) {
 		if (stack.hasTagCompound() && stack.getTagCompound().hasKey("logic", Constants.NBT.TAG_STRING)) {
-			PartGate gate = getPartGate(new ResourceLocation(stack.getTagCompound().getString("logic")));
-			if (gate != null) {
-				gate.readItemNBT(stack.getTagCompound());
-			}
+			Optional<PartGate> gate = getPartGate(new ResourceLocation(stack.getTagCompound().getString("logic")));
+			gate.ifPresent((a) -> a.readItemNBT(stack.getTagCompound()));
 			return gate;
 		} else {
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -74,11 +78,11 @@ public class ItemGate extends ItemBlockBase {
 
 	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
-		PartGate gate = getPartGate(stack);
-		if (gate == null) {
+		Optional<PartGate> gate = getPartGate(stack);
+		if (!gate.isPresent()) {
 			return "[UNKNOWN GATE]";
 		}
-		ResourceLocation loc = SimpleLogicGates.logicClasses.inverse().get(gate.logic.getClass());
+		ResourceLocation loc = SimpleLogicGates.logicClasses.inverse().get(gate.get().logic.getClass());
 		if (loc == null) {
 			return "[UNKNOWN GATE]";
 		}
@@ -87,7 +91,7 @@ public class ItemGate extends ItemBlockBase {
 			return "[UNKNOWN GATE]";
 		}
 
-		if (gate.logic.isSideInverted(EnumFacing.NORTH) && I18n.canTranslate(name + ".i.name")) {
+		if (gate.get().logic.isSideInverted(EnumFacing.NORTH) && I18n.canTranslate(name + ".i.name")) {
 			name += ".i";
 		}
 		return I18n.translateToLocal(name + ".name");
@@ -111,27 +115,27 @@ public class ItemGate extends ItemBlockBase {
 		return super.placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, newState);
 	}
 
-	public static GateLogic getGateLogic(ResourceLocation rs) {
+	public static Optional<GateLogic> getGateLogic(ResourceLocation rs) {
 		try {
 			Class<? extends GateLogic> c = SimpleLogicGates.logicClasses.get(rs);
 			if (c != null) {
-				return c.newInstance();
+				return Optional.of(c.newInstance());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Optional.empty();
 	}
 
-	public static PartGate getPartGate(ResourceLocation rs) {
+	public static Optional<PartGate> getPartGate(ResourceLocation rs) {
 		try {
 			Class<? extends GateLogic> c = SimpleLogicGates.logicClasses.get(rs);
 			if (c != null) {
-				return new PartGate(c.newInstance());
+				return Optional.of(new PartGate(c.newInstance()));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Optional.empty();
 	}
 }

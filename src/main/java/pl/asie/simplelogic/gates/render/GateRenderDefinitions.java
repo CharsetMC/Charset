@@ -38,6 +38,8 @@ import net.minecraftforge.client.model.IModel;
 
 import pl.asie.charset.lib.utils.RenderUtils;
 
+// TODO: Rewrite - remove distinction between BaseDefinition and Definition, allow multiple InputStream for resource
+// TODO: pack overlays
 public class GateRenderDefinitions {
 	public static final GateRenderDefinitions INSTANCE = new GateRenderDefinitions();
 	private static final Gson GSON = new GsonBuilder().create();

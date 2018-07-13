@@ -3,6 +3,10 @@
     {
       "type": "charset:module_loaded",
       "module": "simplelogic.gates"
+    },
+    {
+      "type": "charset:simplelogic_gate_enabled",
+      "gate": "simplelogic:xor"
     }
   ],
   "type": "charset:shaped",

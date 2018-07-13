@@ -335,7 +335,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	}
 
 	public void onNeighborBlockChange(Block block) {
-		if (!getWorld().isSideSolid(getPos().offset(getSide()), getSide().getOpposite())) {
+		if (logic instanceof GateLogicDummy || !getWorld().isSideSolid(getPos().offset(getSide()), getSide().getOpposite())) {
 			IBlockState state = world.getBlockState(pos);
 			state.getBlock().dropBlockAsItem(world, pos, state, 0);
 			world.setBlockToAir(pos);
@@ -505,9 +505,10 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 	public void readItemNBT(NBTTagCompound tag) {
 		if (tag.hasKey("logic", Constants.NBT.TAG_STRING)) {
-			logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
+			Optional<GateLogic> logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
+			logic.ifPresent((a) -> a.readFromNBT(tag, false));
+			this.logic = logic.orElseGet(GateLogicDummy::new);
 		}
-		logic.readFromNBT(tag, false);
 	}
 
 	public NBTTagCompound writeItemNBT(NBTTagCompound tag, boolean silky) {
@@ -522,9 +523,10 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	@Override
 	public void readNBTData(NBTTagCompound tag, boolean isClient) {
 		if (tag.hasKey("logic", Constants.NBT.TAG_STRING)) {
-			logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
+			Optional<GateLogic> logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
+			logic.ifPresent((a) -> a.readFromNBT(tag, isClient));
+			this.logic = logic.orElseGet(GateLogicDummy::new);
 		}
-		logic.readFromNBT(tag, isClient);
 		if (tag.hasKey("m")) {
 			mirrored = tag.getBoolean("m");
 		}
