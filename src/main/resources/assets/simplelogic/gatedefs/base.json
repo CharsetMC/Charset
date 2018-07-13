@@ -5,6 +5,9 @@
         "torch_off": "simplelogic:block/gate_torch_off",
         "torch_on": "simplelogic:block/gate_torch_on"
     },
+    "textures": {
+        "top_underlay": "minecraft:blocks/stone_slab_top"
+    },
     "colors": {
         "off": "381000",
         "on": "E03502",

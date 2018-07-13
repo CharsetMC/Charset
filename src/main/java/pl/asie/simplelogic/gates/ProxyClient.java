@@ -23,10 +23,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraft.util.math.Vec3d;
@@ -79,14 +81,18 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		GateRenderDefinitions.INSTANCE.load("simplelogic:gatedefs/base.json", SimpleLogicGates.logicDefinitions);
+		ResourceLocation top_underlay = GateRenderDefinitions.INSTANCE.base.getTexture("top_underlay");
+		event.getMap().registerSprite(top_underlay);
 
 		for (ResourceLocation rs : SimpleLogicGates.logicClasses.keySet()) {
 			Set<ResourceLocation> textures = new HashSet<>();
 			Map<String, TIntObjectMap<String>> colorMasks = new HashMap<>();
 
+			GateRenderDefinitions.Definition def = GateRenderDefinitions.INSTANCE.getGateDefinition(rs);
+
 			// step 1: gather colormasks
 			int i = 0;
-			for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(rs).layers) {
+			for (GateRenderDefinitions.Layer layer : def.layers) {
 				if (layer.color_mask != null) {
 					layer.texture = rs.getResourceDomain() + ":blocks/" + rs.getResourcePath() + "/layer_" + i;
 					colorMasks.computeIfAbsent(layer.textureBase, (k) -> new TIntObjectHashMap<>())
@@ -96,12 +102,11 @@ public class ProxyClient extends ProxyCommon {
 			}
 
 			// step 2: gather textures
-			GateRenderDefinitions.Definition def = GateRenderDefinitions.INSTANCE.getGateDefinition(rs);
 			for (IModel model : def.getAllModels()) {
 				textures.addAll(model.getTextures());
 			}
 
-			for (GateRenderDefinitions.Layer layer : GateRenderDefinitions.INSTANCE.getGateDefinition(rs).layers) {
+			for (GateRenderDefinitions.Layer layer : def.layers) {
 				if (layer.texture != null) {
 					textures.add(new ResourceLocation(layer.texture));
 				}
@@ -112,18 +117,43 @@ public class ProxyClient extends ProxyCommon {
 				TIntObjectMap<String> resultingTextures = colorMasks.get(baseTexture);
 				resultingTextures.forEachEntry((color, resultingTexture) -> {
 					event.getMap().setTextureEntry(new PixelOperationSprite(resultingTexture, new ResourceLocation(baseTexture),
-							PixelOperationSprite.forEach((x, y, value) -> (value & 0xFFFFFF) == color ? -1 : 0)).forceReadFromFile());
+							PixelOperationSprite.forEach((x, y, value) -> (value & 0xFFFFFF) == color ? -1 : 0)).forceReadFromFile(true));
 					textures.remove(new ResourceLocation(resultingTexture));
 					return true;
 				});
-				event.getMap().setTextureEntry(new PixelOperationSprite(baseTexture, new ResourceLocation(baseTexture),
-						(PixelOperationSprite.forEach((x, y, value) -> {
+				/*
+							(PixelOperationSprite.forEach((x, y, value) -> {
 							if (resultingTextures.containsKey(value & 0xFFFFFF)) {
 								return 0;
 							} else {
+								if ((value & 0xFF000000) == 0) {
+
+								}
 								return value;
 							}
 						}))));
+				 */
+
+				event.getMap().setTextureEntry(new PixelOperationSprite(baseTexture, new ResourceLocation(baseTexture),
+						(pixels, width, getter) -> {
+							TextureAtlasSprite topUnderlay = getter.apply(top_underlay);
+							int height = pixels.length / width;
+							for (int iy = 0; iy < height; iy++) {
+								for (int ix = 0; ix < width; ix++) {
+									int ip = iy * width + ix;
+									int value = pixels[ip];
+									if (resultingTextures.containsKey(value & 0xFFFFFF)) {
+										pixels[ip] = 0;
+									} else {
+										int iUx = ix * topUnderlay.getIconWidth() / width;
+										int iUy = iy * topUnderlay.getIconHeight() / height;
+										int iU = iUy * topUnderlay.getIconWidth() + iUx;
+										pixels[ip] = topUnderlay.getFrameTextureData(0)[0][iU];
+									}
+								}
+							}
+						}, top_underlay
+				).useLargestSize(true));
 				textures.remove(new ResourceLocation(baseTexture));
 			}
 

@@ -27,6 +27,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
@@ -71,9 +72,15 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
     private final Operator operator;
     private final Collection<ResourceLocation> deps;
     private boolean forceReadFromFile;
+    private boolean useLargestSize;
 
-    public PixelOperationSprite forceReadFromFile() {
-        this.forceReadFromFile = true;
+    public PixelOperationSprite forceReadFromFile(boolean value) {
+        this.forceReadFromFile = value;
+        return this;
+    }
+
+    public PixelOperationSprite useLargestSize(boolean value) {
+        this.useLargestSize = value;
         return this;
     }
 
@@ -90,6 +97,7 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
         }
         this.deps = depBuilder.build();
         this.forceReadFromFile = false;
+        this.useLargestSize = false;
     }
 
     @Override
@@ -125,10 +133,29 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
                 return false;
             }
 
-            pixels = new int[image.getWidth() * image.getHeight()];
-            image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
             width = image.getWidth();
             height = image.getHeight();
+            if (useLargestSize) {
+                for (ResourceLocation depLoc : deps) {
+                    TextureAtlasSprite sprite = getter.apply(depLoc);
+                    if (sprite.getIconWidth() > width && sprite.getIconHeight() > height) {
+                        width = sprite.getIconWidth();
+                        height = sprite.getIconHeight();
+                    }
+                }
+            }
+
+            if (width != image.getWidth() || height != image.getHeight()) {
+                BufferedImage oldImage = image;
+                image = new BufferedImage(width, height, image.getType());
+                Graphics2D g = image.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                g.drawImage(oldImage, 0, 0, width, height, 0, 0, oldImage.getWidth(), oldImage.getHeight(), null);
+                g.dispose();
+            }
+
+            pixels = new int[width * height];
+            image.getRGB(0, 0, width, height, pixels, 0, width);
         }
 
         operator.apply(pixels, width, getter);

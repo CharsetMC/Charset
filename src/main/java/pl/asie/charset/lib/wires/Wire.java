@@ -367,7 +367,6 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                 boolean found = false;
                 AxisAlignedBB mask = factory.getBox(location, i + 1);
                 if (mask != null) {
-                    System.out.println("checking " + location + " " + face + " " + mask);
                     if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos(), (state -> !(state.getBlock() instanceof BlockWire)))) {
                         occludedSides |= 1 << connFaces[i].ordinal();
                         validSides.remove(face);

@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.client.model.IModel;
@@ -62,6 +63,10 @@ public class GateRenderDefinitions {
 				int c = Integer.parseInt(colors.get(s), 16);
 				colorMul.put(s, 0xFF000000 | (c & 0x00FF00) | ((c & 0xFF0000) >> 16) | ((c & 0x0000FF) << 16));
 			}
+		}
+
+		public ResourceLocation getTexture(String name) {
+			return textures.containsKey(name) ? new ResourceLocation(textures.get(name)) : TextureMap.LOCATION_MISSING_TEXTURE;
 		}
 	}
 

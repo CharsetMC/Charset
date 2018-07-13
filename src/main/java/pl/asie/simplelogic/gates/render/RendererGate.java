@@ -87,7 +87,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 	}
 
 	public RendererGate() {
-		super(BlockGate.PROPERTY, new ResourceLocation("simplelogic:blocks/gate_bottom"));
+		super(BlockGate.PROPERTY, new ResourceLocation("minecraft:blocks/stone_slab_top"));
 		addDefaultBlockTransforms();
 		addThirdPersonTransformation(getTransformation(0, 2.5f, 2.75f, 75, 45, 0, 0.375f));
 		shiftGuiTransform = getTransformation(0, -16, 0, 90, 0, 0, 1f);

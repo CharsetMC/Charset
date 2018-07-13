@@ -5,18 +5,18 @@
             "faces": {
                 "down": { "texture": "#bottom" },
                 "up": { "texture": "#top" },
-                "north": { "texture": "#north" },
-                "south": { "texture": "#south" },
-                "west": { "texture": "#west" },
-                "east": { "texture": "#east" }
+                "north": { "texture": "#north", "uv": [0, 13, 16, 15] },
+                "south": { "texture": "#south", "uv": [0, 13, 16, 15] },
+                "west": { "texture": "#west", "uv": [0, 13, 16, 15] },
+                "east": { "texture": "#east", "uv": [0, 13, 16, 15] }
             }
         }
     ],
     "textures": {
-        "bottom": "simplelogic:blocks/gate_bottom",
-        "north": "simplelogic:blocks/gate_side",
-        "south": "simplelogic:blocks/gate_side",
-        "west": "simplelogic:blocks/gate_side",
-        "east": "simplelogic:blocks/gate_side"
+        "bottom": "minecraft:blocks/stone_slab_top",
+        "north": "minecraft:blocks/stone_slab_side",
+        "south": "minecraft:blocks/stone_slab_side",
+        "west": "minecraft:blocks/stone_slab_side",
+        "east": "minecraft:blocks/stone_slab_side"
     }
 }
