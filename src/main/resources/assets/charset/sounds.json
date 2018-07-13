@@ -1,0 +1,11 @@
+{
+	"block.crank": {
+		"category": "block",
+		"sounds": [
+			"charset:block/crank1",
+			"charset:block/crank2",
+			"charset:block/crank3",
+			"charset:block/crank4"
+		]
+	}
+}

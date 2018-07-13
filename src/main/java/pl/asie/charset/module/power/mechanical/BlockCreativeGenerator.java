@@ -33,6 +33,7 @@ import javax.annotation.Nullable;
 public class BlockCreativeGenerator extends BlockBase implements ITileEntityProvider {
 	public BlockCreativeGenerator() {
 		super(Material.ROCK);
+		setBlockUnbreakable();
 		setUnlocalizedName("charset.creative_generator_mechanical");
 	}
 

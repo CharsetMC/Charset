@@ -90,6 +90,7 @@ public class TileGearbox extends TileBase implements IMechanicalPowerProducer, I
 		ItemStack.EMPTY
 	};
 
+	public final TraitMechanicalRotation ROTATION;
 	protected Consumer[] consumerHandlers;
 	protected double speedIn, torqueIn, modifier;
 	protected int consumerCount;
@@ -103,6 +104,8 @@ public class TileGearbox extends TileBase implements IMechanicalPowerProducer, I
 		for (int i = 0; i < 6; i++) {
 			consumerHandlers[i] = new Consumer(EnumFacing.getFront(i));
 		}
+
+		registerTrait("rot", ROTATION = new TraitMechanicalRotation());
 	}
 
 	public ItemStack getInventoryStack(int i) {
@@ -194,6 +197,8 @@ public class TileGearbox extends TileBase implements IMechanicalPowerProducer, I
 	@Override
 	public void update() {
 		super.update();
+
+		ROTATION.tick(getSpeedIn());
 
 		if (world.isRemote) {
 			return;

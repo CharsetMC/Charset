@@ -55,6 +55,7 @@ import pl.asie.charset.lib.utils.Quaternion;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.power.mechanical.BlockGearbox;
 import pl.asie.charset.module.power.mechanical.CharsetPowerMechanical;
+import pl.asie.charset.module.power.mechanical.TileAxle;
 import pl.asie.charset.module.power.mechanical.TileGearbox;
 import pl.asie.charset.module.tweak.carry.CarryHandler;
 
@@ -125,17 +126,10 @@ public class TileGearboxRenderer extends TileEntitySpecialRenderer<TileGearbox> 
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(x, y, z);
 
-		double rotD = te.getWorld().getTotalWorldTime() + partialTicks;
-		double rotInput = 0;
-		double rotOutput = 0;
+		double rotD = te.ROTATION.getRotation(partialTicks) * TileAxle.SPEED_MULTIPLIER;
 
-		if (te.getConsumerCount() > 0) {
-			rotInput = rotD * te.getSpeedIn();
-			rotOutput = rotD * te.getSpeedIn();
-		}
-
-		float rotFI = (float) (rotInput % 90) * 4;
-		float rotFO = (float) (rotOutput % 90) * 4;
+		float rotFI = (float) (rotD % 90) * 4;
+		float rotFO = (float) (rotD % 90) * 4;
 
 		if (te.isRedstonePowered()) {
 			drawGear(te, o, te.getInventoryStack(2), 2.5f, 3, 0.5f, -rotFI, 0xFFFFFFFF, 0f);

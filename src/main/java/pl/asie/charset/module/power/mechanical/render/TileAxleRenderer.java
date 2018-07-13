@@ -175,9 +175,8 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 			renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 		}
 
-		long ticks = te.getWorld().getTotalWorldTime();
-		double rotation = ticks + partialTicks;
-		rotation *= te.rotSpeedClient * TileAxle.SPEED_MULTIPLIER;
+		long ticks = getWorld().getTotalWorldTime();
+		double rotation = te.ROTATION.getRotation(partialTicks) * TileAxle.SPEED_MULTIPLIER;
 
 		float offset = (float)te.rotTorqueClient * 0.5f;
 		rotation += ((ticks & 2) != 0) ? offset : -offset;

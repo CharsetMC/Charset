@@ -59,9 +59,9 @@ public class BlockHandCrank extends BlockBase implements ITileEntityProvider {
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
 
 	static {
-		BOXES[0] = new AxisAlignedBB(0, 0, 0, 1, 1, 1);
-		for (int i = 1; i < 6; i++) {
-			BOXES[i] = RotationUtils.rotateFace(BOXES[0], EnumFacing.getFront(i));
+		AxisAlignedBB box = new AxisAlignedBB(1/16f, 0, 1/16f, 15/16f, 7/16f, 15/16f);
+		for (int i = 0; i < 6; i++) {
+			BOXES[i] = RotationUtils.rotateFace(box, EnumFacing.getFront(i ^ 1));
 		}
 	}
 

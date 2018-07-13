@@ -168,6 +168,7 @@ public class CharsetLib {
 		ItemMaterialHeuristics.init(false);
 
 		MinecraftForge.EVENT_BUS.register(new CharsetLibEventHandler());
+		MinecraftForge.EVENT_BUS.register(CharsetSounds.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(Scheduler.INSTANCE);
 
 		Colorspaces.init();

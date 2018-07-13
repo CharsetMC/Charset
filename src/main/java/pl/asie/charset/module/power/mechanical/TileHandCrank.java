@@ -20,14 +20,17 @@
 package pl.asie.charset.module.power.mechanical;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerProducer;
+import pl.asie.charset.lib.CharsetSounds;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
@@ -35,10 +38,16 @@ import pl.asie.charset.lib.capability.Capabilities;
 import javax.annotation.Nullable;
 
 public class TileHandCrank extends TileBase implements ITickable, IMechanicalPowerProducer {
+	public final TraitMechanicalRotation ROTATION;
+
 	private static final double EPSILON = 0.001;
-	private static final double DROPOFF_RATE = 0.999999999;
+	private static final double DROPOFF = 0.035;
+	private static final double MAXIMUM = 2.0;
 	private double force;
-	private double rotation;
+
+	public TileHandCrank() {
+		registerTrait("rot", ROTATION = new TraitMechanicalRotation());
+	}
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
@@ -54,41 +63,34 @@ public class TileHandCrank extends TileBase implements ITickable, IMechanicalPow
 		}
 	}
 
-	public double getRotation() {
-		return rotation;
-	}
-
 	public double getForce() {
 		return force;
 	}
 
+	protected double getAdjustedForce() {
+		return Math.min(MAXIMUM, force);
+	}
+
 	protected boolean updateForce() {
-		double oldForce = force;
+		double oldForce = getAdjustedForce();
+		force = force - DROPOFF;
 		if (force <= EPSILON) {
 			force = 0D;
-		} else {
-			force = force * (Math.sqrt(force) * DROPOFF_RATE);
 		}
 
-		rotation = (rotation + oldForce);
-		return oldForce != force;
+		ROTATION.tick(getAdjustedForce());
+		return oldForce != getAdjustedForce();
 	}
 
 	@Override
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		super.readNBTData(compound, isClient);
-		rotation = compound.getDouble("r");
 		force = compound.getDouble("f");
-
-		if (isClient) {
-			markBlockForRenderUpdate();
-		}
 	}
 
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		compound = super.writeNBTData(compound, isClient);
-		compound.setDouble("r", rotation);
 		compound.setDouble("f", force);
 		return compound;
 	}
@@ -103,7 +105,7 @@ public class TileHandCrank extends TileBase implements ITickable, IMechanicalPow
 				if (tile != null && tile.hasCapability(Capabilities.MECHANICAL_CONSUMER, facing)) {
 					IMechanicalPowerConsumer output = tile.getCapability(Capabilities.MECHANICAL_CONSUMER, facing);
 					if (output.isAcceptingPower()) {
-						output.setForce(force, 1.0);
+						output.setForce(getAdjustedForce(), 0.25);
 					}
 				}
 			}
@@ -120,7 +122,16 @@ public class TileHandCrank extends TileBase implements ITickable, IMechanicalPow
 	}
 
 	public void onActivated(EntityPlayer playerIn) {
-		force = Math.min(1.0D, force + 1.0D);
+		force = Math.min(MAXIMUM * 1.625, force + 1D);
+
+		world.playSound(playerIn,
+				pos.getX() + 0.5 + getFacing().getFrontOffsetX() * 0.25,
+				pos.getY() + 0.5 + getFacing().getFrontOffsetY() * 0.25,
+				pos.getZ() + 0.5 + getFacing().getFrontOffsetZ() * 0.25,
+				CharsetSounds.BLOCK_CRANK,
+				SoundCategory.BLOCKS,
+				1f, 0.875f + (float) (force * 0.0625 / MAXIMUM) + (float) Math.random()*0.01f);
+
 		markDirty();
 		markBlockForUpdate();
 	}

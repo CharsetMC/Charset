@@ -65,6 +65,9 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 
 	public BlockGearbox() {
 		super(Material.WOOD);
+		setHardness(2.0F);
+		setHarvestLevel("axe", 0);
+		setUnlocalizedName("charset.gearbox");
 	}
 
 	@Override

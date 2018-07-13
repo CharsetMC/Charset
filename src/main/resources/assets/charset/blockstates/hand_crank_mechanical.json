@@ -6,7 +6,7 @@
   "variants": {
     "normal": [{}],
     "inventory": [{
-      "transform": "forge:default-block",
+      "transform": "forge:default-item",
       "x": 90, "y": 90
     }]
   }

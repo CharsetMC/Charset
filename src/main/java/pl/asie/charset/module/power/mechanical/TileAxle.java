@@ -24,6 +24,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -39,7 +40,7 @@ import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 
 import javax.annotation.Nullable;
 
-public class TileAxle extends TileBase {
+public class TileAxle extends TileBase implements ITickable {
 	public static final float SPEED_MULTIPLIER = 4.5f;
 
 	protected class AxleSide implements IMechanicalPowerProducer, IMechanicalPowerConsumer {
@@ -91,10 +92,16 @@ public class TileAxle extends TileBase {
 		}
 	}
 
-	public double rotSpeedClient, rotTorqueClient;
+	public final TraitMechanicalRotation ROTATION;
+	public double rotTorqueClient;
 	protected AxleSide[] powerOutputs = new AxleSide[2];
 	protected ItemMaterial material = ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank");
 	protected boolean rendered;
+	private double rotSpeedClient;
+
+	public TileAxle() {
+		registerTrait("rot", ROTATION = new TraitMechanicalRotation());
+	}
 
 	private boolean loadMaterialFromNBT(NBTTagCompound compound) {
 		ItemMaterial nm = ItemMaterialRegistry.INSTANCE.getMaterial(compound, "material");
@@ -115,6 +122,30 @@ public class TileAxle extends TileBase {
 			if (powerOutputs[i] != null) {
 				powerOutputs[i].onNeighborChanged(pos);
 			}
+		}
+	}
+
+	protected double getRotSpeedClient() {
+		if (world.isRemote) {
+			return rotSpeedClient;
+		} else {
+			double ds0 = powerOutputs[0] != null ? powerOutputs[0].speedReceived : 0.0;
+			double ds1 = powerOutputs[1] != null ? powerOutputs[1].speedReceived : 0.0;
+			return Math.max(ds0, ds1);
+		}
+	}
+
+	@Override
+	public void update() {
+		super.update();
+
+		double oldForce = ROTATION.getForce();
+		double newForce = getRotSpeedClient();
+
+		ROTATION.tick(newForce);
+
+		if (oldForce != newForce && !world.isRemote) {
+			markBlockForUpdate();
 		}
 	}
 
@@ -173,7 +204,6 @@ public class TileAxle extends TileBase {
 		if (/*(r || !rendered) && */isClient) {
 			rotSpeedClient = compound.getFloat("rs");
 			rotTorqueClient = compound.getFloat("rt");
-			markBlockForRenderUpdate();
 			rendered = true;
 		}
 	}
@@ -183,12 +213,10 @@ public class TileAxle extends TileBase {
 		compound = super.writeNBTData(compound, isClient);
 		saveMaterialToNBT(compound);
 		if (isClient) {
-			double ds0 = powerOutputs[0] != null ? powerOutputs[0].speedReceived : 0.0;
 			double dt0 = powerOutputs[0] != null ? powerOutputs[0].torqueReceived : 0.0;
-			double ds1 = powerOutputs[1] != null ? powerOutputs[1].speedReceived : 0.0;
 			double dt1 = powerOutputs[1] != null ? powerOutputs[1].torqueReceived : 0.0;
 
-			compound.setFloat("rs", (float) Math.max(ds0, ds1));
+			compound.setFloat("rs", (float) getRotSpeedClient());
 			compound.setFloat("rt", (float) Math.max(dt0, dt1));
 		}
 		return compound;
