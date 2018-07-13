@@ -190,6 +190,7 @@ task shadowJarNonFull(type: com.github.jengelman.gradle.plugins.shadow.tasks.Sha
 	from(sourceSets.main.output) {
 		include "META-INF/**"
 		include "assets/charset/**"
+		include "assets/simplelogic/**"
 		include "licenses/**"
 		include "pl/asie/charset/**"
 		include "mcmod.info"
@@ -202,7 +203,6 @@ task simplelogicJar(type: Jar) {
 	classifier = ""
 	from(sourceSets.main.output) {
 		include "META-INF/MANIFEST.MF"
-		include "assets/simplelogic/**"
 		include "licenses/**"
 		include "pl/asie/simplelogic/**"
 		include "pack.mcmeta"
