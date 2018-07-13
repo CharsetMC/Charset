@@ -57,32 +57,6 @@ public final class RotationUtils {
 		// be it X->Z->X->Z or N->E->S->W, a 90-degree rotation will probably
 		// give a result
 		return state.withRotation(Rotation.CLOCKWISE_90) != state;
-
-		/* if (withRotationCache.containsKey(block)) {
-			return withRotationCache.get(block);
-		}
-
-		Class c = block.getClass();
-		Method m = null;
-
-		try {
-			m = c.getMethod("func_185499_a", IBlockState.class, Rotation.class);
-		} catch (Exception e) {
-			try {
-				m = c.getMethod("withRotation", IBlockState.class, Rotation.class);
-			} catch (Exception ee) {
-
-			}
-		}
-
-		if (m != null) {
-			boolean value = m.getDeclaringClass() != Block.class;
-			withRotationCache.put(block, value);
-			return value;
-		} else {
-			withRotationCache.put(block, false);
-			return false;
-		} */
 	}
 
 	public static boolean rotateAround(World world, BlockPos pos, EnumFacing axis) {
@@ -129,6 +103,9 @@ public final class RotationUtils {
 			}
 
 			// TODO: Add TileEntity.rotate
+			/* if (state.getBlock().hasTileEntity(state)) {
+				TileEntity tile = world.getTileEntity(pos);
+			} */
 
 			if (!rotatedPreviously) {
 				for (IProperty<?> prop : state.getProperties().keySet()) {

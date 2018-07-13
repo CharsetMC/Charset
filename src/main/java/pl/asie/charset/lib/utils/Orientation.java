@@ -76,6 +76,7 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
     public final EnumFacing top;
     
     private final Orientation[] rotations = new Orientation[EnumFacing.VALUES.length];
+    private final Orientation[] mirrors = new Orientation[2];
     private int rotation;
     private Orientation swapped;
     private final EnumFacing[] dirRotations = new EnumFacing[EnumFacing.VALUES.length]; // Admitedly we could just use values() here. But that's ugly.
@@ -86,7 +87,7 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
         this.facing = facing;
         this.top = top;
     }
-    
+
     static {
         for (Orientation o : values()) {
             for (Orientation t : values()) {
@@ -109,9 +110,23 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
         for (Orientation o : values()) {
             o.setupDirectionRotation();
         }
+        for (Orientation o : values()) {
+            o.mirrors[0] = o.setupRotationMirror(EnumFacing.Axis.X); /* FRONT_BACK */
+            o.mirrors[1] = o.setupRotationMirror(EnumFacing.Axis.Z); /* LEFT_RIGHT */
+        }
 
         if (valuesCache.length == 0) {
             throw new RuntimeException("this is weird");
+        }
+    }
+
+    private Orientation setupRotationMirror(EnumFacing.Axis axis) {
+        if (facing.getAxis() == axis) {
+            return find(facing.getOpposite(), top);
+        } else if (top.getAxis() == axis) {
+            return find(facing, top.getOpposite());
+        } else {
+            return this;
         }
     }
 
@@ -269,7 +284,7 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
     @Override
     public int rotate(EnumFacing facing, int vertexIndex) {
         // FIXME see TRSRTransformation
-        return vertexIndex;
+        return toTransformation().rotate(facing, vertexIndex);
     }
 
     /**
@@ -287,26 +302,16 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
         return null;
     }
 
-    // TODO: Cache you, cache me!
     public Orientation mirror(@Nonnull Mirror mirror) {
-        EnumFacing.Axis axis = null;
         switch (mirror) {
             case NONE:
                 return this;
             case FRONT_BACK:
-                axis = EnumFacing.Axis.X;
-                break;
+                return mirrors[0];
             case LEFT_RIGHT:
-                axis = EnumFacing.Axis.Z;
-                break;
-        }
-
-        if (facing.getAxis() == axis) {
-            return find(facing.getOpposite(), top);
-        } else if (top.getAxis() == axis) {
-            return find(facing, top.getOpposite());
-        } else {
-            return this;
+                return mirrors[1];
+            default:
+                throw new RuntimeException("Unknown Mirror type " + mirror.name());
         }
     }
     
