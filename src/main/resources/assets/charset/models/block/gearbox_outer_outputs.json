@@ -15,6 +15,6 @@
     ],
     "textures": {
         "border": "charset:blocks/mechanical/gearbox_border_rounded",
-        "out": "charset:blocks/mechanical/gearbox_border"
+        "out": "charset:blocks/mechanical/gearbox_out"
     }
 }

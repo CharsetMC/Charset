@@ -30,9 +30,12 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.swing.plaf.synth.SynthTreeUI;
 import javax.vecmath.Matrix4f;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class SimpleBakedModel extends BaseBakedModel {
     private final List<BakedQuad>[] quads = new List[7];
@@ -61,6 +64,16 @@ public class SimpleBakedModel extends BaseBakedModel {
     public void addQuads(EnumFacing side, BakedQuad... quads) {
         for (BakedQuad quad : quads) {
             this.quads[side == null ? 6 : side.ordinal()].add(quad);
+        }
+    }
+
+    public void addQuads(EnumFacing side, Stream<BakedQuad> quads) {
+        quads.forEach((quad) -> addQuads(side, quad));
+    }
+
+    public void addQuads(EnumFacing side, Collection<BakedQuad> quads) {
+        if (quads != null) {
+            this.quads[side == null ? 6 : side.ordinal()].addAll(quads);
         }
     }
 

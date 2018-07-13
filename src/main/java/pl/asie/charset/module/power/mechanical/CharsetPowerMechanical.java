@@ -142,9 +142,9 @@ public class CharsetPowerMechanical {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
-		event.getMap().registerSprite(new ResourceLocation("charset:items/mechanical/gear"));
-		ModelGearbox.INSTANCE.modelOuter = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_outer"), event.getMap());
 		ModelGearbox.INSTANCE.modelInner = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_inner"), event.getMap());
+		ModelGearbox.INSTANCE.modelOuter = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_outer"), event.getMap());
+		ModelGearbox.INSTANCE.modelOuterOutputs = RenderUtils.getModelWithTextures(new ResourceLocation("charset:block/gearbox_outer_outputs"), event.getMap());
 	}
 
 	@SubscribeEvent

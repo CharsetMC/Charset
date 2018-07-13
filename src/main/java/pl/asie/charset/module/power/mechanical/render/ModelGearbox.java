@@ -33,18 +33,32 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.model.TRSRTransformation;
 import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.module.power.mechanical.BlockGearbox;
+import pl.asie.charset.module.power.mechanical.CharsetPowerMechanical;
 
 import javax.annotation.Nullable;
 
 public class ModelGearbox extends ModelFactory<GearboxCacheInfo> {
 	public static final ModelGearbox INSTANCE = new ModelGearbox();
-	public IModel modelOuter, modelInner;
+	public IModel modelOuter, modelOuterOutputs, modelInner;
 
 	protected ModelGearbox() {
 		super(BlockGearbox.PROPERTY, new ResourceLocation("minecraft:blocks/planks_oak"));
+	}
+
+	private boolean isMasked(EnumFacing facing, int connMask) {
+		return facing == null || ((connMask) & (1 << facing.ordinal())) != 0;
+	}
+
+	private void addMaskedModel(SimpleBakedModel sbm, IBakedModel model, IBakedModel borderedModel, int connMask) {
+		sbm.addQuads(null, model.getQuads(CharsetPowerMechanical.blockGearbox.getDefaultState(), null, 0L));
+
+		for (EnumFacing facing : EnumFacing.VALUES) {
+			sbm.addQuads(facing, (isMasked(facing, connMask) ? model : borderedModel).getQuads(CharsetPowerMechanical.blockGearbox.getDefaultState(), facing, 0L));
+		}
 	}
 
 	@Override
@@ -55,7 +69,11 @@ public class ModelGearbox extends ModelFactory<GearboxCacheInfo> {
 					"plank", object.plank.getIconName()
 			)).bake(object.orientation, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 		} else if (layer == BlockRenderLayer.CUTOUT) {
-			return modelOuter.uvlock(false).bake(object.orientation, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			IBakedModel outerBordered = modelOuter.uvlock(false).bake(object.orientation, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			IBakedModel outer = modelOuterOutputs.uvlock(false).bake(object.orientation, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
+			SimpleBakedModel sbm = new SimpleBakedModel(outer);
+			addMaskedModel(sbm, outer, outerBordered, object.connMask);
+			return sbm;
 		} else if (isItem) {
 			IBakedModel modelBakedFirst = bake(object, false, BlockRenderLayer.SOLID);
 			IBakedModel modelBakedSecond = bake(object, false, BlockRenderLayer.CUTOUT);
