@@ -27,6 +27,9 @@ import javax.annotation.Nullable;
 /**
  * Implement this class as a capability if you want to
  * emit a bundled cable signal.
+ *
+ * Implementing this capability on the "null" face can
+ * be used for monitoring purposes.
  */
 public interface IBundledEmitter {
 	/**

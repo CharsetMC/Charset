@@ -22,6 +22,8 @@ package pl.asie.charset.module.storage.barrels;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -37,6 +39,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -1317,5 +1321,23 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         } catch (Exception e) {
             return SoundType.WOOD;
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean hasFastRenderer() {
+        /* if (CharsetStorageBarrels.renderBarrelItem3D || !CharsetStorageBarrels.renderBarrelItem) {
+            return true;
+        }*/
+
+        ItemStack i = getItemUnsafe();
+        if (i.isEmpty()) {
+            return true;
+        }
+
+        /*IBakedModel model = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(i, getWorld(), null);
+        return !model.isBuiltInRenderer();*/
+
+        return false;
     }
 }

@@ -34,7 +34,7 @@ import pl.asie.charset.lib.wires.WireProvider;
         name = "audio.transport",
         description = "Audio cables",
         dependencies = {"lib.wires"},
-        profile = ModuleProfile.TESTING
+        profile = ModuleProfile.STABLE
 )
 public class CharsetAudioTransport {
     private WireProviderAudioCable audioCable;

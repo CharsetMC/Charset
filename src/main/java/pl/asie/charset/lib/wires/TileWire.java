@@ -128,6 +128,11 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
         world.setBlockToAir(pos);
     }
 
+    @Override
+    public boolean hasFastRenderer() {
+        return true;
+    }
+
     // I'm a horrible, horrible dev
     protected static boolean isWireCheckingForCaps;
 

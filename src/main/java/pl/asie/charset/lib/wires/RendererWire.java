@@ -537,23 +537,32 @@ public class RendererWire extends ModelFactory<Wire> {
         }
     }
 
+	protected IBakedModel bakeWire(Wire wire, boolean isDynamic, BlockRenderLayer blockLayer) {
+    	boolean hasDynamic = false;
+
+		SimpleBakedModel model = new SimpleBakedModel(this);
+		if (wire != null) {
+			IWireRenderContainer container = containerMap.get(wire.getProvider());
+			if (container != null) {
+				for (int i = 0; i < container.getLayerCount(); i++) {
+					WireRenderHandler handler = container.get(i);
+					if (i == 0) {
+						model.setParticle(handler.getTexture(WireRenderHandler.TextureType.PARTICLE, wire,null, 15));
+					}
+					if (handler.isDynamic() == isDynamic) {
+						hasDynamic = true;
+						addWire(handler, wire, model.getQuads(null, null, 0));
+					}
+				}
+			}
+		}
+
+		return (isDynamic && !hasDynamic) ? null : model;
+	}
+
     @Override
     public IBakedModel bake(Wire wire, boolean isItem, BlockRenderLayer blockLayer) {
-        SimpleBakedModel model = new SimpleBakedModel(this);
-        if (wire != null) {
-            IWireRenderContainer container = containerMap.get(wire.getProvider());
-            if (container != null) {
-                for (int i = 0; i < container.getLayerCount(); i++) {
-                    WireRenderHandler handler = container.get(i);
-                    if (i == 0) {
-                        model.setParticle(handler.getTexture(WireRenderHandler.TextureType.PARTICLE, wire,null, 15));
-                    }
-                    addWire(handler, wire, model.getQuads(null, null, 0));
-                }
-            }
-        }
-
-        return model;
+    	return bakeWire(wire, false, blockLayer);
     }
 
     @Override

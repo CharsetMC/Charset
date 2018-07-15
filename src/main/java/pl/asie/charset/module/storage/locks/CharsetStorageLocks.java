@@ -57,7 +57,7 @@ import pl.asie.charset.patchwork.PatchworkHelper;
 @CharsetModule(
 		name = "storage.locks",
 		description = "Player interaction-preventing locks and keys",
-		profile = ModuleProfile.TESTING
+		profile = ModuleProfile.STABLE
 )
 public class CharsetStorageLocks {
 	@CharsetModule.Instance

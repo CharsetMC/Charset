@@ -30,6 +30,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -60,7 +61,7 @@ public class CharsetLibWires {
 	public static BlockWire blockWire;
 
 	@SideOnly(Side.CLIENT)
-	private RendererWire rendererWire;
+	protected static RendererWire rendererWire;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -114,6 +115,13 @@ public class CharsetLibWires {
 		rendererWire = new RendererWire();
 	}
 
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void initClient(FMLInitializationEvent event) {
+		ClientRegistry.bindTileEntitySpecialRenderer(TileWire.class, new FastTESRWire());
+		MinecraftForge.EVENT_BUS.register(new WireHighlightHandler());
+	}
+
 	@SubscribeEvent(priority = EventPriority.LOW)
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
@@ -132,12 +140,6 @@ public class CharsetLibWires {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=false"), rendererWire);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=true"), rendererWire);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "inventory"), rendererWire);
-	}
-
-	@Mod.EventHandler
-	@SideOnly(Side.CLIENT)
-	public void initClient(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(new WireHighlightHandler());
 	}
 
 	public void registerRenderer(WireProvider provider, IWireRenderContainer container) {

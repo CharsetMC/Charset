@@ -26,6 +26,9 @@ package pl.asie.charset.api.wires;
  * Implement this class as a capability if you want to
  * emit a redstone cable signal. Keep in mind, however,
  * that this does not replace impl redstone APIs.
+ *
+ * Implementing this capability on the "null" face can
+ * be used for monitoring purposes.
  */
 public interface IRedstoneEmitter {
 	/**

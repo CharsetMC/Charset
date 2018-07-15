@@ -68,4 +68,9 @@ public abstract class WireRenderHandler {
 	public boolean isTopSimple() {
 		return true;
 	}
+
+	@SideOnly(Side.CLIENT)
+	public boolean isDynamic() {
+		return false;
+	}
 }

@@ -20,25 +20,20 @@
 package pl.asie.charset.module.power.electric;
 
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import pl.asie.charset.lib.capability.CapabilityProviderFactory;
-import pl.asie.charset.lib.capability.DummyCapabilityStorage;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.RegistryUtils;
+import pl.asie.charset.lib.wires.CharsetLibWires;
 import pl.asie.charset.lib.wires.ItemWire;
 import pl.asie.charset.lib.wires.WireProvider;
-import pl.asie.charset.module.audio.transport.WireProviderAudioCable;
-import pl.asie.charset.module.power.steam.SteamChunkContainer;
 
 @CharsetModule(
 		name = "power.electric",
@@ -47,22 +42,28 @@ import pl.asie.charset.module.power.steam.SteamChunkContainer;
 		profile = ModuleProfile.INDEV
 )
 public class CharsetPowerElectric {
-	private WireProviderElectric electricWire;
-	private ItemWire electricWireWire;
+	private WireProviderElectric wireElectric;
+	private ItemWire itemWireElectric;
 
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {
-		electricWire = new WireProviderElectric();
-		electricWireWire = new ItemWire(electricWire);
+		wireElectric = new WireProviderElectric();
+		itemWireElectric = new ItemWire(wireElectric);
 	}
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
-		RegistryUtils.register(event.getRegistry(), electricWireWire, "electric_wire");
+		RegistryUtils.register(event.getRegistry(), itemWireElectric, "electric_wire");
 	}
 
 	@SubscribeEvent
 	public void registerWires(RegistryEvent.Register<WireProvider> event) {
-		RegistryUtils.register(event.getRegistry(), electricWire, "electric_wire");
+		RegistryUtils.register(event.getRegistry(), wireElectric, "electric_wire");
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGH)
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+		CharsetLibWires.instance.registerRenderer(wireElectric, new WireElectricOverlay(wireElectric));
 	}
 }

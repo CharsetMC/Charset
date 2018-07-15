@@ -46,7 +46,7 @@ import pl.asie.charset.lib.utils.ThreeState;
 @CharsetModule(
 		name = "tweak.rightClickHarvest",
 		description = "Harvest crops by right-clicking!",
-		profile = ModuleProfile.TESTING
+		profile = ModuleProfile.STABLE
 )
 public class CharsetTweakRightClickHarvest {
 	private boolean whitelistRequired;

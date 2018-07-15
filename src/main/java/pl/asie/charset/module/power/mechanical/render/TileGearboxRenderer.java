@@ -61,6 +61,7 @@ import pl.asie.charset.module.tweak.carry.CarryHandler;
 
 import javax.annotation.Nullable;
 
+// TODO: Rewrite as FastTESR
 public class TileGearboxRenderer extends TileEntitySpecialRenderer<TileGearbox> {
 	public static final TileGearboxRenderer INSTANCE = new TileGearboxRenderer();
 
