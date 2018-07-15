@@ -38,7 +38,7 @@ import java.util.Set;
 public class ItemDayBarrel extends ItemBlockBase {
     public ItemDayBarrel(BlockBase block) {
         super(block);
-        setUnlocalizedName("charset.barrel");
+        setTranslationKey("charset.barrel");
     }
 
     @Override

@@ -83,7 +83,7 @@ public class CharsetTweakDoubleDoors {
 					ThreeState state = imc.allows("doubleDoor", block.getRegistryName());
 					boolean allowed = false;
 
-					if (state == ThreeState.MAYBE && !(block.getRegistryName().getResourceDomain().equals("malisisdoors"))) {
+					if (state == ThreeState.MAYBE && !(block.getRegistryName().getNamespace().equals("malisisdoors"))) {
 						Class c = block.getClass();
 						Method m = MethodHandleHelper.reflectMethodRecurse(c, "onBlockActivated", "func_180639_a",
 								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,

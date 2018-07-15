@@ -59,9 +59,9 @@ public class BlockHandCrank extends BlockBase implements ITileEntityProvider {
 	private static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
 
 	static {
-		AxisAlignedBB box = new AxisAlignedBB(1/16f, 0, 1/16f, 15/16f, 7/16f, 15/16f);
+		AxisAlignedBB box = new AxisAlignedBB(4/16f, 0, 4/16f, 12/16f, 7/16f, 12/16f);
 		for (int i = 0; i < 6; i++) {
-			BOXES[i] = RotationUtils.rotateFace(box, EnumFacing.getFront(i ^ 1));
+			BOXES[i] = RotationUtils.rotateFace(box, EnumFacing.byIndex(i ^ 1));
 		}
 	}
 
@@ -69,7 +69,7 @@ public class BlockHandCrank extends BlockBase implements ITileEntityProvider {
 		super(Material.WOOD);
 		setHardness(0.5F);
 		setHarvestLevel("axe", 0);
-		setUnlocalizedName("charset.hand_crank");
+		setTranslationKey("charset.hand_crank");
 		setOpaqueCube(false);
 		setFullCube(false);
 	}
@@ -78,8 +78,7 @@ public class BlockHandCrank extends BlockBase implements ITileEntityProvider {
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		TileEntity tile = worldIn.getTileEntity(pos);
 		if (tile instanceof TileHandCrank) {
-			((TileHandCrank) tile).onActivated(playerIn);
-			return true;
+			return ((TileHandCrank) tile).onActivated(playerIn);
 		} else {
 			return false;
 		}
@@ -113,7 +112,7 @@ public class BlockHandCrank extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(Properties.FACING, EnumFacing.getFront(meta));
+		return getDefaultState().withProperty(Properties.FACING, EnumFacing.byIndex(meta));
 	}
 
 	@Nullable

@@ -108,7 +108,7 @@ public class MirrorChunkContainer {
 	}
 
 	public static IMirror getHighestMirror(World world, BlockPos pos) {
-		Chunk c = world.getChunkFromBlockCoords(pos);
+		Chunk c = world.getChunk(pos);
 		if (c != null && c.hasCapability(CharsetPowerSteam.mirrorContainerCap, null)) {
 			MirrorChunkContainer box = c.getCapability(CharsetPowerSteam.mirrorContainerCap, null);
 			assert box != null;
@@ -119,7 +119,7 @@ public class MirrorChunkContainer {
 	}
 
 	public static void registerMirror(World world, IMirror mirror) {
-		Chunk c = world.getChunkFromBlockCoords(mirror.getMirrorPos());
+		Chunk c = world.getChunk(mirror.getMirrorPos());
 		if (c != null && c.hasCapability(CharsetPowerSteam.mirrorContainerCap, null)) {
 			MirrorChunkContainer box = c.getCapability(CharsetPowerSteam.mirrorContainerCap, null);
 			assert box != null;
@@ -128,7 +128,7 @@ public class MirrorChunkContainer {
 	}
 
 	public static void unregisterMirror(World world, IMirror mirror) {
-		Chunk c = world.getChunkFromBlockCoords(mirror.getMirrorPos());
+		Chunk c = world.getChunk(mirror.getMirrorPos());
 		if (c != null && c.hasCapability(CharsetPowerSteam.mirrorContainerCap, null)) {
 			MirrorChunkContainer box = c.getCapability(CharsetPowerSteam.mirrorContainerCap, null);
 			assert box != null;
@@ -141,7 +141,7 @@ public class MirrorChunkContainer {
 		int chunkZ = pos.getZ() >> 4;
 		for (int ix = chunkX - 1; ix <= chunkX + 1; ix++) {
 			for (int iz = chunkZ - 1; iz <= chunkZ + 1; iz++) {
-				Chunk c = world.getChunkFromChunkCoords(ix, iz);
+				Chunk c = world.getChunk(ix, iz);
 				if (c != null && c.hasCapability(CharsetPowerSteam.mirrorContainerCap, null)) {
 					MirrorChunkContainer box = c.getCapability(CharsetPowerSteam.mirrorContainerCap, null);
 					for (Collection<IMirror> collection : box.mirrorsByHeight.valueCollection()) {
@@ -157,7 +157,7 @@ public class MirrorChunkContainer {
 		int chunkZ = pos.getZ() >> 4;
 		for (int ix = chunkX - 1; ix <= chunkX + 1; ix++) {
 			for (int iz = chunkZ - 1; iz <= chunkZ + 1; iz++) {
-				Chunk c = world.getChunkFromChunkCoords(ix, iz);
+				Chunk c = world.getChunk(ix, iz);
 				if (c != null && c.hasCapability(CharsetPowerSteam.mirrorContainerCap, null)) {
 					MirrorChunkContainer box = c.getCapability(CharsetPowerSteam.mirrorContainerCap, null);
 					box.getMirrors(pos).forEach(consumer);

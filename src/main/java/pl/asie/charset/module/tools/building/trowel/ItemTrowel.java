@@ -19,52 +19,80 @@
 
 package pl.asie.charset.module.tools.building.trowel;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.BlockSnapshot;
 import pl.asie.charset.lib.item.ItemBase;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.module.tools.building.ItemCharsetTool;
 import pl.asie.charset.module.tools.building.ToolsUtils;
+
+import java.util.Optional;
 
 public class ItemTrowel extends ItemCharsetTool {
     public ItemTrowel() {
         super();
         setMaxStackSize(1);
+        setTranslationKey("charset.trowel");
     }
 
     @Override
-    public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player) {
-        return false;
-    }
+    public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, EntityPlayer player) {
+        // are we repeating ourselves?
+        ItemStack stack = player.getHeldItem(EnumHand.OFF_HAND);
+        TrowelCache cache = null;
 
-    @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (hand == EnumHand.MAIN_HAND) {
-            int offset = player.inventory.currentItem;
-
-            for (int i = 2; i >= 0; i--) {
-                int invPos = i*9 + offset;
-                ItemStack stack = player.inventory.getStackInSlot(invPos);
-                if (!stack.isEmpty() && stack.getItem() instanceof ItemBlock) {
-                    ActionResult<ItemStack> result = ToolsUtils.placeBlockOrRollback(stack, player, worldIn, pos);
-                    player.inventory.setInventorySlotContents(invPos, result.getResult());
-
-                    if (result.getType() == EnumActionResult.SUCCESS) {
-                        break;
-                    }
-                }
-            }
-
-            return EnumActionResult.SUCCESS;
-        } else {
-            return EnumActionResult.PASS;
+        if (player.hasCapability(TrowelEventHandler.CACHE, null)) {
+            cache = player.getCapability(TrowelEventHandler.CACHE, null);
         }
+
+        // can we handle this?
+        Optional<TrowelHandler> handler = TrowelEventHandler.getHandler(player, EnumHand.OFF_HAND);
+        if (!handler.isPresent()) {
+            return true;
+        }
+
+        // create snapshot
+        BlockSnapshot snapshot = BlockSnapshot.getBlockSnapshot(player.getEntityWorld(), pos);
+        ItemStack stackSnapshot = stack.copy();
+
+        // remove block, collect drops
+        NonNullList<ItemStack> drops = NonNullList.create();
+        IBlockState state = player.getEntityWorld().getBlockState(pos);
+        state.getBlock().getDrops(drops, player.getEntityWorld(), pos, state, 0);
+        player.getEntityWorld().setBlockToAir(pos);
+
+        if (!handler.get().apply(player, EnumHand.OFF_HAND, pos)) {
+            snapshot.restore();
+        }
+
+        // add drops
+        for (ItemStack dropStack : drops) {
+            ItemUtils.spawnItemEntity(player.getEntityWorld(),
+                    new Vec3d(pos).add(0.5, 0.5, 0.5),
+                    dropStack,
+                    0,0,0,0
+            );
+        }
+
+        // mark cache
+        if (cache != null) {
+            cache.set(player.getEntityWorld(), stackSnapshot, pos);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onBlockDestroyed(ItemStack stack, World worldIn, IBlockState state, BlockPos pos, EntityLivingBase entityLiving) {
+        return false;
     }
 }

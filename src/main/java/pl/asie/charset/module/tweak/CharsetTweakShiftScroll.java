@@ -63,7 +63,7 @@ public class CharsetTweakShiftScroll {
 		Collection<Item> records = new ArrayList<>();
 
 		for (Block b : ForgeRegistries.BLOCKS) {
-			if (b instanceof BlockGlazedTerracotta) glazedTerracottas.put(b.getRegistryName().getResourceDomain(), b);
+			if (b instanceof BlockGlazedTerracotta) glazedTerracottas.put(b.getRegistryName().getNamespace(), b);
 			else if (b instanceof BlockRailBase) rails.add(b);
 		}
 

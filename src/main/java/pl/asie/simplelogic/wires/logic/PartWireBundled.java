@@ -19,6 +19,7 @@
 
 package pl.asie.simplelogic.wires.logic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -210,6 +211,10 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		signalLevel[color] = newSignal;
 		signalValue[color] = (byte) (newSignal >> 8);
 
+		if (DEBUG) {
+			System.out.println("Switch: " + oldSignal + " -> " + newSignal);
+		}
+
 		if (newSignal == 0) {
 			// If we lost signal, propagate only to those which have a signal.
 			// This is an optimization.
@@ -270,11 +275,11 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 				IBundledEmitter emitter = null;
 
 				BlockPos pos = getContainer().pos().offset(facing);
-				if (WireUtils.hasCapability(this, pos, Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false)) {
-					emitter = WireUtils.getCapability(this, pos, Capabilities.BUNDLED_EMITTER, facing.getOpposite(), false);
+				if (WireUtils.hasCapability(this, pos, Capabilities.BUNDLED_EMITTER, facing.getOpposite(), true)) {
+					emitter = WireUtils.getCapability(this, pos, Capabilities.BUNDLED_EMITTER, facing.getOpposite(), true);
 				}
 
-				if (emitter != null && !(emitter instanceof PartWireSignalBase)) {
+				if (emitter != null) {
 					nValues[facing.ordinal()] = emitter.getBundledSignal();
 				}
 			}
@@ -352,12 +357,21 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 	public void addDebugInformation(List<String> stringList, Side side) {
 		if (side == Side.SERVER) {
 			StringBuilder builder = new StringBuilder(getLocation().name());
+			List<String> extraString = new ArrayList<>();
 			builder.append(' ');
 			for (int i = 0; i < 16; i++) {
-				builder.append(ColorUtils.getNearestTextFormatting(EnumDyeColor.byMetadata(i)));
-				builder.append(signalValue[i] <= 0 ? '_' : Integer.toHexString(signalValue[i]).toUpperCase());
+				EnumDyeColor c = EnumDyeColor.byMetadata(i);
+				int v = signalValue[i];
+
+				builder.append(ColorUtils.getNearestTextFormatting(c));
+				builder.append(v <= 0 ? '_' : Integer.toHexString(signalValue[i]).toUpperCase());
+
+				if (v > 0) {
+					extraString.add(ColorUtils.getNearestTextFormatting(c) + I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", c)) + " R:" + v + " S:" + (signalLevel[i] & 0xFF));
+				}
 			}
 			stringList.add(builder.toString());
+			stringList.addAll(extraString);
 		}
 	}
 }

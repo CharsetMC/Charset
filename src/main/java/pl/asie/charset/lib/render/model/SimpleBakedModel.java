@@ -84,7 +84,7 @@ public class SimpleBakedModel extends BaseBakedModel {
     public void addModels(IBakedModel... models) {
         for (IBakedModel model : models) {
             for (int i = 0; i < 7; i++) {
-                quads[i].addAll(model.getQuads(null, i == 6 ? null : EnumFacing.getFront(i), 0));
+                quads[i].addAll(model.getQuads(null, i == 6 ? null : EnumFacing.byIndex(i), 0));
             }
         }
     }

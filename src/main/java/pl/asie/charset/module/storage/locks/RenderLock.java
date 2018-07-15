@@ -46,9 +46,9 @@ public class RenderLock extends Render<EntityLock> {
         GlStateManager.pushMatrix();
         BlockPos pos = entity.getHangingPosition();
         EnumFacing facing = EnumFacing.fromAngle(entity.rotationYaw);
-        double xPos = (double) pos.getX() - entity.posX + x - (facing == null ? 0 : facing.getFrontOffsetX() * 0.46875D);
-        double yPos = (double) pos.getY() - entity.posY + y - (facing == null ? 0 : facing.getFrontOffsetY() * 0.46875D);
-        double zPos = (double) pos.getZ() - entity.posZ + z - (facing == null ? 0 : facing.getFrontOffsetZ() * 0.46875D);
+        double xPos = (double) pos.getX() - entity.posX + x - (facing == null ? 0 : facing.getXOffset() * 0.46875D);
+        double yPos = (double) pos.getY() - entity.posY + y - (facing == null ? 0 : facing.getYOffset() * 0.46875D);
+        double zPos = (double) pos.getZ() - entity.posZ + z - (facing == null ? 0 : facing.getZOffset() * 0.46875D);
         GlStateManager.translate(xPos + 0.5D, yPos + 0.5D, zPos + 0.5D);
         GlStateManager.rotate(180.0F - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
         this.renderManager.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);

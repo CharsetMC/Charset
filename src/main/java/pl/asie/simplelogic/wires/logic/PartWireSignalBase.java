@@ -40,7 +40,7 @@ import pl.asie.charset.lib.wires.*;
 import javax.annotation.Nonnull;
 
 public abstract class PartWireSignalBase extends Wire implements IWire, IDebuggable {
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	public static boolean PROPAGATING = false;
 	public static boolean WIRES_CONNECT_REDSTONE = true;
 	private final EnumSet<EnumFacing> propagationDirs = EnumSet.noneOf(EnumFacing.class);
@@ -170,7 +170,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 	@Override
 	protected void updateConnections() {
 		for (int j = 0; j < 6; j++) {
-			EnumFacing facing = EnumFacing.getFront(j);
+			EnumFacing facing = EnumFacing.byIndex(j);
 			TileEntity tile = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
 			if (tile != null) {
 				if (getSignalFactory().type == WireType.BUNDLED) {

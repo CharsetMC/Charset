@@ -117,19 +117,19 @@ public class CharsetLaser {
         IngredientGroup.register("charset:laser_gem", 7, "gemQuartz");
 
         blockCrystal = new BlockCrystal();
-        blockCrystal.setUnlocalizedName("charset.laser_crystal");
+        blockCrystal.setTranslationKey("charset.laser_crystal");
         itemCrystal = new ItemBlockCrystal(blockCrystal);
 
         blockReflector = new BlockReflector();
-        blockReflector.setUnlocalizedName("charset.laser_reflector");
+        blockReflector.setTranslationKey("charset.laser_reflector");
         itemReflector = new ItemBlockReflector(blockReflector);
 
         blockJar = new BlockJar();
-        blockJar.setUnlocalizedName("charset.beam_torch");
+        blockJar.setTranslationKey("charset.beam_torch");
         itemJar = new ItemBlockJar(blockJar);
 
         blockPrism = new BlockPrism();
-        blockPrism.setUnlocalizedName("charset.prism");
+        blockPrism.setTranslationKey("charset.prism");
         itemPrism = new ItemBlockBase(blockPrism);
 
         MinecraftForge.EVENT_BUS.register(proxy);

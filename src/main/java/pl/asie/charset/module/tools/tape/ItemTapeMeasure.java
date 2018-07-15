@@ -30,7 +30,7 @@ import pl.asie.charset.lib.item.ItemBase;
 public class ItemTapeMeasure extends ItemBase {
 	public ItemTapeMeasure() {
 		super();
-		setUnlocalizedName("charset.tapeMeasure");
+		setTranslationKey("charset.tapeMeasure");
 		setMaxStackSize(1);
 	}
 

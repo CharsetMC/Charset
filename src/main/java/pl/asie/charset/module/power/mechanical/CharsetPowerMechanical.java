@@ -90,7 +90,7 @@ public class CharsetPowerMechanical {
 		GEAR_ITEMS = new ItemGear[GEAR_VALUES.length];
 		for (int i = 0; i < GEAR_VALUES.length; i++) {
 			GEAR_ITEMS[i] = new ItemGear(GEAR_VALUES[i]);
-			GEAR_ITEMS[i].setUnlocalizedName("charset.gear." + GEAR_VALUES[i]);
+			GEAR_ITEMS[i].setTranslationKey("charset.gear." + GEAR_VALUES[i]);
 		}
 	}
 

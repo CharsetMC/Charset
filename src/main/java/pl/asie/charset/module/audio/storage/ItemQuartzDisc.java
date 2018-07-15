@@ -108,7 +108,7 @@ public class ItemQuartzDisc extends Item {
 
 	public ItemQuartzDisc() {
 		super();
-		this.setUnlocalizedName("charset.quartz_disc");
+		this.setTranslationKey("charset.quartz_disc");
 		this.setHasSubtypes(true);
 		this.setMaxStackSize(1);
 	}
@@ -123,7 +123,7 @@ public class ItemQuartzDisc extends Item {
 	}
 
 	@Override
-	public String getUnlocalizedName(ItemStack stack) {
+	public String getTranslationKey(ItemStack stack) {
 		if ((stack.getItemDamage() & 1) == 0) {
 			return "item.charset.quartz_disc.blank";
 		} else {

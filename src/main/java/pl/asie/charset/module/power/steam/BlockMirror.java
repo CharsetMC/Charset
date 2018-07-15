@@ -56,13 +56,13 @@ public class BlockMirror extends BlockBase implements ITileEntityProvider {
 		setOpaqueCube(false);
 		setFullCube(false);
 		setTickRandomly(true);
-		setUnlocalizedName("charset.solar_mirror");
+		setTranslationKey("charset.solar_mirror");
 		setDefaultState(getDefaultState().withProperty(ROT_PROP, ROTATIONS));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 

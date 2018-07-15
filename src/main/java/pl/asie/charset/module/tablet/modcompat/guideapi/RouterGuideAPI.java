@@ -60,7 +60,7 @@ public class RouterGuideAPI implements IRouterSearchable {
 	private String getIndex() {
 		StringBuilder builder = new StringBuilder("\\title{\\local{" + book.getDisplayName() + "}}\n");
 		for (CategoryAbstract category : book.getCategoryList()) {
-			builder.append("\n\\- \\url{/" + location.getResourcePath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "}{" + category.getLocalizedName() + "}");
+			builder.append("\n\\- \\url{/" + location.getPath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "}{" + category.getLocalizedName() + "}");
 		}
 		return builder.toString();
 	}
@@ -68,9 +68,9 @@ public class RouterGuideAPI implements IRouterSearchable {
 	private String getCategory(CategoryAbstract category) {
 		StringBuilder builder = new StringBuilder("\\title{" + category.getLocalizedName() + "}\n");
 		for (Map.Entry<ResourceLocation, EntryAbstract> entry : category.entries.entrySet()) {
-			builder.append("\n\\- \\url{/" + location.getResourcePath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "/" + TabletUtil.encode(entry.getValue().name.toLowerCase(Locale.ROOT)) + "}{" + entry.getValue().getLocalizedName() + "}");
+			builder.append("\n\\- \\url{/" + location.getPath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "/" + TabletUtil.encode(entry.getValue().name.toLowerCase(Locale.ROOT)) + "}{" + entry.getValue().getLocalizedName() + "}");
 		}
-		builder.append("\n\n\\url{/" + location.getResourcePath() + "/index}{Back}");
+		builder.append("\n\n\\url{/" + location.getPath() + "/index}{Back}");
 		return builder.toString();
 	}
 
@@ -83,14 +83,14 @@ public class RouterGuideAPI implements IRouterSearchable {
 				builder.append(((PageText) page).draw.replaceAll("\\\\n", "\n")).append("\n\n");
 			}
 		}
-		builder.append("\\url{/" + location.getResourcePath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "}{Back}");
+		builder.append("\\url{/" + location.getPath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "}{Back}");
 		return builder.toString().trim();
 	}
 
 	@Nullable
 	@Override
 	public String get(URI path) {
-		String cutPath = TabletUtil.decode(path.getPath().substring(location.getResourcePath().length() + 1));
+		String cutPath = TabletUtil.decode(path.getPath().substring(location.getPath().length() + 1));
 		if (cutPath.length() <= 1 || "/index".equals(cutPath)) {
 			return getIndex();
 		} else {
@@ -115,8 +115,8 @@ public class RouterGuideAPI implements IRouterSearchable {
 
 	@Override
 	public boolean matches(URI path) {
-		return "guideapi".equals(path.getScheme()) && location.getResourceDomain().equals(path.getHost())
-				&& path.getPath().startsWith("/" + location.getResourcePath());
+		return "guideapi".equals(path.getScheme()) && location.getNamespace().equals(path.getHost())
+				&& path.getPath().startsWith("/" + location.getPath());
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class RouterGuideAPI implements IRouterSearchable {
 						results.add(new SearchResult(
 								entry.getValue().getLocalizedName(),
 								book.getLocalizedDisplayName(),
-								new URI("guideapi://" + location.getResourceDomain() + "/" + location.getResourcePath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "/" + TabletUtil.encode(entry.getValue().name.toLowerCase(Locale.ROOT)))
+								new URI("guideapi://" + location.getNamespace() + "/" + location.getPath() + "/" + TabletUtil.encode(category.name.toLowerCase(Locale.ROOT)) + "/" + TabletUtil.encode(entry.getValue().name.toLowerCase(Locale.ROOT)))
 						));
 					} catch (URISyntaxException e) {
 						e.printStackTrace();

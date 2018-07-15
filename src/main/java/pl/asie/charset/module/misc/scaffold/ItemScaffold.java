@@ -28,7 +28,7 @@ import pl.asie.charset.lib.item.ItemBlockBase;
 public class ItemScaffold extends ItemBlockBase {
 	public ItemScaffold(BlockBase block) {
 		super(block);
-		setUnlocalizedName("charset.scaffold");
+		setTranslationKey("charset.scaffold");
 	}
 
 	@Override

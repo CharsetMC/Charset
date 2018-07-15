@@ -82,7 +82,7 @@ public class CharsetProjector {
 	public void preInit(FMLPreInitializationEvent event) {
 		blockProjector = new BlockProjector();
 		itemProjector = new ItemBlockBase(blockProjector);
-		itemProjector.setUnlocalizedName("charset.projector");
+		itemProjector.setTranslationKey("charset.projector");
 
 		handlerStack.add(new ProjectorHandlerBook());
 		handlerStack.add(new ProjectorHandlerMap());

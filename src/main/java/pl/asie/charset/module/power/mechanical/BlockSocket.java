@@ -46,13 +46,13 @@ public class BlockSocket extends BlockBase implements ITileEntityProvider {
 	static {
 		BOXES_BASE[0] = new AxisAlignedBB(0,0.75f,0,1,1.0f,1);
 		for (int i = 1; i < 6; i++) {
-			BOXES_BASE[i] = RotationUtils.rotateFace(BOXES_BASE[0], EnumFacing.getFront(i));
+			BOXES_BASE[i] = RotationUtils.rotateFace(BOXES_BASE[0], EnumFacing.byIndex(i));
 		}
 	}
 
 	public BlockSocket() {
 		super(Material.WOOD);
-		setUnlocalizedName("charset.socket");
+		setTranslationKey("charset.socket");
 		setOpaqueCube(false);
 		setFullCube(false);
 	}
@@ -93,7 +93,7 @@ public class BlockSocket extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(Properties.FACING, EnumFacing.getFront(meta));
+		return getDefaultState().withProperty(Properties.FACING, EnumFacing.byIndex(meta));
 	}
 
 	@Nullable

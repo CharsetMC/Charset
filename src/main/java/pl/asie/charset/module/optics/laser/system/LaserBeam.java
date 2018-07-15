@@ -80,7 +80,7 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 		this.start = start;
 		this.length = length;
 
-		direction = EnumFacing.getFront(flags & 7);
+		direction = EnumFacing.byIndex(flags & 7);
 		color = LaserColor.VALUES[(flags >> 3) & 7];
 		endedAtAir = (flags & 0x40) != 0;
 
@@ -155,17 +155,17 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 
 		IBlockState state = world.getBlockState(pos);
 		if (state.isOpaqueCube()) {
-			return endPos.addVector(direction.getOpposite().getFrontOffsetX() * 0.5, direction.getOpposite().getFrontOffsetY() * 0.5, direction.getOpposite().getFrontOffsetZ() * 0.5);
+			return endPos.add(direction.getOpposite().getXOffset() * 0.5, direction.getOpposite().getYOffset() * 0.5, direction.getOpposite().getZOffset() * 0.5);
 		} else {
 			return endPos;
 		}
 
 		// TODO
 
-		// Vec3d startPos = new Vec3d(0.5, 0.5, 0.5).addVector(pos.getX(), pos.getY(), pos.getZ());
+		// Vec3d startPos = new Vec3d(0.5, 0.5, 0.5).add(pos.getX(), pos.getY(), pos.getZ());
 		/* Vec3d defEndPos = endPos;
-		startPos = startPos.addVector(direction.getOpposite().getFrontOffsetX() * 0.5, direction.getOpposite().getFrontOffsetY() * 0.5, direction.getOpposite().getFrontOffsetZ() * 0.5);
-		endPos = endPos.addVector(direction.getFrontOffsetX() * 0.5, direction.getFrontOffsetY() * 0.5, direction.getFrontOffsetZ() * 0.5);
+		startPos = startPos.add(direction.getOpposite().getXOffset() * 0.5, direction.getOpposite().getYOffset() * 0.5, direction.getOpposite().getZOffset() * 0.5);
+		endPos = endPos.add(direction.getXOffset() * 0.5, direction.getYOffset() * 0.5, direction.getZOffset() * 0.5);
 
 		RayTraceResult result = state.collisionRayTrace(world, pos, startPos, endPos);
 		if (result != null && result.typeOfHit == RayTraceResult.Type.BLOCK) {
@@ -217,10 +217,10 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 		}
 
 		/* if (!world.isRemote && state.getMaterial().isOpaque()) {
-			Vec3d startPos = new Vec3d(0.5, 0.5, 0.5).addVector(pos.getX(), pos.getY(), pos.getZ());
-			Vec3d endPos = new Vec3d(0.5, 0.5, 0.5).addVector(pos.getX(), pos.getY(), pos.getZ());
-			startPos = startPos.addVector(direction.getOpposite().getFrontOffsetX() * 0.5, direction.getOpposite().getFrontOffsetY() * 0.5, direction.getOpposite().getFrontOffsetZ() * 0.5);
-			endPos = endPos.addVector(direction.getFrontOffsetX() * 0.5, direction.getFrontOffsetY() * 0.5, direction.getFrontOffsetZ() * 0.5);
+			Vec3d startPos = new Vec3d(0.5, 0.5, 0.5).add(pos.getX(), pos.getY(), pos.getZ());
+			Vec3d endPos = new Vec3d(0.5, 0.5, 0.5).add(pos.getX(), pos.getY(), pos.getZ());
+			startPos = startPos.add(direction.getOpposite().getXOffset() * 0.5, direction.getOpposite().getYOffset() * 0.5, direction.getOpposite().getZOffset() * 0.5);
+			endPos = endPos.add(direction.getXOffset() * 0.5, direction.getYOffset() * 0.5, direction.getZOffset() * 0.5);
 
 			RayTraceResult result = state.collisionRayTrace(world, pos, startPos, endPos);
 			if (result != null && result.typeOfHit == RayTraceResult.Type.BLOCK) {
@@ -235,7 +235,7 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 		boolean foundEnd = false;
 		int i = 0;
 		BlockPos.MutableBlockPos endPos = new BlockPos.MutableBlockPos(start);
-		Chunk chunk = world.getChunkFromBlockCoords(endPos);
+		Chunk chunk = world.getChunk(endPos);
 
 		while (i < MAX_DISTANCE && !foundEnd) {
 			endPos.move(direction);
@@ -245,19 +245,19 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 					break;
 				case NORTH:
 					if ((endPos.getZ() & 15) == 15)
-						chunk = world.getChunkFromBlockCoords(endPos);
+						chunk = world.getChunk(endPos);
 					break;
 				case SOUTH:
 					if ((endPos.getZ() & 15) == 0)
-						chunk = world.getChunkFromBlockCoords(endPos);
+						chunk = world.getChunk(endPos);
 					break;
 				case WEST:
 					if ((endPos.getX() & 15) == 15)
-						chunk = world.getChunkFromBlockCoords(endPos);
+						chunk = world.getChunk(endPos);
 					break;
 				case EAST:
 					if ((endPos.getX() & 15) == 0)
-						chunk = world.getChunkFromBlockCoords(endPos);
+						chunk = world.getChunk(endPos);
 					break;
 			}
 			i++;
@@ -280,10 +280,10 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 			return false;
 		}
 
-		Chunk chunk = world.getChunkFromBlockCoords(start);
+		Chunk chunk = world.getChunk(start);
 		Chunk endChunk = chunk;
 		if (direction.getAxis() != EnumFacing.Axis.Y && (((start.getX() >> 4) != (end.getX() >> 4)) || ((start.getZ() >> 4) != (end.getZ() >> 4)))) {
-			endChunk = world.getChunkFromBlockCoords(end);
+			endChunk = world.getChunk(end);
 		}
 
 		if (endedAtAir == isBlocker(endChunk, end)) {
@@ -299,19 +299,19 @@ public final class LaserBeam implements ILaserBeam, ILaserEndpoint {
 					break;
 				case NORTH:
 					if ((pos.getZ() & 15) == 15)
-						chunk = world.getChunkFromBlockCoords(pos);
+						chunk = world.getChunk(pos);
 					break;
 				case SOUTH:
 					if ((pos.getZ() & 15) == 0)
-						chunk = world.getChunkFromBlockCoords(pos);
+						chunk = world.getChunk(pos);
 					break;
 				case WEST:
 					if ((pos.getX() & 15) == 15)
-						chunk = world.getChunkFromBlockCoords(pos);
+						chunk = world.getChunk(pos);
 					break;
 				case EAST:
 					if ((pos.getX() & 15) == 0)
-						chunk = world.getChunkFromBlockCoords(pos);
+						chunk = world.getChunk(pos);
 					break;
 			}
 

@@ -224,7 +224,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 				result.addModel(
 						definition.getModel(gate.getInverterState(facing) ? "torch_on" : "torch_off")
 								.bake(new ModelStateComposition(
-										transform, new TRSRTransformation(new Vector3f(((facing.getFrontOffsetX() * 6.9875f)) / 16.0f, 0f, ((facing.getFrontOffsetZ() * 6.9875f)) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter())
+										transform, new TRSRTransformation(new Vector3f(((facing.getXOffset() * 6.9875f)) / 16.0f, 0f, ((facing.getZOffset() * 6.9875f)) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter())
 				);
 			}
 		}

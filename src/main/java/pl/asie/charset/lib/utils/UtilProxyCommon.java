@@ -129,19 +129,19 @@ public class UtilProxyCommon implements IThreadListener {
 			}
 
 			Block block = (Block) entry;
-			if (block.getCreativeTabToDisplayOn() == null) {
+			if (block.getCreativeTab() == null) {
 				block.setCreativeTab(tab);
 			}
-			if (block.getUnlocalizedName() == null) {
-				block.setUnlocalizedName("charset.missing_name." + name);
+			if (block.getTranslationKey() == null) {
+				block.setTranslationKey("charset.missing_name." + name);
 			}
 		} else if (entry instanceof Item) {
 			Item item = (Item) entry;
 			if (item.getCreativeTab() == null) {
 				item.setCreativeTab(tab);
 			}
-			if (item.getUnlocalizedName() == null) {
-				item.setUnlocalizedName("charset.missing_name." + name);
+			if (item.getTranslationKey() == null) {
+				item.setTranslationKey("charset.missing_name." + name);
 			}
 		}
 	}

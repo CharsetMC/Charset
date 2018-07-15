@@ -47,7 +47,7 @@ public class CharsetTweakMobEqualizer {
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void upgradeMob(LivingSpawnEvent.SpecialSpawn event) {
 		EnumDifficulty difficulty = event.getWorld().getDifficulty();
-		if (difficulty == null || difficulty.getDifficultyId() <= 1) {
+		if (difficulty == null || difficulty.getId() <= 1) {
 			return;
 		}
 		if (!(event.getEntityLiving() instanceof EntityMob)) {
@@ -57,7 +57,7 @@ public class CharsetTweakMobEqualizer {
 		// TODO: Evaluate this system.
 		// 1) Is canPickUpLoot() a valid check?
 		// 2) Should we add more granular setups (like only some elements of armor, but at a higher frequency)?
-		if (event.getWorld().rand.nextInt(400) > difficulty.getDifficultyId()) {
+		if (event.getWorld().rand.nextInt(400) > difficulty.getId()) {
 			return;
 		}
 		if (!ent.canPickUpLoot()) return;

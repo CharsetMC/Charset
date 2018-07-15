@@ -93,14 +93,14 @@ public class SimpleLogicWires {
 	@SubscribeEvent
 	public void onRegisterItems(RegistryEvent.Register<Item> event) {
 		for (int i = 0; i < wireItems.length; i++) {
-			RegistryUtils.register(event.getRegistry(), wireItems[i], wireItems[i].getRegistryName().getResourcePath(), SimpleLogicShared.getTab());
+			RegistryUtils.register(event.getRegistry(), wireItems[i], wireItems[i].getRegistryName().getPath(), SimpleLogicShared.getTab());
 		}
 	}
 
 	@SubscribeEvent
 	public void onRegisterWires(RegistryEvent.Register<WireProvider> event) {
 		for (int i = 0; i < wireProviders.length; i++) {
-			RegistryUtils.register(event.getRegistry(), wireProviders[i], wireProviders[i].getRegistryName().getResourcePath(), SimpleLogicShared.getTab());
+			RegistryUtils.register(event.getRegistry(), wireProviders[i], wireProviders[i].getRegistryName().getPath(), SimpleLogicShared.getTab());
 		}
 	}
 

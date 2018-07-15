@@ -73,7 +73,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 		setOpaqueCube(false);
 		setFullCube(false);
 		setSoundType(SoundType.WOOD);
-		setUnlocalizedName("charset.scaffold");
+		setTranslationKey("charset.scaffold");
 	}
 
 	public static ItemStack createStack(ItemMaterial plankMaterial, int stackSize) {
@@ -148,7 +148,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 			if (tile instanceof TileBase) {
 				droppedStack = ((TileBase) tile).getDroppedBlock(state);
 			}
-			ItemUtils.spawnItemEntity(worldIn, new Vec3d(pos).addVector(0.5, 0.5, 0.5), droppedStack, 0.1f, 0.1f, 0.1f, 1.0f);
+			ItemUtils.spawnItemEntity(worldIn, new Vec3d(pos).add(0.5, 0.5, 0.5), droppedStack, 0.1f, 0.1f, 0.1f, 1.0f);
 			worldIn.setBlockToAir(pos);
 		}
 	}
@@ -167,7 +167,7 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 	}
 
 	@Override
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 

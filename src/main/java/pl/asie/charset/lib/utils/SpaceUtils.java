@@ -90,7 +90,7 @@ public final class SpaceUtils {
 
     @Nullable
     public static EnumFacing getFacing(int ordinal) {
-        return ordinal == 6 ? null : EnumFacing.getFront(ordinal);
+        return ordinal == 6 ? null : EnumFacing.byIndex(ordinal);
     }
 
     public static Vec3d fromPlayerEyePos(EntityPlayer ent) {
@@ -201,7 +201,7 @@ public final class SpaceUtils {
 
     public static double getAngle(Vec3d a, Vec3d b) {
         double dot = a.dotProduct(b);
-        double mags = a.lengthVector() * b.lengthVector();
+        double mags = a.lengthSquared();
         double div = dot / mags;
         if (div > 1) div = 1;
         if (div < -1) div = -1;
@@ -317,9 +317,9 @@ public final class SpaceUtils {
      */
     public static double lineDistance(Vec3d lineVec, Vec3d point) {
         // http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html equation 9
-        double mag = lineVec.lengthVector();
+        double mag = lineVec.length();
         Vec3d nPoint = scale(point, -1);
-        return lineVec.crossProduct(nPoint).lengthVector() / mag;
+        return lineVec.crossProduct(nPoint).length() / mag;
     }
 
     public static double lineDistance(Vec3d origin, Vec3d lineVec, Vec3d point) {
@@ -456,7 +456,7 @@ public final class SpaceUtils {
 
     public static Vec3d normalize(Vec3d v) {
         // Vanilla's threshold is too low for my purposes.
-        double length = v.lengthVector();
+        double length = v.length();
         if (length == 0) return Vec3d.ZERO;
         double inv = 1.0 / length;
         if (Double.isNaN(inv) || Double.isInfinite(inv)) return Vec3d.ZERO;

@@ -201,9 +201,9 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
                     IBlockState state = world.getBlockState(pos);
 
                     state.getBlock().onBlockActivated(world, pos, state, player, hand, this.facingDirection,
-                            0.5F + this.facingDirection.getFrontOffsetX() * 0.5F,
-                            0.5F + this.facingDirection.getFrontOffsetY() * 0.5F,
-                            0.5F + this.facingDirection.getFrontOffsetZ() * 0.5F
+                            0.5F + this.facingDirection.getXOffset() * 0.5F,
+                            0.5F + this.facingDirection.getYOffset() * 0.5F,
+                            0.5F + this.facingDirection.getZOffset() * 0.5F
                     );
 
                     locked = true;
@@ -292,7 +292,7 @@ public class EntityLock extends EntityHanging implements IEntityAdditionalSpawnD
 
     @Override
     public void readSpawnData(ByteBuf buffer) {
-        this.updateFacingWithBoundingBox(EnumFacing.getFront(buffer.readUnsignedByte()));
+        this.updateFacingWithBoundingBox(EnumFacing.byIndex(buffer.readUnsignedByte()));
         color = buffer.readInt();
     }
 

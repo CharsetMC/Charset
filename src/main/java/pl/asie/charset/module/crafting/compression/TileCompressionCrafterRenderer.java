@@ -53,9 +53,9 @@ public class TileCompressionCrafterRenderer extends FastTESR<TileCompressionCraf
 				extension = Math.max(0.01f * (int)(getWorld().getTotalWorldTime() & 4), extension);
 			}
 
-			double tx = x - pos.getX() + (facing.getFrontOffsetX() * extension);
-			double ty = y - pos.getY() + (facing.getFrontOffsetY() * extension);
-			double tz = z - pos.getZ() + (facing.getFrontOffsetZ() * extension);
+			double tx = x - pos.getX() + (facing.getXOffset() * extension);
+			double ty = y - pos.getY() + (facing.getYOffset() * extension);
+			double tz = z - pos.getZ() + (facing.getZOffset() * extension);
 
 			long r = MathHelper.getPositionRandom(pos);
 

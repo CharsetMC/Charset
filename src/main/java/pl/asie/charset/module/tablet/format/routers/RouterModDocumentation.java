@@ -77,16 +77,16 @@ public class RouterModDocumentation implements IRouterSearchable {
 	@Override
 	public void find(Collection<SearchResult> results, String query) {
 		for (Item i : Item.REGISTRY) {
-			if (modid.equals(i.getRegistryName().getResourceDomain())) {
-				ResourceLocation loc = new ResourceLocation(modid, "doc/item/" + i.getRegistryName().getResourcePath() + ".txt");
+			if (modid.equals(i.getRegistryName().getNamespace())) {
+				ResourceLocation loc = new ResourceLocation(modid, "doc/item/" + i.getRegistryName().getPath() + ".txt");
 				try {
 					Minecraft.getMinecraft().getResourceManager().getResource(loc);
-					String name = I18n.translateToLocal(i.getUnlocalizedName() + ".name");
+					String name = I18n.translateToLocal(i.getTranslationKey() + ".name");
 					if (query.toLowerCase().contains(name.toLowerCase())) {
 						results.add(new SearchResult(
 								name,
 								friendlyName,
-								new URI("item://" + modid + "/" + i.getRegistryName().getResourcePath())
+								new URI("item://" + modid + "/" + i.getRegistryName().getPath())
 						));
 					}
 				} catch (Exception e) {

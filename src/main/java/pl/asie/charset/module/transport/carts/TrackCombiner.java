@@ -106,7 +106,7 @@ public class TrackCombiner {
 			if (transformInv.containsKey(state)) {
 				Pair<ItemStack, IBlockState> pair = transformInv.get(state);
 				if (!world.isRemote) {
-					ItemUtils.spawnItemEntity(world, new Vec3d(pos).addVector(0.5, 0.125, 0.5),
+					ItemUtils.spawnItemEntity(world, new Vec3d(pos).add(0.5, 0.125, 0.5),
 							pair.getLeft().copy(), 0.02f, 0.05f, 0.02f, 1.0f
 					);
 				}

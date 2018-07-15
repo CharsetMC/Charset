@@ -26,7 +26,9 @@ import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -40,6 +42,7 @@ import pl.asie.charset.lib.ui.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.module.tools.building.chisel.*;
 import pl.asie.charset.module.tools.building.trowel.ItemTrowel;
+import pl.asie.charset.module.tools.building.trowel.TrowelEventHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +76,9 @@ public class CharsetToolsBuilding {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		chisel = new ItemChisel();
-		// trowel = new ItemTrowel();
+		trowel = new ItemTrowel();
+
+		TrowelEventHandler.init();
 	}
 
 	@Mod.EventHandler
@@ -97,7 +102,7 @@ public class CharsetToolsBuilding {
 	@SubscribeEvent
 	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(chisel,0, "charset:chisel");
-		// RegistryUtils.registerModel(trowel,0, "charset:trowel");
+		RegistryUtils.registerModel(trowel,0, "charset:trowel");
 	}
 
 	@SubscribeEvent
@@ -113,6 +118,6 @@ public class CharsetToolsBuilding {
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
 		RegistryUtils.register(event.getRegistry(), chisel, "chisel");
-		// RegistryUtils.register(event.getRegistry(), trowel, "trowel");
+		RegistryUtils.register(event.getRegistry(), trowel, "trowel");
 	}
 }

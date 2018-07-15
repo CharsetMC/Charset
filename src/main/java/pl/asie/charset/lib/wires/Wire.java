@@ -136,7 +136,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                         case 11:
                         case 12:
                         case 13: {
-                            EnumFacing facing = EnumFacing.getFront(i - 8);
+                            EnumFacing facing = EnumFacing.byIndex(i - 8);
                             if (connectsExternal(facing)) {
                                 result = getCapabilityProviderRemote(pos.offset(facing), loc, true);
                                 resultFace = facing.getOpposite();
@@ -148,7 +148,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                         case 17:
                         case 18:
                         case 19: {
-                            EnumFacing facing = EnumFacing.getFront(i - 14);
+                            EnumFacing facing = EnumFacing.byIndex(i - 14);
                             if (connectsCorner(facing)) {
                                 result = getCapabilityProviderRemote(pos.offset(facing).offset(loc.facing), WireFace.get(facing.getOpposite()), false);
                                 resultFace = loc.facing.getOpposite();
@@ -209,7 +209,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                         case 11:
                         case 12:
                         case 13: {
-                            EnumFacing facing = EnumFacing.getFront(i - 8);
+                            EnumFacing facing = EnumFacing.byIndex(i - 8);
                             if (connectsExternal(facing)) {
                                 result = getCapabilityRemote(pos.offset(facing), loc, facing.getOpposite(), true, capability);
                             }
@@ -220,7 +220,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                         case 17:
                         case 18:
                         case 19: {
-                            EnumFacing facing = EnumFacing.getFront(i - 14);
+                            EnumFacing facing = EnumFacing.byIndex(i - 14);
                             if (connectsCorner(facing)) {
                                 result = getCapabilityRemote(pos.offset(facing).offset(loc.facing), WireFace.get(facing.getOpposite()), loc.facing.getOpposite(), false, capability);
                             }

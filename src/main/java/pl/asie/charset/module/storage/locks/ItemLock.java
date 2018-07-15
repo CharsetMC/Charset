@@ -35,7 +35,7 @@ import java.util.List;
 public class ItemLock extends ItemLockingDyeable {
     public ItemLock() {
         super();
-        setUnlocalizedName("charset.lock");
+        setTranslationKey("charset.lock");
     }
 
     public String getKey(ItemStack stack) {

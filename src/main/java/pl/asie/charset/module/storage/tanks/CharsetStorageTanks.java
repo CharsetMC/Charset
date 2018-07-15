@@ -111,7 +111,7 @@ public class CharsetStorageTanks {
                 SimpleMultiLayerBakedModel result = new SimpleMultiLayerBakedModel(model);
                 BlockRenderLayer targetLayer = (i >= 4 && i < 8) ? BlockRenderLayer.TRANSLUCENT : BlockRenderLayer.CUTOUT;
                 for (int j = 0; j <= 6; j++) {
-                    EnumFacing facingIn = (j < 6) ? EnumFacing.getFront(j) : null;
+                    EnumFacing facingIn = (j < 6) ? EnumFacing.byIndex(j) : null;
                     for (BakedQuad quadIn : model.getQuads(state, facingIn, 0)) {
                         result.addQuad(targetLayer, facingIn, quadIn);
                     }

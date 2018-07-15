@@ -1,0 +1,34 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "tools.building"
+    },
+    {
+      "type": "charset:indev"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:trowel",
+  "pattern": [
+    " i ",
+    " ii",
+    "s  "
+  ],
+  "key": {
+    "s": {
+      "type": "charset:material",
+      "material": ["item", "wood", "stick"],
+      "nbtKey": "mHandle"
+    },
+    "i": {
+      "type": "charset:material",
+      "material": ["item", "ingot"],
+      "nbtKey": "mHead"
+    }
+  },
+  "result": {
+    "item": "charset:trowel",
+    "count": 1
+  }
+}

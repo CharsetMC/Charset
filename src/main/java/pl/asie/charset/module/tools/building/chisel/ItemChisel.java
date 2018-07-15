@@ -50,9 +50,9 @@ public class ItemChisel extends ItemCharsetTool {
     public ItemChisel() {
         super();
         if (Loader.isModLoaded("chiselsandbits")) {
-            setUnlocalizedName("charset.chisel.large");
+            setTranslationKey("charset.chisel.large");
         } else {
-            setUnlocalizedName("charset.chisel");
+            setTranslationKey("charset.chisel");
         }
     }
 

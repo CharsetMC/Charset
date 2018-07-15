@@ -109,7 +109,7 @@ public class BlockReflector extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(ROTATION, EnumFacing.getFront(meta & 7)).withProperty(SPLITTER, (meta & 8) != 0);
+		return getDefaultState().withProperty(ROTATION, EnumFacing.byIndex(meta & 7)).withProperty(SPLITTER, (meta & 8) != 0);
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class BlockReflector extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 

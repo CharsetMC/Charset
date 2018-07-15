@@ -82,7 +82,7 @@ public class ItemBlockBase extends ItemBlock {
 	@Override
 	public String getUnlocalizedNameInefficiently(ItemStack stack) {
 		// We don't need to be inefficient!
-		return this.getUnlocalizedName(stack);
+		return this.getTranslationKey(stack);
 	}
 
 	@Override

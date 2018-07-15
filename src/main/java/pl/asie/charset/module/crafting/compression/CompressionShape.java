@@ -227,7 +227,7 @@ public class CompressionShape {
 				if (!stack.isEmpty()) {
 					ModCharset.logger.error("Compression Crafter dropping item at " + craftingSourcePos + " - this should NOT happen!");
 					ItemUtils.spawnItemEntity(
-							world, new Vec3d(craftingSourcePos.offset(craftingSourceDir.getOpposite())).addVector(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
+							world, new Vec3d(craftingSourcePos.offset(craftingSourceDir.getOpposite())).add(0.5, 0.5, 0.5), stack, 0, 0, 0, 0
 					);
 				}
 				return true;

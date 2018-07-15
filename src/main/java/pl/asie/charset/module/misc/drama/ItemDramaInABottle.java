@@ -32,7 +32,7 @@ import pl.asie.charset.lib.item.ItemBase;
 public class ItemDramaInABottle extends ItemBase {
 	public ItemDramaInABottle() {
 		super();
-		setUnlocalizedName("charset.dramaInABottle");
+		setTranslationKey("charset.dramaInABottle");
 		setMaxStackSize(1);
 	}
 

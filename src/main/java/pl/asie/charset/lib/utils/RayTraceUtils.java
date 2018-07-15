@@ -66,7 +66,7 @@ public final class RayTraceUtils {
 		double zd = (to.z - from.z) / steps;
 
 		BlockPos lastPos = new BlockPos(from);
-		Vec3d vecPos = from.addVector(xd, yd, zd);
+		Vec3d vecPos = from.add(xd, yd, zd);
 
 		for (int i = 1; i <= steps; i++) {
 			BlockPos pos = new BlockPos(vecPos);
@@ -80,7 +80,7 @@ public final class RayTraceUtils {
 				}
 			}
 
-			vecPos = vecPos.addVector(xd, yd, zd);
+			vecPos = vecPos.add(xd, yd, zd);
 			lastPos = pos;
 		}
 
@@ -96,7 +96,7 @@ public final class RayTraceUtils {
 		double reachDistance = attributeInstance != null ? attributeInstance.getAttributeValue() : 5.0D;
 		Vec3d lookVec = player.getLookVec();
 
-		return getStart(player).addVector(lookVec.x * reachDistance, lookVec.y * reachDistance, lookVec.z * reachDistance);
+		return getStart(player).add(lookVec.x * reachDistance, lookVec.y * reachDistance, lookVec.z * reachDistance);
 	}
 
 	public static Result getCollision(World world, BlockPos pos, EntityLivingBase player, List<AxisAlignedBB> list, boolean adjust) {
@@ -117,8 +117,8 @@ public final class RayTraceUtils {
 		double minDistance = Double.POSITIVE_INFINITY;
 		RayTraceResult hit = null;
 
-		Vec3d origin0 = !adjust ? origin : origin.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
-		Vec3d direction0 = !adjust ? direction : direction.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+		Vec3d origin0 = !adjust ? origin : origin.add((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+		Vec3d direction0 = !adjust ? direction : direction.add((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
 
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i) == null) {
@@ -140,8 +140,8 @@ public final class RayTraceUtils {
 
 	public static RayTraceResult getCollision(BlockPos pos, Vec3d start, Vec3d end, AxisAlignedBB aabb, boolean adjust) {
 		if (adjust) {
-			start = start.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
-			end = end.addVector((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+			start = start.add((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
+			end = end.add((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
 		}
 
 		return getCollisionPreAdjusted(pos, start, end, aabb, 0);
@@ -203,7 +203,7 @@ public final class RayTraceUtils {
 		}
 
 		if (vecHit != null) {
-			RayTraceResult mop = new RayTraceResult(vecHit.addVector(pos.getX(), pos.getY(), pos.getZ()), sideHit, pos);
+			RayTraceResult mop = new RayTraceResult(vecHit.add(pos.getX(), pos.getY(), pos.getZ()), sideHit, pos);
 			mop.subHit = subHit;
 			return mop;
 		} else {

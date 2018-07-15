@@ -65,7 +65,7 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 		setOpaqueCube(false);
 		setSoundType(SoundType.METAL);
 		setHardness(0.0F);
-		setUnlocalizedName("charset.stacks");
+		setTranslationKey("charset.stacks");
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 

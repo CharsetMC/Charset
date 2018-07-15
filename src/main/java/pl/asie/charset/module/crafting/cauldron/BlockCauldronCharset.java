@@ -53,7 +53,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 
 	public BlockCauldronCharset() {
 		super();
-		setUnlocalizedName("cauldron");
+		setTranslationKey("cauldron");
 		setHardness(2.0F);
 	}
 
@@ -74,7 +74,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 	}
 
 	@Override
-	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+	public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
 		if (!worldIn.isRemote) {
 			TileEntity tile = worldIn.getTileEntity(pos);
 			if (tile instanceof TileCauldronCharset) {

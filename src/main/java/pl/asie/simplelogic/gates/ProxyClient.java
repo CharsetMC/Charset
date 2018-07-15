@@ -94,7 +94,7 @@ public class ProxyClient extends ProxyCommon {
 			int i = 0;
 			for (GateRenderDefinitions.Layer layer : def.layers) {
 				if (layer.color_mask != null) {
-					layer.texture = rs.getResourceDomain() + ":blocks/" + rs.getResourcePath() + "/layer_" + i;
+					layer.texture = rs.getNamespace() + ":blocks/" + rs.getPath() + "/layer_" + i;
 					colorMasks.computeIfAbsent(layer.textureBase, (k) -> new TIntObjectHashMap<>())
 						.put(Integer.parseInt(layer.color_mask, 16), layer.texture);
 				}

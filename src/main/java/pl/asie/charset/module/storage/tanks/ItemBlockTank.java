@@ -59,7 +59,7 @@ public class ItemBlockTank extends ItemBlockBase {
 	}
 
 	@Override
-	public String getUnlocalizedName(ItemStack stack) {
+	public String getTranslationKey(ItemStack stack) {
 		return "tile.charset.tank.name";
 	}
 

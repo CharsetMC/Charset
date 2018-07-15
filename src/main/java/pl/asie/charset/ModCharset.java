@@ -219,8 +219,8 @@ public class ModCharset {
 	@SubscribeEvent
 	public void onMissingMappingsBlock(RegistryEvent.MissingMappings<Block> event) {
 		for (RegistryEvent.MissingMappings.Mapping<Block> mapping : event.getAllMappings()) {
-			if (oldPrefixes.contains(mapping.key.getResourceDomain())) {
-				ResourceLocation newName = new ResourceLocation("charset", mapping.key.getResourcePath());
+			if (oldPrefixes.contains(mapping.key.getNamespace())) {
+				ResourceLocation newName = new ResourceLocation("charset", mapping.key.getPath());
 				Block b = Block.getBlockFromName(newName.toString());
 				if (b != null && b != Blocks.AIR) {
 					mapping.remap(b);
@@ -239,8 +239,8 @@ public class ModCharset {
 				continue;
 			}
 
-			if (oldPrefixes.contains(mapping.key.getResourceDomain())) {
-				ResourceLocation newName = new ResourceLocation("charset", mapping.key.getResourcePath());
+			if (oldPrefixes.contains(mapping.key.getNamespace())) {
+				ResourceLocation newName = new ResourceLocation("charset", mapping.key.getPath());
 				Item i = Item.getByNameOrId(newName.toString());
 				if (i != null && i != Items.AIR) {
 					mapping.remap(i);

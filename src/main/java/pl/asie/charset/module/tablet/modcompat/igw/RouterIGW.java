@@ -82,7 +82,7 @@ public class RouterIGW implements IRouterSearchable {
 							matcher.appendReplacement(result, "}");
 						} else {
 							ResourceLocation loc2 = new ResourceLocation(args[0]);
-							String url = "igw://" + loc2.getResourceDomain() + "/item/" + loc2.getResourcePath().replaceAll("^block/", "").replaceAll("^item/", "");
+							String url = "igw://" + loc2.getNamespace() + "/item/" + loc2.getPath().replaceAll("^block/", "").replaceAll("^item/", "");
 							matcher.appendReplacement(result, "\\\\url{" + url + "}{");
 						}
 					} else if ("prefix".equals(cmd) && args.length <= 1) {
@@ -107,7 +107,7 @@ public class RouterIGW implements IRouterSearchable {
 				matcher.appendTail(result);
 				String out = result.toString().trim();
 				if (i != null) {
-					String unl = i.getUnlocalizedName() + ".name";
+					String unl = i.getTranslationKey() + ".name";
 					if (I18n.canTranslate(unl)) {
 						out = "\\title{" + I18n.translateToLocal(unl) + "}\n\n" + out;
 					}
@@ -126,11 +126,11 @@ public class RouterIGW implements IRouterSearchable {
 		StringBuilder builder = new StringBuilder("\\title{" + friendlyName + "}\n");
 
 		for (Item i : Item.REGISTRY) {
-			if (modid.equals(i.getRegistryName().getResourceDomain())) {
+			if (modid.equals(i.getRegistryName().getNamespace())) {
 				Path p = getDocIfExists(i.getRegistryName());
 				if (p != null) {
-					String nname = I18n.translateToLocal(i.getUnlocalizedName() + ".name");
-					builder.append("\n\\- \\url{/item/" + i.getRegistryName().getResourcePath() + "}{" + nname + "}");
+					String nname = I18n.translateToLocal(i.getTranslationKey() + ".name");
+					builder.append("\n\\- \\url{/item/" + i.getRegistryName().getPath() + "}{" + nname + "}");
 				}
 			}
 		}
@@ -156,7 +156,7 @@ public class RouterIGW implements IRouterSearchable {
 
 	@Nullable
 	private Path getDocIfExists(ResourceLocation loc, String langCode, String b) {
-		Path nPath = path.resolve("./" + langCode + "/" + b + "/" + loc.getResourcePath() + ".txt");
+		Path nPath = path.resolve("./" + langCode + "/" + b + "/" + loc.getPath() + ".txt");
 		if (Files.exists(nPath)) {
 			return nPath;
 		} else {
@@ -190,16 +190,16 @@ public class RouterIGW implements IRouterSearchable {
 	@Override
 	public void find(Collection<SearchResult> results, String query) {
 		for (Item i : Item.REGISTRY) {
-			if (modid.equals(i.getRegistryName().getResourceDomain())) {
+			if (modid.equals(i.getRegistryName().getNamespace())) {
 				Path p = getDocIfExists(i.getRegistryName());
 				if (p != null) {
 					try {
-						String name = I18n.translateToLocal(i.getUnlocalizedName() + ".name");
+						String name = I18n.translateToLocal(i.getTranslationKey() + ".name");
 						if (query.toLowerCase().contains(name.toLowerCase())) {
 							results.add(new SearchResult(
 									name,
 									friendlyName,
-									new URI("igw://" + modid + "/item/" + i.getRegistryName().getResourcePath())
+									new URI("igw://" + modid + "/item/" + i.getRegistryName().getPath())
 							));
 						}
 					} catch (Exception e) {

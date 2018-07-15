@@ -246,7 +246,7 @@ public abstract class BlockBase extends Block {
 	public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
 		IBlockState stateOld = world.getBlockState(pos);
 
-		onBlockDestroyedByExplosion(world, pos, explosion);
+		onExplosionDestroy(world, pos, explosion);
 
 		IBlockState state = world.getBlockState(pos);
 		TileEntity tile = world.getTileEntity(pos);

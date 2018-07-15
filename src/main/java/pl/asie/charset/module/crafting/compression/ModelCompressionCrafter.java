@@ -47,7 +47,7 @@ public class ModelCompressionCrafter extends WrappedBakedModel {
 
 		int facing = state.getValue(Properties.FACING).ordinal();
 		if (side == null) {
-			side = EnumFacing.getFront(facing);
+			side = EnumFacing.byIndex(facing);
 		} else if (side.ordinal() == facing) {
 			return Collections.emptyList();
 		}

@@ -64,7 +64,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
         super(Material.GLASS);
         setHardness(0.6F);
         setHarvestLevel("pickaxe", 0);
-        setUnlocalizedName("charset.tank");
+        setTranslationKey("charset.tank");
         setFullCube(false);
         setOpaqueCube(false);
         setComparatorInputOverride(true);
@@ -167,7 +167,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
     }
 
     @Override
-    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
+    public void onBlockExploded(World worldIn, BlockPos pos, Explosion explosionIn) {
         TileEntity tankEntity = worldIn.getTileEntity(pos);
         if (tankEntity instanceof TileTank) {
             TileTank tank = (TileTank) tankEntity;
@@ -192,7 +192,7 @@ public class BlockTank extends BlockBase implements ITileEntityProvider {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.TRANSLUCENT;
     }
 

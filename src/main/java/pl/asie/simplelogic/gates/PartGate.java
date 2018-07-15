@@ -91,7 +91,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 	static {
 		for (int i = 0; i < 6; i++) {
-			EnumFacing facing = EnumFacing.getFront(i);
+			EnumFacing facing = EnumFacing.byIndex(i);
 			BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, 0, 1, 0.125, 1), facing);
 
 			HIT_VECTORS[i] = new Vec3d[5];
@@ -266,7 +266,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		System.arraycopy(values, 0, oldValues, 0, 4);
 
 		for (int i = 0; i <= 3; i++) {
-			EnumFacing facing = EnumFacing.getFront(i + 2);
+			EnumFacing facing = EnumFacing.byIndex(i + 2);
 			GateLogic.Connection conn = logic.getType(facing);
 			values[i] = 0;
 
@@ -374,7 +374,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		}
 
 		if (closestFace >= 0 && closestFace < 4) {
-			EnumFacing dir = EnumFacing.getFront(closestFace + 2);
+			EnumFacing dir = EnumFacing.byIndex(closestFace + 2);
 			EnumFacing itop = getTop();
 			while (itop != EnumFacing.NORTH) {
 				dir = dir.rotateYCCW();
@@ -427,7 +427,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 				if (logic.canInvertSide(closestFace) && logic.isSideInverted(closestFace)) {
 					if (!remote) {
 						logic.invertedSides &= ~(1 << (closestFace.ordinal() - 2));
-						ItemUtils.spawnItemEntity(getWorld(), vec.addVector(getPos().getX(), getPos().getY(), getPos().getZ()),
+						ItemUtils.spawnItemEntity(getWorld(), vec.add(getPos().getX(), getPos().getY(), getPos().getZ()),
 								new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
 					}
 					changed = true;
@@ -550,7 +550,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 		for (int i = 0; i < 4; i++) {
 			if (orientation.top == f[i]) {
-				return EnumFacing.getFront(i + 2);
+				return EnumFacing.byIndex(i + 2);
 			}
 		}
 
@@ -595,7 +595,7 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 		for (int i = 0; i < 4; i++) {
 			if (CONNECTION_DIRS[getSide().ordinal()][i] == rdir) {
-				EnumFacing dir = EnumFacing.getFront(i + 2);
+				EnumFacing dir = EnumFacing.byIndex(i + 2);
 				EnumFacing itop = getTop();
 				while (itop != EnumFacing.NORTH) {
 					dir = dir.rotateYCCW();

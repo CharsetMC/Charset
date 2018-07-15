@@ -36,6 +36,23 @@ public final class ToolsUtils {
 
     }
 
+    public static boolean placeBlock(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos) {
+        ItemStack heldItem = playerIn.getHeldItem(EnumHand.MAIN_HAND);
+
+        playerIn.setHeldItem(EnumHand.MAIN_HAND, stack);
+        EnumActionResult result1 = stack.onItemUse(
+                playerIn, worldIn, pos, EnumHand.MAIN_HAND, EnumFacing.UP,
+                0, 0, 0
+        );
+        playerIn.setHeldItem(EnumHand.MAIN_HAND, heldItem);
+
+        if (result1 == EnumActionResult.SUCCESS && !worldIn.isAirBlock(pos)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static ActionResult<ItemStack> placeBlockOrRollback(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos) {
         ItemStack oldStack = stack.copy();
         ItemStack heldItem = playerIn.getHeldItem(EnumHand.MAIN_HAND);
@@ -51,6 +68,7 @@ public final class ToolsUtils {
         }
 
         worldIn.setBlockToAir(pos);
+
 
         playerIn.setHeldItem(EnumHand.MAIN_HAND, stack);
         EnumActionResult result1 = stack.onItemUse(

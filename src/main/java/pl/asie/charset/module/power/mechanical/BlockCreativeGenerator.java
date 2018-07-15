@@ -34,12 +34,12 @@ public class BlockCreativeGenerator extends BlockBase implements ITileEntityProv
 	public BlockCreativeGenerator() {
 		super(Material.ROCK);
 		setBlockUnbreakable();
-		setUnlocalizedName("charset.creative_generator_mechanical");
+		setTranslationKey("charset.creative_generator_mechanical");
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 

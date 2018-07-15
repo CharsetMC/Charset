@@ -1023,7 +1023,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     protected void playSound(EntityPlayer player, boolean isPlace) {
         if (!world.isRemote) {
             SoundUtils.playSoundRemote(
-                    player, new Vec3d(pos).addVector(0.5, 0.5, 0.5), 64.0D,
+                    player, new Vec3d(pos).add(0.5, 0.5, 0.5), 64.0D,
                     getSoundType().getBreakSound(),
                     SoundCategory.BLOCKS,
                     (getSoundType().getVolume() + 1) / (isPlace ? 3f : 2f),
@@ -1044,7 +1044,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         if (!stack.isEmpty()) {
-            ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).addVector(0.5, 0.5, 0.5), stack, 0.2f, 0.2f, 0.2f, 1, true);
+            ItemUtils.giveOrSpawnItemEntity(player, world, new Vec3d(dropPos).add(0.5, 0.5, 0.5), stack, 0.2f, 0.2f, 0.2f, 1, true);
         }
     }
 

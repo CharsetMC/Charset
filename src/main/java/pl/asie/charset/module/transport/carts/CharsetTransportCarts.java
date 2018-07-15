@@ -94,7 +94,7 @@ public class CharsetTransportCarts {
             linker = new TrainLinker();
             MinecraftForge.EVENT_BUS.register(linker);
 
-            itemLinker = new Item().setUnlocalizedName("linker").setMaxStackSize(1);
+            itemLinker = new Item().setTranslationKey("linker").setMaxStackSize(1);
         }
 
         combiner = new TrackCombiner();

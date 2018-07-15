@@ -35,7 +35,7 @@ public class ItemKey extends ItemLockingDyeable implements IKeyItem {
     public ItemKey() {
         super();
         setMaxStackSize(1);
-        setUnlocalizedName("charset.key");
+        setTranslationKey("charset.key");
     }
 
     // ""security""

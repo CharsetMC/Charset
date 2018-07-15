@@ -136,10 +136,10 @@ public class ProjectorRenderer {
 
 		for (int i = 1; i <= maxDistance; i++) {
 			BlockPos centerPos = pos.offset(projectorDirection, i);
-			Vec3d center = new Vec3d(centerPos).addVector(
-					projectorDirection.getFrontOffsetX() * 0.5f + 0.5f,
-					projectorDirection.getFrontOffsetY() * 0.5f + 0.5f,
-					projectorDirection.getFrontOffsetZ() * 0.5f + 0.5f
+			Vec3d center = new Vec3d(centerPos).add(
+					projectorDirection.getXOffset() * 0.5f + 0.5f,
+					projectorDirection.getYOffset() * 0.5f + 0.5f,
+					projectorDirection.getZOffset() * 0.5f + 0.5f
 			);
 			Vec3d topLeft = center;
 			Vec3d bottomRight = center;
@@ -184,14 +184,14 @@ public class ProjectorRenderer {
 				v += ProjectorHelper.OFFSET + (pos.hashCode() & 31) / 16384f;
 				surface.world = world;
 				surface.cornerStart = topLeft.subtract(
-						projectorDirection.getFrontOffsetX() * v,
-						projectorDirection.getFrontOffsetY() * v,
-						projectorDirection.getFrontOffsetZ() * v
+						projectorDirection.getXOffset() * v,
+						projectorDirection.getYOffset() * v,
+						projectorDirection.getZOffset() * v
 				);
 				surface.cornerEnd = bottomRight.subtract(
-						projectorDirection.getFrontOffsetX() * v,
-						projectorDirection.getFrontOffsetY() * v,
-						projectorDirection.getFrontOffsetZ() * v
+						projectorDirection.getXOffset() * v,
+						projectorDirection.getYOffset() * v,
+						projectorDirection.getZOffset() * v
 				);
 				surface.orientation = orientation;
 				surface.width = sizeFactorW * i;
@@ -208,7 +208,7 @@ public class ProjectorRenderer {
 
 	@SubscribeEvent
 	public void onRender(RenderWorldLastEvent event) {
-		Minecraft.getMinecraft().mcProfiler.startSection("projectors");
+		Minecraft.getMinecraft().profiler.startSection("projectors");
 
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
@@ -303,6 +303,6 @@ public class ProjectorRenderer {
 		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
 		GlStateManager.disableBlend();
 
-		Minecraft.getMinecraft().mcProfiler.endSection();
+		Minecraft.getMinecraft().profiler.endSection();
 	}
 }

@@ -137,7 +137,7 @@ public class RenderMirror {
 	public void onRender(RenderWorldLastEvent event) {
 		Minecraft mc = Minecraft.getMinecraft();
 		World world = mc.world;
-		Minecraft.getMinecraft().mcProfiler.startSection("sunbeams");
+		Minecraft.getMinecraft().profiler.startSection("sunbeams");
 
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
@@ -172,8 +172,8 @@ public class RenderMirror {
 				continue;
 			}
 
-			Vec3d src = new Vec3d(mirror.getMirrorPos()).addVector(0.5, 0.5, 0.5);
-			Vec3d dest = new Vec3d(mirrorTarget.get()).addVector(0.5, 0.5, 0.5);
+			Vec3d src = new Vec3d(mirror.getMirrorPos()).add(0.5, 0.5, 0.5);
+			Vec3d dest = new Vec3d(mirrorTarget.get()).add(0.5, 0.5, 0.5);
 
 			if (!camera.isBoundingBoxInFrustum(new AxisAlignedBB(src, dest))) {
 				continue;
@@ -245,6 +245,6 @@ public class RenderMirror {
 		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
 		GlStateManager.disableBlend();
 
-		Minecraft.getMinecraft().mcProfiler.endSection();
+		Minecraft.getMinecraft().profiler.endSection();
 	}
 }

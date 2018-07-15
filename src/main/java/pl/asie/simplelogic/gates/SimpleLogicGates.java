@@ -175,8 +175,8 @@ public class SimpleLogicGates {
 	}
 
 	private void registerGate(ResourceLocation name, Class<? extends GateLogic> clazz) {
-		registerGate(name, clazz, new ResourceLocation(name.getResourceDomain(), "gatedefs/" + name.getResourcePath() + ".json"),
-				"tile." + name.getResourceDomain() + ".gate." + name.getResourcePath());
+		registerGate(name, clazz, new ResourceLocation(name.getNamespace(), "gatedefs/" + name.getPath() + ".json"),
+				"tile." + name.getNamespace() + ".gate." + name.getPath());
 	}
 
 	public void registerGate(ResourceLocation name, Class<? extends GateLogic> clazz, ResourceLocation gdLoc, String unl) {

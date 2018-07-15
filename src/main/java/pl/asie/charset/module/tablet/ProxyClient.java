@@ -54,8 +54,8 @@ public class ProxyClient extends ProxyCommon {
 							IBlockState state = world.getBlockState(result.getBlockPos());
 							ItemStack stack = state.getBlock().getPickBlock(state, result, world, result.getBlockPos(), player);
 							ResourceLocation loc = state.getBlock().getRegistryName();
-							if (!tablet.openURI(new URI("item://" + loc.getResourceDomain() + "/" + loc.getResourcePath()))) {
-								String key = stack.getUnlocalizedName() + ".name";
+							if (!tablet.openURI(new URI("item://" + loc.getNamespace() + "/" + loc.getPath()))) {
+								String key = stack.getTranslationKey() + ".name";
 								String name = I18n.translateToFallback(key);
 								if (name.equals(key)) {
 									name = I18n.translateToLocal(key);
@@ -68,8 +68,8 @@ public class ProxyClient extends ProxyCommon {
 								if (result.entityHit instanceof EntityItemFrame) {
 									ItemStack stack = ((EntityItemFrame) result.entityHit).getDisplayedItem();
 									ResourceLocation loc = stack.getItem().getRegistryName();
-									if (!stack.isEmpty() && !tablet.openURI(new URI("item://" + loc.getResourceDomain() + "/" + loc.getResourcePath()))) {
-										String key = stack.getUnlocalizedName() + ".name";
+									if (!stack.isEmpty() && !tablet.openURI(new URI("item://" + loc.getNamespace() + "/" + loc.getPath()))) {
+										String key = stack.getTranslationKey() + ".name";
 										String name = I18n.translateToFallback(key);
 										if (name.equals(key)) {
 											name = I18n.translateToLocal(key);
@@ -80,7 +80,7 @@ public class ProxyClient extends ProxyCommon {
 									EntityEntry entry = EntityRegistry.getEntry(result.entityHit.getClass());
 									if (entry != null) {
 										ResourceLocation loc = entry.getRegistryName();
-										if (loc != null && !tablet.openURI(new URI("entity://" + loc.getResourceDomain() + "/" + loc.getResourcePath()))) {
+										if (loc != null && !tablet.openURI(new URI("entity://" + loc.getNamespace() + "/" + loc.getPath()))) {
 											String key = "entity." + EntityList.getEntityString(result.entityHit) + ".name";
 											String name = I18n.translateToFallback(key);
 											if (name.equals(key)) {

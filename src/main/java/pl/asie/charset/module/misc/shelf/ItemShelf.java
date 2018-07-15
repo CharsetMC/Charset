@@ -29,7 +29,7 @@ public class ItemShelf extends ItemBlockBase {
 	public ItemShelf(BlockBase block) {
 		super(block);
 		setHasSubtypes(true);
-		setUnlocalizedName("charset.shelf");
+		setTranslationKey("charset.shelf");
 	}
 
 	@Override

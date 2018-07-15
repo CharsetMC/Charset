@@ -69,7 +69,7 @@ public class BlockProjector extends BlockBase implements ITileEntityProvider {
 		setHardness(2.5F);
 		setHarvestLevel("pickaxe", 0);
 		setSoundType(SoundType.METAL);
-		setUnlocalizedName("charset.projector");
+		setTranslationKey("charset.projector");
 		setFullCube(false);
 		setOpaqueCube(false);
 	}

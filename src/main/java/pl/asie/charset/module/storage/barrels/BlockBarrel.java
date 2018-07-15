@@ -67,7 +67,7 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         setHardness(2.5F);
         setHarvestLevel("axe", 0);
         setSoundType(SoundType.WOOD);
-        setUnlocalizedName("charset.barrel");
+        setTranslationKey("charset.barrel");
     }
 
     @Nullable

@@ -36,7 +36,7 @@ import pl.asie.charset.lib.utils.RegistryUtils;
         profile = ModuleProfile.STABLE
 )
 public class CharsetMaterialsDyes {
-	private Item graphite = new Item().setUnlocalizedName("charset.graphite");
+	private Item graphite = new Item().setTranslationKey("charset.graphite");
 
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {

@@ -251,7 +251,7 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 									builder.put(e, color);
 									break;
 								case NORMAL:
-									builder.put(e, face.getFrontOffsetX(), face.getFrontOffsetY(), face.getFrontOffsetZ(), 0);
+									builder.put(e, face.getXOffset(), face.getYOffset(), face.getZOffset(), 0);
 									break;
 								case UV:
 									float u = sprite.getInterpolatedU(uv[0]);

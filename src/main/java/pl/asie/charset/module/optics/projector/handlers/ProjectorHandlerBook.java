@@ -71,9 +71,9 @@ public class ProjectorHandlerBook implements IProjectorHandler<ItemStack> {
 		// oh boy! text!
 		if (stack.hasTagCompound()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(((surface.getCornerStart().x + surface.getCornerEnd().x) / 2) + surface.getScreenFacing().getFrontOffsetX() * 0.001f,
-					((surface.getCornerStart().y + surface.getCornerEnd().y) / 2) + surface.getScreenFacing().getFrontOffsetY() * 0.001f,
-					((surface.getCornerStart().z + surface.getCornerEnd().z) / 2) + surface.getScreenFacing().getFrontOffsetZ() * 0.001f);
+			GlStateManager.translate(((surface.getCornerStart().x + surface.getCornerEnd().x) / 2) + surface.getScreenFacing().getXOffset() * 0.001f,
+					((surface.getCornerStart().y + surface.getCornerEnd().y) / 2) + surface.getScreenFacing().getYOffset() * 0.001f,
+					((surface.getCornerStart().z + surface.getCornerEnd().z) / 2) + surface.getScreenFacing().getZOffset() * 0.001f);
 
 			Orientation orientation = ProjectorHelper.INSTANCE.getOrientation(surface);
 

@@ -67,7 +67,7 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 		super(Material.WOOD);
 		setHardness(2.0F);
 		setHarvestLevel("axe", 0);
-		setUnlocalizedName("charset.gearbox");
+		setTranslationKey("charset.gearbox");
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 	public IBlockState getStateFromMeta(int meta) {
 		Orientation o = Orientation.FACE_NORTH_POINT_UP;
 		if (meta >= 8 && meta < 12) {
-			o = Orientation.fromDirection(EnumFacing.getFront(meta - 6)).pointTopTo(EnumFacing.UP);
+			o = Orientation.fromDirection(EnumFacing.byIndex(meta - 6)).pointTopTo(EnumFacing.UP);
 		} else if (meta >= 0 && meta < 8) {
 			o = Orientation.getOrientation(meta);
 		}
@@ -157,7 +157,7 @@ public class BlockGearbox extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 

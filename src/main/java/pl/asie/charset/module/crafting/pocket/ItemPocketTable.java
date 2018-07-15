@@ -33,7 +33,7 @@ public class ItemPocketTable extends ItemBase {
     
     public ItemPocketTable() {
         super();
-        setUnlocalizedName("charset.pocket_crafting_table");
+        setTranslationKey("charset.pocket_crafting_table");
         setMaxStackSize(1);
     }
 

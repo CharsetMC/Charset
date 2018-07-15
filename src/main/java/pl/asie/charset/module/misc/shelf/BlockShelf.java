@@ -73,7 +73,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
         setHardness(1.0F);
         setHarvestLevel("axe", 0);
         setSoundType(SoundType.WOOD);
-        setUnlocalizedName("charset.shelf");
+        setTranslationKey("charset.shelf");
         setOpaqueCube(false);
         setFullCube(false);
     }
@@ -147,7 +147,7 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(Properties.FACING4, EnumFacing.getFront((meta & 3) + 2))
+        return getDefaultState().withProperty(Properties.FACING4, EnumFacing.byIndex((meta & 3) + 2))
                 .withProperty(BACK, meta >= 4);
     }
 
@@ -156,14 +156,14 @@ public class BlockShelf extends BlockBase implements ITileEntityProvider {
     }
 
     public static EnumFacing getFacePlaced(EnumFacing facing, float hitX, float hitY, float hitZ, EntityLivingBase placer) {
-        Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ());
+        Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getXOffset(), facing.getYOffset(), facing.getZOffset());
         placementVec = placementVec.rotateYaw(placer.getHorizontalFacing().getHorizontalAngle() / 180 * (float) Math.PI);
         return getFace(placer.getHorizontalFacing(), placementVec.z > 0);
     }
 
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getFrontOffsetX(), facing.getFrontOffsetY(), facing.getFrontOffsetZ());
+        Vec3d placementVec = new Vec3d(hitX - 0.5F, hitY - 0.5F, hitZ - 0.5F).subtract(facing.getXOffset(), facing.getYOffset(), facing.getZOffset());
         placementVec = placementVec.rotateYaw(placer.getHorizontalFacing().getHorizontalAngle() / 180 * (float) Math.PI);
         return this.getDefaultState().withProperty(Properties.FACING4, placer.getHorizontalFacing()).withProperty(BACK, placementVec.z > 0);
     }

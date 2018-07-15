@@ -50,7 +50,7 @@ public class BlockCompressionCrafter extends BlockBase implements ITileEntityPro
 		setSoundType(SoundType.STONE);
 		setHardness(0.5F);
 		setOpaqueCube(false);
-		setUnlocalizedName("charset.compression_crafter");
+		setTranslationKey("charset.compression_crafter");
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class BlockCompressionCrafter extends BlockBase implements ITileEntityPro
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(Properties.FACING, EnumFacing.getFront(meta & 7));
+		return getDefaultState().withProperty(Properties.FACING, EnumFacing.byIndex(meta & 7));
 	}
 
 	@Override

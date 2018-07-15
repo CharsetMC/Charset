@@ -48,7 +48,7 @@ public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider 
 		setHardness(2.5F);
 		setHarvestLevel("pickaxe", 0);
 		setSoundType(SoundType.METAL);
-		setUnlocalizedName("charset.record_player");
+		setTranslationKey("charset.record_player");
 		setFullCube(false);
 		setOpaqueCube(false);
 	}
@@ -70,7 +70,7 @@ public class BlockRecordPlayer extends BlockBase implements ITileEntityProvider 
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(Properties.FACING4, EnumFacing.getFront((meta & 3) + 2));
+		return getDefaultState().withProperty(Properties.FACING4, EnumFacing.byIndex((meta & 3) + 2));
 	}
 
 	@Override

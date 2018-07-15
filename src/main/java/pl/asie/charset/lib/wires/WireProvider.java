@@ -62,7 +62,7 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
         float y = getHeight();
 
         for (int j = 0; j < 6; j++) {
-            EnumFacing f = EnumFacing.getFront(j);
+            EnumFacing f = EnumFacing.byIndex(j);
             EnumFacing[] faces = WireUtils.getConnectionsForRender(WireFace.get(f));
             for (int i = 0; i < faces.length; i++) {
                 if (i >= 2) {

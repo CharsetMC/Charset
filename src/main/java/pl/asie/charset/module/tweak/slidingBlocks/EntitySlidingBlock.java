@@ -212,9 +212,9 @@ public class EntitySlidingBlock extends Entity {
 		this.prevPosX = posX;
 		this.prevPosY = posY;
 		this.prevPosZ = posZ;
-		this.motionX = 0.3f * direction.getFrontOffsetX();
+		this.motionX = 0.3f * direction.getXOffset();
 		this.motionY = 0.00f;
-		this.motionZ = 0.3f * direction.getFrontOffsetZ();
+		this.motionZ = 0.3f * direction.getZOffset();
 
 		dataManager.set(DATA_PARAMETER, serializeTileData());
 	}

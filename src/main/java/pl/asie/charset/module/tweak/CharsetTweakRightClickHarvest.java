@@ -106,7 +106,7 @@ public class CharsetTweakRightClickHarvest {
 								}
 
 								ItemUtils.spawnItemEntity(
-										world, new Vec3d(pos).addVector(0.5, 0.5, 0.5),
+										world, new Vec3d(pos).add(0.5, 0.5, 0.5),
 										stack,
 										distance, distance, distance,
 										1.0f

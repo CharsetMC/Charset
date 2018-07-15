@@ -41,11 +41,11 @@ public class BlockRailCharset extends BlockRailBase {
 		super(false);
 		setHardness(0.7F);
 		setSoundType(SoundType.METAL);
-		setUnlocalizedName("charset.rail_charset");
+		setTranslationKey("charset.rail_charset");
 	}
 
 	@Override
-	public String getUnlocalizedName() {
+	public String getTranslationKey() {
 		return "tile.charset.rail_cross";
 	}
 

@@ -32,7 +32,7 @@ public class ItemTablet extends ItemBase {
 	public ItemTablet() {
 		super();
 		setMaxStackSize(1);
-		setUnlocalizedName("charset.tablet");
+		setTranslationKey("charset.tablet");
 	}
 
 	@Override

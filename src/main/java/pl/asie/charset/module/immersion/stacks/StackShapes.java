@@ -90,7 +90,7 @@ public class StackShapes {
 			}
 			INGOT_POSITIONS[target_i] = new Vec3d[8];
 			for (int j = 0; j < 8; j++) {
-				INGOT_POSITIONS[target_i][j] = base[j].addVector(x, y, z);
+				INGOT_POSITIONS[target_i][j] = base[j].add(x, y, z);
 			}
 		}
 

@@ -50,7 +50,7 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 	static {
 		BOXES[1] = new AxisAlignedBB(6/16f, 0, 6/16f, 10/16f, 10/16f, 10/16f);
 		for (int i = 1; i < 6; i++) {
-			BOXES[i ^ 1] = RotationUtils.rotateFace(BOXES[1], EnumFacing.getFront(i));
+			BOXES[i ^ 1] = RotationUtils.rotateFace(BOXES[1], EnumFacing.byIndex(i));
 		}
 	}
 
@@ -154,7 +154,7 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(Properties.FACING, EnumFacing.getFront(meta & 7));
+		return getDefaultState().withProperty(Properties.FACING, EnumFacing.byIndex(meta & 7));
 	}
 
 	@Override
@@ -170,7 +170,7 @@ public class BlockJar extends BlockBase implements ITileEntityProvider {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 

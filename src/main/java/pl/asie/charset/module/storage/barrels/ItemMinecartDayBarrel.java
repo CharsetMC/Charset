@@ -52,7 +52,7 @@ public class ItemMinecartDayBarrel extends ItemMinecartCharset {
 
     public ItemMinecartDayBarrel() {
         super();
-        setUnlocalizedName("charset.barrelCart");
+        setTranslationKey("charset.barrelCart");
     }
 
     @Override

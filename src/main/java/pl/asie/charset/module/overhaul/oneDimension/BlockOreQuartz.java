@@ -48,7 +48,7 @@ public class BlockOreQuartz extends BlockBase {
         setSoundType(SoundType.STONE);
         setResistance(5.0F);
         setHarvestLevel("pickaxe", 1);
-        setUnlocalizedName("charset.oreQuartz");
+        setTranslationKey("charset.oreQuartz");
     }
 
     @Override
@@ -64,7 +64,7 @@ public class BlockOreQuartz extends BlockBase {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT_MIPPED;
     }
 }

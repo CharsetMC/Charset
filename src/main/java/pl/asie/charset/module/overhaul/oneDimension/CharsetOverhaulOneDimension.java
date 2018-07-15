@@ -92,7 +92,7 @@ public class CharsetOverhaulOneDimension {
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
-        Items.QUARTZ.setUnlocalizedName("charset.gemQuartz");
+        Items.QUARTZ.setTranslationKey("charset.gemQuartz");
         RegistryUtils.register(event.getRegistry(), quartzOreItem, "oreQuartz");
     }
 

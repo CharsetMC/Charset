@@ -68,7 +68,7 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable, IT
 		for (int i = 0; i < 6; i++) {
 			LaserColor source = sourceColors[i];
 			if (source != LaserColor.NONE) {
-				EnumFacing face = EnumFacing.getFront(i);
+				EnumFacing face = EnumFacing.byIndex(i);
 				FaceBehaviour b = getFaceBehaviour(face);
 				if (b == FaceBehaviour.PASS) {
 					colors[i ^ 1] = colors[i ^ 1].union(source);
@@ -103,7 +103,7 @@ public class TilePrism extends TileLaserSourceBase implements IAxisRotatable, IT
 
 		for (int i = 0; i < 6; i++) {
 			if (colors[i] != oldColors[i]) {
-				CharsetLaser.laserStorage.markLaserForUpdate(this, EnumFacing.getFront(i));
+				CharsetLaser.laserStorage.markLaserForUpdate(this, EnumFacing.byIndex(i));
 			}
 		}
 	}

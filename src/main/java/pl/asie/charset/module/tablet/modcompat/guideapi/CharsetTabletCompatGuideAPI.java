@@ -44,7 +44,7 @@ public class CharsetTabletCompatGuideAPI {
 	public void onPostInit(FMLPostInitializationEvent event) {
 		for (Map.Entry<ResourceLocation, Book> entry : GuideAPI.getBooks().entrySet()) {
 			TabletAPI.INSTANCE.registerRouter(new RouterGuideAPI(entry.getKey(), entry.getValue()));
-			TabletAPI.INSTANCE.addBook(entry.getValue().getDisplayName(), "guideapi://" + entry.getKey().getResourceDomain() + "/" + entry.getKey().getResourcePath() + "/index");
+			TabletAPI.INSTANCE.addBook(entry.getValue().getDisplayName(), "guideapi://" + entry.getKey().getNamespace() + "/" + entry.getKey().getPath() + "/index");
 		}
 	}
 }

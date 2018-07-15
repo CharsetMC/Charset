@@ -134,7 +134,7 @@ public class ProxyClient extends ProxyCommon {
 					continue;
 				}
 
-				EnumFacing facing = EnumFacing.getFront(k % 6);
+				EnumFacing facing = EnumFacing.byIndex(k % 6);
 				IModelState modelState = ROTATIONS[k % 6];
 				if (k >= 6) {
 					modelState = new ModelStateComposition(

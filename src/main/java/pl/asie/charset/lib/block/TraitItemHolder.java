@@ -92,7 +92,7 @@ public abstract class TraitItemHolder extends Trait {
 			if (!getStack().isEmpty()) {
 				if (!parent.getWorld().isRemote) {
 					ItemUtils.giveOrSpawnItemEntity(player, parent.getWorld(),
-							new Vec3d(parent.getPos()).addVector(0.5F, 0.5F, 0.5F).add(new Vec3d(getTop().getDirectionVec()).scale(0.5F)),
+							new Vec3d(parent.getPos()).add(0.5F, 0.5F, 0.5F).add(new Vec3d(getTop().getDirectionVec()).scale(0.5F)),
 							getStack(), 0, 0, 0, 0, true
 					);
 					setStack(ItemStack.EMPTY);

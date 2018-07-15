@@ -71,7 +71,7 @@ public class LaserRenderer {
 
 		if (totalLasers == 0) return;
 
-		Minecraft.getMinecraft().mcProfiler.startSection("lasers");
+		Minecraft.getMinecraft().profiler.startSection("lasers");
 
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
@@ -113,18 +113,18 @@ public class LaserRenderer {
 			if (beam.getColor().blue) t += 0.001f;
 
 			if (beam.getStart().getX() == beam.getEnd().getX()) {
-				startVec = startVec.addVector(-t / 16.0, 0, 0);
-				endVec = endVec.addVector(t / 16.0, 0, 0);
+				startVec = startVec.add(-t / 16.0, 0, 0);
+				endVec = endVec.add(t / 16.0, 0, 0);
 			}
 
 			if (beam.getStart().getY() == beam.getEnd().getY()) {
-				startVec = startVec.addVector(0, -t / 16.0, 0);
-				endVec = endVec.addVector(0, t / 16.0, 0);
+				startVec = startVec.add(0, -t / 16.0, 0);
+				endVec = endVec.add(0, t / 16.0, 0);
 			}
 
 			if (beam.getStart().getZ() == beam.getEnd().getZ()) {
-				startVec = startVec.addVector(0, 0, -t / 16.0);
-				endVec = endVec.addVector(0, 0, t / 16.0);
+				startVec = startVec.add(0, 0, -t / 16.0);
+				endVec = endVec.add(0, 0, t / 16.0);
 			}
 
 			if (!camera.isBoundingBoxInFrustum(SpaceUtils.from(startVec, endVec))) {
@@ -167,6 +167,6 @@ public class LaserRenderer {
 		GlStateManager.enableTexture2D();
 		GlStateManager.disableBlend();
 
-		Minecraft.getMinecraft().mcProfiler.endSection();
+		Minecraft.getMinecraft().profiler.endSection();
 	}
 }

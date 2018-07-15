@@ -117,7 +117,7 @@ public class LockEventHandler {
         if (!canUnlock) {
             ITextComponent displayName = tile.getDisplayName();
             if (displayName == null) {
-                displayName = new TextComponentTranslation(tile.getBlockType().getUnlocalizedName() + ".name");
+                displayName = new TextComponentTranslation(tile.getBlockType().getTranslationKey() + ".name");
             }
             new Notice(tile,NotificationComponentString.translated("container.isLocked", new NotificationComponentTextComponent(displayName))).sendTo(player);
             player.getEntityWorld().playSound(player, tile.getPos(), SoundEvents.BLOCK_CHEST_LOCKED, SoundCategory.BLOCKS, 1.0f, 1.0f);

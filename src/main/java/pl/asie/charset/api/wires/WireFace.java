@@ -37,7 +37,7 @@ public enum WireFace {
 	CENTER;
 
 	WireFace() {
-		facing = ordinal() >= 6 ? null : EnumFacing.getFront(ordinal());
+		facing = ordinal() >= 6 ? null : EnumFacing.byIndex(ordinal());
 	}
 
 	public static final WireFace[] VALUES = values();

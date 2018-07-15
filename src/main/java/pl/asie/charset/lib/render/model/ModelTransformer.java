@@ -49,7 +49,7 @@ public final class ModelTransformer {
          SimpleBakedModel out = new SimpleBakedModel(model);
 
          for (int i = 0; i <= 6; i++) {
-             EnumFacing side = (i == 6 ? null : EnumFacing.getFront(i));
+             EnumFacing side = (i == 6 ? null : EnumFacing.byIndex(i));
              for (BakedQuad quad : model.getQuads(state, side, rand)) {
                  out.addQuad(side, transform(quad, transformer, format));
              }

@@ -114,7 +114,7 @@ public class CompressionShapeRenderer {
 			for (GridEntry barrel : shape.grid) {
 				center = center.add(new Vec3d(barrel.getPos()).scale(1.0 / shape.grid.size()));
 			}
-			center = center.addVector(0.5, 0.5, 0.5);
+			center = center.add(0.5, 0.5, 0.5);
 
 			GlStateManager.translate(center.x, center.y, center.z);
 			GlStateManager.scale(scale[2], scale[0], scale[1]);

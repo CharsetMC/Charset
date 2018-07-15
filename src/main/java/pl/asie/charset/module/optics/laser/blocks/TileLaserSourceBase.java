@@ -47,7 +47,7 @@ public class TileLaserSourceBase extends TileBase {
 				if (colors[i] == LaserColor.NONE) {
 					beam = null;
 				} else if (beam == null || !beam.isValid(getWorld(), getPos()) || beam.getColor() != colors[i]) {
-					beam = factory.create(TileLaserSourceBase.this, EnumFacing.getFront(i), colors[i]);
+					beam = factory.create(TileLaserSourceBase.this, EnumFacing.byIndex(i), colors[i]);
 				}
 			}
 		};

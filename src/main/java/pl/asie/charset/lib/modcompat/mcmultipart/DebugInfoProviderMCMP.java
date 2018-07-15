@@ -19,7 +19,10 @@
 
 package pl.asie.charset.lib.modcompat.mcmultipart;
 
+import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
+import mcmultipart.api.multipart.MultipartHelper;
+import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -31,15 +34,23 @@ import pl.asie.charset.lib.wires.Wire;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class DebugInfoProviderMCMP implements DebugInfoProvider.Handler {
 	@Override
 	public boolean addDebugInformation(RayTraceResult mouseOver, World world, List<String> info, Side side) {
 		if (mouseOver.hitInfo instanceof IPartInfo) {
-			TileEntity tile = ((IPartInfo) mouseOver.hitInfo).getTile().getTileEntity();
-			if (tile.hasCapability(Capabilities.DEBUGGABLE, null)) {
-				DebugInfoProvider.addDebugInformation(Objects.requireNonNull(tile.getCapability(Capabilities.DEBUGGABLE, null)), world, info, side);
-				return true;
+			IPartSlot slot = ((IPartInfo) mouseOver.hitInfo).getSlot();
+			Optional<IMultipartContainer> container = MultipartHelper.getContainer(world, ((IPartInfo) mouseOver.hitInfo).getPartPos());
+			if (container.isPresent()) {
+				Optional<IPartInfo> partInfo = container.get().get(slot);
+				if (partInfo.isPresent()) {
+					TileEntity tile = partInfo.get().getTile().getTileEntity();
+					if (tile != null && tile.hasCapability(Capabilities.DEBUGGABLE, null)) {
+						DebugInfoProvider.addDebugInformation(Objects.requireNonNull(tile.getCapability(Capabilities.DEBUGGABLE, null)), world, info, side);
+						return true;
+					}
+				}
 			}
 		}
 

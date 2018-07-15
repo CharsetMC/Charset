@@ -153,7 +153,7 @@ public class TileMirror extends TileBase implements IMirror {
 							break;
 					}
 
-					RayTraceUtils.Result resultTmp = RayTraceUtils.getCollision(world, new Vec3d(pos).addVector(0.5, 0.5, 0.5), new Vec3d(targetPos).addVector(0.5, 0.5, 0.5), (checkPos) -> {
+					RayTraceUtils.Result resultTmp = RayTraceUtils.getCollision(world, new Vec3d(pos).add(0.5, 0.5, 0.5), new Vec3d(targetPos).add(0.5, 0.5, 0.5), (checkPos) -> {
 						IBlockState cstate = world.getBlockState(checkPos);
 						return !(cstate.getBlock() instanceof BlockMirror) && cstate.getLightOpacity(world, checkPos) <= 0;
 					});

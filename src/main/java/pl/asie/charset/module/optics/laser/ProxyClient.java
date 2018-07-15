@@ -126,7 +126,7 @@ public class ProxyClient extends ProxyCommon {
 						if (CharsetLaser.blockJar.canRenderInLayer(CharsetLaser.blockJar.getDefaultState(), layer)) {
 							ForgeHooksClient.setRenderLayer(layer);
 							for (int i = 0; i <= 6; i++) {
-								EnumFacing facingIn = (i < 6) ? EnumFacing.getFront(i) : null;
+								EnumFacing facingIn = (i < 6) ? EnumFacing.byIndex(i) : null;
 								for (BakedQuad quadIn : model.getQuads(state, facingIn, 0)) {
 									result.addQuad(layer, facingIn, ModelTransformer.transform(quadIn, (quad, element, data) -> {
 										if (quad.getTintIndex() == 1 && element == DefaultVertexFormats.TEX_2S) {

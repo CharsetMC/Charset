@@ -54,7 +54,7 @@ public class RenderSteamParticle {
 	public void onRenderWorldLast(RenderWorldLastEvent event) {
 		Minecraft mc = Minecraft.getMinecraft();
 		World world = mc.world;
-		Minecraft.getMinecraft().mcProfiler.startSection("charset_steam");
+		Minecraft.getMinecraft().profiler.startSection("charset_steam");
 		Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
 		float rotationX = ActiveRenderInfo.getRotationX();
@@ -100,7 +100,7 @@ public class RenderSteamParticle {
 				float alpha = 0.25f;
 
 				Vec3d pos = particle.getPosition(Minecraft.getMinecraft().getRenderPartialTicks());
-				AxisAlignedBB box = new AxisAlignedBB(pos.addVector(-size, -size, -size), pos.addVector(size, size, size));
+				AxisAlignedBB box = new AxisAlignedBB(pos.add(-size, -size, -size), pos.add(size, size, size));
 
 				if (!camera.isBoundingBoxInFrustum(box)) {
 					continue;
@@ -137,6 +137,6 @@ public class RenderSteamParticle {
 		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
 		GlStateManager.disableBlend();
 
-		Minecraft.getMinecraft().mcProfiler.endSection();
+		Minecraft.getMinecraft().profiler.endSection();
 	}
 }

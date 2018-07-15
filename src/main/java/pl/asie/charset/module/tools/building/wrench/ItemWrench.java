@@ -44,7 +44,7 @@ import java.util.Optional;
 public class ItemWrench extends ItemCharsetTool {
     public ItemWrench() {
         super();
-        setUnlocalizedName("charset.wrench");
+        setTranslationKey("charset.wrench");
         setHarvestLevel("wrench", 2);
     }
 

@@ -42,11 +42,11 @@ public class WireRenderHandlerDefault extends WireRenderHandler {
 		super(provider);
 
 		ResourceLocation location = provider.getTexturePrefix();
-		this.domain = location.getResourceDomain();
-		if (!location.getResourcePath().endsWith("/")) {
-			this.path = location.getResourcePath() + "_";
+		this.domain = location.getNamespace();
+		if (!location.getPath().endsWith("/")) {
+			this.path = location.getPath() + "_";
 		} else {
-			this.path = location.getResourcePath();
+			this.path = location.getPath();
 		}
 	}
 

@@ -69,7 +69,7 @@ public class TileCrystal extends TileLaserSourceBase {
 				if (c == LaserColor.NONE) {
 					beam = null;
 				} else if (beam == null || !beam.isValid() || !beam.getStart().equals(getPos()) || beam.getColor() != c) {
-					beam = factory.create(TileCrystal.this, EnumFacing.getFront(i), c);
+					beam = factory.create(TileCrystal.this, EnumFacing.byIndex(i), c);
 				}
 			}
 		};
@@ -176,7 +176,7 @@ public class TileCrystal extends TileLaserSourceBase {
 
 				if (newColors[_i ^ 1] != colorHit) {
 					newColors[_i ^ 1] = colorHit;
-					updateOpacity(EnumFacing.getFront(_i ^ 1), oldState, colorHit, false);
+					updateOpacity(EnumFacing.byIndex(_i ^ 1), oldState, colorHit, false);
 				} else {
 					updateOpacity(null, oldState, colorHit, false);
 				}

@@ -134,9 +134,9 @@ public final class CharsetIMC {
             return ThreeState.NO;
         } else if (registryLocs.get(wKey).contains(location)) {
             return ThreeState.YES;
-        } else if (registryDomainLocs.get(bKey).contains(location.getResourceDomain())) {
+        } else if (registryDomainLocs.get(bKey).contains(location.getNamespace())) {
             return ThreeState.NO;
-        } else if (registryDomainLocs.get(wKey).contains(location.getResourceDomain())) {
+        } else if (registryDomainLocs.get(wKey).contains(location.getNamespace())) {
             return ThreeState.YES;
         } else {
             return ThreeState.MAYBE;
@@ -169,8 +169,8 @@ public final class CharsetIMC {
         if (checkFrozen(entryKey)) return false;
 
         boolean result;
-        if (entry.getResourcePath().equals("*")) {
-            result = registryDomainLocs.put(entryKey, entry.getResourceDomain());
+        if (entry.getPath().equals("*")) {
+            result = registryDomainLocs.put(entryKey, entry.getNamespace());
         } else {
             result = registryLocs.put(entryKey, entry);
         }
@@ -184,8 +184,8 @@ public final class CharsetIMC {
         if (checkFrozen(entryKey)) return false;
 
         boolean result;
-        if (entry.getResourcePath().equals("*")) {
-            result = registryDomainLocs.remove(entryKey, entry.getResourceDomain());
+        if (entry.getPath().equals("*")) {
+            result = registryDomainLocs.remove(entryKey, entry.getNamespace());
         } else {
             result = registryLocs.remove(entryKey, entry);
         }

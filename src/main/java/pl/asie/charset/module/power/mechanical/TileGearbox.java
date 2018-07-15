@@ -102,7 +102,7 @@ public class TileGearbox extends TileBase implements IMechanicalPowerProducer, I
 		consumerHandlers = new Consumer[6];
 		registerTrait("wood", material = new TraitMaterial("wood", ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank")));
 		for (int i = 0; i < 6; i++) {
-			consumerHandlers[i] = new Consumer(EnumFacing.getFront(i));
+			consumerHandlers[i] = new Consumer(EnumFacing.byIndex(i));
 		}
 
 		registerTrait("rot", ROTATION = new TraitMechanicalRotation());

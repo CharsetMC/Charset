@@ -157,7 +157,7 @@ public abstract class GateLogic {
 		System.arraycopy(outputValues, 0, oldValues, 0, 4);
 
 		for (int i = 0; i <= 3; i++) {
-			EnumFacing facing = EnumFacing.getFront(i + 2);
+			EnumFacing facing = EnumFacing.byIndex(i + 2);
 			GateLogic.Connection conn = getType(facing);
 			if (conn.isOutput() && conn.isRedstone()) {
 				outputValues[i] = calculateOutputInside(facing);
@@ -196,7 +196,7 @@ public abstract class GateLogic {
 	protected final byte getSideMask() {
 		byte j = 0;
 		for (int i = 0; i <= 3; i++) {
-			if (getType(EnumFacing.getFront(i + 2)) != Connection.NONE) {
+			if (getType(EnumFacing.byIndex(i + 2)) != Connection.NONE) {
 				j |= (1 << i);
 			}
 		}

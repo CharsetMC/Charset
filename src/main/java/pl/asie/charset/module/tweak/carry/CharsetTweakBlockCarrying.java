@@ -115,7 +115,7 @@ public class CharsetTweakBlockCarrying {
         Block block = state.getBlock();
 
         boolean hasTileEntity = state.getBlock().hasTileEntity(state);
-        boolean isVanilla = "minecraft".equals(block.getRegistryName().getResourceDomain());
+        boolean isVanilla = "minecraft".equals(block.getRegistryName().getNamespace());
 
         // Set<String> names = new HashSet<>();
         Set<ResourceLocation> locs = new HashSet<>();

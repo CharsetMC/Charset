@@ -34,6 +34,7 @@ import pl.asie.charset.lib.CharsetSounds;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.utils.EntityUtils;
 
 import javax.annotation.Nullable;
 
@@ -105,7 +106,7 @@ public class TileHandCrank extends TileBase implements ITickable, IMechanicalPow
 				if (tile != null && tile.hasCapability(Capabilities.MECHANICAL_CONSUMER, facing)) {
 					IMechanicalPowerConsumer output = tile.getCapability(Capabilities.MECHANICAL_CONSUMER, facing);
 					if (output.isAcceptingPower()) {
-						output.setForce(getAdjustedForce(), 0.25);
+						output.setForce(getAdjustedForce(), getAdjustedForce() > EPSILON ? 0.25 : 0.0);
 					}
 				}
 			}
@@ -121,18 +122,23 @@ public class TileHandCrank extends TileBase implements ITickable, IMechanicalPow
 		}
 	}
 
-	public void onActivated(EntityPlayer playerIn) {
+	public boolean onActivated(EntityPlayer playerIn) {
+		if (EntityUtils.isPlayerFake(playerIn)) {
+			return false;
+		}
+
 		force = Math.min(MAXIMUM * 1.625, force + 1D);
 
 		world.playSound(playerIn,
-				pos.getX() + 0.5 + getFacing().getFrontOffsetX() * 0.25,
-				pos.getY() + 0.5 + getFacing().getFrontOffsetY() * 0.25,
-				pos.getZ() + 0.5 + getFacing().getFrontOffsetZ() * 0.25,
+				pos.getX() + 0.5 + getFacing().getXOffset() * 0.25,
+				pos.getY() + 0.5 + getFacing().getYOffset() * 0.25,
+				pos.getZ() + 0.5 + getFacing().getZOffset() * 0.25,
 				CharsetSounds.BLOCK_CRANK,
 				SoundCategory.BLOCKS,
 				1f, 0.875f + (float) (force * 0.0625 / MAXIMUM) + (float) Math.random()*0.01f);
 
 		markDirty();
 		markBlockForUpdate();
+		return true;
 	}
 }

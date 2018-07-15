@@ -69,7 +69,7 @@ public class TileCompressionCrafter extends TileBase implements ITickable, IItem
 			return false;
 		}
 
-		Vec3d dropPos = new Vec3d(pos.offset(facing)).addVector(0.5, 0.5, 0.5);
+		Vec3d dropPos = new Vec3d(pos.offset(facing)).add(0.5, 0.5, 0.5);
 		for (ItemStack stack : buffer) {
 			ItemUtils.giveOrSpawnItemEntity(player, world, dropPos, stack, 0, 0, 0, 0, true);
 		}

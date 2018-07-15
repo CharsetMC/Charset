@@ -43,8 +43,8 @@ public class FixCharsetUnifyModId {
             String id = compound.getString("id");
             if (id.indexOf(':') > 0) {
                 ResourceLocation idLoc = new ResourceLocation(id);
-                if (prefixes.contains(idLoc.getResourceDomain())) {
-                    compound.setString("id", "charset:" + idLoc.getResourcePath());
+                if (prefixes.contains(idLoc.getNamespace())) {
+                    compound.setString("id", "charset:" + idLoc.getPath());
                 }
             }
             return compound;

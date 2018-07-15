@@ -126,7 +126,7 @@ public class ItemKeyring extends ItemBase implements IKeyItem, IBauble {
     public ItemKeyring() {
         super();
         setMaxStackSize(1);
-        setUnlocalizedName("charset.keyring");
+        setTranslationKey("charset.keyring");
     }
 
 

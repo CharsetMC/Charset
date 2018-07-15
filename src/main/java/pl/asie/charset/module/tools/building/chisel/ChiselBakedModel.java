@@ -90,7 +90,7 @@ public class ChiselBakedModel extends BaseBakedModel {
                     builder.put(e, sprite.getInterpolatedU(x*16), sprite.getInterpolatedV(y*16), 0, 1);
                     break;
                 case NORMAL:
-                    builder.put(e, side.getFrontOffsetX(), side.getFrontOffsetY(), side.getFrontOffsetZ(), 0);
+                    builder.put(e, side.getXOffset(), side.getYOffset(), side.getZOffset(), 0);
                     break;
                 default:
                     builder.put(e);

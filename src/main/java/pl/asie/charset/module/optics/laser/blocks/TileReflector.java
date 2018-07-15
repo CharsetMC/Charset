@@ -46,7 +46,7 @@ public class TileReflector extends TileLaserSourceBase {
 		LaserColor oldColor = colors[ri];
 		colors[ri] = passedColors[ri].union(bouncedColors[ri]);
 		if (colors[ri] != oldColor) {
-			CharsetLaser.laserStorage.markLaserForUpdate(TileReflector.this, EnumFacing.getFront(ri));
+			CharsetLaser.laserStorage.markLaserForUpdate(TileReflector.this, EnumFacing.byIndex(ri));
 		}
 	}
 
@@ -78,7 +78,7 @@ public class TileReflector extends TileLaserSourceBase {
 			LaserColor colorFiltered = sourceColors[i].intersection(this.color);
 			LaserColor colorRemaining = isSplitter ? sourceColors[i] : sourceColors[i].difference(this.color);
 
-			int ri = BlockReflector.getTargetFacing(EnumFacing.getFront(i), rotation).ordinal();
+			int ri = BlockReflector.getTargetFacing(EnumFacing.byIndex(i), rotation).ordinal();
 			if (colorFiltered != bouncedColors[ri]) {
 				bouncedColors[ri] = colorFiltered;
 				updateColor(ri);
@@ -122,7 +122,7 @@ public class TileReflector extends TileLaserSourceBase {
 		}
 		for (int i = 0; i < 6; i++) {
 			updateSourceColor(i);
-			CharsetLaser.laserStorage.markLaserForUpdate(TileReflector.this, EnumFacing.getFront(i));
+			CharsetLaser.laserStorage.markLaserForUpdate(TileReflector.this, EnumFacing.byIndex(i));
 		}
 		markBlockForUpdate();
 	}

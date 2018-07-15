@@ -65,7 +65,7 @@ public class BlockAxle extends BlockBase implements ITileEntityProvider {
 		super(Material.WOOD);
 		setHardness(1.0F);
 		setHarvestLevel("axe", 0);
-		setUnlocalizedName("charset.axle");
+		setTranslationKey("charset.axle");
 		setOpaqueCube(false);
 		setFullCube(false);
 	}

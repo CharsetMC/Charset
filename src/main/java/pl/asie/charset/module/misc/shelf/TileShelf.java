@@ -57,7 +57,7 @@ public class TileShelf extends TileBase {
 	}
 
 	protected boolean isBook(ItemStack stack) {
-		return stack.getItem().getUnlocalizedName().toLowerCase().contains("book");
+		return stack.getItem().getTranslationKey().toLowerCase().contains("book");
 	}
 
 	private int toNonBookSlotId(int id) {
@@ -78,7 +78,7 @@ public class TileShelf extends TileBase {
 		handler.setStackInSlot(slotId, ItemStack.EMPTY);
 		markBlockForUpdate();
 
-		ItemUtils.giveOrSpawnItemEntity(player, getWorld(), new Vec3d(pos).addVector(hitX, hitY, hitZ), stack, 0,0,0,0, true);
+		ItemUtils.giveOrSpawnItemEntity(player, getWorld(), new Vec3d(pos).add(hitX, hitY, hitZ), stack, 0,0,0,0, true);
 		return true;
 	}
 
@@ -93,7 +93,7 @@ public class TileShelf extends TileBase {
 
 			if (!handler.getStackInSlot(slotId).isEmpty()) {
 				final int sentSlotId = slotId;
-				new Notice(new Vec3d(pos).addVector(hitX, hitY, hitZ), msg -> msg.setMessage(new NotificationComponentItemStack(handler.getStackInSlot(sentSlotId), true, true))).sendTo(player);
+				new Notice(new Vec3d(pos).add(hitX, hitY, hitZ), msg -> msg.setMessage(new NotificationComponentItemStack(handler.getStackInSlot(sentSlotId), true, true))).sendTo(player);
 
 				return true;
 			} else {

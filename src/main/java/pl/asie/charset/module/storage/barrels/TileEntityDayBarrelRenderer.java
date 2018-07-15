@@ -122,14 +122,14 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             }
         }
 
-        Minecraft.getMinecraft().mcProfiler.startSection("barrels");
+        Minecraft.getMinecraft().profiler.startSection("barrels");
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
 
         doDraw(barrel, is, partialTicks);
 
         GlStateManager.popMatrix();
-        Minecraft.getMinecraft().mcProfiler.endSection();
+        Minecraft.getMinecraft().profiler.endSection();
 
         GlStateManager.disableBlend();
         RenderHelper.enableStandardItemLighting();

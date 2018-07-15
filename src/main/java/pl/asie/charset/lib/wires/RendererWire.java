@@ -149,7 +149,7 @@ public class RendererWire extends ModelFactory<Wire> {
     protected void makeTopFace(List<BakedQuad> quads, WireRenderHandler handler, Wire wire, Vector3f from, Vector3f to, int connMask, EnumFacing facing, EnumFacing renderFacing, ModelRotation rot) {
     	if (!handler.isTopSimple()) {
     		// Render the top face as up to five quads
-		    EnumFacing[] dirs = WireUtils.getConnectionsForRender(WireFace.get(EnumFacing.getFront(facing.ordinal() & (~1))));
+		    EnumFacing[] dirs = WireUtils.getConnectionsForRender(WireFace.get(EnumFacing.byIndex(facing.ordinal() & (~1))));
 		    addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, -1, from, to, quads, connMask, rot);
 		    if ((connMask & 8) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 0, from, to, quads, connMask, rot);
 		    if ((connMask & 4) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 1, from, to, quads, connMask, rot);

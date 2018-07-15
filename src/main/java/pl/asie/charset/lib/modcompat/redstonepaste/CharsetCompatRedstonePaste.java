@@ -91,7 +91,7 @@ public class CharsetCompatRedstonePaste {
             }
 
             TileEntity tile = world.getTileEntity(pos);
-            if (tile != null && TileEntity.getKey(tile.getClass()).getResourcePath().equals("redstonepastete")) {
+            if (tile != null && TileEntity.getKey(tile.getClass()).getPath().equals("redstonepastete")) {
                 NBTTagCompound tag = tile.writeToNBT(new NBTTagCompound());
                 if (
                     tag.hasKey("facetype", Constants.NBT.TAG_INT_ARRAY) &&
