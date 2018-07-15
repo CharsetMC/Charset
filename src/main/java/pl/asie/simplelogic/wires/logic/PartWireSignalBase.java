@@ -29,6 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import net.minecraftforge.common.capabilities.Capability;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
@@ -40,7 +41,9 @@ import pl.asie.charset.lib.wires.*;
 import javax.annotation.Nonnull;
 
 public abstract class PartWireSignalBase extends Wire implements IWire, IDebuggable {
-	public static boolean DEBUG = true;
+	@SuppressWarnings("PointlessBooleanExpression")
+	public static boolean DEBUG = false && ModCharset.INDEV;
+
 	public static boolean PROPAGATING = false;
 	public static boolean WIRES_CONNECT_REDSTONE = true;
 	private final EnumSet<EnumFacing> propagationDirs = EnumSet.noneOf(EnumFacing.class);
