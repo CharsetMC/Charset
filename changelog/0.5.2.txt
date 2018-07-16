@@ -1,0 +1,14 @@
+Additions:
+
+* SimpleLogic Gates: Allow disabling individual gates in the configuration file.
+* SimpleLogic Gates: Generate gate slab texture based on the resource pack installed.
+* SimpleLogic Wires: Minor tweaks to bundled wire texture.
+
+Bugs fixed:
+
+* SimpleLogic Wires: Fix bundled wire propagation bug (found by @marcin212).
+
+Module promotions:
+
+* storage.locks: Testing -> Stable
+* tweak.rightClickHarvest: Testing -> Stable

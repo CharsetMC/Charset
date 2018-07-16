@@ -50,7 +50,7 @@ import pl.asie.charset.module.tablet.format.words.minecraft.*;
 @CharsetModule(
 		name = "tablet",
 		description = "The Tablet, providing documentation for Charset and other mods!",
-		profile = ModuleProfile.STABLE
+		profile = ModuleProfile.TESTING
 )
 public class CharsetTablet {
 	public static ItemTablet itemTablet;
