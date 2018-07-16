@@ -50,7 +50,7 @@ public class WireElectricOverlay extends WireRenderHandler implements IWireRende
 	@Override
 	@SideOnly(Side.CLIENT)
 	public float getWidth() {
-		return provider.getWidth() - EPSILON;
+		return provider.getWidth() - (4f/16f);
 	}
 
 	@Override
@@ -74,7 +74,23 @@ public class WireElectricOverlay extends WireRenderHandler implements IWireRende
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getColor(TextureType type, Wire wire, @Nullable EnumFacing direction) {
-		return 0xFF333333;
+		boolean lit = false;
+		WireElectric we = (WireElectric) wire;
+
+		if (direction != null) {
+			lit = we.STORAGE[direction.ordinal()] != null && we.STORAGE[direction.ordinal()].isLit();
+		} else {
+			for (EnumFacing d : EnumFacing.VALUES) {
+				if (we.STORAGE[d.ordinal()] != null) {
+					lit = we.STORAGE[d.ordinal()] != null && we.STORAGE[d.ordinal()].isLit();
+				}
+				if (lit) {
+					break;
+				}
+			}
+		}
+
+		return lit ? 0xFFFFFF1F : 0xFF6C6C22;
 	}
 
 	@Override
