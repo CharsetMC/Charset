@@ -29,14 +29,12 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.translation.I18n;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lwjgl.opengl.Display;
-import pl.asie.charset.api.tape.IDataStorage;
 import pl.asie.charset.lib.ui.GuiContainerCharset;
 
 public class GuiRecordPlayer extends GuiContainerCharset {
@@ -192,8 +190,8 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 		super.mouseClicked(x, y, mb);
 		if(mb == 0) {
 			for(Button button: Button.values()) {
-				int button_x = this.xCenter + BUTTON_START_X + (button.ordinal() * 20);
-				int button_y = this.yCenter + BUTTON_START_Y;
+				int button_x = this.xBase + BUTTON_START_X + (button.ordinal() * 20);
+				int button_y = this.yBase + BUTTON_START_Y;
 				if(x >= button_x && x < (button_x + 20) && y >= button_y && y < (button_y + 15)) {
 					if(!isButtonPressed(button)) {
 						buttonHovering = button;
@@ -235,18 +233,18 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 		super.drawGuiContainerBackgroundLayer(f, i, j);
 
 		this.mc.getTextureManager().bindTexture(TEXTURE);
-		this.drawTexturedModalRect(this.xCenter, this.yCenter, 0, 0, this.xSize, this.ySize);
+		this.drawTexturedModalRect(this.xBase, this.yBase, 0, 0, this.xSize, this.ySize);
 
 		// Draw buttons
 		for(Button button: Button.values()) {
 			int button_ty = 166 + (button.ordinal() * 15);
 			int button_tx = isButtonPressed(button) ? 20 : 0;
 			int button_x = BUTTON_START_X + (button.ordinal() * 20);
-			this.drawTexturedModalRect(this.xCenter + button_x, this.yCenter + BUTTON_START_Y, button_tx, button_ty, 20, 15);
+			this.drawTexturedModalRect(this.xBase + button_x, this.yBase + BUTTON_START_Y, button_tx, button_ty, 20, 15);
 		}
 
 		GlStateManager.enableBlend();
-		this.drawTexturedModalRect(this.xCenter + 98, this.yCenter + 34, 98, 34, 22, 16);
+		this.drawTexturedModalRect(this.xBase + 98, this.yBase + 34, 98, 34, 22, 16);
 		GlStateManager.disableBlend();
 
 		// Draw label
@@ -270,6 +268,6 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 				label += "...";
 			}
 		}
-		this.drawCenteredString(this.fontRenderer, label, this.xCenter + 88, this.yCenter + 15, labelColor);
+		this.drawCenteredString(this.fontRenderer, label, this.xBase + 88, this.yBase + 15, labelColor);
 	}
 }

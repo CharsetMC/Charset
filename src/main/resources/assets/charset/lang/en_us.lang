@@ -179,6 +179,9 @@ tile.charset.barrel.HOPPING.name=Hopping
 tile.charset.barrel.STICKY.name=Sticky
 tile.charset.barrel.INFINITE.name=Infinite
 
+# storage.chests
+tile.charset.chest.format=%1$s %2$s
+
 # storage.locks
 
 config.charset.storage.locks.general.name=General

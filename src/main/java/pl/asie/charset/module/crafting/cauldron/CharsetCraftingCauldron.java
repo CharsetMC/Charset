@@ -154,8 +154,8 @@ public class CharsetCraftingCauldron {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
-		TextureWhitener.INSTANCE.remap(event.getMap(), WATER_STILL, FluidDyedWater.TEXTURE_STILL, WATER_STILL);
-		TextureWhitener.INSTANCE.remap(event.getMap(), WATER_FLOWING, FluidDyedWater.TEXTURE_FLOWING, WATER_STILL);
+		event.getMap().setTextureEntry(TextureWhitener.INSTANCE.remap(WATER_STILL, FluidDyedWater.TEXTURE_STILL, WATER_STILL));
+		event.getMap().setTextureEntry(TextureWhitener.INSTANCE.remap(WATER_FLOWING, FluidDyedWater.TEXTURE_FLOWING, WATER_STILL));
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOW)

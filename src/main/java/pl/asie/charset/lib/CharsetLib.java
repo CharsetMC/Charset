@@ -69,6 +69,7 @@ import pl.asie.charset.lib.recipe.IngredientGroup;
 import pl.asie.charset.lib.recipe.RecipeIngredientPatcher;
 import pl.asie.charset.lib.recipe.RecipeReplacement;
 import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.render.sprite.TextureWhitener;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.resources.ColorPaletteParser;
 import pl.asie.charset.lib.scheduler.Scheduler;
@@ -114,6 +115,7 @@ public class CharsetLib {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		ModelFactory.clearCaches();
+		TextureWhitener.INSTANCE.clear();
 		ColorLookupHandler.INSTANCE.clear();
 	}
 

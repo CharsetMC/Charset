@@ -22,7 +22,6 @@ package pl.asie.charset.module.tools.building.chisel;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ui.GuiContainerCharset;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 
@@ -49,7 +48,7 @@ public class GuiChisel extends GuiContainerCharset {
 
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 3; x++) {
-                        if (insideRect(mouseX, mouseY, xCenter + 8 + x * 18, yCenter + 8 + y * 18, 18, 18)) {
+                        if (insideRect(mouseX, mouseY, xBase + 8 + x * 18, yBase + 8 + y * 18, 18, 18)) {
                             blockMask ^= (1 << i);
                         }
 
@@ -70,7 +69,7 @@ public class GuiChisel extends GuiContainerCharset {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(CHISEL_GUI);
 
-        drawTexturedModalRect(xCenter, yCenter, 0, 0, xSize, ySize);
+        drawTexturedModalRect(xBase, yBase, 0, 0, xSize, ySize);
         ItemStack stack = containerChisel.playerInv.getStackInSlot(containerChisel.heldPos);
         if (stack.getItem() == CharsetToolsBuilding.chisel) {
             GlStateManager.color(0.5F, 0.5F, 0.5F, 1.0F);
@@ -78,7 +77,7 @@ public class GuiChisel extends GuiContainerCharset {
             for (int y = 0; y < 3; y++) {
                 for (int x = 0; x < 3; x++) {
                     if ((blockMask & 1) == 0) {
-                        drawTexturedModalRect(xCenter + 8 + x*18, yCenter + 8 + y*18,
+                        drawTexturedModalRect(xBase + 8 + x*18, yBase + 8 + y*18,
                                 8,8, 16, 16);
                     }
                     blockMask >>= 1;

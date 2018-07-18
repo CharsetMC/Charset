@@ -39,6 +39,33 @@ public class ItemMaterialRegistry {
 
 	}
 
+	public Optional<String> getLocalizedNameFor(ItemMaterial material) {
+		if (material != null) {
+			String mDispName = null;
+			for (String s : material.getTypes()) {
+				if (I18n.canTranslate("charset.material." + s)) {
+					mDispName = I18n.translateToLocal("charset.material." + s);
+					break;
+				}
+			}
+
+			if (mDispName == null) {
+				if (material.getTypes().contains("plank")) {
+					ItemMaterial alt = material.getRelated("log");
+					if (alt != null) {
+						material = alt;
+					}
+				}
+
+				mDispName = material.getStack().getDisplayName();
+			}
+
+			return Optional.of(mDispName);
+		} else {
+			return Optional.empty();
+		}
+	}
+
 	public String getLocalizedNameFor(String prefix, ItemMaterial material) {
 		if (material != null) {
 			String mDispName = null;

@@ -34,6 +34,7 @@ import pl.asie.charset.lib.utils.colorspace.Colorspace;
 import pl.asie.charset.lib.utils.colorspace.Colorspaces;
 
 import java.awt.image.BufferedImage;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 // Remember to brush your teeth!
@@ -42,21 +43,26 @@ public class TextureWhitener {
 	private final TObjectFloatMap<ResourceLocation> lumaMap = new TObjectFloatHashMap<>();
 	private final TObjectIntMap<ResourceLocation> alphaMap = new TObjectIntHashMap<>();
 
-	private void findMaxLumaAlpha(ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> getter) {
+	private void findMaxLumaAlpha(ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> getter, BiPredicate<Float, Float> usePixel) {
 		BufferedImage image = RenderUtils.getTextureImage(location, getter);
 		float luma = 0.0f;
 		int alpha = 0;
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
-				int a = (image.getRGB(x, y) >> 24) & 0xFF;
-				if (alpha < a) {
-					alpha = a;
-				}
+				if (usePixel != null && !usePixel.test(x / (float) image.getWidth(), y / (float) image.getHeight()))
+					continue;
 
-				float[] vals = Colorspaces.convertFromRGB(image.getRGB(x, y), Colorspace.YUV);
-				if (luma < vals[0]) {
-					luma = vals[0];
+				int a = (image.getRGB(x, y) >> 24) & 0xFF;
+				if (a > 0) {
+					if (alpha < a) {
+						alpha = a;
+					}
+
+					float[] vals = Colorspaces.convertFromRGB(image.getRGB(x, y), Colorspace.YUV);
+					if (luma < vals[0]) {
+						luma = vals[0];
+					}
 				}
 			}
 		}
@@ -65,37 +71,56 @@ public class TextureWhitener {
 		alphaMap.put(location, alpha);
 	}
 
-	public void remap(TextureMap map, ResourceLocation sourceTexture, ResourceLocation destTexture, ResourceLocation colorTexture) {
-		remap(map, sourceTexture, destTexture, colorTexture, -1);
+	public void clear() {
+		lumaMap.clear();
+		alphaMap.clear();
 	}
 
-	public void remap(TextureMap map, ResourceLocation sourceTexture, ResourceLocation destTexture, ResourceLocation colorTexture, int newAlpha) {
+	public TextureAtlasSprite remap(ResourceLocation sourceTexture, ResourceLocation destTexture, ResourceLocation colorTexture) {
+		return remap(sourceTexture, destTexture, colorTexture, -1);
+	}
+
+	public TextureAtlasSprite remap(ResourceLocation sourceTexture, ResourceLocation destTexture, ResourceLocation colorTexture, int newAlpha) {
+		return remap(sourceTexture, destTexture, colorTexture, newAlpha, null);
+	}
+
+	public void remap(int[] pixels, int width, Function<ResourceLocation, TextureAtlasSprite> getter, ResourceLocation colorTexture, int newAlpha, BiPredicate<Float, Float> usePixel, float lumaMultiplier, boolean preserveColor) {
+		if (!lumaMap.containsKey(colorTexture)) {
+			findMaxLumaAlpha(colorTexture, getter, usePixel);
+		}
+
+		float luma = lumaMap.get(colorTexture);
+		int a = alphaMap.get(colorTexture);
+		int height = pixels.length / width;
+
+		PixelOperationSprite.forEach((x, y, value) -> {
+			if (usePixel != null && !usePixel.test(x / (float) width, y / (float) height))
+				return value;
+
+			float[] vals = Colorspaces.convertFromRGB(value, Colorspace.YUV);
+			vals[0] *= (1.0f / luma) * lumaMultiplier;
+			if (!preserveColor) {
+				vals[1] = 0.0f;
+				vals[2] = 0.0f;
+			}
+			int alpha = ((value >> 24) & 0xFF);
+			if (newAlpha > 0 && alpha > 0) {
+				alpha = newAlpha;
+			} else {
+				alpha = (int) ((float) alpha * 255.0f / (float) a);
+			}
+			return (alpha << 24) | (Colorspaces.convertToRGB(vals, Colorspace.YUV) & 0xFFFFFF);
+		}).apply(pixels, width, getter);
+	}
+
+	public TextureAtlasSprite remap(ResourceLocation sourceTexture, ResourceLocation destTexture, ResourceLocation colorTexture, int newAlpha, BiPredicate<Float, Float> usePixel) {
 		if (!lumaMap.isEmpty()) {
 			lumaMap.clear();
 			alphaMap.clear();
 		}
 
-		map.setTextureEntry(new PixelOperationSprite(destTexture.toString(), sourceTexture, ((pixels, width, getter) -> {
-			if (!lumaMap.containsKey(colorTexture)) {
-				findMaxLumaAlpha(colorTexture, getter);
-			}
-
-			float luma = lumaMap.get(colorTexture);
-			int a = alphaMap.get(colorTexture);
-
-			PixelOperationSprite.forEach((x, y, value) -> {
-				float[] vals = Colorspaces.convertFromRGB(value, Colorspace.YUV);
-				vals[0] *= 100.0f / luma;
-				vals[1] = 0.0f;
-				vals[2] = 0.0f;
-				int alpha = ((value >> 24) & 0xFF);
-				if (newAlpha > 0 && alpha > 0) {
-					alpha = newAlpha;
-				} else {
-					alpha = (int) ((float) alpha * 255.0f / (float) a);
-				}
-				return (alpha << 24) | (Colorspaces.convertToRGB(vals, Colorspace.YUV) & 0xFFFFFF);
-			}).apply(pixels, width, getter);
-		}), colorTexture));
+		return new PixelOperationSprite(destTexture.toString(), sourceTexture,
+				((pixels, width, getter) -> remap(pixels,width, getter, colorTexture, newAlpha, usePixel, 1.0f, false)),
+				colorTexture);
 	}
 }

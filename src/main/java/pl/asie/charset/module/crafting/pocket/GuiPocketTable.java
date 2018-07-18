@@ -49,8 +49,8 @@ public class GuiPocketTable extends GuiContainerCharset {
     protected void renderHoveredToolTip(int mouseX, int mouseY) {
         super.renderHoveredToolTip(mouseX, mouseY);
         for (int i = 0; i < buttonGridCount; i++) {
-            int x = xCenter + buttonGridX + (i * 11);
-            int y = yCenter + buttonGridY;
+            int x = xBase + buttonGridX + (i * 11);
+            int y = yBase + buttonGridY;
             if (insideRect(mouseX, mouseY, x, y, 11, 11) && button_pressed < 0) {
                 drawHoveringText(Collections.singletonList(getActionDescription(i)), mouseX, mouseY, fontRenderer);
             }
@@ -63,8 +63,8 @@ public class GuiPocketTable extends GuiContainerCharset {
 
         if (mouseButton == 0) {
             for (int i = 0; i < buttonGridCount; i++) {
-                int x = xCenter + buttonGridX + (i * 11);
-                int y = yCenter + buttonGridY;
+                int x = xBase + buttonGridX + (i * 11);
+                int y = yBase + buttonGridY;
                 if (insideRect(mouseX, mouseY, x, y, 11, 11) && button_pressed < 0) {
                     button_pressed = i;
                     break;
@@ -94,11 +94,11 @@ public class GuiPocketTable extends GuiContainerCharset {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(POCKET_GUI);
 
-        drawTexturedModalRect(xCenter, yCenter, 0, 0, xSize, ySize);
+        drawTexturedModalRect(xBase, yBase, 0, 0, xSize, ySize);
 
         for (int i = 0; i < buttonGridCount; i++) {
-            int x = xCenter + buttonGridX + (i * 11);
-            int y = yCenter + buttonGridY;
+            int x = xBase + buttonGridX + (i * 11);
+            int y = yBase + buttonGridY;
             int state = 0;
             if (button_pressed == i) {
                 state = 2;

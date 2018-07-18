@@ -49,7 +49,7 @@ public final class RegistryUtils {
 	}
 
 	public static void register(Class<? extends TileEntity> tileEntity, String name) {
-		GameRegistry.registerTileEntity(tileEntity, new ResourceLocation("charset", name).toString());
+		GameRegistry.registerTileEntity(tileEntity, new ResourceLocation("charset", name));
 	}
 
 	public static void register(Class<? extends Entity> entity, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates) {

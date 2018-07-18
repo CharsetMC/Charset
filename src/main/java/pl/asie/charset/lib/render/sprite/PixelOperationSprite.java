@@ -113,7 +113,7 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
         if (deps.contains(location) && !forceReadFromFile) {
             TextureAtlasSprite sprite = getter.apply(location);
             try {
-                if (sprite != null) {
+                if (sprite != null && sprite.getIconWidth() == sprite.getIconHeight() && sprite.getFrameCount() > 0 /* bail for non-rectangular textures */) {
                     int frameSize = sprite.getIconWidth() * sprite.getIconHeight();
                     pixels = new int[frameSize * sprite.getFrameCount()];
                     for (int i = 0; i < sprite.getFrameCount(); i++) {

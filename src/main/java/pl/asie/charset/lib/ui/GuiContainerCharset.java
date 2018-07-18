@@ -23,7 +23,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
 
 public class GuiContainerCharset extends GuiContainer {
-	protected int xCenter, yCenter;
+	protected int xBase, yBase;
 
 	public GuiContainerCharset(Container container, int xSize, int ySize) {
 		super(container);
@@ -44,7 +44,7 @@ public class GuiContainerCharset extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-		this.xCenter = (this.width - this.xSize) / 2;
-		this.yCenter = (this.height - this.ySize) / 2;
+		this.xBase = (this.width - this.xSize) / 2;
+		this.yBase = (this.height - this.ySize) / 2;
 	}
 }

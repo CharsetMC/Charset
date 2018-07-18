@@ -21,6 +21,7 @@ package pl.asie.charset.lib.render.sprite;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.PngSizeInfo;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResource;
@@ -41,6 +42,31 @@ public class TextureAtlasSpriteCustom extends TextureAtlasSprite {
 
 	protected TextureAtlasSpriteCustom(String spriteName) {
 		super(spriteName);
+	}
+
+	@Override
+	public void loadSprite(PngSizeInfo sizeInfo, boolean isAnimation) throws IOException {
+		if (sizeInfo.pngWidth == sizeInfo.pngHeight || isAnimation) {
+			super.loadSprite(sizeInfo, isAnimation);
+			return;
+		}
+
+		try {
+			ANIMATION_METADATA_SETTER.invokeExact((TextureAtlasSprite) this, null);
+		} catch (Throwable t) {
+			// pass
+		}
+		this.setFramesTextureData(Lists.newArrayList());
+		this.frameCounter = 0;
+		this.tickCounter = 0;
+
+		this.width = sizeInfo.pngWidth;
+		this.height = sizeInfo.pngHeight;
+
+		if (isAnimation) {
+			//noinspection SuspiciousNameCombination
+			this.height = this.width;
+		}
 	}
 
 	protected void addFrameTextureData(int width, int height, int[] pixels) {

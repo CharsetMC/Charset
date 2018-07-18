@@ -29,7 +29,7 @@ import pl.asie.charset.lib.utils.ColorUtils;
 
 public class ModelMinecartWrapped extends ModelBase {
 	public static final ResourceLocation DYEABLE_MINECART = new ResourceLocation("charset_generated:textures/entity/minecart.png");
-	public static final ResourceLocation MINECART = new ResourceLocation("textures/entity/minecart.png");
+	public static final ResourceLocation MINECART = new ResourceLocation("entity/minecart");
 	private final ModelBase parent;
 
 	public ModelMinecartWrapped(ModelBase parent) {

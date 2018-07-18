@@ -41,6 +41,7 @@ public class RecipeDummy extends IForgeRegistryEntry.Impl<IRecipe> implements IR
 
     @Override
     public boolean isDynamic() {
+        // This also hides it from the recipe book!
         return true;
     }
 

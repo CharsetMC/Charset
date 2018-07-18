@@ -1,0 +1,30 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "storage.chests"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:chest",
+  "pattern": [
+    "ppp",
+    "p p",
+    "ppp"
+  ],
+  "key": {
+    "p": {
+      "type": "charset:material",
+      "material": ["plank", "wood", "block"],
+      "nbtKey": "wood"
+    }
+  },
+  "result": {
+    "item": "charset:chest",
+    "count": 1
+  }
+}
+
+
+
+

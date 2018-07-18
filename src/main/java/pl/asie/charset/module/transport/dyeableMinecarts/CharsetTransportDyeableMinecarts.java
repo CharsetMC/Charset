@@ -29,6 +29,7 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -48,8 +49,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
+import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
+import pl.asie.charset.lib.render.sprite.TextureWhitener;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 import pl.asie.charset.lib.utils.ColorUtils;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -99,46 +103,14 @@ public class CharsetTransportDyeableMinecarts {
 	public void preInitClient(FMLPreInitializationEvent event) {
 		CharsetFakeResourcePack.INSTANCE.registerEntry(ModelMinecartWrapped.DYEABLE_MINECART, (stream) -> {
 			try {
-				BufferedImage image = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(ModelMinecartWrapped.MINECART).getInputStream());
-				float scale = (float) image.getWidth() / 64;
-				int maxValue = 0;
-
-				for (int y = 0; y < 28*scale; y++) {
-					for (int x = 0; x < 44*scale; x++) {
-						int rgb = image.getRGB(x, y);
-						if (((rgb >> 24) & 0xFF) != 0) {
-							for (int i = 0; i < 3; i++, rgb >>= 8) {
-								if ((rgb & 0xFF) > maxValue) {
-									maxValue = (rgb & 0xFF);
-									if (maxValue == 255) break;
-								}
-							}
-						}
-						if (maxValue == 255) break;
-					}
-					if (maxValue == 255) break;
-				}
-
-				maxValue = maxValue * 8 / 9;
-
-				if (maxValue < 255) {
-					for (int y = 0; y < 28 * scale; y++) {
-						for (int x = 0; x < 44 * scale; x++) {
-							int rgb = image.getRGB(x, y);
-							if (((rgb >> 24) & 0xFF) != 0) {
-								for (int i = 0; i < 3; i++) {
-									int mask = 0xFF << (i * 8);
-									int v = (rgb >> (i * 8)) & 0xFF;
-									v = v * 255 / maxValue;
-									if (v > 255) v = 255;
-
-									rgb = (rgb & (~mask)) | (v << (i * 8));
-								}
-								image.setRGB(x, y, rgb);
-							}
-						}
-					}
-				}
+				BufferedImage image = RenderUtils.getTextureImage(ModelMinecartWrapped.MINECART, ModelLoader.defaultTextureGetter());
+				int[] pixels = new int[image.getWidth() * image.getHeight()];
+				image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
+				TextureWhitener.INSTANCE.remap(
+						pixels, image.getWidth(), ModelLoader.defaultTextureGetter(),
+						ModelMinecartWrapped.MINECART, -1, (x,y) -> x < 44f/64f && y < 28f/32f, 8f/9f, false
+				);
+				image.setRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
 
 				ImageIO.write(image, "png", stream);
 			} catch (IOException e) {

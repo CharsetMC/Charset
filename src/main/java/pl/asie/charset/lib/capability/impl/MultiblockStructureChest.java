@@ -36,7 +36,7 @@ public class MultiblockStructureChest implements IMultiblockStructure {
 
     @Override
     public Iterator<BlockPos> iterator() {
-        List<BlockPos> list = new ArrayList<>(5);
+        List<BlockPos> list = new ArrayList<>(2);
 
         list.add(chest.getPos());
         if (chest.adjacentChestXNeg != null) list.add(chest.adjacentChestXNeg.getPos());

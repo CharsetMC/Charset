@@ -167,7 +167,7 @@ public final class RenderUtils {
 	public static BufferedImage getTextureImage(ResourceLocation location, @Nullable Function<ResourceLocation, TextureAtlasSprite> getter) {
 		if (getter != null) {
 			TextureAtlasSprite sprite = getter.apply(location);
-			if (sprite != null && sprite.getFrameCount() > 0 && sprite.getIconWidth() > 0 && sprite.getIconHeight() > 0) {
+			if (sprite != null && !sprite.getIconName().equals("missingno") && sprite.getFrameCount() > 0 && sprite.getIconWidth() > 0 && sprite.getIconHeight() > 0) {
 				int width, height;
 				try {
 					int frameSize = sprite.getIconWidth() * sprite.getIconHeight();
@@ -327,6 +327,10 @@ public final class RenderUtils {
 
 	public static void glColor(int color) {
 		GlStateManager.color((((color >> 16) & 0xFF) / 255.0f), (((color >> 8) & 0xFF) / 255.0f), ((color & 0xFF) / 255.0f), (((color >> 24) & 0xFF) / 255.0f));
+	}
+
+	public static void glColor(int color, float alpha) {
+		GlStateManager.color((((color >> 16) & 0xFF) / 255.0f), (((color >> 8) & 0xFF) / 255.0f), ((color & 0xFF) / 255.0f), (((color >> 24) & 0xFF) / 255.0f) * alpha);
 	}
 
 	public static float[] calculateUV(Vector3f from, Vector3f to, EnumFacing facing1) {

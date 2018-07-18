@@ -439,4 +439,18 @@ public abstract class BlockBase extends Block {
 			return state;
 		}
 	}
+
+	@Override
+	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int type) {
+		if (super.eventReceived(state, worldIn, pos, id, type)) {
+			return true;
+		}
+
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if (tile != null) {
+			return tile.receiveClientEvent(id, type);
+		}
+
+		return false;
+	}
 }

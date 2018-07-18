@@ -45,6 +45,21 @@ public class WrappedBakedModel extends BaseBakedModel {
     }
 
     @Override
+    public boolean isAmbientOcclusion() {
+        return parent.isAmbientOcclusion();
+    }
+
+    @Override
+    public boolean isAmbientOcclusion(IBlockState state) {
+        return parent.isAmbientOcclusion(state);
+    }
+
+    @Override
+    public boolean isBuiltInRenderer() {
+        return parent.isBuiltInRenderer();
+    }
+
+    @Override
     public boolean isGui3d() {
         return parent.isGui3d();
     }

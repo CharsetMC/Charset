@@ -231,6 +231,11 @@ public class TileBase extends TileEntity {
 	public void update() {
 	}
 
+	@Override
+	public boolean canRenderBreaking() {
+		return false;
+	}
+
 	public TileEntity getNeighbourTile(EnumFacing side) {
 		return world != null && side != null ? world.getTileEntity(pos.offset(side)) : null;
 	}

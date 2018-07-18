@@ -23,7 +23,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.ui.GuiContainerCharset;
 
 /**
@@ -43,8 +42,8 @@ public class GuiKeyring extends GuiContainerCharset {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(GENERIC_54);
 
-        drawTexturedModalRect(xCenter, yCenter, 0, 0, xSize, 35);
-        drawTexturedModalRect(xCenter, yCenter + 35, 0, 125, xSize, ySize - 35);
+        drawTexturedModalRect(xBase, yBase, 0, 0, xSize, 35);
+        drawTexturedModalRect(xBase, yBase + 35, 0, 125, xSize, ySize - 35);
     }
 
     @Override
