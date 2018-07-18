@@ -43,7 +43,7 @@ public class TileEntityChestRendererCharset extends TileEntitySpecialRenderer<Ti
 		@Override
 		public void renderByItem(ItemStack stack, float partialTicks) {
 			TileEntityChestCharset chest = new TileEntityChestCharset();
-			chest.readNBTItem(stack);
+			chest.loadFromStack(stack);
 			TileEntityChestRendererCharset.INSTANCE.render(
 					chest, 0, 0, 0, partialTicks, -1, 1.0F
 			);

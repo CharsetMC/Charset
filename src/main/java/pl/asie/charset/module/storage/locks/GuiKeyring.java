@@ -21,17 +21,16 @@ package pl.asie.charset.module.storage.locks;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.ui.GuiContainerCharset;
+import pl.asie.charset.lib.inventory.GuiContainerCharset;
 
 /**
  * Created by asie on 6/28/17.
  */
-public class GuiKeyring extends GuiContainerCharset {
+public class GuiKeyring extends GuiContainerCharset<ContainerKeyring> {
     private static final ResourceLocation GENERIC_54 = new ResourceLocation("minecraft:textures/gui/container/generic_54.png");
 
-    public GuiKeyring(Container container) {
+    public GuiKeyring(ContainerKeyring container) {
         super(container, 176, 131);
     }
 
@@ -49,6 +48,6 @@ public class GuiKeyring extends GuiContainerCharset {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-        this.fontRenderer.drawString(I18n.format("gui.charset.keyring.name"), 8, 6, 4210752);
+        this.fontRenderer.drawString(container.held.hasDisplayName() ? container.held.getDisplayName() : I18n.format("gui.charset.keyring.name"), 8, 6, 0x404040);
     }
 }

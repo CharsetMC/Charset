@@ -50,7 +50,7 @@ import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.loader.ModuleLoader;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.misc.FixCharsetUnifyModId;
 

@@ -35,7 +35,6 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.tape.IDataStorage;
@@ -44,13 +43,12 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.resources.ColorPaletteUpdateEvent;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.audio.storage.system.DataStorage;
 import pl.asie.charset.module.audio.storage.system.DataStorageCapStorage;
 import pl.asie.charset.module.audio.storage.system.DataStorageManager;
-import pl.asie.charset.module.storage.locks.ContainerKeyring;
 
 import java.io.IOException;
 import java.util.List;
@@ -126,7 +124,7 @@ public class CharsetAudioStorage {
     @SideOnly(Side.CLIENT)
     public void initClient(FMLInitializationEvent event) {
         ClientRegistry.bindTileEntitySpecialRenderer(TileRecordPlayer.class, TileRecordPlayerRenderer.INSTANCE);
-        GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.RECORD_PLAYER, Side.CLIENT, (r) -> new GuiRecordPlayer(r.getContainer()));
+        GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.RECORD_PLAYER, Side.CLIENT, (r) -> new GuiRecordPlayer(r.getContainer(ContainerRecordPlayer.class)));
     }
 
     @Mod.EventHandler

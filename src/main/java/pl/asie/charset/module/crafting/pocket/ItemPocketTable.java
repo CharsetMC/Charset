@@ -27,7 +27,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.item.ItemBase;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 
 public class ItemPocketTable extends ItemBase {
     

@@ -26,7 +26,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
@@ -35,9 +34,9 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lwjgl.opengl.Display;
-import pl.asie.charset.lib.ui.GuiContainerCharset;
+import pl.asie.charset.lib.inventory.GuiContainerCharset;
 
-public class GuiRecordPlayer extends GuiContainerCharset {
+public class GuiRecordPlayer extends GuiContainerCharset<ContainerRecordPlayer> {
 	public class DialogThread implements Runnable {
 		public JFileChooser chooser = new JFileChooser();
 		public int result;
@@ -77,9 +76,9 @@ public class GuiRecordPlayer extends GuiContainerCharset {
 		return recordThread != null && recordThread.isAlive();
 	}
 
-	public GuiRecordPlayer(Container container) {
+	public GuiRecordPlayer(ContainerRecordPlayer container) {
 		super(container, 176, 166);
-		this.owner = ((ContainerRecordPlayer) container).owner;
+		this.owner = container.owner;
 	}
 
 	public boolean isButtonPressed(Button button) {

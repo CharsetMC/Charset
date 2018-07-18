@@ -27,10 +27,9 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.material.FastRecipeLookup;
-import pl.asie.charset.lib.ui.ContainerBase;
-import pl.asie.charset.lib.ui.SlotBlocked;
+import pl.asie.charset.lib.inventory.ContainerBase;
+import pl.asie.charset.lib.inventory.SlotBlocked;
 import pl.asie.charset.lib.utils.ItemUtils;
-import pl.asie.charset.lib.utils.RecipeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +66,10 @@ public class ContainerPocketTable extends ContainerBase {
 
     private boolean isCrafting = false;
     private boolean dirty = false;
+
+    protected ItemStack getHeld() {
+        return playerInv.getStackInSlot(heldPos);
+    }
 
     public ContainerPocketTable(EntityPlayer player) {
         super(player.inventory);

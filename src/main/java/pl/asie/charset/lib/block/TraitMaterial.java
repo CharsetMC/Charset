@@ -29,7 +29,7 @@ import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nullable;
 
-public class TraitMaterial extends Trait {
+public class TraitMaterial extends Trait implements ITraitItemAppendable {
 	private final String name;
 	private final ItemMaterial defaultMaterial;
 	private ItemMaterial material;
@@ -44,6 +44,13 @@ public class TraitMaterial extends Trait {
 		return material;
 	}
 
+	@Override
+	public ItemStack saveToStack(ItemStack stack) {
+		material.writeToNBT(ItemUtils.getTagCompound(stack, true), name);
+		return stack;
+	}
+
+	@Override
 	public void loadFromStack(ItemStack stack) {
 		if (stack.hasTagCompound()) {
 			ItemMaterial newMaterial = ItemMaterialRegistry.INSTANCE.getMaterial(stack.getTagCompound(), name);
@@ -53,11 +60,6 @@ public class TraitMaterial extends Trait {
 				material = defaultMaterial;
 			}
 		}
-	}
-
-	public ItemStack appendToStack(ItemStack stack) {
-		material.writeToNBT(ItemUtils.getTagCompound(stack, true), name);
-		return stack;
 	}
 
 	@Override

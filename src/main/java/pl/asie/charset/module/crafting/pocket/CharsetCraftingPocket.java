@@ -32,7 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
@@ -74,7 +74,7 @@ public class CharsetCraftingPocket {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.POCKET_TABLE, Side.CLIENT, (r) -> new GuiPocketTable((ContainerPocketTable) r.getContainer()));
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.POCKET_TABLE, Side.CLIENT, (r) -> new GuiPocketTable(r.getContainer(ContainerPocketTable.class)));
 	}
 
 	@Mod.EventHandler

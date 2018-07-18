@@ -19,23 +19,9 @@
 
 package pl.asie.charset.lib.block;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraft.item.ItemStack;
 
-import javax.annotation.Nullable;
-
-public abstract class Trait {
-	public abstract void readNBTData(NBTTagCompound compound, boolean isClient);
-	public abstract NBTTagCompound writeNBTData(boolean isClient);
-	public abstract boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing);
-	public abstract <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing);
-
-	public void onLoad() {
-
-	}
-
-	public void onInvalidate(TileBase.InvalidationType type) {
-
-	}
+public interface ITraitItemAppendable {
+	ItemStack saveToStack(ItemStack stack);
+	void loadFromStack(ItemStack stack);
 }

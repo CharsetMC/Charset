@@ -20,10 +20,8 @@
 package pl.asie.charset.module.storage.chests;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -36,7 +34,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.config.Configuration;
@@ -55,20 +52,15 @@ import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
-import pl.asie.charset.lib.item.ItemBlockBase;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.recipe.RecipeDummy;
 import pl.asie.charset.lib.recipe.RecipePatchwork;
 import pl.asie.charset.lib.render.sprite.TextureWhitener;
 import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.utils.RenderUtils;
-import pl.asie.charset.module.audio.storage.ContainerRecordPlayer;
-import pl.asie.charset.module.audio.storage.GuiRecordPlayer;
-import pl.asie.charset.module.audio.storage.TileRecordPlayer;
-import pl.asie.charset.module.transport.dyeableMinecarts.ModelMinecartWrapped;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -164,7 +156,7 @@ public class CharsetStorageChests {
 	@Mod.EventHandler
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
-		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHEST, Side.CLIENT, (r) -> new GuiChestCharset((ContainerChestCharset) r.getContainer()));
+		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHEST, Side.CLIENT, (r) -> new GuiChestCharset(r.getContainer(ContainerChestCharset.class)));
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChestCharset.class, TileEntityChestRendererCharset.INSTANCE);
 		ForgeHooksClient.registerTESRItemStack(itemChest, 0, TileEntityChestCharset.class);
 		itemChest.setTileEntityItemStackRenderer(new TileEntityChestRendererCharset.Stack());

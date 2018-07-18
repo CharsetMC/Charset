@@ -66,7 +66,7 @@ public class ItemBlockChestCharset extends ItemBlockBase {
 		TileEntityChestCharset chest = new TileEntityChestCharset();
 		chest.setWorld(world);
 		chest.setPos(pos);
-		chest.readNBTItem(stack);
+		chest.loadFromStack(stack);
 
 		BlockPos neighborPos = null;
 		EnumFacing neighborFacing = null;

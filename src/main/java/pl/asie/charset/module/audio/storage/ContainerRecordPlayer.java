@@ -21,7 +21,7 @@ package pl.asie.charset.module.audio.storage;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraftforge.items.SlotItemHandler;
-import pl.asie.charset.lib.ui.ContainerBase;
+import pl.asie.charset.lib.inventory.ContainerBase;
 
 public class ContainerRecordPlayer extends ContainerBase {
 	protected final TileRecordPlayer owner;

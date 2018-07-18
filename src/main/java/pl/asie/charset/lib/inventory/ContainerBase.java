@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.ui;
+package pl.asie.charset.lib.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -140,7 +140,13 @@ public abstract class ContainerBase extends Container {
 		return fromStack;
 	}
 
+	int playerInventoryX = -1, playerInventoryY = -1;
+	InventoryPlayer playerInventory = null;
+
 	public void bindPlayerInventory(InventoryPlayer inventoryPlayer, int startX, int startY) {
+		playerInventoryX = startX;
+		playerInventoryY = startY;
+		playerInventory = inventoryPlayer;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
 				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,

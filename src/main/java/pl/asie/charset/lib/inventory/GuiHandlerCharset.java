@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.ui;
+package pl.asie.charset.lib.inventory;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -52,8 +52,10 @@ public class GuiHandlerCharset implements IGuiHandler {
 			return world.getTileEntity(new BlockPos(x, y, z));
 		}
 
-		public Container getContainer() {
-			return (Container) GuiHandlerCharset.INSTANCE.getServerGuiElement(id, player, world, x, y, z);
+		public <T extends Container> T getContainer(Class<T> t) {
+			Object o = GuiHandlerCharset.INSTANCE.getServerGuiElement(id, player, world, x, y, z);
+			//noinspection unchecked
+			return (T) o;
 		}
 	}
 

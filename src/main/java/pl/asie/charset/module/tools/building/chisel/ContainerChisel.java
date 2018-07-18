@@ -21,7 +21,7 @@ package pl.asie.charset.module.tools.building.chisel;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import pl.asie.charset.lib.ui.ContainerBase;
+import pl.asie.charset.lib.inventory.ContainerBase;
 
 public class ContainerChisel extends ContainerBase {
     public final EntityPlayer player;

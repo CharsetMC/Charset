@@ -38,12 +38,11 @@ import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.experimental.mechanical.IMechanicalPowerConsumer;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.tape.IDataStorage;
-import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitItemHolder;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 
 import javax.annotation.Nullable;
 import java.util.List;

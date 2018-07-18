@@ -22,21 +22,18 @@ package pl.asie.charset.module.crafting.pocket;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.ui.GuiContainerCharset;
+import pl.asie.charset.lib.inventory.GuiContainerCharset;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Locale;
 
-public class GuiPocketTable extends GuiContainerCharset {
+public class GuiPocketTable extends GuiContainerCharset<ContainerPocketTable> {
     private static final ResourceLocation POCKET_GUI = new ResourceLocation("charset:textures/gui/pocketgui.png");
     private final int buttonGridX, buttonGridY, buttonGridCount;
 
-    public ContainerPocketTable containerPocket;
-
     public GuiPocketTable(ContainerPocketTable container) {
         super(container, 235, 90);
-        containerPocket = container;
         buttonGridX = 196;
         buttonGridY = 51;
         buttonGridCount = 3;
@@ -44,6 +41,11 @@ public class GuiPocketTable extends GuiContainerCharset {
 
     private int open_time = 0;
     private int button_pressed = -1;
+
+    @Override
+    protected boolean showPlayerInventoryName() {
+        return false; // Too small!
+    }
 
     @Override
     protected void renderHoveredToolTip(int mouseX, int mouseY) {
@@ -127,8 +129,8 @@ public class GuiPocketTable extends GuiContainerCharset {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         // I'd like it to say "Pocket Crafting", but that doesn't fit.
         // Could also make the tab a bit longer...
-        // this.fontRenderer.drawString("Crafting", 178, 10, 4210752);
-        this.fontRenderer.drawString(I18n.format("gui.charset.crafting.name"), 184, 11, 4210752);
+        // this.fontRenderer.drawString("Crafting", 178, 10, 0x404040);
+        this.fontRenderer.drawString(I18n.format("gui.charset.crafting.name"), 184, 11, 0x404040);
         /* int color = 0xa0a0a0;
         int length = 3;
         int d = 10;
@@ -141,7 +143,7 @@ public class GuiPocketTable extends GuiContainerCharset {
             int y = d * (i - length);
             this.fontRenderer.drawString(key + ": " + msg, 8, y, color);
         }
-        // this.fontRenderer.drawString("123456789", 178, 10, 4210752);
+        // this.fontRenderer.drawString("123456789", 178, 10, 0x404040);
         // we can fit only that much */
     }
 

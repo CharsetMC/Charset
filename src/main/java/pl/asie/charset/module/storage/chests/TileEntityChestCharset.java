@@ -22,10 +22,7 @@ package pl.asie.charset.module.storage.chests;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -37,27 +34,27 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IMultiblockStructure;
-import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.block.TraitLockable;
 import pl.asie.charset.lib.block.TraitMaterial;
+import pl.asie.charset.lib.block.TraitNameable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
-import pl.asie.charset.lib.ui.IContainerHandler;
-import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.IContainerHandler;
 import pl.asie.charset.lib.utils.MathUtils;
 
 import javax.annotation.Nonnull;
@@ -85,6 +82,7 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	public TileEntityChestCharset() {
 		registerTrait("wood", material = new TraitMaterial("wood", ItemMaterialRegistry.INSTANCE.getDefaultMaterialByType("plank")));
 		registerTrait("lock", lockable = new TraitLockable(this));
+		registerTrait("name", new TraitNameable());
 	}
 
 	protected int getPlayerCount() {
@@ -142,11 +140,6 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	public void update() {
 		super.update();
 
-		if (hasNeighbor() && neighborFace.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE) {
-			return;
-		}
-
-
 		this.prevLidAngle = this.lidAngle;
 		int pc = getPlayerCount();
 		if (pc > 0) {
@@ -178,13 +171,6 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	}
 
 	@Override
-	public ItemStack getDroppedBlock(IBlockState state) {
-		ItemStack stack = new ItemStack(state.getBlock());
-		material.appendToStack(stack);
-		return stack;
-	}
-
-	@Override
 	public void getDrops(NonNullList<ItemStack> stackList, IBlockState state, int fortune, boolean silkTouch) {
 		stackList.add(getDroppedBlock(state));
 		for (int i = 0; i < stacks.getSlots(); i++) {
@@ -193,12 +179,6 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 				stackList.add(s);
 			}
 		}
-	}
-
-	@Override
-	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
-		super.onPlacedBy(placer, face, stack, hitX, hitY, hitZ);
-		readNBTItem(stack);
 	}
 
 	@Override
@@ -257,10 +237,6 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 		return true;
 	}
 
-	public void readNBTItem(ItemStack stack) {
-		material.loadFromStack(stack);
-	}
-
 	private IItemHandlerModifiable ihFirstHandler() {
 		return neighborFace != null && neighborFace.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? neighbor.stacks : this.stacks;
 	}
@@ -283,6 +259,14 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 		} else {
 			return ihFirstHandler();
 		}
+	}
+
+	@Nullable
+	@Override
+	public ITextComponent getDisplayName() {
+		return getTraitDisplayName(
+				new TextComponentTranslation(hasNeighbor() ? "container.chestDouble" : "container.chest")
+		);
 	}
 
 	@Override

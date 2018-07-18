@@ -151,17 +151,7 @@ public class TileGearbox extends TileBase implements IMechanicalPowerProducer, I
 	@Override
 	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		super.onPlacedBy(placer, face, stack, hitX, hitY, hitZ);
-		loadFromStack(stack);
 		neighborChanged();
-	}
-
-	public void loadFromStack(ItemStack stack) {
-		material.loadFromStack(stack);
-	}
-
-	@Override
-	public ItemStack getDroppedBlock(IBlockState state) {
-		return material.appendToStack(super.getDroppedBlock(state));
 	}
 
 	@Override

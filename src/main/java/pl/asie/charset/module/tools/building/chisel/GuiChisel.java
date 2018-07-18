@@ -22,18 +22,16 @@ package pl.asie.charset.module.tools.building.chisel;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.ui.GuiContainerCharset;
+import pl.asie.charset.lib.inventory.GuiContainerCharset;
 import pl.asie.charset.module.tools.building.CharsetToolsBuilding;
 
 import java.io.IOException;
 
-public class GuiChisel extends GuiContainerCharset {
+public class GuiChisel extends GuiContainerCharset<ContainerChisel> {
     private static final ResourceLocation CHISEL_GUI = new ResourceLocation("charset:textures/gui/chiselgui.png");
-    private final ContainerChisel containerChisel;
 
     public GuiChisel(ContainerChisel container) {
         super(container, 68, 68);
-        this.containerChisel = container;
     }
 
     @Override
@@ -41,7 +39,7 @@ public class GuiChisel extends GuiContainerCharset {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
         if (mouseButton == 0) {
-            ItemStack stack = containerChisel.playerInv.getStackInSlot(containerChisel.heldPos);
+            ItemStack stack = container.playerInv.getStackInSlot(container.heldPos);
             if (stack.getItem() == CharsetToolsBuilding.chisel) {
                 int blockMask = CharsetToolsBuilding.chisel.getBlockMask(stack);
                 int i = 0;
@@ -56,7 +54,7 @@ public class GuiChisel extends GuiContainerCharset {
                     }
                 }
 
-                CharsetToolsBuilding.packet.sendToServer(new PacketSetBlockMask(blockMask, containerChisel.heldPos));
+                CharsetToolsBuilding.packet.sendToServer(new PacketSetBlockMask(blockMask, container.heldPos));
                 CharsetToolsBuilding.chisel.setBlockMask(stack, blockMask);
             }
         }
@@ -70,7 +68,7 @@ public class GuiChisel extends GuiContainerCharset {
         this.mc.getTextureManager().bindTexture(CHISEL_GUI);
 
         drawTexturedModalRect(xBase, yBase, 0, 0, xSize, ySize);
-        ItemStack stack = containerChisel.playerInv.getStackInSlot(containerChisel.heldPos);
+        ItemStack stack = container.playerInv.getStackInSlot(container.heldPos);
         if (stack.getItem() == CharsetToolsBuilding.chisel) {
             GlStateManager.color(0.5F, 0.5F, 0.5F, 1.0F);
             int blockMask = CharsetToolsBuilding.chisel.getBlockMask(stack);

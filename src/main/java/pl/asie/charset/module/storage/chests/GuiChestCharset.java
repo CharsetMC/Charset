@@ -19,16 +19,13 @@
 
 package pl.asie.charset.module.storage.chests;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.ui.GuiContainerCharset;
+import pl.asie.charset.lib.inventory.GuiContainerCharset;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class GuiChestCharset extends GuiContainerCharset {
+public class GuiChestCharset extends GuiContainerCharset<ContainerChestCharset> {
 	private ResourceLocation texture;
 
 	protected ResourceLocation getTexture() {
@@ -37,12 +34,12 @@ public class GuiChestCharset extends GuiContainerCharset {
 		}
 
 		String s = "textures/gui/container/generic_";
-		ResourceLocation first = new ResourceLocation(s + (containerChestCharset.inventoryRows * 9) + ".png");
+		ResourceLocation first = new ResourceLocation(s + (container.inventoryRows * 9) + ".png");
 		try {
 			this.mc.getResourceManager().getResource(first);
 			texture = first;
 		} catch (IOException e) {
-			first = new ResourceLocation("charset", s + (containerChestCharset.inventoryRows * 9) + ".png");
+			first = new ResourceLocation("charset", s + (container.inventoryRows * 9) + ".png");
 			try {
 				this.mc.getResourceManager().getResource(first);
 				texture = first;
@@ -54,19 +51,16 @@ public class GuiChestCharset extends GuiContainerCharset {
 		return texture;
 	}
 
-	private final ContainerChestCharset containerChestCharset;
-
 	public GuiChestCharset(ContainerChestCharset container) {
 		super(container, 222, 114 + container.inventoryRows * 18);
-		this.containerChestCharset = container;
 	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
-		if (this.containerChestCharset.tile.getDisplayName() != null) {
-			this.fontRenderer.drawString(this.containerChestCharset.tile.getDisplayName().getUnformattedText(), 8, 6, 0x404040);
+		if (this.container.tile.getDisplayName() != null) {
+			this.fontRenderer.drawString(this.container.tile.getDisplayName().getUnformattedText(), 8, 6, 0x404040);
 		}
 	}
 
@@ -78,7 +72,7 @@ public class GuiChestCharset extends GuiContainerCharset {
 
 		GlStateManager.color(1, 1, 1,1 );
 		this.mc.getTextureManager().bindTexture(getTexture());
-		this.drawTexturedModalRect(xBase, yBase, 0, 0, xSize, containerChestCharset.inventoryRows * 18 + 17);
-		this.drawTexturedModalRect(xBase, yBase + containerChestCharset.inventoryRows * 18 + 17, 0, 126, xSize, 96);
+		this.drawTexturedModalRect(xBase, yBase, 0, 0, xSize, container.inventoryRows * 18 + 17);
+		this.drawTexturedModalRect(xBase, yBase + container.inventoryRows * 18 + 17, 0, 126, xSize, 96);
 	}
 }

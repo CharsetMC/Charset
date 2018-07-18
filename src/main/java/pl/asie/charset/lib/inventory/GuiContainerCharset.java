@@ -17,18 +17,23 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.ui;
+package pl.asie.charset.lib.inventory;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.Container;
 
-public class GuiContainerCharset extends GuiContainer {
+public class GuiContainerCharset<T extends ContainerBase> extends GuiContainer {
 	protected int xBase, yBase;
+	protected final T container;
 
-	public GuiContainerCharset(Container container, int xSize, int ySize) {
+	public GuiContainerCharset(T container, int xSize, int ySize) {
 		super(container);
 		this.xSize = xSize;
 		this.ySize = ySize;
+		this.container = container;
+	}
+
+	protected boolean showPlayerInventoryName() {
+		return true;
 	}
 
 	protected final boolean insideRect(int x, int y, int x0, int y0, int w, int h) {
@@ -46,5 +51,14 @@ public class GuiContainerCharset extends GuiContainer {
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		this.xBase = (this.width - this.xSize) / 2;
 		this.yBase = (this.height - this.ySize) / 2;
+	}
+
+	@Override
+	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		if (showPlayerInventoryName() && container.playerInventory != null) {
+			this.fontRenderer.drawString(container.playerInventory.getDisplayName().getUnformattedText(),
+					container.playerInventoryX, container.playerInventoryY - 11,
+					0x404040);
+		}
 	}
 }

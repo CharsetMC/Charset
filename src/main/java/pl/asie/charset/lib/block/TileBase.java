@@ -32,6 +32,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -113,11 +114,45 @@ public class TileBase extends TileEntity {
 	}
 
 	public ItemStack getDroppedBlock(IBlockState state) {
-		return new ItemStack(state.getBlock());
+		ItemStack stack = new ItemStack(state.getBlock());;
+		saveToStack(stack);
+		return stack;
+	}
+
+	protected final ITextComponent getTraitDisplayName(ITextComponent fallback) {
+		for (Trait t : traits.values()) {
+			if (t instanceof TraitNameable) {
+				return ((TraitNameable) t).getName(fallback);
+			}
+		}
+		return fallback;
+	}
+
+	@Nullable
+	@Override
+	public ITextComponent getDisplayName() {
+		return getTraitDisplayName(null);
+	}
+
+	public void loadFromStack(ItemStack stack) {
+		for (Trait t : traits.values()) {
+			if (t instanceof ITraitItemAppendable) {
+				((ITraitItemAppendable) t).loadFromStack(stack);
+			}
+		}
+	}
+
+	public ItemStack saveToStack(ItemStack stack) {
+		for (Trait t : traits.values()) {
+			if (t instanceof ITraitItemAppendable) {
+				stack = ((ITraitItemAppendable) t).saveToStack(stack);
+			}
+		}
+		return stack;
 	}
 
 	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
-
+		loadFromStack(stack);
 	}
 
 	public int getComparatorValue() {

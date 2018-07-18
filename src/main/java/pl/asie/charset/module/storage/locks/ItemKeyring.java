@@ -46,8 +46,8 @@ import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.api.lib.IDyeableItem;
 import pl.asie.charset.lib.item.ItemBase;
-import pl.asie.charset.lib.ui.GuiHandlerCharset;
-import pl.asie.charset.lib.ui.ItemHandlerCharset;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
+import pl.asie.charset.lib.inventory.ItemHandlerCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import javax.annotation.Nonnull;

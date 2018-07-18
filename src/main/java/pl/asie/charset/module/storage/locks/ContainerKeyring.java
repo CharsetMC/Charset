@@ -25,14 +25,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import pl.asie.charset.lib.ui.ContainerBase;
-import pl.asie.charset.lib.ui.SlotBlocked;
+import pl.asie.charset.lib.inventory.ContainerBase;
+import pl.asie.charset.lib.inventory.SlotBlocked;
 
 public class ContainerKeyring extends ContainerBase {
+    protected ItemStack held;
     private final InventoryPlayer inventoryPlayer;
     private final int heldPos;
     private Slot heldSlot;
-    private ItemStack held;
 
     public ContainerKeyring(InventoryPlayer inventoryPlayer) {
         super(inventoryPlayer);
