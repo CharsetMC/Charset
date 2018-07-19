@@ -73,7 +73,7 @@ import java.util.function.BiPredicate;
 @CharsetModule(
 		name = "storage.chests",
 		description = "Chests out of any wood!",
-		profile = ModuleProfile.INDEV
+		profile = ModuleProfile.TESTING
 )
 public class CharsetStorageChests {
 	@CharsetModule.Configuration
