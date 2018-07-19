@@ -154,12 +154,26 @@ public class BlockChestCharset extends BlockBase implements ITileEntityProvider 
 
 	@Override
 	public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+		IBlockState state = world.getBlockState(pos);
+		EnumFacing facing = state.getValue(Properties.FACING4);
+		EnumFacing newFacing = axis == EnumFacing.DOWN ? facing.rotateYCCW() : facing.rotateY();
+
 		TileEntity tile = world.getTileEntity(pos);
-		if (tile instanceof TileEntityChestCharset && ((TileEntityChestCharset) tile).hasNeighbor()) {
-			// TODO
+		if (!(tile instanceof TileEntityChestCharset)) {
 			return false;
+		} else if (((TileEntityChestCharset) tile).hasNeighbor()) {
+			BlockPos otherPos = ((TileEntityChestCharset) tile).getNeighbor().getPos();
+			IBlockState otherState = world.getBlockState(otherPos);
+			EnumFacing otherFacing = otherState.getValue(Properties.FACING4);
+			if (facing != otherFacing) {
+				return false;
+			}
+
+			newFacing = facing.rotateY().rotateY();
+			world.setBlockState(otherPos, otherState.withProperty(Properties.FACING4, newFacing));
 		}
 
-		return super.rotateBlock(world, pos, axis);
+		world.setBlockState(pos, state.withProperty(Properties.FACING4, newFacing));
+		return true;
 	}
 }
