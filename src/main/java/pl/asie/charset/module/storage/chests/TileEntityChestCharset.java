@@ -44,6 +44,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IMultiblockStructure;
@@ -226,6 +227,32 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	}
 
 	public boolean activate(EntityPlayer player, EnumFacing side, EnumHand hand) {
+		ItemStack stack = player.getHeldItem(hand);
+		if (!stack.isEmpty()) {
+			if (stack.getItem().getToolClasses(stack).contains("wrench")) {
+				boolean attached = false;
+
+				BlockPos otherPos = pos.offset(side);
+				TileEntity otherTile = world.getTileEntity(otherPos);
+				if (otherTile instanceof TileEntityChestCharset
+						&& ((TileEntityChestCharset) otherTile).material.getMaterial() == material.getMaterial()) {
+					if (!((TileEntityChestCharset) otherTile).hasNeighbor()) {
+						attached = true;
+						setNeighbor((TileEntityChestCharset) otherTile, side);
+						player.swingArm(hand);
+					}
+				}
+
+				if (hasNeighbor() && !attached) {
+					neighbor.setNeighbor(null, null);
+					setNeighbor(null, null);
+					player.swingArm(hand);
+				}
+
+				return true;
+			}
+		}
+
 		if (isBlocked() || (hasNeighbor() && getNeighbor().isBlocked())) {
 			return true;
 		}

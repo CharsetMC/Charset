@@ -1,0 +1,19 @@
+\scale{2}{\item{charset:chest}{1}{32767}} \title{The Chest}
+
+Chests can store up to 27 different stacks of items.
+
+Right-clicking on a chest opens its inventory, in which
+you can manage the items.
+
+Chests can be made out of any wood type available.
+
+Chests will connect to a surrounding chest of the same material to create a double
+chest, which stores 54 stacks of items. You can control this
+by placing the chest while sneaking; placing it on the ground
+will always create a single chest, whereas placing it on the face
+of an existing chest will always create a double chest.
+
+Machines can extract from and insert to any side of the chest.
+
+You can, additionally, use a wrench to connect and disconnect chests from each
+other. To do so, right-click a suitable chest with one.

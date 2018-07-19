@@ -4,15 +4,20 @@ Barrels can store up to 64 stacks of a single item.
 So, a single barrel can store 4096 sticks,
 64 swords, or 1024 eggs.
 
-Right clicking a barrel will store what you're holding,
-and left clicking removes a stack.
-Shift left clicking will remove a single item.
+Right-clicking a barrel will store what you're holding,
+and left-clicking removes a stack.
+Sneak left-clicking will remove a single item.
 Double right-clicking will fill the barrel
 from your inventory.
 
 Barrels can have any direction and orientation.
 Clicking near the side edge of a block will place the barrel
 with its top pointing to that side.
+
+Barrels can also be made from any kind of wood. However,
+keep in mind that the log and slab's type has to match;
+for instance, you can make a barrel out of an oak log and
+oak slab, but not out of a birch log and spruce slab.
 
 Machines can only extract from the bottom of the barrel.
 Insertion is done from the top, or the back.

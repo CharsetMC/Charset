@@ -39,9 +39,11 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -142,6 +144,7 @@ public class CharsetStorageChests {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		RegistryUtils.register(TileEntityChestCharset.class, "chest");
+		FMLInterModComms.sendMessage("charset", "addCarry", blockChest.getRegistryName());
 
 		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.CHEST, Side.SERVER, (r) -> {
 			TileEntity tile = r.getTileEntity();
