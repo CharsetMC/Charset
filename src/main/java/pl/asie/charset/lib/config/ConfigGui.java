@@ -70,7 +70,7 @@ public class ConfigGui extends GuiConfig {
 	private static List<IConfigElement> getConfigElements() {
 		Configuration config = ModCharset.configModules;
 		List<IConfigElement> list = Lists.newArrayList(
-				new ConfigElement(config.getCategory("general").get("profile")),
+				new ConfigElement(ModCharset.configGeneral.getCategory("general").get("profile")),
 				new DummyConfigElement.DummyCategoryElement("categories", "config.charset.categories.name", getSubConfigElements(config, "categories", ConfigElement::new)),
 				new DummyConfigElement.DummyCategoryElement("overrides", "config.charset.overrides.name", getSubConfigElements(config, "overrides", ConfigElement::new))
 		);

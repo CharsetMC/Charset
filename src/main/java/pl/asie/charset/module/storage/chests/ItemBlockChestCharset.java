@@ -93,13 +93,11 @@ public class ItemBlockChestCharset extends ItemBlockBase {
 				TileEntity otherTile = world.getTileEntity(otherPos);
 				if (otherTile instanceof TileEntityChestCharset
 						&& ((TileEntityChestCharset) otherTile).material.getMaterial() == chest.material.getMaterial()) {
-					if (neighborPos != null || ((TileEntityChestCharset) otherTile).hasNeighbor()) {
-						return false;
+					if (neighborPos == null && !((TileEntityChestCharset) otherTile).hasNeighbor()) {
+						neighborPos = otherPos;
+						neighborFacing = facing;
+						neighbor = (TileEntityChestCharset) otherTile;
 					}
-
-					neighborPos = otherPos;
-					neighborFacing = facing;
-					neighbor = (TileEntityChestCharset) otherTile;
 				}
 			}
 		}
