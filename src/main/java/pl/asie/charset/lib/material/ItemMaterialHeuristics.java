@@ -379,7 +379,7 @@ public final class ItemMaterialHeuristics {
             }
         } else {
             supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
-            supplyExpandedStacks(OreDictionary.getOres("plankWood", false), ItemMaterialHeuristics::initLoglessPlankMaterial);
+            // supplyExpandedStacks(OreDictionary.getOres("plankWood", false), ItemMaterialHeuristics::initLoglessPlankMaterial);
         }
 
         bar.step("Ores");

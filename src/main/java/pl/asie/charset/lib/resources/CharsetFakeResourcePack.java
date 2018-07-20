@@ -21,6 +21,8 @@ package pl.asie.charset.lib.resources;
 
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.IResourcePack;
@@ -101,12 +103,22 @@ public class CharsetFakeResourcePack implements IResourcePack, IResourceManagerR
         invalidate();
     }
 
-    public void invalidate() {
+    @SuppressWarnings("ConstantConditions")
+    public void clearTexturesFromManager() {
+        TextureManager manager = Minecraft.getMinecraft().getTextureManager();
+        if (manager == null) {
+            return;
+        }
+
         for (ResourceLocation location : entries.keySet()) {
-            if (location.getPath().startsWith("textures/")) {
-                Minecraft.getMinecraft().getTextureManager().deleteTexture(location);
+            ITextureObject object;
+            if (location.getPath().startsWith("textures/") && (object = manager.getTexture(location)) != null) {
+                manager.loadTexture(location, object);
             }
         }
+    }
+
+    public void invalidate() {
         data.clear();
     }
 }

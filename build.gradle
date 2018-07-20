@@ -24,7 +24,7 @@ apply plugin: 'net.minecrell.licenser'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.5.2.1"
+version = "0.5.2.2"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 

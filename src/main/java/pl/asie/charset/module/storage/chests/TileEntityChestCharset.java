@@ -154,6 +154,10 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		super.readNBTData(compound, isClient);
 
+		if (!isClient && compound.hasKey("inv")) {
+			stacks.deserializeNBT(compound.getCompoundTag("inv"));
+		}
+
 		EnumFacing oldNF = neighborFace;
 		neighborFace = compound.hasKey("nf", Constants.NBT.TAG_ANY_NUMERIC) ? EnumFacing.byIndex(compound.getByte("nf")) : null;
 
@@ -165,6 +169,11 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	@Override
 	public NBTTagCompound writeNBTData(NBTTagCompound compound, boolean isClient) {
 		compound = super.writeNBTData(compound, isClient);
+		if (!isClient) {
+			NBTTagCompound invTag = stacks.serializeNBT();
+			compound.setTag("inv", invTag);
+		}
+
 		if (neighborFace != null) {
 			compound.setByte("nf", (byte) neighborFace.ordinal());
 		}

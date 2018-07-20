@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.modcompat.rustic;
+package pl.asie.charset.lib.modcompat.quark;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
@@ -36,31 +36,28 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ColorUtils;
 
 @CharsetModule(
-		name = "rustic:lib",
+		name = "quark:lib",
 		profile = ModuleProfile.COMPAT,
-		dependencies = {"mod:rustic"}
+		dependencies = {"mod:quark"}
 )
-public class CharsetCompatRustic {
+public class CharsetCompatQuark {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		for (EnumDyeColor color : EnumDyeColor.values()) {
-			ResourceLocation location = new ResourceLocation(ColorUtils.getOreDictEntry("rustic:painted_wood_", color));
-			Item i = ForgeRegistries.ITEMS.getValue(location);
-			if (i instanceof ItemBlock) {
-				ItemStack wood = new ItemStack(i);
+		ResourceLocation location = new ResourceLocation("quark:stained_planks");
+		Item it = ForgeRegistries.ITEMS.getValue(location);
+		ItemStack stick = new ItemStack(Items.STICK);
+		ItemMaterial stickMaterial = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stick);
+
+		if (it instanceof ItemBlock) {
+			for (int i = 0; i < 16; i++) {
+				ItemStack wood = new ItemStack(it, 1, i);
 				ItemMaterial material = ItemMaterialRegistry.INSTANCE.getMaterialIfPresent(wood);
 				if (material != null) {
-					continue;
+					return;
 				}
-
-				OreDictionary.registerOre("plankWood", i);
-				OreDictionary.registerOre("plankStained", i); // (Quark)
 
 				material = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(wood);
 				ItemMaterialRegistry.INSTANCE.registerTypes(material, "wood", "plank", "block");
-
-				ItemStack stick = new ItemStack(Items.STICK);
-				ItemMaterial stickMaterial = ItemMaterialRegistry.INSTANCE.getOrCreateMaterial(stick);
 				ItemMaterialRegistry.INSTANCE.registerRelation(material, stickMaterial, "stick");
 			}
 		}

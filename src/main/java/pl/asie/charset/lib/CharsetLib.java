@@ -118,7 +118,9 @@ public class CharsetLib {
 		ModelFactory.clearCaches();
 		TextureWhitener.INSTANCE.clear();
 		ColorLookupHandler.INSTANCE.clear();
+
 		CharsetFakeResourcePack.INSTANCE.invalidate();
+		CharsetFakeResourcePack.INSTANCE.clearTexturesFromManager();
 	}
 
 	@Mod.EventHandler
