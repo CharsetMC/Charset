@@ -20,12 +20,14 @@
 package pl.asie.charset.lib.resources;
 
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.MetadataSerializer;
 import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
@@ -35,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+// TODO: FakeResourcePack class with in-ModCharset/in-CharsetLib? instance
 public class CharsetFakeResourcePack implements IResourcePack, IResourceManagerReloadListener {
     public static final CharsetFakeResourcePack INSTANCE = new CharsetFakeResourcePack();
 
@@ -95,6 +98,15 @@ public class CharsetFakeResourcePack implements IResourcePack, IResourceManagerR
 
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
+        invalidate();
+    }
+
+    public void invalidate() {
+        for (ResourceLocation location : entries.keySet()) {
+            if (location.getPath().startsWith("textures/")) {
+                Minecraft.getMinecraft().getTextureManager().deleteTexture(location);
+            }
+        }
         data.clear();
     }
 }

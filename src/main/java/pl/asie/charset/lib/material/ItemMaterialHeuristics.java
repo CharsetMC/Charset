@@ -45,6 +45,7 @@ import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -111,6 +112,60 @@ public final class ItemMaterialHeuristics {
         }
     }
 
+    private static void initLoglessPlankMaterial(ItemStack plank) {
+        // Log Material is null, as logWood iteration should have caught those before.
+        initPlankMaterial(plank, null);
+    }
+
+    private static void initPlankMaterial(ItemStack plank, @Nullable ItemMaterial logMaterial) {
+        if (!isBlock(plank)) {
+            return;
+        }
+
+        ItemMaterial material = reg.getMaterialIfPresent(plank);
+        if (material != null && material.getTypes().contains("plank")) {
+            return;
+        }
+
+        if (plank.getCount() > 1) {
+            plank = plank.copy();
+            plank.setCount(1);
+        }
+        ItemMaterial plankMaterial = reg.getOrCreateMaterial(plank);
+        if (reg.registerTypes(plankMaterial, "plank", "wood", "block")) {
+            if (logMaterial != null) {
+                reg.registerRelation(logMaterial, plankMaterial, "plank", "log");
+            }
+
+            ItemStack stick = FastRecipeLookup.getCraftingResultQuickly(true, 2, null, 1, 2,
+                    plank,
+                    plank);
+            if (!stick.isEmpty() && !ItemUtils.isOreType(stick, "stickWood")) {
+                stick = ItemStack.EMPTY;
+            }
+
+            if (stick.isEmpty()) {
+                stick = new ItemStack(Items.STICK);
+            } else {
+                stick.setCount(1);
+            }
+
+            ItemMaterial stickMaterial = reg.getOrCreateMaterial(stick);
+            if (reg.registerTypes(stickMaterial, "stick", "wood", "item")) {
+                if (stick.getItem() != Items.STICK) {
+                    reg.registerRelation(plankMaterial, stickMaterial, "stick", "plank");
+                    if (logMaterial != null) {
+                        reg.registerRelation(logMaterial, stickMaterial, "stick", "log");
+                    }
+                } else {
+                    reg.registerRelation(plankMaterial, stickMaterial, "stick");
+                    if (logMaterial != null) {
+                        reg.registerRelation(logMaterial, stickMaterial, "stick");
+                    }
+                }
+            }
+        }
+    }
     private static void initLogMaterial(ItemStack log) {
         if (!isBlock(log))
             return;
@@ -125,40 +180,14 @@ public final class ItemMaterialHeuristics {
         // get registered.
 
         ItemStack plank = FastRecipeLookup.getCraftingResultQuickly(false, 1,null, 1, 1, log);
+
         if (isBlock(plank) && ItemUtils.isOreType(plank, "plankWood")) {
             ItemMaterial logMaterial = reg.getOrCreateMaterial(log);
             if (reg.registerTypes(logMaterial, "log", "wood", "block")) {
-                plank.setCount(1);
-                ItemMaterial plankMaterial = reg.getOrCreateMaterial(plank);
-                if (reg.registerTypes(plankMaterial, "plank", "wood", "block")) {
-                    reg.registerRelation(logMaterial, plankMaterial, "plank", "log");
-
-                    ItemStack stick = FastRecipeLookup.getCraftingResultQuickly(true, 2, null, 1, 2,
-                            plank,
-                            plank);
-                    if (!stick.isEmpty() && !ItemUtils.isOreType(stick, "stickWood")) {
-                        stick = ItemStack.EMPTY;
-                    }
-
-                    if (stick.isEmpty()) {
-                        stick = new ItemStack(Items.STICK);
-                    } else {
-                        stick.setCount(1);
-                    }
-
-                    ItemMaterial stickMaterial = reg.getOrCreateMaterial(stick);
-                    if (reg.registerTypes(stickMaterial, "stick", "wood", "item")) {
-                        if (stick.getItem() != Items.STICK) {
-                            reg.registerRelation(plankMaterial, stickMaterial, "stick", "plank");
-                            reg.registerRelation(logMaterial, stickMaterial, "stick", "log");
-                        } else {
-                            reg.registerRelation(plankMaterial, stickMaterial, "stick");
-                            reg.registerRelation(logMaterial, stickMaterial, "stick");
-                        }
-                    }
-                }
+                initPlankMaterial(plank, logMaterial);
             }
         }
+
     }
 
     private static boolean containsOreDict(ItemStack stack, String entry) {
@@ -350,6 +379,7 @@ public final class ItemMaterialHeuristics {
             }
         } else {
             supplyExpandedStacks(OreDictionary.getOres("logWood", false), ItemMaterialHeuristics::initLogMaterial);
+            supplyExpandedStacks(OreDictionary.getOres("plankWood", false), ItemMaterialHeuristics::initLoglessPlankMaterial);
         }
 
         bar.step("Ores");

@@ -1,0 +1,8 @@
+Additions:
+
+* [lib] Proper handling of non-log-based wooden planks (such as Quark stained planks) for materials - allows them to work with Chests!
+* [lib] Rustic compatibility module, with regards to the above.
+
+Bugs fixed:
+
+* [lib] Certain textures not getting refreshed on resource pack reload.

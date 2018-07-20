@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -111,12 +112,13 @@ public class CharsetLib {
 	public static boolean showAllItemTypes;
 	public static int doubleClickDuration;
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	@SideOnly(Side.CLIENT)
-	public void onTextureStitch(TextureStitchEvent.Pre event) {
+	public void onModelBake(ModelBakeEvent event) {
 		ModelFactory.clearCaches();
 		TextureWhitener.INSTANCE.clear();
 		ColorLookupHandler.INSTANCE.clear();
+		CharsetFakeResourcePack.INSTANCE.invalidate();
 	}
 
 	@Mod.EventHandler
