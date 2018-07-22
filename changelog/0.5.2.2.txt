@@ -1,0 +1,6 @@
+Bugs fixed:
+
+* [lib] [#252] Resource loader breakage issue (introduced in 0.5.2.1)
+* [lib] [#250] Crash with other mods adding resource packs on load (introduced in 0.5.2.1)
+* [lib] plankWoods which were not supposed to count being added as valid plank variants
+* [storage.chests] [#255] Reloading deletes items in chests

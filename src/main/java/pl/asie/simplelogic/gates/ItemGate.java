@@ -19,6 +19,7 @@
 
 package pl.asie.simplelogic.gates;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -35,15 +36,19 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.charset.lib.item.ItemBlockBase;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class ItemGate extends ItemBlockBase {
 	public ItemGate(Block block) {
 		super(block);
 		setHasSubtypes(true);
+		setSubItemProvider(() -> ImmutableList.copyOf(SimpleLogicGates.gateStacks));
 	}
 
 	public static ItemStack getStack(PartGate gate) {
@@ -95,16 +100,6 @@ public class ItemGate extends ItemBlockBase {
 			name += ".i";
 		}
 		return I18n.translateToLocal(name + ".name");
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
-		if (this.isInCreativeTab(tab)) {
-			for (ItemStack stack : SimpleLogicGates.gateStacks) {
-				items.add(stack);
-			}
-		}
 	}
 
 	@Override

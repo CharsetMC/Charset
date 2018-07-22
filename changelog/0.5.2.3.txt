@@ -1,0 +1,7 @@
+Additions:
+
+* lib.cfg -> showAllItemTypesJEI, allowing you to show all chest/barrel/etc. item types in JEI and not the creative menu
+
+Bugs fixed:
+
+* [lib] [#256] Shift-clicking into a full inventory causes a freeze

@@ -28,6 +28,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
@@ -43,8 +44,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.item.ISubItemProvider;
+import pl.asie.charset.lib.item.SubItemProviderCache;
+import pl.asie.charset.lib.item.SubItemProviderRecipes;
+import pl.asie.charset.lib.item.SubItemSetHelper;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
+
+import java.util.List;
 
 public class BlockChestCharset extends BlockBase implements ITileEntityProvider {
 	protected static final IUnlistedProperty<ItemMaterial> MATERIAL_PROP = new UnlistedPropertyGeneric<>("material", ItemMaterial.class);
@@ -66,6 +73,16 @@ public class BlockChestCharset extends BlockBase implements ITileEntityProvider 
 		setHardness(2.5F);
 		setSoundType(SoundType.WOOD);
 		setTranslationKey("chest");
+	}
+
+	@Override
+	protected ISubItemProvider createSubItemProvider() {
+		 return new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetStorageChests.itemChest) {
+			@Override
+			protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
+				return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("wood", SubItemSetHelper::sortByItem));
+			}
+		});
 	}
 
 	@Override

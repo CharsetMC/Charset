@@ -58,11 +58,12 @@ public abstract class ContainerBase extends Container {
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
 		Slot slotObject = inventorySlots.get(slot);
 		if (slotObject != null && slotObject.getHasStack()) {
-			ItemStack stack = tryTransferStackInSlot(player, slotObject, slotObject.inventory == player.inventory ? SLOTS_INVENTORY : SLOTS_PLAYER);
+			int oldStackCount = slotObject.getStack().getCount();
+			ItemStack remainder = tryTransferStackInSlot(player, slotObject, slotObject.inventory == player.inventory ? SLOTS_INVENTORY : SLOTS_PLAYER);
 			detectAndSendChanges();
-			return stack;
+			return oldStackCount > remainder.getCount() ? remainder : ItemStack.EMPTY;
 		} else {
-			return slotObject.getStack();
+			return ItemStack.EMPTY;
 		}
 	}
 
@@ -99,7 +100,6 @@ public abstract class ContainerBase extends Container {
 
 	// TODO: BUGTEST ME
 	protected ItemStack tryTransferStackInSlot(EntityPlayer player, Slot from, Collection<Slot> targets) {
-		ItemStack fromStack = from.getStack();
 		Collection<Slot> targetsValidEmpty = new ArrayList<>(targets.size());
 		boolean dirty = false;
 
@@ -108,7 +108,7 @@ public abstract class ContainerBase extends Container {
 
 		// Pass 1: Merge
 		for (Slot to : targets) {
-			if (to.isItemValid(fromStack)) {
+			if (to.isItemValid(from.getStack())) {
 				if (to.getHasStack()) {
 					dirty |= tryInsertStackToSlot(player, from, to);
 
@@ -130,11 +130,13 @@ public abstract class ContainerBase extends Container {
 			}
 		}
 
+		ItemStack fromStack = from.getStack();
+
 		if (dirty) {
 			// Using putStack instead of onSlotChanged here,
 			// as putStack calls the latter + IItemHandler's
 			// onContentsChanged.
-			from.putStack(from.getStack());
+			from.putStack(fromStack);
 		}
 
 		return fromStack;

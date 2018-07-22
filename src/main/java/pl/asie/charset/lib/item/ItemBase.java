@@ -32,7 +32,7 @@ import pl.asie.charset.lib.utils.UtilProxyClient;
 
 import javax.annotation.Nullable;
 
-public class ItemBase extends Item {
+public class ItemBase extends Item implements ISubItemProvider.Container {
 	private final ISubItemProvider subItemProvider;
 
 	public ItemBase() {
@@ -40,6 +40,7 @@ public class ItemBase extends Item {
 		subItemProvider = createSubItemProvider();
 	}
 
+	@Override
 	public final ISubItemProvider getSubItemProvider() {
 		return subItemProvider;
 	}

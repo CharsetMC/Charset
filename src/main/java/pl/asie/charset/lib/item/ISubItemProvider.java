@@ -21,13 +21,21 @@ package pl.asie.charset.lib.item;
 
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 
 @FunctionalInterface
 public interface ISubItemProvider {
+     @FunctionalInterface
+     interface Container {
+          ISubItemProvider getSubItemProvider();
+     }
+
+     @Nonnull
      List<ItemStack> getItems();
 
+     @Nonnull
      default List<ItemStack> getAllItems() {
           return getItems();
      }

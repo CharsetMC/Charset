@@ -64,7 +64,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.List;
 
-public abstract class BlockBase extends Block {
+public abstract class BlockBase extends Block implements ISubItemProvider.Container {
 	private final boolean isTileProvider;
 	private final ISubItemProvider subItemProvider;
 	private boolean fullCube = true, opaqueCube = true, comparatorInputOverride = false;
@@ -98,6 +98,7 @@ public abstract class BlockBase extends Block {
 		subItemProvider = createSubItemProvider();
 	}
 
+	@Override
 	public final ISubItemProvider getSubItemProvider() {
 		return subItemProvider;
 	}

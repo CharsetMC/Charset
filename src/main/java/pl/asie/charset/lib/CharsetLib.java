@@ -30,6 +30,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -110,6 +111,8 @@ public class CharsetLib {
 	public static boolean alwaysDropDroppablesGivenToPlayer;
 	public static boolean enableDebugInfo;
 	public static boolean showAllItemTypes;
+	public static boolean showAllItemTypesJEI;
+	// TODO public static boolean showAllItemTypesSeparateTabs;
 	public static int doubleClickDuration;
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
@@ -154,7 +157,11 @@ public class CharsetLib {
 		doubleClickDuration = ConfigUtils.getInt(config, "general", "doubleClickDuration", 10, 0, 60*20, "The duration of ticks that can pass between two clicks to be registered as a double-click.", false);
 
 		boolean oldShowAllItemTypes = showAllItemTypes;
-		showAllItemTypes = ConfigUtils.getBoolean(config, "general","showAllItemTypes", ModCharset.INDEV, "Make mods such as JEI show all combinations of a given item (within reason), as opposed to a random selection.", false);
+		showAllItemTypes = ConfigUtils.getBoolean(config, "general","showAllItemTypes", ModCharset.INDEV, "Show all item types in Charset's main creative tab.", false);
+		if (Loader.isModLoaded("jei")) {
+			showAllItemTypesJEI = ConfigUtils.getBoolean(config, "general", "showAllItemTypesJEI", true, "Show all item types in JustEnoughItems's recipe list.", true);
+		}
+
 		if (!event.isFirstTime() && oldShowAllItemTypes != showAllItemTypes) {
 			SubItemProviderCache.clear();
 		}

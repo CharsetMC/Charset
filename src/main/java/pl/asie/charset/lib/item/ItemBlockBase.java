@@ -38,13 +38,28 @@ import pl.asie.charset.lib.utils.UtilProxyClient;
 
 import javax.annotation.Nullable;
 
-public class ItemBlockBase extends ItemBlock {
+public class ItemBlockBase extends ItemBlock implements ISubItemProvider.Container {
+	private ISubItemProvider provider;
+
 	public ItemBlockBase(Block block) {
 		super(block);
 	}
 
-	public final ISubItemProvider getSubItemProvider() {
-		return block instanceof BlockBase ? ((BlockBase) block).getSubItemProvider() : null;
+	protected ItemBlockBase setSubItemProvider(ISubItemProvider provider) {
+		this.provider = provider;
+		return this;
+	}
+
+	@Override
+	public ISubItemProvider getSubItemProvider() {
+		if (provider != null) {
+			return provider;
+		} else if (block instanceof BlockBase) {
+			return ((BlockBase) block).getSubItemProvider();
+		} else {
+			// TODO
+			return null;
+		}
 	}
 
 	@Override

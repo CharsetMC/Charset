@@ -43,7 +43,7 @@ import net.minecraftforge.fml.common.Optional;
 import pl.asie.charset.ModCharset;
 
 @Optional.Interface(iface = "mods.railcraft.api.core.items.IMinecartItem", modid = "Railcraft")
-public abstract class ItemMinecartCharset extends ItemMinecart implements IMinecartItem {
+public abstract class ItemMinecartCharset extends ItemMinecart implements IMinecartItem, ISubItemProvider.Container {
     private static final IBehaviorDispenseItem MINECART_DISPENSER_BEHAVIOR = new BehaviorDefaultDispenseItem() {
         private final BehaviorDefaultDispenseItem behaviourDefaultDispenseItem = new BehaviorDefaultDispenseItem();
 
@@ -77,6 +77,7 @@ public abstract class ItemMinecartCharset extends ItemMinecart implements IMinec
         subItemProvider = createSubItemProvider();
     }
 
+    @Override
     public final ISubItemProvider getSubItemProvider() {
         return subItemProvider;
     }

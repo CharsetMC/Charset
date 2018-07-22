@@ -31,6 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.Properties;
+import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.item.*;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 
@@ -38,13 +39,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class ItemBlockChestCharset extends ItemBlockBase {
-	private final ISubItemProvider provider = new SubItemProviderCache(new SubItemProviderRecipes(() -> CharsetStorageChests.itemChest) {
-		@Override
-		protected int compareSets(List<ItemStack> first, List<ItemStack> second) {
-			return SubItemSetHelper.wrapLists(first, second, SubItemSetHelper.extractMaterial("wood", SubItemSetHelper::sortByItem));
-		}
-	});
-
 	public ItemBlockChestCharset(Block block) {
 		super(block);
 		setTranslationKey("chest");
@@ -120,13 +114,6 @@ public class ItemBlockChestCharset extends ItemBlockBase {
 			return true;
 		} else {
 			return false;
-		}
-	}
-
-	@Override
-	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
-		if (this.isInCreativeTab(tab)) {
-			items.addAll(provider.getItems());
 		}
 	}
 }
