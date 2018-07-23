@@ -24,6 +24,8 @@ package pl.asie.charset.api.carry;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntityMobSpawnerRenderer;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -51,7 +53,7 @@ public class CustomCarryHandler {
         return false;
     }
 
-    public void onPlace(World world, BlockPos pos) {
+    public void onPlace(World world, BlockPos pos, EnumFacing side, EntityLivingBase placer) {
     }
 
     public void tick() {

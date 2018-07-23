@@ -100,8 +100,12 @@ public class CarryHandler implements ICacheable, ICarryHandler {
         this.tileInstance = null;
     }
 
-    protected void setCustomCarryHandler(boolean emptied) {
-        if (!emptied && block != null) {
+    protected void clearCustomCarryHandler() {
+        customCarryHandler = null;
+    }
+
+    protected void setCustomCarryHandler() {
+        if (block != null) {
             CustomCarryHandler.Provider provider = CapabilityHelper.getBlockCapability(access, ACCESS_POS, block, null, Capabilities.CUSTOM_CARRY_PROVIDER);
             if (provider != null) {
                 customCarryHandler = provider.create(this);
@@ -132,7 +136,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
         grabbedYaw = player != null ? player.rotationYaw : 0.0F;
         this.block = state;
         setTile(tile);
-        setCustomCarryHandler(false);
+        setCustomCarryHandler();
     }
 
     public boolean grab(World world, BlockPos pos) {
@@ -153,7 +157,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
                 setTile(null);
             }
 
-            setCustomCarryHandler(false);
+            setCustomCarryHandler();
             world.setBlockToAir(pos);
 
             if (!block.getBlock().canPlaceBlockAt(world, pos)) {
@@ -235,10 +239,6 @@ public class CarryHandler implements ICacheable, ICarryHandler {
                     setTile(null);
                 }
 
-                if (customCarryHandler != null) {
-                    customCarryHandler.onPlace(world, pos);
-                }
-
                 float yawDiff = player != null ? grabbedYaw - player.rotationYaw : 0.0F;
                 while (yawDiff < 0)
                     yawDiff += 360.0F;
@@ -246,6 +246,10 @@ public class CarryHandler implements ICacheable, ICarryHandler {
 
                 if (rotCycles > 0) {
                     RotationUtils.rotateAround(world, pos, EnumFacing.UP, rotCycles);
+                }
+
+                if (customCarryHandler != null) {
+                    customCarryHandler.onPlace(world, pos, facing, player);
                 }
 
                 block = null;
@@ -264,7 +268,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
                 }
 
                 CharsetTweakBlockCarrying.syncCarryWithAllClients(player);
-                setCustomCarryHandler(true);
+                clearCustomCarryHandler();
 
                 return true;
             } else {
@@ -282,7 +286,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
     public void empty() {
         block = null;
         setTile(null);
-        setCustomCarryHandler(true);
+        clearCustomCarryHandler();
     }
 
     @Override
@@ -350,7 +354,7 @@ public class CarryHandler implements ICacheable, ICarryHandler {
 
                     if (compound.hasKey("b:tile")) {
                         instance.tile = compound.getCompoundTag("b:tile");
-                        instance.setCustomCarryHandler(false);
+                        instance.setCustomCarryHandler();
                     }
                 }
             }

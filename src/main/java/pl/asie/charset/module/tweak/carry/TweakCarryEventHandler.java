@@ -19,6 +19,8 @@
 
 package pl.asie.charset.module.tweak.carry;
 
+import gnu.trove.map.TLongLongMap;
+import gnu.trove.map.hash.TLongLongHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -192,9 +194,14 @@ public class TweakCarryEventHandler {
         }
     }
 
+    private final TLongLongMap rightClickCooldowns = new TLongLongHashMap();
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         EntityPlayer player = event.getEntityPlayer();
+        if (event.getWorld().getTotalWorldTime() <= rightClickCooldowns.get(player.getEntityId())) {
+            event.setCanceled(true);
+        }
 
         CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (carryHandler != null && carryHandler.isCarrying()) {
@@ -209,7 +216,9 @@ public class TweakCarryEventHandler {
                 pos = pos.offset(facing);
             }
 
-            carryHandler.place(world, pos, facing, player);
+            if (carryHandler.place(world, pos, facing, player)) {
+                rightClickCooldowns.put(player.getEntityId(), world.getTotalWorldTime());
+            }
         }
     }
 

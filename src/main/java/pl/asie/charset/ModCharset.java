@@ -80,7 +80,7 @@ public class ModCharset {
 
 	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs("charset") {
 		@Override
-		public ItemStack getTabIconItem() {
+		public ItemStack createIcon() {
 			return charsetIconStack;
 		}
 	};

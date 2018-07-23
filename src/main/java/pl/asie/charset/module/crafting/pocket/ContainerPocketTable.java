@@ -19,21 +19,30 @@
 
 package pl.asie.charset.module.crafting.pocket;
 
+import com.google.common.collect.ImmutableList;
+import invtweaks.api.container.ContainerSection;
+import invtweaks.api.container.ContainerSectionCallback;
+import invtweaks.api.container.InventoryContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.material.FastRecipeLookup;
 import pl.asie.charset.lib.inventory.ContainerBase;
 import pl.asie.charset.lib.inventory.SlotBlocked;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
+@InventoryContainer // TODO: InvTweaks
 public class ContainerPocketTable extends ContainerBase {
     //InventoryPlayer Slots:
     //09 10 11 12 13 14 15 16 17
@@ -69,6 +78,14 @@ public class ContainerPocketTable extends ContainerBase {
 
     protected ItemStack getHeld() {
         return playerInv.getStackInSlot(heldPos);
+    }
+
+    public List<Slot> getCraftingSlots() {
+        return craftingSlots;
+    }
+
+    public List<Slot> getNonCraftingSlots() {
+        return nonCraftingInventorySlots;
     }
 
     public ContainerPocketTable(EntityPlayer player) {
@@ -417,5 +434,17 @@ public class ContainerPocketTable extends ContainerBase {
             }
         }
         playerInv.setInventorySlotContents(slot, toMove.isEmpty() ? ItemStack.EMPTY : toMove);
+    }
+
+    // Inventory Tweaks Compat
+    // TODO: https://github.com/Inventory-Tweaks/inventory-tweaks/issues/548
+    @ContainerSectionCallback
+    @Optional.Method(modid = "inventorytweaks")
+    protected Map<ContainerSection, List<Slot>> invTweaks_getContainerSections() {
+        Map<ContainerSection, List<Slot>> map = new EnumMap<>(ContainerSection.class);
+        map.put(ContainerSection.INVENTORY, SLOTS_PLAYER);
+        map.put(ContainerSection.CRAFTING_IN, craftingSlots);
+        map.put(ContainerSection.CRAFTING_OUT, ImmutableList.of(craftResultSlot));
+        return map;
     }
 }

@@ -24,7 +24,7 @@ apply plugin: 'net.minecrell.licenser'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.5.2.3"
+version = "0.5.3"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
@@ -40,12 +40,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.4.2736"
+	version = "1.12.2-14.23.4.2739"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20180715"
+	mappings = "snapshot_20180722"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -119,6 +119,7 @@ dependencies {
 		exclude module: "jei_1.12.2"
 	}
 	deobfCompile "com.mod-buildcraft:buildcraft-api:7.99.16"
+	deobfCompile name: "InventoryTweaks", version: "1.63-api"
 	deobfCompile name: "theoneprobe", version: "1.12-1.4.19-api"
 	deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.6.457"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12:api"

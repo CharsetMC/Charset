@@ -1,0 +1,10 @@
+Additions:
+
+* [crafting.pocket] JustEnoughItems recipe transfer compatibility.
+* [storage.chests] Inventory Tweaks compatibility.
+* [storage.chests] Allow linking chests via Charset Block Carrying.
+
+Bugs fixed:
+
+* [storage.chests] GUI moved too much to the left side
+* [tweak.carry] Placing on the side of a block activated the block being placed on.

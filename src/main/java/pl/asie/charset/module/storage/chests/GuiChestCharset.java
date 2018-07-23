@@ -52,7 +52,7 @@ public class GuiChestCharset extends GuiContainerCharset<ContainerChestCharset> 
 	}
 
 	public GuiChestCharset(ContainerChestCharset container) {
-		super(container, 222, 114 + container.inventoryRows * 18);
+		super(container, 176, 114 + container.inventoryRows * 18);
 	}
 
 	@Override

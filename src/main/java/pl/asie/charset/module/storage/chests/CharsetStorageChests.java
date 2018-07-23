@@ -52,6 +52,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -92,6 +94,8 @@ public class CharsetStorageChests {
 	public void preInit(FMLPreInitializationEvent event) {
 		blockChest = new BlockChestCharset();
 		itemChest = new ItemBlockChestCharset(blockChest);
+
+		CapabilityHelper.registerBlockProvider(Capabilities.CUSTOM_CARRY_PROVIDER, blockChest, (a, b, c, d) -> CustomCarryHandlerChest::new);
 	}
 
 	@SubscribeEvent

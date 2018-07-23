@@ -28,10 +28,11 @@ import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public abstract class ContainerBase extends Container {
-	protected final Collection<Slot> SLOTS_PLAYER = new ArrayList<>(36);
-	protected final Collection<Slot> SLOTS_INVENTORY = new ArrayList<>();
+	protected final List<Slot> SLOTS_PLAYER = new ArrayList<>(36);
+	protected final List<Slot> SLOTS_INVENTORY = new ArrayList<>();
 	protected final EntityPlayer owner;
 	private final IContainerHandler containerHandler;
 

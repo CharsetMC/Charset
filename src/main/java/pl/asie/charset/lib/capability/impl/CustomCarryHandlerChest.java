@@ -22,6 +22,7 @@ package pl.asie.charset.lib.capability.impl;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
@@ -38,8 +39,8 @@ public class CustomCarryHandlerChest extends CustomCarryHandler {
     }
 
     @Override
-    public void onPlace(World world, BlockPos pos) {
-        super.onPlace(world, pos);
+    public void onPlace(World world, BlockPos pos, EnumFacing side, EntityLivingBase placer) {
+        super.onPlace(world, pos, side, placer);
 
         for (EnumFacing facing1 : EnumFacing.HORIZONTALS) {
             if (world.getBlockState(pos.offset(facing1)).getBlock() instanceof BlockChest) {

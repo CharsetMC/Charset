@@ -19,10 +19,13 @@
 
 package pl.asie.charset.module.storage.chests;
 
+import invtweaks.api.container.ChestContainer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.SlotItemHandler;
 import pl.asie.charset.lib.inventory.ContainerBase;
 
+@ChestContainer // TODO: InvTweaks
 public class ContainerChestCharset extends ContainerBase {
 	protected final TileEntityChestCharset tile;
 	protected final int inventoryRows;

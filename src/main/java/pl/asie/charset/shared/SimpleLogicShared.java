@@ -33,7 +33,7 @@ public class SimpleLogicShared {
 		if (TAB == null) {
 			 TAB = new CreativeTabs("simplelogic") {
 				@Override
-				public ItemStack getTabIconItem() {
+				public ItemStack createIcon() {
 					return TAB_ICON;
 				}
 			};
