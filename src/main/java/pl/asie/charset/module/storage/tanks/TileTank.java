@@ -489,18 +489,18 @@ public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutoma
     }
 
     @Override
-    public int getComparatorValue() {
+    public int getComparatorValue(int max) {
         if (getWorld() == null)
             return 0;
 
         if (getBottomTank() != this)
-            return getBottomTank().getComparatorValue();
+            return getBottomTank().getComparatorValue(15);
 
         FluidStack contents = getContents();
         if (contents == null || contents.amount <= 0)
             return 0;
 
-        return Math.max(1, contents.amount * 15 / getCapacity());
+        return Math.max(1, contents.amount * max / getCapacity());
     }
 
     @Override

@@ -195,7 +195,7 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 			TileEntity tile = worldIn.getTileEntity(pos);
 
 			if (tile instanceof TileBase) {
-				return ((TileBase) tile).getComparatorValue();
+				return ((TileBase) tile).getComparatorValue(15);
 			}
 		}
 		return 0;

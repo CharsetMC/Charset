@@ -87,7 +87,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 
 	private int getVanillaLevelValue() {
 		if (CharsetCraftingCauldron.waterBottleSize == 0) {
-			return getComparatorValue();
+			return getComparatorValue(15);
 		} else {
 			int maxBottles = 1000 / CharsetCraftingCauldron.waterBottleSize;
 			int bottles = stack != null ? (stack.amount / CharsetCraftingCauldron.waterBottleSize) : 0;
@@ -156,10 +156,10 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 	}
 
 	@Override
-	public int getComparatorValue() {
+	public int getComparatorValue(int max) {
 		if (CharsetCraftingCauldron.waterBottleSize != 0) {
 			int v = stack == null ? 0 : ((stack.amount + (CharsetCraftingCauldron.waterBottleSize - 1)) / CharsetCraftingCauldron.waterBottleSize);
-			return MathHelper.clamp(v, 0, 15);
+			return MathHelper.clamp(v, 0, max);
 		}
 
 		if (stack == null) {
@@ -185,7 +185,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 	}
 
 	protected void setContents(FluidStack stack) {
-		int oldC = getComparatorValue();
+		int oldC = getComparatorValue(15);
 
 		if (stack != null && stack.amount <= 0) {
 			stack = null;
@@ -201,7 +201,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 		rebuildFromStack(false);
 		markBlockForUpdate();
 
-		if (oldC != getComparatorValue()) {
+		if (oldC != getComparatorValue(15)) {
 			world.updateComparatorOutputLevel(pos, CharsetCraftingCauldron.blockCauldron);
 		}
 	}
@@ -256,7 +256,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 
 		int toFill = Math.min(stack != null ? (getCapacity() - stack.amount) : getCapacity(), resource.amount);
 		if (doFill) {
-			int oldC = getComparatorValue();
+			int oldC = getComparatorValue(15);
 
 			if (stack == null) {
 				stack = new FluidStack(resource, toFill);
@@ -267,7 +267,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 			rebuildFromStack(false);
 			markBlockForUpdate();
 
-			if (oldC != getComparatorValue()) {
+			if (oldC != getComparatorValue(15)) {
 				world.updateComparatorOutputLevel(pos, CharsetCraftingCauldron.blockCauldron);
 			}
 		}
@@ -298,7 +298,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 		}
 
 		if (doDrain) {
-			int oldC = getComparatorValue();
+			int oldC = getComparatorValue(15);
 
 			if (drainedStack.amount == stack.amount) {
 				stack = null;
@@ -308,7 +308,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 			rebuildFromStack(false);
 			markBlockForUpdate();
 
-			if (oldC != getComparatorValue()) {
+			if (oldC != getComparatorValue(15)) {
 				world.updateComparatorOutputLevel(pos, CharsetCraftingCauldron.blockCauldron);
 			}
 		}

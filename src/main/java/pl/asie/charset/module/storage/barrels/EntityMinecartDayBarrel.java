@@ -303,7 +303,7 @@ public class EntityMinecartDayBarrel extends EntityMinecart {
 
     @Override
     public int getComparatorLevel() {
-        return barrel.getComparatorValue();
+        return barrel.getComparatorValue(15);
     }
 
     @Override

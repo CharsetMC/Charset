@@ -25,13 +25,18 @@ import mcmultipart.api.multipart.MultipartRedstoneHelper;
 import mcmultipart.api.slot.EnumEdgeSlot;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.items.IItemHandler;
 import pl.asie.charset.lib.modcompat.mcmultipart.MCMPUtils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +50,25 @@ public final class RedstoneUtils {
 	}
 
 	private static final List<IRedstoneGetter> GETTERS = new ArrayList<>();
+
+	public static int getComparatorValue(IItemHandler handler, int max) {
+		float value = 0;
+		int count = 0;
+
+		for (int i = 0; i < handler.getSlots(); i++) {
+			ItemStack stack = handler.getStackInSlot(i);
+			if (!stack.isEmpty()) {
+				value += stack.getCount() / Math.min(stack.getMaxStackSize(), handler.getSlotLimit(i));
+				count++;
+			}
+		}
+
+		if (count > 0) {
+			return 1 + MathHelper.floor(value * (max - 1) / (float) handler.getSlots());
+		} else {
+			return 0;
+		}
+	}
 
 	public static void addRedstoneGetter(IRedstoneGetter getter) {
 		GETTERS.add(getter);

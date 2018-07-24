@@ -57,7 +57,7 @@ public class ItemBlockChestCharset extends ItemBlockBase {
 
 	@Override
 	public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-		TileEntityChestCharset chest = new TileEntityChestCharset();
+		TileEntityChestCharset chest = (TileEntityChestCharset) newState.getBlock().createTileEntity(world, newState);
 		chest.setWorld(world);
 		chest.setPos(pos);
 		chest.loadFromStack(stack);

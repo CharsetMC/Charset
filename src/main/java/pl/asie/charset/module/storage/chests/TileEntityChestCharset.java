@@ -57,6 +57,7 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.inventory.IContainerHandler;
 import pl.asie.charset.lib.utils.MathUtils;
+import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,6 +72,7 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 		protected void onContentsChanged(int slot) {
 			super.onContentsChanged(slot);
 			TileEntityChestCharset.this.markDirty();
+			TileEntityChestCharset.this.updateComparators();
 		}
 	};
 	private TileEntityChestCharset neighbor;
@@ -135,6 +137,11 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 
 	public boolean hasNeighbor() {
 		return neighborFace != null && getNeighbor() != null;
+	}
+
+	@Override
+	public int getComparatorValue(int max) {
+		return RedstoneUtils.getComparatorValue(this, max);
 	}
 
 	@Override

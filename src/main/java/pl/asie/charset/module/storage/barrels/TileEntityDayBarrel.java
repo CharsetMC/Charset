@@ -1083,17 +1083,17 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
 
     //Misc junk
     @Override
-    public int getComparatorValue() {
+    public int getComparatorValue(int maxV) {
         int count = getItemCount();
         if (count <= 0) {
             return 0;
         }
         int max = getMaxItemCount();
         if (count >= max) {
-            return 15;
+            return maxV;
         }
         float v = count/(float)max;
-        return (int) Math.max(1, Math.floor(v*15));
+        return (int) Math.max(1, Math.floor(v*maxV));
     }
 
     public List<ItemStack> getContentDrops(boolean silkTouch) {

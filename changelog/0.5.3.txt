@@ -1,8 +1,9 @@
 Additions:
 
 * [crafting.pocket] JustEnoughItems recipe transfer compatibility.
-* [storage.chests] Inventory Tweaks compatibility.
 * [storage.chests] Allow linking chests via Charset Block Carrying.
+* [storage.chests] Chests now output comparator values.
+* [storage.chests] Inventory Tweaks compatibility.
 
 Bugs fixed:
 

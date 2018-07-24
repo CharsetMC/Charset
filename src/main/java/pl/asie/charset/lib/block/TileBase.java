@@ -71,7 +71,7 @@ public class TileBase extends TileEntity {
 	}
 
 	protected final boolean updateComparators() {
-		int cc = getComparatorValue();
+		int cc = getComparatorValue(15);
 		if (cc != lastComparatorValue) {
 			world.updateComparatorOutputLevel(getPos(), getBlockType());
 			lastComparatorValue = cc;
@@ -155,7 +155,7 @@ public class TileBase extends TileEntity {
 		loadFromStack(stack);
 	}
 
-	public int getComparatorValue() {
+	public int getComparatorValue(int max) {
 		return 0;
 	}
 

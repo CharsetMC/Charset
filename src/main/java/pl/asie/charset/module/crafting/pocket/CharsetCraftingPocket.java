@@ -35,6 +35,8 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
+import javax.annotation.Nonnull;
+
 @CharsetModule(
 		name = "crafting.pocket",
 		description = "Adds a Pocket Crafting Table",
@@ -49,6 +51,8 @@ public class CharsetCraftingPocket {
 
 	public static ItemPocketTable pocketTable;
 	public static String pocketActions = "xcbf";
+
+
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

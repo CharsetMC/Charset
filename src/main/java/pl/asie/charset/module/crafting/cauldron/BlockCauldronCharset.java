@@ -273,7 +273,7 @@ public class BlockCauldronCharset extends BlockCauldron implements ITileEntityPr
 	public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos) {
 		TileEntity tile = worldIn.getTileEntity(pos);
 		if (tile instanceof TileCauldronCharset) {
-			return ((TileCauldronCharset) tile).getComparatorValue();
+			return ((TileCauldronCharset) tile).getComparatorValue(15);
 		} else {
 			return blockState.getValue(LEVEL);
 		}
