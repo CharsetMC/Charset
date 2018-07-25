@@ -47,6 +47,7 @@ import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.wires.*;
 import pl.asie.simplelogic.wires.LogicWireUtils;
+import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 import javax.annotation.Nonnull;
 
@@ -289,7 +290,11 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		// Handle rendering updates.
 		if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
 			if (getWireType() == WireType.NORMAL) {
-				getContainer().requestRenderUpdate();
+				if (SimpleLogicWires.useTESRs) {
+					getContainer().requestNetworkUpdate();
+				} else {
+					getContainer().requestRenderUpdate();
+				}
 			}
 
 			if (getLocation() != WireFace.CENTER) {

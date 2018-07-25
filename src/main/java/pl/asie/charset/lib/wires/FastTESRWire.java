@@ -49,7 +49,7 @@ public class FastTESRWire extends FastTESR<TileWire> {
 			return;
 		}
 
-		IBakedModel m = CharsetLibWires.rendererWire.bakeWire(wire, true, null);
+		IBakedModel m = CharsetLibWires.rendererWire.bakeWire(wire, true, false, null);
 		if (m != null) {
 			buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 			renderer.renderModel(getWorld(), m, CharsetLibWires.blockWire.getDefaultState(), pos, buffer, false);

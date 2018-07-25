@@ -19,6 +19,7 @@
 
 package pl.asie.simplelogic.gates;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -45,6 +46,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.item.ISubItemProvider;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nullable;
@@ -61,8 +63,8 @@ public class BlockGate extends BlockBase implements ITileEntityProvider {
 	}
 
 	@Override
-	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> itemList) {
-
+	protected ISubItemProvider createSubItemProvider() {
+		return () -> ImmutableList.copyOf(SimpleLogicGates.gateStacks);
 	}
 
 	@Override

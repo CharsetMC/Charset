@@ -52,6 +52,7 @@ import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.*;
+import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 import javax.annotation.Nullable;
 
@@ -537,7 +538,9 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 		orientation = Orientation.getOrientation(tag.getByte("o"));
 
 		if (isClient) {
-			markBlockForRenderUpdate();
+			if (!SimpleLogicGates.useTESRs) {
+				markBlockForRenderUpdate();
+			}
 		}
 	}
 

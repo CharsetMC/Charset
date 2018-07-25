@@ -48,7 +48,6 @@ public class ItemGate extends ItemBlockBase {
 	public ItemGate(Block block) {
 		super(block);
 		setHasSubtypes(true);
-		setSubItemProvider(() -> ImmutableList.copyOf(SimpleLogicGates.gateStacks));
 	}
 
 	public static ItemStack getStack(PartGate gate) {
@@ -74,11 +73,6 @@ public class ItemGate extends ItemBlockBase {
 		} else {
 			return Optional.empty();
 		}
-	}
-
-	@Override
-	public String getCreatorModId(ItemStack itemStack) {
-		return "simplelogic";
 	}
 
 	@Override

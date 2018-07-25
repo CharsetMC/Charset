@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -37,6 +38,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.api.wires.WireType;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
@@ -44,9 +47,7 @@ import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.recipe.IngredientGroup;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
-import pl.asie.charset.lib.wires.CharsetLibWires;
-import pl.asie.charset.lib.wires.ItemWire;
-import pl.asie.charset.lib.wires.WireProvider;
+import pl.asie.charset.lib.wires.*;
 import pl.asie.charset.shared.SimpleLogicShared;
 import pl.asie.simplelogic.wires.logic.LogicWireProvider;
 import pl.asie.simplelogic.wires.logic.WireRenderHandlerOverlay;
@@ -68,6 +69,15 @@ public class SimpleLogicWires {
 
 	public static WireProvider[] wireProviders = new WireProvider[18];
 	public static ItemWire[] wireItems = new ItemWire[18];
+
+	@CharsetModule.Configuration
+	public static Configuration config;
+	public static boolean useTESRs;
+
+	@EventHandler
+	public void loadConfig(CharsetLoadConfigEvent event) {
+		useTESRs = ConfigUtils.getBoolean(config, "client", "forceWireTESRs", false, "Forces redstone cables to render using TESRs.", false);
+	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -108,6 +118,13 @@ public class SimpleLogicWires {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
 		CharsetLibWires.instance.registerRenderer(wireProviders[17], new WireRenderHandlerOverlay(wireProviders[17]));
+		CharsetLibWires.instance.registerRenderer(wireProviders[0], new IWireRenderContainer.Simple(new WireRenderHandlerDefault(wireProviders[0]) {
+			@Override
+			@SideOnly(Side.CLIENT)
+			public boolean isDynamic() {
+				return useTESRs;
+			}
+		}));
 	}
 
 	private void addWireOD(String name, Item i) {

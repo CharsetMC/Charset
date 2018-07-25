@@ -88,9 +88,13 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
         this.property = property;
     }
 
+    public void invalidate() {
+        cache.invalidateAll();
+    }
+
     public static void clearCaches() {
         for (ModelFactory factory : FACTORIES) {
-            factory.cache.invalidateAll();
+            factory.invalidate();
         }
     }
 

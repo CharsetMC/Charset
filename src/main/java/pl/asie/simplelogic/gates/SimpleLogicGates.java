@@ -47,6 +47,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 import pl.asie.charset.lib.modcompat.mcmultipart.RedstoneGetterMultipart;
 import pl.asie.charset.shared.SimpleLogicShared;
@@ -56,6 +57,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.simplelogic.gates.render.FastTESRGate;
+import pl.asie.simplelogic.gates.render.RendererGate;
 
 @CharsetModule(
 		name = "simplelogic.gates",
@@ -77,7 +79,7 @@ public class SimpleLogicGates {
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
-	public static boolean onlyBottomFace;
+	public static boolean onlyBottomFace, useTESRs;
 	public static BlockGate blockGate;
 	public static ItemGate itemGate;
 	public static Set<String> inversionSensitiveLogics = new HashSet<>();
@@ -94,7 +96,14 @@ public class SimpleLogicGates {
 
 	@EventHandler
 	public void onLoadConfig(CharsetLoadConfigEvent event) {
-		onlyBottomFace = config.getBoolean("gatesOnlyBottomFace", "general", false, "Set to true if you wish that gates only be placed on the bottom face of a block - this is great for vanilla-plus style modpacks!");
+		onlyBottomFace = ConfigUtils.getBoolean(config, "general", "gatesOnlyBottomFace", false, "Set to true if you wish that gates only be placed on the bottom face of a block - this is great for vanilla-plus style modpacks!", false);
+		useTESRs = ConfigUtils.getBoolean(config, "client", "forceGateTESRs", false, "Forces gates to render using TESRs.", false);
+	}
+
+	@EventHandler
+	@SideOnly(Side.CLIENT)
+	public void onLoadConfigClient(CharsetLoadConfigEvent event) {
+		RendererGate.INSTANCE.invalidate();
 	}
 
 	@SubscribeEvent

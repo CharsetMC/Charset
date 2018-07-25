@@ -2,11 +2,13 @@ Additions:
 
 * [lib] InfraRedstone compatibility: all comparator-supporting blocks will return more detailed information via InfraRedstone's Encoder.
 * [crafting.pocket] JustEnoughItems recipe transfer compatibility.
+* [simplelogic.*] Options to force TESR rendering on heavily updating parts. Note - no caching is being done on them yet!
 * [storage.chests] Allow linking chests via Charset Block Carrying.
 * [storage.chests] Chests now output comparator values.
 * [storage.chests] Inventory Tweaks compatibility.
 
 Bugs fixed:
 
+* [simplelogic.gates] Gates not showing up in creative tab
 * [storage.chests] GUI moved too much to the left side
 * [tweak.carry] Placing on the side of a block activated the block being placed on.

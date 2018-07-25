@@ -19,14 +19,39 @@
 
 package pl.asie.simplelogic.gates.render;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.model.ModelStateComposition;
 import net.minecraftforge.client.model.animation.FastTESR;
+import pl.asie.charset.lib.render.model.SimpleBakedModel;
+import pl.asie.charset.lib.wires.CharsetLibWires;
+import pl.asie.charset.lib.wires.Wire;
 import pl.asie.simplelogic.gates.PartGate;
+import pl.asie.simplelogic.gates.SimpleLogicGates;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 
 public class FastTESRGate extends FastTESR<PartGate> {
+	protected static BlockModelRenderer renderer;
+
 	@Override
 	public void renderTileEntityFast(PartGate te, double x, double y, double z, float partialTicks, int destroyStage, float partial, BufferBuilder buffer) {
-		GateLogic logic = te.logic;
+		if (SimpleLogicGates.useTESRs) {
+			if (renderer == null) {
+				renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
+			}
+
+			BlockPos pos = te.getPos();
+
+			SimpleBakedModel result = new SimpleBakedModel(RendererGate.INSTANCE);
+			ModelStateComposition transform = RendererGate.INSTANCE.getTransform(te);
+			RendererGate.INSTANCE.addLayers(result, transform, te);
+
+			buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+			renderer.renderModel(getWorld(), result, SimpleLogicGates.blockGate.getDefaultState(), pos, buffer, false);
+			buffer.setTranslation(0, 0, 0);
+		}
 	}
 }

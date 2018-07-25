@@ -102,9 +102,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 		}
 	}
 
-	@Override
-	public IBakedModel bake(PartGate gate, boolean isItem, BlockRenderLayer blockRenderLayer) {
-		SimpleBakedModel result = new SimpleBakedModel(this);
+	public ModelStateComposition getTransform(PartGate gate) {
 		ModelStateComposition transform = COMPOSITIONS[gate.getSide().ordinal() * 6 + gate.getTop().ordinal()];
 
 		if (gate.mirrored) {
@@ -116,21 +114,33 @@ public class RendererGate extends ModelFactory<PartGate> {
 			);
 		}
 
+		return transform;
+	}
+
+	public boolean addBase(SimpleBakedModel result, ModelStateComposition transform, PartGate gate) {
 		GateLogic logic = gate.logic;
 
 		GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(SimpleLogicGates.getId(logic));
 		if (definition == null) {
 			result.addModel(ModelLoaderRegistry.getMissingModel().bake(transform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()));
-			return result;
-		}
+			return false;
+		} else {
 
+			IModel model = definition.getModel(gate.getModelName());
+			if (model != null) {
+				result.addModel(model.bake(transform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()));
+			}
+			return true;
+		}
+	}
+
+	public void addLayers(SimpleBakedModel result, ModelStateComposition transform, PartGate gate) {
+		GateLogic logic = gate.logic;
+		GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(SimpleLogicGates.getId(logic));
 		GateRenderDefinitions.BaseDefinition base = GateRenderDefinitions.INSTANCE.base;
 
-		IModel model = definition.getModel(gate.getModelName());
-		if (model != null) {
-			result.addModel(model.bake(transform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()));
-		}
 		IModel layerModel = definition.getModel("layer");
+		IModel model;
 
 		int i = 0;
 
@@ -228,7 +238,20 @@ public class RendererGate extends ModelFactory<PartGate> {
 				);
 			}
 		}
+	}
 
+	@Override
+	public IBakedModel bake(PartGate gate, boolean isItem, BlockRenderLayer blockRenderLayer) {
+		SimpleBakedModel result = new SimpleBakedModel(this);
+		ModelStateComposition transform = getTransform(gate);
+
+		if (!addBase(result, transform, gate)) {
+			return result;
+		}
+
+		if (!SimpleLogicGates.useTESRs || isItem) {
+			addLayers(result, transform, gate);
+		}
 		return result;
 	}
 
