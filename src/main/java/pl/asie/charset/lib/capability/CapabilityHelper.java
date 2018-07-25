@@ -52,7 +52,7 @@ public final class CapabilityHelper {
 
     public static <T> void registerBlockProvider(Capability<T> capability, Block block, IBlockCapabilityProvider<T> provider) {
         if (blockProviders.contains(block, capability)) {
-            throw new RuntimeException("Capability provider already exists for pair (" + capability.getName() + ", " + block.toString() + ")!");
+            throw new RuntimeException("CapabilityImpl provider already exists for pair (" + capability.getName() + ", " + block.toString() + ")!");
         } else {
             blockProviders.put(block, capability, provider);
         }

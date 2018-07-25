@@ -27,7 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
- * Capability for usage by tile entities which can be rotated
+ * CapabilityImpl for usage by tile entities which can be rotated
  * **specifically** around a given axis. If you're implementing the
  * interface, please ensure that - to the best of my knowledge, Forge
  * does not make such promises in rotateBlock()!

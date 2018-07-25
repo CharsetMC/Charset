@@ -1,5 +1,6 @@
 Additions:
 
+* [lib] InfraRedstone compatibility: all comparator-supporting blocks will return more detailed information via InfraRedstone's Encoder.
 * [crafting.pocket] JustEnoughItems recipe transfer compatibility.
 * [storage.chests] Allow linking chests via Charset Block Carrying.
 * [storage.chests] Chests now output comparator values.
