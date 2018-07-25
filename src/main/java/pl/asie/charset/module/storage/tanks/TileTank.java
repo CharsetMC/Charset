@@ -494,7 +494,7 @@ public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutoma
             return 0;
 
         if (getBottomTank() != this)
-            return getBottomTank().getComparatorValue(15);
+            return getBottomTank().getComparatorValue(max);
 
         FluidStack contents = getContents();
         if (contents == null || contents.amount <= 0)
