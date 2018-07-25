@@ -69,7 +69,9 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
         setHardness(0.0f);
         setOpaqueCube(false);
         setFullCube(false);
-        setDefaultState(getDefaultState().withProperty(REDSTONE, false));
+
+        // BlockTrapdoor etc. rely on this!
+        setDefaultState(getDefaultState().withProperty(REDSTONE, true));
     }
 
     @Override

@@ -307,6 +307,16 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 	}
 
 	@Override
+	public boolean canConnectRedstone(EnumFacing facing) {
+		return false;
+	}
+
+	@Override
+	public boolean connectsWeak(EnumFacing facing) {
+		return false;
+	}
+
+	@Override
 	public int getSignalLevel() {
 		return 0;
 	}

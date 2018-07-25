@@ -245,7 +245,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 
 	@Override
 	public boolean canConnectRedstone(EnumFacing facing) {
-		return WIRES_CONNECT_REDSTONE && getSignalFactory().type != WireType.BUNDLED && connectsExternal(facing);
+		return WIRES_CONNECT_REDSTONE && connectsExternal(facing);
 	}
 
 	@Override
@@ -258,10 +258,6 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 	}
 
 	public boolean connectsWeak(EnumFacing facing) {
-		if (getSignalFactory().type == WireType.BUNDLED) {
-			return false;
-		}
-
 		// Block any signals if there's a wire on the target face
 		if (getLocation().facing == facing) {
 			return true;
@@ -281,11 +277,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 
 	@Override
 	public int getStrongPower(EnumFacing facing) {
-		if (!PROPAGATING && getSignalFactory().type == WireType.NORMAL && getLocation().facing == facing) {
-			return getRedstoneLevel();
-		} else {
-			return 0;
-		}
+		return 0;
 	}
 
 	@Override

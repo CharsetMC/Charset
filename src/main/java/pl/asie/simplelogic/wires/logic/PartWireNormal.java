@@ -248,12 +248,6 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 						if (neighborLevel[nLoc.ordinal()] > 0) {
 							propagateNotifyCorner(getLocation().facing, facing, getColor());
 						}
-					} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != getLocation().facing) {
-						TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
-						// Redstone receivers are handled elsewhere!
-						if (nt == null || !(nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()))) {
-							neighborChanged(getContainer().pos().offset(facing));
-						}
 					}
 				}
 			}
@@ -277,10 +271,28 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 						if (nChanged) {
 							propagateNotifyCorner(getLocation().facing, facing, getColor());
 						}
-					} else if (getWireType() == WireType.NORMAL && facing.getOpposite() != getLocation().facing) {
-						TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
-						if (nt == null || !(nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()))) {
-							neighborChanged(getContainer().pos().offset(facing));
+					}
+				}
+			}
+		}
+
+		// TODO: This can probably be optimized a little bit more.
+		if (getWireType() == WireType.NORMAL) {
+			for (EnumFacing facing : EnumFacing.VALUES) {
+				if (facing != getLocation().facing && (connectsExternal(facing) || connectsCorner(facing))) {
+					continue;
+				}
+
+				TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
+				if (nt == null || !(nt.hasCapability(Capabilities.REDSTONE_RECEIVER, facing.getOpposite()))) {
+					neighborChanged(getContainer().pos().offset(facing));
+				}
+
+				if (facing == getLocation().facing) {
+					EnumFacing facingO = facing.getOpposite();
+					for (EnumFacing facing2 : EnumFacing.VALUES) {
+						if (facing2 != facingO) {
+							neighborChanged(getContainer().pos().offset(facing).offset(facing2));
 						}
 					}
 				}
@@ -358,6 +370,17 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	@Deprecated
 	public int getRedstoneSignal() {
 		return !PROPAGATING ? getRedstoneLevel() : 0;
+	}
+
+	@Override
+	public int getStrongPower(EnumFacing facing) {
+		if (!PROPAGATING) {
+			if (getSignalFactory().type == WireType.NORMAL && facing != null && getLocation().facing == facing.getOpposite()) {
+				return getRedstoneLevel();
+			}
+		}
+
+		return 0;
 	}
 
 	@Override

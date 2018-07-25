@@ -1,0 +1,4 @@
+Bugs fixed:
+
+* [simplelogic.wires] Issues with strong power propagation.
+    * The fix is a bit quick. It can probably be optimized further. If you run into any lag issues, let me know!
