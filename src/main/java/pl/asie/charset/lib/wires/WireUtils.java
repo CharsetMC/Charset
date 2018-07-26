@@ -71,7 +71,7 @@ public final class WireUtils {
         if (wire.getLocation() != WireFace.CENTER) {
             Optional<IMultipartContainer> container = MultipartHelper.getContainer(wire.getContainer().world(), pos);
             if (container.isPresent()) {
-            	boolean result = MCMPUtils.streamParts(container.get(), wire.getLocation().facing, face).anyMatch((info) -> info.getTile().hasPartCapability(capability, face));
+            	boolean result = MCMPUtils.streamParts(container.get(), wire.getLocation().facing, face).anyMatch((info) -> info != null && info.getTile() != null && info.getTile().hasPartCapability(capability, face));
                 TileWire.isWireCheckingForCaps = false;
                 return result;
             }
@@ -99,7 +99,7 @@ public final class WireUtils {
         if (searcher.getLocation() != WireFace.CENTER) {
             Optional<IMultipartContainer> container = MultipartHelper.getContainer(searcher.getContainer().world(), pos);
             if (container.isPresent()) {
-                T result = MCMPUtils.streamParts(container.get(), searcher.getLocation().facing, face).filter((info) -> info.getTile().hasPartCapability(capability, face))
+                T result = MCMPUtils.streamParts(container.get(), searcher.getLocation().facing, face).filter((info) -> info != null && info.getTile() != null && info.getTile().hasPartCapability(capability, face))
 		                .map((info) -> info.getTile().getPartCapability(capability, face)).findFirst().orElse(null);
                 TileWire.isWireCheckingForCaps = false;
                 return result;
