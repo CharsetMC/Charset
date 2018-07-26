@@ -222,11 +222,28 @@ public class RendererGate extends ModelFactory<PartGate> {
 				}
 			}
 
-			result.addModel(
-					definition.getModel(state == GateLogic.State.ON ? (torch.model_on == null ? "torch_on" : torch.model_on) : (torch.model_off == null ? "torch_off" : torch.model_off))
-							.bake(new ModelStateComposition(
-									transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f, 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter())
-			);
+			String name = state == GateLogic.State.ON ? (torch.model_on == null ? "torch_on" : torch.model_on) : (torch.model_off == null ? "torch_off" : torch.model_off);
+			if (name.length() > 0) {
+				IBakedModel torchModel = definition.getModel(name)
+						.bake(new ModelStateComposition(
+								transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f, 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
+				String torchColorStr = state == GateLogic.State.ON ? torch.color_on : torch.color_off;
+				if (torchColorStr != null) {
+					int torchColor = Integer.parseInt(torchColorStr, 16);
+					if ((torchColor & 0xFF000000) == 0) {
+						torchColor |= 0xFF000000;
+					}
+
+					torchModel = ModelTransformer.transform(
+							torchModel,
+							SimpleLogicGates.blockGate.getDefaultState(),
+							0L,
+							ModelTransformer.IVertexTransformer.tint(torchColor)
+					);
+				}
+
+				result.addModel(torchModel);
+			}
 		}
 
 		for (EnumFacing facing : EnumFacing.HORIZONTALS) {

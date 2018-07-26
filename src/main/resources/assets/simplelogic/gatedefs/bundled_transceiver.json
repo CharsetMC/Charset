@@ -21,7 +21,6 @@
     "torches": [
         {
             "pos": [7.5, 7.5],
-            "model_on": "cable",
             "model_off": "cable"
         },
         {

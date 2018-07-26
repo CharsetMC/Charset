@@ -145,6 +145,7 @@ public class GateRenderDefinitions {
 
 	public class Torch {
 		public final float[] pos = new float[2];
+		public String color_on, color_off;
 		public String model_on, model_off;
 		public String inverter;
 	}

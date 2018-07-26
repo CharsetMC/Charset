@@ -1,0 +1,20 @@
+{
+    "models": {
+        "cable": "simplelogic:block/gate_inverter_cable"
+    },
+    "textures": {
+        "top": "simplelogic:blocks/empty"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "color_mask": "00FF00"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [7.5, 7.5],
+            "model_off": "cable"
+        }
+    ]
+}

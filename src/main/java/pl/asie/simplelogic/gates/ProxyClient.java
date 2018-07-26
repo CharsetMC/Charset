@@ -117,7 +117,7 @@ public class ProxyClient extends ProxyCommon {
 				TIntObjectMap<String> resultingTextures = colorMasks.get(baseTexture);
 				resultingTextures.forEachEntry((color, resultingTexture) -> {
 					event.getMap().setTextureEntry(new PixelOperationSprite(resultingTexture, new ResourceLocation(baseTexture),
-							PixelOperationSprite.forEach((x, y, value) -> (value & 0xFFFFFF) == color ? -1 : 0)).forceReadFromFile(true));
+							PixelOperationSprite.forEach((x, y, value) -> ((value & 0xFFFFFF) == color && (value & 0xFF000000) != 0) ? -1 : 0)).forceReadFromFile(true));
 					textures.remove(new ResourceLocation(resultingTexture));
 					return true;
 				});
@@ -130,7 +130,7 @@ public class ProxyClient extends ProxyCommon {
 								for (int ix = 0; ix < width; ix++) {
 									int ip = iy * width + ix;
 									int value = pixels[ip];
-									if (resultingTextures.containsKey(value & 0xFFFFFF)) {
+									if (resultingTextures.containsKey(value & 0xFFFFFF) && (value & 0xFF000000) != 0) {
 										pixels[ip] = 0;
 									} else {
 										int iUx = ix * topUnderlay.getIconWidth() / width;
