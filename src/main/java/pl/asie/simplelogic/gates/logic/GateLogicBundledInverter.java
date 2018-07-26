@@ -46,7 +46,7 @@ public class GateLogicBundledInverter extends GateLogic {
 	@Override
 	public byte[] getOutputValueBundled(EnumFacing side) {
 		return output;
-	}c
+	}
 
 	@Override
 	public State getLayerState(int id) {

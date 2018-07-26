@@ -41,6 +41,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -58,7 +60,7 @@ import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 import javax.annotation.Nullable;
 
-public class PartGate extends TileBase implements IRenderComparable<PartGate>, ITickable {
+public class PartGate extends TileBase implements IDebuggable, IRenderComparable<PartGate>, ITickable {
 	private class RedstoneCommunications implements IBundledEmitter, IBundledReceiver, IRedstoneEmitter, IRedstoneReceiver {
 		private final EnumFacing side;
 
@@ -213,13 +215,15 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing direction) {
-		return hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
+		return capability == Capabilities.DEBUGGABLE || hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, EnumFacing enumFacing) {
-		if (hasRedstoneCapability(capability, enumFacing)) {
+		if (capability == Capabilities.DEBUGGABLE) {
+			return Capabilities.DEBUGGABLE.cast(this);
+		} else if (hasRedstoneCapability(capability, enumFacing)) {
 			EnumFacing dir = realToGate(enumFacing);
 			if (dir.ordinal() >= 2) {
 				return (T) COMMS[dir.ordinal() - 2];
@@ -687,6 +691,13 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	public int renderHashCode() {
 		return logic.renderHashCode(Objects.hash(logic.getClass(), this.orientation, this.mirrored,
 				getUniqueSideRenderID(EnumFacing.NORTH), getUniqueSideRenderID(EnumFacing.SOUTH), getUniqueSideRenderID(EnumFacing.WEST), getUniqueSideRenderID(EnumFacing.EAST)));
+	}
+
+	@Override
+	public void addDebugInformation(List<String> stringList, Side side) {
+		if (side == Side.SERVER) {
+			stringList.add("O: " + getOrientation().name());
+		}
 	}
 
 	@Override
