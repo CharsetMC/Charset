@@ -145,8 +145,8 @@ public class BlockScaffold extends BlockBase implements ITileEntityProvider {
 		if (!canStay(worldIn, pos)) {
 			ItemStack droppedStack = new ItemStack(this);
 			TileEntity tile = worldIn.getTileEntity(pos);
-			if (tile instanceof TileBase) {
-				droppedStack = ((TileBase) tile).getDroppedBlock(state);
+			if (tile instanceof TileScaffold) {
+				droppedStack = ((TileScaffold) tile).getDroppedBlock(state);
 			}
 			ItemUtils.spawnItemEntity(worldIn, new Vec3d(pos).add(0.5, 0.5, 0.5), droppedStack, 0.1f, 0.1f, 0.1f, 1.0f);
 			worldIn.setBlockToAir(pos);

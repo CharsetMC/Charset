@@ -68,7 +68,7 @@ public class ItemGate extends ItemBlockBase {
 	public static Optional<PartGate> getPartGate(ItemStack stack) {
 		if (stack.hasTagCompound() && stack.getTagCompound().hasKey("logic", Constants.NBT.TAG_STRING)) {
 			Optional<PartGate> gate = getPartGate(new ResourceLocation(stack.getTagCompound().getString("logic")));
-			gate.ifPresent((a) -> a.readItemNBT(stack.getTagCompound()));
+			gate.ifPresent((a) -> a.loadFromStack(stack));
 			return gate;
 		} else {
 			return Optional.empty();

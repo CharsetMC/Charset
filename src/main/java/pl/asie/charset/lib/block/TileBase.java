@@ -113,7 +113,7 @@ public class TileBase extends TileEntity {
 		return getDroppedBlock(state);
 	}
 
-	public ItemStack getDroppedBlock(IBlockState state) {
+	protected ItemStack getDroppedBlock(IBlockState state) {
 		ItemStack stack = new ItemStack(state.getBlock());;
 		saveToStack(stack);
 		return stack;

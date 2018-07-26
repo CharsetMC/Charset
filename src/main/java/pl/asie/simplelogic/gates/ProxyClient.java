@@ -121,18 +121,6 @@ public class ProxyClient extends ProxyCommon {
 					textures.remove(new ResourceLocation(resultingTexture));
 					return true;
 				});
-				/*
-							(PixelOperationSprite.forEach((x, y, value) -> {
-							if (resultingTextures.containsKey(value & 0xFFFFFF)) {
-								return 0;
-							} else {
-								if ((value & 0xFF000000) == 0) {
-
-								}
-								return value;
-							}
-						}))));
-				 */
 
 				event.getMap().setTextureEntry(new PixelOperationSprite(baseTexture, new ResourceLocation(baseTexture),
 						(pixels, width, getter) -> {

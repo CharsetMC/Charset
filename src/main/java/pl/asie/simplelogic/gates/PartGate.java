@@ -45,6 +45,8 @@ import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
+import pl.asie.charset.lib.block.TraitMaterial;
+import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.simplelogic.gates.logic.GateLogicDummy;
@@ -231,22 +233,33 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 	@Override
 	public ItemStack getPickedBlock(@Nullable EntityPlayer player, @Nullable RayTraceResult result, IBlockState state) {
-		return ItemGate.getStack(this, true);
+		ItemStack stack = ItemGate.getStack(this, true);
+		saveToStack(stack);
+		return stack;
 	}
 
 	@Override
 	public void getDrops(NonNullList<ItemStack> stacks, IBlockState state, int fortune, boolean silkTouch) {
-		stacks.add(ItemGate.getStack(this, silkTouch));
+		ItemStack stack = ItemGate.getStack(this, silkTouch);
+		saveToStack(stack);
+		stacks.add(stack);
 	}
 
 	@Override
 	public void update() {
-		if (getWorld() != null && !getWorld().isRemote && pendingTick > 0) {
-			pendingTick--;
-			if (pendingTick == 0) {
-				if (tick() || pendingChange) {
-					propagateOutputs();
-					pendingChange = false;
+		//noinspection ConstantConditions
+		if (getWorld() != null) {
+			if (logic instanceof ITickable) {
+				((ITickable) logic).update();
+			}
+
+			if (!getWorld().isRemote && pendingTick > 0) {
+				pendingTick--;
+				if (pendingTick == 0) {
+					if (tick() || pendingChange) {
+						propagateOutputs();
+						pendingChange = false;
+					}
 				}
 			}
 		}
@@ -503,9 +516,10 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	@Override
 	public void onPlacedBy(EntityLivingBase placer, @Nullable EnumFacing face, ItemStack stack, float hitX, float hitY, float hitZ) {
 		super.onPlacedBy(placer, face, stack, hitX, hitY, hitZ);
-		readItemNBT(stack.getTagCompound());
-		orientation = Orientation.fromDirection(SimpleLogicGates.onlyBottomFace ? EnumFacing.UP : face);
-		orientation = orientation.pointTopTo(gateToReal(getClosestFace(new Vec3d(hitX, hitY, hitZ), false)));
+		if (face != null) {
+			orientation = Orientation.fromDirection(SimpleLogicGates.onlyBottomFace ? EnumFacing.UP : face);
+			orientation = orientation.pointTopTo(gateToReal(getClosestFace(new Vec3d(hitX, hitY, hitZ), false)));
+		}
 	}
 
 	@Override
@@ -521,6 +535,14 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 			tag.setBoolean("pch", pendingChange);
 		}
 		return tag;
+	}
+
+	@Override
+	public void loadFromStack(ItemStack stack) {
+		super.loadFromStack(stack);
+		if (stack.hasTagCompound()) {
+			readItemNBT(stack.getTagCompound());
+		}
 	}
 
 	public void readItemNBT(NBTTagCompound tag) {

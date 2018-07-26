@@ -60,19 +60,6 @@ public class GateLogicBundledTransceiver extends GateLogic {
 		return inputChange || bundledInputChange;
 	}
 
-
-	@Override
-	public byte[] getInputValueBundled(EnumFacing side) {
-		switch (side) {
-			case NORTH:
-				return inputNorth;
-			case SOUTH:
-				return inputSouth;
-			default:
-				throw new RuntimeException("No bundled input here!");
-		}
-	}
-
 	@Override
 	public byte[] getOutputValueBundled(EnumFacing side) {
 		if (inputState == 3) {

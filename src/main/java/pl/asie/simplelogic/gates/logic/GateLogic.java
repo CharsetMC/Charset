@@ -187,7 +187,7 @@ public abstract class GateLogic {
 	}
 
 	public boolean canBlockSide(EnumFacing side) {
-		return getType(side).isInput();
+		return getType(side).isInput() && !getType(side).isBundled();
 	}
 
 	public boolean canInvertSide(EnumFacing side) {
@@ -240,10 +240,6 @@ public abstract class GateLogic {
 		} else {
 			return outputValues[side.ordinal() - 2];
 		}
-	}
-
-	public byte[] getInputValueBundled(EnumFacing side) {
-		throw new RuntimeException("You should implement this yourself!");
 	}
 
 	public byte[] getOutputValueBundled(EnumFacing side) {
