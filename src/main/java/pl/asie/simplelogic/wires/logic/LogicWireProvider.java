@@ -40,7 +40,7 @@ public class LogicWireProvider extends WireProvider {
 
     @Override
     public boolean canProvidePower() {
-        return true;
+        return type != WireType.BUNDLED;
     }
 
     @Override

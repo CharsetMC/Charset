@@ -260,7 +260,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
 
     @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-        IBlockState state = getDefaultState();
+        IBlockState state = getDefaultState().withProperty(REDSTONE, false);
         ItemStack stack = placer.getHeldItem(hand);
         if (stack.getItem() instanceof ItemWire) {
             WireProvider provider = ((ItemWire) stack.getItem()).getWireProvider();

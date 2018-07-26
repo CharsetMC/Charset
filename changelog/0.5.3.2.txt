@@ -1,0 +1,4 @@
+Bugs fixed:
+
+* [lib] [GitHub/#262] Rare crash in WireUtils
+* [simplelogic.wires] Bundled cables unnecessarily claiming to be redstone providers
