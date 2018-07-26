@@ -30,16 +30,16 @@ public class GateLogicBundledTransceiver extends GateLogic {
 	private int inputState = 0;
 
 	@Override
-	public boolean tick(PartGate parent) {
-		boolean inputChange = parent.updateInputs(inputValues);
+	public boolean tick(PartGate gate) {
+		boolean inputChange = gate.updateInputs(inputValues);
 		boolean bundledInputChange = false;
 
 		if (inputChange) {
 			inputState = ((getInputValueInside(EnumFacing.WEST) > 0) ? 2 : 0) | ((getInputValueInside(EnumFacing.EAST) > 0) ? 1 : 0);
 		}
 
-		byte[] newInputNorth = parent.getBundledInput(EnumFacing.NORTH);
-		byte[] newInputSouth = parent.getBundledInput(EnumFacing.SOUTH);
+		byte[] newInputNorth = gate.getBundledInput(EnumFacing.NORTH);
+		byte[] newInputSouth = gate.getBundledInput(EnumFacing.SOUTH);
 
 		if (!Arrays.equals(inputNorth, newInputNorth)) {
 			inputNorth = newInputNorth;

@@ -51,8 +51,8 @@ public class GateLogicSynchronizer extends GateLogic {
 		super.readFromNBT(tag, isClient);
 	}
 
-	public void onChanged(PartGate parent) {
-		boolean changed = parent.updateInputs(inputValues);
+	public void onChanged(PartGate gate) {
+		boolean changed = gate.updateInputs(inputValues);
 		if (changed) {
 			if (getInputValueInside(EnumFacing.SOUTH) > 0) {
 				pulseLeft = pulseRight = 0;
@@ -67,19 +67,19 @@ public class GateLogicSynchronizer extends GateLogic {
 				}
 			}
 			if (pulseRight > 0 && pulseLeft > 0) {
-				parent.scheduleTick();
+				gate.scheduleTick();
 				updateOutputs();
 			}
-			parent.propagateOutputs();
+			gate.propagateOutputs();
 		}
 	}
 
 	@Override
-	public boolean tick(PartGate parent) {
+	public boolean tick(PartGate gate) {
 		if (pulseLeft > 0 && pulseRight > 0) {
 			pulseLeft = pulseRight = 0;
 		}
-		return super.tick(parent);
+		return super.tick(gate);
 	}
 
 	@Override

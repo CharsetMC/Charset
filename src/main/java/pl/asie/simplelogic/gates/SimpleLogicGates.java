@@ -65,13 +65,9 @@ import pl.asie.simplelogic.gates.render.RendererGate;
 		description = "Simple logic gates."
 )
 public class SimpleLogicGates {
-	public static final String MODID = "CharsetGates";
-	public static final String NAME = "CharsetGates";
-	public static final String VERSION = "@VERSION@";
-
 	@CharsetModule.SidedProxy(clientSide = "pl.asie.simplelogic.gates.ProxyClient", serverSide = "pl.asie.simplelogic.gates.ProxyCommon")
 	public static ProxyCommon proxy;
-	@CharsetModule.Instance(SimpleLogicGates.MODID)
+	@CharsetModule.Instance
 	public static SimpleLogicGates INSTANCE;
 
 	@CharsetModule.Configuration

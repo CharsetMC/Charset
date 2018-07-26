@@ -246,12 +246,12 @@ public abstract class GateLogic {
 		throw new RuntimeException("You should implement this yourself!");
 	}
 
-	public void onChanged(PartGate parent) {
-		parent.scheduleTick();
+	public void onChanged(PartGate gate) {
+		gate.scheduleTick();
 	}
 
-	public boolean tick(PartGate parent) {
-		boolean inputChange = parent.updateInputs(inputValues);
+	public boolean tick(PartGate gate) {
+		boolean inputChange = gate.updateInputs(inputValues);
 		boolean outputChange = updateOutputs();
 		return inputChange || outputChange;
 	}
