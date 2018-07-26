@@ -23,15 +23,19 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.api.wires.IBundledEmitter;
 
 public class DefaultBundledEmitterStorage implements Capability.IStorage<IBundledEmitter> {
 	@Override
 	public NBTBase writeNBT(Capability<IBundledEmitter> capability, IBundledEmitter instance, EnumFacing side) {
 		if (instance instanceof DefaultBundledEmitter) {
-			NBTTagCompound cpd = new NBTTagCompound();
-			cpd.setByteArray("s", instance.getBundledSignal());
-			return cpd;
+			byte[] data = instance.getBundledSignal();
+			if (data != null) {
+				NBTTagCompound cpd = new NBTTagCompound();
+				cpd.setByteArray("s", data);
+				return cpd;
+			}
 		}
 		return null;
 	}
@@ -40,9 +44,9 @@ public class DefaultBundledEmitterStorage implements Capability.IStorage<IBundle
 	public void readNBT(Capability<IBundledEmitter> capability, IBundledEmitter instance, EnumFacing side, NBTBase nbt) {
 		if (instance instanceof DefaultBundledEmitter && nbt instanceof NBTTagCompound) {
 			NBTTagCompound cpd = (NBTTagCompound) nbt;
-			if (cpd.hasKey("s")) {
+			if (cpd.hasKey("s", Constants.NBT.TAG_BYTE_ARRAY)) {
 				byte[] data = cpd.getByteArray("s");
-				if (data != null && data.length == 16) {
+				if (data.length == 16) {
 					((DefaultBundledEmitter) instance).emit(data);
 				}
 			}

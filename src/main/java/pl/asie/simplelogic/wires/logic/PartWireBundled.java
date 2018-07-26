@@ -280,7 +280,11 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 				}
 
 				if (emitter != null) {
-					nValues[facing.ordinal()] = emitter.getBundledSignal();
+					if (emitter instanceof PartWireBundled) {
+						nValues[facing.ordinal()] = ((PartWireBundled) emitter).getBundledSignalUnsafe();
+					} else {
+						nValues[facing.ordinal()] = emitter.getBundledSignal();
+					}
 				}
 			}
 		}
@@ -328,6 +332,10 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 	@Override
 	public byte[] getBundledSignal() {
+		return Arrays.copyOf(signalValue, 16);
+	}
+
+	protected byte[] getBundledSignalUnsafe() {
 		return signalValue;
 	}
 

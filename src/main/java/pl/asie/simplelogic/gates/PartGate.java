@@ -66,7 +66,8 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 
 		@Override
 		public byte[] getBundledSignal() {
-			return new byte[0];
+			GateLogic.Connection type = logic.getType(side);
+			return type.isOutput() && type.isBundled() ? logic.getOutputValueBundled(side) : new byte[0];
 		}
 
 		@Override
@@ -258,6 +259,24 @@ public class PartGate extends TileBase implements IRenderComparable<PartGate>, I
 	public void propagateOutputs() {
 		world.notifyNeighborsRespectDebug(getPos(), getBlockType(), false);
 		markBlockForUpdate();
+	}
+
+	public byte[] getBundledInput(EnumFacing facing) {
+		GateLogic.Connection conn = logic.getType(facing);
+
+		if (conn.isInput() && conn.isBundled()) {
+			if (logic.isSideOpen(facing)) {
+				EnumFacing real = gateToReal(facing);
+				World w = getWorld();
+				BlockPos p = getPos().offset(real);
+				TileEntity tile = w.getTileEntity(p);
+				if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
+					return tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite()).getBundledSignal();
+				}
+			}
+		}
+
+		return new byte[16];
 	}
 
 	public boolean updateInputs(byte[] values) {

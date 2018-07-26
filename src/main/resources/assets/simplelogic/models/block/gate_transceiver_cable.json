@@ -1,0 +1,32 @@
+{
+    "elements": [
+        { "from": [ 1, 2, 0 ],
+            "to": [ 15, 4, 16 ],
+            "faces": {
+                "up": { "texture": "#cable_top" },
+                "north": { "texture": "#side", "uv": [1, 2, 15, 4] },
+                "south": { "texture": "#side", "uv": [1, 2, 15, 4] }
+            }
+        },
+        { "from": [ 1, 0, 0 ],
+            "to": [ 15, 4, 6 ],
+            "faces": {
+                "south": { "texture": "#side", "uv": [1, 0, 15, 4] },
+                "west": { "texture": "#side", "uv": [0, 0, 6, 4] },
+                "east": { "texture": "#side", "uv": [0, 0, 6, 4] }
+            }
+        },
+        { "from": [ 1, 0, 10 ],
+            "to": [ 15, 4, 16 ],
+            "faces": {
+                "north": { "texture": "#side", "uv": [1, 0, 15, 4] },
+                "west": { "texture": "#side", "uv": [0, 0, 6, 4] },
+                "east": { "texture": "#side", "uv": [0, 0, 6, 4] }
+            }
+        }
+    ],
+    "textures": {
+        "cable_top": "simplelogic:blocks/gate_bundled_transceiver/cable_top",
+        "side": "simplelogic:blocks/wire/wire_bundled_side"
+    }
+}

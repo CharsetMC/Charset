@@ -35,14 +35,15 @@ public abstract class GateLogic {
 		INPUT_ANALOG,
 		OUTPUT_ANALOG,
 		INPUT_BUNDLED,
-		OUTPUT_BUNDLED;
+		OUTPUT_BUNDLED,
+		INPUT_OUTPUT_BUNDLED;
 
 		public boolean isInput() {
-			return this == INPUT || this == INPUT_ANALOG || this == INPUT_OUTPUT || this == INPUT_BUNDLED;
+			return this == INPUT || this == INPUT_ANALOG || this == INPUT_OUTPUT || this == INPUT_BUNDLED || this == INPUT_OUTPUT_BUNDLED;
 		}
 
 		public boolean isOutput() {
-			return this == OUTPUT || this == OUTPUT_ANALOG || this == INPUT_OUTPUT || this == OUTPUT_BUNDLED;
+			return this == OUTPUT || this == OUTPUT_ANALOG || this == INPUT_OUTPUT || this == OUTPUT_BUNDLED || this == INPUT_OUTPUT_BUNDLED;
 		}
 
 		public boolean isRedstone() {
@@ -58,7 +59,7 @@ public abstract class GateLogic {
 		}
 
 		public boolean isBundled() {
-			return this == INPUT_BUNDLED || this == OUTPUT_BUNDLED;
+			return this == INPUT_BUNDLED || this == OUTPUT_BUNDLED || this == INPUT_OUTPUT_BUNDLED;
 		}
 	}
 
@@ -239,6 +240,14 @@ public abstract class GateLogic {
 		} else {
 			return outputValues[side.ordinal() - 2];
 		}
+	}
+
+	public byte[] getInputValueBundled(EnumFacing side) {
+		throw new RuntimeException("You should implement this yourself!");
+	}
+
+	public byte[] getOutputValueBundled(EnumFacing side) {
+		throw new RuntimeException("You should implement this yourself!");
 	}
 
 	public void onChanged(PartGate parent) {

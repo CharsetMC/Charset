@@ -1,0 +1,6 @@
+{
+    "parent": "simplelogic:block/gate_transceiver_blob",
+    "textures": {
+        "blob": "simplelogic:blocks/gate_bundled_transceiver/blob_on_up"
+    }
+}

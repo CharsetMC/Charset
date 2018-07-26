@@ -1,0 +1,38 @@
+{
+    "models": {
+        "cable": "simplelogic:block/gate_transceiver_cable",
+        "boff": "simplelogic:block/gate_transceiver_blob_off",
+        "bondown": "simplelogic:block/gate_transceiver_blob_on_down",
+        "bonup": "simplelogic:block/gate_transceiver_blob_on_up"
+    },
+    "textures": {
+        "top": "simplelogic:blocks/gate_bundled_transceiver/top"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "color_mask": "00FF00"
+        },
+        {
+            "type": "color",
+            "color_mask": "0000FF"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [7.5, 7.5],
+            "model_on": "cable",
+            "model_off": "cable"
+        },
+        {
+            "pos": [3.5, 7.5],
+            "model_on": "bondown",
+            "model_off": "boff"
+        },
+        {
+            "pos": [11.5, 7.5],
+            "model_on": "bonup",
+            "model_off": "boff"
+        }
+    ]
+}

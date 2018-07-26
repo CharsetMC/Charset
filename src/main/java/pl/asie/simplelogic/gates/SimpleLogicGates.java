@@ -130,6 +130,7 @@ public class SimpleLogicGates {
 		registerGate(new ResourceLocation("simplelogic:rs_latch"), GateLogicRSLatch.class);
 		registerGate(new ResourceLocation("simplelogic:randomizer"), GateLogicRandomizer.class);
 		registerGate(new ResourceLocation("simplelogic:synchronizer"), GateLogicSynchronizer.class);
+		registerGate(new ResourceLocation("simplelogic:bundled_transceiver"), GateLogicBundledTransceiver.class);
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		// configure creative tab
@@ -160,6 +161,7 @@ public class SimpleLogicGates {
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRSLatch())));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRandomizer())));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicSynchronizer())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledTransceiver())));
 
 		proxy.init();
 

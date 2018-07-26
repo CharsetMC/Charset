@@ -13,6 +13,7 @@ tile.simplelogic.gate.multiplexer.name=Multiplexer
 tile.simplelogic.gate.rs_latch.name=Set-Reset Latch
 tile.simplelogic.gate.randomizer.name=Randomizer
 tile.simplelogic.gate.synchronizer.name=Synchronizer
+tile.simplelogic.gate.bundled_transceiver.name=Bundled Transceiver
 
 tile.simplelogic.wire.name=Redstone Cable
 tile.simplelogic.wire.insulated.name=%s Insulated Cable
