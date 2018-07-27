@@ -50,7 +50,7 @@ public class ItemWrench extends ItemCharsetTool {
 
     @Override
     public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player) {
-        return false;
+        return true;
     }
 
     @net.minecraftforge.fml.common.Optional.Method(modid = "mcmultipart")

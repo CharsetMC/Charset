@@ -31,6 +31,7 @@ import pl.asie.charset.lib.wires.CharsetLibWires;
 import pl.asie.charset.lib.wires.Wire;
 import pl.asie.simplelogic.gates.PartGate;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
+import pl.asie.simplelogic.gates.SimpleLogicGatesClient;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 
 public class FastTESRGate extends FastTESR<PartGate> {
@@ -38,20 +39,31 @@ public class FastTESRGate extends FastTESR<PartGate> {
 
 	@Override
 	public void renderTileEntityFast(PartGate te, double x, double y, double z, float partialTicks, int destroyStage, float partial, BufferBuilder buffer) {
-		if (SimpleLogicGates.useTESRs) {
+		GateDynamicRenderer gdr = SimpleLogicGatesClient.INSTANCE.getDynamicRenderer(te.logic.getClass());
+
+		if (SimpleLogicGates.useTESRs || gdr != null) {
 			if (renderer == null) {
 				renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 			}
 
 			BlockPos pos = te.getPos();
 
-			SimpleBakedModel result = new SimpleBakedModel(RendererGate.INSTANCE);
-			ModelStateComposition transform = RendererGate.INSTANCE.getTransform(te);
-			RendererGate.INSTANCE.addLayers(result, transform, te);
+			if (SimpleLogicGates.useTESRs) {
+				SimpleBakedModel result = new SimpleBakedModel(RendererGate.INSTANCE);
+				ModelStateComposition transform = RendererGate.INSTANCE.getTransform(te);
+				RendererGate.INSTANCE.addLayers(result, transform, te);
 
-			buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
-			renderer.renderModel(getWorld(), result, SimpleLogicGates.blockGate.getDefaultState(), pos, buffer, false);
-			buffer.setTranslation(0, 0, 0);
+				buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+				renderer.renderModel(getWorld(), result, SimpleLogicGates.blockGate.getDefaultState(), pos, buffer, false);
+				buffer.setTranslation(0, 0, 0);
+			}
+
+			if (gdr != null) {
+				//noinspection unchecked
+				gdr.render(
+						te, te.logic, getWorld(), x, y, z, partialTicks, destroyStage, partial, buffer
+				);
+			}
 		}
 	}
 }

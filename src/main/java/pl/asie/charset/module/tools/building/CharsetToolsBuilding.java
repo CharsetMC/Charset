@@ -98,6 +98,7 @@ public class CharsetToolsBuilding {
 	}
 
 	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(chisel,0, "charset:chisel");
 		RegistryUtils.registerModel(trowel,0, "charset:trowel");

@@ -55,6 +55,10 @@ tile.charset.compression_crafter.name=Compression Crafter
 
 item.charset.pocket_crafting_table.name=Pocket Crafting Table
 
+# decoration.signs
+
+tile.charset.sign.format=%1$s %2$s
+
 # lib
 
 charset.color.black=Black

@@ -22,6 +22,7 @@ package pl.asie.charset.lib.render.model;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
@@ -30,10 +31,14 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import net.minecraftforge.common.model.IModelPart;
+import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.ITransformation;
+import net.minecraftforge.common.model.TRSRTransformation;
 import org.lwjgl.util.vector.Vector3f;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.function.Function;
 
 public final class ModelTransformer {
@@ -117,6 +122,15 @@ public final class ModelTransformer {
      public interface IVertexTransformer {
          float[] transform(BakedQuad quad, VertexFormatElement element, float... data);
 
+         static IVertexTransformer transform(IModelState state, @Nullable ItemCameraTransforms.TransformType type) {
+             Optional<TRSRTransformation> transformation = state.apply(Optional.ofNullable(type));
+             if (transformation.isPresent()) {
+                 return transform(transformation.get());
+             } else {
+                 return (q, e, d) -> d;
+             }
+         }
+
          static IVertexTransformer transform(ITransformation transformation) {
              return (quad, element, data) -> {
                  switch (element.getUsage()) {
@@ -152,6 +166,41 @@ public final class ModelTransformer {
                      default:
                          return data;
                  }
+             };
+         }
+
+         static IVertexTransformer tintByIndex(int[] colorInts) {
+             final float[][] color = new float[colorInts.length][];
+
+             return (quad, element, data) -> {
+                 if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
+                     if (quad.getTintIndex() >= 0 && quad.getTintIndex() < color.length) {
+                         if (color[quad.getTintIndex()] == null) {
+                             color[quad.getTintIndex()] = new float[]{
+                                     ((colorInts[quad.getTintIndex()] >> 24) & 0xFF) / 255.0f,
+                                     ((colorInts[quad.getTintIndex()] >> 16) & 0xFF) / 255.0f,
+                                     ((colorInts[quad.getTintIndex()] >> 8) & 0xFF) / 255.0f,
+                                     ((colorInts[quad.getTintIndex()]) & 0xFF) / 255.0f
+                             };
+                         }
+
+                         return new float[]{data[0] * color[quad.getTintIndex()][1], data[1] * color[quad.getTintIndex()][2], data[2] * color[quad.getTintIndex()][3], data[3] * color[quad.getTintIndex()][0]};
+                     }
+                 }
+
+                 return data;
+             };
+         }
+
+         static IVertexTransformer tintByIndex(float[][] color) {
+             return (quad, element, data) -> {
+                 if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
+                     if (quad.getTintIndex() >= 0 && quad.getTintIndex() < color.length) {
+                         return new float[]{data[0] * color[quad.getTintIndex()][1], data[1] * color[quad.getTintIndex()][2], data[2] * color[quad.getTintIndex()][3], data[3] * color[quad.getTintIndex()][0]};
+                     }
+                 }
+
+                 return data;
              };
          }
 
