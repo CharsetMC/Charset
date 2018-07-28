@@ -1,0 +1,6 @@
+{
+    "parent": "simplelogic:block/gate_bundled_base",
+    "textures": {
+        "cable_top": "simplelogic:blocks/gate_bundled/inverter"
+    }
+}

@@ -65,10 +65,13 @@ public class GateLogicBundledInverter extends GateLogic {
 
 	@Override
 	public Connection getType(EnumFacing dir) {
-		if (dir == EnumFacing.SOUTH) {
-			return Connection.INPUT_BUNDLED;
-		} else {
-			return Connection.OUTPUT_BUNDLED;
+		switch (dir) {
+			case SOUTH:
+				return Connection.INPUT_BUNDLED;
+			case NORTH:
+				return Connection.OUTPUT_BUNDLED;
+			default:
+				return Connection.NONE;
 		}
 	}
 }
