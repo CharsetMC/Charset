@@ -26,6 +26,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.simplelogic.gates.PartGate;
 
+import java.util.Arrays;
+
 public abstract class GateLogic {
 	public enum Connection {
 		NONE,
@@ -113,7 +115,13 @@ public abstract class GateLogic {
 		return tag;
 	}
 
-	public void readFromNBT(NBTTagCompound compound, boolean isClient) {
+	// Return true if a rendering update is in order.
+	public boolean readFromNBT(NBTTagCompound compound, boolean isClient) {
+		byte oldES = enabledSides;
+		byte oldIS = invertedSides;
+		byte[] oldIV = inputValues;
+		byte[] oldOV = outputValues;
+
 		if (compound.hasKey("le", Constants.NBT.TAG_ANY_NUMERIC)) {
 			enabledSides = compound.getByte("le");
 		}
@@ -135,20 +143,24 @@ public abstract class GateLogic {
 			outputValues = new byte[4];
 		}
 
-		if (compound.hasKey("lv", Constants.NBT.TAG_BYTE_ARRAY)) {
-			// Compat code
-			byte[] values = compound.getByteArray("lv");
-			for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-				Connection c = getType(facing);
-				if (c.isOutput()) {
-					inputValues[facing.ordinal() - 2] = 0;
-					outputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
-				} else {
-					inputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
-					outputValues[facing.ordinal() - 2] = 0;
+		if (!isClient) {
+			if (compound.hasKey("lv", Constants.NBT.TAG_BYTE_ARRAY)) {
+				// Compat code
+				byte[] values = compound.getByteArray("lv");
+				for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+					Connection c = getType(facing);
+					if (c.isOutput()) {
+						inputValues[facing.ordinal() - 2] = 0;
+						outputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
+					} else {
+						inputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
+						outputValues[facing.ordinal() - 2] = 0;
+					}
 				}
 			}
 		}
+
+		return oldES != enabledSides || oldIS != invertedSides || !Arrays.equals(oldIV, inputValues) || !Arrays.equals(oldOV, outputValues);
 	}
 
 	public boolean updateOutputs() {

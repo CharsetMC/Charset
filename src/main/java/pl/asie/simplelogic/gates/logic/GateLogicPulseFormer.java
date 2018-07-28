@@ -45,9 +45,10 @@ public class GateLogicPulseFormer extends GateLogic {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound tag, boolean isClient) {
+	public boolean readFromNBT(NBTTagCompound tag, boolean isClient) {
+		byte oldPl = pulse;
 		pulse = tag.getByte("pl");
-		super.readFromNBT(tag, isClient);
+		return super.readFromNBT(tag, isClient) || (oldPl != pulse);
 	}
 
 	public void onChanged(PartGate gate) {

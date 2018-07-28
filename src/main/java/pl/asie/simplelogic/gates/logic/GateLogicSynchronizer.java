@@ -45,10 +45,12 @@ public class GateLogicSynchronizer extends GateLogic {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound tag, boolean isClient) {
+	public boolean readFromNBT(NBTTagCompound tag, boolean isClient) {
+		byte oldPll = pulseLeft;
+		byte oldPlr = pulseRight;
 		pulseLeft = tag.getByte("pll");
 		pulseRight = tag.getByte("plr");
-		super.readFromNBT(tag, isClient);
+		return super.readFromNBT(tag, isClient) || (oldPll != pulseLeft) || (oldPlr != pulseRight);
 	}
 
 	public void onChanged(PartGate gate) {

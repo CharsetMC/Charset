@@ -97,10 +97,12 @@ public class GateLogicRSLatch extends GateLogic {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound tag, boolean isClient) {
+	public boolean readFromNBT(NBTTagCompound tag, boolean isClient) {
+		boolean oldTg = toggled;
+		boolean oldBt = burnt;
 		toggled = tag.getBoolean("tg");
 		burnt = tag.getBoolean("br");
-		super.readFromNBT(tag, isClient);
+		return super.readFromNBT(tag, isClient) || (oldTg != toggled) || (oldBt != burnt);
 	}
 
 	@Override

@@ -568,24 +568,30 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 
 	@Override
 	public void readNBTData(NBTTagCompound tag, boolean isClient) {
+		boolean renderUpdate = false;
+
 		if (tag.hasKey("logic", Constants.NBT.TAG_STRING)) {
 			Optional<GateLogic> logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
-			logic.ifPresent((a) -> a.readFromNBT(tag, isClient));
+			if (logic.isPresent()) {
+				renderUpdate |= logic.get().readFromNBT(tag, isClient);
+			}
 			this.logic = logic.orElseGet(GateLogicDummy::new);
 		}
 		if (tag.hasKey("m")) {
+			boolean om = mirrored;
 			mirrored = tag.getBoolean("m");
+			renderUpdate |= (mirrored != om);
 		}
 		if (tag.hasKey("p")) {
 			pendingTick = tag.getByte("p");
 			pendingChange = tag.getBoolean("pch");
 		}
+		Orientation oldO = orientation;
 		orientation = Orientation.getOrientation(tag.getByte("o"));
+		renderUpdate |= (oldO != orientation);
 
-		if (isClient) {
-			if (!SimpleLogicGates.useTESRs) {
-				markBlockForRenderUpdate();
-			}
+		if (renderUpdate && isClient && !SimpleLogicGates.useTESRs) {
+			markBlockForRenderUpdate();
 		}
 	}
 
@@ -697,6 +703,10 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 	public void addDebugInformation(List<String> stringList, Side side) {
 		if (side == Side.SERVER) {
 			stringList.add("O: " + getOrientation().name());
+		}
+
+		if (logic instanceof IDebuggable) {
+			((IDebuggable) logic).addDebugInformation(stringList, side);
 		}
 	}
 
