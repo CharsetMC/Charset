@@ -392,11 +392,26 @@ public final class RenderUtils {
 	public static IModel getModelWithTextures(ResourceLocation location, TextureMap map) {
 		IModel model = getModel(location);
 		if (model != null) {
-			for (ResourceLocation tlocation : model.getTextures()) {
+			for (ResourceLocation tlocation : getAllTextures(model)) {
 				map.registerSprite(tlocation);
 			}
 		}
 		return model;
+	}
+
+	public static Collection<ResourceLocation> getAllTextures(IModel model) {
+		Collection<ResourceLocation> textures = new ArrayList<>(model.getTextures());
+
+		LinkedList<ResourceLocation> locs = new LinkedList<>();
+		locs.addAll(model.getDependencies());
+		while (!locs.isEmpty()) {
+			IModel m = RenderUtils.getModel(locs.remove());
+			if (m != null) {
+				textures.addAll(m.getTextures());
+				locs.addAll(m.getDependencies());
+			}
+		}
+		return textures;
 	}
 
 	private static int getSelectionMask(int y, int x, int z) {

@@ -19,10 +19,7 @@
 
 package pl.asie.simplelogic.gates;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 import gnu.trove.map.TIntObjectMap;
@@ -42,6 +39,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
+import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.simplelogic.gates.render.GateRenderDefinitions;
 import pl.asie.simplelogic.gates.render.RendererGate;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -103,7 +101,7 @@ public class ProxyClient extends ProxyCommon {
 
 			// step 2: gather textures
 			for (IModel model : def.getAllModels()) {
-				textures.addAll(model.getTextures());
+				textures.addAll(RenderUtils.getAllTextures(model));
 			}
 
 			for (GateRenderDefinitions.Layer layer : def.layers) {
