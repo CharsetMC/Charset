@@ -59,10 +59,9 @@ public abstract class ContainerBase extends Container {
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
 		Slot slotObject = inventorySlots.get(slot);
 		if (slotObject != null && slotObject.getHasStack()) {
-			int oldStackCount = slotObject.getStack().getCount();
-			ItemStack remainder = tryTransferStackInSlot(player, slotObject, slotObject.inventory == player.inventory ? SLOTS_INVENTORY : SLOTS_PLAYER);
-			detectAndSendChanges();
-			return oldStackCount > remainder.getCount() ? remainder : ItemStack.EMPTY;
+			ItemStack stack = slotObject.getStack().copy();
+			tryTransferStackInSlot(player, slotObject, slotObject.inventory == player.inventory ? SLOTS_INVENTORY : SLOTS_PLAYER);
+			return stack;
 		} else {
 			return ItemStack.EMPTY;
 		}
@@ -79,7 +78,6 @@ public abstract class ContainerBase extends Container {
 
 				if (amount > 0) {
 					to.putStack(fromStack.splitStack(amount));
-					to.putStack(to.getStack());
 
 					return true;
 				}
@@ -99,35 +97,47 @@ public abstract class ContainerBase extends Container {
 		return false;
 	}
 
-	// TODO: BUGTEST ME
-	protected ItemStack tryTransferStackInSlot(EntityPlayer player, Slot from, Collection<Slot> targets) {
-		Collection<Slot> targetsValidEmpty = new ArrayList<>(targets.size());
+	protected void tryTransferStackInSlot(EntityPlayer player, Slot from, Collection<Slot> targets) {
 		boolean dirty = false;
 
-		if (!from.getHasStack())
-			return from.getStack();
+		if (!from.getHasStack()) {
+			return;
+		}
 
-		// Pass 1: Merge
-		for (Slot to : targets) {
-			if (to.isItemValid(from.getStack())) {
-				if (to.getHasStack()) {
+		if (from.getStack().isStackable()) {
+			Collection<Slot> targetsValidEmpty = new ArrayList<>(targets.size());
+
+			// Pass 1: Merge
+			for (Slot to : targets) {
+				if (to.isItemValid(from.getStack())) {
+					if (to.getHasStack()) {
+						dirty |= tryInsertStackToSlot(player, from, to);
+
+						if (!from.getHasStack())
+							break;
+					} else {
+						targetsValidEmpty.add(to);
+					}
+				}
+			}
+
+			// Pass 2: Place
+			if (from.getHasStack()) {
+				for (Slot to : targetsValidEmpty) {
 					dirty |= tryInsertStackToSlot(player, from, to);
 
 					if (!from.getHasStack())
 						break;
-				} else {
-					targetsValidEmpty.add(to);
 				}
 			}
-		}
+		} else {
+			for (Slot to : targets) {
+				if (to.isItemValid(from.getStack()) && !to.getHasStack()) {
+					dirty |= tryInsertStackToSlot(player, from, to);
 
-		// Pass 2: Place
-		if (from.getHasStack()) {
-			for (Slot to : targetsValidEmpty) {
-				dirty |= tryInsertStackToSlot(player, from, to);
-
-				if (!from.getHasStack())
-					break;
+					if (!from.getHasStack())
+						break;
+				}
 			}
 		}
 
@@ -137,10 +147,11 @@ public abstract class ContainerBase extends Container {
 			// Using putStack instead of onSlotChanged here,
 			// as putStack calls the latter + IItemHandler's
 			// onContentsChanged.
+			if (fromStack.isEmpty()) {
+				fromStack = ItemStack.EMPTY;
+			}
 			from.putStack(fromStack);
 		}
-
-		return fromStack;
 	}
 
 	int playerInventoryX = -1, playerInventoryY = -1;

@@ -249,39 +249,37 @@ public class ContainerPocketTable extends ContainerBase {
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
         Slot slot = inventorySlots.get(slotId);
+        ItemStack slotStack = slot.getStack();
+        if (slot.getHasStack()) {
+            slotStack = slotStack.copy();
+        }
 
         if (slot == craftResultSlot) {
             updateCraft();
-            ItemStack res = craftResultSlot.getStack();
-            ItemStack held;
+            ItemStack res = slotStack;
 
             if (res.isEmpty()) {
-                return slot.getStack();
-            } else {
-                res = res.copy();
+                return ItemStack.EMPTY;
             }
 
             for (int count = getMaxCraftingAttempts(res); count > 0; count--) {
                 ItemStack craftedStack = craftResultSlot.getStack().copy();
-                held = tryTransferStackInSlot(player, craftResultSlot, nonCraftingInventorySlots);
+                tryTransferStackInSlot(player, craftResultSlot, nonCraftingInventorySlots);
                 craftResultSlot.onTake(player, craftedStack);
-                if (!held.isEmpty()) {
-                    break;
-                }
                 updateCraft();
                 ItemStack newRes = craftResultSlot.getStack();
                 if (newRes.isEmpty() || !ItemUtils.canMerge(res, newRes) || getMaxCraftingAttempts(newRes, newRes.getCount()) <= 0) {
                     break;
                 }
             }
+
         } else if (nonCraftingInventorySlots.contains(slot)) {
             tryTransferStackInSlot(player, slot, craftingSlots);
         } else if (craftingSlots.contains(slot)) {
             tryTransferStackInSlot(player, slot, nonCraftingInventorySlots);
         }
 
-        detectAndSendChanges();
-        return ItemStack.EMPTY;
+        return slotStack;
     }
 
     int getMaxCraftingAttempts(ItemStack res) {
