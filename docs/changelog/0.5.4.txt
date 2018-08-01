@@ -1,0 +1,7 @@
+Additions:
+
+* [simplelogic.gates] New gates: Bundled Transceiver and Bundled Inverter
+
+Bugs fixed:
+
+* [GitHub/#267] Incompatibility between Charset inventories and Item Scroller

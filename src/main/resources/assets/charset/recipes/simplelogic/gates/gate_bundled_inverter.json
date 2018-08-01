@@ -6,14 +6,14 @@
     },
     {
       "type": "charset:simplelogic_gate_enabled",
-      "gate": "simplelogic:bundled_transceiver"
+      "gate": "simplelogic:bundled_inverter"
     }
   ],
   "type": "charset:shaped",
-  "group": "charset:gate_bundled_transceiver",
+  "group": "charset:gate_bundled_inverter",
   "pattern": [
     "sbs",
-    "crc",
+    "ccc",
     "sbs"
   ],
   "key": {
@@ -27,9 +27,6 @@
     },
     "c": {
       "item": "minecraft:redstone_torch"
-    },
-    "r": {
-      "item": "minecraft:repeater"
     }
   },
   "result": {
@@ -38,7 +35,7 @@
     "data": 0,
     "count": 1,
     "nbt": {
-      "logic": "simplelogic:bundled_transceiver"
+      "logic": "simplelogic:bundled_inverter"
     }
   }
 }

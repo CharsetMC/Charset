@@ -1,3 +1,0 @@
-Additions:
-
-* [simplelogic.gates] New gate: Bundled Transceiver
