@@ -27,13 +27,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.recipe.IRecipeResultBuilder;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 
 public final class IngredientWrapper extends Ingredient {
+    private static final Set<IngredientWrapper> ALL_INGREDIENTS = Collections.newSetFromMap(new WeakHashMap<>());
+
     private static final IRecipeResultBuilder DEFAULT_BUILDER = new IRecipeResultBuilder() {
         @Override
         public Ingredient getIngredient(char c) {
@@ -51,6 +54,7 @@ public final class IngredientWrapper extends Ingredient {
     IngredientWrapper(IngredientCharset charset) {
         super(0);
         this.charset = charset;
+        ALL_INGREDIENTS.add(this);
     }
 
     public final IngredientCharset getIngredientCharset() {
@@ -82,5 +86,13 @@ public final class IngredientWrapper extends Ingredient {
     @Override
     public boolean isSimple() {
         return false;
+    }
+
+    public static void invalidate(Predicate<IngredientCharset> predicate) {
+        for (IngredientWrapper wrapper : ALL_INGREDIENTS) {
+            if (predicate.test(wrapper.charset)) {
+                wrapper.charset.invalidate();
+            }
+        }
     }
 }

@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* Cache invalidation issues causing items to not appear in the creative tab or JEI at times

@@ -26,6 +26,8 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.text.translation.I18n;
+import pl.asie.charset.lib.recipe.IngredientMaterial;
+import pl.asie.charset.lib.recipe.ingredient.IngredientWrapper;
 import pl.asie.charset.lib.utils.ItemUtils;
 
 import java.util.*;
@@ -218,6 +220,7 @@ public class ItemMaterialRegistry {
 		if (type.length() > 0 && !material.getTypes().contains(type)) {
 			material.getTypes().add(type);
 			materialsByType.put(type, material);
+			onRegistryChange();
 			return true;
 		} else {
 			return false;
@@ -230,7 +233,12 @@ public class ItemMaterialRegistry {
 
 	public boolean registerRelation(ItemMaterial source, ItemMaterial target, String relation) {
 		source.getRelations().put(relation, target);
+		onRegistryChange();
 		return true;
+	}
+
+	private void onRegistryChange() {
+		IngredientWrapper.invalidate((a) -> a instanceof IngredientMaterial);
 	}
 
 	public Collection<String> getAllTypes() {

@@ -136,6 +136,8 @@ public class IngredientGroup extends IngredientCharset {
                 e.idNameMap.put(id, name);
                 e.nameIdMap.put(name, id);
             }
+
+            IngredientWrapper.invalidate((a) -> a instanceof IngredientGroup);
         } else {
             throw new RuntimeException("Unknown/unaccepted type: " + object.getClass().getName() + "!");
         }

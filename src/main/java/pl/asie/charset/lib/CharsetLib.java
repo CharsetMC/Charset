@@ -56,6 +56,7 @@ import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.handlers.*;
 import pl.asie.charset.lib.item.SubItemProviderCache;
+import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ColorLookupHandler;
@@ -191,6 +192,8 @@ public class CharsetLib {
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
 		RecipeReplacement.PRIMARY.register();
 		RecipeIngredientPatcher.PRIMARY.process(event.getRegistry().getValuesCollection());
+		SubItemProviderCache.clear();
+		FastRecipeLookup.clearRecipeLists();
 	}
 
 	@Mod.EventHandler
@@ -261,7 +264,7 @@ public class CharsetLib {
 	}
 
 	@Mod.EventHandler
-	public void serverStarting(FMLServerStartedEvent event) {
+	public void serverStarted(FMLServerStartedEvent event) {
 		FastRecipeLookup.clearRecipeLists();
 	}
 
