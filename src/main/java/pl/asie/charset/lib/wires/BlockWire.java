@@ -54,6 +54,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.block.BlockBase;
+import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.modcompat.mcmultipart.IMultipartBase;
 
 import javax.annotation.Nullable;
@@ -72,6 +73,20 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
 
         // BlockTrapdoor etc. rely on this!
         setDefaultState(getDefaultState().withProperty(REDSTONE, true));
+    }
+
+    @Override
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IPartInfo part, int fortune) {
+        NonNullList<ItemStack> drops = NonNullList.create();
+        getDrops(drops, part.getPartWorld(), part.getPartPos(), part.getState(), part.getTile() != null ? part.getTile().getTileEntity() : null, fortune, false);
+        return drops;
+    }
+
+    @Override
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, @Nullable TileEntity te, int fortune, boolean silkTouch) {
+        if (te instanceof TileBase) {
+            ((TileBase) te).getDrops(drops, state, fortune, silkTouch);
+        }
     }
 
     @Override

@@ -46,9 +46,7 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
     }
 
     final void setItemWire(ItemWire i) {
-        if (iw == null) {
-            iw = i;
-        }
+        iw = i;
     }
 
     protected final void generateBoxes() {

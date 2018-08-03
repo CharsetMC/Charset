@@ -104,6 +104,7 @@ public class RecipeWireConversion extends RecipeCharset {
             ItemStack stack = inv.getStackInSlot(i);
             if (!stack.isEmpty()) {
                 ItemStack newStack = stack.copy();
+                newStack.setCount(1);
                 newStack.setItemDamage(newStack.getItemDamage() ^ 1);
                 return newStack;
             }

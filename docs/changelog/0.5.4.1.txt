@@ -1,0 +1,4 @@
+Bugs fixed:
+
+* [lib.wires] [GitHub/#269] Duplication bug converting between freestanding and non-freestanding wire
+* [simplelogic.wires] [GitHub/#271] Invalid drops when breaking multiple wires at once

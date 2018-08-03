@@ -33,13 +33,14 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import pl.asie.charset.lib.modcompat.mcmultipart.MultipartBase;
 import pl.asie.charset.module.misc.scaffold.CharsetMiscScaffold;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class MultipartScaffold implements IMultipart {
+public class MultipartScaffold extends MultipartBase {
     public static class Slot implements IPartSlot {
         public static final Slot INSTANCE = new Slot();
 

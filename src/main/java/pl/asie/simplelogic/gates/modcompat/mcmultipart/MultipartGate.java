@@ -33,13 +33,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.modcompat.mcmultipart.IMultipartBase;
+import pl.asie.charset.lib.modcompat.mcmultipart.MultipartBase;
 import pl.asie.simplelogic.gates.PartGate;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 
 import java.util.Collections;
 import java.util.List;
 
-public class MultipartGate implements IMultipartBase {
+public class MultipartGate extends MultipartBase {
 	@Override
 	public Block getBlock() {
 		return SimpleLogicGates.blockGate;
