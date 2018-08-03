@@ -51,6 +51,7 @@ import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 import pl.asie.charset.lib.modcompat.mcmultipart.RedstoneGetterMultipart;
 import pl.asie.charset.shared.SimpleLogicShared;
+import pl.asie.simplelogic.gates.addon.GateRegisterEvent;
 import pl.asie.simplelogic.gates.logic.*;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
@@ -112,6 +113,8 @@ public class SimpleLogicGates {
 		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate", SimpleLogicShared.getTab());
 	}
 
+	private GateRegisterEvent addonEvent;
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		blockGate = new BlockGate();
@@ -130,7 +133,11 @@ public class SimpleLogicGates {
 			registerGate(new ResourceLocation("simplelogic:bundled_transceiver"), GateLogicBundledTransceiver.class);
 			registerGate(new ResourceLocation("simplelogic:bundled_inverter"), GateLogicBundledInverter.class);
 		}
+
 		MinecraftForge.EVENT_BUS.register(proxy);
+
+		addonEvent = new GateRegisterEvent();
+		MinecraftForge.EVENT_BUS.post(addonEvent);
 
 		// configure creative tab
 		if (!ModCharset.isModuleLoaded("simplelogic.wires") && !gateStacks.isEmpty()) {
@@ -163,6 +170,10 @@ public class SimpleLogicGates {
 		if (ModCharset.isModuleLoaded("simplelogic.wires")) {
 			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledTransceiver())));
 			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledInverter())));
+		}
+
+		for (PartGate p : addonEvent.getGateStackPartList()) {
+			registerGateStack(ItemGate.getStack(p));
 		}
 
 		proxy.init();

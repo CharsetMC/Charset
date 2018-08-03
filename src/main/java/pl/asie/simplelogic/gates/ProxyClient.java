@@ -33,6 +33,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -40,6 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.simplelogic.gates.addon.GateRegisterClientEvent;
 import pl.asie.simplelogic.gates.render.GateRenderDefinitions;
 import pl.asie.simplelogic.gates.render.RendererGate;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -60,6 +62,8 @@ public class ProxyClient extends ProxyCommon {
 					return gate.getOrientation();
 				},
 				SimpleLogicGates.itemGate);
+
+		MinecraftForge.EVENT_BUS.post(new GateRegisterClientEvent());
 	}
 
 	@SubscribeEvent
