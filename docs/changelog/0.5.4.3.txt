@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* [simplelogic.wires] Bundled wires not propagating across corners correctly (probably a regression)

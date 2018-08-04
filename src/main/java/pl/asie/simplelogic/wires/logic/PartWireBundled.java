@@ -167,7 +167,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 				}
 			} else if (connectsCorner(facing)) {
 				BlockPos cornerPos = getContainer().pos().offset(facing).offset(getLocation().facing);
-				Wire wire = WireUtils.getWire(getContainer().world(), cornerPos, getLocation());
+				Wire wire = WireUtils.getWire(getContainer().world(), cornerPos, WireFace.get(facing.getOpposite()));
 
 				if (wire instanceof PartWireSignalBase) {
 					isWire[facing.ordinal()] = true;
