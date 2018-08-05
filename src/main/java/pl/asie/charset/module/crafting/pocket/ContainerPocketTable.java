@@ -42,7 +42,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-@InventoryContainer // TODO: InvTweaks
+//@InventoryContainer // TODO: InvTweaks
 public class ContainerPocketTable extends ContainerBase {
     //InventoryPlayer Slots:
     //09 10 11 12 13 14 15 16 17
@@ -436,7 +436,7 @@ public class ContainerPocketTable extends ContainerBase {
 
     // Inventory Tweaks Compat
     // TODO: https://github.com/Inventory-Tweaks/inventory-tweaks/issues/548
-    @ContainerSectionCallback
+    /* @ContainerSectionCallback
     @Optional.Method(modid = "inventorytweaks")
     protected Map<ContainerSection, List<Slot>> invTweaks_getContainerSections() {
         Map<ContainerSection, List<Slot>> map = new EnumMap<>(ContainerSection.class);
@@ -444,5 +444,5 @@ public class ContainerPocketTable extends ContainerBase {
         map.put(ContainerSection.CRAFTING_IN, craftingSlots);
         map.put(ContainerSection.CRAFTING_OUT, ImmutableList.of(craftResultSlot));
         return map;
-    }
+    } */
 }

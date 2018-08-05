@@ -144,7 +144,7 @@ public class ModCharset {
 		charsetIconItem = new IconCharset();
 		charsetIconStack = new ItemStack(charsetIconItem);
 
-		ModuleLoader.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEventWithProgress(event);
 
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -164,7 +164,7 @@ public class ModCharset {
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, GuiHandlerCharset.INSTANCE);
 
 		ModuleLoader.INSTANCE.init();
-		ModuleLoader.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEventWithProgress(event);
 
 		if (configIds.hasChanged()) configIds.save();
 	}
@@ -172,7 +172,7 @@ public class ModCharset {
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		ModuleLoader.INSTANCE.postInit();
-		ModuleLoader.INSTANCE.passEvent(event);
+		ModuleLoader.INSTANCE.passEventWithProgress(event);
 	}
 
 	@Mod.EventHandler

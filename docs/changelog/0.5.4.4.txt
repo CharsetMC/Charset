@@ -1,3 +1,7 @@
+Removed:
+
+* [crafting.pocket] InventoryTweaks integration for the Pocket Crafting Table - it caused crashes and I doubt it ever worked
+
 Bugs fixed:
 
 * [simplelogic.wires] [GitHub/#272] Crash when checking upwards connections to red alloy wire by vanilla redstone wire

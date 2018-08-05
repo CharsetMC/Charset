@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.material;
 
+import com.google.common.base.Joiner;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -36,15 +37,19 @@ import net.minecraftforge.common.crafting.IngredientNBT;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.recipe.RecipeCharset;
 import pl.asie.charset.lib.utils.RecipeUtils;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class FastRecipeLookup {
 	public static boolean ENABLED = true;
-	private static final boolean DEBUG = false;
+	private static boolean IGNORE_NO_SHAPELESS = false;
 	private static final Set<Class> saneClasses = new HashSet<>();
 
 	static {
@@ -77,7 +82,7 @@ public class FastRecipeLookup {
 
 	protected static ItemStack getCraftingResultQuickly(boolean noShapeless, int nonEmptyStacks, World world, int width, int height, ItemStack... stacks) {
 		InventoryCrafting crafting = RecipeUtils.getCraftingInventory(width, height, stacks);
-		IRecipe recipe = findMatchingRecipeQuickly(!DEBUG && noShapeless, nonEmptyStacks, crafting, world);
+		IRecipe recipe = findMatchingRecipeQuickly(!IGNORE_NO_SHAPELESS && noShapeless, nonEmptyStacks, crafting, world);
 
 		if (recipe != null) {
 			return recipe.getCraftingResult(crafting);
@@ -246,29 +251,37 @@ public class FastRecipeLookup {
 				}
 			}
 
-			if (DEBUG) {
-				System.out.println("SHAPELESS ONE ELEMENT = " + shapelessOneElement.size() + " lists");
-				for (int i = 0; i < 9; i++) {
-					System.out.println("SHAPELESS " + (i + 1) + " = " + recipeLists.get(i).size());
-				}
-				for (int i = 0; i < 9; i++) {
-					System.out.println("SHAPED " + ((i % 3) + 1) + "x" + ((i / 3) + 1) + " = " + recipeLists.get(i + 9).size());
-				}
-				for (int i = 0; i < 9; i++) {
-					System.out.println("WEIRD " + (i + 1) + " = " + recipeLists.get(i + 18).size());
-				}
-				System.out.println("REALLY WEIRD = " + recipeLists.get(27).size());
+			if (CharsetLib.enableDebugInfo) {
+				try {
+					File outputFile = new File("charsetFastRecipeLookup.txt");
+					PrintWriter writer = new PrintWriter(outputFile);
+					writer.println("SHAPELESS ONE ELEMENT = " + shapelessOneElement.size() + " lists");
+					for (int i = 0; i < 9; i++) {
+						writer.println("SHAPELESS " + (i + 1) + " = " + recipeLists.get(i).size());
+					}
+					for (int i = 0; i < 9; i++) {
+						writer.println("SHAPED " + ((i % 3) + 1) + "x" + ((i / 3) + 1) + " = " + recipeLists.get(i + 9).size());
+					}
+					for (int i = 0; i < 9; i++) {
+						writer.println("WEIRD " + (i + 1) + " = " + recipeLists.get(i + 18).size());
+					}
+					writer.println("REALLY WEIRD = " + recipeLists.get(27).size());
 
-				for (int i = 0; i <= 9; i++) {
-					Collection<IRecipe> recipes = recipeLists.get(i + 18);
-					TObjectIntMap<Class> classMap = new TObjectIntHashMap<>();
-					String name = i == 9 ? "REALLY WEIRD" : ("WEIRD " + (i + 1));
-					for (IRecipe recipe : recipes) {
-						classMap.adjustOrPutValue(recipe.getClass(), 1, 1);
+					for (int i = 0; i <= 9; i++) {
+						Collection<IRecipe> recipes = recipeLists.get(i + 18);
+						TObjectIntMap<Class> classMap = new TObjectIntHashMap<>();
+						String name = i == 9 ? "REALLY WEIRD" : ("WEIRD " + (i + 1));
+						for (IRecipe recipe : recipes) {
+							classMap.adjustOrPutValue(recipe.getClass(), 1, 1);
+						}
+						for (Class c : classMap.keySet()) {
+							writer.println("[" + name + "] " + classMap.get(c) + "x" + c.getName());
+						}
 					}
-					for (Class c : classMap.keySet()) {
-						System.out.println("[" + name + "] " + classMap.get(c) + "x" + c.getName());
-					}
+
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}

@@ -28,6 +28,7 @@ import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.discovery.asm.ModAnnotation;
 import net.minecraftforge.fml.common.event.FMLEvent;
@@ -545,6 +546,26 @@ public class ModuleLoader {
 		if (ModCharset.configModules.hasChanged() || configDirty) {
 			ModCharset.configModules.save();
 			configDirty = false;
+		}
+	}
+
+	public void passEventWithProgress(FMLEvent o) {
+		Class<? extends FMLEvent> c = o.getClass();
+		List<Pair<String, MethodHandle>> list = loaderHandles.get(c);
+		if (list != null) {
+			//ProgressManager.ProgressBar bar = ProgressManager.push("Charset", list.size());
+
+			for (Pair<String, MethodHandle> pair : list) {
+				try {
+					//bar.step(pair.getKey());
+					pair.getValue().invoke(loadedModules.get(pair.getKey()), o);
+				} catch (Throwable t) {
+					t.printStackTrace();
+					throw new RuntimeException(t);
+				}
+			}
+
+			//ProgressManager.pop(bar);
 		}
 	}
 
