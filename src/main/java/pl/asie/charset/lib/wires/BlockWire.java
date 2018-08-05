@@ -101,6 +101,10 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
 
     @Override
     public boolean canConnectRedstone(IBlockState blockState, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side) {
+        if (side == null) {
+            return false;
+        }
+
         if (blockState.getValue(REDSTONE)) {
             Wire wire = WireUtils.getAnyWire(world, pos);
             if (wire != null) {

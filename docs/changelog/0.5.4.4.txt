@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* [simplelogic.wires] [GitHub/#272] Crash when checking upwards connections to red alloy wire by vanilla redstone wire
