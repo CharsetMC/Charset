@@ -1,0 +1,3 @@
+Additions:
+
+* Support for Forge's selective resource reloading

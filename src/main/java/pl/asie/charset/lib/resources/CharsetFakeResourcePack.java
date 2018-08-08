@@ -29,18 +29,23 @@ import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.MetadataSerializer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.resource.IResourceType;
+import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
+import net.minecraftforge.client.resource.VanillaResourceType;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 // TODO: FakeResourcePack class with in-ModCharset/in-CharsetLib? instance
-public class CharsetFakeResourcePack implements IResourcePack, IResourceManagerReloadListener {
+public class CharsetFakeResourcePack implements IResourcePack, ISelectiveResourceReloadListener {
     public static final CharsetFakeResourcePack INSTANCE = new CharsetFakeResourcePack();
 
     private final Map<ResourceLocation, byte[]> data = new HashMap<>();
@@ -101,6 +106,30 @@ public class CharsetFakeResourcePack implements IResourcePack, IResourceManagerR
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
         invalidate();
+    }
+
+    @Override
+    public void onResourceManagerReload(IResourceManager resourceManager, Predicate<IResourceType> resourcePredicate) {
+        Iterator<ResourceLocation> keys = data.keySet().iterator();
+        while (keys.hasNext()) {
+            ResourceLocation key = keys.next();
+            String kp = key.getPath();
+            boolean remove = true;
+
+            if (kp.startsWith("lang/") || kp.startsWith("texts/")) {
+                remove = resourcePredicate.test(VanillaResourceType.LANGUAGES);
+            } else if (kp.startsWith("sound")) {
+                remove = resourcePredicate.test(VanillaResourceType.SOUNDS);
+            } else if (kp.startsWith("textures/") || kp.startsWith("models/") || kp.startsWith("blockstates/")) {
+                remove = resourcePredicate.test(VanillaResourceType.MODELS) || resourcePredicate.test(VanillaResourceType.TEXTURES);
+            } else if (kp.startsWith("shaders/")) {
+                remove = resourcePredicate.test(VanillaResourceType.SHADERS);
+            }
+
+            if (remove) {
+                keys.remove();
+            }
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
