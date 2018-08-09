@@ -1,3 +1,7 @@
+Additions:
+
+* Support for Forge's new selective resource reloading
+
 Bugs fixed:
 
 * [simplelogic.gates] [GitHub/#283] Bundled Inverter not working correctly
