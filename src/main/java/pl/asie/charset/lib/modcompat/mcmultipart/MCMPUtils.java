@@ -24,6 +24,7 @@ import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.item.ItemBlockMultipart;
 import mcmultipart.api.multipart.IMultipart;
 import mcmultipart.api.multipart.MultipartHelper;
+import mcmultipart.api.slot.EnumCenterSlot;
 import mcmultipart.api.slot.EnumEdgeSlot;
 import mcmultipart.api.slot.EnumFaceSlot;
 import mcmultipart.api.slot.IPartSlot;
@@ -63,10 +64,12 @@ public final class MCMPUtils {
 		if (edge != null) addSlot(EnumFaceSlot.fromFace(edge), container, partSlots, streamBuilder);
 
 		for (IPartSlot slot : container.getParts().keySet()) {
-			if (partSlots.add(slot)) {
+			if (!(slot instanceof EnumCenterSlot) && !(slot instanceof EnumFaceSlot) && !(slot instanceof EnumEdgeSlot) && partSlots.add(slot)) {
 				addSlot(slot, container, partSlots, streamBuilder);
 			}
 		}
+
+		addSlot(EnumCenterSlot.CENTER, container, partSlots, streamBuilder);
 
 		return streamBuilder.build();
 	}

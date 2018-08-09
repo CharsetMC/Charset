@@ -30,10 +30,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.Properties;
+import pl.asie.charset.lib.modcompat.mcmultipart.MultipartBase;
 import pl.asie.charset.module.misc.shelf.BlockShelf;
 import pl.asie.charset.module.misc.shelf.CharsetMiscShelf;
 
-public class MultipartShelf implements IMultipart {
+public class MultipartShelf extends MultipartBase {
     @Override
     public Block getBlock() {
         return CharsetMiscShelf.shelfBlock;

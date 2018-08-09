@@ -253,6 +253,14 @@ public class RendererWire extends ModelFactory<Wire> {
                     )
             );
 
+	        addNonNull(quads,
+			        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+					        new Vector3f(min, 0, -height), new Vector3f(max, 0, 0),
+					        handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.DOWN), topUV,
+					        handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.DOWN, rot, false
+			        )
+	        );
+
             addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(min, 0, -height), new Vector3f(min, height, 0),
@@ -287,6 +295,14 @@ public class RendererWire extends ModelFactory<Wire> {
                     )
             );
 
+	        addNonNull(quads,
+			        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+					        new Vector3f(min, 0, 16), new Vector3f(max, 0, 16 + height),
+					        handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.DOWN), topUV,
+					        handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.DOWN, rot, false
+			        )
+	        );
+
             addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
                             new Vector3f(min, 0, 16), new Vector3f(min, height, 16 + height),
@@ -312,6 +328,14 @@ public class RendererWire extends ModelFactory<Wire> {
                             handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.UP, rot, false
                     )
             );
+
+	        addNonNull(quads,
+			        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+					        new Vector3f(-height, 0, min), new Vector3f(0, 0, max),
+					        handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.DOWN), topUV,
+					        handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.DOWN, rot, false
+			        )
+	        );
 
             addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(
@@ -346,6 +370,14 @@ public class RendererWire extends ModelFactory<Wire> {
                             handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.UP, rot, false
                     )
             );
+
+	        addNonNull(quads,
+			        CharsetFaceBakery.INSTANCE.makeBakedQuad(
+					        new Vector3f(16, 0, min), new Vector3f(16 + height, 0, max),
+					        handler.getColor(WireRenderHandler.TextureType.TOP, wire, EnumFacing.DOWN), topUV,
+					        handler.getTexture(WireRenderHandler.TextureType.TOP, wire, null, 15), EnumFacing.DOWN, rot, false
+			        )
+	        );
 
             addNonNull(quads,
                     CharsetFaceBakery.INSTANCE.makeBakedQuad(

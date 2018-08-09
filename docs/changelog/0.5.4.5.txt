@@ -1,0 +1,6 @@
+Bugs fixed:
+
+* [simplelogic.gates] [GitHub/#283] Bundled Inverter not working correctly
+* [simplelogic.gates] [GitHub/#281] Freestanding Cables connecting to Gates
+* [simplelogic.wires] [GitHub/#282] Weird behaviour with insulated cables and vanilla-esque redstone blocks
+* [simplelogic.wires] [GitHub/#280] Missing render face on wire outer corners

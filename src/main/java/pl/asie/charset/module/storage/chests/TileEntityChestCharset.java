@@ -57,10 +57,12 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.inventory.IContainerHandler;
 import pl.asie.charset.lib.utils.MathUtils;
+import pl.asie.charset.lib.utils.OcclusionUtils;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -226,6 +228,15 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	}
 
 	public boolean isBlocked() {
+		// self position check
+		if (OcclusionUtils.INSTANCE.intersects(
+				Collections.singleton(
+						new AxisAlignedBB(0, 0.875, 0, 1, 1, 1)
+				), world, pos, (s) -> !(s.getBlock() instanceof BlockChestCharset)
+		)) {
+			return true;
+		}
+
 		// position check
 		BlockPos posUp = pos.up();
 		if (world.getBlockState(posUp).doesSideBlockChestOpening(world, posUp, EnumFacing.DOWN)) {

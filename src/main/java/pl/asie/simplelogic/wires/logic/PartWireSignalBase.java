@@ -250,7 +250,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 
 	@Override
 	public int getWeakPower(EnumFacing facing) {
-		if (!PROPAGATING && connectsWeak(facing)) {
+		if (!PROPAGATING && facing != null && connectsWeak(facing.getOpposite())) {
 			return getRedstoneLevel();
 		} else {
 			return 0;

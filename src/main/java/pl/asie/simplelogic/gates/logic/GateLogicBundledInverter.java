@@ -20,6 +20,8 @@
 package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.MathHelper;
+import pl.asie.charset.lib.utils.MathUtils;
 import pl.asie.simplelogic.gates.PartGate;
 
 import java.util.Arrays;
@@ -33,7 +35,7 @@ public class GateLogicBundledInverter extends GateLogic {
 
 		byte[] input = gate.getBundledInput(EnumFacing.SOUTH);
 		for (int i = 0; i < 16; i++) {
-			byte v = (byte) ((input[i]) ^ 0xFF);
+			byte v = (byte) (15 - MathHelper.clamp(input[i], 0, 15));
 			if (v != output[i]) {
 				bundledInputChange = true;
 				output[i] = v;
