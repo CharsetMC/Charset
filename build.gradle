@@ -40,7 +40,7 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.4.2739"
+	version = "1.12.2-14.23.4.2747"
 
 	runDir = "run"
 	useDepAts = true
