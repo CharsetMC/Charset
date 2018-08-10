@@ -24,6 +24,7 @@ import java.util.*;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ModelRotation;
@@ -94,6 +95,12 @@ public class RendererGate extends ModelFactory<PartGate> {
 	}
 
 	@Override
+	public void invalidate() {
+		super.invalidate();
+		layerModels.clear();
+	}
+
+	@Override
 	public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
 		if (cameraTransformType == ItemCameraTransforms.TransformType.GUI && GuiScreen.isShiftKeyDown()) {
 			return ImmutablePair.of(this, shiftGuiTransform.getMatrix());
@@ -103,18 +110,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 	}
 
 	public ModelStateComposition getTransform(PartGate gate) {
-		ModelStateComposition transform = COMPOSITIONS[gate.getSide().ordinal() * 6 + gate.getTop().ordinal()];
-
-		if (gate.mirrored) {
-			transform = new ModelStateComposition(
-					transform,
-					new TRSRTransformation(
-							null, null, new Vector3f(-1.0f, 1.0f, 1.0f), null
-					)
-			);
-		}
-
-		return transform;
+		return COMPOSITIONS[gate.getSide().ordinal() * 6 + gate.getTop().ordinal()];
 	}
 
 	public boolean addBase(SimpleBakedModel result, ModelStateComposition transform, PartGate gate) {
@@ -125,8 +121,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 			result.addModel(ModelLoaderRegistry.getMissingModel().bake(transform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()));
 			return false;
 		} else {
-
-			IModel model = definition.getModel(gate.getModelName());
+			IModel model = definition.getModel(gate.getBaseModelName());
 			if (model != null) {
 				result.addModel(model.bake(transform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()));
 			}
@@ -139,7 +134,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 		GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(SimpleLogicGates.getId(logic));
 		GateRenderDefinitions.BaseDefinition base = GateRenderDefinitions.INSTANCE.base;
 
-		IModel layerModel = definition.getModel("layer");
+		IModel layerModel = definition.getModel(gate.getLayerModelName());
 		IModel model;
 
 		int i = 0;
@@ -160,10 +155,11 @@ public class RendererGate extends ModelFactory<PartGate> {
 			}
 
 			if ("color".equals(layer.type) && layer.texture != null) {
-				model = layerModels.get(layer.texture);
+				String key = layer.texture; if (gate.mirrored) key = "m$" + key;
+				model = layerModels.get(key);
 				if (model == null) {
 					model = layerModel.retexture(ImmutableMap.of("layer", layer.texture));
-					layerModels.put(layer.texture, model);
+					layerModels.put(key, model);
 				}
 
 				IBakedModel bakedModel = model.bake(layerTransform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
@@ -193,10 +189,11 @@ public class RendererGate extends ModelFactory<PartGate> {
 				}
 
 				if (texture != null) {
-					model = layerModels.get(texture);
+					String key = texture; if (gate.mirrored) key = "m$" + key;
+					model = layerModels.get(key);
 					if (model == null) {
 						model = layerModel.retexture(ImmutableMap.of("layer", texture));
-						layerModels.put(texture, model);
+						layerModels.put(key, model);
 					}
 
 					result.addModel(model.bake(layerTransform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter()));
@@ -224,9 +221,16 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 			String name = state == GateLogic.State.ON ? (torch.model_on == null ? "torch_on" : torch.model_on) : (torch.model_off == null ? "torch_off" : torch.model_off);
 			if (name.length() > 0) {
+				float xPos = (torch.pos[0] - 7.5f) / 16.0f;
+				float zPos = (torch.pos[1] - 7.5f) / 16.0f;
+
+				if (gate.mirrored) {
+					xPos = -xPos;
+				}
+
 				IBakedModel torchModel = definition.getModel(name)
 						.bake(new ModelStateComposition(
-								transform, new TRSRTransformation(new Vector3f((torch.pos[0] - 7.5f) / 16.0f, 0f, (torch.pos[1] - 7.5f) / 16.0f), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
+								transform, new TRSRTransformation(new Vector3f(xPos, 0f, zPos), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
 				String torchColorStr = state == GateLogic.State.ON ? torch.color_on : torch.color_off;
 				if (torchColorStr != null) {
 					int torchColor = Integer.parseInt(torchColorStr, 16);

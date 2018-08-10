@@ -29,18 +29,53 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.render.sprite.SpritesheetFactory;
 import pl.asie.charset.lib.wires.*;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class WireRenderHandlerOverlay extends WireRenderHandler implements IWireRenderContainer {
+	public static class Color extends WireRenderHandler {
+		@Nonnull
+		private TextureAtlasSprite[] top;
+
+		public Color(WireProvider provider) {
+			super(provider);
+		}
+
+		@Override
+		public boolean isTranslucent() {
+			return false;
+		}
+
+		@Override
+		public void refresh(TextureMap map) {
+			top = SpritesheetFactory.register(map, new ResourceLocation("simplelogic", "blocks/wire/wire_bundled_colored_top"), 4, 4);
+		}
+
+		@Override
+		public TextureAtlasSprite getTexture(TextureType type, Wire wire, EnumFacing facing, int connMask) {
+			if (type != TextureType.TOP) return null;
+
+			return top[connMask & 15];
+		}
+
+		@Override
+		public int getColor(TextureType type, Wire wire, @Nullable EnumFacing direction) {
+			return wire instanceof PartWireBundled ? ((PartWireBundled) wire).getBundledRenderColor() : -1;
+		}
+	}
+
 	private static final float EPSILON = 1/1024f;
 	private final WireRenderHandler defaultHandler;
+	private final WireRenderHandler colorHandler;
 	private TextureAtlasSprite top;
 
-	public WireRenderHandlerOverlay(WireProvider provider) {
+	public WireRenderHandlerOverlay(WireProvider provider, boolean isColored) {
 		super(provider);
 		this.defaultHandler = new WireRenderHandlerDefault(provider);
+		this.colorHandler = isColored ? new Color(provider) : null;
 	}
 
 	@Override
@@ -100,12 +135,15 @@ public class WireRenderHandlerOverlay extends WireRenderHandler implements IWire
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getLayerCount() {
-		return 2;
+		return colorHandler != null ? 3 : 2;
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public WireRenderHandler get(int layer) {
-		return layer == 1 ? this : defaultHandler;
+		if (colorHandler != null && layer == 1) {
+			return colorHandler;
+		}
+		return layer > 0 ? this : defaultHandler;
 	}
 }

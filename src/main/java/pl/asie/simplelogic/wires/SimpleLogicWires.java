@@ -67,67 +67,109 @@ public class SimpleLogicWires {
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
-	public static WireProvider[] wireProviders = new WireProvider[18];
-	public static ItemWire[] wireItems = new ItemWire[18];
+	private static WireProvider[] wireProviders = new WireProvider[34];
+	private static ItemWire[] wireItems = new ItemWire[wireProviders.length];
 
 	@CharsetModule.Configuration
 	public static Configuration config;
 	public static boolean useTESRs;
+	public static boolean enableRedstoneCables, enableInsulatedCables, enableBundledCables, enableColoredBundledCables;
 
 	@EventHandler
 	public void loadConfig(CharsetLoadConfigEvent event) {
 		useTESRs = ConfigUtils.getBoolean(config, "client", "forceWireTESRs", false, "Forces redstone cables to render using TESRs.", false);
+		enableRedstoneCables = ConfigUtils.getBoolean(config, "general", "enableRedstoneCables", true, "Should redstone cables be enabled? Note that recipes will not be currently adapted.", true);
+		enableInsulatedCables = ConfigUtils.getBoolean(config, "general", "enableInsulatedCables", true, "Should insulated cables be enabled? Note that recipes will not be currently adapted.", true);
+		enableBundledCables = ConfigUtils.getBoolean(config, "general", "enableBundledCables", true, "Should bundled cables be enabled? Note that recipes will not be currently adapted.", true);
+		enableColoredBundledCables = ConfigUtils.getBoolean(config, "general", "enableColoredBundledCables", true, "Should colored bundled cables be enabled? Note that recipes will not be currently adapted.", true);
 	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		wireProviders[0] = new LogicWireProvider(WireType.NORMAL, -1).setRegistryName(new ResourceLocation("charset:logic_wire_n"));
-		for (int i = 0; i < 16; i++) {
-			wireProviders[i + 1] = new LogicWireProvider(WireType.INSULATED, i).setRegistryName(new ResourceLocation("charset:logic_wire_i" + i));
+		if (enableRedstoneCables) {
+			wireProviders[0] = new LogicWireProvider(WireType.NORMAL, -1).setRegistryName(new ResourceLocation("charset:logic_wire_n"));
 		}
-		wireProviders[17] = new LogicWireProvider(WireType.BUNDLED, -1).setRegistryName(new ResourceLocation("charset:logic_wire_b"));
+		if (enableInsulatedCables) {
+			for (int i = 0; i < 16; i++) {
+				wireProviders[i + 1] = new LogicWireProvider(WireType.INSULATED, i).setRegistryName(new ResourceLocation("charset:logic_wire_i" + i));
+			}
+		}
+		if (enableBundledCables) {
+			wireProviders[17] = new LogicWireProvider(WireType.BUNDLED, -1).setRegistryName(new ResourceLocation("charset:logic_wire_b"));
+		}
+		if (enableColoredBundledCables) {
+			for (int i = 0; i < 16; i++) {
+				wireProviders[i + 18] = new LogicWireProvider(WireType.BUNDLED, i).setRegistryName(new ResourceLocation("charset:logic_wire_bc" + i));
+			}
+		}
 
+		boolean setIcon = false;
 		for (int i = 0; i < wireProviders.length; i++) {
-			wireItems[i] = new ItemWire(wireProviders[i]);
-			wireItems[i].setRegistryName(wireProviders[i].getRegistryName());
+			if (wireProviders[i] != null) {
+				wireItems[i] = new ItemWire(wireProviders[i]);
+				wireItems[i].setRegistryName(wireProviders[i].getRegistryName());
+				if (!setIcon) {
+					SimpleLogicShared.TAB_ICON = new ItemStack(wireItems[i]);
+					setIcon = true;
+				}
+			}
 		}
 
-		// configure creative tab
-		SimpleLogicShared.TAB_ICON = new ItemStack(wireItems[0]);
-
-		for (int i = 0; i < 16; i++) {
-			IngredientGroup.register("simplelogic:wireInsulated", i, new ItemStack(wireItems[i + 1]));
+		if (enableInsulatedCables) {
+			for (int i = 0; i < 16; i++) {
+				IngredientGroup.register("simplelogic:wireInsulated", i, new ItemStack(wireItems[i + 1]));
+			}
+		}
+		if (enableColoredBundledCables) {
+			for (int i = 0; i < 16; i++) {
+				IngredientGroup.register("simplelogic:wireBundledColored", i, new ItemStack(wireItems[i + 18]));
+			}
 		}
 	}
 
 	@SubscribeEvent
 	public void onRegisterItems(RegistryEvent.Register<Item> event) {
 		for (int i = 0; i < wireItems.length; i++) {
-			RegistryUtils.register(event.getRegistry(), wireItems[i], wireItems[i].getRegistryName().getPath(), SimpleLogicShared.getTab());
+			if (wireItems[i] != null) {
+				RegistryUtils.register(event.getRegistry(), wireItems[i], wireItems[i].getRegistryName().getPath(), SimpleLogicShared.getTab());
+			}
 		}
 	}
 
 	@SubscribeEvent
 	public void onRegisterWires(RegistryEvent.Register<WireProvider> event) {
 		for (int i = 0; i < wireProviders.length; i++) {
-			RegistryUtils.register(event.getRegistry(), wireProviders[i], wireProviders[i].getRegistryName().getPath(), SimpleLogicShared.getTab());
+			if (wireProviders[i] != null) {
+				RegistryUtils.register(event.getRegistry(), wireProviders[i], wireProviders[i].getRegistryName().getPath(), SimpleLogicShared.getTab());
+			}
 		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitchPre(TextureStitchEvent.Pre event) {
-		CharsetLibWires.instance.registerRenderer(wireProviders[17], new WireRenderHandlerOverlay(wireProviders[17]));
-		CharsetLibWires.instance.registerRenderer(wireProviders[0], new IWireRenderContainer.Simple(new WireRenderHandlerDefault(wireProviders[0]) {
-			@Override
-			@SideOnly(Side.CLIENT)
-			public boolean isDynamic() {
-				return useTESRs;
+		if (enableRedstoneCables) {
+			CharsetLibWires.instance.registerRenderer(wireProviders[0], new IWireRenderContainer.Simple(new WireRenderHandlerDefault(wireProviders[0]) {
+				@Override
+				@SideOnly(Side.CLIENT)
+				public boolean isDynamic() {
+					return useTESRs;
+				}
+			}));
+		}
+		if (enableBundledCables) {
+			CharsetLibWires.instance.registerRenderer(wireProviders[17], new WireRenderHandlerOverlay(wireProviders[17], false));
+		}
+		if (enableColoredBundledCables) {
+			for (int i = 0; i < 16; i++) {
+				CharsetLibWires.instance.registerRenderer(wireProviders[18 + i], new WireRenderHandlerOverlay(wireProviders[18 + i], true));
 			}
-		}));
+		}
 	}
 
 	private void addWireOD(String name, Item i) {
+		if (i == null) return;
+
 		ItemStack nonFreestanding = new ItemStack(i, 1, 0);
 		ItemStack freestanding = new ItemStack(i, 1, 1);
 
@@ -141,13 +183,24 @@ public class SimpleLogicWires {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		Collection<Item> scrollableInsulated = new LinkedHashSet<>();
-		for (int i = 0; i < 16; i++) {
-			scrollableInsulated.add(wireItems[i + 1]);
-		}
+		if (enableInsulatedCables) {
+			Collection<Item> scrollableInsulated = new LinkedHashSet<>();
+			for (int i = 0; i < 16; i++) {
+				scrollableInsulated.add(wireItems[i + 1]);
+			}
 
-		ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, false));
-		ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, true));
+			ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, false));
+			ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, true));
+		}
+		if (enableColoredBundledCables) {
+			Collection<Item> scrollableInsulated = new LinkedHashSet<>();
+			for (int i = 0; i < 16; i++) {
+				scrollableInsulated.add(wireItems[i + 18]);
+			}
+
+			ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, false));
+			ShiftScrollHandler.INSTANCE.register(new ShiftScrollProviderWire(scrollableInsulated, true));
+		}
 
 		addWireOD("Redstone", wireItems[0]);
 		addWireOD("Bundled", wireItems[17]);
@@ -155,6 +208,8 @@ public class SimpleLogicWires {
 		for (int i = 0; i < 16; i++) {
 			addWireOD("Insulated", wireItems[i + 1]);
 			addWireOD(ColorUtils.getOreDictEntry("Insulated", EnumDyeColor.byMetadata(i)), wireItems[i + 1]);
+			addWireOD("BundledColored", wireItems[i + 18]);
+			addWireOD(ColorUtils.getOreDictEntry("BundledColored", EnumDyeColor.byMetadata(i)), wireItems[i + 1]);
 		}
 	}
 

@@ -3,7 +3,7 @@
         { "from": [ 0, 0, 0 ],
             "to": [ 16, 2, 16 ],
             "faces": {
-                "up": { "texture": "#layer" }
+                "up": { "texture": "#layer", "uv": [16, 0, 0, 16] }
             }
         }
     ]

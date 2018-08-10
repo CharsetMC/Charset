@@ -43,6 +43,11 @@ public abstract class WireRenderHandler {
 	}
 
 	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.CUTOUT;
+	}
+
+	@SideOnly(Side.CLIENT)
 	public abstract boolean isTranslucent();
 
 	@SideOnly(Side.CLIENT)

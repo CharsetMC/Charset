@@ -191,6 +191,13 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
         return BlockRenderLayer.CUTOUT;
     }
 
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+        return layer != BlockRenderLayer.SOLID;
+    }
+
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
         return ((IExtendedBlockState) state).withProperty(Wire.PROPERTY, WireUtils.getAnyWire(world, pos));

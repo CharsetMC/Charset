@@ -1,7 +1,9 @@
 {
     "models": {
         "base": "simplelogic:block/gate_base",
+        "base_mirrored": "simplelogic:block/gate_base_mirrored",
         "layer": "simplelogic:block/gate_layer",
+        "layer_mirrored": "simplelogic:block/gate_layer_mirrored",
         "torch_off": "simplelogic:block/gate_torch_off",
         "torch_on": "simplelogic:block/gate_torch_on"
     },

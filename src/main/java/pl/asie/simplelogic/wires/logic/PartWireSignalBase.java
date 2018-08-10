@@ -104,7 +104,11 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 				// Insulated wires of the same color are handled by the super call above.
 				return sWire.getWireType() != WireType.INSULATED;
 			case BUNDLED:
-				return sWire.getWireType() != WireType.NORMAL;
+				if (sWire.getWireType() == WireType.BUNDLED) {
+					return sWire.getColor() == -1 || getColor() == -1;
+				} else {
+					return sWire.getWireType() != WireType.NORMAL;
+				}
 		}
 
 		return false;

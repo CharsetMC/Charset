@@ -1,4 +1,17 @@
+Additions:
+
+* [simplelogic.wires] Configuration options for all cable types.
+* [simplelogic.wires] Colored Bundled Cables!
+    * I don't usually add features to patch releases, but Charset's release schedule is all strange again. Sorry!
+
 Bugs fixed:
 
+* [simplelogic.gates] [GitHub/#265] A lot of assorted issues relating to gate mirroring.
+    * Does anyone test this mod?
 * [storage.tanks] [GitHub/#278] Various issues pertaining to Charset tanks
 * [tweak.carry] [GitHub/#277] Blacklist lilypads from being carried (I wish I had a better solution)
+
+Errata:
+
+* [GitHub/#287] MCMultiPart-contained gates cannot be mirrored with all wrenches.
+    * Charset, AE2, ... wrenches do, however, work.

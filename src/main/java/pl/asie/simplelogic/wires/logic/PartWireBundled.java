@@ -56,6 +56,11 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		super(container, factory, location);
 	}
 
+	public int getBundledRenderColor() {
+		int c = 0xFF000000 | EnumDyeColor.byMetadata(getColor()).getColorValue();
+		return (c & 0xFF00FF00) | ((c >> 16) & 0xFF) | ((c << 16) & 0xFF0000);
+	}
+
 	protected int[] getInsulatedColorCache() {
 		if (getContainer().world() != null && getContainer().pos() != null) {
 			if (insulatedColorCache == null) {
@@ -368,6 +373,10 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 	@Override
 	public String getDisplayName() {
+		if (getColor() >= 0) {
+			return String.format(I18n.translateToLocal("tile.simplelogic.wire.bundled.colored" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name")),
+					I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", EnumDyeColor.byMetadata(getColor()))));
+		}
 		return I18n.translateToLocal("tile.simplelogic.wire.bundled" + (getLocation() == WireFace.CENTER ? ".freestanding.name" : ".name"));
 	}
 

@@ -1,0 +1,31 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "simplelogic.wires"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:logic_wire_bundled_colored",
+  "pattern": [
+    " w ",
+    "wdw",
+    " w "
+  ],
+  "key": {
+    "w": {
+      "type": "forge:ore_dict",
+      "ore": "wireLogicBundledGrounded"
+    },
+    "d": {
+      "type": "charset:group",
+      "group": "dye",
+      "itemPrefix": "charset:logic_wire_bc"
+    }
+  },
+  "result": {
+    "item": "charset:logic_wire_b",
+    "data": 0,
+    "count": 4
+  }
+}

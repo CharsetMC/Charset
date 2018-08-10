@@ -24,7 +24,7 @@ apply plugin: 'net.minecrell.licenser'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.5.4.5"
+version = "0.5.4.6"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
@@ -100,6 +100,7 @@ license {
 	sourceSets = [project.sourceSets.main]
 	header = project.file("docs/licenses/LICENSE")
 	ignoreFailures = true
+	exclude '**/*.ogg'
 	exclude '**/*.lang'
 	exclude '**/*.info'
 	exclude '**/*.mcmeta'

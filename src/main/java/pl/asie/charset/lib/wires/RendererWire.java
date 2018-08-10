@@ -581,7 +581,7 @@ public class RendererWire extends ModelFactory<Wire> {
 					if (i == 0) {
 						model.setParticle(handler.getTexture(WireRenderHandler.TextureType.PARTICLE, wire,null, 15));
 					}
-					if (isItem || (handler.isDynamic() == isDynamic)) {
+					if (isItem || ((handler.isDynamic() == isDynamic) && blockLayer == handler.getRenderLayer())) {
 						hasDynamic = true;
 						addWire(handler, wire, model.getQuads(null, null, 0));
 					}

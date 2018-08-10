@@ -56,6 +56,9 @@ public class LogicWireProvider extends WireProvider {
                 break;
             case BUNDLED:
                 wire = new PartWireBundled(container, this, location);
+                if (color >= 0) {
+                    wire.setColor(color);
+                }
                 break;
         }
 

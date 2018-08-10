@@ -36,6 +36,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import net.minecraftforge.common.capabilities.Capability;
@@ -391,7 +392,6 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		double distance = Double.MAX_VALUE;
 		for (int i = 0; i <= (allowNulls ? 4 : 3); i++) {
 			double d = HIT_VECTORS[i].squareDistanceTo(vec);
-			System.out.println(HIT_VECTORS[i]);
 			if (d < distance) {
 				closestFace = i;
 				distance = d;
@@ -410,7 +410,8 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		boolean used = false;
 		boolean remote = getWorld().isRemote;
 		ItemStack stack = playerIn.getHeldItem(hand);
-		Vec3d vec = realToGate(new Vec3d(hitX, hitY, hitZ));
+		Vec3d vecOrig = new Vec3d(hitX, hitY, hitZ);
+		Vec3d vec = realToGate(vecOrig);
 
 		if (!stack.isEmpty()) {
 			if (stack.getItem().getToolClasses(stack).contains("wrench")) {
@@ -454,7 +455,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 					if (logic.canInvertSide(closestFace) && logic.isSideInverted(closestFace)) {
 						if (!remote) {
 							logic.invertedSides &= ~(1 << (closestFace.ordinal() - 2));
-							ItemUtils.spawnItemEntity(getWorld(), vec.add(getPos().getX(), getPos().getY(), getPos().getZ()),
+							ItemUtils.spawnItemEntity(getWorld(), vecOrig.add(getPos().getX(), getPos().getY(), getPos().getZ()),
 									new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
 						}
 						changed = true;
@@ -475,6 +476,8 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 				onChanged();
 				pendingChange = true;
 				markBlockForUpdate();
+			} else {
+				markBlockForRenderUpdate();
 			}
 			return true;
 		} else {
@@ -482,8 +485,12 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		}
 	}
 
-	public String getModelName() {
-		return "base";
+	public String getBaseModelName() {
+		return mirrored ? "base_mirrored" : "base";
+	}
+
+	public String getLayerModelName() {
+		return mirrored ? "layer_mirrored" : "layer";
 	}
 
 	public boolean canConnectRedstone(@Nullable EnumFacing direction) {
@@ -559,6 +566,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 	@Override
 	public void readNBTData(NBTTagCompound tag, boolean isClient) {
 		boolean renderUpdate = false;
+		boolean orientationUpdate = false;
 
 		if (tag.hasKey("logic", Constants.NBT.TAG_STRING)) {
 			Optional<GateLogic> logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
@@ -570,7 +578,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		if (tag.hasKey("m")) {
 			boolean om = mirrored;
 			mirrored = tag.getBoolean("m");
-			renderUpdate |= (mirrored != om);
+			orientationUpdate |= (mirrored != om);
 		}
 		if (tag.hasKey("p")) {
 			pendingTick = tag.getByte("p");
@@ -578,9 +586,9 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		}
 		Orientation oldO = orientation;
 		orientation = Orientation.getOrientation(tag.getByte("o"));
-		renderUpdate |= (oldO != orientation);
+		orientationUpdate |= (oldO != orientation);
 
-		if (renderUpdate && isClient && !SimpleLogicGates.useTESRs) {
+		if (isClient && (orientationUpdate || (!SimpleLogicGates.useTESRs && renderUpdate))) {
 			markBlockForRenderUpdate();
 		}
 	}
@@ -696,7 +704,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 	@Override
 	public void addDebugInformation(List<String> stringList, Side side) {
 		if (side == Side.SERVER) {
-			stringList.add("O: " + getOrientation().name());
+			stringList.add("O: " + getOrientation().name() + (mirrored ? TextFormatting.RED+"M" : ""));
 		}
 
 		if (logic instanceof IDebuggable) {
