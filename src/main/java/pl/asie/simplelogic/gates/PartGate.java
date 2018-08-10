@@ -92,33 +92,21 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 	}
 
 	public static final AxisAlignedBB[] BOXES = new AxisAlignedBB[6];
-	private static final Vec3d[][] HIT_VECTORS = new Vec3d[6][];
+	private static final Vec3d[] HIT_VECTORS;
 	private final RedstoneCommunications[] COMMS = new RedstoneCommunications[4];
 
 	static {
 		for (int i = 0; i < 6; i++) {
 			EnumFacing facing = EnumFacing.byIndex(i);
 			BOXES[i] = RotationUtils.rotateFace(new AxisAlignedBB(0, 0, 0, 1, 0.125, 1), facing);
-
-			HIT_VECTORS[i] = new Vec3d[5];
-			HIT_VECTORS[i][4] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 0.5f), facing);
-
-			if (facing.getAxis() != EnumFacing.Axis.Y) {
-				HIT_VECTORS[i][1] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 0.0f), facing);
-				HIT_VECTORS[i][0] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 1.0f), facing);
-			} else {
-				HIT_VECTORS[i][0] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 0.0f), facing);
-				HIT_VECTORS[i][1] = RotationUtils.rotateVec(new Vec3d(0.5f, 0.125f, 1.0f), facing);
-			}
-
-			if (facing == EnumFacing.SOUTH || facing == EnumFacing.WEST) {
-				HIT_VECTORS[i][3] = RotationUtils.rotateVec(new Vec3d(0.0f, 0.125f, 0.5f), facing);
-				HIT_VECTORS[i][2] = RotationUtils.rotateVec(new Vec3d(1.0f, 0.125f, 0.5f), facing);
-			} else {
-				HIT_VECTORS[i][2] = RotationUtils.rotateVec(new Vec3d(0.0f, 0.125f, 0.5f), facing);
-				HIT_VECTORS[i][3] = RotationUtils.rotateVec(new Vec3d(1.0f, 0.125f, 0.5f), facing);
-			}
 		}
+
+		HIT_VECTORS = new Vec3d[5];
+		HIT_VECTORS[0] = new Vec3d(0.5, 0.125, 0);
+		HIT_VECTORS[1] = new Vec3d(0.5, 0.125, 1);
+		HIT_VECTORS[2] = new Vec3d(0, 0.125, 0.5);
+		HIT_VECTORS[3] = new Vec3d(1, 0.125, 0.5);
+		HIT_VECTORS[4] = new Vec3d(0.5, 0.125, 0.5);
 	}
 
 	public boolean mirrored;
@@ -399,11 +387,11 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 
 	@Nullable
 	private EnumFacing getClosestFace(Vec3d vec, boolean allowNulls) {
-		Vec3d[] compare = HIT_VECTORS[getSide().ordinal()];
 		int closestFace = -1;
 		double distance = Double.MAX_VALUE;
 		for (int i = 0; i <= (allowNulls ? 4 : 3); i++) {
-			double d = compare[i].squareDistanceTo(vec);
+			double d = HIT_VECTORS[i].squareDistanceTo(vec);
+			System.out.println(HIT_VECTORS[i]);
 			if (d < distance) {
 				closestFace = i;
 				distance = d;
@@ -411,13 +399,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		}
 
 		if (closestFace >= 0 && closestFace < 4) {
-			EnumFacing dir = EnumFacing.byIndex(closestFace + 2);
-			EnumFacing itop = getTop();
-			while (itop != EnumFacing.NORTH) {
-				dir = dir.rotateYCCW();
-				itop = itop.rotateYCCW();
-			}
-			return dir;
+			return EnumFacing.byIndex(closestFace + 2);
 		} else {
 			return null;
 		}
@@ -425,9 +407,10 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 
 	public boolean onActivated(EntityPlayer playerIn, EnumHand hand, float hitX, float hitY, float hitZ) {
 		boolean changed = false;
+		boolean used = false;
 		boolean remote = getWorld().isRemote;
 		ItemStack stack = playerIn.getHeldItem(hand);
-		Vec3d vec = new Vec3d(hitX, hitY, hitZ);
+		Vec3d vec = realToGate(new Vec3d(hitX, hitY, hitZ));
 
 		if (!stack.isEmpty()) {
 			if (stack.getItem().getToolClasses(stack).contains("wrench")) {
@@ -439,6 +422,8 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 				} else {
 					changed = rotate(orientation.facing);
 				}
+
+				used = true;
 			} else if (stack.getItem() instanceof ItemBlock) {
 				Block block = Block.getBlockFromItem(stack.getItem());
 				if (block == Blocks.REDSTONE_TORCH || block == Blocks.UNLIT_REDSTONE_TORCH) {
@@ -455,29 +440,33 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 							changed = true;
 						}
 					}
+
+					used = true;
 				}
 			}
-		} else {
-			EnumFacing closestFace = getClosestFace(vec, true);
+		}
 
-			if (closestFace != null) {
-				if (logic.canInvertSide(closestFace) && logic.isSideInverted(closestFace)) {
-					if (!remote) {
-						logic.invertedSides &= ~(1 << (closestFace.ordinal() - 2));
-						ItemUtils.spawnItemEntity(getWorld(), vec.add(getPos().getX(), getPos().getY(), getPos().getZ()),
-								new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
-					}
-					changed = true;
-				} else if (playerIn.isSneaking()) {
-					if (logic.canBlockSide(closestFace)) {
+		if (!used) {
+			if (!(changed = logic.onRightClick(this, playerIn, vec, hand))) {
+				EnumFacing closestFace = getClosestFace(vec, true);
+
+				if (closestFace != null) {
+					if (logic.canInvertSide(closestFace) && logic.isSideInverted(closestFace)) {
 						if (!remote) {
-							logic.enabledSides ^= (1 << (closestFace.ordinal() - 2));
+							logic.invertedSides &= ~(1 << (closestFace.ordinal() - 2));
+							ItemUtils.spawnItemEntity(getWorld(), vec.add(getPos().getX(), getPos().getY(), getPos().getZ()),
+									new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
 						}
 						changed = true;
+					} else if (playerIn.isSneaking()) {
+						if (logic.canBlockSide(closestFace)) {
+							if (!remote) {
+								logic.enabledSides ^= (1 << (closestFace.ordinal() - 2));
+							}
+							changed = true;
+						}
 					}
 				}
-			} else {
-				changed = logic.onRightClick(this, playerIn, hand);
 			}
 		}
 
@@ -522,7 +511,8 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		super.onPlacedBy(placer, face, stack, hitX, hitY, hitZ);
 		if (face != null) {
 			orientation = Orientation.fromDirection(SimpleLogicGates.onlyBottomFace ? EnumFacing.UP : face);
-			orientation = orientation.pointTopTo(gateToReal(getClosestFace(new Vec3d(hitX, hitY, hitZ), false)));
+			Vec3d vec = realToGate(new Vec3d(hitX, hitY, hitZ));
+			orientation = orientation.pointTopTo(gateToReal(getClosestFace(vec, false)));
 		}
 	}
 
@@ -640,6 +630,10 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		}
 
 		return CONNECTION_DIRS[getSide().ordinal()][dir.ordinal() - 2];
+	}
+
+	protected Vec3d realToGate(Vec3d vec) {
+		return Quaternion.fromOrientation(orientation.getPrevRotationOnFace()).applyReverseRotation(vec.scale(2).subtract(1, 1, 1)).add(1, 1, 1).scale(0.5);
 	}
 
 	protected EnumFacing realToGate(EnumFacing rdir) {

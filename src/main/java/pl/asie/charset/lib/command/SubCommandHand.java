@@ -68,8 +68,8 @@ public class SubCommandHand extends SubCommand {
                 if (material == null) {
                     sender.sendMessage(new TextComponentString(TextFormatting.RED + "Not a material!"));
                 } else {
-                    sender.sendMessage(new TextComponentString(TextFormatting.GREEN + material.getId()));
-                    sender.sendMessage(new TextComponentString("[" + CommandCharset.COMMAS.join(material.getTypes()) + "]"));
+                    sender.sendMessage(new TextComponentString("Material ID: " + TextFormatting.GREEN + material.getId()));
+                    sender.sendMessage(new TextComponentString("Material types: [" + CommandCharset.COMMAS.join(material.getTypes()) + "]"));
                     for (Map.Entry<String, ItemMaterial> entry : material.getRelations().entrySet()) {
                         sender.sendMessage(new TextComponentString("-> " + entry.getKey() + ": " + entry.getValue().getId()));
                     }

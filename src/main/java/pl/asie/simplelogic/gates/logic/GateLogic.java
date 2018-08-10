@@ -23,6 +23,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.simplelogic.gates.PartGate;
 
@@ -218,8 +219,13 @@ public abstract class GateLogic {
 
 	protected abstract byte calculateOutputInside(EnumFacing side);
 
+	@Deprecated
 	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, EnumHand hand) {
 		return false;
+	}
+
+	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
+		return onRightClick(gate, playerIn, hand);
 	}
 
 	public final boolean isSideOpen(EnumFacing side) {
