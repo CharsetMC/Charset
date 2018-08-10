@@ -149,6 +149,7 @@ public class CharsetTweakBlockCarrying {
 
         // Class-based bans
         // if (block instanceof IPlantable) return false;
+        if (block instanceof BlockLilyPad) return false;
         if (block instanceof BlockPistonExtension || block instanceof BlockPistonMoving) return false;
         if (block instanceof BlockPistonBase) {
             // If we don't have the BlockPistonBase.EXTENDED key, this piston

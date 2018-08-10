@@ -1,3 +1,4 @@
 Bugs fixed:
 
 * [storage.tanks] [GitHub/#278] Various issues pertaining to Charset tanks
+* [tweak.carry] [GitHub/#277] Blacklist lilypads from being carried (I wish I had a better solution)
