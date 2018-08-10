@@ -165,19 +165,17 @@ public final class FluidUtils {
                             changed = true;
                         }
                     } else {
-                        ItemStack stackOne = stack.splitStack(1);
+                        ItemStack stackOne = stack.copy();
+                        stackOne.setCount(1);
 
                         Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stackOne, playerIn.isCreative(), iterateAllDrain, iterateAllFill);
                         if (result.isPresent()) {
                             ItemStack resultStack = result.get();
-                            if (resultStack != stackOne) {
-                                if (!playerIn.inventory.addItemStackToInventory(resultStack)) {
-                                    ItemUtils.spawnItemEntity(worldIn, playerIn.getPositionVector(), resultStack, 0, 0, 0, 0);
-                                    // no more!
-                                    return changed;
-                                }
-                            } else {
-                                stackOne.grow(1);
+                            stack.shrink(1);
+                            if (!playerIn.inventory.addItemStackToInventory(resultStack)) {
+                                ItemUtils.spawnItemEntity(worldIn, playerIn.getPositionVector(), resultStack, 0, 0, 0, 0);
+                                // no more!
+                                return changed;
                             }
 
                             changed = true;
@@ -209,11 +207,9 @@ public final class FluidUtils {
                 Optional<ItemStack> result = handleTank(tank, fluidContained, worldIn, pos, stackOne, playerIn.isCreative(), true, true);
                 if (result.isPresent()) {
                     ItemStack resultStack = result.get();
-                    if (resultStack != stackOne) {
-                        stackOne.shrink(1);
-                        if (!playerIn.inventory.addItemStackToInventory(resultStack)) {
-                            ItemUtils.spawnItemEntity(worldIn, playerIn.getPositionVector(), resultStack, 0, 0, 0, 0);
-                        }
+                    stack.shrink(1);
+                    if (!playerIn.inventory.addItemStackToInventory(resultStack)) {
+                        ItemUtils.spawnItemEntity(worldIn, playerIn.getPositionVector(), resultStack, 0, 0, 0, 0);
                     }
 
                     return true;

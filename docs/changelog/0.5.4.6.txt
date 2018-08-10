@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* [storage.tanks] [GitHub/#278] Various issues pertaining to Charset tanks
