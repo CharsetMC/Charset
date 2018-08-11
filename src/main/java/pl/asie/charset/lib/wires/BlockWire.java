@@ -53,12 +53,14 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.modcompat.mcmultipart.IMultipartBase;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -175,6 +177,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         Wire wire = WireUtils.getAnyWire(worldIn, pos);
+
         if (wire != null) {
             int connMask = wire.getConnectionMask();
 
@@ -332,10 +335,16 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
                     WireUtils.getAllWires(world, pos.offset(facing).offset(location.facing)).forEach((wire) -> wire.onChanged(true));
                 }
             } else {
-                if ((connectionMask & (1 << (facing.ordinal() + 8))) != 0) {
+                // TODO: Simplify the logic for non-wire-breakage scenarios
+                if (location.facing == facing || (connectionMask & ((1 << (facing.ordinal())) * 0x10101)) != 0) {
                     world.neighborChanged(pos.offset(facing), this, pos);
-                } else if (location != WireFace.CENTER && location.facing.getAxis() != facing.getAxis()) {
-                    world.neighborChanged(pos.offset(facing).offset(location.facing), this, pos);
+
+                    BlockPos basePos = pos.offset(facing);
+                    for (EnumFacing facing2 : EnumFacing.VALUES) {
+                        if (facing2 != facing.getOpposite()) {
+                            world.neighborChanged(basePos.offset(facing2), this, pos);
+                        }
+                    }
                 }
             }
         }

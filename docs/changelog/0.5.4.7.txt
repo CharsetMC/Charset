@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* [GitHub/#289] Breaking wires does not always cause a redstone update
