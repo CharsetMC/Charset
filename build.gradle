@@ -121,9 +121,7 @@ dependencies {
 //	shadow name: "ibxm", version: "a73"
 
 	// APIs
-	deobfCompile ("appeng:appliedenergistics2:rv5-stable-11:api") {
-		exclude module: "jei_1.12.2"
-	}
+	deobfCompile name: "appliedenergistics2", version: "rv5-stable-11-api"
 	deobfCompile name: "Baubles", version: "1.12-1.5.2"
 	deobfCompile "com.mod-buildcraft:buildcraft-api:7.99.16"
 	deobfCompile name: "chiselsandbits", version: "14.20"

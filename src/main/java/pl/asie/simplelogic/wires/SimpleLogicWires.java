@@ -61,7 +61,7 @@ import java.util.List;
 		name = "simplelogic.wires",
 		description = "Simple wires.",
 		dependencies = {"lib.wires"},
-		profile = ModuleProfile.TESTING
+		profile = ModuleProfile.STABLE
 )
 public class SimpleLogicWires {
 	@CharsetModule.PacketRegistry
