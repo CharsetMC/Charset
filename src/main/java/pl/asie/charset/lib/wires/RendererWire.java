@@ -87,6 +87,15 @@ public class RendererWire extends ModelFactory<Wire> {
 
         if (!wc(wire, side.facing)) {
             h = 8.0f - (handler.getWidth() * 8);
+        } else if (wire.getLocation() == WireFace.CENTER && side != WireFace.CENTER) {
+        	WireNeighborWHCache cache = wire.getNeighborWHCache();
+        	if (cache != null) {
+        		float myWidth = handler.getWidth();
+        		float otherWidth = cache.getWidth(side.facing);
+        		if (otherWidth == myWidth) {
+        			h = cache.getHeight(side.facing) * 16f;
+		        }
+	        }
         }
 
         return side.facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16.0f - h : h;

@@ -117,7 +117,14 @@ public class SimpleLogicGates {
 		RegistryUtils.register(event.getRegistry(), itemGate, "logic_gate", SimpleLogicShared.getTab());
 	}
 
-	private GateRegisterEvent addonEvent;
+	private static GateRegisterEvent addonEvent;
+
+	static void sendAddonEventIfNotSent() {
+		if (addonEvent == null) {
+			addonEvent = new GateRegisterEvent();
+			MinecraftForge.EVENT_BUS.post(addonEvent);
+		}
+	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -140,9 +147,6 @@ public class SimpleLogicGates {
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 
-		addonEvent = new GateRegisterEvent();
-		MinecraftForge.EVENT_BUS.post(addonEvent);
-
 		// configure creative tab
 		if (!ModCharset.isModuleLoaded("simplelogic.wires") && !gateStacks.isEmpty()) {
 			SimpleLogicShared.TAB_ICON = gateStacks.iterator().next();
@@ -155,6 +159,8 @@ public class SimpleLogicGates {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		sendAddonEventIfNotSent();
+
 		RegistryUtils.register(PartGate.class, "logic_gate");
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(itemGate));
 

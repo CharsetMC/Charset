@@ -48,6 +48,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
     private final @Nonnull WireFace location;
     private final @Nullable net.minecraftforge.common.capabilities.CapabilityDispatcher capabilities;
 
+    private WireNeighborWHCache neighborWHCache;
     private byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
     private boolean connectionCheckDirty;
 
@@ -253,12 +254,29 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         }
     }
 
+    WireNeighborWHCache getNeighborWHCache() {
+        if (getContainer().world() == null) {
+            return null;
+        }
+
+        if (getLocation() == WireFace.CENTER && connectsAnyInternal() && neighborWHCache == null) {
+            neighborWHCache = new WireNeighborWHCache(getContainer().world(), getContainer().pos(), this);
+        }
+
+        return neighborWHCache;
+    }
+
     public void readNBTData(NBTTagCompound nbt, boolean isClient) {
+        int oldIC = internalConnections;
         internalConnections = nbt.getByte("iC");
         externalConnections = nbt.getByte("eC");
         cornerConnections = nbt.hasKey("cC") ? nbt.getByte("cC") : 0;
         occludedSides = nbt.hasKey("oS") ? nbt.getByte("oS") : 0;
         cornerOccludedSides = nbt.hasKey("coS") ? nbt.getByte("coS") : 0;
+
+        if (oldIC != internalConnections) {
+            neighborWHCache = null;
+        }
     }
 
     public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
@@ -307,8 +325,20 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         return location;
     }
 
+    public final boolean connectsAnyInternal() {
+        return (internalConnections & 0x7F) != 0;
+    }
+
+    public final boolean connectsInternal(EnumFacing side) {
+        return (internalConnections & (1 << side.ordinal())) != 0;
+    }
+
     public final boolean connectsInternal(WireFace side) {
         return (internalConnections & (1 << side.ordinal())) != 0;
+    }
+
+    public final boolean connectsAnyExternal() {
+        return (externalConnections & 0x3F) != 0;
     }
 
     public final boolean connectsExternal(EnumFacing side) {
@@ -317,6 +347,10 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
 
     public final boolean connectsAny(EnumFacing direction) {
         return ((internalConnections | externalConnections | cornerConnections) & (1 << (direction != null ? direction.ordinal() : 6))) != 0;
+    }
+
+    public final boolean connectsAnyCorner() {
+        return (cornerConnections & 0x3F) != 0;
     }
 
     public final boolean connectsCorner(EnumFacing direction) {
@@ -419,6 +453,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
             container.requestRenderUpdate();
         }
 
+        neighborWHCache = null;
         connectionCheckDirty = false;
     }
 
@@ -458,16 +493,28 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
 
     @Override
     public boolean renderEquals(Wire other) {
-        return other.factory == factory
+        if (!(other.factory == factory
                 && other.location == location
                 && other.internalConnections == internalConnections
                 && other.externalConnections == externalConnections
-                && other.cornerConnections == cornerConnections;
+                && other.cornerConnections == cornerConnections)) {
+            return false;
+        }
+
+        if (location == WireFace.CENTER) {
+            WireNeighborWHCache cache1 = getNeighborWHCache();
+            WireNeighborWHCache cache2 = other.getNeighborWHCache();
+            if (!cache1.renderEquals(cache2)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
     public int renderHashCode() {
-        return Objects.hash(factory, location, internalConnections, externalConnections, cornerConnections);
+        return Objects.hash(factory, location, internalConnections, externalConnections, cornerConnections, neighborWHCache != null ? neighborWHCache.renderHashCode() : 0);
     }
 
     @Override

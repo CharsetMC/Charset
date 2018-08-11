@@ -228,7 +228,8 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return ((IExtendedBlockState) state).withProperty(Wire.PROPERTY, WireUtils.getAnyWire(world, pos));
+        Wire wire = WireUtils.getAnyWire(world, pos);
+        return ((IExtendedBlockState) state).withProperty(Wire.PROPERTY, wire);
     }
 
     @Override

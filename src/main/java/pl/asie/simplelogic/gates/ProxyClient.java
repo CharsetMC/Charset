@@ -82,6 +82,8 @@ public class ProxyClient extends ProxyCommon {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		SimpleLogicGates.sendAddonEventIfNotSent();
+
 		GateRenderDefinitions.INSTANCE.load("simplelogic:gatedefs/base.json", SimpleLogicGates.logicDefinitions);
 		ResourceLocation top_underlay = GateRenderDefinitions.INSTANCE.base.getTexture("top_underlay");
 		event.getMap().registerSprite(top_underlay);
