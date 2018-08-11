@@ -504,8 +504,14 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         if (location == WireFace.CENTER) {
             WireNeighborWHCache cache1 = getNeighborWHCache();
             WireNeighborWHCache cache2 = other.getNeighborWHCache();
-            if (!cache1.renderEquals(cache2)) {
-                return false;
+            if (cache1 != null || cache2 != null) {
+                if (cache1 == null || cache2 == null) {
+                    return false;
+                }
+
+                if (!cache1.renderEquals(cache2)) {
+                    return false;
+                }
             }
         }
 
