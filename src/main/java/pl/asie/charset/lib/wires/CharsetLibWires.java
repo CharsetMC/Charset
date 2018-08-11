@@ -47,6 +47,10 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.simplelogic.wires.logic.WireRenderHandlerOverlay;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @CharsetModule(
 	name = "lib.wires",
@@ -62,6 +66,7 @@ public class CharsetLibWires {
 
 	@SideOnly(Side.CLIENT)
 	protected static RendererWire rendererWire;
+	protected static Set<ResourceLocation> orderedWireLocations = new LinkedHashSet<>();
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -75,12 +80,17 @@ public class CharsetLibWires {
 				.add(new IForgeRegistry.AddCallback<WireProvider>() {
 					@Override
 					public void onAdd(IForgeRegistryInternal<WireProvider> owner, RegistryManager stage, int id, WireProvider obj, @Nullable WireProvider oldObj) {
+						orderedWireLocations.add(obj.getRegistryName());
 						obj.generateBoxes();
 					}
 				})
 				.create();
 
 		ModCharset.dataFixes.registerFix(FixTypes.ITEM_INSTANCE, new FixCharsetWireItemSeparation());
+	}
+
+	public static Stream<WireProvider> getOrderedWireProviders() {
+		return orderedWireLocations.stream().filter((r) -> WireManager.REGISTRY.containsKey(r)).map((r) -> WireManager.REGISTRY.getValue(r));
 	}
 
 	@SubscribeEvent

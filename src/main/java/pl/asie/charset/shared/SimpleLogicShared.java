@@ -22,6 +22,7 @@ package pl.asie.charset.shared;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import pl.asie.charset.lib.CreativeTabCharset;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 import pl.asie.simplelogic.wires.SimpleLogicWires;
 
@@ -31,7 +32,7 @@ public class SimpleLogicShared {
 
 	public static CreativeTabs getTab() {
 		if (TAB == null) {
-			 TAB = new CreativeTabs("simplelogic") {
+			 TAB = new CreativeTabCharset("simplelogic") {
 				@Override
 				public ItemStack createIcon() {
 					return TAB_ICON;

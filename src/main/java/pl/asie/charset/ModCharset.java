@@ -27,6 +27,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -40,25 +41,30 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.lib.CharsetIMC;
 import pl.asie.charset.lib.CharsetImplAPI;
+import pl.asie.charset.lib.CreativeTabCharset;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.loader.ModuleLoader;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.misc.IconCharset;
 import pl.asie.charset.lib.inventory.GuiHandlerCharset;
+import pl.asie.charset.lib.recipe.IngredientGroup;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.misc.FixCharsetUnifyModId;
+import pl.asie.charset.lib.wires.CharsetLibWires;
+import pl.asie.charset.lib.wires.ItemWire;
+import pl.asie.charset.lib.wires.WireProvider;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Mod(modid = ModCharset.MODID, name = ModCharset.NAME, version = ModCharset.VERSION, updateJSON = ModCharset.UPDATE_URL, dependencies = ModCharset.DEP_LIB, guiFactory = "pl.asie.charset.lib.config.ConfigGuiFactory")
 public class ModCharset {
@@ -78,7 +84,7 @@ public class ModCharset {
 	private static ItemStack charsetIconStack;
 	public static ModuleProfile profile;
 
-	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs("charset") {
+	public static final CreativeTabs CREATIVE_TAB = new CreativeTabCharset("charset") {
 		@Override
 		public ItemStack createIcon() {
 			return charsetIconStack;
