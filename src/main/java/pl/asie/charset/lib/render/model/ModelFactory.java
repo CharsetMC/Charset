@@ -105,15 +105,19 @@ public abstract class ModelFactory<T extends IRenderComparable<T>> extends BaseB
     public abstract IBakedModel bake(T object, boolean isItem, BlockRenderLayer layer);
     public abstract T fromItemStack(ItemStack stack);
 
+    public boolean shouldCache(T object, BlockRenderLayer layer) {
+        return true;
+    }
+
     private IBakedModel getModel(T object, BlockRenderLayer layer) {
         if (object == null) {
             return null;
         }
 
-        ModelKey<T> key = new ModelKey<>(object, layer);
-        if (DISABLE_CACHE) {
+        if (DISABLE_CACHE || !shouldCache(object, layer)) {
             return bake(object, layer == null, layer);
         } else {
+            ModelKey<T> key = new ModelKey<>(object, layer);
             IBakedModel model = cache.getIfPresent(key);
             if (model != null) {
                 return model;

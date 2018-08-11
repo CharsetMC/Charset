@@ -49,10 +49,7 @@ import javax.vecmath.Vector3f;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import pl.asie.simplelogic.gates.BlockGate;
-import pl.asie.simplelogic.gates.ItemGate;
-import pl.asie.simplelogic.gates.SimpleLogicGates;
-import pl.asie.simplelogic.gates.PartGate;
+import pl.asie.simplelogic.gates.*;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.ModelTransformer;
@@ -92,6 +89,11 @@ public class RendererGate extends ModelFactory<PartGate> {
 		addDefaultBlockTransforms();
 		addThirdPersonTransformation(getTransformation(0, 2.5f, 2.75f, 75, 45, 0, 0.375f));
 		shiftGuiTransform = getTransformation(0, -16, 0, 90, 0, 0, 1f);
+	}
+
+	@Override
+	public boolean shouldCache(PartGate object, BlockRenderLayer layer) {
+		return layer != null || SimpleLogicGatesClient.INSTANCE.getDynamicRenderer(object.logic.getClass()) != null;
 	}
 
 	@Override
@@ -273,6 +275,14 @@ public class RendererGate extends ModelFactory<PartGate> {
 		if (!SimpleLogicGates.useTESRs || isItem) {
 			addLayers(result, transform, gate);
 		}
+
+		if (isItem) {
+			GateDynamicRenderer renderer = SimpleLogicGatesClient.INSTANCE.getDynamicRenderer(gate.logic.getClass());
+			if (renderer != null) {
+				renderer.appendModelsToItem(gate, result);
+			}
+		}
+
 		return result;
 	}
 

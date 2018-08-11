@@ -25,6 +25,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.render.model.ModelTransformer;
+import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.simplelogic.gates.PartGate;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 import pl.asie.simplelogic.gates.logic.GateLogic;
@@ -36,24 +37,35 @@ import static pl.asie.simplelogic.gates.render.FastTESRGate.renderer;
 public abstract class GateDynamicRenderer<T extends GateLogic> {
 	public abstract Class<T> getLogicClass();
 
+	protected final IBakedModel getTransformedModel(IBakedModel model, PartGate gate) {
+		return getTransformedModel(model, null, gate);
+	}
+
+	protected final IBakedModel getTransformedModel(IBakedModel model, @Nullable ModelTransformer.IVertexTransformer transformer, PartGate gate) {
+		ModelTransformer.IVertexTransformer rotate = ModelTransformer.IVertexTransformer.transform(RendererGate.INSTANCE.getTransform(gate), null);
+
+		return ModelTransformer.transform(
+				model, SimpleLogicGates.blockGate.getDefaultState(),
+				0L,
+				transformer != null ? ModelTransformer.IVertexTransformer.compose(transformer, rotate) : rotate
+		);
+	}
+
 	protected final void renderTransformedModel(IBakedModel model, PartGate gate, IBlockAccess world, double x, double y, double z, BufferBuilder buffer) {
 		renderTransformedModel(model, null, gate, world, x, y, z, buffer);
 	}
 
 	@SuppressWarnings("SameParameterValue")
 	protected final void renderTransformedModel(IBakedModel model, @Nullable  ModelTransformer.IVertexTransformer transformer, PartGate gate, IBlockAccess world, double x, double y, double z, BufferBuilder buffer) {
-		ModelTransformer.IVertexTransformer rotate = ModelTransformer.IVertexTransformer.transform(RendererGate.INSTANCE.getTransform(gate), null);
-
-		model = ModelTransformer.transform(
-				model, SimpleLogicGates.blockGate.getDefaultState(),
-				0L,
-				transformer != null ? ModelTransformer.IVertexTransformer.compose(transformer, rotate) : rotate
-		);
-
+		model = getTransformedModel(model, transformer, gate);
 		BlockPos pos = gate.getPos();
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 		renderer.renderModel(world, model, SimpleLogicGates.blockGate.getDefaultState(), pos, buffer, false);
 		buffer.setTranslation(0, 0, 0);
+	}
+
+	public void appendModelsToItem(PartGate gate, SimpleBakedModel model) {
+
 	}
 
 	public abstract void render(PartGate gate, T logic, IBlockAccess world, double x, double y, double z, float partialTicks, int destroyStage, float partial, BufferBuilder buffer);
