@@ -34,6 +34,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -75,6 +76,30 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
 
         // BlockTrapdoor etc. rely on this!
         setDefaultState(getDefaultState().withProperty(REDSTONE, true));
+    }
+
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World source, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        Wire wire = WireUtils.getAnyWire(source, pos);
+        if (wire != null) {
+            EnumFacing[] connFaces = WireUtils.getConnectionsForRender(wire.getLocation());
+            for (int i = 0; i <= connFaces.length; i++) {
+                AxisAlignedBB mask = wire.getProvider().getBox(wire.getLocation(), i);
+                boolean add = i == 0;
+                if (!add) {
+                    if (wire.connectsAny(connFaces[i - 1])) {
+                        add = true;
+                    }
+                }
+
+                if (add) {
+                    AxisAlignedBB box = mask.offset(pos);
+                    if (box.intersects(entityBox)) {
+                        collidingBoxes.add(box);
+                    }
+                }
+            }
+        }
     }
 
     @Override

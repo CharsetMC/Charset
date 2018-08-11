@@ -1,4 +1,5 @@
 Bugs fixed:
 
+* [GitHub/#290] Collision boxes not implemented for wires
 * [GitHub/#289] Breaking wires does not always cause a redstone update
 * Wires are now sorted correctly in Charset's creative tabs
