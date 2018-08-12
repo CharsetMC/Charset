@@ -27,6 +27,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -40,6 +41,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Created by asie on 1/6/16.
@@ -74,9 +76,9 @@ public final class RedstoneUtils {
 		GETTERS.add(getter);
 	}
 
-	public static int getModdedWeakPower(IBlockAccess w, BlockPos p, EnumFacing face, EnumFacing edge) {
+	public static int getModdedWeakPower(IBlockAccess w, BlockPos p, EnumFacing face, EnumFacing edge, Predicate<TileEntity> tileEntityPredicate) {
 		for (IRedstoneGetter getter : GETTERS) {
-			int v = getter.get(w, p, face, edge);
+			int v = getter.get(w, p, face, edge, tileEntityPredicate);
 			if (v >= 0) {
 				return v;
 			}

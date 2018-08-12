@@ -35,6 +35,7 @@ import pl.asie.charset.lib.utils.redstone.IRedstoneGetter;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 
 import java.util.EnumMap;
+import java.util.function.Predicate;
 
 /**
  * Due to lack of an API on Redstone Paste's side and the BY-NC-ND license
@@ -85,13 +86,17 @@ public class CharsetCompatRedstonePaste {
 
     public static class RedstoneGetterPaste implements IRedstoneGetter {
         @Override
-        public int get(IBlockAccess world, BlockPos pos, EnumFacing face, EnumFacing edge) {
+        public int get(IBlockAccess world, BlockPos pos, EnumFacing face, EnumFacing edge, Predicate<TileEntity> tileEntityPredicate) {
             if (edge == null) {
                 return -1;
             }
 
             TileEntity tile = world.getTileEntity(pos);
             if (tile != null && TileEntity.getKey(tile.getClass()).getPath().equals("redstonepastete")) {
+                if (!tileEntityPredicate.test(tile)) {
+                    return 0;
+                }
+
                 NBTTagCompound tag = tile.writeToNBT(new NBTTagCompound());
                 if (
                     tag.hasKey("facetype", Constants.NBT.TAG_INT_ARRAY) &&

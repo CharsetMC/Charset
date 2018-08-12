@@ -1,0 +1,19 @@
+Additions:
+
+* New gate: Comparator
+    * Acts like the vanilla Redstone Comparator
+* New gate: Repeater
+    * Acts like the vanilla Redstone Repeater.
+
+Bugs fixed:
+
+* [lib.wires] [GitHub/#296] MCMP doesn't block vertical connection between freestanding cable and bundled cable bug
+* [simplelogic.gates] [GitHub/#295] Regression in freestanding cable visibility for gates
+* [simplelogic.gates] [GitHub/#294] Issues with render updates of Bundled Transceiver (may have also fixed other gates)
+* [simplelogic.wires] Placing freestanding wire one block above vanilla redstone wire would power said redstone wire
+* [storage.tanks] Incorrect rounding of comparator output value
+
+Errata:
+
+* The SimpleLogic Repeater still has tiny timing issues relative to vanilla. This will be fixed, and should not
+  affect simpler builds.

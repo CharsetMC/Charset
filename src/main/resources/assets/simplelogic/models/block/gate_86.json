@@ -1,0 +1,19 @@
+{
+  "textures": {
+    "eightysix": "blocks/bedrock"
+  },
+  "elements": [
+    {
+      "from": [2, 2, 7],
+      "to": [14, 4, 9],
+      "faces": {
+        "down":  { "uv": [ 7, 2,  9, 14 ], "texture": "#eightysix", "rotation": 90 },
+        "up":    { "uv": [ 7, 2,  9, 14 ], "texture": "#eightysix", "rotation": 90 },
+        "north": { "texture": "#eightysix" },
+        "south": { "texture": "#eightysix" },
+        "west":  { "texture": "#eightysix" },
+        "east":  { "texture": "#eightysix" }
+      }
+    }
+  ]
+}

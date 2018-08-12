@@ -99,6 +99,15 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 	}
 
 	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		super.breakBlock(worldIn, pos, state);
+
+		if (hasComparatorInputOverride(state)) {
+			worldIn.updateComparatorOutputLevel(pos, this);
+		}
+	}
+
+	@Override
 	public final ISubItemProvider getSubItemProvider() {
 		return subItemProvider;
 	}

@@ -36,6 +36,7 @@ import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.client.model.IModel;
 
+import net.minecraftforge.fml.common.ProgressManager;
 import pl.asie.charset.lib.utils.RenderUtils;
 
 // TODO: Rewrite - remove distinction between BaseDefinition and Definition, allow multiple InputStream for resource
@@ -146,7 +147,7 @@ public class GateRenderDefinitions {
 	public class Torch {
 		public final float[] pos = new float[2];
 		public String color_on, color_off;
-		public String model_on, model_off;
+		public String model_on, model_off, model_disabled;
 		public String inverter;
 	}
 
@@ -158,6 +159,10 @@ public class GateRenderDefinitions {
 	}
 
 	public void load(String baseLoc, Map<ResourceLocation, ResourceLocation> definitions) {
+		ProgressManager.ProgressBar bar = ProgressManager.push("SimpleLogic gate models", definitions.size() + 1);
+
+		bar.step("base");
+
 		try {
 			base = GSON.fromJson(new InputStreamReader(
 					Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(baseLoc)).getInputStream()
@@ -170,9 +175,13 @@ public class GateRenderDefinitions {
 
 		if (base != null) {
 			base.init();
+		}
 
-			for (ResourceLocation s : definitions.keySet()) {
-				try {
+		for (ResourceLocation s : definitions.keySet()) {
+			bar.step(s.toString());
+
+			try {
+				if (base != null) {
 					Definition def = GSON.fromJson(new InputStreamReader(
 							Minecraft.getMinecraft().getResourceManager().getResource(definitions.get(s)).getInputStream()
 					), Definition.class);
@@ -180,10 +189,12 @@ public class GateRenderDefinitions {
 					def.merge(base);
 					def.postInit();
 					definitionMap.put(s, def);
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
+
+		ProgressManager.pop(bar);
 	}
 }

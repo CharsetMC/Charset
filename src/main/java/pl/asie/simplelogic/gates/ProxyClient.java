@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -136,10 +137,34 @@ public class ProxyClient extends ProxyCommon {
 									int value = pixels[ip];
 									if (resultingTextures.containsKey(value & 0xFFFFFF) && (value & 0xFF000000) != 0) {
 										pixels[ip] = 0;
+									} else if ((value & 0xFF000000) == 0xFF000000) {
+										pixels[ip] = value;
+									} else if ((value & 0xFF000000) != 0x00000000) {
+										// colormixing
+										int iUx = ix * topUnderlay.getIconWidth() / width;
+										int iUy = iy * topUnderlay.getIconHeight() / height;
+										int iU = iUy * topUnderlay.getIconWidth() + iUx;
+										int col1 = topUnderlay.getFrameTextureData(0)[0][iU];
+										int col2 = value;
+
+										int r1 = (col1 >> 16) & 0xFF;
+										int g1 = (col1 >> 8) & 0xFF;
+										int b1 = (col1) & 0xFF;
+										int a2 = (col2 >> 24) & 0xFF;
+										int r2 = (col2 >> 16) & 0xFF;
+										int g2 = (col2 >> 8) & 0xFF;
+										int b2 = (col2) & 0xFF;
+
+										int r = MathHelper.clamp(r1 + Math.round((r2 - r1) * (a2) / 255f) , 0, 255);
+										int g = MathHelper.clamp(g1 + Math.round((g2 - g1) * (a2) / 255f) , 0, 255);
+										int b = MathHelper.clamp(b1 + Math.round((b2 - b1) * (a2) / 255f) , 0, 255);
+
+										pixels[ip] = 0xFF000000 | (r << 16) | (g << 8) | b;
 									} else {
 										int iUx = ix * topUnderlay.getIconWidth() / width;
 										int iUy = iy * topUnderlay.getIconHeight() / height;
 										int iU = iUy * topUnderlay.getIconWidth() + iUx;
+
 										pixels[ip] = topUnderlay.getFrameTextureData(0)[0][iU];
 									}
 								}

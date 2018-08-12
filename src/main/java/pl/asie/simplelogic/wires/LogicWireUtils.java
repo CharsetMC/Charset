@@ -19,18 +19,14 @@
 
 package pl.asie.simplelogic.wires;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
 import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
@@ -39,6 +35,9 @@ import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireUtils;
 import pl.asie.simplelogic.wires.logic.PartWireSignalBase;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public final class LogicWireUtils {
 	private static final Set<Block> WIRE_PLACEABLE = new HashSet<Block>();
@@ -111,7 +110,7 @@ public final class LogicWireUtils {
 		World world = wire.getContainer().world();
 
 		// Step 1: Check with mods.
-		int power = RedstoneUtils.getModdedWeakPower(world, pos, facing, face.facing);
+		int power = RedstoneUtils.getModdedWeakPower(world, pos, facing, face.facing, tileEntity -> true);
 		if (power >= 0) {
 			return power;
 		}

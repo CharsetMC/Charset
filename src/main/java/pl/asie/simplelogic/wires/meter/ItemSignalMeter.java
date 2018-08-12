@@ -17,10 +17,9 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.misc;
+package pl.asie.simplelogic.wires.meter;
 
-import net.minecraft.util.EnumFacing;
+import pl.asie.charset.lib.item.ItemBase;
 
-public interface IConnectable {
-	boolean connects(EnumFacing side);
+public class ItemSignalMeter extends ItemBase {
 }

@@ -31,6 +31,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -55,6 +56,7 @@ import pl.asie.charset.lib.misc.DoubleClickHandler;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.FluidUtils;
 import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.MathUtils;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -500,7 +502,7 @@ public class TileTank extends TileBase implements FluidUtils.IFluidHandlerAutoma
         if (contents == null || contents.amount <= 0)
             return 0;
 
-        return Math.max(1, contents.amount * max / getCapacity());
+        return MathHelper.clamp(contents.amount * (max + 1) / getCapacity(), 1, 15);
     }
 
     @Override

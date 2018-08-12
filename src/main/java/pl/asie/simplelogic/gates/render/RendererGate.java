@@ -222,9 +222,14 @@ public class RendererGate extends ModelFactory<PartGate> {
 			}
 
 			String name = state == GateLogic.State.ON ? (torch.model_on == null ? "torch_on" : torch.model_on) : (torch.model_off == null ? "torch_off" : torch.model_off);
+			if (state == GateLogic.State.DISABLED && torch.model_disabled != null) {
+				name = torch.model_disabled;
+			}
+
 			if (name.length() > 0) {
 				float xPos = (torch.pos[0] - 7.5f) / 16.0f;
 				float zPos = (torch.pos[1] - 7.5f) / 16.0f;
+				float yOffset = torch.pos.length >= 3 ? (torch.pos[2] / 16.0f) : 0;
 
 				if (gate.mirrored) {
 					xPos = -xPos;
@@ -232,7 +237,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 				IBakedModel torchModel = definition.getModel(name)
 						.bake(new ModelStateComposition(
-								transform, new TRSRTransformation(new Vector3f(xPos, 0f, zPos), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
+								transform, new TRSRTransformation(new Vector3f(xPos, yOffset, zPos), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
 				String torchColorStr = state == GateLogic.State.ON ? torch.color_on : torch.color_off;
 				if (torchColorStr != null) {
 					int torchColor = Integer.parseInt(torchColorStr, 16);

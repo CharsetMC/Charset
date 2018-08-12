@@ -22,6 +22,7 @@ package pl.asie.simplelogic.wires.logic;
 import java.util.*;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -256,6 +257,13 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 	@Override
 	public int getWeakPower(EnumFacing facing) {
 		if (!PROPAGATING && facing != null && connectsWeak(facing.getOpposite())) {
+			if (facing == EnumFacing.UP) {
+				IBlockState state = getContainer().world().getBlockState(getContainer().pos().down());
+				if (state.getBlock() instanceof BlockRedstoneWire) {
+					return 0;
+				}
+			}
+
 			return getRedstoneLevel();
 		} else {
 			return 0;

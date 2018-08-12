@@ -24,6 +24,7 @@ import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import mcmultipart.api.multipart.MultipartHelper;
 import mcmultipart.api.multipart.MultipartRedstoneHelper;
 import mcmultipart.api.slot.EnumEdgeSlot;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -32,15 +33,20 @@ import pl.asie.charset.lib.utils.redstone.IRedstoneGetter;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class RedstoneGetterMultipart implements IRedstoneGetter {
 	@Override
-	public int get(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge) {
+	public int get(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge, Predicate<TileEntity> tileEntityPredicate) {
 		Optional<IMultipartContainer> container = MultipartHelper.getContainer(world, pos);
 		//noinspection OptionalIsPresent
 		if (container.isPresent()) {
 			return MCMPUtils.streamParts(container.get(), edge, face.getOpposite()).map(
 					(info) -> {
+						if (info.getTile() != null && info.getTile().getTileEntity() != null && !tileEntityPredicate.test(info.getTile().getTileEntity())) {
+							return 0;
+						}
+
 						if (info.getTile().hasPartCapability(Capabilities.REDSTONE_EMITTER, face.getOpposite())) {
 							return info.getTile().getPartCapability(Capabilities.REDSTONE_EMITTER, face.getOpposite()).getRedstoneSignal();
 						} else if (info.getState().canProvidePower()) {

@@ -17,20 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.utils.redstone;
+package pl.asie.charset.lib.stagingapi;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-
-import javax.annotation.Nullable;
-import java.util.OptionalInt;
-import java.util.function.Predicate;
-
-public interface IRedstoneGetter {
-    /**
-     * @return -1 = ignore result (use next handler), 0-15 - redstone signal value
-     */
-    int get(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge, Predicate<TileEntity> tileEntityPredicate);
+public interface ISignalMeter {
 }

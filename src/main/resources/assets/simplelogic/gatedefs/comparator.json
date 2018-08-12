@@ -1,0 +1,37 @@
+{
+    "textures": {
+        "top": "simplelogic:blocks/gate_comparator"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "color_mask": "00FF00"
+        },
+        {
+            "type": "color",
+            "color_mask": "FF0000"
+        },
+        {
+            "type": "color",
+            "color_mask": "0000FF"
+        },
+        {
+            "type": "color",
+            "color_mask": "FFFF00"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [4.5, 12.5, 1]
+        },
+        {
+            "pos": [10.5, 12.5, 1]
+        },
+        {
+            "pos": [7.5, 2.5, -2]
+        },
+        {
+            "pos": [7.5, 2.5, -1]
+        }
+    ]
+}

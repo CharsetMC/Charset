@@ -239,7 +239,7 @@ public class NotifyProxyClient extends NotifyProxy {
             BlockPos pos = co.getPos();
             IBlockState bs = co.getWorld().getBlockState(pos);
             AxisAlignedBB bb = bs.getCollisionBoundingBox(co.getWorld(), pos);
-            if (bb != null) {
+            if (bb != null && (bb.maxY < 0.5f || bb.contains(new Vec3d(pos).add(0.5, 0.5, 0.5)))) {
                 y = (float) Math.max(y, pos.getY() + bb.maxY);
             } else {
                 y = (float) Math.max(y, pos.getY() + 0.5f);

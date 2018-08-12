@@ -31,16 +31,14 @@ import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import org.lwjgl.util.vector.Vector3f;
-import pl.asie.charset.ModCharset;
-import pl.asie.charset.lib.misc.IConnectable;
+import pl.asie.charset.lib.misc.IModelConnectable;
 import pl.asie.charset.lib.render.CharsetFaceBakery;
-import pl.asie.charset.lib.utils.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class ModelPipeShaped<T extends IConnectable> extends BaseBakedModel {
+public abstract class ModelPipeShaped<T extends IModelConnectable> extends BaseBakedModel {
     private static final boolean RENDER_INNER_FACES = true;
     private static final boolean RENDER_OUTER_FACES = true;
 

@@ -1,0 +1,35 @@
+{
+    "models": {
+        "eightysix": "simplelogic:block/gate_86"
+    },
+    "textures": {
+        "top": "simplelogic:blocks/gate_repeater"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "color_mask": "FF0000"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [7.5, 2.5]
+        },
+        {
+            "pos": [7.5, 6.5],
+            "model_disabled": "eightysix"
+        },
+        {
+            "pos": [7.5, 8.5],
+            "model_disabled": "eightysix"
+        },
+        {
+            "pos": [7.5, 10.5],
+            "model_disabled": "eightysix"
+        },
+        {
+            "pos": [7.5, 12.5],
+            "model_disabled": "eightysix"
+        }
+    ]
+}

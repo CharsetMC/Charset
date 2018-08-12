@@ -179,4 +179,23 @@ public class BlockGate extends BlockBase implements ITileEntityProvider {
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new PartGate();
 	}
+
+	// comparator support
+
+	@Override
+	public void onNeighborChange(IBlockAccess worldIn, BlockPos pos, BlockPos neighbor) {
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if (tile instanceof PartGate) {
+			PartGate gate = ((PartGate) tile);
+			if (gate.logic.hasComparatorInputs()) {
+				((PartGate) tile).onChanged();
+				return;
+			}
+		}
+	}
+
+	@Override
+	public boolean getWeakChanges(IBlockAccess world, BlockPos pos) {
+		return true;
+	}
 }

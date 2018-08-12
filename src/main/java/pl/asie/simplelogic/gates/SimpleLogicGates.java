@@ -145,6 +145,12 @@ public class SimpleLogicGates {
 			registerGate(new ResourceLocation("simplelogic:bundled_inverter"), GateLogicBundledInverter.class);
 		}
 
+		registerGate(new ResourceLocation("simplelogic:comparator"), GateLogicComparator.class);
+
+		if (ModCharset.INDEV) {
+			registerGate(new ResourceLocation("simplelogic:repeater"), GateLogicRepeater.class);
+		}
+
 		MinecraftForge.EVENT_BUS.register(proxy);
 
 		// configure creative tab
@@ -159,8 +165,6 @@ public class SimpleLogicGates {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		sendAddonEventIfNotSent();
-
 		RegistryUtils.register(PartGate.class, "logic_gate");
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(itemGate));
 
@@ -181,6 +185,13 @@ public class SimpleLogicGates {
 			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledTransceiver())));
 			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledInverter())));
 		}
+
+		if (ModCharset.INDEV) {
+			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRepeater())));
+			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicComparator())));
+		}
+
+		sendAddonEventIfNotSent();
 
 		for (PartGate p : addonEvent.getGateStackPartList()) {
 			registerGateStack(ItemGate.getStack(p));

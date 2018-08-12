@@ -31,38 +31,54 @@ import java.util.Arrays;
 
 public abstract class GateLogic {
 	public enum Connection {
-		NONE,
-		INPUT,
-		OUTPUT,
-		INPUT_OUTPUT,
-		INPUT_ANALOG,
-		OUTPUT_ANALOG,
-		INPUT_BUNDLED,
-		OUTPUT_BUNDLED,
-		INPUT_OUTPUT_BUNDLED;
+		NONE(false, false, false, false, false),
+		INPUT(true, false, true, false, false),
+		OUTPUT(false, true, true, false, false),
+		INPUT_OUTPUT(true, true, true, false, false),
+		INPUT_ANALOG(true, false, true, true, false),
+		INPUT_COMPARATOR(true, false, true, true, false),
+		INPUT_REPEATER(true, false, false, false, false),
+		OUTPUT_ANALOG(false, true, true, true, false),
+		INPUT_BUNDLED(true, false, false, false, true),
+		OUTPUT_BUNDLED(false, true, false, false, true),
+		INPUT_OUTPUT_BUNDLED(true, true, false, false, true);
+
+		private final boolean input, output, redstone, analogRedstone, bundled;
+
+		Connection(boolean input, boolean output, boolean redstone, boolean analogRedstone, boolean bundled) {
+			this.input = input;
+			this.output = output;
+			this.redstone = redstone;
+			this.analogRedstone = analogRedstone;
+			this.bundled = bundled;
+		}
+
+		public boolean isComparator() {
+			return this == INPUT_COMPARATOR;
+		}
 
 		public boolean isInput() {
-			return this == INPUT || this == INPUT_ANALOG || this == INPUT_OUTPUT || this == INPUT_BUNDLED || this == INPUT_OUTPUT_BUNDLED;
+			return input;
 		}
 
 		public boolean isOutput() {
-			return this == OUTPUT || this == OUTPUT_ANALOG || this == INPUT_OUTPUT || this == OUTPUT_BUNDLED || this == INPUT_OUTPUT_BUNDLED;
+			return output;
 		}
 
 		public boolean isRedstone() {
-			return this == INPUT || this == OUTPUT || this == INPUT_ANALOG || this == OUTPUT_ANALOG || this == INPUT_OUTPUT;
+			return redstone;
 		}
 
 		public boolean isDigital() {
-			return this == INPUT || this == OUTPUT || this == INPUT_OUTPUT;
+			return redstone && !analogRedstone;
 		}
 
 		public boolean isAnalog() {
-			return this == INPUT_ANALOG || this == OUTPUT_ANALOG;
+			return analogRedstone;
 		}
 
 		public boolean isBundled() {
-			return this == INPUT_BUNDLED || this == OUTPUT_BUNDLED || this == INPUT_OUTPUT_BUNDLED;
+			return bundled;
 		}
 	}
 
@@ -187,6 +203,10 @@ public abstract class GateLogic {
 		return changed;
 	}
 
+	public boolean shouldTick() {
+		return true;
+	}
+
 	public Connection getType(EnumFacing dir) {
 		return dir == EnumFacing.NORTH ? Connection.OUTPUT : Connection.INPUT;
 	}
@@ -194,6 +214,16 @@ public abstract class GateLogic {
 	public abstract State getLayerState(int id);
 
 	public abstract State getTorchState(int id);
+
+	public boolean hasComparatorInputs() {
+		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+			if (getType(facing).isComparator()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	public boolean canMirror() {
 		return getType(EnumFacing.WEST) != Connection.NONE || getType(EnumFacing.EAST) != Connection.NONE;
