@@ -49,9 +49,9 @@ import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 @CharsetModule(
-		name = "engineering",
+		name = "tools.engineering",
 		description = "Engineer's tools: Stopwatch, Signal Meter, Tuning Fork, Tape Measure.",
-		profile = ModuleProfile.EXPERIMENTAL
+		profile = ModuleProfile.TESTING
 )
 public class CharsetToolsEngineering {
 	//public static ItemTapeMeasure tapeMeasure;
