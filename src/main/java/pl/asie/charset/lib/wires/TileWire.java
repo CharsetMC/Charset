@@ -37,6 +37,10 @@ import pl.asie.charset.lib.scheduler.Scheduler;
 public class TileWire extends TileBase implements IMultipartTile, ITickable, IWireContainer {
     protected Wire wire;
 
+    public Wire getWire() {
+        return wire;
+    }
+
     @Override
     public void update() {
         super.update();

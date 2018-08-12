@@ -69,7 +69,7 @@ public final class MCMPUtils {
 			}
 		}
 
-		addSlot(EnumCenterSlot.CENTER, container, partSlots, streamBuilder);
+		if (edge == null) addSlot(EnumCenterSlot.CENTER, container, partSlots, streamBuilder);
 
 		return streamBuilder.build();
 	}

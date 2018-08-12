@@ -421,17 +421,15 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
             }
         }
 
-        // TODO: Fix CENTER occlusion
-/*        if (validSides.contains(WireFace.CENTER)) {
+        if (validSides.contains(WireFace.CENTER)) {
             AxisAlignedBB mask = factory.getBox(WireFace.CENTER, 1 + location.ordinal());
             if (mask != null) {
-                if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos())) {
+                if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos(), (state -> !(state.getBlock() instanceof BlockWire)))) {
                     occludedSides |= 1 << 6;
-                    System.out.println("removing");
                     validSides.remove(WireFace.CENTER);
                 }
             }
-        } */
+        }
 
         // Connection test
         for (WireFace facing : validSides) {

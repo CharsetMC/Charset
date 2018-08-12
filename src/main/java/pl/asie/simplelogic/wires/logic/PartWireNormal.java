@@ -301,7 +301,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 
 		// Handle rendering updates.
 		if ((oldSignal & 0xF00) != (signalLevel & 0xF00)) {
-			if (getWireType() == WireType.NORMAL) {
+			if (getWireType() == WireType.NORMAL || PartWireSignalBase.DEBUG_CLIENT_WIRE_STATE) {
 				if (SimpleLogicWires.useTESRs) {
 					getContainer().requestNetworkUpdate();
 				} else {
@@ -390,9 +390,11 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 
 	@Override
 	public void addDebugInformation(List<String> stringList, Side side) {
-		if (side == Side.SERVER) {
-			stringList.add(getLocation().name() + " R:" + (signalLevel >> 8) + " S:" + (signalLevel & 0xFF));
+		if (side == Side.CLIENT && !PartWireSignalBase.DEBUG_CLIENT_WIRE_STATE) {
+			return;
 		}
+
+		stringList.add(getLocation().name() + " R:" + (signalLevel >> 8) + " S:" + (signalLevel & 0xFF));
 	}
 
 	@Override

@@ -44,6 +44,7 @@ import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireProvider;
 import pl.asie.charset.lib.wires.WireUtils;
 import pl.asie.simplelogic.wires.LogicWireUtils;
+import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 import javax.annotation.Nonnull;
 
@@ -263,6 +264,14 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 			}
 		}
 
+		if (PartWireSignalBase.DEBUG_CLIENT_WIRE_STATE) {
+			if (SimpleLogicWires.useTESRs) {
+				getContainer().requestNetworkUpdate();
+			} else {
+				getContainer().requestRenderUpdate();
+			}
+		}
+
 		finishPropagation();
 	}
 
@@ -382,23 +391,25 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 
 	@Override
 	public void addDebugInformation(List<String> stringList, Side side) {
-		if (side == Side.SERVER) {
-			StringBuilder builder = new StringBuilder(getLocation().name());
-			List<String> extraString = new ArrayList<>();
-			builder.append(' ');
-			for (int i = 0; i < 16; i++) {
-				EnumDyeColor c = EnumDyeColor.byMetadata(i);
-				int v = signalValue[i];
-
-				builder.append(ColorUtils.getNearestTextFormatting(c));
-				builder.append(v <= 0 ? '_' : Integer.toHexString(signalValue[i]).toUpperCase());
-
-				if (v > 0) {
-					extraString.add(ColorUtils.getNearestTextFormatting(c) + I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", c)) + " R:" + v + " S:" + (signalLevel[i] & 0xFF));
-				}
-			}
-			stringList.add(builder.toString());
-			stringList.addAll(extraString);
+		if (side == Side.CLIENT && !PartWireSignalBase.DEBUG_CLIENT_WIRE_STATE) {
+			return;
 		}
+
+		StringBuilder builder = new StringBuilder(getLocation().name());
+		List<String> extraString = new ArrayList<>();
+		builder.append(' ');
+		for (int i = 0; i < 16; i++) {
+			EnumDyeColor c = EnumDyeColor.byMetadata(i);
+			int v = signalValue[i];
+
+			builder.append(ColorUtils.getNearestTextFormatting(c));
+			builder.append(v <= 0 ? '_' : Integer.toHexString(signalValue[i]).toUpperCase());
+
+			if (v > 0) {
+				extraString.add(ColorUtils.getNearestTextFormatting(c) + I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", c)) + " R:" + v + " S:" + (signalLevel[i] & 0xFF));
+			}
+		}
+		stringList.add(builder.toString());
+		stringList.addAll(extraString);
 	}
 }

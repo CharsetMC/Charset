@@ -44,13 +44,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
-import pl.asie.charset.api.wires.IBundledEmitter;
-import pl.asie.charset.api.wires.IBundledReceiver;
-import pl.asie.charset.api.wires.IRedstoneEmitter;
-import pl.asie.charset.api.wires.IRedstoneReceiver;
+import pl.asie.charset.api.wires.*;
 import pl.asie.charset.lib.block.TraitMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
+import pl.asie.charset.lib.wires.TileWire;
+import pl.asie.charset.lib.wires.Wire;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.simplelogic.gates.logic.GateLogicDummy;
 import pl.asie.charset.lib.block.TileBase;
@@ -264,7 +263,13 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 
 	public void propagateOutputs() {
 		world.notifyNeighborsRespectDebug(getPos(), getBlockType(), false);
-		markBlockForUpdate();
+		if (world.isRemote) {
+			if (!SimpleLogicGates.useTESRs) {
+				markBlockForRenderUpdate();
+			}
+		} else {
+			markBlockForUpdate();
+		}
 	}
 
 	public byte[] getBundledInput(EnumFacing facing) {
@@ -307,7 +312,10 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 					} else {
 						TileEntity tile = w.getTileEntity(p);
 						if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
-							values[i] = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
+							// TODO: FIXME - this is a hack
+							if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
+								values[i] = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
+							}
 						} else {
 							IBlockState s = w.getBlockState(p);
 							if (RedstoneUtils.canConnectFace(w, p, s, real, getSide())) {
@@ -569,7 +577,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		boolean orientationUpdate = false;
 
 		if (tag.hasKey("logic", Constants.NBT.TAG_STRING)) {
-			Optional<GateLogic> logic = ItemGate.getGateLogic(new ResourceLocation(tag.getString("logic")));
+			Optional<GateLogic> logic = ItemGate.getGateLogic(this.logic, new ResourceLocation(tag.getString("logic")));
 			if (logic.isPresent()) {
 				renderUpdate |= logic.get().readFromNBT(tag, isClient);
 			}

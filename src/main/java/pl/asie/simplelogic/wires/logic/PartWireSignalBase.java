@@ -42,6 +42,7 @@ import javax.annotation.Nonnull;
 
 public abstract class PartWireSignalBase extends Wire implements IWire, IDebuggable {
 	@SuppressWarnings("PointlessBooleanExpression")
+	public static boolean DEBUG_CLIENT_WIRE_STATE = true;
 	public static boolean DEBUG = false && ModCharset.INDEV;
 
 	public static boolean PROPAGATING = false;

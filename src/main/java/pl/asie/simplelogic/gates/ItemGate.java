@@ -34,6 +34,7 @@ import net.minecraft.util.text.translation.I18n;
 
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.item.ISubItemProvider;
@@ -76,6 +77,18 @@ public class ItemGate extends ItemBlockBase {
 	}
 
 	@Override
+	public String getCreatorModId(ItemStack stack) {
+		if (stack.hasTagCompound() && stack.getTagCompound().hasKey("logic", Constants.NBT.TAG_STRING)) {
+			String s = new ResourceLocation(stack.getTagCompound().getString("logic")).getNamespace();
+			if (Loader.isModLoaded(s)) {
+				return s;
+			}
+		}
+
+		return super.getCreatorModId(stack);
+	}
+
+	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
 		Optional<PartGate> gate = getPartGate(stack);
 		if (!gate.isPresent()) {
@@ -102,6 +115,18 @@ public class ItemGate extends ItemBlockBase {
 			return false;
 		}
 		return super.placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, newState);
+	}
+
+	public static Optional<GateLogic> getGateLogic(GateLogic prevLogic, ResourceLocation rs) {
+		try {
+			Class<? extends GateLogic> c = SimpleLogicGates.logicClasses.get(rs);
+			if (c != null && (prevLogic == null || prevLogic.getClass() != c)) {
+				return Optional.of(c.newInstance());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return Optional.of(prevLogic);
 	}
 
 	public static Optional<GateLogic> getGateLogic(ResourceLocation rs) {
