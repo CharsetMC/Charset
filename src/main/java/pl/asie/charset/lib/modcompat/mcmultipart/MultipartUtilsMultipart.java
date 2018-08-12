@@ -24,14 +24,41 @@ import mcmultipart.api.world.IMultipartBlockAccess;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
-import pl.asie.charset.lib.utils.OcclusionUtils;
+import pl.asie.charset.lib.utils.MultipartUtils;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 
-public class OcclusionUtilsMultipart extends OcclusionUtils {
-    public OcclusionUtilsMultipart() {
+public class MultipartUtilsMultipart extends MultipartUtils {
+    public MultipartUtilsMultipart() {
+    }
+
+    private static IPartInfo getPartInfo(RayTraceResult mouseOver) {
+        if (mouseOver.hitInfo instanceof IPartInfo) {
+            return (IPartInfo) mouseOver.hitInfo;
+        }
+
+        if (mouseOver.hitInfo instanceof RayTraceResult && mouseOver.hitInfo != mouseOver) {
+            RayTraceResult result = (RayTraceResult) mouseOver.hitInfo;
+            mouseOver.hitInfo = null; // prevent circular loops
+            IPartInfo v = getPartInfo(result);
+            mouseOver.hitInfo = result;
+            return v;
+        }
+
+        return null;
+    }
+
+    @Override
+    public ExtendedRayTraceResult getTrueResult(RayTraceResult result) {
+        IPartInfo info = getPartInfo(result);
+        if (info != null) {
+            return new ExtendedRayTraceResult(result, info.getTile() != null ? info.getTile().getTileEntity() : null);
+        } else {
+            return super.getTrueResult(result);
+        }
     }
 
     @Override

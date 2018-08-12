@@ -21,12 +21,17 @@ package pl.asie.simplelogic.gates;
 
 import net.minecraft.entity.player.EntityPlayer;
 
-public class ProxyCommon {
-	public void init() {
-
+public class PacketGateOpenGUI extends PacketGate {
+	public PacketGateOpenGUI() {
+		super();
 	}
 
-	public void openGui(PartGate gate, EntityPlayer playerIn) {
-		SimpleLogicGates.packet.sendTo(new PacketGateOpenGUI(gate), playerIn);
+	public PacketGateOpenGUI(PartGate gate) {
+		super(gate);
+	}
+
+	@Override
+	public void applyGate(PartGate gate, EntityPlayer player) {
+		SimpleLogicGates.proxy.openGui(gate, player);
 	}
 }

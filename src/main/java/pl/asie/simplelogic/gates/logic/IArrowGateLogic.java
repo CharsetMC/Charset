@@ -17,16 +17,16 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates;
+package pl.asie.simplelogic.gates.logic;
 
-import net.minecraft.entity.player.EntityPlayer;
+public interface IArrowGateLogic {
+	/**
+	 * @return Arrow position [0-1). 0 = NORTH, 0.25 = EAST, 0.5 = SOUTH, 0.75 = WEST
+	 */
+	float getArrowPosition();
 
-public class ProxyCommon {
-	public void init() {
-
-	}
-
-	public void openGui(PartGate gate, EntityPlayer playerIn) {
-		SimpleLogicGates.packet.sendTo(new PacketGateOpenGUI(gate), playerIn);
-	}
+	/**
+	 * @return The delta rotation per tick. Can be 0.
+	 */
+	float getArrowRotationDelta();
 }

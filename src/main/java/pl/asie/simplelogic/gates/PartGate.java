@@ -56,6 +56,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.*;
 import pl.asie.simplelogic.gates.logic.GateLogicRepeater;
+import pl.asie.simplelogic.gates.logic.IGateTickable;
 import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 import javax.annotation.Nullable;
@@ -201,16 +202,20 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		}
 	}
 
+	public void openGUI(EntityPlayer player) {
+		SimpleLogicGates.proxy.openGui(this, player);
+	}
+
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing direction) {
-		return capability == Capabilities.DEBUGGABLE || hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
+		return capability == Capabilities.DEBUGGABLE || (capability == SimpleLogicGates.GATE_CAP && direction == getSide()) || hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, EnumFacing enumFacing) {
-		if (capability == Capabilities.DEBUGGABLE) {
-			return Capabilities.DEBUGGABLE.cast(this);
+		if (capability == Capabilities.DEBUGGABLE || capability == SimpleLogicGates.GATE_CAP) {
+			return (T) this;
 		} else if (hasRedstoneCapability(capability, enumFacing)) {
 			EnumFacing dir = realToGate(enumFacing);
 			if (dir.ordinal() >= 2) {
@@ -243,6 +248,8 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		if (getWorld() != null) {
 			if (logic instanceof ITickable) {
 				((ITickable) logic).update();
+			} else if (logic instanceof IGateTickable) {
+				((IGateTickable) logic).update(this);
 			}
 
 			if (!getWorld().isRemote && pendingTick > 0 && logic.shouldTick()) {

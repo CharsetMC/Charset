@@ -64,6 +64,7 @@ public class GuiHandlerCharset implements IGuiHandler {
 	public static final int CHISEL = 0x102;
 	public static final int RECORD_PLAYER = 0x103;
 	public static final int CHEST = 0x104;
+	public static final int TIMER = 0x105;
 
 	public static final GuiHandlerCharset INSTANCE = new GuiHandlerCharset();
 	private static final TIntObjectMap<Function<Request, Object>> map = new TIntObjectHashMap<>();

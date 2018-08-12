@@ -28,16 +28,19 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -49,11 +52,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.capability.DummyCapabilityStorage;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
-import pl.asie.charset.lib.modcompat.mcmultipart.RedstoneGetterMultipart;
-import pl.asie.charset.lib.utils.OcclusionUtils;
+import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.shared.SimpleLogicShared;
 import pl.asie.simplelogic.gates.addon.GateRegisterEvent;
 import pl.asie.simplelogic.gates.logic.*;
@@ -75,11 +78,15 @@ public class SimpleLogicGates {
 	@CharsetModule.Instance
 	public static SimpleLogicGates INSTANCE;
 
+	@CapabilityInject(PartGate.class)
+	public static Capability<PartGate> GATE_CAP;
+
 	@CharsetModule.Configuration
 	public static Configuration config;
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
+	public static int minTimerTickTime;
 	public static boolean onlyBottomFace, useTESRs;
 	public static BlockGate blockGate;
 	public static ItemGate itemGate;
@@ -99,6 +106,7 @@ public class SimpleLogicGates {
 	public void onLoadConfig(CharsetLoadConfigEvent event) {
 		onlyBottomFace = ConfigUtils.getBoolean(config, "general", "gatesOnlyBottomFace", false, "Set to true if you wish that gates only be placed on the bottom face of a block - this is great for vanilla-plus style modpacks!", false);
 		useTESRs = ConfigUtils.getBoolean(config, "client", "forceGateTESRs", false, "Forces gates to render using TESRs.", false);
+		minTimerTickTime = ConfigUtils.getInt(config, "general", "minTimerTickTime", 4, 4, 24000, "The minimum amount of ticks, in 1/20-second units, Timers are allowed to tick at.", false);
 	}
 
 	@EventHandler
@@ -146,10 +154,8 @@ public class SimpleLogicGates {
 		}
 
 		registerGate(new ResourceLocation("simplelogic:comparator"), GateLogicComparator.class);
-
-		if (ModCharset.INDEV) {
-			registerGate(new ResourceLocation("simplelogic:repeater"), GateLogicRepeater.class);
-		}
+		registerGate(new ResourceLocation("simplelogic:repeater"), GateLogicRepeater.class);
+		registerGate(new ResourceLocation("simplelogic:timer"), GateLogicTimer.class);
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 
@@ -161,10 +167,15 @@ public class SimpleLogicGates {
 		if (config.hasChanged()) {
 			config.save();
 		}
+
+		CapabilityManager.INSTANCE.register(PartGate.class, DummyCapabilityStorage.get(), PartGate::new);
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		packet.registerPacket(0x01, PacketGateOpenGUI.class);
+		packet.registerPacket(0x02, PacketTimerChangeTT.class);
+
 		RegistryUtils.register(PartGate.class, "logic_gate");
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(itemGate));
 
@@ -186,10 +197,9 @@ public class SimpleLogicGates {
 			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledInverter())));
 		}
 
-		if (ModCharset.INDEV) {
-			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRepeater())));
-			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicComparator())));
-		}
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRepeater())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicComparator())));
+		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicTimer())));
 
 		sendAddonEventIfNotSent();
 

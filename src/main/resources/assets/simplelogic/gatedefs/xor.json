@@ -18,6 +18,10 @@
         {
             "type": "color",
             "color_mask": "00FFFF"
+        },
+        {
+            "type": "color",
+            "color_mask": "FF4040"
         }
     ],
     "torches": [

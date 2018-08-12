@@ -19,14 +19,14 @@
 
 package pl.asie.charset.module.tools.engineering;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import pl.asie.charset.lib.capability.Capabilities;
-import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.stagingapi.ISignalMeterData;
-import pl.asie.charset.lib.stagingapi.ISignalMeterDataProvider;
 import pl.asie.charset.lib.stagingapi.ISignalMeterDataRemoteProvider;
+import pl.asie.charset.lib.utils.MultipartUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,10 +57,11 @@ public class SignalMeterProviderHandler {
 		Optional<ISignalMeterData> dataPre = getRemoteData(remoteProviderBeforeList, world, pos, result);
 		if (dataPre.isPresent()) return dataPre;
 
-		ISignalMeterDataProvider provider = CapabilityHelper.get(world, pos, Capabilities.SIGNAL_METER_DATA_PROVIDER, result != null ? result.sideHit : null,
-			true, true, false);
-		if (provider != null) {
-			return Optional.ofNullable(provider.getSignalMeterData());
+		// check tile
+		MultipartUtils.ExtendedRayTraceResult extResult = MultipartUtils.INSTANCE.getTrueResult(result);
+		TileEntity tileEntity = extResult.getTile(world);
+		if (tileEntity != null && tileEntity.hasCapability(Capabilities.SIGNAL_METER_DATA_PROVIDER, null)) {
+			return Optional.ofNullable(tileEntity.getCapability(Capabilities.SIGNAL_METER_DATA_PROVIDER, null).getSignalMeterData());
 		}
 
 		return getRemoteData(remoteProviderAfterList, world, pos, result);

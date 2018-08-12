@@ -33,7 +33,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.render.model.IRenderComparable;
-import pl.asie.charset.lib.utils.OcclusionUtils;
+import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nonnull;
@@ -401,7 +401,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                 boolean found = false;
                 AxisAlignedBB mask = factory.getBox(location, i + 1);
                 if (mask != null) {
-                    if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos(), (state -> !(state.getBlock() instanceof BlockWire)))) {
+                    if (MultipartUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos(), (state -> !(state.getBlock() instanceof BlockWire)))) {
                         occludedSides |= 1 << connFaces[i].ordinal();
                         validSides.remove(face);
                         found = true;
@@ -412,7 +412,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
                     BlockPos cPos = container.pos().offset(connFaces[i]);
                     AxisAlignedBB cornerMask = factory.getCornerBox(location, i ^ 1);
                     if (cornerMask != null) {
-                        if (OcclusionUtils.PRIMARY.intersects(Collections.singletonList(cornerMask), container.world(), cPos)) {
+                        if (MultipartUtils.PRIMARY.intersects(Collections.singletonList(cornerMask), container.world(), cPos)) {
                             cornerOccludedSides |= 1 << connFaces[i].ordinal();
                             invalidCornerSides.add(face);
                         }
@@ -424,7 +424,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         if (validSides.contains(WireFace.CENTER)) {
             AxisAlignedBB mask = factory.getBox(WireFace.CENTER, 1 + location.ordinal());
             if (mask != null) {
-                if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos(), (state -> !(state.getBlock() instanceof BlockWire)))) {
+                if (MultipartUtils.INSTANCE.intersects(Collections.singletonList(mask), container.world(), container.pos(), (state -> !(state.getBlock() instanceof BlockWire)))) {
                     occludedSides |= 1 << 6;
                     validSides.remove(WireFace.CENTER);
                 }

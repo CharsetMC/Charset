@@ -82,7 +82,7 @@ public class ModelSignalMeter extends WrappedBakedModel {
 		float dotStart = 10.5f - (dotSize / 2);
 
 		if (dots instanceof ISignalMeterDataBands) {
-			dotStart += 2f;
+			dotStart += 2.5f;
 		}
 
 		float bx = 4f + ((8f - (dots.getDotCount() * dotSize)) / 2f);
@@ -103,7 +103,7 @@ public class ModelSignalMeter extends WrappedBakedModel {
 	public void renderBands(List<BakedQuad> quads, ISignalMeterDataBands bands) {
 		float z = 8.502f;
 		float bandStart = 8f;
-		float bandHeight = 5f;
+		float bandHeight = 5.5f;
 		float bandWidth = Math.min(8f / bands.getBandCount(), 1f);
 
 		if (bands instanceof ISignalMeterDataDots) {

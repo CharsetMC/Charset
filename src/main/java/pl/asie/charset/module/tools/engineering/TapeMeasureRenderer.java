@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tools.tape;
+package pl.asie.charset.module.tools.engineering;
 
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -42,7 +42,7 @@ public class TapeMeasureRenderer implements IItemColor {
 
 	@SubscribeEvent
 	public void onItemColor(ColorHandlerEvent.Item event) {
-		event.getItemColors().registerItemColorHandler(this, CharsetToolsTapeMeasure.tapeMeasure);
+//		event.getItemColors().registerItemColorHandler(this, CharsetToolsEngineering.tapeMeasure);
 	}
 
 	@Override

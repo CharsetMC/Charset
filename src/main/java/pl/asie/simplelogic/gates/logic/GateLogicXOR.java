@@ -42,6 +42,8 @@ public class GateLogicXOR extends GateLogic {
 				return State.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
 				return State.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0);
+			case 4:
+				return State.input(getOutputValueOutside(EnumFacing.NORTH));
 		}
 		return State.OFF;
 	}
@@ -54,7 +56,7 @@ public class GateLogicXOR extends GateLogic {
 			case 1:
 				return State.input(getInputValueInside(EnumFacing.EAST)).invert();
 			case 2:
-				return State.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0).invert();
+				return State.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0);
 		}
 		return State.ON;
 	}

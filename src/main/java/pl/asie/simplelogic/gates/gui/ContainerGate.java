@@ -17,17 +17,23 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tools.engineering.modcompat.mcmultipart;
+package pl.asie.simplelogic.gates.gui;
 
-import mcmultipart.api.addon.IMCMPAddon;
-import mcmultipart.api.multipart.IMultipartRegistry;
-import pl.asie.charset.lib.modcompat.mcmultipart.CharsetMCMPAddon;
-import pl.asie.charset.module.tools.engineering.SignalMeterProviderHandler;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.EnumFacing;
+import pl.asie.charset.lib.inventory.ContainerBase;
+import pl.asie.simplelogic.gates.PartGate;
 
-@CharsetMCMPAddon("tools.engineering")
-public class CharsetToolsEngineeringMCMP implements IMCMPAddon {
+public class ContainerGate extends ContainerBase {
+	protected final PartGate gate;
+
+	public ContainerGate(InventoryPlayer inventoryPlayer, PartGate gate) {
+		super(inventoryPlayer);
+		this.gate = gate;
+	}
+
 	@Override
-	public void registerParts(IMultipartRegistry registry) {
-		SignalMeterProviderHandler.INSTANCE.registerRemoteProvider(new SignalMeterDataMCMPProvider(), true);
+	public boolean isOwnerPresent() {
+		return !gate.isInvalid();
 	}
 }

@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.tools.tape;
+package pl.asie.charset.module.tools.engineering;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumActionResult;

@@ -68,7 +68,7 @@ public class GateLogicComparator extends GateLogic {
 
 	@Override
 	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
-		if (playerIn.isSneaking()) {
+		if (!playerIn.isSneaking()) {
 			mode = (byte) (1 - mode);
 			gate.markBlockForUpdate();
 		}

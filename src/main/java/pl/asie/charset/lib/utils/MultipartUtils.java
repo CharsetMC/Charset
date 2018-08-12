@@ -21,8 +21,11 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -31,11 +34,43 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class OcclusionUtils {
-    public static OcclusionUtils INSTANCE = new OcclusionUtils();
+public class MultipartUtils {
+    public static class ExtendedRayTraceResult extends RayTraceResult {
+        protected TileEntity tile;
+        protected boolean hasTile;
 
-    protected OcclusionUtils() {
+        public ExtendedRayTraceResult(RayTraceResult result) {
+            super(result.typeOfHit, result.hitVec, result.sideHit, result.getBlockPos());
+            this.entityHit = result.entityHit;
+            this.subHit = result.subHit;
+            this.hitInfo = result.hitInfo;
+        }
 
+        public ExtendedRayTraceResult(RayTraceResult result, TileEntity tile) {
+            this(result);
+            this.hasTile = true;
+            this.tile = tile;
+        }
+
+        public TileEntity getTile(IBlockAccess world) {
+            if (hasTile) {
+                return tile;
+            } else if (typeOfHit == Type.BLOCK) {
+                return world.getTileEntity(getBlockPos());
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public static MultipartUtils INSTANCE = new MultipartUtils();
+
+    protected MultipartUtils() {
+
+    }
+
+    public ExtendedRayTraceResult getTrueResult(RayTraceResult result) {
+        return new ExtendedRayTraceResult(result);
     }
 
     public boolean intersects(Collection<AxisAlignedBB> boxes1, Collection<AxisAlignedBB> boxes2) {

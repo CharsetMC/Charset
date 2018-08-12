@@ -19,11 +19,8 @@
 
 package pl.asie.simplelogic.gates.logic;
 
-import net.minecraft.util.ITickable;
+import pl.asie.simplelogic.gates.PartGate;
 
-public abstract class GateLogicWithTime extends GateLogic implements ITickable {
-	@Override
-	public void update() {
-		// TODO
-	}
+public interface IGateTickable {
+	void update(PartGate gate);
 }

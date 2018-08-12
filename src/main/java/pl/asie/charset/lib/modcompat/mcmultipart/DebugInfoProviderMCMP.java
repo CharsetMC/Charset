@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.handlers.DebugInfoProvider;
+import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.lib.wires.Wire;
 
 import java.util.List;

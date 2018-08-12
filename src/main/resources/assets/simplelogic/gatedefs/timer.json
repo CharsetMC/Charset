@@ -1,0 +1,27 @@
+{
+    "models": {
+        "arrow_base": "simplelogic:block/gate_arrow_base"
+    },
+    "textures": {
+        "top": "simplelogic:blocks/gate_timer"
+    },
+    "layers": [
+        {
+            "type": "color",
+            "color_mask": "00FF00"
+        },
+        {
+            "type": "color",
+            "color_mask": "FF0000"
+        }
+    ],
+    "torches": [
+        {
+            "pos": [7.5, 2.5]
+        },
+        {
+            "pos": [7.5, 7.5],
+            "model_on": "arrow_base"
+        }
+    ]
+}

@@ -44,7 +44,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.lib.IMultiblockStructure;
@@ -57,7 +56,7 @@ import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.inventory.IContainerHandler;
 import pl.asie.charset.lib.utils.MathUtils;
-import pl.asie.charset.lib.utils.OcclusionUtils;
+import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 
 import javax.annotation.Nonnull;
@@ -229,7 +228,7 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 
 	public boolean isBlocked() {
 		// self position check
-		if (OcclusionUtils.INSTANCE.intersects(
+		if (MultipartUtils.INSTANCE.intersects(
 				Collections.singleton(
 						new AxisAlignedBB(0, 0.875, 0, 1, 1, 1)
 				), world, pos, (s) -> !(s.getBlock() instanceof BlockChestCharset)

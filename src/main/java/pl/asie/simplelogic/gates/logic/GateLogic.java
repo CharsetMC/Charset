@@ -155,9 +155,13 @@ public abstract class GateLogic {
 
 		if (inputValues == null || inputValues.length != 4) {
 			inputValues = new byte[4];
+		} else {
+			inputValues = Arrays.copyOf(inputValues, 4);
 		}
 		if (outputValues == null || outputValues.length != 4) {
 			outputValues = new byte[4];
+		} else {
+			outputValues = Arrays.copyOf(outputValues, 4);
 		}
 
 		if (!isClient) {

@@ -133,7 +133,9 @@ public class StopwatchTracker implements IWorldEventListener {
 						BlockPos startPos = startPosMap.get(s);
 						BlockPos endPos = pos;
 
-						new Notice(startPos, NotificationComponentString.translated("notice.charset.stopwatch.timeStart", NotificationComponentString.raw(timeStr))).withStyle(NoticeStyle.DRAWFAR).sendTo(player);
+						if (!startPos.equals(endPos)) {
+							new Notice(startPos, NotificationComponentString.translated("notice.charset.stopwatch.timeStart", NotificationComponentString.raw(timeStr))).withStyle(NoticeStyle.DRAWFAR).sendTo(player);
+						}
 						new Notice(endPos, NotificationComponentString.translated("notice.charset.stopwatch.timeEnd", NotificationComponentString.raw(timeStr))).withStyle(NoticeStyle.DRAWFAR).sendTo(player);
 					});
 				}

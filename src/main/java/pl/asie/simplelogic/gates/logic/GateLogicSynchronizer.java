@@ -122,7 +122,7 @@ public class GateLogicSynchronizer extends GateLogic {
 			case 1:
 				return State.input(pulseRight);
 			case 2:
-				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
+				return State.input(getOutputValueInside(EnumFacing.NORTH));
 		}
 		return State.ON;
 	}

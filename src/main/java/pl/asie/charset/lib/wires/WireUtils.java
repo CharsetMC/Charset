@@ -22,10 +22,8 @@ package pl.asie.charset.lib.wires;
 import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
-import mcmultipart.api.multipart.MultipartCapabilityHelper;
 import mcmultipart.api.multipart.MultipartHelper;
 import mcmultipart.api.slot.EnumCenterSlot;
-import mcmultipart.api.slot.EnumEdgeSlot;
 import mcmultipart.api.slot.EnumFaceSlot;
 import mcmultipart.api.slot.IPartSlot;
 import mcmultipart.api.world.IMultipartBlockAccess;
@@ -37,9 +35,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pl.asie.charset.api.wires.WireFace;
-import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.modcompat.mcmultipart.MCMPUtils;
-import pl.asie.charset.lib.utils.OcclusionUtils;
+import pl.asie.charset.lib.utils.MultipartUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -145,7 +142,7 @@ public final class WireUtils {
         }
 
         AxisAlignedBB mask = wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
-        if (OcclusionUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos, (state -> !(state.getBlock() instanceof BlockWire)))) {
+        if (MultipartUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos, (state -> !(state.getBlock() instanceof BlockWire)))) {
             return false;
         }
 

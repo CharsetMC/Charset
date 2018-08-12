@@ -26,6 +26,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraft.util.math.MathHelper;
@@ -43,6 +44,10 @@ import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.simplelogic.gates.addon.GateRegisterClientEvent;
+import pl.asie.simplelogic.gates.gui.GuiTimer;
+import pl.asie.simplelogic.gates.logic.GateLogic;
+import pl.asie.simplelogic.gates.logic.GateLogicTimer;
+import pl.asie.simplelogic.gates.render.GateDynamicRendererArrow;
 import pl.asie.simplelogic.gates.render.GateRenderDefinitions;
 import pl.asie.simplelogic.gates.render.RendererGate;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -64,7 +69,22 @@ public class ProxyClient extends ProxyCommon {
 				},
 				SimpleLogicGates.itemGate);
 
+
+		SimpleLogicGatesClient.INSTANCE.registerDynamicRenderer(new GateDynamicRendererArrow() {
+			@Override
+			public Class<GateLogicTimer> getLogicClass() {
+				return GateLogicTimer.class;
+			}
+		});
+
+		SimpleLogicGatesClient.INSTANCE.registerGui(GateLogicTimer.class, GuiTimer::new);
+
 		MinecraftForge.EVENT_BUS.post(new GateRegisterClientEvent());
+	}
+
+	@Override
+	public void openGui(PartGate gate, EntityPlayer playerIn) {
+		SimpleLogicGatesClient.INSTANCE.openGui(gate);
 	}
 
 	@SubscribeEvent
@@ -84,6 +104,8 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		SimpleLogicGates.sendAddonEventIfNotSent();
+
+		GateDynamicRendererArrow.arrowModel = RenderUtils.getModelWithTextures(new ResourceLocation("simplelogic:block/gate_arrow"), event.getMap());
 
 		GateRenderDefinitions.INSTANCE.load("simplelogic:gatedefs/base.json", SimpleLogicGates.logicDefinitions);
 		ResourceLocation top_underlay = GateRenderDefinitions.INSTANCE.base.getTexture("top_underlay");

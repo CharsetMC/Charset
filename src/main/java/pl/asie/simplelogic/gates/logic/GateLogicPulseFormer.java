@@ -114,7 +114,7 @@ public class GateLogicPulseFormer extends GateLogic {
 			case 1:
 				return State.input(getInputValueInside(EnumFacing.SOUTH));
 			case 2:
-				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
+				return State.input(getOutputValueInside(EnumFacing.NORTH));
 		}
 		return State.ON;
 	}

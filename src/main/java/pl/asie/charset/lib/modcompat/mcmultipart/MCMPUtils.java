@@ -48,22 +48,6 @@ public final class MCMPUtils {
 
 	}
 
-	public static IPartInfo getPartInfo(RayTraceResult mouseOver) {
-		if (mouseOver.hitInfo instanceof IPartInfo) {
-			return (IPartInfo) mouseOver.hitInfo;
-		}
-
-		if (mouseOver.hitInfo instanceof RayTraceResult && mouseOver.hitInfo != mouseOver) {
-			RayTraceResult result = (RayTraceResult) mouseOver.hitInfo;
-			mouseOver.hitInfo = null; // prevent circular loops
-			IPartInfo v = getPartInfo(result);
-			mouseOver.hitInfo = result;
-			return v;
-		}
-
-		return null;
-	}
-
 	private static void addSlot(IPartSlot slot, IMultipartContainer container, Collection<IPartSlot> partSlots, Stream.Builder<IPartInfo> builder) {
 		if (slot != null) {
 			partSlots.add(slot);

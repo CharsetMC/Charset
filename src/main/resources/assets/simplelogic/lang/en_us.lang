@@ -16,10 +16,15 @@ tile.simplelogic.gate.synchronizer.name=Synchronizer
 tile.simplelogic.gate.bundled_inverter.name=Bundled Inverter
 tile.simplelogic.gate.bundled_transceiver.name=Bundled Transceiver
 tile.simplelogic.gate.repeater.name=Repeater
+tile.simplelogic.gate.comparator.name=Comparator
+tile.simplelogic.gate.timer.name=Timer
 
 notice.simplelogic.gate.repeater.ticks=%s ticks
 notice.simplelogic.gate.comparator.mode.0=Compare
 notice.simplelogic.gate.comparator.mode.1=Subtract
+notice.simplelogic.gate.timer.seconds=%s s
+notice.simplelogic.gate.timer.minutes=%s m
+notice.simplelogic.gate.timer.minutes_seconds=%s m %s s
 
 tile.simplelogic.wire.name=Redstone Cable
 tile.simplelogic.wire.insulated.name=%s Insulated Cable

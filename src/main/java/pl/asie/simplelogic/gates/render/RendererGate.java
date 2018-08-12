@@ -207,16 +207,19 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 		i = 0;
 		for (GateRenderDefinitions.Torch torch : definition.torches) {
-			GateLogic.State state = gate.logic.getTorchState(i++);
-			if (state == GateLogic.State.NO_RENDER) {
-				continue;
-			}
+			GateLogic.State state;
 
 			if (torch.inverter != null) {
 				EnumFacing inverter = EnumFacing.byName(torch.inverter);
 				if (gate.logic.isSideInverted(inverter)) {
 					invertedSides.add(inverter);
+					state = GateLogic.State.bool(gate.getInverterState(inverter));
 				} else {
+					continue;
+				}
+			} else {
+				state = gate.logic.getTorchState(i++);
+				if (state == GateLogic.State.NO_RENDER) {
 					continue;
 				}
 			}

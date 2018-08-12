@@ -54,6 +54,7 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 		profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetToolsEngineering {
+	//public static ItemTapeMeasure tapeMeasure;
 	public static ItemStopwatch stopwatch;
 	public static ItemSignalMeter signalMeter;
 
@@ -74,6 +75,7 @@ public class CharsetToolsEngineering {
 	public void preInit(FMLPreInitializationEvent event) {
 		stopwatch = new ItemStopwatch();
 		signalMeter = new ItemSignalMeter();
+		//tapeMeasure = new ItemTapeMeasure();
 
 		CapabilityManager.INSTANCE.register(StopwatchTracker.class, DummyCapabilityStorage.get(), StopwatchTracker::new);
 		CapabilityManager.INSTANCE.register(ISignalMeterTracker.class, DummyCapabilityStorage.get(), SignalMeterTracker::new);
@@ -81,6 +83,12 @@ public class CharsetToolsEngineering {
 		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataDummy.class, SignalMeterDataDummy::new);
 		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataRedstone.class, SignalMeterDataRedstone::new);
 		SignalMeterProviderHandler.INSTANCE.registerRemoteProvider(new SignalMeterDataRedstone.Provider(), false);
+	}
+
+	@Mod.EventHandler
+	@SideOnly(Side.CLIENT)
+	public void onPreInitClient(FMLPreInitializationEvent event) {
+		//MinecraftForge.EVENT_BUS.register(TapeMeasureRenderer.INSTANCE);
 	}
 
 	@Mod.EventHandler
@@ -94,6 +102,7 @@ public class CharsetToolsEngineering {
 	public void registerItems(RegistryEvent.Register<Item> event) {
 		RegistryUtils.register(event.getRegistry(), stopwatch, "stopwatch");
 		RegistryUtils.register(event.getRegistry(), signalMeter, "signal_meter");
+		//RegistryUtils.register(event.getRegistry(), tapeMeasure, "tape_measure");
 	}
 
 	@SubscribeEvent
@@ -101,6 +110,7 @@ public class CharsetToolsEngineering {
 	public void registerModels(ModelRegistryEvent event) {
 		RegistryUtils.registerModel(stopwatch, 0, "charset:stopwatch");
 		RegistryUtils.registerModel(signalMeter, 0, "charset:signal_meter");
+		//RegistryUtils.registerModel(tapeMeasure, 0, "charset:tape_measure");
 	}
 
 	@SubscribeEvent

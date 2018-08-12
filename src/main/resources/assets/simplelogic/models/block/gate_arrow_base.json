@@ -1,0 +1,19 @@
+{
+  "textures": {
+    "arrow": "blocks/stone"
+  },
+  "elements": [
+    {
+      "from": [7, 2, 7],
+      "to": [9, 8, 9],
+      "faces": {
+        "down":  { "texture": "#arrow" },
+        "up":    { "texture": "#arrow" },
+        "north": { "texture": "#arrow" },
+        "south": { "texture": "#arrow" },
+        "west":  { "texture": "#arrow" },
+        "east":  { "texture": "#arrow" }
+      }
+    }
+  ]
+}

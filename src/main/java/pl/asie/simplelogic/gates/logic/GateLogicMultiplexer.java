@@ -62,7 +62,7 @@ public class GateLogicMultiplexer extends GateLogic {
 			case 2:
 				return (isWest || eastOn) ? State.OFF : State.ON;
 			case 3:
-				return State.input(getInputValueOutside(EnumFacing.SOUTH)).invert();
+				return State.input(getOutputValueInside(EnumFacing.NORTH));
 		}
 		return State.ON;
 	}
