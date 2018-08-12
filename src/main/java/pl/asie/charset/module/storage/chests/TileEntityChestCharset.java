@@ -73,7 +73,7 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 		@Override
 		protected void onContentsChanged(int slot) {
 			super.onContentsChanged(slot);
-			TileEntityChestCharset.this.markDirty();
+			TileEntityChestCharset.this.markChunkDirty();
 			TileEntityChestCharset.this.updateComparators();
 		}
 	};

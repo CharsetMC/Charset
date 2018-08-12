@@ -69,11 +69,13 @@ import pl.asie.charset.lib.capability.mechanical.DefaultMechanicalPowerConsumer;
 import pl.asie.charset.lib.capability.mechanical.DefaultMechanicalPowerProducer;
 import pl.asie.charset.lib.capability.pipe.DefaultPipeView;
 import pl.asie.charset.lib.capability.redstone.*;
+import pl.asie.charset.lib.capability.staging.DefaultSignalMeterDataProvider;
 import pl.asie.charset.lib.capability.storage.DummyBarrel;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInventory;
 import pl.asie.charset.api.lib.IDyeableItem;
+import pl.asie.charset.lib.stagingapi.ISignalMeterDataProvider;
 
 import javax.annotation.Nullable;
 
@@ -111,6 +113,9 @@ public class Capabilities {
 	public static Capability<IRedstoneEmitter> REDSTONE_EMITTER;
 	@CapabilityInject(IRedstoneReceiver.class)
 	public static Capability<IRedstoneReceiver> REDSTONE_RECEIVER;
+
+	@CapabilityInject(ISignalMeterDataProvider.class)
+	public static Capability<ISignalMeterDataProvider> SIGNAL_METER_DATA_PROVIDER;
 
 	@CapabilityInject(IBarrel.class)
 	public static Capability<IBarrel> BARREL;
@@ -163,6 +168,8 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IRedstoneEmitter.class, new DefaultRedstoneEmitterStorage(), DefaultRedstoneEmitter::new);
 		CapabilityManager.INSTANCE.register(IBundledReceiver.class, DummyCapabilityStorage.get(), DummyRedstoneReceiver::new);
 		CapabilityManager.INSTANCE.register(IRedstoneReceiver.class, DummyCapabilityStorage.get(), DummyRedstoneReceiver::new);
+
+		CapabilityManager.INSTANCE.register(ISignalMeterDataProvider.class, DummyCapabilityStorage.get(), DefaultSignalMeterDataProvider::new);
 
 		CapabilityManager.INSTANCE.register(IBarrel.class, DummyCapabilityStorage.get(), DummyBarrel::new);
 		CapabilityManager.INSTANCE.register(Lockable.class, LOCKABLE_STORAGE, Lockable::new);

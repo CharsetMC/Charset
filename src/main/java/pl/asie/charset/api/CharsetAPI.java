@@ -61,7 +61,6 @@ public class CharsetAPI {
 		throw new RuntimeException("Charset API not initialized - please use isPresent()!");
 	}
 
-	@Nullable
 	public <T> ISimpleInstantiatingRegistry<T> findSimpleInstantiatingRegistry(Class<T> c) {
 		throw new RuntimeException("Charset API not initialized - please use isPresent()!");
 	}

@@ -21,6 +21,8 @@ package pl.asie.charset.lib.utils;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
@@ -54,7 +56,7 @@ public final class ColorUtils {
 			"brown", "green", "red", "black"
 	};
 
-	private static TIntObjectMap<EnumDyeColor> oredictDyeIdMap;
+	private static Int2ObjectMap<EnumDyeColor> oredictDyeIdMap;
 
 	private static final char[] WOOL_TO_CHAT = new char[]{
 			'f', '6', 'd', '9', 'e', 'a', 'd', '8',
@@ -65,9 +67,9 @@ public final class ColorUtils {
 
 	}
 
-	public static TIntObjectMap<EnumDyeColor> getOredictDyeIdMap() {
+	public static Int2ObjectMap<EnumDyeColor> getOredictDyeIdMap() {
 		if (oredictDyeIdMap == null) {
-		    oredictDyeIdMap = new TIntObjectHashMap<>();
+		    oredictDyeIdMap = new Int2ObjectOpenHashMap<>();
 			for (int i = 0; i < 16; i++) {
 				oredictDyeIdMap.put(OreDictionary.getOreID("dye" + UPPERCASE_DYE_SUFFIXES[i]), EnumDyeColor.byMetadata(i));
 			}
@@ -80,6 +82,7 @@ public final class ColorUtils {
 		return "\u00a7" + WOOL_TO_CHAT[color.getMetadata()];
 	}
 
+	// TODO 1.13 make Optional
 	public static @Nullable EnumDyeColor getDyeColor(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return null;
@@ -90,7 +93,7 @@ public final class ColorUtils {
 		}
 
 		int[] itemOreIDs = OreDictionary.getOreIDs(stack);
-		TIntObjectMap<EnumDyeColor> map = getOredictDyeIdMap();
+		Int2ObjectMap<EnumDyeColor> map = getOredictDyeIdMap();
 		for (int id : itemOreIDs) {
 			EnumDyeColor color = map.get(id);
 			if (color != null)

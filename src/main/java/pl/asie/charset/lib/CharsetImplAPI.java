@@ -32,10 +32,15 @@ import pl.asie.charset.api.audio.AudioSink;
 import pl.asie.charset.api.lib.IBlockCapabilityProvider;
 import pl.asie.charset.api.lib.ISimpleInstantiatingRegistry;
 import pl.asie.charset.lib.capability.CapabilityHelper;
+import pl.asie.charset.lib.utils.CharsetSimpleInstantiatingRegistry;
 
 import javax.annotation.Nullable;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public final class CharsetImplAPI extends CharsetAPI {
+	private final Map<Class, ISimpleInstantiatingRegistry> registryMap = new IdentityHashMap<>();
+
 	@Override
 	public boolean isPresent() {
 		return true;
@@ -66,7 +71,7 @@ public final class CharsetImplAPI extends CharsetAPI {
 		} else if (c == AudioSink.class) {
 			return (ISimpleInstantiatingRegistry<T>) AudioAPI.SINK_REGISTRY;
 		} else {
-			return null;
+			return registryMap.computeIfAbsent(c, (cc) -> new CharsetSimpleInstantiatingRegistry());
 		}
 	}
 }

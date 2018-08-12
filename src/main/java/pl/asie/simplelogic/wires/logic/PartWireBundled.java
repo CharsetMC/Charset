@@ -38,6 +38,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.api.wires.*;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.wires.IWireContainer;
 import pl.asie.charset.lib.wires.Wire;
@@ -411,5 +412,10 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		}
 		stringList.add(builder.toString());
 		stringList.addAll(extraString);
+	}
+
+	@Override
+	public ISignalMeterData getSignalMeterData() {
+		return new SignalMeterDataBundledWire(signalValue);
 	}
 }

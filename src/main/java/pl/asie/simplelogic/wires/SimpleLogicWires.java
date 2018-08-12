@@ -24,7 +24,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -37,6 +36,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
@@ -45,17 +45,20 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.recipe.IngredientGroup;
+import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.wires.*;
 import pl.asie.charset.shared.SimpleLogicShared;
 import pl.asie.simplelogic.wires.logic.LogicWireProvider;
+import pl.asie.charset.module.tools.engineering.ModelSignalMeter;
+import pl.asie.simplelogic.wires.logic.SignalMeterDataBundledWire;
+import pl.asie.simplelogic.wires.logic.SignalMeterDataWire;
 import pl.asie.simplelogic.wires.logic.WireRenderHandlerOverlay;
+import pl.asie.charset.module.tools.engineering.ItemSignalMeter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 @CharsetModule(
 		name = "simplelogic.wires",
@@ -165,6 +168,8 @@ public class SimpleLogicWires {
 				CharsetLibWires.instance.registerRenderer(wireProviders[18 + i], new WireRenderHandlerOverlay(wireProviders[18 + i], true));
 			}
 		}
+
+		ModelSignalMeter.WHITE = event.getMap().registerSprite(new ResourceLocation("charset", "misc/white"));
 	}
 
 	private void addWireOD(String name, Item i) {
@@ -211,6 +216,9 @@ public class SimpleLogicWires {
 			addWireOD("BundledColored", wireItems[i + 18]);
 			addWireOD(ColorUtils.getOreDictEntry("BundledColored", EnumDyeColor.byMetadata(i)), wireItems[i + 1]);
 		}
+
+		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataWire.class, SignalMeterDataWire::new);
+		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataBundledWire.class, SignalMeterDataBundledWire::new);
 	}
 
 	@EventHandler

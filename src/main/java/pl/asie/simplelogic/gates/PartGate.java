@@ -268,6 +268,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 				markBlockForRenderUpdate();
 			}
 		} else {
+			markChunkDirty();
 			markBlockForUpdate();
 		}
 	}

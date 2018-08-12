@@ -44,6 +44,10 @@ public class WrappedBakedModel extends BaseBakedModel {
         this.particleSprite = particleSprite;
     }
 
+    protected IBakedModel getParent() {
+        return parent;
+    }
+
     @Override
     public boolean isAmbientOcclusion() {
         return parent.isAmbientOcclusion();

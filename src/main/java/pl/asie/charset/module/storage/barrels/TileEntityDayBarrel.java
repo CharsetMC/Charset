@@ -461,7 +461,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         if (itemChanged) {
-            markDirty();
+            markChunkDirty();
         }
     }
 

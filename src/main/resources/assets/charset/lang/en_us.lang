@@ -213,6 +213,15 @@ item.charset.chisel.name=Chisel
 item.charset.chisel.large.name=Large Chisel
 item.charset.wrench.name=Wrench
 
+# tools.engineering
+
+item.charset.signal_meter.name=Signal Meter
+item.charset.stopwatch.name=Stopwatch
+notice.charset.stopwatch.timeStart=%s seconds ->
+notice.charset.stopwatch.timeEnd=-> %s seconds
+notice.charset.stopwatch.markStart=Marked start position!
+notice.charset.stopwatch.markEnd=Marked end position!
+
 # tools.tapemeasure
 
 item.charset.tapeMeasure.name=Tape Measure

@@ -31,20 +31,37 @@ import mcmultipart.api.slot.IPartSlot;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.handlers.DebugInfoProvider;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public final class MCMPUtils {
 	private MCMPUtils() {
 
+	}
+
+	public static IPartInfo getPartInfo(RayTraceResult mouseOver) {
+		if (mouseOver.hitInfo instanceof IPartInfo) {
+			return (IPartInfo) mouseOver.hitInfo;
+		}
+
+		if (mouseOver.hitInfo instanceof RayTraceResult && mouseOver.hitInfo != mouseOver) {
+			RayTraceResult result = (RayTraceResult) mouseOver.hitInfo;
+			mouseOver.hitInfo = null; // prevent circular loops
+			IPartInfo v = getPartInfo(result);
+			mouseOver.hitInfo = result;
+			return v;
+		}
+
+		return null;
 	}
 
 	private static void addSlot(IPartSlot slot, IMultipartContainer container, Collection<IPartSlot> partSlots, Stream.Builder<IPartInfo> builder) {

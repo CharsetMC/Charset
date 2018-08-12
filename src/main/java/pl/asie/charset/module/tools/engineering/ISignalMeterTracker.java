@@ -17,10 +17,11 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.stagingapi;
+package pl.asie.charset.module.tools.engineering;
 
-import net.minecraft.util.math.Vec3d;
+import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 
-public interface ISignalMeterTile {
-	<T> T getValue(ISignalMeter meter, Vec3d vec);
+public interface ISignalMeterTracker {
+	ISignalMeterData getClientData();
+	void setClientData(ISignalMeterData data);
 }

@@ -137,7 +137,7 @@ public class TileHandCrank extends TileBase implements ITickable, IMechanicalPow
 				SoundCategory.BLOCKS,
 				1f, 0.875f + (float) (force * 0.0625 / MAXIMUM) + (float) Math.random()*0.01f);
 
-		markDirty();
+		markChunkDirty();
 		markBlockForUpdate();
 		return true;
 	}

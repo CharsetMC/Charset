@@ -36,14 +36,15 @@ import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.stagingapi.ISignalMeterDataProvider;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.*;
 
 import javax.annotation.Nonnull;
 
-public abstract class PartWireSignalBase extends Wire implements IWire, IDebuggable {
+public abstract class PartWireSignalBase extends Wire implements IWire, ISignalMeterDataProvider, IDebuggable {
 	@SuppressWarnings("PointlessBooleanExpression")
-	public static boolean DEBUG_CLIENT_WIRE_STATE = true;
+	public static boolean DEBUG_CLIENT_WIRE_STATE = false;
 	public static boolean DEBUG = false && ModCharset.INDEV;
 
 	public static boolean PROPAGATING = false;
@@ -295,7 +296,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-		if (capability == Capabilities.DEBUGGABLE) {
+		if (capability == Capabilities.DEBUGGABLE || capability == Capabilities.SIGNAL_METER_DATA_PROVIDER) {
 			return true;
 		}
 
@@ -304,8 +305,9 @@ public abstract class PartWireSignalBase extends Wire implements IWire, IDebugga
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-		if (capability == Capabilities.DEBUGGABLE) {
-			return Capabilities.DEBUGGABLE.cast(this);
+		if (capability == Capabilities.DEBUGGABLE || capability == Capabilities.SIGNAL_METER_DATA_PROVIDER) {
+			//noinspection unchecked
+			return (T) this;
 		}
 
 		return super.getCapability(capability, facing);

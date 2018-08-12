@@ -17,9 +17,9 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.wires.meter;
+package pl.asie.charset.lib.stagingapi;
 
-import pl.asie.charset.lib.item.ItemBase;
-
-public class ItemSignalMeter extends ItemBase {
+public interface ISignalMeterDataDots extends ISignalMeterData {
+	int getDotCount();
+	int getDotColor(int i);
 }

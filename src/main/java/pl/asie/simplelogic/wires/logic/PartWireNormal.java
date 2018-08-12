@@ -45,6 +45,7 @@ import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 import pl.asie.charset.lib.wires.*;
 import pl.asie.simplelogic.wires.LogicWireUtils;
 import pl.asie.simplelogic.wires.SimpleLogicWires;
@@ -65,7 +66,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	public int getRenderColor() {
 		int signalValue = signalLevel >> 8;
 		int v = (signalValue > 0 ? 0x96 : 0x78) + (signalValue * 7);
-		return 0xFF000000 | (v << 16) | (v << 8) | v;
+		return 0xFF000000 | (v * 0x10101);
 	}
 
 	@Override
@@ -413,5 +414,10 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		}
 
 		return Objects.hash(super.renderHashCode(), getRedstoneLevel());
+	}
+
+	@Override
+	public ISignalMeterData getSignalMeterData() {
+		return new SignalMeterDataWire((byte) getRedstoneLevel(), getColor());
 	}
 }

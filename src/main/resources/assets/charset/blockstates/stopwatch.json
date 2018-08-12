@@ -1,0 +1,19 @@
+{
+    "forge_marker": 1,
+    "defaults": {
+        "model": "forge:item-layer",
+        "transform": "forge:default-item"
+    },
+    "variants": {
+        "inventory": [{
+            "textures": {
+                "layer0": "charset:items/tools/stopwatch"
+            }
+        }],
+        "inventory_active": [{
+            "textures": {
+                "layer0": "charset:items/tools/stopwatch_active"
+            }
+        }]
+    }
+}

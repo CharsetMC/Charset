@@ -19,5 +19,10 @@
 
 package pl.asie.charset.lib.stagingapi;
 
-public interface ISignalMeter {
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
+
+public interface ISignalMeterDataRemoteProvider {
+	ISignalMeterData getSignalMeterData(IBlockAccess world, BlockPos pos, RayTraceResult result);
 }
