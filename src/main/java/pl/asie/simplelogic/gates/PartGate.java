@@ -19,9 +19,6 @@
 
 package pl.asie.simplelogic.gates;
 
-import java.util.*;
-import java.util.function.Predicate;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
@@ -37,26 +34,38 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-
 import net.minecraftforge.common.capabilities.Capability;
-
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
-import pl.asie.charset.api.wires.*;
-import pl.asie.charset.lib.notify.Notice;
-import pl.asie.charset.lib.notify.component.NotificationComponent;
-import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
-import pl.asie.charset.lib.wires.TileWire;
-import pl.asie.simplelogic.gates.logic.*;
+import pl.asie.charset.api.wires.IBundledEmitter;
+import pl.asie.charset.api.wires.IBundledReceiver;
+import pl.asie.charset.api.wires.IRedstoneEmitter;
+import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponent;
 import pl.asie.charset.lib.render.model.IRenderComparable;
-import pl.asie.charset.lib.utils.*;
+import pl.asie.charset.lib.stagingapi.ISignalMeterData;
+import pl.asie.charset.lib.stagingapi.ISignalMeterDataProvider;
+import pl.asie.charset.lib.utils.ItemUtils;
+import pl.asie.charset.lib.utils.Orientation;
+import pl.asie.charset.lib.utils.Quaternion;
+import pl.asie.charset.lib.utils.RotationUtils;
+import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
+import pl.asie.charset.lib.wires.SignalMeterDataBundledWire;
+import pl.asie.charset.lib.wires.SignalMeterDataWire;
+import pl.asie.charset.lib.wires.TileWire;
+import pl.asie.simplelogic.gates.logic.*;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
-public class PartGate extends TileBase implements IDebuggable, IGateContainer, IRenderComparable<PartGate>, ITickable {
+public class PartGate extends TileBase implements IDebuggable, IGateContainer, IRenderComparable<PartGate>, ISignalMeterDataProvider, ITickable {
 	private class RedstoneCommunications implements IBundledEmitter, IBundledReceiver, IRedstoneEmitter, IRedstoneReceiver {
 		private final EnumFacing side;
 
@@ -202,13 +211,14 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing direction) {
-		return capability == Capabilities.DEBUGGABLE || (capability == SimpleLogicGates.GATE_CAP && direction == getSide()) || hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
+		return capability == Capabilities.DEBUGGABLE || capability == Capabilities.SIGNAL_METER_DATA_PROVIDER
+				|| (capability == SimpleLogicGates.GATE_CAP && direction == getSide()) || hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capability, EnumFacing enumFacing) {
-		if (capability == Capabilities.DEBUGGABLE || capability == SimpleLogicGates.GATE_CAP) {
+		if (capability == Capabilities.DEBUGGABLE || capability == SimpleLogicGates.GATE_CAP || capability == Capabilities.SIGNAL_METER_DATA_PROVIDER) {
 			return (T) this;
 		} else if (hasRedstoneCapability(capability, enumFacing)) {
 			EnumFacing dir = realToGate(enumFacing);
@@ -280,7 +290,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 					TileEntity tile = w.getTileEntity(p);
 					if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
 						// TODO: FIXME - this is a hack
-						if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
+						if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing.getOpposite()) {
 							v = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
 						}
 					} else {
@@ -341,7 +351,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 				TileEntity tile = w.getTileEntity(p);
 				if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
 					// TODO: FIXME - this is a hack
-					if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
+					if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing.getOpposite()) {
 						return tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite()).getBundledSignal();
 					}
 				}
@@ -436,22 +446,21 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	}
 
 	@Nullable
-	private EnumFacing getClosestFace(Vec3d vec, boolean allowNulls) {
-		int closestFace = -1;
+	private EnumFacing getClosestFace(Vec3d vec, Predicate<EnumFacing> predicate) {
+		EnumFacing closestFace = null;
 		double distance = Double.MAX_VALUE;
-		for (int i = 0; i <= (allowNulls ? 4 : 3); i++) {
+		for (int i = 0; i <= 4; i++) {
 			double d = HIT_VECTORS[i].squareDistanceTo(vec);
 			if (d < distance) {
-				closestFace = i;
-				distance = d;
+				EnumFacing face = i == 4 ? null : EnumFacing.byIndex(i + 2);
+				if (predicate.test(face)) {
+					closestFace = face;
+					distance = d;
+				}
 			}
 		}
 
-		if (closestFace >= 0 && closestFace < 4) {
-			return EnumFacing.byIndex(closestFace + 2);
-		} else {
-			return null;
-		}
+		return closestFace;
 	}
 
 	public boolean onActivated(EntityPlayer playerIn, EnumHand hand, float hitX, float hitY, float hitZ) {
@@ -477,7 +486,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 			} else if (stack.getItem() instanceof ItemBlock) {
 				Block block = Block.getBlockFromItem(stack.getItem());
 				if (block == Blocks.REDSTONE_TORCH || block == Blocks.UNLIT_REDSTONE_TORCH) {
-					EnumFacing closestFace = getClosestFace(vec, true);
+					EnumFacing closestFace = getClosestFace(vec, facing -> true);
 
 					if (closestFace != null) {
 						if (logic.canInvertSide(closestFace) && !logic.isSideInverted(closestFace)) {
@@ -498,7 +507,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 
 		if (!used) {
 			if (!(changed = logic.onRightClick(this, playerIn, vec, hand))) {
-				EnumFacing closestFace = getClosestFace(vec, true);
+				EnumFacing closestFace = getClosestFace(vec, facing -> true);
 
 				if (closestFace != null) {
 					if (logic.canInvertSide(closestFace) && logic.isSideInverted(closestFace)) {
@@ -567,7 +576,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		if (face != null) {
 			orientation = Orientation.fromDirection(SimpleLogicGates.onlyBottomFace ? EnumFacing.UP : face);
 			Vec3d vec = realToGate(new Vec3d(hitX, hitY, hitZ));
-			orientation = orientation.pointTopTo(gateToReal(getClosestFace(vec, false)));
+			orientation = orientation.pointTopTo(gateToReal(getClosestFace(vec, Objects::nonNull)));
 		}
 	}
 
@@ -659,6 +668,11 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		}
 
 		throw new RuntimeException("!?");
+	}
+
+	@Override
+	public GateLogic getLogic() {
+		return logic;
 	}
 
 	public AxisAlignedBB getBox() {
@@ -762,6 +776,46 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		if (logic instanceof IDebuggable) {
 			((IDebuggable) logic).addDebugInformation(stringList, side);
 		}
+	}
+
+	@Override
+	public ISignalMeterData getSignalMeterData(RayTraceResult result) {
+		Vec3d vecOrig = result.hitVec.subtract(pos.getX(), pos.getY(), pos.getZ());
+		Vec3d vec = realToGate(vecOrig);
+		EnumFacing facing = getClosestFace(vec, facing1 -> {
+			if (facing1 == null) {
+				return true;
+			} else {
+				return logic.getType(facing1).isInput() || logic.getType(facing1).isOutput();
+			}
+		});
+
+		if (facing == null) {
+			if (logic instanceof ISignalMeterDataProvider) {
+				return ((ISignalMeterDataProvider) logic).getSignalMeterData(result);
+			}
+
+			facing = getClosestFace(vec, facing1 -> {
+				if (facing1 == null) {
+					return false;
+				} else {
+					return logic.getType(facing1).isInput() || logic.getType(facing1).isOutput();
+				}
+			});
+		}
+
+		GateConnection type = logic.getType(facing);
+		if (type.isInput() && type.isBundled()) {
+			return new SignalMeterDataBundledWire(logic.getInputValueBundled(facing));
+		} else if (type.isInput() && type.isRedstone()) {
+			return new SignalMeterDataWire(logic.getInputValueInside(facing), -1);
+		} else if (type.isOutput() && type.isBundled()) {
+			return new SignalMeterDataBundledWire(logic.getOutputValueBundled(facing));
+		} else if (type.isOutput() && type.isRedstone()) {
+			return new SignalMeterDataWire(logic.getOutputValueInside(facing), -1);
+		}
+
+		return null;
 	}
 
 	@Override

@@ -109,7 +109,7 @@ public class GuiTimer extends GuiContainerCharset<ContainerGate> {
 			for (TinyButton button : buttonList) {
 				int bx = this.xBase + button.x;
 				int by = this.yBase + button.y;
-				if (x >= bx && x < (bx + 9) && y >= by && y < (by + 9)) {
+				if (x >= bx && x < (bx + button.w) && y >= by && y < (by + button.h)) {
 					button.pressed = true;
 				}
 			}

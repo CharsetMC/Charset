@@ -86,6 +86,7 @@ public class SimpleLogicGates {
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
+	public static int redstoneTickLength;
 	public static int minTimerTickTime;
 	public static boolean onlyBottomFace, useTESRs;
 	public static BlockGate blockGate;
@@ -107,6 +108,7 @@ public class SimpleLogicGates {
 		onlyBottomFace = ConfigUtils.getBoolean(config, "general", "gatesOnlyBottomFace", false, "Set to true if you wish that gates only be placed on the bottom face of a block - this is great for vanilla-plus style modpacks!", false);
 		useTESRs = ConfigUtils.getBoolean(config, "client", "forceGateTESRs", false, "Forces gates to render using TESRs.", false);
 		minTimerTickTime = ConfigUtils.getInt(config, "general", "minTimerTickTime", 4, 4, 24000, "The minimum amount of ticks, in 1/20-second units, Timers are allowed to tick at.", false);
+		redstoneTickLength = ConfigUtils.getInt(config, "expert", "redstoneTickLength", 2, 1, 20, "The length of a redstone tick, in game ticks (1/20 second units). USE ONLY IF YOU REALLY KNOW WHAT YOU ARE DOING - VALUES OTHER THAN 2 DO *NOT* MATCH VANILLA EXPECTATIONS!", false);
 	}
 
 	@EventHandler
@@ -151,6 +153,7 @@ public class SimpleLogicGates {
 		if (ModCharset.isModuleLoaded("simplelogic.wires")) {
 			registerGate(new ResourceLocation("simplelogic:bundled_transceiver"), GateLogicBundledTransceiver.class);
 			registerGate(new ResourceLocation("simplelogic:bundled_inverter"), GateLogicBundledInverter.class);
+			registerGate(new ResourceLocation("simplelogic:bundled_transposer"), GateLogicBundledTransposer.class);
 		}
 
 		registerGate(new ResourceLocation("simplelogic:comparator"), GateLogicComparator.class);
@@ -175,6 +178,7 @@ public class SimpleLogicGates {
 	public void init(FMLInitializationEvent event) {
 		packet.registerPacket(0x01, PacketGateOpenGUI.class);
 		packet.registerPacket(0x02, PacketTimerChangeTT.class);
+		packet.registerPacket(0x03, PacketTransposerConnection.class);
 
 		RegistryUtils.register(PartGate.class, "logic_gate");
 
@@ -194,6 +198,7 @@ public class SimpleLogicGates {
 		if (ModCharset.isModuleLoaded("simplelogic.wires")) {
 			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledTransceiver())));
 			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledInverter())));
+			registerGateStack(ItemGate.getStack(new PartGate(new GateLogicBundledTransposer())));
 		}
 
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicRepeater())));

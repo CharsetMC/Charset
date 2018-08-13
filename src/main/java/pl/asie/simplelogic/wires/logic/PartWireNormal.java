@@ -26,13 +26,13 @@ import java.util.Objects;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
@@ -421,7 +421,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	}
 
 	@Override
-	public ISignalMeterData getSignalMeterData() {
+	public ISignalMeterData getSignalMeterData(RayTraceResult result) {
 		return new SignalMeterDataWire((byte) getRedstoneLevel(), getColor());
 	}
 }

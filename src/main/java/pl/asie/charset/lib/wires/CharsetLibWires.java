@@ -41,8 +41,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.*;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.api.CharsetAPI;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
+import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.simplelogic.wires.logic.WireRenderHandlerOverlay;
 
@@ -118,6 +120,9 @@ public class CharsetLibWires {
 	public void init(FMLInitializationEvent event) {
 		RegistryUtils.register(TileWire.class, "wire");
 		RegistryUtils.register(TileWire.Tickable.class, "wire.tickable");
+
+		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataWire.class, SignalMeterDataWire::new);
+		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataBundledWire.class, SignalMeterDataBundledWire::new);
 	}
 
 	@Mod.EventHandler

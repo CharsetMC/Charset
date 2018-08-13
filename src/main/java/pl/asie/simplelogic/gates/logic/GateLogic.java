@@ -75,9 +75,17 @@ public abstract class GateLogic {
 		return tag;
 	}
 
-	private byte[] ensureSizeAndCopy(byte[] data, int len) {
+	protected byte[] ensureSizeAndCopy(byte[] data, int len) {
 		if (data.length != len) {
 			return new byte[len];
+		} else {
+			return Arrays.copyOf(data, len);
+		}
+	}
+
+	protected int[] ensureSizeAndCopy(int[] data, int len) {
+		if (data.length != len) {
+			return new int[len];
 		} else {
 			return Arrays.copyOf(data, len);
 		}

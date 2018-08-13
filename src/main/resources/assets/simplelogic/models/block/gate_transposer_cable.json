@@ -8,27 +8,43 @@
                 "south": { "texture": "#side", "uv": [1, 2, 15, 4] }
             }
         },
+        { "from": [ 1, 2, 3 ],
+            "to": [ 15, 4, 13 ],
+            "faces": {
+                "north": { "texture": "#side", "uv": [1, 2, 15, 4] },
+                "south": { "texture": "#side", "uv": [1, 2, 15, 4] },
+                "west": { "texture": "#side", "uv": [3, 2, 13, 4] },
+                "east": { "texture": "#side", "uv": [3, 2, 13, 4] }
+            }
+        },
         { "from": [ 1, 0, 3 ],
             "to": [ 15, 4, 5 ],
             "faces": {
-                "north": { "texture": "#side", "uv": [1, 0, 15, 4] },
-                "south": { "texture": "#side", "uv": [1, 0, 15, 4] },
-                "west": { "texture": "#side", "uv": [0, 0, 6, 4] },
-                "east": { "texture": "#side", "uv": [0, 0, 6, 4] }
+                "south": { "texture": "#inner_side", "uv": [1, 0, 15, 4] }
             }
         },
         { "from": [ 1, 0, 11 ],
             "to": [ 15, 4, 13 ],
             "faces": {
-                "north": { "texture": "#side", "uv": [1, 0, 15, 4] },
-                "south": { "texture": "#side", "uv": [1, 0, 15, 4] },
-                "west": { "texture": "#side", "uv": [0, 0, 6, 4] },
-                "east": { "texture": "#side", "uv": [0, 0, 6, 4] }
+                "north": { "texture": "#inner_side", "uv": [1, 0, 15, 4] }
+            }
+        },
+        { "from": [ 1, 0, 4 ],
+            "to": [ 2, 4, 12 ],
+            "faces": {
+                "east": { "texture": "#side", "uv": [4, 0, 12, 4] }
+            }
+        },
+        { "from": [ 14, 0, 4 ],
+            "to": [ 15, 4, 12 ],
+            "faces": {
+                "west": { "texture": "#side", "uv": [4, 0, 12, 4] }
             }
         }
     ],
     "textures": {
         "cable_top": "simplelogic:blocks/gate_bundled/transposer",
+        "inner_side": "simplelogic:blocks/gate_bundled/transposer_inner_side",
         "side": "simplelogic:blocks/wire/wire_bundled_side"
     }
 }

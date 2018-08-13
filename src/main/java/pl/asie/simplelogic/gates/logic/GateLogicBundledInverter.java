@@ -23,13 +23,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
 
 public class GateLogicBundledInverter extends GateLogic {
-	private byte[] output = new byte[16];
-
 	@Override
 	public boolean tick(IGateContainer gate) {
-		boolean bundledInputChange = false;
-
-		return bundledInputChange;
+		return true;
 	}
 
 	@Override

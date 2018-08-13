@@ -19,24 +19,16 @@
 
 package pl.asie.simplelogic.gates.addon;
 
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.eventhandler.Event;
-import pl.asie.simplelogic.gates.PartGate;
-import pl.asie.simplelogic.gates.SimpleLogicGates;
 import pl.asie.simplelogic.gates.SimpleLogicGatesClient;
-import pl.asie.simplelogic.gates.logic.GateLogic;
-import pl.asie.simplelogic.gates.render.GateDynamicRenderer;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import pl.asie.simplelogic.gates.render.GateCustomRenderer;
 
 public class GateRegisterClientEvent extends Event {
 	public GateRegisterClientEvent() {
 
 	}
 
-	public void registerDynamicRenderer(GateDynamicRenderer renderer) {
-		SimpleLogicGatesClient.INSTANCE.registerDynamicRenderer(renderer);
+	public void registerDynamicRenderer(GateCustomRenderer renderer) {
+		SimpleLogicGatesClient.INSTANCE.registerRenderer(renderer);
 	}
 }

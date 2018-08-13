@@ -21,10 +21,12 @@ package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
+import pl.asie.simplelogic.gates.SimpleLogicGates;
 
 // TODO: Add locking
 public class GateLogicRepeater extends GateLogic {
@@ -125,20 +127,20 @@ public class GateLogicRepeater extends GateLogic {
 	public void onChanged(IGateContainer gate) {
 		gate.markGateChanged(false);
 
-		if (isRepeaterLocked() || (repeatedSignal != 0 && ticks < 2)) {
+		if (isRepeaterLocked() || (repeatedSignal != 0 && ticks < 1)) {
 			return;
 		}
 
 		if (getInputSignal() != repeatedSignal) {
 			repeatedSignal = getInputSignal();
 			ticks = 0;
-			gate.scheduleTick(signalValues[valueMode] * 2);
+			gate.scheduleTick(signalValues[valueMode] * SimpleLogicGates.redstoneTickLength);
 		}
 	}
 
 	@Override
 	public boolean tick(IGateContainer gate) {
-		if (ticks == 2) {
+		if (ticks == 1) {
 			if (repeatedSignal != getInputSignal()) {
 				repeatedSignal = getInputSignal();
 				return true;
@@ -147,7 +149,7 @@ public class GateLogicRepeater extends GateLogic {
 			}
 		} else {
 			ticks++;
-			gate.scheduleTick(signalValues[valueMode] * 2);
+			gate.scheduleTick(signalValues[valueMode] * SimpleLogicGates.redstoneTickLength);
 			return true;
 		}
 	}

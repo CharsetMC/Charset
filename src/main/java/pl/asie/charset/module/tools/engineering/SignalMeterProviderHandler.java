@@ -61,7 +61,7 @@ public class SignalMeterProviderHandler {
 		MultipartUtils.ExtendedRayTraceResult extResult = MultipartUtils.INSTANCE.getTrueResult(result);
 		TileEntity tileEntity = extResult.getTile(world);
 		if (tileEntity != null && tileEntity.hasCapability(Capabilities.SIGNAL_METER_DATA_PROVIDER, null)) {
-			return Optional.ofNullable(tileEntity.getCapability(Capabilities.SIGNAL_METER_DATA_PROVIDER, null).getSignalMeterData());
+			return Optional.ofNullable(tileEntity.getCapability(Capabilities.SIGNAL_METER_DATA_PROVIDER, null).getSignalMeterData(result));
 		}
 
 		return getRemoteData(remoteProviderAfterList, world, pos, result);

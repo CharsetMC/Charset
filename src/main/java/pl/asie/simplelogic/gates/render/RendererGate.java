@@ -23,6 +23,7 @@ import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ModelRotation;
@@ -52,6 +53,7 @@ import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.simplelogic.gates.logic.GateRenderState;
+import pl.asie.simplelogic.gates.logic.IGateContainer;
 
 public class RendererGate extends ModelFactory<PartGate> {
 	public static final RendererGate INSTANCE = new RendererGate();
@@ -91,7 +93,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 	@Override
 	public boolean shouldCache(PartGate object, BlockRenderLayer layer) {
-		return layer != null || SimpleLogicGatesClient.INSTANCE.getDynamicRenderer(object.logic.getClass()) != null;
+		return layer != null || SimpleLogicGatesClient.INSTANCE.getRenderer(object.logic.getClass()) != null;
 	}
 
 	@Override
@@ -109,7 +111,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 		}
 	}
 
-	public ModelStateComposition getTransform(PartGate gate) {
+	public ModelStateComposition getTransform(IGateContainer gate) {
 		return COMPOSITIONS[gate.getSide().ordinal() * 6 + gate.getTop().ordinal()];
 	}
 
@@ -129,7 +131,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 		}
 	}
 
-	public void addLayers(SimpleBakedModel result, ModelStateComposition transform, PartGate gate) {
+	public void addLayers(SimpleBakedModel result, ModelStateComposition transform, PartGate gate, boolean isItem) {
 		GateLogic logic = gate.logic;
 		GateRenderDefinitions.Definition definition = GateRenderDefinitions.INSTANCE.getGateDefinition(SimpleLogicGates.getId(logic));
 		GateRenderDefinitions.BaseDefinition base = GateRenderDefinitions.INSTANCE.base;
@@ -267,6 +269,15 @@ public class RendererGate extends ModelFactory<PartGate> {
 				);
 			}
 		}
+
+		GateCustomRenderer renderer = SimpleLogicGatesClient.INSTANCE.getRenderer(gate.logic.getClass());
+		if (renderer != null) {
+			appendStaticModels(renderer, gate, result, isItem);
+		}
+	}
+
+	private void appendStaticModels(GateCustomRenderer renderer, PartGate gate, SimpleBakedModel model, boolean isItem) {
+		renderer.renderStatic(gate, gate.logic, isItem, (m) -> model.addModel((IBakedModel) m), (q, f) -> model.addQuad((EnumFacing) f, (BakedQuad) q));
 	}
 
 	@Override
@@ -279,14 +290,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 		}
 
 		if (!SimpleLogicGates.useTESRs || isItem) {
-			addLayers(result, transform, gate);
-		}
-
-		if (isItem) {
-			GateDynamicRenderer renderer = SimpleLogicGatesClient.INSTANCE.getDynamicRenderer(gate.logic.getClass());
-			if (renderer != null) {
-				renderer.appendModelsToItem(gate, result);
-			}
+			addLayers(result, transform, gate, isItem);
 		}
 
 		return result;

@@ -20,7 +20,6 @@
 package pl.asie.simplelogic.gates;
 
 import java.util.*;
-import java.util.function.Function;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -30,7 +29,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -43,11 +41,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.render.ArrowHighlightHandler;
 import pl.asie.charset.lib.render.sprite.PixelOperationSprite;
 import pl.asie.charset.lib.utils.RenderUtils;
+import pl.asie.charset.module.tools.engineering.ModelSignalMeter;
 import pl.asie.simplelogic.gates.addon.GateRegisterClientEvent;
 import pl.asie.simplelogic.gates.gui.GuiTimer;
-import pl.asie.simplelogic.gates.logic.GateLogic;
+import pl.asie.simplelogic.gates.gui.GuiTransposer;
+import pl.asie.simplelogic.gates.logic.GateLogicBundledTransposer;
 import pl.asie.simplelogic.gates.logic.GateLogicTimer;
-import pl.asie.simplelogic.gates.render.GateDynamicRendererArrow;
+import pl.asie.simplelogic.gates.render.GateCustomRendererArrow;
+import pl.asie.simplelogic.gates.render.GateCustomRendererTransposer;
 import pl.asie.simplelogic.gates.render.GateRenderDefinitions;
 import pl.asie.simplelogic.gates.render.RendererGate;
 import pl.asie.charset.lib.utils.RegistryUtils;
@@ -70,7 +71,8 @@ public class ProxyClient extends ProxyCommon {
 				SimpleLogicGates.itemGate);
 
 
-		SimpleLogicGatesClient.INSTANCE.registerDynamicRenderer(new GateDynamicRendererArrow() {
+		SimpleLogicGatesClient.INSTANCE.registerRenderer(new GateCustomRendererTransposer());
+		SimpleLogicGatesClient.INSTANCE.registerRenderer(new GateCustomRendererArrow() {
 			@Override
 			public Class<GateLogicTimer> getLogicClass() {
 				return GateLogicTimer.class;
@@ -78,6 +80,7 @@ public class ProxyClient extends ProxyCommon {
 		});
 
 		SimpleLogicGatesClient.INSTANCE.registerGui(GateLogicTimer.class, GuiTimer::new);
+		SimpleLogicGatesClient.INSTANCE.registerGui(GateLogicBundledTransposer.class, GuiTransposer::new);
 
 		MinecraftForge.EVENT_BUS.post(new GateRegisterClientEvent());
 	}
@@ -100,12 +103,15 @@ public class ProxyClient extends ProxyCommon {
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:logic_gate", "inventory"), RendererGate.INSTANCE);
 	}
 
+	// TODO: Fix zero-layer textures not getting overlaid.
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		GateCustomRendererTransposer.WHITE = event.getMap().registerSprite(new ResourceLocation("charset", "misc/white"));
+		GateCustomRendererTransposer.rayModels = null;
 		SimpleLogicGates.sendAddonEventIfNotSent();
 
-		GateDynamicRendererArrow.arrowModel = RenderUtils.getModelWithTextures(new ResourceLocation("simplelogic:block/gate_arrow"), event.getMap());
+		GateCustomRendererArrow.arrowModel = RenderUtils.getModelWithTextures(new ResourceLocation("simplelogic:block/gate_arrow"), event.getMap());
 
 		GateRenderDefinitions.INSTANCE.load("simplelogic:gatedefs/base.json", SimpleLogicGates.logicDefinitions);
 		ResourceLocation top_underlay = GateRenderDefinitions.INSTANCE.base.getTexture("top_underlay");

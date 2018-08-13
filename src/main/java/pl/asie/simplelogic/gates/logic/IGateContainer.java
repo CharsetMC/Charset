@@ -25,14 +25,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.component.NotificationComponent;
+import pl.asie.simplelogic.gates.SimpleLogicGates;
 
 public interface IGateContainer {
 	World getGateWorld();
 	BlockPos getGatePos();
+	EnumFacing getSide();
+	EnumFacing getTop();
+	GateLogic getLogic();
 
 	void scheduleTick(int gameTicks);
 	default void scheduleRedstoneTick() {
-		scheduleTick(2);
+		scheduleTick(SimpleLogicGates.redstoneTickLength);
 	}
 
 	byte getRedstoneInput(EnumFacing facing);

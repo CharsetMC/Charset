@@ -24,7 +24,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import pl.asie.simplelogic.gates.gui.ContainerGate;
 import pl.asie.simplelogic.gates.logic.GateLogic;
-import pl.asie.simplelogic.gates.render.GateDynamicRenderer;
+import pl.asie.simplelogic.gates.render.GateCustomRenderer;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -33,10 +33,10 @@ import java.util.function.Function;
 public class SimpleLogicGatesClient {
 	public static final SimpleLogicGatesClient INSTANCE = new SimpleLogicGatesClient();
 	private final Map<Class<? extends GateLogic>, Function<ContainerGate, GuiScreen>> guis = new IdentityHashMap<>();
-	private final Map<Class<? extends GateLogic>, GateDynamicRenderer> dynamicRenderers = new IdentityHashMap<>();
+	private final Map<Class<? extends GateLogic>, GateCustomRenderer> dynamicRenderers = new IdentityHashMap<>();
 
 	@SuppressWarnings("unchecked")
-	public void registerDynamicRenderer(GateDynamicRenderer renderer) {
+	public void registerRenderer(GateCustomRenderer renderer) {
 		dynamicRenderers.put(renderer.getLogicClass(), renderer);
 	}
 
@@ -49,7 +49,7 @@ public class SimpleLogicGatesClient {
 		FMLCommonHandler.instance().showGuiScreen(guis.get(gate.logic.getClass()).apply(new ContainerGate(Minecraft.getMinecraft().player.inventory, gate)));
 	}
 
-	public GateDynamicRenderer getDynamicRenderer(Class<? extends GateLogic> cl) {
+	public GateCustomRenderer getRenderer(Class<? extends GateLogic> cl) {
 		return dynamicRenderers.get(cl);
 	}
 }

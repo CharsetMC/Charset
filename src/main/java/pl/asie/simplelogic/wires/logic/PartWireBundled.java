@@ -29,7 +29,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
@@ -40,10 +40,7 @@ import pl.asie.charset.api.wires.*;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 import pl.asie.charset.lib.utils.ColorUtils;
-import pl.asie.charset.lib.wires.IWireContainer;
-import pl.asie.charset.lib.wires.Wire;
-import pl.asie.charset.lib.wires.WireProvider;
-import pl.asie.charset.lib.wires.WireUtils;
+import pl.asie.charset.lib.wires.*;
 import pl.asie.simplelogic.wires.LogicWireUtils;
 import pl.asie.simplelogic.wires.SimpleLogicWires;
 
@@ -419,7 +416,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 	}
 
 	@Override
-	public ISignalMeterData getSignalMeterData() {
+	public ISignalMeterData getSignalMeterData(RayTraceResult result) {
 		return new SignalMeterDataBundledWire(signalValue);
 	}
 }

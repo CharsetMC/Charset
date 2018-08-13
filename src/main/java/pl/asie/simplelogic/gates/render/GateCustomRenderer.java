@@ -20,7 +20,9 @@
 package pl.asie.simplelogic.gates.render;
 
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -29,19 +31,40 @@ import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.simplelogic.gates.PartGate;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 import pl.asie.simplelogic.gates.logic.GateLogic;
+import pl.asie.simplelogic.gates.logic.IGateContainer;
 
 import javax.annotation.Nullable;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import static pl.asie.simplelogic.gates.render.FastTESRGate.renderer;
 
-public abstract class GateDynamicRenderer<T extends GateLogic> {
+public abstract class GateCustomRenderer<T extends GateLogic> {
 	public abstract Class<T> getLogicClass();
 
-	protected final IBakedModel getTransformedModel(IBakedModel model, PartGate gate) {
+	/**
+	 * Make sure to override GateLogic.renderEquals/renderHashCode for cases where isItem = false!
+	 */
+	public void renderStatic(IGateContainer gate, T logic, boolean isItem, Consumer<IBakedModel> modelConsumer, BiConsumer<BakedQuad, EnumFacing> quadConsumer) {
+
+	}
+
+	public boolean hasDynamic() {
+		return false;
+	}
+
+	public void renderDynamic(IGateContainer gate, T logic, IBlockAccess world, double x, double y, double z, float partialTicks, int destroyStage, float partial, BufferBuilder buffer) {
+
+	}
+
+	// Utility methods
+
+	protected final IBakedModel getTransformedModel(IBakedModel model, IGateContainer gate) {
 		return getTransformedModel(model, null, gate);
 	}
 
-	protected final IBakedModel getTransformedModel(IBakedModel model, @Nullable ModelTransformer.IVertexTransformer transformer, PartGate gate) {
+	protected final IBakedModel getTransformedModel(IBakedModel model, @Nullable ModelTransformer.IVertexTransformer transformer, IGateContainer gate) {
 		ModelTransformer.IVertexTransformer rotate = ModelTransformer.IVertexTransformer.transform(RendererGate.INSTANCE.getTransform(gate), null);
 
 		return ModelTransformer.transform(
@@ -51,22 +74,16 @@ public abstract class GateDynamicRenderer<T extends GateLogic> {
 		);
 	}
 
-	protected final void renderTransformedModel(IBakedModel model, PartGate gate, IBlockAccess world, double x, double y, double z, BufferBuilder buffer) {
+	protected final void renderTransformedModel(IBakedModel model, IGateContainer gate, IBlockAccess world, double x, double y, double z, BufferBuilder buffer) {
 		renderTransformedModel(model, null, gate, world, x, y, z, buffer);
 	}
 
 	@SuppressWarnings("SameParameterValue")
-	protected final void renderTransformedModel(IBakedModel model, @Nullable  ModelTransformer.IVertexTransformer transformer, PartGate gate, IBlockAccess world, double x, double y, double z, BufferBuilder buffer) {
+	protected final void renderTransformedModel(IBakedModel model, @Nullable  ModelTransformer.IVertexTransformer transformer, IGateContainer gate, IBlockAccess world, double x, double y, double z, BufferBuilder buffer) {
 		model = getTransformedModel(model, transformer, gate);
-		BlockPos pos = gate.getPos();
+		BlockPos pos = gate.getGatePos();
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 		renderer.renderModel(world, model, SimpleLogicGates.blockGate.getDefaultState(), pos, buffer, false);
 		buffer.setTranslation(0, 0, 0);
 	}
-
-	public void appendModelsToItem(PartGate gate, SimpleBakedModel model) {
-
-	}
-
-	public abstract void render(PartGate gate, T logic, IBlockAccess world, double x, double y, double z, float partialTicks, int destroyStage, float partial, BufferBuilder buffer);
 }

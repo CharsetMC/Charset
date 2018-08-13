@@ -231,8 +231,7 @@ public class CharsetLib {
 		DataSerializersCharset.init();
 		UtilProxyCommon.proxy.init();
 
-		if (ModCharset.INDEV || enableDebugInfo)
-			MinecraftForge.EVENT_BUS.register(new DebugInfoProvider());
+		MinecraftForge.EVENT_BUS.register(new DebugInfoProvider());
 
 		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioData.class).register(AudioDataDFPWM.class, AudioDataDFPWM::new);
 		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(AudioData.class).register(AudioDataGameSound.class, AudioDataGameSound::new);

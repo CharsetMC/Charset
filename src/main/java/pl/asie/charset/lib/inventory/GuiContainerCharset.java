@@ -19,7 +19,14 @@
 
 package pl.asie.charset.lib.inventory;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.utils.RenderUtils;
 
 public class GuiContainerCharset<T extends ContainerBase> extends GuiContainer {
 	protected int xBase, yBase;

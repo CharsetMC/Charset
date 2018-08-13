@@ -22,27 +22,26 @@ package pl.asie.simplelogic.gates.render;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelStateComposition;
 import net.minecraftforge.common.model.TRSRTransformation;
-import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.simplelogic.gates.PartGate;
-import pl.asie.simplelogic.gates.SimpleLogicGates;
 import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.simplelogic.gates.logic.IArrowGateLogic;
+import pl.asie.simplelogic.gates.logic.IGateContainer;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
-public abstract class GateDynamicRendererArrow<T extends GateLogic> extends GateDynamicRenderer<T> {
+public abstract class GateCustomRendererArrow<T extends GateLogic> extends GateCustomRenderer<T> {
 	public static IModel arrowModel;
 
 	@Override
-	public void render(PartGate gate, T logic, IBlockAccess world, double xpos, double ypos, double zpos, float partialTicks, int destroyStage, float partial, BufferBuilder buffer) {
+	public boolean hasDynamic() {
+		return true;
+	}
+
+	@Override
+	public void renderDynamic(IGateContainer gate, T logic, IBlockAccess world, double xpos, double ypos, double zpos, float partialTicks, int destroyStage, float partial, BufferBuilder buffer) {
 		if (arrowModel == null || !(logic instanceof IArrowGateLogic)) {
 			return;
 		}

@@ -19,6 +19,8 @@
 
 package pl.asie.charset.lib.stagingapi;
 
+import net.minecraft.util.math.RayTraceResult;
+
 public interface ISignalMeterDataProvider {
-	ISignalMeterData getSignalMeterData();
+	ISignalMeterData getSignalMeterData(RayTraceResult result);
 }

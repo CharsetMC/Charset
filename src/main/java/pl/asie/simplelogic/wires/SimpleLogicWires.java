@@ -51,11 +51,9 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 import pl.asie.charset.lib.wires.*;
 import pl.asie.charset.shared.SimpleLogicShared;
 import pl.asie.simplelogic.wires.logic.LogicWireProvider;
-import pl.asie.charset.module.tools.engineering.ModelSignalMeter;
-import pl.asie.simplelogic.wires.logic.SignalMeterDataBundledWire;
-import pl.asie.simplelogic.wires.logic.SignalMeterDataWire;
+import pl.asie.charset.lib.wires.SignalMeterDataBundledWire;
+import pl.asie.charset.lib.wires.SignalMeterDataWire;
 import pl.asie.simplelogic.wires.logic.WireRenderHandlerOverlay;
-import pl.asie.charset.module.tools.engineering.ItemSignalMeter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -214,9 +212,6 @@ public class SimpleLogicWires {
 			addWireOD("BundledColored", wireItems[i + 18]);
 			addWireOD(ColorUtils.getOreDictEntry("BundledColored", EnumDyeColor.byMetadata(i)), wireItems[i + 1]);
 		}
-
-		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataWire.class, SignalMeterDataWire::new);
-		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataBundledWire.class, SignalMeterDataBundledWire::new);
 	}
 
 	@EventHandler

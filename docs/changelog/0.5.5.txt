@@ -2,6 +2,8 @@ Additions:
 
 * [simplelogic.gates] New gate: Repeater
     * Acts like the vanilla Redstone Repeater.
+* [simplelogic.gates] New gate: Bundled Transposer
+    * Allows instantly shifting bundled signals around.
 * New module: tools.engineering!
     * New tool: Signal Meter! Lets you measure the signal strength of vanilla redstone and SimpleLogic wires.
     * New tool: Stopwatch! Lets you measure time between two block updates.

@@ -3,9 +3,13 @@
         "cable": "simplelogic:block/gate_transposer_cable"
     },
     "textures": {
-        "top": "simplelogic:blocks/empty"
+        "top": "simplelogic:blocks/gate_bundled/transposer_top"
     },
     "layers": [
+        {
+            "type": "color",
+            "color_mask": "00FF00"
+        }
     ],
     "torches": [
         {

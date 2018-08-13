@@ -19,12 +19,13 @@
 
 package pl.asie.charset.lib.capability.staging;
 
+import net.minecraft.util.math.RayTraceResult;
 import pl.asie.charset.lib.stagingapi.ISignalMeterData;
 import pl.asie.charset.lib.stagingapi.ISignalMeterDataProvider;
 
 public class DefaultSignalMeterDataProvider implements ISignalMeterDataProvider {
 	@Override
-	public ISignalMeterData getSignalMeterData() {
+	public ISignalMeterData getSignalMeterData(RayTraceResult result) {
 		return null;
 	}
 }
