@@ -8,4 +8,5 @@ Additions:
 
 Bugs fixed:
 
+* [simplelogic.gates] [GitHub/#304] Fix OR and NOR gate torch state
 * [simplelogic.wires] Flickering state on disabling of one of two sources facing each other

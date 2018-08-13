@@ -52,8 +52,6 @@ public class GateLogicNOR extends GateLogic {
 	public State getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
-			case 1:
 				return State.input(getOutputValueInside(EnumFacing.NORTH));
 		}
 		return State.ON;
