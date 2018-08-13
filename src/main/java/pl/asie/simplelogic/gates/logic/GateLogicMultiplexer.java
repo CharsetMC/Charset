@@ -28,43 +28,43 @@ public class GateLogicMultiplexer extends GateLogic {
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		boolean isWest = getInputValueInside(EnumFacing.SOUTH) != 0;
 		boolean westOn = getInputValueInside(EnumFacing.WEST) != 0;
 		boolean eastOn = getInputValueInside(EnumFacing.EAST) != 0;
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.WEST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
 			case 2:
-				return State.input(getInputValueInside(EnumFacing.EAST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
-				return State.bool(isWest && !westOn);
+				return GateRenderState.bool(isWest && !westOn);
 			case 4:
-				return State.bool(!isWest && !eastOn);
+				return GateRenderState.bool(!isWest && !eastOn);
 			case 5:
-				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 		}
-		return State.OFF;
+		return GateRenderState.OFF;
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		boolean isWest = getInputValueInside(EnumFacing.SOUTH) != 0;
 		boolean westOn = getInputValueInside(EnumFacing.WEST) != 0;
 		boolean eastOn = getInputValueInside(EnumFacing.EAST) != 0;
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 			case 1:
-				return (!isWest || westOn) ? State.OFF : State.ON;
+				return (!isWest || westOn) ? GateRenderState.OFF : GateRenderState.ON;
 			case 2:
-				return (isWest || eastOn) ? State.OFF : State.ON;
+				return (isWest || eastOn) ? GateRenderState.OFF : GateRenderState.ON;
 			case 3:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 		}
-		return State.ON;
+		return GateRenderState.ON;
 	}
 
 	@Override
@@ -74,9 +74,9 @@ public class GateLogicMultiplexer extends GateLogic {
 	}
 
 	@Override
-	public Connection getType(EnumFacing dir) {
-		return dir == EnumFacing.NORTH ? Connection.OUTPUT_ANALOG :
-				(dir == EnumFacing.SOUTH ? Connection.INPUT : Connection.INPUT_ANALOG);
+	public GateConnection getType(EnumFacing dir) {
+		return dir == EnumFacing.NORTH ? GateConnection.OUTPUT_ANALOG :
+				(dir == EnumFacing.SOUTH ? GateConnection.INPUT : GateConnection.INPUT_ANALOG);
 	}
 
 	@Override

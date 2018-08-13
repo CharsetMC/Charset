@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.wires;
 
+import mcmultipart.api.multipart.MultipartHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -33,6 +34,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.render.model.IRenderComparable;
+import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.utils.MultipartUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
@@ -40,7 +42,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public abstract class Wire implements ITickable, ICapabilityProvider, IRenderComparable<Wire> {
+public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wire> {
     public static final IUnlistedProperty<Wire> PROPERTY = new UnlistedPropertyGeneric<>("wire", Wire.class);
 
     private final @Nonnull IWireContainer container;
@@ -50,7 +52,6 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
 
     private WireNeighborWHCache neighborWHCache;
     private byte internalConnections, externalConnections, cornerConnections, occludedSides, cornerOccludedSides;
-    private boolean connectionCheckDirty;
 
     protected Wire(@Nonnull IWireContainer container, @Nonnull WireProvider factory, @Nonnull WireFace location) {
         this.container = container;
@@ -63,7 +64,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
     }
 
     protected final void scheduleConnectionUpdate() {
-        connectionCheckDirty = true;
+        Scheduler.INSTANCE.in(MultipartHelper.unwrapWorld(getContainer().world()), 0, this::updateConnections);
     }
 
     private ICapabilityProvider getCapabilityProviderRemoteBlock(BlockPos pos) {
@@ -247,13 +248,6 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         };
     }
 
-    @Override
-    public void update() {
-        if (connectionCheckDirty) {
-            updateConnections();
-        }
-    }
-
     WireNeighborWHCache getNeighborWHCache() {
         if (getContainer().world() == null) {
             return null;
@@ -280,12 +274,8 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
     }
 
     public NBTTagCompound writeNBTData(NBTTagCompound nbt, boolean isClient) {
-        if (isClient) {
-            updateConnections();
-        } else {
-            nbt.setByte("oS", occludedSides);
-            nbt.setByte("coS", cornerOccludedSides);
-        }
+	    nbt.setByte("oS", occludedSides);
+        nbt.setByte("coS", cornerOccludedSides);
         nbt.setByte("iC", internalConnections);
         nbt.setByte("eC", externalConnections);
         if (location != WireFace.CENTER) {
@@ -303,10 +293,7 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
             }
         }
 
-        connectionCheckDirty = true;
-        if (remote && getContainer().pos() != null) {
-            updateConnections();
-        }
+        scheduleConnectionUpdate();
     }
 
     public int getRenderColor() {
@@ -370,10 +357,6 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
     }
 
     protected void updateConnections() {
-        if (!connectionCheckDirty) {
-            return;
-        }
-
         Set<WireFace> validSides = EnumSet.noneOf(WireFace.class);
         Set<WireFace> invalidCornerSides = EnumSet.noneOf(WireFace.class);
 
@@ -452,7 +435,6 @@ public abstract class Wire implements ITickable, ICapabilityProvider, IRenderCom
         }
 
         neighborWHCache = null;
-        connectionCheckDirty = false;
     }
 
     protected int getWeakPower(EnumFacing side) {

@@ -21,56 +21,46 @@ package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import pl.asie.simplelogic.gates.PartGate;
-
-import java.util.Arrays;
 
 public class GateLogicRSLatch extends GateLogic {
 	private boolean toggled;
 	private boolean burnt;
 
 	@Override
-	public boolean tick(IGateContainer gate) {
+	public boolean updateInputs(IGateContainer gate) {
 		boolean oldIS = getInputValueInside(EnumFacing.WEST) != 0;
 		boolean oldIR = getInputValueInside(EnumFacing.EAST) != 0;
 
-		boolean changed = false;
+		boolean changed = super.updateInputs(gate);
+		if (changed) {
+			boolean newIS = getInputValueInside(EnumFacing.WEST) != 0;
+			boolean newIR = getInputValueInside(EnumFacing.EAST) != 0;
 
-		if (gate.updateRedstoneInputs(inputValues)) {
-			changed = true;
+			int state = ((oldIR != newIR && newIR) ? 1 : 0) | ((oldIS != newIS && newIS) ? 2 : 0);
+
+			switch (state) {
+				case 0:
+				default:
+					break;
+				case 1:
+					toggled = false;
+					break;
+				case 2:
+					toggled = true;
+					break;
+				case 3:
+					//burnt = true;
+					//BlockPos pos = parent.getPos();
+					//parent.getWorld().playSound(pos.getX() + 0.5F, pos.getY() + 0.1F, pos.getZ() + 0.5F,
+					//		new SoundEvent(new ResourceLocation("random.fizz")), SoundCategory.BLOCKS, 0.5F, 2.6F + (parent.getWorld().rand.nextFloat() - parent.getWorld().rand.nextFloat()) * 0.8F, true);
+
+					// haha, JK
+					toggled = !toggled;
+					break;
+			}
 		}
 
-		boolean newIS = getInputValueInside(EnumFacing.WEST) != 0;
-		boolean newIR = getInputValueInside(EnumFacing.EAST) != 0;
-
-		int state = ((oldIR != newIR && newIR) ? 1 : 0) | ((oldIS != newIS && newIS) ? 2 : 0);
-
-		switch (state) {
-			case 0:
-			default:
-				break;
-			case 1:
-				toggled = false;
-				break;
-			case 2:
-				toggled = true;
-				break;
-			case 3:
-				//burnt = true;
-				//BlockPos pos = parent.getPos();
-				//parent.getWorld().playSound(pos.getX() + 0.5F, pos.getY() + 0.1F, pos.getZ() + 0.5F,
-				//		new SoundEvent(new ResourceLocation("random.fizz")), SoundCategory.BLOCKS, 0.5F, 2.6F + (parent.getWorld().rand.nextFloat() - parent.getWorld().rand.nextFloat()) * 0.8F, true);
-
-				// haha, JK
-				toggled = !toggled;
-				break;
-		}
-
-		return updateOutputs();
+		return changed;
 	}
 
 	@Override
@@ -84,8 +74,8 @@ public class GateLogicRSLatch extends GateLogic {
 	}
 
 	@Override
-	public Connection getType(EnumFacing dir) {
-		return dir.getAxis() == EnumFacing.Axis.X ? Connection.INPUT_OUTPUT : Connection.OUTPUT;
+	public GateConnection getType(EnumFacing dir) {
+		return dir.getAxis() == EnumFacing.Axis.X ? GateConnection.INPUT_OUTPUT : GateConnection.OUTPUT;
 	}
 
 	@Override
@@ -106,29 +96,29 @@ public class GateLogicRSLatch extends GateLogic {
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		if (burnt) {
-			return State.OFF;
+			return GateRenderState.OFF;
 		}
 		switch (id) {
 			case 1:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 			case 0:
-				return State.input(getOutputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.SOUTH));
 		}
 		return null;
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		if (burnt) {
-			return State.OFF;
+			return GateRenderState.OFF;
 		}
 		switch (id) {
 			case 0:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 			case 1:
-				return State.input(getOutputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.SOUTH));
 		}
 		return null;
 	}

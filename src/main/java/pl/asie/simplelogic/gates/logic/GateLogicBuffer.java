@@ -33,40 +33,40 @@ public class GateLogicBuffer extends GateLogic {
 	}
 
 	@Override
-	public Connection getType(EnumFacing dir) {
-		return dir == EnumFacing.SOUTH ? Connection.INPUT_ANALOG : Connection.OUTPUT;
+	public GateConnection getType(EnumFacing dir) {
+		return dir == EnumFacing.SOUTH ? GateConnection.INPUT_ANALOG : GateConnection.OUTPUT;
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
 				if (!isSideOpen(EnumFacing.WEST)) {
-					return State.DISABLED;
+					return GateRenderState.DISABLED;
 				}
-				return State.input(getOutputValueInside(EnumFacing.WEST));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.WEST));
 			case 1:
 				if (!isSideOpen(EnumFacing.EAST)) {
-					return State.DISABLED;
+					return GateRenderState.DISABLED;
 				}
-				return State.input(getOutputValueInside(EnumFacing.EAST));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.EAST));
 			case 2:
-				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 			case 3:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 		}
-		return State.OFF;
+		return GateRenderState.OFF;
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 			case 1:
-				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 		}
-		return State.ON;
+		return GateRenderState.ON;
 	}
 
 	@Override

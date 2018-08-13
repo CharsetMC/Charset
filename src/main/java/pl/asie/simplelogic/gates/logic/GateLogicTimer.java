@@ -27,7 +27,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
-import pl.asie.simplelogic.gates.PartGate;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 
 public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateTickable {
@@ -35,16 +34,16 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 	private int ticks;
 
 	@Override
-	public Connection getType(EnumFacing side) {
+	public GateConnection getType(EnumFacing side) {
 		switch (side) {
 			case EAST:
 			case WEST:
-				return Connection.OUTPUT;
+				return GateConnection.OUTPUT;
 			case SOUTH:
-				return Connection.INPUT;
+				return GateConnection.INPUT;
 			case NORTH:
 			default:
-				return Connection.OUTPUT;
+				return GateConnection.OUTPUT;
 		}
 	}
 
@@ -100,9 +99,18 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 
 	@Override
 	public boolean readFromNBT(NBTTagCompound tag, boolean isClient) {
+		boolean oldRead = super.readFromNBT(tag, isClient);
+
 		int oldT = ticks;
 		int oldTT = ticksTotal;
 		ticks = tag.getInteger("rt");
+		if (isClient && !isStopped()) {
+			int tDiff = Math.abs(ticks - oldT);
+			if (tDiff == 1 || tDiff == (ticksTotal - 1)) {
+				ticks = oldT;
+			}
+		}
+
 		if (!tag.hasKey("rtt")) {
 			ticksTotal = clampTicksTotal(20);
 		} else {
@@ -113,7 +121,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 			ticks = 0;
 		}
 
-		return super.readFromNBT(tag, isClient) || (oldT != ticks) || (oldTT != ticksTotal);
+		return oldRead || (oldT != ticks) || (oldTT != ticksTotal);
 	}
 
 	private boolean isStopped() {
@@ -135,24 +143,24 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 1:
 			default:
-				return State.bool(isPowered());
+				return GateRenderState.bool(isPowered());
 		}
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		switch (id) {
 			case 0:
 			default:
-				return State.bool(isPowered());
+				return GateRenderState.bool(isPowered());
 			case 1:
-				return State.ON;
+				return GateRenderState.ON;
 		}
 	}
 
@@ -163,7 +171,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 
 	@Override
 	public float getArrowPosition() {
-		return (float) ticks / ticksTotal;
+		return isStopped() ? 0 : (ticks - 1f) / ticksTotal;
 	}
 
 	@Override
@@ -186,12 +194,12 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 
 		if (oldTicks != ticks && ticks < 3) {
 			if (!gate.getGateWorld().isRemote) {
-				if (updateOutputs()) {
-					gate.propagateOutputs();
+				if (updateOutputs(gate)) {
+					gate.markGateChanged(true);
 				}
 			} else if (ticks == 0 || ticks == 2) {
 				if (gate.getGateWorld().isRemote) {
-					gate.markGateChanged();
+					gate.markGateChanged(true);
 				}
 			}
 		}
@@ -205,7 +213,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		int newTicksTotal = clampTicksTotal(ch);
 		if (newTicksTotal != ticksTotal) {
 			ticksTotal = newTicksTotal;
-			gate.markGateChanged();
+			gate.markGateChanged(true);
 		}
 	}
 }

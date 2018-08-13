@@ -21,9 +21,8 @@ package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
-import pl.asie.simplelogic.gates.PartGate;
 
+// TODO: add burnout
 public class GateLogicPulseFormer extends GateLogic {
 	private byte pulse;
 
@@ -54,70 +53,65 @@ public class GateLogicPulseFormer extends GateLogic {
 	@Override
 	public void onChanged(IGateContainer gate) {
 		if (pulse == 0) {
-			boolean changed = gate.updateRedstoneInputs(inputValues);
-			if (changed) {
-				pulse = getInputValueInside(EnumFacing.SOUTH);
+			pulse = getInputValueInside(EnumFacing.SOUTH);
+			if (updateOutputs(gate)) {
 				if (pulse != 0) {
-					gate.scheduleTick();
+					gate.scheduleRedstoneTick();
 				}
-				gate.updateRedstoneInputs(inputValues);
-				gate.propagateOutputs();
+				gate.markGateChanged(true);
 			}
 		}
 	}
 
 	@Override
 	public boolean tick(IGateContainer gate) {
-		boolean changed = pulse != 0;
-		if (changed) {
-			super.tick(gate);
+		if (pulse != 0) {
 			pulse = 0;
-			gate.scheduleTick();
 			return true;
 		} else {
-			return super.tick(gate);
+			return false;
 		}
 	}
 
 	@Override
-	public Connection getType(EnumFacing dir) {
+	public GateConnection getType(EnumFacing dir) {
 		if (dir == EnumFacing.NORTH) {
-			return Connection.OUTPUT;
+			return GateConnection.OUTPUT;
 		} else if (dir == EnumFacing.SOUTH) {
-			return Connection.INPUT;
+			return GateConnection.INPUT;
 		} else {
-			return Connection.NONE;
+			return GateConnection.NONE;
 		}
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		boolean hasSignal = getInputValueInside(EnumFacing.SOUTH) != 0;
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 1:
 			case 2:
-				return State.bool(!hasSignal);
+				return GateRenderState.bool(!hasSignal);
 			case 3:
-				return State.bool(hasSignal);
+				return GateRenderState.bool(hasSignal);
 			case 4:
-				return State.input(getOutputValueOutside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueOutside(EnumFacing.NORTH));
 		}
-		return State.OFF;
+		return GateRenderState.OFF;
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 2:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 		}
-		return State.ON;
+		return GateRenderState.ON;
 	}
 
 	@Override

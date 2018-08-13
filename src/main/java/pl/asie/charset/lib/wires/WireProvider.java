@@ -93,6 +93,10 @@ public abstract class WireProvider implements IForgeRegistryEntry<WireProvider> 
         return false;
     }
 
+    public boolean canTick() {
+        return false;
+    }
+
     public boolean canPlace(IBlockAccess access, BlockPos pos, WireFace face) {
         if (face == WireFace.CENTER) {
             return hasFreestandingWire();

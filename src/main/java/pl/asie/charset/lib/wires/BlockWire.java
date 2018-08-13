@@ -67,6 +67,7 @@ import java.util.Set;
 
 public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityProvider {
     protected static final PropertyBool REDSTONE = PropertyBool.create("redstone");
+    protected static final PropertyBool TICKABLE = PropertyBool.create("tickable");
 
     public BlockWire() {
         super(Material.CIRCUITS);
@@ -75,7 +76,7 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
         setFullCube(false);
 
         // BlockTrapdoor etc. rely on this!
-        setDefaultState(getDefaultState().withProperty(REDSTONE, true));
+        setDefaultState(getDefaultState().withProperty(REDSTONE, true).withProperty(TICKABLE, true));
     }
 
     @Override
@@ -181,22 +182,22 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
     @Nullable
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
-        return new TileWire();
+        return ((meta & 2) != 0) ? new TileWire.Tickable() : new TileWire();
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(REDSTONE) ? 1 : 0;
+        return (state.getValue(REDSTONE) ? 1 : 0) | (state.getValue(TICKABLE) ? 2 : 0);
     }
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(REDSTONE, meta > 0);
+        return getDefaultState().withProperty(REDSTONE, (meta & 1) != 0).withProperty(TICKABLE, (meta & 2) != 0);
     }
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new ExtendedBlockState(this, new IProperty[] { REDSTONE }, new IUnlistedProperty[]{Wire.PROPERTY});
+        return new ExtendedBlockState(this, new IProperty[] { REDSTONE, TICKABLE }, new IUnlistedProperty[]{ Wire.PROPERTY });
     }
 
     @Override
@@ -315,12 +316,15 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
 
     @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-        IBlockState state = getDefaultState().withProperty(REDSTONE, false);
+        IBlockState state = getDefaultState().withProperty(REDSTONE, false).withProperty(TICKABLE, false);
         ItemStack stack = placer.getHeldItem(hand);
         if (stack.getItem() instanceof ItemWire) {
             WireProvider provider = ((ItemWire) stack.getItem()).getWireProvider();
             if (provider != null && provider.canProvidePower()) {
                 state = state.withProperty(REDSTONE, true);
+            }
+            if (provider != null && provider.canTick()) {
+                state = state.withProperty(TICKABLE, true);
             }
         }
 

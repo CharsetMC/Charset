@@ -24,9 +24,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
-import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
-import pl.asie.simplelogic.gates.PartGate;
 
 // TODO: Add locking
 public class GateLogicRepeater extends GateLogic {
@@ -38,17 +36,17 @@ public class GateLogicRepeater extends GateLogic {
 	private byte repeatedSignal;
 	private byte valueMode = 0;
 
-	public Connection getType(EnumFacing dir) {
+	public GateConnection getType(EnumFacing dir) {
 		switch (dir) {
 			case NORTH:
-				return Connection.OUTPUT;
+				return GateConnection.OUTPUT;
 			case SOUTH:
-				return Connection.INPUT;
+				return GateConnection.INPUT;
 			case WEST:
 			case EAST:
-				return Connection.INPUT_REPEATER;
+				return GateConnection.INPUT_REPEATER;
 			default:
-				return Connection.NONE;
+				return GateConnection.NONE;
 		}
 	}
 
@@ -66,7 +64,7 @@ public class GateLogicRepeater extends GateLogic {
 	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		if (!playerIn.isSneaking()) {
 			valueMode = (byte) ((valueMode + 1) % signalValues.length);
-			gate.markGateChanged();
+			gate.markGateChanged(true);
 		}
 
 		gate.createNotice(NotificationComponentString.translated("notice.simplelogic.gate.repeater.ticks", NotificationComponentString.raw(Integer.toString(signalValues[valueMode]))))
@@ -104,18 +102,18 @@ public class GateLogicRepeater extends GateLogic {
 	}
 
 	@Override
-	public State getLayerState(int id) {
-		return State.input(repeatedSignal);
+	public GateRenderState getLayerState(int id) {
+		return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		if (id == 0) {
-			return State.input(repeatedSignal);
+			return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 		} else if (id == valueMode+1) {
-			return isRepeaterLocked() ? State.DISABLED : State.input(repeatedSignal);
+			return isRepeaterLocked() ? GateRenderState.DISABLED : GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 		} else {
-			return State.NO_RENDER;
+			return GateRenderState.NO_RENDER;
 		}
 	}
 
@@ -125,38 +123,31 @@ public class GateLogicRepeater extends GateLogic {
 
 	@Override
 	public void onChanged(IGateContainer gate) {
-		boolean changed = gate.updateRedstoneInput(inputValues, EnumFacing.WEST) | gate.updateRedstoneInput(inputValues, EnumFacing.EAST);
-		if (changed) {
-			gate.markGateChanged();
-		}
+		gate.markGateChanged(false);
 
 		if (isRepeaterLocked() || (repeatedSignal != 0 && ticks < 2)) {
 			return;
 		}
 
-		changed |= gate.updateRedstoneInput(inputValues, EnumFacing.SOUTH);
-		if (changed) {
+		if (getInputSignal() != repeatedSignal) {
 			repeatedSignal = getInputSignal();
 			ticks = 0;
-			gate.scheduleTick(signalValues[valueMode] * 2 - 1);
+			gate.scheduleTick(signalValues[valueMode] * 2);
 		}
 	}
 
 	@Override
 	public boolean tick(IGateContainer gate) {
 		if (ticks == 2) {
-			boolean changed = gate.updateRedstoneInputs(inputValues);
-			if (changed) {
+			if (repeatedSignal != getInputSignal()) {
 				repeatedSignal = getInputSignal();
-				updateOutputs();
 				return true;
 			} else {
 				return false;
 			}
 		} else {
 			ticks++;
-			gate.scheduleTick(signalValues[valueMode]);
-			updateOutputs();
+			gate.scheduleTick(signalValues[valueMode] * 2);
 			return true;
 		}
 	}

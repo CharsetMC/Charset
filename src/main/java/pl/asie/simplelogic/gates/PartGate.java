@@ -44,19 +44,15 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.wires.*;
-import pl.asie.charset.lib.block.TraitMaterial;
-import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.component.NotificationComponent;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.TileWire;
-import pl.asie.charset.lib.wires.Wire;
 import pl.asie.simplelogic.gates.logic.*;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.*;
-import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 import javax.annotation.Nullable;
 
@@ -70,7 +66,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 
 		@Override
 		public byte[] getBundledSignal() {
-			GateLogic.Connection type = logic.getType(side);
+			GateConnection type = logic.getType(side);
 			return type.isOutput() && type.isBundled() ? logic.getOutputValueBundled(side) : new byte[0];
 		}
 
@@ -81,7 +77,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 
 		@Override
 		public int getRedstoneSignal() {
-			GateLogic.Connection type = logic.getType(side);
+			GateConnection type = logic.getType(side);
 			return type.isOutput() && type.isRedstone() ? logic.getOutputValueOutside(side) : 0;
 		}
 
@@ -111,8 +107,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 
 	public boolean mirrored;
 	public GateLogic logic;
-	private boolean pendingChange;
-	private int pendingTick;
+	private long pendingTick = -1;
 
 	private Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
 
@@ -142,7 +137,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		if (direction != null && direction.getAxis() != orientation.facing.getAxis()) {
 			EnumFacing dir = realToGate(direction);
 			if (logic.isSideOpen(dir)) {
-				GateLogic.Connection conn = logic.getType(dir);
+				GateConnection conn = logic.getType(dir);
 				if (capability == Capabilities.BUNDLED_EMITTER && conn.isOutput() && conn.isBundled()) {
 					return true;
 				} else if (capability == Capabilities.BUNDLED_RECEIVER && conn.isInput() && conn.isBundled()) {
@@ -164,7 +159,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 			orientation = orientation.rotateAround(EnumFacing.UP);
 		}
 		onChanged();
-		pendingChange = true;
+		scheduleTick(0);
 		markBlockForUpdate();
 	}
 
@@ -191,12 +186,12 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 					break;
 			}
 			onChanged();
-			pendingChange = true;
+			scheduleTick(0);
 			markBlockForUpdate();
 		} else {
 			orientation = orientation.mirror(mirror);
 			onChanged();
-			pendingChange = true;
+			scheduleTick(0);
 			markBlockForUpdate();
 		}
 	}
@@ -245,42 +240,98 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	public void update() {
 		//noinspection ConstantConditions
 		if (getWorld() != null) {
-			if (logic instanceof ITickable) {
-				((ITickable) logic).update();
-			} else if (logic instanceof IGateTickable) {
+			if (logic instanceof IGateTickable) {
 				((IGateTickable) logic).update(this);
 			}
 
-			if (!getWorld().isRemote && pendingTick > 0 && logic.shouldTick()) {
-				pendingTick--;
-				if (pendingTick == 0) {
-					if (tick() || pendingChange) {
-						propagateOutputs();
-						pendingChange = false;
+			if (!getWorld().isRemote) {
+				if (pendingTick >= 0 && world.getTotalWorldTime() >= pendingTick && logic.shouldTick()) {
+					pendingTick = -1;
+					if (logic.tick(this)) {
+						markGateChanged(logic.updateOutputs(this));
 					}
 				}
 			}
 		}
 	}
 
-	protected boolean tick() {
-		return logic.tick(this);
-	}
+	@Override
+	public byte getRedstoneInput(EnumFacing facing) {
+		GateConnection conn = logic.getType(facing);
 
-	public void propagateOutputs() {
-		world.notifyNeighborsRespectDebug(getPos(), getBlockType(), false);
-		if (world.isRemote) {
-			if (!SimpleLogicGates.useTESRs) {
-				markBlockForRenderUpdate();
+		if (conn == GateConnection.INPUT_REPEATER) {
+			EnumFacing real = gateToReal(facing);
+			World w = getWorld();
+			BlockPos p = getPos().offset(real);
+			Predicate<TileEntity> predicate = tileEntity -> (tileEntity instanceof PartGate && ((PartGate) tileEntity).logic instanceof GateLogicRepeater);
+			return (byte) MathHelper.clamp(RedstoneUtils.getModdedWeakPower(w, p, real, getSide(), predicate), 0, 15);
+		} else if (conn.isInput() && conn.isRedstone()) {
+			byte v = 0;
+			if (logic.isSideOpen(facing)) {
+				EnumFacing real = gateToReal(facing);
+				World w = getWorld();
+				BlockPos p = getPos().offset(real);
+				Predicate<TileEntity> predicate = tileEntity -> true;
+
+				int mpValue = RedstoneUtils.getModdedWeakPower(w, p, real, getSide(), predicate);
+				if (mpValue >= 0) {
+					v = (byte) mpValue;
+				} else {
+					TileEntity tile = w.getTileEntity(p);
+					if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
+						// TODO: FIXME - this is a hack
+						if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
+							v = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
+						}
+					} else {
+						IBlockState s = w.getBlockState(p);
+						if (RedstoneUtils.canConnectFace(w, p, s, real, getSide())) {
+							if (s.getBlock() instanceof BlockRedstoneWire) {
+								v = s.getValue(BlockRedstoneWire.POWER).byteValue();
+							} else {
+								v = (byte) (byte) s.getWeakPower(w, p, real);
+							}
+						}
+					}
+				}
+
+				if (conn.isComparator() && v < 15) {
+					IBlockState s = w.getBlockState(p);
+					if (s.hasComparatorInputOverride()) {
+						v = (byte) Math.max(MathHelper.clamp(s.getComparatorInputOverride(w, p), 0, 15), v);
+					} else if (s.isNormalCube()) {
+						v = 0;
+						BlockPos pp = p.offset(real);
+						s = w.getBlockState(pp);
+						if (s.hasComparatorInputOverride()) {
+							v = (byte) Math.max(MathHelper.clamp(s.getComparatorInputOverride(w, pp), 0, 15), v);
+						} else if (!s.isNormalCube()) {
+							List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, new AxisAlignedBB(pp), (frame) -> frame != null && frame.getHorizontalFacing() == facing);
+							for (EntityItemFrame frame : frames) {
+								v = (byte) Math.max(MathHelper.clamp(frame.getAnalogOutput(), 0, 15), v);
+							}
+						}
+					}
+				}
+
+				if (conn.isDigital()) {
+					v = v != 0 ? (byte) 15 : 0;
+				}
+
+				if (logic.isSideInverted(facing)) {
+					v = v != 0 ? 0 : (byte) 15;
+				}
 			}
+
+			return v;
 		} else {
-			markChunkDirty();
-			markBlockForUpdate();
+			return 0;
 		}
 	}
 
+	@Override
 	public byte[] getBundledInput(EnumFacing facing) {
-		GateLogic.Connection conn = logic.getType(facing);
+		GateConnection conn = logic.getType(facing);
 
 		if (conn.isInput() && conn.isBundled()) {
 			if (logic.isSideOpen(facing)) {
@@ -300,93 +351,22 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		return new byte[16];
 	}
 
-	public boolean updateRedstoneInput(byte[] values, EnumFacing facing) {
-		int i = facing.ordinal() - 2;
-		GateLogic.Connection conn = logic.getType(facing);
-		byte oldValue = values[i];
-		values[i] = 0;
-
-		if (conn == GateLogic.Connection.INPUT_REPEATER) {
-			EnumFacing real = gateToReal(facing);
-			World w = getWorld();
-			BlockPos p = getPos().offset(real);
-			Predicate<TileEntity> predicate = tileEntity -> (tileEntity instanceof PartGate && ((PartGate) tileEntity).logic instanceof GateLogicRepeater);
-			values[i] = (byte) MathHelper.clamp(RedstoneUtils.getModdedWeakPower(w, p, real, getSide(), predicate), 0, 15);
-		} else if (conn.isInput() && conn.isRedstone()) {
-			if (logic.isSideOpen(facing)) {
-				EnumFacing real = gateToReal(facing);
-				World w = getWorld();
-				BlockPos p = getPos().offset(real);
-				Predicate<TileEntity> predicate = tileEntity -> true;
-
-				int mpValue = RedstoneUtils.getModdedWeakPower(w, p, real, getSide(), predicate);
-				if (mpValue >= 0) {
-					values[i] = (byte) mpValue;
-				} else {
-					TileEntity tile = w.getTileEntity(p);
-					if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
-						// TODO: FIXME - this is a hack
-						if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
-							values[i] = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
-						}
-					} else {
-						IBlockState s = w.getBlockState(p);
-						if (RedstoneUtils.canConnectFace(w, p, s, real, getSide())) {
-							if (s.getBlock() instanceof BlockRedstoneWire) {
-								values[i] = s.getValue(BlockRedstoneWire.POWER).byteValue();
-							} else {
-								values[i] = (byte) s.getWeakPower(w, p, real);
-							}
-						}
-					}
-				}
-
-
-				if (conn.isComparator() && values[i] < 15) {
-					IBlockState s = w.getBlockState(p);
-					if (s.hasComparatorInputOverride()) {
-						values[i] = (byte) Math.max(MathHelper.clamp(s.getComparatorInputOverride(w, p), 0, 15), values[i]);
-					} else if (s.isNormalCube()) {
-						values[i] = 0;
-						BlockPos pp = p.offset(real);
-						s = w.getBlockState(pp);
-						if (s.hasComparatorInputOverride()) {
-							values[i] = (byte) Math.max(MathHelper.clamp(s.getComparatorInputOverride(w, pp), 0, 15), values[i]);
-						} else if (!s.isNormalCube()) {
-							List<EntityItemFrame> frames = world.getEntitiesWithinAABB(EntityItemFrame.class, new AxisAlignedBB(pp), (frame) -> frame != null && frame.getHorizontalFacing() == facing);
-							for (EntityItemFrame frame : frames) {
-								values[i] = (byte) Math.max(MathHelper.clamp(frame.getAnalogOutput(), 0, 15), values[i]);
-							}
-						}
-					}
-				}
-
-				if (conn.isDigital()) {
-					values[i] = values[i] != 0 ? (byte) 15 : 0;
-				}
-
-				if (logic.isSideInverted(facing)) {
-					values[i] = values[i] != 0 ? 0 : (byte) 15;
-				}
-			}
-		}
-
-		if (values[i] != oldValue) {
-			return true;
-		}
-
-		return false;
-	}
-
 	@Override
 	public Notice createNotice(NotificationComponent component) {
 		return new Notice(this, component);
 	}
 
 	@Override
-	public void markGateChanged() {
+	public void markGateChanged(boolean changedIO) {
+		if (changedIO) {
+//			System.out.println("change " + pos + " " + getWorld().getTotalWorldTime());
+			world.notifyNeighborsRespectDebug(getPos(), getBlockType(), false);
+		}
+
 		if (world.isRemote) {
-			markBlockForRenderUpdate();
+			if (!SimpleLogicGates.useTESRs) {
+				markBlockForRenderUpdate();
+			}
 		} else {
 			markChunkDirty();
 			markBlockForUpdate();
@@ -399,11 +379,9 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	}
 
 	protected void onChanged() {
-		logic.onChanged(this);
-	}
-
-	public void scheduleTick() {
-		scheduleTick(2);
+		if (logic.updateInputs(this)) {
+			logic.onChanged(this);
+		}
 	}
 
 	@Override
@@ -417,19 +395,21 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	}
 
 	public void scheduleTick(int duration) {
-		if (pendingTick == 0) {
-			pendingTick = duration;
+		if (pendingTick < 0) {
+			pendingTick = world.getTotalWorldTime() + duration;
+		} else {
+			pendingTick = Math.min(pendingTick, world.getTotalWorldTime() + duration);
 		}
 	}
+
 
 	@Override
 	public void validate() {
 		super.validate();
-		pendingTick = 1;
-		pendingChange = true;
+		scheduleTick(0);
 	}
 
-	public void onNeighborBlockChange(@Nullable Block block) {
+	public void onNeighborBlockChange(BlockPos fromPos, @Nullable Block block) {
 		if (logic instanceof GateLogicDummy || !getWorld().isSideSolid(getPos().offset(getSide()), getSide().getOpposite())) {
 			IBlockState state = world.getBlockState(pos);
 			state.getBlock().dropBlockAsItem(world, pos, state, 0);
@@ -543,7 +523,6 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		if (changed) {
 			if (!remote) {
 				onChanged();
-				pendingChange = true;
 				markBlockForUpdate();
 			} else {
 				markBlockForRenderUpdate();
@@ -600,9 +579,10 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		}
 		tag.setBoolean("m", mirrored);
 		tag.setByte("o", (byte) orientation.ordinal());
-		if (!isClient && pendingTick != 0) {
-			tag.setByte("p", (byte) pendingTick);
-			tag.setBoolean("pch", pendingChange);
+		if (!isClient) {
+			if (pendingTick >= 0) {
+				tag.setLong("pt", pendingTick);
+			}
 		}
 		return tag;
 	}
@@ -649,9 +629,12 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 			mirrored = tag.getBoolean("m");
 			orientationUpdate |= (mirrored != om);
 		}
-		if (tag.hasKey("p")) {
-			pendingTick = tag.getByte("p");
-			pendingChange = tag.getBoolean("pch");
+		if (!isClient) {
+			if (tag.hasKey("pt")) {
+				pendingTick = tag.getLong("pt");
+			} else {
+				pendingTick = -1;
+			}
 		}
 		Orientation oldO = orientation;
 		orientation = Orientation.getOrientation(tag.getByte("o"));

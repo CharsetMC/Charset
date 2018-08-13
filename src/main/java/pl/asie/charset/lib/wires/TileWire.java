@@ -34,7 +34,22 @@ import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.scheduler.Scheduler;
 
-public class TileWire extends TileBase implements IMultipartTile, ITickable, IWireContainer {
+public class TileWire extends TileBase implements IMultipartTile, IWireContainer {
+    public static class Tickable extends TileWire implements ITickable {
+        @Override
+        public boolean isTickable() {
+            return true;
+        }
+
+        @Override
+        public void update() {
+            super.update();
+            if (wire instanceof ITickable) {
+                ((ITickable) wire).update();
+            }
+        }
+    }
+
     protected Wire wire;
 
     public Wire getWire() {
@@ -42,28 +57,25 @@ public class TileWire extends TileBase implements IMultipartTile, ITickable, IWi
     }
 
     @Override
-    public void update() {
-        super.update();
-        if (wire != null) {
-            wire.update();
-        } else {
-            // Modifying it instantly will cause a CME in MCMultiPart.
-            // We only get here upon module removal anyway, so...
-            Scheduler.INSTANCE.in(world, 0, () -> world.setBlockToAir(getPos()));
-        }
+    public boolean isTickable() {
+        return false;
     }
 
     @Override
     public void readNBTData(NBTTagCompound nbt, boolean isClient) {
         if (nbt.hasKey("f")) {
             WireProvider factory = WireManager.REGISTRY.getValue(nbt.getByte("f"));
-            if (factory != null) {
-                WireFace location = WireFace.VALUES[nbt.getByte("l")];
-                wire = factory.create(this, location);
-                wire.readNBTData(nbt, isClient);
+            if (wire == null) {
+                if (factory != null) {
+                    WireFace location = WireFace.VALUES[nbt.getByte("l")];
+                    wire = factory.create(this, location);
+                }
             }
-            if (isClient) {
-                markBlockForRenderUpdate();
+            if (wire != null) {
+                wire.readNBTData(nbt, isClient);
+                if (isClient) {
+                    markBlockForRenderUpdate();
+                }
             }
         } else {
             if (wire != null) {

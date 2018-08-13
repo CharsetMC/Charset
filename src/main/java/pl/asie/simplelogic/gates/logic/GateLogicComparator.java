@@ -25,25 +25,23 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
-import pl.asie.simplelogic.gates.PartGate;
 
 public class GateLogicComparator extends GateLogic {
 	private byte mode = 0;
 
 	@Override
-	public Connection getType(EnumFacing dir) {
+	public GateConnection getType(EnumFacing dir) {
 		switch (dir) {
 			case NORTH:
-				return Connection.OUTPUT_ANALOG;
+				return GateConnection.OUTPUT_ANALOG;
 			case WEST:
 			case EAST:
-				return Connection.INPUT_ANALOG;
+				return GateConnection.INPUT_ANALOG;
 			case SOUTH:
-				return Connection.INPUT_COMPARATOR;
+				return GateConnection.INPUT_COMPARATOR;
 			default:
-				return Connection.NONE;
+				return GateConnection.NONE;
 		}
 	}
 
@@ -70,7 +68,7 @@ public class GateLogicComparator extends GateLogic {
 	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		if (!playerIn.isSneaking()) {
 			mode = (byte) (1 - mode);
-			gate.markGateChanged();
+			gate.markGateChanged(false);
 		}
 
 		gate.createNotice(NotificationComponentString.translated("notice.simplelogic.gate.comparator.mode." + mode))
@@ -79,32 +77,32 @@ public class GateLogicComparator extends GateLogic {
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 2:
-				return State.input(getInputValueInside(EnumFacing.WEST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
 			case 3:
-				return State.input(getInputValueInside(EnumFacing.EAST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.EAST));
 			default:
-				return State.OFF;
+				return GateRenderState.OFF;
 		}
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		switch (id) {
 			case 0:
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 2:
-				return mode == 0 ? State.OFF : State.NO_RENDER;
+				return mode == 0 ? GateRenderState.OFF : GateRenderState.NO_RENDER;
 			case 3:
-				return mode == 1 ? State.ON : State.NO_RENDER;
+				return mode == 1 ? GateRenderState.ON : GateRenderState.NO_RENDER;
 			default:
-				return State.OFF;
+				return GateRenderState.OFF;
 		}
 	}
 

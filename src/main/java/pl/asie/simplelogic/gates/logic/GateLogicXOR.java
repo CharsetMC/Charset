@@ -23,42 +23,42 @@ import net.minecraft.util.EnumFacing;
 
 public class GateLogicXOR extends GateLogic {
 	@Override
-	public Connection getType(EnumFacing dir) {
+	public GateConnection getType(EnumFacing dir) {
 		if (dir == EnumFacing.SOUTH) {
-			return Connection.NONE;
+			return GateConnection.NONE;
 		} else {
-			return dir == EnumFacing.NORTH ? Connection.OUTPUT : Connection.INPUT;
+			return dir == EnumFacing.NORTH ? GateConnection.OUTPUT : GateConnection.INPUT;
 		}
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.WEST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
 			case 2:
-				return State.input(getInputValueInside(EnumFacing.EAST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
-				return State.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0);
+				return GateRenderState.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0);
 			case 4:
-				return State.input(getOutputValueOutside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueOutside(EnumFacing.NORTH));
 		}
-		return State.OFF;
+		return GateRenderState.OFF;
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.WEST)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.WEST)).invert();
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.EAST)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.EAST)).invert();
 			case 2:
-				return State.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0);
+				return GateRenderState.bool(getInputValueInside(EnumFacing.WEST) == 0 && getInputValueInside(EnumFacing.EAST) == 0);
 		}
-		return State.ON;
+		return GateRenderState.ON;
 	}
 
 	@Override
@@ -68,5 +68,13 @@ public class GateLogicXOR extends GateLogic {
 		} else {
 			return 0;
 		}
+	}
+
+	private boolean rsToDigi(byte v) {
+		return v > 0;
+	}
+
+	private byte digiToRs(boolean v) {
+		return v ? (byte) 15 : 0;
 	}
 }

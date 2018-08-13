@@ -19,21 +19,28 @@
 
 package pl.asie.simplelogic.gates.logic;
 
-import net.minecraft.util.EnumFacing;
+public enum GateRenderState {
+	NO_RENDER,
+	OFF,
+	ON,
+	DISABLED;
 
-public class GateLogicDummy extends GateLogic {
-	@Override
-	public GateRenderState getLayerState(int id) {
-		return GateRenderState.DISABLED;
+	public GateRenderState invert() {
+		switch (this) {
+			case OFF:
+				return ON;
+			case ON:
+				return OFF;
+			default:
+				return this;
+		}
 	}
 
-	@Override
-	public GateRenderState getTorchState(int id) {
-		return GateRenderState.OFF;
+	public static GateRenderState input(byte i) {
+		return i > 0 ? ON : OFF;
 	}
 
-	@Override
-	protected byte calculateOutputInside(EnumFacing side) {
-		return 0;
+	public static GateRenderState bool(boolean v) {
+		return v ? ON : OFF;
 	}
 }

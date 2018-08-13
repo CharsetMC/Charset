@@ -21,7 +21,6 @@ package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import pl.asie.simplelogic.gates.PartGate;
 
 public class GateLogicSynchronizer extends GateLogic {
 	private byte pulseLeft, pulseRight;
@@ -55,77 +54,79 @@ public class GateLogicSynchronizer extends GateLogic {
 
 	@Override
 	public void onChanged(IGateContainer gate) {
-		boolean changed = gate.updateRedstoneInputs(inputValues);
-		if (changed) {
-			if (getInputValueInside(EnumFacing.SOUTH) > 0) {
-				pulseLeft = pulseRight = 0;
-			} else {
-				byte newPulseLeft = getInputValueInside(EnumFacing.WEST);
-				byte newPulseRight = getInputValueInside(EnumFacing.EAST);
-				if (newPulseLeft > pulseLeft) {
-					pulseLeft = newPulseLeft;
-				}
-				if (newPulseRight > pulseRight) {
-					pulseRight = newPulseRight;
-				}
+		if (getInputValueInside(EnumFacing.SOUTH) > 0) {
+			pulseLeft = pulseRight = 0;
+		} else {
+			byte newPulseLeft = getInputValueInside(EnumFacing.WEST);
+			byte newPulseRight = getInputValueInside(EnumFacing.EAST);
+			if (newPulseLeft > pulseLeft) {
+				pulseLeft = newPulseLeft;
 			}
+			if (newPulseRight > pulseRight) {
+				pulseRight = newPulseRight;
+			}
+		}
+		if (updateOutputs(gate)) {
 			if (pulseRight > 0 && pulseLeft > 0) {
-				gate.scheduleTick();
-				updateOutputs();
+				gate.scheduleRedstoneTick();
 			}
-			gate.propagateOutputs();
+			gate.markGateChanged(true);
+		} else {
+			gate.markGateChanged(false);
 		}
 	}
 
 	@Override
 	public boolean tick(IGateContainer gate) {
-		if (pulseLeft > 0 && pulseRight > 0) {
+		if (pulseLeft != 0 && pulseRight != 0) {
 			pulseLeft = pulseRight = 0;
-		}
-		return super.tick(gate);
-	}
-
-	@Override
-	public Connection getType(EnumFacing dir) {
-		if (dir == EnumFacing.NORTH) {
-			return Connection.OUTPUT;
-		} else if (dir == EnumFacing.SOUTH) {
-			return Connection.INPUT;
+			return true;
 		} else {
-			return Connection.INPUT_ANALOG;
+			return false;
 		}
 	}
 
 	@Override
-	public State getLayerState(int id) {
+	public GateConnection getType(EnumFacing dir) {
+		if (dir == EnumFacing.NORTH) {
+			return GateConnection.OUTPUT;
+		} else if (dir == EnumFacing.SOUTH) {
+			return GateConnection.INPUT;
+		} else {
+			return GateConnection.INPUT_ANALOG;
+		}
+	}
+
+	@Override
+	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.WEST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
 			case 2:
-				return State.input(getInputValueInside(EnumFacing.EAST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
-				return State.input(pulseLeft);
+				return GateRenderState.input(pulseLeft);
 			case 4:
-				return State.input(pulseRight);
+				return GateRenderState.input(pulseRight);
 			case 5:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 		}
-		return State.OFF;
+		return GateRenderState.OFF;
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(pulseLeft);
+				return GateRenderState.input(pulseLeft);
 			case 1:
-				return State.input(pulseRight);
+				return GateRenderState.input(pulseRight);
 			case 2:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 		}
-		return State.ON;
+		return GateRenderState.ON;
 	}
 
 	@Override

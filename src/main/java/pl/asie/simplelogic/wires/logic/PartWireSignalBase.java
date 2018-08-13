@@ -36,6 +36,7 @@ import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.stagingapi.ISignalMeterDataProvider;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.*;
@@ -44,13 +45,13 @@ import javax.annotation.Nonnull;
 
 public abstract class PartWireSignalBase extends Wire implements IWire, ISignalMeterDataProvider, IDebuggable {
 	@SuppressWarnings("PointlessBooleanExpression")
-	public static boolean DEBUG_CLIENT_WIRE_STATE = false;
+	public static boolean DEBUG_CLIENT_WIRE_STATE = false && ModCharset.INDEV;
+	@SuppressWarnings("PointlessBooleanExpression")
 	public static boolean DEBUG = false && ModCharset.INDEV;
 
 	public static boolean PROPAGATING = false;
 	public static boolean WIRES_CONNECT_REDSTONE = true;
 	private final EnumSet<EnumFacing> propagationDirs = EnumSet.noneOf(EnumFacing.class);
-	private boolean logicUpdateNeeded = true;
 	private int color = -1;
 
 	public PartWireSignalBase(@Nonnull IWireContainer container, @Nonnull WireProvider factory, @Nonnull WireFace location) {
@@ -72,19 +73,19 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 	protected abstract void onSignalChanged(int color);
 
 	protected void scheduleLogicUpdate() {
-		logicUpdateNeeded = true;
-	}
-
-	@Override
-	public void update() {
-		super.update();
-
-		if (logicUpdateNeeded) {
+		if (getContainer().world() != null && getContainer().pos() != null) {
 			if (!getContainer().world().isRemote) {
 				onSignalChanged(-1);
 			}
-			logicUpdateNeeded = false;
+		} else if (getContainer().world() != null) {
+			Scheduler.INSTANCE.in(getContainer().world(), 0, this::scheduleLogicUpdate);
 		}
+	}
+
+	@Override
+	public void onChanged(boolean external) {
+		super.onChanged(external);
+		scheduleLogicUpdate();
 	}
 
 	@Override

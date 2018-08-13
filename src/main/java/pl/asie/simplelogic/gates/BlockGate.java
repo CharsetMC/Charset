@@ -149,7 +149,7 @@ public class BlockGate extends BlockBase implements ITileEntityProvider {
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
 		TileEntity tile = worldIn.getTileEntity(pos);
 		if (tile instanceof PartGate) {
-			((PartGate) tile).onNeighborBlockChange(blockIn);
+			((PartGate) tile).onNeighborBlockChange(fromPos, blockIn);
 		}
 	}
 

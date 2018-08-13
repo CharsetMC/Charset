@@ -20,98 +20,87 @@
 package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.util.EnumFacing;
-import pl.asie.simplelogic.gates.PartGate;
 
 import java.util.Arrays;
 
 public class GateLogicBundledTransceiver extends GateLogic {
-	private byte[] inputNorth = new byte[16], inputSouth = new byte[16];
-	private byte[] inputCombined = new byte[16];
 	private int inputState = 0;
 
 	@Override
 	public boolean tick(IGateContainer gate) {
-		boolean inputChange = gate.updateRedstoneInputs(inputValues);
-		boolean bundledInputChange = false;
+		inputState = ((getInputValueInside(EnumFacing.WEST) > 0) ? 2 : 0) | ((getInputValueInside(EnumFacing.EAST) > 0) ? 1 : 0);
 
-		if (inputChange) {
-			inputState = ((getInputValueInside(EnumFacing.WEST) > 0) ? 2 : 0) | ((getInputValueInside(EnumFacing.EAST) > 0) ? 1 : 0);
-		}
-
-		byte[] newInputNorth = gate.getBundledInput(EnumFacing.NORTH);
-		byte[] newInputSouth = gate.getBundledInput(EnumFacing.SOUTH);
-
-		if (!Arrays.equals(inputNorth, newInputNorth)) {
-			inputNorth = newInputNorth;
-			bundledInputChange = true;
-		}
-
-		if (!Arrays.equals(inputSouth, newInputSouth)) {
-			inputSouth = newInputSouth;
-			bundledInputChange = true;
-		}
-
-		if (bundledInputChange && inputState == 3) {
-			for (int i = 0; i < 16; i++) {
-				inputCombined[i] = (byte) Math.max(inputNorth[i], inputSouth[i]);
-			}
-		}
-
-		return inputChange || bundledInputChange;
+		return true;
 	}
 
 	@Override
-	public byte[] getOutputValueBundled(EnumFacing side) {
+	public void calculateOutputBundled(EnumFacing side, byte[] data) {
 		if (inputState == 3) {
-			return inputCombined;
+			byte[] inputNorth = getInputValueBundled(EnumFacing.NORTH);
+			byte[] inputSouth = getInputValueBundled(EnumFacing.SOUTH);
+			for (int i = 0; i < 16; i++) {
+				data[i] = (byte) Math.max(inputNorth != null ? inputNorth[i] : 0, inputSouth != null ? inputSouth[i] : 0);
+			}
+			return;
 		}
+
+		byte[] src = null;
 
 		switch (side) {
 			case SOUTH:
-				return ((inputState & 2) != 0) ? inputNorth : new byte[16];
+				if (((inputState & 2) != 0)) {
+					src = getInputValueBundled(EnumFacing.NORTH);
+				}
+				break;
 			case NORTH:
-				return ((inputState & 1) != 0) ? inputSouth : new byte[16];
+				if (((inputState & 1) != 0)) {
+					src = getInputValueBundled(EnumFacing.SOUTH);
+				}
+				break;
 			default:
 				throw new RuntimeException("No bundled input here!");
 		}
-	}
 
-	@Override
-	public State getLayerState(int id) {
-		switch (id) {
-			case 0:
-				return State.input(getInputValueOutside(EnumFacing.WEST));
-			case 1:
-				return State.input(getInputValueOutside(EnumFacing.EAST));
-			default:
-				return State.DISABLED;
-		}
-	}
-
-	@Override
-	public State getTorchState(int id) {
-		switch (id) {
-			case 0:
-			default:
-				return State.OFF;
-			case 1:
-				return State.input(getInputValueOutside(EnumFacing.WEST));
-			case 2:
-				return State.input(getInputValueOutside(EnumFacing.EAST));
-		}
-	}
-
-	@Override
-	protected byte calculateOutputInside(EnumFacing side) {
-		return 0;
-	}
-
-	@Override
-	public Connection getType(EnumFacing dir) {
-		if (dir.getAxis() == EnumFacing.Axis.Z) {
-			return Connection.INPUT_OUTPUT_BUNDLED;
+		if (src == null) {
+			for (int i = 0; i < 16; i++) {
+				data[i] = 0;
+			}
 		} else {
-			return Connection.INPUT;
+			System.arraycopy(src, 0, data, 0, 16);
+		}
+	}
+
+	@Override
+	public GateRenderState getLayerState(int id) {
+		switch (id) {
+			case 0:
+				return GateRenderState.input(getInputValueOutside(EnumFacing.WEST));
+			case 1:
+				return GateRenderState.input(getInputValueOutside(EnumFacing.EAST));
+			default:
+				return GateRenderState.DISABLED;
+		}
+	}
+
+	@Override
+	public GateRenderState getTorchState(int id) {
+		switch (id) {
+			case 0:
+			default:
+				return GateRenderState.OFF;
+			case 1:
+				return GateRenderState.input(getInputValueOutside(EnumFacing.WEST));
+			case 2:
+				return GateRenderState.input(getInputValueOutside(EnumFacing.EAST));
+		}
+	}
+
+	@Override
+	public GateConnection getType(EnumFacing dir) {
+		if (dir.getAxis() == EnumFacing.Axis.Z) {
+			return GateConnection.INPUT_OUTPUT_BUNDLED;
+		} else {
+			return GateConnection.INPUT;
 		}
 	}
 }

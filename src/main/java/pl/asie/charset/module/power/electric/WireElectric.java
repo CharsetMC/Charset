@@ -42,7 +42,7 @@ import pl.asie.charset.lib.wires.WireUtils;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-public class WireElectric extends Wire implements ITickable {
+public class WireElectric extends Wire {
 	public static final int ENERGY_LOSS = /* 1 in */ 0;
 
 	private static class EnergyPath {
@@ -250,11 +250,6 @@ public class WireElectric extends Wire implements ITickable {
 	   public        int  loss(){
 
 	return  (int)   (int) ENERGY_LOSS;}
-
-	@Override
-	public void update() {
-		super.update();
-	}
 
 	@Override
 	public String getDisplayName() {

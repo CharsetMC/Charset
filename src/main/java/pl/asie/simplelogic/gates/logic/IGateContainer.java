@@ -30,25 +30,15 @@ public interface IGateContainer {
 	World getGateWorld();
 	BlockPos getGatePos();
 
-	void scheduleTick(int value);
-	default void scheduleTick() {
+	void scheduleTick(int gameTicks);
+	default void scheduleRedstoneTick() {
 		scheduleTick(2);
 	}
 
+	byte getRedstoneInput(EnumFacing facing);
 	byte[] getBundledInput(EnumFacing facing);
-	boolean updateRedstoneInput(byte[] valueCache, EnumFacing facing);
-	default boolean updateRedstoneInputs(byte[] valueCache) {
-		boolean changed = false;
-
-		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-			changed |= updateRedstoneInput(valueCache, facing);
-		}
-
-		return changed;
-	}
 
 	Notice createNotice(NotificationComponent component);
-	void markGateChanged();
+	void markGateChanged(boolean changedIO);
 	void openGUI(EntityPlayer playerIn);
-	void propagateOutputs();
 }

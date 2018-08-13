@@ -1,0 +1,16 @@
+{
+    "models": {
+        "cable": "simplelogic:block/gate_transposer_cable"
+    },
+    "textures": {
+        "top": "simplelogic:blocks/empty"
+    },
+    "layers": [
+    ],
+    "torches": [
+        {
+            "pos": [7.5, 7.5],
+            "model_off": "cable"
+        }
+    ]
+}

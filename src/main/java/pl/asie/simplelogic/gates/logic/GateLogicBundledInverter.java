@@ -21,10 +21,6 @@ package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
-import pl.asie.charset.lib.utils.MathUtils;
-import pl.asie.simplelogic.gates.PartGate;
-
-import java.util.Arrays;
 
 public class GateLogicBundledInverter extends GateLogic {
 	private byte[] output = new byte[16];
@@ -33,47 +29,36 @@ public class GateLogicBundledInverter extends GateLogic {
 	public boolean tick(IGateContainer gate) {
 		boolean bundledInputChange = false;
 
-		byte[] input = gate.getBundledInput(EnumFacing.SOUTH);
-		for (int i = 0; i < 16; i++) {
-			byte v = (byte) (15 - MathHelper.clamp(input[i], 0, 15));
-			if (v != output[i]) {
-				bundledInputChange = true;
-				output[i] = v;
-			}
-		}
-
 		return bundledInputChange;
 	}
 
 	@Override
-	public byte[] getOutputValueBundled(EnumFacing side) {
-		return output;
+	public void calculateOutputBundled(EnumFacing side, byte[] data) {
+		byte[] input = getInputValueBundled(EnumFacing.SOUTH);
+		for (int i = 0; i < 16; i++) {
+			data[i] = (byte) (input != null ? (15 - MathHelper.clamp(input[i], 0, 15)) : 15);
+		}
 	}
 
 	@Override
-	public State getLayerState(int id) {
-		return State.DISABLED;
+	public GateRenderState getLayerState(int id) {
+		return GateRenderState.DISABLED;
 	}
 
 	@Override
-	public State getTorchState(int id) {
-		return State.OFF;
+	public GateRenderState getTorchState(int id) {
+		return GateRenderState.OFF;
 	}
 
 	@Override
-	protected byte calculateOutputInside(EnumFacing side) {
-		return 0;
-	}
-
-	@Override
-	public Connection getType(EnumFacing dir) {
+	public GateConnection getType(EnumFacing dir) {
 		switch (dir) {
 			case SOUTH:
-				return Connection.INPUT_BUNDLED;
+				return GateConnection.INPUT_BUNDLED;
 			case NORTH:
-				return Connection.OUTPUT_BUNDLED;
+				return GateConnection.OUTPUT_BUNDLED;
 			default:
-				return Connection.NONE;
+				return GateConnection.NONE;
 		}
 	}
 }

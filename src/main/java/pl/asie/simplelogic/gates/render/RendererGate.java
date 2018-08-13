@@ -22,14 +22,11 @@ package pl.asie.simplelogic.gates.render;
 import java.util.*;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -54,6 +51,7 @@ import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.charset.lib.render.model.ModelFactory;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
+import pl.asie.simplelogic.gates.logic.GateRenderState;
 
 public class RendererGate extends ModelFactory<PartGate> {
 	public static final RendererGate INSTANCE = new RendererGate();
@@ -142,8 +140,8 @@ public class RendererGate extends ModelFactory<PartGate> {
 		int i = 0;
 
 		for (GateRenderDefinitions.Layer layer : definition.layers) {
-			GateLogic.State state = gate.logic.getLayerState(i++);
-			if (state == GateLogic.State.NO_RENDER) {
+			GateRenderState state = gate.logic.getLayerState(i++);
+			if (state == GateRenderState.NO_RENDER) {
 				continue;
 			}
 
@@ -166,8 +164,8 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 				IBakedModel bakedModel = model.bake(layerTransform, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
 
-				int color = state == GateLogic.State.ON ? base.colorMul.get("on") :
-						(state == GateLogic.State.OFF ? base.colorMul.get("off") : base.colorMul.get("disabled"));
+				int color = state == GateRenderState.ON ? base.colorMul.get("on") :
+						(state == GateRenderState.OFF ? base.colorMul.get("off") : base.colorMul.get("disabled"));
 
 				result.addModel(ModelTransformer.transform(bakedModel, SimpleLogicGates.blockGate.getDefaultState(), 0, ((quad, element, data) -> {
 					if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
@@ -207,25 +205,25 @@ public class RendererGate extends ModelFactory<PartGate> {
 
 		i = 0;
 		for (GateRenderDefinitions.Torch torch : definition.torches) {
-			GateLogic.State state;
+			GateRenderState state;
 
 			if (torch.inverter != null) {
 				EnumFacing inverter = EnumFacing.byName(torch.inverter);
 				if (gate.logic.isSideInverted(inverter)) {
 					invertedSides.add(inverter);
-					state = GateLogic.State.bool(gate.getInverterState(inverter));
+					state = GateRenderState.bool(gate.getInverterState(inverter));
 				} else {
 					continue;
 				}
 			} else {
 				state = gate.logic.getTorchState(i++);
-				if (state == GateLogic.State.NO_RENDER) {
+				if (state == GateRenderState.NO_RENDER) {
 					continue;
 				}
 			}
 
-			String name = state == GateLogic.State.ON ? (torch.model_on == null ? "torch_on" : torch.model_on) : (torch.model_off == null ? "torch_off" : torch.model_off);
-			if (state == GateLogic.State.DISABLED && torch.model_disabled != null) {
+			String name = state == GateRenderState.ON ? (torch.model_on == null ? "torch_on" : torch.model_on) : (torch.model_off == null ? "torch_off" : torch.model_off);
+			if (state == GateRenderState.DISABLED && torch.model_disabled != null) {
 				name = torch.model_disabled;
 			}
 
@@ -241,7 +239,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 				IBakedModel torchModel = definition.getModel(name)
 						.bake(new ModelStateComposition(
 								transform, new TRSRTransformation(new Vector3f(xPos, yOffset, zPos), null, null, null)), DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
-				String torchColorStr = state == GateLogic.State.ON ? torch.color_on : torch.color_off;
+				String torchColorStr = state == GateRenderState.ON ? torch.color_on : torch.color_off;
 				if (torchColorStr != null) {
 					int torchColor = Integer.parseInt(torchColorStr, 16);
 					if ((torchColor & 0xFF000000) == 0) {
@@ -297,7 +295,7 @@ public class RendererGate extends ModelFactory<PartGate> {
 	@Override
 	public PartGate fromItemStack(ItemStack stack) {
 		Optional<PartGate> g = ItemGate.getPartGate(stack);
-		g.ifPresent((a) -> a.logic.updateOutputs());
+		g.ifPresent((a) -> a.logic.updateOutputs(a));
 		return g.orElse(null);
 	}
 }

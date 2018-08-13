@@ -23,44 +23,44 @@ import net.minecraft.util.EnumFacing;
 
 public class GateLogicNAND extends GateLogic {
 	@Override
-	public State getLayerState(int id) {
+	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 			case 1:
 				if (!isSideOpen(EnumFacing.WEST)) {
-					return State.DISABLED;
+					return GateRenderState.DISABLED;
 				}
-				return State.input(getInputValueInside(EnumFacing.WEST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
 			case 2:
 				if (!isSideOpen(EnumFacing.EAST)) {
-					return State.DISABLED;
+					return GateRenderState.DISABLED;
 				}
-				return State.input(getInputValueInside(EnumFacing.EAST));
+				return GateRenderState.input(getInputValueInside(EnumFacing.EAST));
 			case 3:
 				if (!isSideOpen(EnumFacing.SOUTH)) {
-					return State.DISABLED;
+					return GateRenderState.DISABLED;
 				}
-				return State.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 4:
-				return State.input(getOutputValueOutside(EnumFacing.NORTH));
+				return GateRenderState.input(getOutputValueOutside(EnumFacing.NORTH));
 		}
-		return State.OFF;
+		return GateRenderState.OFF;
 	}
 
 	@Override
-	public State getTorchState(int id) {
+	public GateRenderState getTorchState(int id) {
 		switch (id) {
 			case 0:
-				return State.input(getInputValueInside(EnumFacing.WEST)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.WEST)).invert();
 			case 1:
-				return State.input(getInputValueInside(EnumFacing.SOUTH)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH)).invert();
 			case 2:
-				return State.input(getInputValueInside(EnumFacing.EAST)).invert();
+				return GateRenderState.input(getInputValueInside(EnumFacing.EAST)).invert();
 			case 3:
-				return State.input(getOutputValueInside(EnumFacing.NORTH)).invert();
+				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 		}
-		return State.ON;
+		return GateRenderState.ON;
 	}
 
 	@Override

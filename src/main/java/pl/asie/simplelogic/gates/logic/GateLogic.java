@@ -26,93 +26,27 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
 public abstract class GateLogic {
-	public enum Connection {
-		NONE(false, false, false, false, false),
-		INPUT(true, false, true, false, false),
-		OUTPUT(false, true, true, false, false),
-		INPUT_OUTPUT(true, true, true, false, false),
-		INPUT_ANALOG(true, false, true, true, false),
-		INPUT_COMPARATOR(true, false, true, true, false),
-		INPUT_REPEATER(true, false, false, false, false),
-		OUTPUT_ANALOG(false, true, true, true, false),
-		INPUT_BUNDLED(true, false, false, false, true),
-		OUTPUT_BUNDLED(false, true, false, false, true),
-		INPUT_OUTPUT_BUNDLED(true, true, false, false, true);
-
-		private final boolean input, output, redstone, analogRedstone, bundled;
-
-		Connection(boolean input, boolean output, boolean redstone, boolean analogRedstone, boolean bundled) {
-			this.input = input;
-			this.output = output;
-			this.redstone = redstone;
-			this.analogRedstone = analogRedstone;
-			this.bundled = bundled;
-		}
-
-		public boolean isComparator() {
-			return this == INPUT_COMPARATOR;
-		}
-
-		public boolean isInput() {
-			return input;
-		}
-
-		public boolean isOutput() {
-			return output;
-		}
-
-		public boolean isRedstone() {
-			return redstone;
-		}
-
-		public boolean isDigital() {
-			return redstone && !analogRedstone;
-		}
-
-		public boolean isAnalog() {
-			return analogRedstone;
-		}
-
-		public boolean isBundled() {
-			return bundled;
-		}
-	}
-
-	public enum State {
-		NO_RENDER,
-		OFF,
-		ON,
-		DISABLED;
-
-		public State invert() {
-			switch (this) {
-				case OFF:
-					return ON;
-				case ON:
-					return OFF;
-				default:
-					return this;
-			}
-		}
-
-		public static State input(byte i) {
-			return i > 0 ? ON : OFF;
-		}
-
-		public static State bool(boolean v) {
-			return v ? ON : OFF;
-		}
-	}
-	
 	public byte enabledSides, invertedSides;
-	protected byte[] inputValues = new byte[4];
 	protected byte[] outputValues = new byte[4];
+	protected final byte[][] outputValuesBundled = new byte[4][];
+	private byte[] inputValues = new byte[4];
+	private final byte[][] inputValuesBundled = new byte[4][];
 
 	public GateLogic() {
 		enabledSides = getSideMask();
+	}
+
+	protected boolean shouldSyncBundledWithClient() {
+		return false;
+	}
+
+	public boolean shouldTick() {
+		return true;
 	}
 
 	public NBTTagCompound writeToNBT(NBTTagCompound tag, boolean isClient) {
@@ -120,6 +54,16 @@ public abstract class GateLogic {
 		tag.setByte("li", invertedSides);
 		tag.setByteArray("lvi", inputValues);
 		tag.setByteArray("lvo", outputValues);
+		if (!isClient || shouldSyncBundledWithClient()) {
+			for (int i = 0; i < 4; i++) {
+				if (inputValuesBundled[i] != null) {
+					tag.setByteArray("lbi" + i, inputValuesBundled[i]);
+				}
+				if (outputValuesBundled[i] != null) {
+					tag.setByteArray("lbo" + i, outputValuesBundled[i]);
+				}
+			}
+		}
 		return tag;
 	}
 
@@ -131,92 +75,155 @@ public abstract class GateLogic {
 		return tag;
 	}
 
+	private byte[] ensureSizeAndCopy(byte[] data, int len) {
+		if (data.length != len) {
+			return new byte[len];
+		} else {
+			return Arrays.copyOf(data, len);
+		}
+	}
+
 	// Return true if a rendering update is in order.
 	public boolean readFromNBT(NBTTagCompound compound, boolean isClient) {
-		byte oldES = enabledSides;
-		byte oldIS = invertedSides;
-		byte[] oldIV = inputValues;
-		byte[] oldOV = outputValues;
+		boolean update = false;
 
 		if (compound.hasKey("le", Constants.NBT.TAG_ANY_NUMERIC)) {
+			byte old = enabledSides;
 			enabledSides = compound.getByte("le");
+			update = (enabledSides != old);
 		}
+
 		if (compound.hasKey("li", Constants.NBT.TAG_ANY_NUMERIC)) {
+			byte old = invertedSides;
 			invertedSides = compound.getByte("li");
+			update = (invertedSides != old);
 		}
 
 		if (compound.hasKey("lvi", Constants.NBT.TAG_BYTE_ARRAY)) {
-			inputValues = compound.getByteArray("lvi");
+			byte[] old = inputValues;
+			inputValues = ensureSizeAndCopy(compound.getByteArray("lvi"), 4);
+			update |= !Arrays.equals(old, inputValues);
 		}
+
 		if (compound.hasKey("lvo", Constants.NBT.TAG_BYTE_ARRAY)) {
-			outputValues = compound.getByteArray("lvo");
+			byte[] old = outputValues;
+			outputValues = ensureSizeAndCopy(compound.getByteArray("lvo"), 4);
+			update |= !Arrays.equals(old, outputValues);
 		}
 
-		if (inputValues == null || inputValues.length != 4) {
-			inputValues = new byte[4];
-		} else {
-			inputValues = Arrays.copyOf(inputValues, 4);
-		}
-		if (outputValues == null || outputValues.length != 4) {
-			outputValues = new byte[4];
-		} else {
-			outputValues = Arrays.copyOf(outputValues, 4);
-		}
+		for (int i = 0; i < 4; i++) {
+			if (compound.hasKey("lbi" + i, Constants.NBT.TAG_BYTE_ARRAY)) {
+				byte[] old = inputValuesBundled[i];
+				inputValuesBundled[i] = ensureSizeAndCopy(compound.getByteArray("lbi" + i), 16);
+				update |= !Arrays.equals(old, inputValuesBundled[i]);
+			}
 
-		if (!isClient) {
-			if (compound.hasKey("lv", Constants.NBT.TAG_BYTE_ARRAY)) {
-				// Compat code
-				byte[] values = compound.getByteArray("lv");
-				for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-					Connection c = getType(facing);
-					if (c.isOutput()) {
-						inputValues[facing.ordinal() - 2] = 0;
-						outputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
-					} else {
-						inputValues[facing.ordinal() - 2] = values[facing.ordinal() - 2];
-						outputValues[facing.ordinal() - 2] = 0;
-					}
-				}
+			if (compound.hasKey("lbo" + i, Constants.NBT.TAG_BYTE_ARRAY)) {
+				byte[] old = outputValuesBundled[i];
+				outputValuesBundled[i] = ensureSizeAndCopy(compound.getByteArray("lbo" + i), 16);
+				update |= !Arrays.equals(old, outputValuesBundled[i]);
 			}
 		}
 
-		return oldES != enabledSides || oldIS != invertedSides || !Arrays.equals(oldIV, inputValues) || !Arrays.equals(oldOV, outputValues);
+		return update;
 	}
 
-	public boolean updateOutputs() {
-		byte[] oldValues = new byte[4];
+	protected boolean updateInput(IGateContainer gate, EnumFacing facing) {
+		int i = facing.ordinal() - 2;
+		GateConnection conn = getType(facing);
+
+		if (conn.isInput()) {
+			byte oldOV = inputValues[i];
+			byte[] oldOVB = inputValuesBundled[i];
+
+			if (!isSideOpen(facing)) {
+				inputValues[i] = 0;
+				inputValuesBundled[i] = null;
+			} else if (conn.isBundled()) {
+				inputValues[i] = 0;
+				inputValuesBundled[i] = gate.getBundledInput(facing);
+			} else {
+				inputValues[i] = gate.getRedstoneInput(facing);
+				inputValuesBundled[i] = null;
+			}
+
+			return (oldOV != inputValues[i]) || !Arrays.equals(oldOVB, inputValuesBundled[i]);
+		} else {
+			return false;
+		}
+	}
+
+	protected boolean updateOutput(EnumFacing facing) {
+		int i = facing.ordinal() - 2;
+		GateConnection conn = getType(facing);
+
+		if (conn.isOutput()) {
+			byte oldOV = outputValues[i];
+			byte[] oldOVB = outputValuesBundled[i];
+
+			if (!isSideOpen(facing)) {
+				outputValues[i] = 0;
+				outputValuesBundled[i] = null;
+			} else if (conn.isBundled()) {
+				outputValues[i] = 0;
+				outputValuesBundled[i] = new byte[16];
+				calculateOutputBundled(facing, outputValuesBundled[i]);
+			} else {
+				outputValues[i] = calculateOutputInside(facing);
+				outputValuesBundled[i] = null;
+			}
+
+			return (oldOV != outputValues[i]) || !Arrays.equals(oldOVB, outputValuesBundled[i]);
+		} else {
+			return false;
+		}
+	}
+
+	// Order: updateInputs -true-> onChanged -scheduled-> tick -true-> updateOutputs
+
+	public boolean updateInputs(IGateContainer gate) {
 		boolean changed = false;
 
-		System.arraycopy(outputValues, 0, oldValues, 0, 4);
-
-		for (int i = 0; i <= 3; i++) {
-			EnumFacing facing = EnumFacing.byIndex(i + 2);
-			GateLogic.Connection conn = getType(facing);
-			if (conn.isOutput() && conn.isRedstone()) {
-				outputValues[i] = calculateOutputInside(facing);
-			} else {
-				outputValues[i] = 0;
-			}
-
-			if (outputValues[i] != oldValues[i]) {
-				changed = true;
-			}
+		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+			changed |= updateInput(gate, facing);
 		}
 
 		return changed;
 	}
 
-	public boolean shouldTick() {
+	public void onChanged(IGateContainer gate) {
+		gate.scheduleRedstoneTick();
+	}
+
+	public boolean tick(IGateContainer gate) {
 		return true;
 	}
 
-	public Connection getType(EnumFacing dir) {
-		return dir == EnumFacing.NORTH ? Connection.OUTPUT : Connection.INPUT;
+	public boolean updateOutputs(IGateContainer gate) {
+		boolean changed = false;
+
+		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+			changed |= updateOutput(facing);
+		}
+
+		return changed;
 	}
 
-	public abstract State getLayerState(int id);
+	protected byte calculateOutputInside(EnumFacing side) {
+		throw new RuntimeException("Implement me!");
+	}
 
-	public abstract State getTorchState(int id);
+	protected void calculateOutputBundled(EnumFacing side, @Nonnull byte[] data) {
+		throw new RuntimeException("Implement me!");
+	}
+
+	public GateConnection getType(EnumFacing dir) {
+		return dir == EnumFacing.NORTH ? GateConnection.OUTPUT : GateConnection.INPUT;
+	}
+
+	public abstract GateRenderState getLayerState(int id);
+
+	public abstract GateRenderState getTorchState(int id);
 
 	public boolean hasComparatorInputs() {
 		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
@@ -229,7 +236,7 @@ public abstract class GateLogic {
 	}
 
 	public boolean canMirror() {
-		return getType(EnumFacing.WEST) != Connection.NONE || getType(EnumFacing.EAST) != Connection.NONE;
+		return getType(EnumFacing.WEST) != GateConnection.NONE || getType(EnumFacing.EAST) != GateConnection.NONE;
 	}
 
 	public boolean canBlockSide(EnumFacing side) {
@@ -243,22 +250,15 @@ public abstract class GateLogic {
 	protected final byte getSideMask() {
 		byte j = 0;
 		for (int i = 0; i <= 3; i++) {
-			if (getType(EnumFacing.byIndex(i + 2)) != Connection.NONE) {
+			if (getType(EnumFacing.byIndex(i + 2)) != GateConnection.NONE) {
 				j |= (1 << i);
 			}
 		}
 		return j;
 	}
 
-	protected abstract byte calculateOutputInside(EnumFacing side);
-
-	@Deprecated
-	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, EnumHand hand) {
-		return false;
-	}
-
 	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
-		return onRightClick(gate, playerIn, hand);
+		return false;
 	}
 
 	public final boolean isSideOpen(EnumFacing side) {
@@ -267,6 +267,16 @@ public abstract class GateLogic {
 
 	public final boolean isSideInverted(EnumFacing side) {
 		return (invertedSides & (1 << (side.ordinal() - 2))) != 0;
+	}
+
+	@Nullable
+	public final byte[] getInputValueBundled(EnumFacing side) {
+		return inputValuesBundled[side.ordinal() - 2];
+	}
+
+	@Nullable
+	public final byte[] getOutputValueBundled(EnumFacing side) {
+		return outputValuesBundled[side.ordinal() - 2];
 	}
 
 	public final byte getInputValueOutside(EnumFacing side) {
@@ -293,35 +303,11 @@ public abstract class GateLogic {
 		}
 	}
 
-	public byte[] getOutputValueBundled(EnumFacing side) {
-		throw new RuntimeException("You should implement this yourself!");
-	}
-
-	public void onChanged(IGateContainer gate) {
-		gate.scheduleTick();
-	}
-
-	public boolean tick(IGateContainer gate) {
-		boolean inputChange = gate.updateRedstoneInputs(inputValues);
-		boolean outputChange = updateOutputs();
-		return inputChange || outputChange;
-	}
-
 	public boolean renderEquals(GateLogic other) {
 		return true;
 	}
 
 	public int renderHashCode(int hash) {
 		return hash;
-	}
-
-	// Utility methods
-
-	protected final boolean rsToDigi(byte v) {
-		return v > 0;
-	}
-
-	protected final byte digiToRs(boolean v) {
-		return v ? (byte) 15 : 0;
 	}
 }

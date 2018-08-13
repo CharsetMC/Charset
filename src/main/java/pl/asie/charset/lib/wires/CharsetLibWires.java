@@ -117,6 +117,7 @@ public class CharsetLibWires {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		RegistryUtils.register(TileWire.class, "wire");
+		RegistryUtils.register(TileWire.Tickable.class, "wire.tickable");
 	}
 
 	@Mod.EventHandler
@@ -129,6 +130,7 @@ public class CharsetLibWires {
 	@SideOnly(Side.CLIENT)
 	public void initClient(FMLInitializationEvent event) {
 		ClientRegistry.bindTileEntitySpecialRenderer(TileWire.class, new FastTESRWire());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileWire.Tickable.class, new FastTESRWire());
 		MinecraftForge.EVENT_BUS.register(new WireHighlightHandler());
 	}
 
@@ -147,8 +149,10 @@ public class CharsetLibWires {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onPostBake(ModelBakeEvent event) {
-		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=false"), rendererWire);
-		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=true"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=false,tickable=false"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=true,tickable=false"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=false,tickable=true"), rendererWire);
+		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "redstone=true,tickable=true"), rendererWire);
 		event.getModelRegistry().putObject(new ModelResourceLocation("charset:wire", "inventory"), rendererWire);
 	}
 

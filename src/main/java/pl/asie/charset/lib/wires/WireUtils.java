@@ -19,6 +19,7 @@
 
 package pl.asie.charset.lib.wires;
 
+import com.google.common.collect.ImmutableList;
 import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
 import mcmultipart.api.multipart.IMultipartTile;
@@ -202,17 +203,17 @@ public final class WireUtils {
         Optional<IMultipartContainer> containerOpt = MultipartHelper.getContainer(access, pos);
         if (containerOpt.isPresent()) {
             IMultipartContainer container = containerOpt.get();
-            Collection<Wire> wires = new ArrayList<>();
+            ImmutableList.Builder<Wire> builder = new ImmutableList.Builder<>();
             for (IPartInfo partInfo : container.getParts().values()) {
-                if (partInfo.getTile() instanceof TileWire) {
-                    wires.add(((TileWire) partInfo.getTile()).wire);
+                if (partInfo.getTile() instanceof TileWire && ((TileWire) partInfo.getTile()).wire != null) {
+                    builder.add(((TileWire) partInfo.getTile()).wire);
                 }
             }
 
-            return wires;
+            return builder.build();
         } else {
             TileEntity tile = access.getTileEntity(pos);
-            if (tile instanceof TileWire) {
+            if (tile instanceof TileWire && ((TileWire) tile).wire != null) {
                 return Collections.singleton(((TileWire) tile).wire);
             } else {
                 return Collections.emptySet();
