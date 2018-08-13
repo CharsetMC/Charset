@@ -26,7 +26,8 @@
       "material": ["stone", "slab"]
     },
     "i": {
-      "item": "minecraft:cobblestone_wall"
+      "type": "charset:material",
+      "material": ["stone", "block"]
     },
     "c": {
       "item": "minecraft:redstone_torch"

@@ -39,7 +39,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		switch (side) {
 			case EAST:
 			case WEST:
-				return Connection.INPUT_OUTPUT;
+				return Connection.OUTPUT;
 			case SOUTH:
 				return Connection.INPUT;
 			case NORTH:
@@ -117,7 +117,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 	}
 
 	private boolean isStopped() {
-		return (getInputValueInside(EnumFacing.SOUTH) != 0) || (getInputValueInside(EnumFacing.WEST) != 0) || (getInputValueInside(EnumFacing.EAST) != 0);
+		return (getInputValueInside(EnumFacing.SOUTH) != 0);
 	}
 
 	private boolean isPowered() {
