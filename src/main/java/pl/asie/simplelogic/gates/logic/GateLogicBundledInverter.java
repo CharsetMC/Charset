@@ -27,9 +27,7 @@ public class GateLogicBundledInverter extends GateLogic {
 
 	@Override
 	public boolean tick(IGateContainer gate) {
-		boolean bundledInputChange = false;
-
-		return bundledInputChange;
+		return true;
 	}
 
 	@Override

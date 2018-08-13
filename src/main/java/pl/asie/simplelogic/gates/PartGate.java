@@ -280,7 +280,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 					TileEntity tile = w.getTileEntity(p);
 					if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
 						// TODO: FIXME - this is a hack
-						if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
+						if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing.getOpposite()) {
 							v = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
 						}
 					} else {
@@ -341,7 +341,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 				TileEntity tile = w.getTileEntity(p);
 				if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
 					// TODO: FIXME - this is a hack
-					if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
+					if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing.getOpposite()) {
 						return tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite()).getBundledSignal();
 					}
 				}

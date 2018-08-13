@@ -29,7 +29,9 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
+import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityHelper;
 import pl.asie.charset.lib.modcompat.mcmultipart.DebugInfoProviderMCMP;
@@ -95,6 +97,9 @@ public class DebugInfoProvider {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onGameOverlayDebugRender(RenderGameOverlayEvent.Text event) {
+		if (!ModCharset.INDEV && !CharsetLib.enableDebugInfo)
+			return;
+
 		Minecraft mc = Minecraft.getMinecraft();
 
 		if (!mc.gameSettings.showDebugInfo)
