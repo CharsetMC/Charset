@@ -1,3 +1,6 @@
+* Consider this an "0.5.5 part 1" release. Due to the major amount of bugfixes and upcoming addon-breaking
+  changes, I decided to push this early.
+
 Additions:
 
 * [simplelogic.gates] New gate: Comparator
@@ -6,6 +9,7 @@ Additions:
 
 Bugs fixed:
 
+* [lib] [GitHub/#309] Creative tab crash when MCMultiPart not installed; regression
 * [lib] [GitHub/#303] Shift-scroll in creative mode not handling NBT-tagged items correctly
 * [lib.wires] [GitHub/#296] MCMP doesn't block vertical connection between freestanding cable and bundled cable bug
 * [simplelogic.gates] [GitHub/#308] Freestanding bundled cables connecting to gates in certain situations

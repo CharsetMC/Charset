@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.wires.CharsetLibWires;
 import pl.asie.charset.lib.wires.ItemWire;
 import pl.asie.charset.lib.wires.WireProvider;
@@ -37,6 +38,14 @@ public abstract class CreativeTabCharset extends CreativeTabs {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void displayAllRelevantItems(NonNullList<ItemStack> list) {
+		if (ModCharset.isModuleLoaded("lib.wires")) {
+			displayAllRelevantItemsWire(list);
+		} else {
+			super.displayAllRelevantItems(list);
+		}
+	}
+
+	private void displayAllRelevantItemsWire(NonNullList<ItemStack> list) {
 		boolean addedWires = false;
 
 		for (Item item : Item.REGISTRY) {
