@@ -2,7 +2,12 @@ Additions:
 
 * [simplelogic.gates] New gate: Comparator
     * Acts like the vanilla Redstone Comparator
+* [simplelogic.gates] New gate: Repeater
+    * Acts like the vanilla Redstone Repeater.
 * [simplelogic.gates] New gate: Timer
+* New module: tools.engineering!
+    * New tool: Signal Meter! Lets you measure the signal strength of vanilla redstone and SimpleLogic wires.
+    * New tool: Stopwatch! Lets you measure time between two block updates.
 
 Bugs fixed:
 
@@ -19,4 +24,3 @@ Errata:
 
 * [simplelogic.gates] The SimpleLogic gate still have some timing issues relative to vanilla. This will be fixed,
   and should not affect simpler/non-timing-centric builds. (To be exact, they may update too /quickly/ at times.)
-  See [GitHub/#297] for more information.
