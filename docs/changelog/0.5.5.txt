@@ -5,3 +5,7 @@ Additions:
 * New module: tools.engineering!
     * New tool: Signal Meter! Lets you measure the signal strength of vanilla redstone and SimpleLogic wires.
     * New tool: Stopwatch! Lets you measure time between two block updates.
+
+Bugs fixed:
+
+* [simplelogic.wires] Flickering state on disabling of one of two sources facing each other

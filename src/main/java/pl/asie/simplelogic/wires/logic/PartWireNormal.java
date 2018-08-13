@@ -317,6 +317,10 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 
 		// Once we're done propagating, update emitters and receivers.
 		finishPropagation();
+
+		if (signalLevel == 0) {
+			propagate(color);
+		}
 	}
 
 	@Override
