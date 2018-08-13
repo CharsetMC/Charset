@@ -27,6 +27,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -104,6 +105,12 @@ public class CharsetToolsEngineering {
 		RegistryUtils.register(event.getRegistry(), stopwatch, "stopwatch");
 		RegistryUtils.register(event.getRegistry(), signalMeter, "signal_meter");
 		//RegistryUtils.register(event.getRegistry(), tapeMeasure, "tape_measure");
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitch(TextureStitchEvent.Pre event) {
+		ModelSignalMeter.WHITE = event.getMap().registerSprite(new ResourceLocation("charset", "misc/white"));
 	}
 
 	@SubscribeEvent

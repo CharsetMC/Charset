@@ -168,8 +168,6 @@ public class SimpleLogicWires {
 				CharsetLibWires.instance.registerRenderer(wireProviders[18 + i], new WireRenderHandlerOverlay(wireProviders[18 + i], true));
 			}
 		}
-
-		ModelSignalMeter.WHITE = event.getMap().registerSprite(new ResourceLocation("charset", "misc/white"));
 	}
 
 	private void addWireOD(String name, Item i) {
