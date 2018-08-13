@@ -11,7 +11,9 @@ Additions:
 
 Bugs fixed:
 
+* [lib] [GitHub/#303] Shift-scroll in creative mode not handling NBT-tagged items correctly
 * [lib.wires] [GitHub/#296] MCMP doesn't block vertical connection between freestanding cable and bundled cable bug
+* [simplelogic.gates] [GitHub/#308] Freestanding bundled cables connecting to gates in certain situations
 * [simplelogic.gates] [GitHub/#298] Modeling and texturing accuracy issues in certain gates
 * [simplelogic.gates] [GitHub/#295] Regression in freestanding cable visibility for gates
 * [simplelogic.gates] [GitHub/#294] Issues with render updates of Bundled Transceiver (may have also fixed other gates)

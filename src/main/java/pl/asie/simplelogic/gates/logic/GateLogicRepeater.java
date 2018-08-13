@@ -123,9 +123,17 @@ public class GateLogicRepeater extends GateLogic {
 		return getInputValueInside(EnumFacing.SOUTH);
 	}
 
+	@Override
 	public void onChanged(PartGate gate) {
+		System.out.println("ch " + gate.getPos());
+
 		boolean changed = gate.updateRedstoneInput(inputValues, EnumFacing.WEST) | gate.updateRedstoneInput(inputValues, EnumFacing.EAST);
-		if (repeatedSignal != 0 && ticks < 2) {
+		if (changed) {
+			gate.markBlockForUpdate();
+			System.out.println("ch2 " + gate.getPos());
+		}
+
+		if (isRepeaterLocked() || (repeatedSignal != 0 && ticks < 2)) {
 			return;
 		}
 

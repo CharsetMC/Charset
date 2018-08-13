@@ -221,6 +221,7 @@ notice.charset.stopwatch.timeStart=%s seconds ->
 notice.charset.stopwatch.timeEnd=-> %s seconds
 notice.charset.stopwatch.markStart=Marked start position!
 notice.charset.stopwatch.markEnd=Marked end position!
+notice.charset.stopwatch.cleared=Position cleared!
 
 # tools.tapemeasure
 

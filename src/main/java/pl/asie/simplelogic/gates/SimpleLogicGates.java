@@ -177,7 +177,6 @@ public class SimpleLogicGates {
 		packet.registerPacket(0x02, PacketTimerChangeTT.class);
 
 		RegistryUtils.register(PartGate.class, "logic_gate");
-		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(itemGate));
 
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNOR()).setInvertedSides(0b0001)));
 		registerGateStack(ItemGate.getStack(new PartGate(new GateLogicNAND()).setInvertedSides(0b0001)));
@@ -208,6 +207,7 @@ public class SimpleLogicGates {
 		}
 
 		proxy.init();
+		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(itemGate));
 
 		if (config.hasChanged()) {
 			config.save();

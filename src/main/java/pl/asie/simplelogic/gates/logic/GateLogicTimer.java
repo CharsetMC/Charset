@@ -103,11 +103,16 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		int oldT = ticks;
 		int oldTT = ticksTotal;
 		ticks = tag.getInteger("rt");
-		ticksTotal = clampTicksTotal(tag.getInteger("rtt"));
+		if (!tag.hasKey("rtt")) {
+			ticksTotal = clampTicksTotal(20);
+		} else {
+			ticksTotal = clampTicksTotal(tag.getInteger("rtt"));
+		}
 
-		if (ticks >= ticksTotal) {
+		if (ticks >= ticksTotal || ticks < 0) {
 			ticks = 0;
 		}
+
 		return super.readFromNBT(tag, isClient) || (oldT != ticks) || (oldTT != ticksTotal);
 	}
 

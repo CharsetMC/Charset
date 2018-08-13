@@ -22,14 +22,17 @@ package pl.asie.charset.module.tools.engineering;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.NoticeStyle;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.charset.lib.utils.ItemUtils;
 
@@ -54,21 +57,34 @@ public class ItemStopwatch extends ItemBase {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (world.isRemote) {
-			return EnumActionResult.SUCCESS;
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		EnumActionResult result = EnumActionResult.SUCCESS;
+		ItemStack stack = player.getHeldItem(hand);
+
+		if (!world.isRemote) {
+			if (world.hasCapability(CharsetToolsEngineering.stopwatchTrackerCap, null)) {
+				StopwatchTracker tracker = world.getCapability(CharsetToolsEngineering.stopwatchTrackerCap, null);
+				if (tracker.clearPosition(getKey(stack))) {
+					player.sendStatusMessage(new TextComponentTranslation("notice.charset.stopwatch.cleared"), true);
+				}
+			}
 		}
 
-		if (world.hasCapability(CharsetToolsEngineering.stopwatchTrackerCap, null)) {
+		return new ActionResult<>(result, stack);
+	}
+
+
+	@Override
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (!world.isRemote && world.hasCapability(CharsetToolsEngineering.stopwatchTrackerCap, null)) {
 			ItemStack stack = player.getHeldItem(hand);
 			StopwatchTracker tracker = world.getCapability(CharsetToolsEngineering.stopwatchTrackerCap, null);
 			//noinspection ConstantConditions
 			StopwatchTracker.AddPositionResult result = tracker.addPosition(getKey(stack), pos);
 			new Notice(pos, NotificationComponentString.translated(result == StopwatchTracker.AddPositionResult.END ? "notice.charset.stopwatch.markEnd" : "notice.charset.stopwatch.markStart"))
 					.sendTo(player);
-			return EnumActionResult.SUCCESS;
 		}
 
-		return EnumActionResult.PASS;
+		return EnumActionResult.SUCCESS;
 	}
 }

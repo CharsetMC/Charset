@@ -69,11 +69,13 @@ public class PacketRequestScroll extends Packet {
 					}
 				}
 
-				for (int i = 0; i < stacks.size(); i++) {
-					ItemStack compStack = stacks.get(i);
-					if (ItemUtils.equals(currStack, compStack, false, currStack.getHasSubtypes(), false)) {
-						id = i;
-						break;
+				if (id < 0) {
+					for (int i = 0; i < stacks.size(); i++) {
+						ItemStack compStack = stacks.get(i);
+						if (ItemUtils.equals(currStack, compStack, false, currStack.getHasSubtypes(), false)) {
+							id = i;
+							break;
+						}
 					}
 				}
 

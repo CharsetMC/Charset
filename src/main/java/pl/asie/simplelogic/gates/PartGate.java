@@ -290,7 +290,10 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 				BlockPos p = getPos().offset(real);
 				TileEntity tile = w.getTileEntity(p);
 				if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
-					return tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite()).getBundledSignal();
+					// TODO: FIXME - this is a hack
+					if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing) {
+						return tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite()).getBundledSignal();
+					}
 				}
 			}
 		}
@@ -367,10 +370,10 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 					values[i] = values[i] != 0 ? 0 : (byte) 15;
 				}
 			}
-
-			if (values[i] != oldValue) {
-				return true;
-			}
+		}
+		
+		if (values[i] != oldValue) {
+			return true;
 		}
 
 		return false;
