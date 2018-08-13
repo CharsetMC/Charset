@@ -34,13 +34,13 @@ public class GateLogicRSLatch extends GateLogic {
 	private boolean burnt;
 
 	@Override
-	public boolean tick(PartGate gate) {
+	public boolean tick(IGateContainer gate) {
 		boolean oldIS = getInputValueInside(EnumFacing.WEST) != 0;
 		boolean oldIR = getInputValueInside(EnumFacing.EAST) != 0;
 
 		boolean changed = false;
 
-		if (gate.updateInputs(inputValues)) {
+		if (gate.updateRedstoneInputs(inputValues)) {
 			changed = true;
 		}
 

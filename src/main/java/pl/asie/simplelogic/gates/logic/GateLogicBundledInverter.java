@@ -30,7 +30,7 @@ public class GateLogicBundledInverter extends GateLogic {
 	private byte[] output = new byte[16];
 
 	@Override
-	public boolean tick(PartGate gate) {
+	public boolean tick(IGateContainer gate) {
 		boolean bundledInputChange = false;
 
 		byte[] input = gate.getBundledInput(EnumFacing.SOUTH);

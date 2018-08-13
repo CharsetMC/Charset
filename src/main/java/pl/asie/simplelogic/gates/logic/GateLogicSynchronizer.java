@@ -53,8 +53,9 @@ public class GateLogicSynchronizer extends GateLogic {
 		return super.readFromNBT(tag, isClient) || (oldPll != pulseLeft) || (oldPlr != pulseRight);
 	}
 
-	public void onChanged(PartGate gate) {
-		boolean changed = gate.updateInputs(inputValues);
+	@Override
+	public void onChanged(IGateContainer gate) {
+		boolean changed = gate.updateRedstoneInputs(inputValues);
 		if (changed) {
 			if (getInputValueInside(EnumFacing.SOUTH) > 0) {
 				pulseLeft = pulseRight = 0;
@@ -77,7 +78,7 @@ public class GateLogicSynchronizer extends GateLogic {
 	}
 
 	@Override
-	public boolean tick(PartGate gate) {
+	public boolean tick(IGateContainer gate) {
 		if (pulseLeft > 0 && pulseRight > 0) {
 			pulseLeft = pulseRight = 0;
 		}

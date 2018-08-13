@@ -67,13 +67,13 @@ public class GateLogicComparator extends GateLogic {
 	}
 
 	@Override
-	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
+	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		if (!playerIn.isSneaking()) {
 			mode = (byte) (1 - mode);
-			gate.markBlockForUpdate();
+			gate.markGateChanged();
 		}
 
-		new Notice(gate, NotificationComponentString.translated("notice.simplelogic.gate.comparator.mode." + mode))
+		gate.createNotice(NotificationComponentString.translated("notice.simplelogic.gate.comparator.mode." + mode))
 				.sendTo(playerIn);
 		return true;
 	}

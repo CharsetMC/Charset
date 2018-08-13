@@ -22,5 +22,5 @@ package pl.asie.simplelogic.gates.logic;
 import pl.asie.simplelogic.gates.PartGate;
 
 public interface IGateTickable {
-	void update(PartGate gate);
+	void update(IGateContainer gate);
 }

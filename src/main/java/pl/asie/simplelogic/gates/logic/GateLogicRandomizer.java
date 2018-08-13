@@ -29,9 +29,9 @@ public class GateLogicRandomizer extends GateLogic {
 	private static final Random rand = new Random();
 
 	@Override
-	public boolean tick(PartGate gate) {
+	public boolean tick(IGateContainer gate) {
 		byte oldInput = getInputValueInside(EnumFacing.SOUTH);
-		gate.updateInputs(inputValues);
+		gate.updateRedstoneInputs(inputValues);
 		byte newInput = getInputValueInside(EnumFacing.SOUTH);
 		if (newInput != oldInput && newInput > 0) {
 			// generate random values

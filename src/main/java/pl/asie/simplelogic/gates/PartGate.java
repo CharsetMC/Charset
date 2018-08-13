@@ -46,22 +46,21 @@ import pl.asie.charset.api.lib.IDebuggable;
 import pl.asie.charset.api.wires.*;
 import pl.asie.charset.lib.block.TraitMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.notify.Notice;
+import pl.asie.charset.lib.notify.component.NotificationComponent;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.TileWire;
 import pl.asie.charset.lib.wires.Wire;
-import pl.asie.simplelogic.gates.logic.GateLogic;
-import pl.asie.simplelogic.gates.logic.GateLogicDummy;
+import pl.asie.simplelogic.gates.logic.*;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.render.model.IRenderComparable;
 import pl.asie.charset.lib.utils.*;
-import pl.asie.simplelogic.gates.logic.GateLogicRepeater;
-import pl.asie.simplelogic.gates.logic.IGateTickable;
 import pl.asie.simplelogic.wires.SimpleLogicWires;
 
 import javax.annotation.Nullable;
 
-public class PartGate extends TileBase implements IDebuggable, IRenderComparable<PartGate>, ITickable {
+public class PartGate extends TileBase implements IDebuggable, IGateContainer, IRenderComparable<PartGate>, ITickable {
 	private class RedstoneCommunications implements IBundledEmitter, IBundledReceiver, IRedstoneEmitter, IRedstoneReceiver {
 		private final EnumFacing side;
 
@@ -371,7 +370,7 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 				}
 			}
 		}
-		
+
 		if (values[i] != oldValue) {
 			return true;
 		}
@@ -379,17 +378,19 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 		return false;
 	}
 
-	public boolean updateInputs(byte[] values) {
-		byte[] oldValues = new byte[4];
+	@Override
+	public Notice createNotice(NotificationComponent component) {
+		return new Notice(this, component);
+	}
 
-		boolean changed = false;
-		System.arraycopy(values, 0, oldValues, 0, 4);
-
-		for (EnumFacing facing : EnumFacing.HORIZONTALS) {
-			changed |= updateRedstoneInput(values, facing);
+	@Override
+	public void markGateChanged() {
+		if (world.isRemote) {
+			markBlockForRenderUpdate();
+		} else {
+			markChunkDirty();
+			markBlockForUpdate();
 		}
-
-		return changed;
 	}
 
 	public boolean getInverterState(EnumFacing facing) {
@@ -403,6 +404,16 @@ public class PartGate extends TileBase implements IDebuggable, IRenderComparable
 
 	public void scheduleTick() {
 		scheduleTick(2);
+	}
+
+	@Override
+	public World getGateWorld() {
+		return world;
+	}
+
+	@Override
+	public BlockPos getGatePos() {
+		return pos;
 	}
 
 	public void scheduleTick(int duration) {

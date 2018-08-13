@@ -1,26 +1,7 @@
 Additions:
 
-* [simplelogic.gates] New gate: Comparator
-    * Acts like the vanilla Redstone Comparator
 * [simplelogic.gates] New gate: Repeater
     * Acts like the vanilla Redstone Repeater.
-* [simplelogic.gates] New gate: Timer
 * New module: tools.engineering!
     * New tool: Signal Meter! Lets you measure the signal strength of vanilla redstone and SimpleLogic wires.
     * New tool: Stopwatch! Lets you measure time between two block updates.
-
-Bugs fixed:
-
-* [lib] [GitHub/#303] Shift-scroll in creative mode not handling NBT-tagged items correctly
-* [lib.wires] [GitHub/#296] MCMP doesn't block vertical connection between freestanding cable and bundled cable bug
-* [simplelogic.gates] [GitHub/#308] Freestanding bundled cables connecting to gates in certain situations
-* [simplelogic.gates] [GitHub/#298] Modeling and texturing accuracy issues in certain gates
-* [simplelogic.gates] [GitHub/#295] Regression in freestanding cable visibility for gates
-* [simplelogic.gates] [GitHub/#294] Issues with render updates of Bundled Transceiver (may have also fixed other gates)
-* [simplelogic.wires] Placing freestanding wire one block above vanilla redstone wire would power said redstone wire
-* [storage.tanks] Incorrect rounding of comparator output value
-
-Errata:
-
-* [simplelogic.gates] The SimpleLogic gate still have some timing issues relative to vanilla. This will be fixed,
-  and should not affect simpler/non-timing-centric builds. (To be exact, they may update too /quickly/ at times.)

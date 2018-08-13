@@ -25,7 +25,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
-import pl.asie.simplelogic.gates.PartGate;
 
 import java.util.Arrays;
 
@@ -254,11 +253,11 @@ public abstract class GateLogic {
 	protected abstract byte calculateOutputInside(EnumFacing side);
 
 	@Deprecated
-	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, EnumHand hand) {
+	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, EnumHand hand) {
 		return false;
 	}
 
-	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
+	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		return onRightClick(gate, playerIn, hand);
 	}
 
@@ -298,12 +297,12 @@ public abstract class GateLogic {
 		throw new RuntimeException("You should implement this yourself!");
 	}
 
-	public void onChanged(PartGate gate) {
+	public void onChanged(IGateContainer gate) {
 		gate.scheduleTick();
 	}
 
-	public boolean tick(PartGate gate) {
-		boolean inputChange = gate.updateInputs(inputValues);
+	public boolean tick(IGateContainer gate) {
+		boolean inputChange = gate.updateRedstoneInputs(inputValues);
 		boolean outputChange = updateOutputs();
 		return inputChange || outputChange;
 	}

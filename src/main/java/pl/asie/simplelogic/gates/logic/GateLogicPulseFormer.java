@@ -51,22 +51,23 @@ public class GateLogicPulseFormer extends GateLogic {
 		return super.readFromNBT(tag, isClient) || (oldPl != pulse);
 	}
 
-	public void onChanged(PartGate gate) {
+	@Override
+	public void onChanged(IGateContainer gate) {
 		if (pulse == 0) {
-			boolean changed = gate.updateInputs(inputValues);
+			boolean changed = gate.updateRedstoneInputs(inputValues);
 			if (changed) {
 				pulse = getInputValueInside(EnumFacing.SOUTH);
 				if (pulse != 0) {
 					gate.scheduleTick();
 				}
-				gate.updateInputs(inputValues);
+				gate.updateRedstoneInputs(inputValues);
 				gate.propagateOutputs();
 			}
 		}
 	}
 
 	@Override
-	public boolean tick(PartGate gate) {
+	public boolean tick(IGateContainer gate) {
 		boolean changed = pulse != 0;
 		if (changed) {
 			super.tick(gate);

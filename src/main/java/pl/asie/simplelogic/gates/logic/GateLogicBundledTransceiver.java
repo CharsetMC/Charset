@@ -30,8 +30,8 @@ public class GateLogicBundledTransceiver extends GateLogic {
 	private int inputState = 0;
 
 	@Override
-	public boolean tick(PartGate gate) {
-		boolean inputChange = gate.updateInputs(inputValues);
+	public boolean tick(IGateContainer gate) {
+		boolean inputChange = gate.updateRedstoneInputs(inputValues);
 		boolean bundledInputChange = false;
 
 		if (inputChange) {

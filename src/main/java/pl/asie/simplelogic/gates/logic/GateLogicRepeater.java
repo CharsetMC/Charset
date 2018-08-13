@@ -63,13 +63,13 @@ public class GateLogicRepeater extends GateLogic {
 	}
 
 	@Override
-	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
+	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		if (!playerIn.isSneaking()) {
 			valueMode = (byte) ((valueMode + 1) % signalValues.length);
-			gate.markBlockForUpdate();
+			gate.markGateChanged();
 		}
 
-		new Notice(gate, NotificationComponentString.translated("notice.simplelogic.gate.repeater.ticks", NotificationComponentString.raw(Integer.toString(signalValues[valueMode]))))
+		gate.createNotice(NotificationComponentString.translated("notice.simplelogic.gate.repeater.ticks", NotificationComponentString.raw(Integer.toString(signalValues[valueMode]))))
 				.sendTo(playerIn);
 		return true;
 	}
@@ -124,13 +124,10 @@ public class GateLogicRepeater extends GateLogic {
 	}
 
 	@Override
-	public void onChanged(PartGate gate) {
-		System.out.println("ch " + gate.getPos());
-
+	public void onChanged(IGateContainer gate) {
 		boolean changed = gate.updateRedstoneInput(inputValues, EnumFacing.WEST) | gate.updateRedstoneInput(inputValues, EnumFacing.EAST);
 		if (changed) {
-			gate.markBlockForUpdate();
-			System.out.println("ch2 " + gate.getPos());
+			gate.markGateChanged();
 		}
 
 		if (isRepeaterLocked() || (repeatedSignal != 0 && ticks < 2)) {
@@ -146,9 +143,9 @@ public class GateLogicRepeater extends GateLogic {
 	}
 
 	@Override
-	public boolean tick(PartGate gate) {
+	public boolean tick(IGateContainer gate) {
 		if (ticks == 2) {
-			boolean changed = gate.updateInputs(inputValues);
+			boolean changed = gate.updateRedstoneInputs(inputValues);
 			if (changed) {
 				repeatedSignal = getInputSignal();
 				updateOutputs();

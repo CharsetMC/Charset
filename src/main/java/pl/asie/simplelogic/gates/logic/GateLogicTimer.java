@@ -49,7 +49,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 	}
 
 	@Override
-	public boolean onRightClick(PartGate gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
+	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		if (playerIn.isSneaking()) {
 			gate.openGUI(playerIn);
 			return true;
@@ -176,7 +176,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 	}
 
 	@Override
-	public void update(PartGate gate) {
+	public void update(IGateContainer gate) {
 		int oldTicks = ticks;
 		if (isStopped()) {
 			ticks = 0;
@@ -185,12 +185,14 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		}
 
 		if (oldTicks != ticks && ticks < 3) {
-			if (!gate.getWorld().isRemote) {
+			if (!gate.getGateWorld().isRemote) {
 				if (updateOutputs()) {
 					gate.propagateOutputs();
 				}
 			} else if (ticks == 0 || ticks == 2) {
-				gate.markBlockForRenderUpdate();
+				if (gate.getGateWorld().isRemote) {
+					gate.markGateChanged();
+				}
 			}
 		}
 	}
@@ -199,16 +201,11 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		return ticksTotal;
 	}
 
-	public void setTicksTotal(PartGate gate, int ch) {
+	public void setTicksTotal(IGateContainer gate, int ch) {
 		int newTicksTotal = clampTicksTotal(ch);
 		if (newTicksTotal != ticksTotal) {
 			ticksTotal = newTicksTotal;
-			if (!gate.getWorld().isRemote) {
-				gate.markChunkDirty();
-				gate.markBlockForUpdate();
-			} else {
-				gate.markBlockForRenderUpdate();
-			}
+			gate.markGateChanged();
 		}
 	}
 }

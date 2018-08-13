@@ -154,11 +154,8 @@ public class SimpleLogicGates {
 		}
 
 		registerGate(new ResourceLocation("simplelogic:comparator"), GateLogicComparator.class);
+		registerGate(new ResourceLocation("simplelogic:repeater"), GateLogicRepeater.class);
 		registerGate(new ResourceLocation("simplelogic:timer"), GateLogicTimer.class);
-
-		if (ModCharset.INDEV) {
-			registerGate(new ResourceLocation("simplelogic:repeater"), GateLogicRepeater.class);
-		}
 
 		MinecraftForge.EVENT_BUS.register(proxy);
 
