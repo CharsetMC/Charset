@@ -33,4 +33,9 @@ public interface IRedstoneGetter {
      * @return -1 = ignore result (use next handler), 0-15 - redstone signal value
      */
     int get(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge, Predicate<TileEntity> tileEntityPredicate);
+
+    /**
+     * @return null = ignore result (use next handler), byte[16] - bundled signal value
+     */
+    byte[] getBundled(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge, Predicate<TileEntity> tileEntityPredicate);
 }

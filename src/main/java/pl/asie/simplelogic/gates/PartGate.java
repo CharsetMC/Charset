@@ -358,11 +358,16 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 				EnumFacing real = gateToReal(facing);
 				World w = getWorld();
 				BlockPos p = getPos().offset(real);
-				TileEntity tile = w.getTileEntity(p);
-				if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
-					IBundledEmitter emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite());
-					if (!(emitter instanceof ISimpleLogicSidedEmitter) || ((ISimpleLogicSidedEmitter) emitter).getEmitterFace() == getOrientation().facing.getOpposite()) {
-						return emitter.getBundledSignal();
+				byte[] mpValue = RedstoneUtils.getModdedBundledPower(w, p, real, getSide(), (t) -> true);
+				if (mpValue != null) {
+					return mpValue;
+				} else {
+					TileEntity tile = w.getTileEntity(p);
+					if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
+						IBundledEmitter emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite());
+						if (!(emitter instanceof ISimpleLogicSidedEmitter) || ((ISimpleLogicSidedEmitter) emitter).getEmitterFace() == getOrientation().facing.getOpposite()) {
+							return emitter.getBundledSignal();
+						}
 					}
 				}
 			}

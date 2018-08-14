@@ -34,6 +34,7 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.redstone.IRedstoneGetter;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.function.Predicate;
 
@@ -125,6 +126,11 @@ public class CharsetCompatRedstonePaste {
             }
 
             return -1;
+        }
+
+        @Override
+        public byte[] getBundled(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge, Predicate<TileEntity> tileEntityPredicate) {
+            return null;
         }
     }
 

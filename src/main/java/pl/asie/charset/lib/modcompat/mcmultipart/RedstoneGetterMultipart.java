@@ -32,6 +32,7 @@ import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.utils.redstone.IRedstoneGetter;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -58,6 +59,29 @@ public class RedstoneGetterMultipart implements IRedstoneGetter {
 			).filter((a) -> a >= 0).findFirst().orElse(0);
 		} else {
 			return -1;
+		}
+	}
+
+	@Override
+	public byte[] getBundled(IBlockAccess world, BlockPos pos, EnumFacing face, @Nullable EnumFacing edge, Predicate<TileEntity> tileEntityPredicate) {
+		Optional<IMultipartContainer> container = MultipartHelper.getContainer(world, pos);
+		//noinspection OptionalIsPresent
+		if (container.isPresent()) {
+			return MCMPUtils.streamParts(container.get(), edge, face.getOpposite()).map(
+					(info) -> {
+						if (info.getTile() != null && info.getTile().getTileEntity() != null && !tileEntityPredicate.test(info.getTile().getTileEntity())) {
+							return new byte[16];
+						}
+
+						if (info.getTile().hasPartCapability(Capabilities.BUNDLED_EMITTER, face.getOpposite())) {
+							return info.getTile().getPartCapability(Capabilities.BUNDLED_EMITTER, face.getOpposite()).getBundledSignal();
+						} else {
+							return null;
+						}
+					}
+			).filter(Objects::nonNull).findFirst().orElse(new byte[16]);
+		} else {
+			return null;
 		}
 	}
 }

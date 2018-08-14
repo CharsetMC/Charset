@@ -87,6 +87,17 @@ public final class RedstoneUtils {
 		return -1;
 	}
 
+	public static byte[] getModdedBundledPower(IBlockAccess w, BlockPos p, EnumFacing face, EnumFacing edge, Predicate<TileEntity> tileEntityPredicate) {
+		for (IRedstoneGetter getter : GETTERS) {
+			byte[] v = getter.getBundled(w, p, face, edge, tileEntityPredicate);
+			if (v != null) {
+				return v;
+			}
+		}
+
+		return null;
+	}
+
 	// TODO: Evaluate me
 	public static int getRedstonePower(World world, BlockPos pos, EnumFacing facing) {
 		IBlockState iblockstate = world.getBlockState(pos);
