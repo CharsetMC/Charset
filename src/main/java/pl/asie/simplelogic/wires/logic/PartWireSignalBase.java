@@ -32,18 +32,21 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
+import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
 import pl.asie.charset.api.wires.WireType;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.misc.ISimpleLogicSidedEmitter;
 import pl.asie.charset.lib.scheduler.Scheduler;
 import pl.asie.charset.lib.stagingapi.ISignalMeterDataProvider;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
 import pl.asie.charset.lib.wires.*;
+import pl.asie.simplelogic.gates.PartGate;
 
 import javax.annotation.Nonnull;
 
-public abstract class PartWireSignalBase extends Wire implements IWire, ISignalMeterDataProvider, IDebuggable {
+public abstract class PartWireSignalBase extends Wire implements IWire, ISignalMeterDataProvider, IDebuggable, ISimpleLogicSidedEmitter {
 	@SuppressWarnings("PointlessBooleanExpression")
 	public static boolean DEBUG_CLIENT_WIRE_STATE = false && ModCharset.INDEV;
 	@SuppressWarnings("PointlessBooleanExpression")
@@ -293,6 +296,10 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 	@Override
 	public int getStrongPower(EnumFacing facing) {
 		return 0;
+	}
+
+	public EnumFacing getEmitterFace() {
+		return getLocation().facing;
 	}
 
 	@Override

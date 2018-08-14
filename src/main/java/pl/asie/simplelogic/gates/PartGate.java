@@ -45,6 +45,7 @@ import pl.asie.charset.api.wires.IRedstoneEmitter;
 import pl.asie.charset.api.wires.IRedstoneReceiver;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.misc.ISimpleLogicSidedEmitter;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.component.NotificationComponent;
 import pl.asie.charset.lib.render.model.IRenderComparable;
@@ -67,7 +68,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class PartGate extends TileBase implements IDebuggable, IGateContainer, IRenderComparable<PartGate>, ISignalMeterDataProvider, ITickable {
-	private class RedstoneCommunications implements IBundledEmitter, IBundledReceiver, IRedstoneEmitter, IRedstoneReceiver {
+	private class RedstoneCommunications implements IBundledEmitter, IBundledReceiver, IRedstoneEmitter, IRedstoneReceiver, ISimpleLogicSidedEmitter {
 		private final EnumFacing side;
 
 		RedstoneCommunications(EnumFacing side) {
@@ -94,6 +95,11 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		@Override
 		public void onRedstoneInputChange() {
 			onChanged();
+		}
+
+		@Override
+		public EnumFacing getEmitterFace() {
+			return PartGate.this.orientation.facing.getOpposite();
 		}
 	}
 
@@ -293,9 +299,9 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 				} else {
 					TileEntity tile = w.getTileEntity(p);
 					if (tile != null && tile.hasCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite())) {
-						// TODO: FIXME - this is a hack
-						if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing.getOpposite()) {
-							v = (byte) tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite()).getRedstoneSignal();
+						IRedstoneEmitter emitter = tile.getCapability(Capabilities.REDSTONE_EMITTER, real.getOpposite());
+						if (!(emitter instanceof ISimpleLogicSidedEmitter) || ((ISimpleLogicSidedEmitter) emitter).getEmitterFace() == getOrientation().facing.getOpposite()) {
+							v = (byte) emitter.getRedstoneSignal();
 						}
 					} else {
 						IBlockState s = w.getBlockState(p);
@@ -354,9 +360,9 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 				BlockPos p = getPos().offset(real);
 				TileEntity tile = w.getTileEntity(p);
 				if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
-					// TODO: FIXME - this is a hack
-					if (!(tile instanceof TileWire) || ((TileWire) tile).getWire().getLocation().facing == getOrientation().facing.getOpposite()) {
-						return tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite()).getBundledSignal();
+					IBundledEmitter emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite());
+					if (!(emitter instanceof ISimpleLogicSidedEmitter) || ((ISimpleLogicSidedEmitter) emitter).getEmitterFace() == getOrientation().facing.getOpposite()) {
+						return emitter.getBundledSignal();
 					}
 				}
 			}

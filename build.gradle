@@ -24,7 +24,7 @@ apply plugin: 'net.minecrell.licenser'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-version = "0.5.4.8"
+version = "0.5.5.0a"
 group = "pl.asie.charset"
 archivesBaseName = "Charset"
 
@@ -40,12 +40,12 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.4.2747"
+	version = "1.12.2-14.23.4.2750"
 
 	runDir = "run"
 	useDepAts = true
 	makeObfSourceJar = false
-	mappings = "snapshot_20180722"
+	mappings = "snapshot_20180814"
 
 	replace '@VERSION@', project.version
 	replace '@MC_VERSION@', version
@@ -131,7 +131,7 @@ dependencies {
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12:api"
 	deobfCompile name: "infraredstone", version: "1.12.2-1.2.104-api"
 	deobfCompile name: "InventoryTweaks", version: "1.63-api"
-	deobfCompile "mezz.jei:jei_1.12.2:4.11.0.205"
+	deobfCompile "mezz.jei:jei_1.12.2:4.12.0.214"
 	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.5.1_66"
 	deobfCompile "com.elytradev:mirage:2.0.3-rc3-SNAPSHOT"
 	deobfCompile "li.cil.oc:OpenComputers:MC1.12-1.7.+:api"

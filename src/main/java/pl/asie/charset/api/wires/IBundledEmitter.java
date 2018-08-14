@@ -22,6 +22,8 @@
 
 package pl.asie.charset.api.wires;
 
+import net.minecraft.util.EnumFacing;
+
 import javax.annotation.Nullable;
 
 /**
@@ -37,4 +39,8 @@ public interface IBundledEmitter {
 	 * @return A byte array of length 16 with each value in it being in the range <0, 15> or null.
 	 */
 	@Nullable byte[] getBundledSignal();
+
+	default boolean bundledEmitterRestsOnFace(EnumFacing face) {
+		return true;
+	}
 }

@@ -22,6 +22,10 @@
 
 package pl.asie.charset.api.wires;
 
+import net.minecraft.util.EnumFacing;
+
+import javax.annotation.Nullable;
+
 /**
  * Implement this class as a capability if you want to
  * emit a redstone cable signal. Keep in mind, however,

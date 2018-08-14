@@ -17,30 +17,10 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib.capability.staging;
+package pl.asie.charset.lib.misc;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import pl.asie.charset.lib.stagingapi.IConfigurationHolder;
+import net.minecraft.util.EnumFacing;
 
-public class DefaultConfigurationHolder implements IConfigurationHolder {
-	@Override
-	public ResourceLocation getConfigType() {
-		return new ResourceLocation("charset:dummy");
-	}
-
-	@Override
-	public boolean acceptsConfigType(ResourceLocation location) {
-		return false;
-	}
-
-	@Override
-	public NBTTagCompound serializeConfig() {
-		return new NBTTagCompound();
-	}
-
-	@Override
-	public DeserializationResult deserializeConfig(NBTTagCompound compound, ResourceLocation type) {
-		return DeserializationResult.INVALID;
-	}
+public interface ISimpleLogicSidedEmitter {
+	EnumFacing getEmitterFace();
 }

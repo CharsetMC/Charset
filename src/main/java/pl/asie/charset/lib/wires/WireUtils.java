@@ -36,6 +36,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import pl.asie.charset.api.wires.WireFace;
+import pl.asie.charset.lib.misc.ISimpleLogicSidedEmitter;
 import pl.asie.charset.lib.modcompat.mcmultipart.MCMPUtils;
 import pl.asie.charset.lib.utils.MultipartUtils;
 
@@ -76,6 +77,13 @@ public final class WireUtils {
 
         TileEntity tile = wire.getContainer().world().getTileEntity(pos);
         boolean result = tile != null && tile.hasCapability(capability, face);
+        if (result) {
+            Object o = tile.getCapability(capability, face);
+            if (o instanceof ISimpleLogicSidedEmitter && ((ISimpleLogicSidedEmitter) o).getEmitterFace() != wire.getLocation().facing) {
+                result = false;
+            }
+        }
+
         TileWire.isWireCheckingForCaps = false;
         return result;
     }
