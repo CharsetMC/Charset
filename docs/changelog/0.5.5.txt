@@ -7,6 +7,8 @@ Additions:
 * New module: tools.engineering!
     * New tool: Signal Meter! Lets you measure the signal strength of vanilla redstone and SimpleLogic wires.
     * New tool: Stopwatch! Lets you measure time between two block updates.
+    * New tool: Tuning Fork! Lets you copy and paste block configurations.
+    * Moved Wrench from tools.building.wrench to tools.engineering.
 
 Changes:
 

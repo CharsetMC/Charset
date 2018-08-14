@@ -43,6 +43,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.lib.item.FontRendererFancy;
 import pl.asie.charset.lib.notify.component.NotificationComponent;
 import pl.asie.charset.lib.utils.EntityUtils;
 
@@ -198,7 +199,13 @@ public class NotifyProxyClient extends NotifyProxy {
         int width = 0;
         String[] lines = m.msgRendered.split("\n");
 
-        FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+        FontRenderer fr;
+        try {
+            fr = new FontRendererFancy(Minecraft.getMinecraft().fontRenderer);
+        } catch (IllegalAccessException e) {
+            fr = Minecraft.getMinecraft().fontRenderer;
+        }
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder worldrenderer = tessellator.getBuffer();
 

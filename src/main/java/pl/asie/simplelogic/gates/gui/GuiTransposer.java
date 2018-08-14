@@ -91,6 +91,7 @@ public class GuiTransposer extends GuiContainerCharset<ContainerGate> {
 
 		for (int step = 0; step < 9; step++, x += xd, y += yd) {
 			int col = (step & 1) == 0 ? color1 : color2;
+			if (col == 0) continue;
 			builder.pos(x, y, 0).color((col >> 16) & 0xFF, (col >> 8) & 0xFF, (col) & 0xFF, (col >> 24) & 0xFF).endVertex();
 			if (step < 8) builder.pos(x+xd, y+yd, 0).color((col >> 16) & 0xFF, (col >> 8) & 0xFF, (col) & 0xFF, (col >> 24) & 0xFF).endVertex();
 		}
@@ -128,12 +129,13 @@ public class GuiTransposer extends GuiContainerCharset<ContainerGate> {
 			if (col == 16) {
 				for (int i = 0; i < 16; i++) {
 					int c1 = EnumDyeColor.byMetadata(i).getColorValue() | 0xFF000000;
-					int c2 = 0xFF000000;
+					int c2 = GuiScreen.isShiftKeyDown() ? 0 : c1;
 					drawLine(xBase + 12 + i * 9, yBase + pressedButton.y + (pressedButton.bottomRow ? 0 : 9), mouseX, mouseY, c1, c2);
 				}
 			} else {
-				int c = EnumDyeColor.byMetadata(col).getColorValue() | 0xFF000000;
-				drawLine(xBase + pressedButton.x + 5, yBase + pressedButton.y + (pressedButton.bottomRow ? 0 : 9), mouseX, mouseY, c, c);
+				int c1 = EnumDyeColor.byMetadata(col).getColorValue() | 0xFF000000;
+				int c2 = GuiScreen.isShiftKeyDown() ? 0 : c1;
+				drawLine(xBase + pressedButton.x + 5, yBase + pressedButton.y + (pressedButton.bottomRow ? 0 : 9), mouseX, mouseY, c1, c2);
 			}
 		}
 

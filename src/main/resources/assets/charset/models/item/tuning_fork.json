@@ -1,0 +1,7 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "charset:items/tools/tuning_fork",
+    "layer1": "charset:items/tools/tuning_fork"
+  }
+}

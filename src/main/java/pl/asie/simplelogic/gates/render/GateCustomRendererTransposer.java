@@ -51,6 +51,9 @@ public class GateCustomRendererTransposer extends GateCustomRenderer<GateLogicBu
 		}
 
 		float width = 0.125f/16f;
+		if (isItem) {
+			width *= 2;
+		}
 
 		// SOUTH -> NORTH
 		for (int from = 0; from < 16; from++) {
@@ -83,7 +86,7 @@ public class GateCustomRendererTransposer extends GateCustomRenderer<GateLogicBu
 							float qx2 = (x + xd) / 16f;
 							float qy2 = (y + yd) / 16f;
 
-							VertexFormat fmt = DefaultVertexFormats.BLOCK;
+							VertexFormat fmt = isItem ? DefaultVertexFormats.ITEM : DefaultVertexFormats.BLOCK;
 							UnpackedBakedQuad.Builder quad = new UnpackedBakedQuad.Builder(fmt);
 							quad.setTexture(WHITE);
 							quad.setQuadOrientation(EnumFacing.UP);

@@ -35,6 +35,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
@@ -212,23 +213,26 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing direction) {
 		return capability == Capabilities.DEBUGGABLE || capability == Capabilities.SIGNAL_METER_DATA_PROVIDER
-				|| (capability == SimpleLogicGates.GATE_CAP && direction == getSide()) || hasRedstoneCapability(capability, direction) || super.hasCapability(capability, direction);
+				|| (capability == SimpleLogicGates.GATE_CAP && direction == getSide()) || hasRedstoneCapability(capability, direction)
+				|| (logic instanceof ICapabilityProvider && ((ICapabilityProvider) logic).hasCapability(capability, direction)) || super.hasCapability(capability, direction);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T getCapability(Capability<T> capability, EnumFacing enumFacing) {
+	public <T> T getCapability(Capability<T> capability, EnumFacing direction) {
 		if (capability == Capabilities.DEBUGGABLE || capability == SimpleLogicGates.GATE_CAP || capability == Capabilities.SIGNAL_METER_DATA_PROVIDER) {
 			return (T) this;
-		} else if (hasRedstoneCapability(capability, enumFacing)) {
-			EnumFacing dir = realToGate(enumFacing);
+		} else if (hasRedstoneCapability(capability, direction)) {
+			EnumFacing dir = realToGate(direction);
 			if (dir.ordinal() >= 2) {
 				return (T) COMMS[dir.ordinal() - 2];
 			} else {
 				return null;
 			}
+		} else if (logic instanceof ICapabilityProvider && ((ICapabilityProvider) logic).hasCapability(capability, direction)) {
+			return ((ICapabilityProvider) logic).getCapability(capability, direction);
 		} else {
-			return super.getCapability(capability, enumFacing);
+			return super.getCapability(capability, direction);
 		}
 	}
 

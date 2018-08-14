@@ -32,7 +32,7 @@ public class SignalMeterDataBundledWire implements ISignalMeterDataBands, ISigna
 	}
 
 	public SignalMeterDataBundledWire(byte[] data) {
-		this.data = data;
+		this.data = data != null ? data : new byte[16];
 	}
 
 	@Override

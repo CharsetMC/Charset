@@ -23,32 +23,61 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
+import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.stagingapi.IConfigurationHolder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
-public class GateLogicBundledTransposer extends GateLogic {
+public class GateLogicBundledTransposer extends GateLogic implements ICapabilityProvider, IConfigurationHolder {
 	public int[] transpositionMap = new int[16]; // int[from] & to
 	private int tMapHash = 0;
 
+	private boolean readTmap(NBTTagCompound tag) {
+		if (tag.hasKey("tmap", Constants.NBT.TAG_INT_ARRAY)) {
+			int[] oldTranspositionMap = transpositionMap;
+			transpositionMap = ensureSizeAndCopy(tag.getIntArray("tmap"), 16);
+			tMapHash = Arrays.hashCode(transpositionMap);
+			return !Arrays.equals(oldTranspositionMap, transpositionMap);
+		} else {
+			return false;
+		}
+	}
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag, boolean isClient) {
-		super.writeToNBT(tag, isClient);
-		tag.setIntArray("tmap", transpositionMap);
+		tag = super.writeToNBT(tag, isClient);
+		if (isClient) {
+			tag.setIntArray("tmap", transpositionMap);
+		} else {
+			for (int i = 0; i < 16; i++) {
+				if (transpositionMap[i] != 0) {
+					tag.setIntArray("tmap", transpositionMap);
+					break;
+				}
+			}
+		}
+		return tag;
+	}
+
+	@Override
+	public NBTTagCompound writeItemNBT(NBTTagCompound tag, boolean silky) {
+		tag = super.writeItemNBT(tag, silky);
+		if (silky) {
+			tag.setIntArray("tmap", transpositionMap);
+		}
 		return tag;
 	}
 
 	@Override
 	public boolean readFromNBT(NBTTagCompound tag, boolean isClient) {
-		boolean update = super.readFromNBT(tag, isClient);
-		if (tag.hasKey("tmap", Constants.NBT.TAG_INT_ARRAY)) {
-			int[] oldTranspositionMap = transpositionMap;
-			transpositionMap = ensureSizeAndCopy(tag.getIntArray("tmap"), 16);
-			tMapHash = Arrays.hashCode(transpositionMap);
-			update |= !Arrays.equals(oldTranspositionMap, transpositionMap);
-		}
-		return update;
+		return super.readFromNBT(tag, isClient) | readTmap(tag);
 	}
 
 	@Override
@@ -135,5 +164,37 @@ public class GateLogicBundledTransposer extends GateLogic {
 	@Override
 	public int renderHashCode(int hash) {
 		return hash * 31 + tMapHash;
+	}
+
+	@Override
+	public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
+		return capability == Capabilities.CONFIGURATION_HOLDER;
+	}
+
+	@Nullable
+	@Override
+	public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+		return capability == Capabilities.CONFIGURATION_HOLDER ? Capabilities.CONFIGURATION_HOLDER.cast(this) : null;
+	}
+
+	@Override
+	public ResourceLocation getConfigType() {
+		return new ResourceLocation("simplelogic:bundled_transposer");
+	}
+
+	@Override
+	public NBTTagCompound serializeConfig() {
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setIntArray("tmap", transpositionMap);
+		return tag;
+	}
+
+	@Override
+	public DeserializationResult deserializeConfig(NBTTagCompound compound, ResourceLocation type) {
+		if (compound.hasKey("tmap", Constants.NBT.TAG_INT_ARRAY)) {
+			return readTmap(compound) ? DeserializationResult.CHANGED_ACCURATE : DeserializationResult.UNCHANGED;
+		} else {
+			return DeserializationResult.INVALID;
+		}
 	}
 }

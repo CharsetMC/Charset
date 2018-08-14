@@ -43,7 +43,11 @@ public class SignalMeterTrackerEventHandler {
 						}
 
 //						if (data != null) {
-						CharsetToolsEngineering.packet.sendTo(new PacketSignalMeterData(data), event.player);
+						try {
+							CharsetToolsEngineering.packet.sendTo(new PacketSignalMeterData(data), event.player);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 //						}
 					}
 				}

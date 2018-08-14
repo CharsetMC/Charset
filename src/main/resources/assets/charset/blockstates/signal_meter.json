@@ -7,7 +7,8 @@
     "variants": {
         "inventory": [{
             "textures": {
-                "layer0": "simplelogic:items/meter"
+                "layer0": "charset:items/tools/signal_meter_inner",
+                "layer1": "charset:items/tools/signal_meter_outer"
             }
         }]
     }
