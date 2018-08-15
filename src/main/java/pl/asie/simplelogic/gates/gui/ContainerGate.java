@@ -23,6 +23,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.EnumFacing;
 import pl.asie.charset.lib.inventory.ContainerBase;
 import pl.asie.simplelogic.gates.PartGate;
+import pl.asie.simplelogic.gates.logic.IGateContainer;
 
 public class ContainerGate extends ContainerBase {
 	protected final PartGate gate;
@@ -30,6 +31,10 @@ public class ContainerGate extends ContainerBase {
 	public ContainerGate(InventoryPlayer inventoryPlayer, PartGate gate) {
 		super(inventoryPlayer);
 		this.gate = gate;
+	}
+
+	public IGateContainer getGate() {
+		return gate;
 	}
 
 	@Override
