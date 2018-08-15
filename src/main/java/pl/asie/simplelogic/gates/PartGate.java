@@ -267,8 +267,9 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 			if (!getWorld().isRemote) {
 				if (pendingTick >= 0 && world.getTotalWorldTime() >= pendingTick && logic.shouldTick()) {
 					pendingTick = -1;
-					if (logic.tick(this)) {
-						markGateChanged(logic.updateOutputs(this));
+					markGateChanged(true);
+					if (logic.updateInputs(this)) {
+						logic.onChanged(this);
 					}
 				}
 			}
@@ -404,7 +405,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	}
 
 	protected void onChanged() {
-		if (logic.updateInputs(this)) {
+		if (pendingTick < 0 && logic.updateInputs(this)) {
 			logic.onChanged(this);
 		}
 	}
@@ -545,12 +546,8 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		}
 
 		if (changed) {
-			if (!remote) {
-				onChanged();
-				markBlockForUpdate();
-			} else {
-				markBlockForRenderUpdate();
-			}
+			logic.updateInputs(this);
+			logic.onChanged(this);
 			return true;
 		} else {
 			return false;
