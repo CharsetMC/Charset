@@ -9,6 +9,7 @@ Additions:
     * New tool: Stopwatch! Lets you measure time between two block updates.
     * New tool: Tuning Fork! Lets you copy and paste block configurations.
     * Moved Wrench from tools.building.wrench to tools.engineering.
+* New debugging command: /ch gateTickLength, to get/set the gate tick length!
 
 Changes:
 
@@ -19,6 +20,8 @@ Changes:
 Bugs fixed:
 
 * [simplelogic.*] [GitHub/#297] Assorted precise gate/wire logic timing bugs
+* [simplelogic.gates] [GitHub/#328] Gate "quantum states" upon mid-tick wire state changes
+* [simplelogic.gates] [GitHub/#325] Timer head not rendering in multiplayer
 * [simplelogic.gates] [GitHub/#318] Can't disable timer output because the GUI opens
 * [simplelogic.gates] [GitHub/#313] Bugs with multiple unconnected bundled gates in one block space
 * [simplelogic.gates] [GitHub/#304] Fix OR and NOR gate torch state

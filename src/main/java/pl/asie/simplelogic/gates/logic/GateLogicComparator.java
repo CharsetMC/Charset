@@ -68,7 +68,9 @@ public class GateLogicComparator extends GateLogic {
 	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		if (!playerIn.isSneaking()) {
 			mode = (byte) (1 - mode);
-			gate.markGateChanged(false);
+			if (!(gate.getGateWorld().isRemote)) {
+				gate.markGateChanged(true);
+			}
 		}
 
 		gate.createNotice(NotificationComponentString.translated("notice.simplelogic.gate.comparator.mode." + mode))

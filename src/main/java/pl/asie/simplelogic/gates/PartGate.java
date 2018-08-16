@@ -123,6 +123,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 
 	public boolean mirrored;
 	public GateLogic logic;
+	private long tickScheduleTime = -1;
 	private long pendingTick = -1;
 
 	private Orientation orientation = Orientation.FACE_UP_POINT_NORTH;
@@ -407,7 +408,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	}
 
 	protected void onChanged() {
-		if (pendingTick < 0 && logic.updateInputs(this)) {
+		if ((pendingTick < 0 || tickScheduleTime == world.getTotalWorldTime()) && logic.updateInputs(this)) {
 			logic.onChanged(this);
 		}
 	}
@@ -425,6 +426,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 	public void scheduleTick(int duration) {
 		if (pendingTick < 0) {
 			pendingTick = world.getTotalWorldTime() + duration;
+			tickScheduleTime = world.getTotalWorldTime();
 		} else {
 			pendingTick = Math.min(pendingTick, world.getTotalWorldTime() + duration);
 		}
@@ -545,7 +547,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 			}
 
 			if (!changed) {
-				logic.onRightClick(this, playerIn, vec, hand);
+				changed = logic.onRightClick(this, playerIn, vec, hand);
 			}
 		}
 

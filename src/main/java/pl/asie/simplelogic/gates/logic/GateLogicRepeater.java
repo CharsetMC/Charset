@@ -66,7 +66,9 @@ public class GateLogicRepeater extends GateLogic {
 	public boolean onRightClick(IGateContainer gate, EntityPlayer playerIn, Vec3d vec, EnumHand hand) {
 		if (!playerIn.isSneaking()) {
 			valueMode = (byte) ((valueMode + 1) % signalValues.length);
-			gate.markGateChanged(true);
+			if (!(gate.getGateWorld().isRemote)) {
+				gate.markGateChanged(true);
+			}
 		}
 
 		gate.createNotice(NotificationComponentString.translated("notice.simplelogic.gate.repeater.ticks", NotificationComponentString.raw(Integer.toString(signalValues[valueMode]))))

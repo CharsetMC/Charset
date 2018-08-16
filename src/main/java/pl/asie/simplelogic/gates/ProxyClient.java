@@ -70,7 +70,6 @@ public class ProxyClient extends ProxyCommon {
 				},
 				SimpleLogicGates.itemGate);
 
-
 		SimpleLogicGatesClient.INSTANCE.registerRenderer(new GateCustomRendererTransposer());
 		SimpleLogicGatesClient.INSTANCE.registerRenderer(new GateCustomRendererArrow() {
 			@Override

@@ -270,11 +270,11 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 			}
 		}
 
-		finishPropagation();
-
 		if (newSignal == 0) {
 			propagate(color);
 		}
+
+		finishPropagation();
 	}
 
 	@Override

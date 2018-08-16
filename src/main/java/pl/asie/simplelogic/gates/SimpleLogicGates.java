@@ -53,6 +53,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
+import pl.asie.charset.lib.command.CommandCharset;
+import pl.asie.charset.lib.command.SubCommandAt;
 import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
 import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.handlers.ShiftScrollHandler;
@@ -210,6 +212,8 @@ public class SimpleLogicGates {
 		for (PartGate p : addonEvent.getGateStackPartList()) {
 			registerGateStack(ItemGate.getStack(p));
 		}
+
+		CommandCharset.register(new SubCommandGateTickLength());
 
 		proxy.init();
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(itemGate));
