@@ -14,9 +14,12 @@
   "pattern": [
     "sss",
     "bbb",
-    "sss"
+    "sos"
   ],
   "key": {
+    "o": {
+      "item": "minecraft:obsidian"
+    },
     "b": {
       "type": "forge:ore_dict",
       "ore": "wireLogicBundled"

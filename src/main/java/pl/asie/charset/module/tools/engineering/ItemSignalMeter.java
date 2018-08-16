@@ -19,6 +19,8 @@
 
 package pl.asie.charset.module.tools.engineering;
 
+import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.item.ItemStack;
 import pl.asie.charset.lib.item.ItemBase;
 
 public class ItemSignalMeter extends ItemBase {
@@ -26,5 +28,12 @@ public class ItemSignalMeter extends ItemBase {
 		super();
 		setMaxStackSize(1);
 		setTranslationKey("charset.signal_meter");
+	}
+
+	public static class Color implements IItemColor {
+		@Override
+		public int colorMultiplier(ItemStack stack, int tintIndex) {
+			return tintIndex == 1 ? 0xFFEDE740 : -1;
+		}
 	}
 }

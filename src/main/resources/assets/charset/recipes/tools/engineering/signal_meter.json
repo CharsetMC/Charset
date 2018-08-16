@@ -1,0 +1,38 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "tools.engineering"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:signal_meter",
+  "pattern": [
+    "prp",
+    "igi",
+    "prp"
+  ],
+  "key": {
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "stone"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "paneGlass"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    },
+    "r": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    }
+  },
+  "result": {
+    "item": "charset:signal_meter",
+    "data": 0,
+    "count": 1
+  }
+}

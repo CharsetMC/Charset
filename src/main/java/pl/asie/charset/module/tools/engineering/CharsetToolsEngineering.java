@@ -25,6 +25,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -130,6 +131,12 @@ public class CharsetToolsEngineering {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerItemColors(ColorHandlerEvent.Item event) {
+		event.getItemColors().registerItemColorHandler(new ItemSignalMeter.Color(), signalMeter);
 	}
 
 	@SubscribeEvent

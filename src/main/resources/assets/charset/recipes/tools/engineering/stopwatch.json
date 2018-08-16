@@ -1,0 +1,26 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "tools.engineering"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:stopwatch",
+  "pattern": [
+    "a",
+    "b"
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:tripwire_hook"
+    },
+    "b": {
+      "item": "minecraft:clock"
+    }
+  },
+  "result": {
+    "item": "charset:stopwatch",
+    "count": 1
+  }
+}
