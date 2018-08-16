@@ -36,12 +36,76 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class GateCustomRendererTransposer extends GateCustomRenderer<GateLogicBundledTransposer> {
-	public static TextureAtlasSprite WHITE;
+	public static TextureAtlasSprite STRIPES, WHITE;
 	public static IBakedModel[] rayModels;
 
 	@Override
 	public Class<GateLogicBundledTransposer> getLogicClass() {
 		return GateLogicBundledTransposer.class;
+	}
+
+	private BakedQuad makeQuad(float x1, float x2, float y1, float y2, float width, float height, int col, TextureAtlasSprite sprite, boolean isItem, boolean invertY) {
+		VertexFormat fmt = isItem ? DefaultVertexFormats.ITEM : DefaultVertexFormats.BLOCK;
+		UnpackedBakedQuad.Builder quad = new UnpackedBakedQuad.Builder(fmt);
+		quad.setTexture(sprite);
+		quad.setQuadOrientation(EnumFacing.UP);
+		quad.setApplyDiffuseLighting(true);
+		quad.setContractUVs(false);
+		quad.setQuadTint(-1);
+
+		for (int vc = 0; vc < 4; vc++) {
+			for (int el = 0; el < fmt.getElementCount(); el++) {
+				switch (fmt.getElement(el).getUsage()) {
+					case POSITION:
+						switch (vc) {
+							case 0:
+								quad.put(el, x1 - width, height, y1);
+								break;
+							case 1:
+								quad.put(el, x1 + width, height, y1);
+								break;
+							case 2:
+								quad.put(el, x2 + width, height, y2);
+								break;
+							case 3:
+								quad.put(el, x2 - width, height, y2);
+								break;
+						}
+						break;
+					case NORMAL:
+						quad.put(el, 0, 1, 0);
+						break;
+					case COLOR:
+						quad.put(el, ((col >> 16) & 0xFF) / 255.0f, ((col >> 8) & 0xFF) / 255.0f, ((col) & 0xFF) / 255.0f, ((col >> 24) & 0xFF) / 255.0f);
+						break;
+					case UV:
+						if (fmt.getElement(el).getIndex() == 0) {
+							switch (vc) {
+								case 0:
+									quad.put(el, sprite.getMinU(), invertY ? sprite.getMinV() : sprite.getMaxV());
+									break;
+								case 1:
+									quad.put(el, sprite.getMaxU(), invertY ? sprite.getMinV() : sprite.getMaxV());
+									break;
+								case 2:
+									quad.put(el, sprite.getMaxU(), !invertY ? sprite.getMinV() : sprite.getMaxV());
+									break;
+								case 3:
+									quad.put(el, sprite.getMinU(), !invertY ? sprite.getMinV() : sprite.getMaxV());
+									break;
+							}
+						} else {
+							quad.put(el);
+						}
+						break;
+					default:
+						quad.put(el);
+						break;
+				}
+			}
+		}
+
+		return quad.build();
 	}
 
 	@Override
@@ -74,66 +138,11 @@ public class GateCustomRendererTransposer extends GateCustomRenderer<GateLogicBu
 						float y2 = 4.975F;
 						float height = 3f / 16f - ((from * 16 + i) / 65536f);
 
-						float x = x1;
-						float y = y1;
-						float xd = (x2 - x1) / 8f;
-						float yd = (y2 - y1) / 8f;
-
-						for (int step = 0; step < 8; step++, x += xd, y += yd) {
-							int col = (step & 1) == 0 ? color1 : color2;
-							float qx1 = x / 16f;
-							float qy1 = y / 16f;
-							float qx2 = (x + xd) / 16f;
-							float qy2 = (y + yd) / 16f;
-
-							VertexFormat fmt = isItem ? DefaultVertexFormats.ITEM : DefaultVertexFormats.BLOCK;
-							UnpackedBakedQuad.Builder quad = new UnpackedBakedQuad.Builder(fmt);
-							quad.setTexture(WHITE);
-							quad.setQuadOrientation(EnumFacing.UP);
-							quad.setApplyDiffuseLighting(true);
-							quad.setContractUVs(false);
-							quad.setQuadTint(-1);
-
-							for (int vc = 0; vc < 4; vc++) {
-								for (int el = 0; el < fmt.getElementCount(); el++) {
-									switch (fmt.getElement(el).getUsage()) {
-										case POSITION:
-											switch (vc) {
-												case 0:
-													quad.put(el, qx1 - width, height, qy1);
-													break;
-												case 1:
-													quad.put(el, qx1 + width, height, qy1);
-													break;
-												case 2:
-													quad.put(el, qx2 + width, height, qy2);
-													break;
-												case 3:
-													quad.put(el, qx2 - width, height, qy2);
-													break;
-											}
-											break;
-										case NORMAL:
-											quad.put(el, 0, 1, 0);
-											break;
-										case COLOR:
-											quad.put(el, ((col >> 16) & 0xFF) / 255.0f, ((col >> 8) & 0xFF) / 255.0f, ((col) & 0xFF) / 255.0f, ((col >> 24) & 0xFF) / 255.0f);
-											break;
-										case UV:
-											if (fmt.getElement(el).getIndex() == 0) {
-												quad.put(el, WHITE.getMinU(), WHITE.getMinV());
-											} else {
-												quad.put(el);
-											}
-											break;
-										default:
-											quad.put(el);
-											break;
-									}
-								}
-							}
-
-							model.addQuad(null, quad.build());
+						if (color1 == color2) {
+							model.addQuad(null, makeQuad(x1/16f, x2/16f, y1/16f, y2/16f, width, height, color1, WHITE, isItem, false));
+						} else {
+							model.addQuad(null, makeQuad(x1/16f, x2/16f, y1/16f, y2/16f, width, height, color1, STRIPES, isItem, false));
+							model.addQuad(null, makeQuad(x1/16f, x2/16f, y1/16f, y2/16f, width, height, color2, STRIPES, isItem, true));
 						}
 
 						rayModels[pos] = model;

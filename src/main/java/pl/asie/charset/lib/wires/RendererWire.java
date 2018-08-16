@@ -109,6 +109,18 @@ public class RendererWire extends ModelFactory<Wire> {
     	float maxZ = maxX;
 
     	int dirP = dirI;
+	    switch (facing) {
+		    case UP:
+		    	if (dirP < 2)
+		    		dirP ^= 1;
+			    break;
+		    case SOUTH:
+		    case EAST:
+			    if (dirP >= 2)
+				    dirP ^= 1;
+		    	break;
+	    }
+
 	    switch (dirP) {
 		    case 0:
 			    minZ = 0.0f;
@@ -160,6 +172,17 @@ public class RendererWire extends ModelFactory<Wire> {
     		// Render the top face as up to five quads
 		    EnumFacing[] dirs = WireUtils.getConnectionsForRender(WireFace.get(EnumFacing.byIndex(facing.ordinal() & (~1))));
 		    addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, -1, from, to, quads, connMask, rot);
+
+		    switch (facing) {
+			    case UP:
+			    	connMask = (connMask & 3) | ((connMask & 8) >> 1) | ((connMask & 4) << 1);
+			    	break;
+			    case SOUTH:
+			    case EAST:
+				    connMask = (connMask & 12) | ((connMask & 2) >> 1) | ((connMask & 1) << 1);
+				    break;
+		    }
+
 		    if ((connMask & 8) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 0, from, to, quads, connMask, rot);
 		    if ((connMask & 4) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 1, from, to, quads, connMask, rot);
 		    if ((connMask & 2) != 0) addTopFaceCplxInner(handler, wire, facing, renderFacing, dirs, 2, from, to, quads, connMask, rot);

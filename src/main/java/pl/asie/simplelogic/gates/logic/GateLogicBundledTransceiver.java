@@ -21,8 +21,6 @@ package pl.asie.simplelogic.gates.logic;
 
 import net.minecraft.util.EnumFacing;
 
-import java.util.Arrays;
-
 public class GateLogicBundledTransceiver extends GateLogic {
 	private int inputState = 0;
 
@@ -74,9 +72,9 @@ public class GateLogicBundledTransceiver extends GateLogic {
 	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return GateRenderState.input(getInputValueOutside(EnumFacing.WEST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.WEST, getInputValueOutside(EnumFacing.WEST));
 			case 1:
-				return GateRenderState.input(getInputValueOutside(EnumFacing.EAST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.EAST, getInputValueOutside(EnumFacing.EAST));
 			default:
 				return GateRenderState.DISABLED;
 		}

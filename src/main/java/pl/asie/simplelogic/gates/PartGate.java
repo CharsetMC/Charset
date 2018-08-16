@@ -524,26 +524,28 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 		}
 
 		if (!used) {
-			if (!(changed = logic.onRightClick(this, playerIn, vec, hand))) {
-				EnumFacing closestFace = getClosestFace(vec, facing -> true);
+			EnumFacing closestFace = getClosestFace(vec, facing -> true);
 
-				if (closestFace != null) {
-					if (logic.canInvertSide(closestFace) && logic.isSideInverted(closestFace)) {
+			if (closestFace != null) {
+				if (logic.canInvertSide(closestFace) && logic.isSideInverted(closestFace)) {
+					if (!remote) {
+						logic.invertedSides &= ~(1 << (closestFace.ordinal() - 2));
+						ItemUtils.spawnItemEntity(getWorld(), vecOrig.add(getPos().getX(), getPos().getY(), getPos().getZ()),
+								new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
+					}
+					changed = true;
+				} else if (playerIn.isSneaking()) {
+					if (logic.canBlockSide(closestFace)) {
 						if (!remote) {
-							logic.invertedSides &= ~(1 << (closestFace.ordinal() - 2));
-							ItemUtils.spawnItemEntity(getWorld(), vecOrig.add(getPos().getX(), getPos().getY(), getPos().getZ()),
-									new ItemStack(Blocks.REDSTONE_TORCH), 0.0f, 0.2f, 0.0f, 0.1f);
+							logic.enabledSides ^= (1 << (closestFace.ordinal() - 2));
 						}
 						changed = true;
-					} else if (playerIn.isSneaking()) {
-						if (logic.canBlockSide(closestFace)) {
-							if (!remote) {
-								logic.enabledSides ^= (1 << (closestFace.ordinal() - 2));
-							}
-							changed = true;
-						}
 					}
 				}
+			}
+
+			if (!changed) {
+				logic.onRightClick(this, playerIn, vec, hand);
 			}
 		}
 

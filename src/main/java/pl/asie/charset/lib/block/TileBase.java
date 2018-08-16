@@ -281,7 +281,7 @@ public class TileBase extends TileEntity {
 
 	public void markBlockForUpdate() {
 		IBlockState state = world.getBlockState(pos);
-		world.notifyBlockUpdate(pos, state, state, 3);
+		world.notifyBlockUpdate(pos, state, state, 2);
 	}
 
 	public void markChunkDirty() {

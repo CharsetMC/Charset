@@ -28,20 +28,11 @@ public class GateLogicNOR extends GateLogic {
 		case 0:
 			return GateRenderState.input(getOutputValueOutside(EnumFacing.NORTH));
 		case 1:
-			if (!isSideOpen(EnumFacing.WEST)) {
-				return GateRenderState.DISABLED;
-			}
-			return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
+			return GateRenderState.inputOrDisabled(this, EnumFacing.WEST, getInputValueInside(EnumFacing.WEST));
 		case 2:
-			if (!isSideOpen(EnumFacing.EAST)) {
-				return GateRenderState.DISABLED;
-			}
-			return GateRenderState.input(getInputValueInside(EnumFacing.EAST));
+			return GateRenderState.inputOrDisabled(this, EnumFacing.EAST, getInputValueInside(EnumFacing.EAST));
 		case 3:
-			if (!isSideOpen(EnumFacing.SOUTH)) {
-				return GateRenderState.DISABLED;
-			}
-			return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
+			return GateRenderState.inputOrDisabled(this, EnumFacing.SOUTH, getInputValueInside(EnumFacing.SOUTH));
 		case 4:
 			return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
 	}

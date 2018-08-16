@@ -19,6 +19,8 @@
 
 package pl.asie.simplelogic.gates.logic;
 
+import net.minecraft.util.EnumFacing;
+
 public enum GateRenderState {
 	NO_RENDER,
 	OFF,
@@ -33,6 +35,14 @@ public enum GateRenderState {
 				return OFF;
 			default:
 				return this;
+		}
+	}
+
+	public static GateRenderState inputOrDisabled(GateLogic logic, EnumFacing facing, byte v) {
+		if (!logic.isSideOpen(facing)) {
+			return GateRenderState.DISABLED;
+		} else {
+			return input(v);
 		}
 	}
 

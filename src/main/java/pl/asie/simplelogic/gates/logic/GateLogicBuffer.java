@@ -24,7 +24,7 @@ import net.minecraft.util.EnumFacing;
 public class GateLogicBuffer extends GateLogic {
 	@Override
 	public boolean canBlockSide(EnumFacing side) {
-		return side == EnumFacing.WEST || side == EnumFacing.EAST;
+		return side.getAxis() == EnumFacing.Axis.X;
 	}
 
 	@Override
@@ -41,15 +41,9 @@ public class GateLogicBuffer extends GateLogic {
 	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				if (!isSideOpen(EnumFacing.WEST)) {
-					return GateRenderState.DISABLED;
-				}
-				return GateRenderState.input(getOutputValueInside(EnumFacing.WEST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.WEST, getOutputValueInside(EnumFacing.WEST));
 			case 1:
-				if (!isSideOpen(EnumFacing.EAST)) {
-					return GateRenderState.DISABLED;
-				}
-				return GateRenderState.input(getOutputValueInside(EnumFacing.EAST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.EAST, getOutputValueInside(EnumFacing.EAST));
 			case 2:
 				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH)).invert();
 			case 3:

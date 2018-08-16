@@ -101,7 +101,7 @@ public class GateLogicSynchronizer extends GateLogic {
 	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.SOUTH, getInputValueInside(EnumFacing.SOUTH));
 			case 1:
 				return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
 			case 2:

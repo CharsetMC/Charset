@@ -68,11 +68,11 @@ public class GateLogicRandomizer extends GateLogic {
 			case 0:
 				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 1:
-				return GateRenderState.input(getOutputValueInside(EnumFacing.WEST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.WEST, getOutputValueInside(EnumFacing.WEST));
 			case 2:
-				return GateRenderState.input(getOutputValueInside(EnumFacing.NORTH));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.NORTH, getOutputValueInside(EnumFacing.NORTH));
 			case 3:
-				return GateRenderState.input(getOutputValueInside(EnumFacing.EAST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.EAST, getOutputValueInside(EnumFacing.EAST));
 		}
 		return null;
 	}

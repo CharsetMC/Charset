@@ -85,7 +85,7 @@ public class GateLogicRepeater extends GateLogic {
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag, boolean isClient) {
-		super.writeToNBT(tag, isClient);
+		tag = super.writeToNBT(tag, isClient);
 		tag.setByte("rtk", ticks);
 		tag.setByte("rrs", repeatedSignal);
 		tag.setByte("rvm", valueMode);
@@ -125,7 +125,9 @@ public class GateLogicRepeater extends GateLogic {
 
 	@Override
 	public void onChanged(IGateContainer gate) {
-		gate.markGateChanged(false);
+		if (!gate.getGateWorld().isRemote) {
+			gate.markGateChanged(false);
+		}
 
 		if (isRepeaterLocked() || (repeatedSignal != 0 && ticks < 1)) {
 			return;

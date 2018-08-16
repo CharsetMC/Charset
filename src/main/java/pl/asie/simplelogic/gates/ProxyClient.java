@@ -108,6 +108,7 @@ public class ProxyClient extends ProxyCommon {
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch(TextureStitchEvent.Pre event) {
 		GateCustomRendererTransposer.WHITE = event.getMap().registerSprite(new ResourceLocation("charset", "misc/white"));
+		GateCustomRendererTransposer.STRIPES = event.getMap().registerSprite(new ResourceLocation("simplelogic", "blocks/stripes"));
 		GateCustomRendererTransposer.rayModels = null;
 		SimpleLogicGates.sendAddonEventIfNotSent();
 

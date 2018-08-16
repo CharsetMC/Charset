@@ -70,8 +70,8 @@ public class GuiTransposer extends GuiContainerCharset<ContainerGate> {
 		super(container, 167, 76);
 
 		for (int i = 0; i <= 16; i++) {
-			buttonList.add(new TinyButton(i == 16 ? 85 : 76, 7 + i * 9 ,8, i, false));
-			buttonList.add(new TinyButton(i == 16 ? 85 : 76, 7 + i * 9 ,59, i, true));
+			buttonList.add(new TinyButton(i == 16 ? 85 : 76, 7 + i * 9 ,8, i, true));
+			buttonList.add(new TinyButton(i == 16 ? 85 : 76, 7 + i * 9 ,59, i, false));
 		}
 	}
 
@@ -118,7 +118,7 @@ public class GuiTransposer extends GuiContainerCharset<ContainerGate> {
 				if ((v & 1) != 0) {
 					int c1 = EnumDyeColor.byMetadata(from).getColorValue() | 0xDF000000;
 					int c2 = EnumDyeColor.byMetadata(i).getColorValue() | 0xDF000000;
-					drawLine(xBase + 12 + from * 9, yBase + 17, xBase + 12 + i * 9, yBase + 58, c1, c2);
+					drawLine(xBase + 12 + i * 9, yBase + 17, xBase + 12 + from * 9, yBase + 58, c1, c2);
 				}
 				v >>= 1; i++;
 			}
@@ -130,12 +130,12 @@ public class GuiTransposer extends GuiContainerCharset<ContainerGate> {
 				for (int i = 0; i < 16; i++) {
 					int c1 = EnumDyeColor.byMetadata(i).getColorValue() | 0xFF000000;
 					int c2 = GuiScreen.isShiftKeyDown() ? 0 : c1;
-					drawLine(xBase + 12 + i * 9, yBase + pressedButton.y + (pressedButton.bottomRow ? 0 : 9), mouseX, mouseY, c1, c2);
+					drawLine(xBase + 12 + i * 9, yBase + pressedButton.y + (!pressedButton.bottomRow ? 0 : 9), mouseX, mouseY, c1, c2);
 				}
 			} else {
 				int c1 = EnumDyeColor.byMetadata(col).getColorValue() | 0xFF000000;
 				int c2 = GuiScreen.isShiftKeyDown() ? 0 : c1;
-				drawLine(xBase + pressedButton.x + 5, yBase + pressedButton.y + (pressedButton.bottomRow ? 0 : 9), mouseX, mouseY, c1, c2);
+				drawLine(xBase + pressedButton.x + 5, yBase + pressedButton.y + (!pressedButton.bottomRow ? 0 : 9), mouseX, mouseY, c1, c2);
 			}
 		}
 

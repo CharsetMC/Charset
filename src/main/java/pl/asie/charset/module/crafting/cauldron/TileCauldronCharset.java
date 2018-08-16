@@ -56,7 +56,7 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 
 		if (isClient) {
 			rebuildFromStack(false);
-			markBlockForUpdate();
+			markBlockForRenderUpdate();
 		}
 	}
 
@@ -147,11 +147,9 @@ public class TileCauldronCharset extends TileBase implements ICauldron, IFluidHa
 			int currLevel = newLevel;
 			int desiredLevel = getVanillaLevelValue();
 			if (currLevel != desiredLevel) {
-				world.setBlockState(pos, state.withProperty(BlockCauldron.LEVEL, desiredLevel), 0);
+				world.setBlockState(pos, state.withProperty(BlockCauldron.LEVEL, desiredLevel), 3);
+				world.updateComparatorOutputLevel(pos, CharsetCraftingCauldron.blockCauldron);
 			}
-
-			world.updateComparatorOutputLevel(pos, CharsetCraftingCauldron.blockCauldron);
-			markBlockForUpdate();
 		}
 	}
 

@@ -23,6 +23,11 @@ import net.minecraft.util.EnumFacing;
 
 public class GateLogicXOR extends GateLogic {
 	@Override
+	public boolean canBlockSide(EnumFacing side) {
+		return false;
+	}
+
+	@Override
 	public GateConnection getType(EnumFacing dir) {
 		if (dir == EnumFacing.SOUTH) {
 			return GateConnection.NONE;

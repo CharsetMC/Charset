@@ -139,15 +139,20 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 
 	@Override
 	public boolean canBlockSide(EnumFacing side) {
-		return side.getAxis() == EnumFacing.Axis.X;
+		return true;
 	}
 
 	@Override
 	public GateRenderState getLayerState(int id) {
 		switch (id) {
 			case 0:
-				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.SOUTH, getInputValueInside(EnumFacing.SOUTH));
 			case 1:
+				return !isSideOpen(EnumFacing.WEST) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered());
+			case 2:
+				return !isSideOpen(EnumFacing.NORTH) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered());
+			case 3:
+				return !isSideOpen(EnumFacing.EAST) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered());
 			default:
 				return GateRenderState.bool(isPowered());
 		}

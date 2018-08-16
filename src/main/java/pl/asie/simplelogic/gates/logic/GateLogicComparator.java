@@ -83,9 +83,9 @@ public class GateLogicComparator extends GateLogic {
 			case 1:
 				return GateRenderState.input(getInputValueInside(EnumFacing.SOUTH));
 			case 2:
-				return GateRenderState.input(getInputValueInside(EnumFacing.WEST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.WEST, getInputValueInside(EnumFacing.WEST));
 			case 3:
-				return GateRenderState.input(getInputValueInside(EnumFacing.EAST));
+				return GateRenderState.inputOrDisabled(this, EnumFacing.EAST, getInputValueInside(EnumFacing.EAST));
 			default:
 				return GateRenderState.OFF;
 		}

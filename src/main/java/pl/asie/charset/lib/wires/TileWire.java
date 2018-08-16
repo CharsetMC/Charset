@@ -134,7 +134,9 @@ public class TileWire extends TileBase implements IMultipartTile, IWireContainer
 
     @Override
     public void requestRenderUpdate() {
-        requestNetworkUpdate();
+        if (world != null && !world.isRemote) {
+            requestNetworkUpdate();
+        }
         markBlockForRenderUpdate();
     }
 
