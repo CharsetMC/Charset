@@ -34,6 +34,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -47,10 +48,7 @@ import pl.asie.simplelogic.gates.gui.GuiTimer;
 import pl.asie.simplelogic.gates.gui.GuiTransposer;
 import pl.asie.simplelogic.gates.logic.GateLogicBundledTransposer;
 import pl.asie.simplelogic.gates.logic.GateLogicTimer;
-import pl.asie.simplelogic.gates.render.GateCustomRendererArrow;
-import pl.asie.simplelogic.gates.render.GateCustomRendererTransposer;
-import pl.asie.simplelogic.gates.render.GateRenderDefinitions;
-import pl.asie.simplelogic.gates.render.RendererGate;
+import pl.asie.simplelogic.gates.render.*;
 import pl.asie.charset.lib.utils.RegistryUtils;
 
 public class ProxyClient extends ProxyCommon {
@@ -81,6 +79,7 @@ public class ProxyClient extends ProxyCommon {
 		SimpleLogicGatesClient.INSTANCE.registerGui(GateLogicTimer.class, GuiTimer::new);
 		SimpleLogicGatesClient.INSTANCE.registerGui(GateLogicBundledTransposer.class, GuiTransposer::new);
 
+		ClientRegistry.bindTileEntitySpecialRenderer(PartGate.class, new FastTESRGate());
 		MinecraftForge.EVENT_BUS.post(new GateRegisterClientEvent());
 	}
 

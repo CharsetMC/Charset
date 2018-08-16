@@ -42,6 +42,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.CharsetAPI;
+import pl.asie.charset.api.tools.IStopwatchTracker;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -64,10 +66,8 @@ public class CharsetToolsEngineering {
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
-	@CapabilityInject(StopwatchTracker.class)
-	static Capability<StopwatchTracker> stopwatchTrackerCap;
 	private static final ResourceLocation stopwatchTrackerLoc = new ResourceLocation("charset", "stopwatchTracker");
-	private static CapabilityProviderFactory<StopwatchTracker> stopwatchTrackerProvider;
+	private static CapabilityProviderFactory<IStopwatchTracker> stopwatchTrackerProvider;
 
 	@CapabilityInject(ISignalMeterTracker.class)
 	static Capability<ISignalMeterTracker> meterTrackerCap;
@@ -80,7 +80,6 @@ public class CharsetToolsEngineering {
 		signalMeter = new ItemSignalMeter();
 		//tapeMeasure = new ItemTapeMeasure();
 
-		CapabilityManager.INSTANCE.register(StopwatchTracker.class, DummyCapabilityStorage.get(), StopwatchTracker::new);
 		CapabilityManager.INSTANCE.register(ISignalMeterTracker.class, DummyCapabilityStorage.get(), SignalMeterTracker::new);
 
 		CharsetAPI.INSTANCE.findSimpleInstantiatingRegistry(ISignalMeterData.class).register(SignalMeterDataDummy.class, SignalMeterDataDummy::new);
@@ -143,7 +142,7 @@ public class CharsetToolsEngineering {
 	public void attachCapsWorld(AttachCapabilitiesEvent<World> event) {
 		if (!event.getObject().isRemote) {
 			if (stopwatchTrackerProvider == null) {
-				stopwatchTrackerProvider = new CapabilityProviderFactory<>(stopwatchTrackerCap);
+				stopwatchTrackerProvider = new CapabilityProviderFactory<>(Capabilities.STOPWATCH_TRACKER);
 			}
 
 			event.addCapability(stopwatchTrackerLoc, stopwatchTrackerProvider.create(new StopwatchTracker(event.getObject())));

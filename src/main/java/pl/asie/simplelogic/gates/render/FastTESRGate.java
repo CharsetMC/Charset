@@ -37,7 +37,7 @@ public class FastTESRGate extends FastTESR<PartGate> {
 	public void renderTileEntityFast(PartGate te, double x, double y, double z, float partialTicks, int destroyStage, float partial, BufferBuilder buffer) {
 		GateCustomRenderer gdr = SimpleLogicGatesClient.INSTANCE.getRenderer(te.logic.getClass());
 
-		if (SimpleLogicGates.useTESRs || (gdr != null && !gdr.hasDynamic())) {
+		if (SimpleLogicGates.useTESRs || (gdr != null && gdr.hasDynamic())) {
 			if (renderer == null) {
 				renderer = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer();
 			}

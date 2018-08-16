@@ -52,6 +52,7 @@ import pl.asie.charset.api.lib.*;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.pipes.IPipeView;
 import pl.asie.charset.api.storage.IBarrel;
+import pl.asie.charset.api.tools.IStopwatchTracker;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IBundledReceiver;
 import pl.asie.charset.api.wires.IRedstoneEmitter;
@@ -72,6 +73,7 @@ import pl.asie.charset.lib.capability.redstone.*;
 import pl.asie.charset.lib.capability.staging.DefaultConfigurationHolder;
 import pl.asie.charset.lib.capability.staging.DefaultSignalMeterDataProvider;
 import pl.asie.charset.lib.capability.storage.DummyBarrel;
+import pl.asie.charset.lib.capability.tools.DefaultStopwatchTracker;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperFluidStacks;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInsertionToItemHandler;
 import pl.asie.charset.lib.capability.wrappers.CapabilityWrapperInventory;
@@ -126,6 +128,9 @@ public class Capabilities {
 	@CapabilityInject(Lockable.class)
 	public static Capability<Lockable> LOCKABLE;
 
+	@CapabilityInject(IStopwatchTracker.class)
+	public static Capability<IStopwatchTracker> STOPWATCH_TRACKER;
+
 	@CapabilityInject(IMultiblockStructure.class)
 	public static Capability<IMultiblockStructure> MULTIBLOCK_STRUCTURE;
 	@CapabilityInject(CustomCarryHandler.Provider.class)
@@ -179,6 +184,8 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IBarrel.class, DummyCapabilityStorage.get(), DummyBarrel::new);
 		CapabilityManager.INSTANCE.register(Lockable.class, LOCKABLE_STORAGE, Lockable::new);
 		CapabilityManager.INSTANCE.register(IMultiblockStructure.class, DummyCapabilityStorage.get(), DefaultMultiblockStructure::new);
+
+		CapabilityManager.INSTANCE.register(IStopwatchTracker.class, DummyCapabilityStorage.get(), DefaultStopwatchTracker::new);
 
 		CapabilityManager.INSTANCE.register(ILaserReceiver.class, DummyCapabilityStorage.get(), DummyLaserReceiver::new);
 

@@ -32,6 +32,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.World;
+import pl.asie.charset.api.tools.IStopwatchTracker;
 import pl.asie.charset.lib.notify.Notice;
 import pl.asie.charset.lib.notify.NoticeStyle;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
@@ -40,14 +41,8 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
-public class StopwatchTracker implements IWorldEventListener {
-	public enum AddPositionResult {
-		START,
-		END
-	}
-
+public class StopwatchTracker implements IStopwatchTracker, IWorldEventListener {
 	private final World world;
 	private final Map<String, BlockPos> startPosMap = new HashMap<>();
 	private final Map<String, BlockPos> endPosMap = new HashMap<>();
@@ -66,6 +61,7 @@ public class StopwatchTracker implements IWorldEventListener {
 		world.addEventListener(this);
 	}
 
+	@Override
 	public boolean clearPosition(String key) {
 		BlockPos startPos = startPosMap.remove(key);
 		BlockPos endPos = endPosMap.remove(key);
@@ -81,6 +77,7 @@ public class StopwatchTracker implements IWorldEventListener {
 		return startPos != null || endPos != null;
 	}
 
+	@Override
 	public AddPositionResult addPosition(String key, BlockPos pos) {
 		if (endPosMap.containsKey(key)) {
 			clearPosition(key);
@@ -119,13 +116,12 @@ public class StopwatchTracker implements IWorldEventListener {
 			}
 		}
 	}
-
 	@Override
-	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
+	public void markChanged(BlockPos pos) {
 		for (String s : endPosListeners.get(pos)) {
 			long spt = startPosTimes.removeLong(s);
 			if (spt >= 0) {
-				long time = worldIn.getTotalWorldTime() - spt;
+				long time = world.getTotalWorldTime() - spt;
 				if (time > 0) {
 					notify(s, (player, stack) -> {
 						String timeStr = String.format("%d.%02d", time/20, (time%20)*5);
@@ -144,13 +140,18 @@ public class StopwatchTracker implements IWorldEventListener {
 
 		for (String s : startPosListeners.get(pos)) {
 			if (!startPosTimes.containsKey(s)) {
-				startPosTimes.put(s, worldIn.getTotalWorldTime());
+				startPosTimes.put(s, world.getTotalWorldTime());
 
 				/* notify(s, (player, stack) -> {
 					stack.setItemDamage(1);
 				}); */
 			}
 		}
+	}
+
+	@Override
+	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
+		markChanged(pos);
 	}
 
 	@Override

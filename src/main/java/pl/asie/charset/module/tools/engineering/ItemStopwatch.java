@@ -30,9 +30,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import pl.asie.charset.api.tools.IStopwatchTracker;
+import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.item.ItemBase;
 import pl.asie.charset.lib.notify.Notice;
-import pl.asie.charset.lib.notify.NoticeStyle;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.charset.lib.utils.ItemUtils;
 
@@ -62,8 +63,8 @@ public class ItemStopwatch extends ItemBase {
 		ItemStack stack = player.getHeldItem(hand);
 
 		if (!world.isRemote) {
-			if (world.hasCapability(CharsetToolsEngineering.stopwatchTrackerCap, null)) {
-				StopwatchTracker tracker = world.getCapability(CharsetToolsEngineering.stopwatchTrackerCap, null);
+			if (world.hasCapability(Capabilities.STOPWATCH_TRACKER, null)) {
+				IStopwatchTracker tracker = world.getCapability(Capabilities.STOPWATCH_TRACKER, null);
 				if (tracker.clearPosition(getKey(stack))) {
 					player.sendStatusMessage(new TextComponentTranslation("notice.charset.stopwatch.cleared"), true);
 				}
@@ -76,12 +77,12 @@ public class ItemStopwatch extends ItemBase {
 
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!world.isRemote && world.hasCapability(CharsetToolsEngineering.stopwatchTrackerCap, null)) {
+		if (!world.isRemote && world.hasCapability(Capabilities.STOPWATCH_TRACKER, null)) {
 			ItemStack stack = player.getHeldItem(hand);
-			StopwatchTracker tracker = world.getCapability(CharsetToolsEngineering.stopwatchTrackerCap, null);
+			IStopwatchTracker tracker = world.getCapability(Capabilities.STOPWATCH_TRACKER, null);
 			//noinspection ConstantConditions
 			StopwatchTracker.AddPositionResult result = tracker.addPosition(getKey(stack), pos);
-			new Notice(pos, NotificationComponentString.translated(result == StopwatchTracker.AddPositionResult.END ? "notice.charset.stopwatch.markEnd" : "notice.charset.stopwatch.markStart"))
+			new Notice(pos, NotificationComponentString.translated(result == IStopwatchTracker.AddPositionResult.END ? "notice.charset.stopwatch.markEnd" : "notice.charset.stopwatch.markStart"))
 					.sendTo(player);
 		}
 

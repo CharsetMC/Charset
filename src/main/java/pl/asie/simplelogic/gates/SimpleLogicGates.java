@@ -236,12 +236,6 @@ public class SimpleLogicGates {
 		}
 	}
 
-	@Mod.EventHandler
-	@SideOnly(Side.CLIENT)
-	public void initClient(FMLInitializationEvent event) {
-		ClientRegistry.bindTileEntitySpecialRenderer(PartGate.class, new FastTESRGate());
-	}
-
 	public void registerGateStack(ItemStack stack) {
 		if (!stack.isEmpty() && (stack.getItem() instanceof ItemGate)) {
 			if (stack.hasTagCompound() && stack.getTagCompound().getByte("li") > 0) {

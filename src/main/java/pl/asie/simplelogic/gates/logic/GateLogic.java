@@ -29,6 +29,8 @@ import net.minecraftforge.common.util.Constants;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class GateLogic {
 	public byte enabledSides, invertedSides;

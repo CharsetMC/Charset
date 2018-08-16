@@ -21,6 +21,7 @@ package pl.asie.simplelogic.wires.logic;
 
 import java.util.*;
 
+import mcmultipart.api.multipart.MultipartHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.state.IBlockState;
@@ -32,6 +33,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import pl.asie.charset.ModCharset;
 import pl.asie.charset.api.lib.IDebuggable;
+import pl.asie.charset.api.tools.IStopwatchTracker;
 import pl.asie.charset.api.wires.IBundledEmitter;
 import pl.asie.charset.api.wires.IWire;
 import pl.asie.charset.api.wires.WireFace;
@@ -220,6 +222,9 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 		}
 	}
 
+	// TODO: hack
+	private boolean scheduledStopwatch;
+
 	protected void finishPropagation() {
 		for (EnumFacing facing : propagationDirs) {
 			TileEntity nt = getContainer().world().getTileEntity(getContainer().pos().offset(facing));
@@ -244,6 +249,19 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 		}
 
 		propagationDirs.clear();
+
+		if (!scheduledStopwatch) {
+			scheduledStopwatch = true;
+			if (getContainer().world().hasCapability(Capabilities.STOPWATCH_TRACKER, null)) {
+				IStopwatchTracker tracker = getContainer().world().getCapability(Capabilities.STOPWATCH_TRACKER, null);
+				if (tracker != null) {
+					Scheduler.INSTANCE.in(MultipartHelper.unwrapWorld(getContainer().world()), 0, () -> {
+						tracker.markChanged(getContainer().pos());
+						scheduledStopwatch = false;
+					});
+				}
+			}
+		}
 	}
 
 	protected final void neighborChanged(BlockPos neighborPos) {

@@ -24,6 +24,7 @@ import net.minecraft.util.EnumFacing;
 
 // TODO: add burnout
 public class GateLogicPulseFormer extends GateLogic {
+	private long tickTime = -1;
 	private byte pulse;
 
 	@Override
@@ -52,8 +53,10 @@ public class GateLogicPulseFormer extends GateLogic {
 
 	@Override
 	public void onChanged(IGateContainer gate) {
-		if (pulse == 0) {
+		long time = gate.getGateWorld().getTotalWorldTime();
+		if (pulse == 0 || tickTime == time) {
 			pulse = getInputValueInside(EnumFacing.SOUTH);
+			tickTime = time;
 			if (updateOutputs(gate)) {
 				if (pulse != 0) {
 					gate.scheduleRedstoneTick();
