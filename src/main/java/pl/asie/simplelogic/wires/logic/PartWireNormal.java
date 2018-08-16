@@ -208,6 +208,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 
 		if (DEBUG) {
 			System.out.println("Levels: " + Arrays.toString(neighborLevel));
+			System.out.println("IsWire: " + Arrays.toString(isWire));
 		}
 
 		if (maxSignal > signalLevel) {
