@@ -24,7 +24,9 @@ import net.minecraft.util.EnumFacing;
 
 // TODO: add burnout
 public class GateLogicPulseFormer extends GateLogic {
+	private long checkTime = -1;
 	private long tickTime = -1;
+	private byte prevValue;
 	private byte pulse;
 
 	@Override
@@ -52,10 +54,25 @@ public class GateLogicPulseFormer extends GateLogic {
 	}
 
 	@Override
+	public boolean updateInputs(IGateContainer gate) {
+		long time = gate.getGateWorld().getTotalWorldTime();
+		if (checkTime != time) {
+			checkTime = time;
+			prevValue = getInputValueInside(EnumFacing.SOUTH);
+		}
+
+		return super.updateInputs(gate);
+	}
+
+
+	@Override
 	public void onChanged(IGateContainer gate) {
 		long time = gate.getGateWorld().getTotalWorldTime();
 		if (pulse == 0 || tickTime == time) {
 			pulse = getInputValueInside(EnumFacing.SOUTH);
+			if (pulse == prevValue) {
+				pulse = 0;
+			}
 			tickTime = time;
 			if (updateOutputs(gate)) {
 				if (pulse != 0) {

@@ -87,7 +87,9 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	@Override
 	protected void onSignalChanged(int color, boolean clearMode) {
 		if (getContainer().world() != null && getContainer().pos() != null && !getContainer().world().isRemote) {
-			propagate(color, clearMode);
+			PropagationQueue queue = new PropagationQueue(clearMode);
+			queue.add(this, -1);
+			queue.propagate();
 		}
 	}
 
@@ -97,11 +99,12 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	}
 
 	@Override
-	public void propagate(int color, boolean clearMode) {
+	public void propagate(int color, PropagationQueue queue) {
 		if (DEBUG) {
 			System.out.println("--- PROPAGATE " + getContainer().pos().toString() + " " + getLocation().name() + " (" + getContainer().world().getTotalWorldTime() + ") ---");
 		}
 
+		color = getColor();
 		boolean[] isWire = new boolean[7];
 		int[] neighborLevel = new int[7];
 
@@ -211,7 +214,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 			System.out.println("IsWire: " + Arrays.toString(isWire));
 		}
 
-		if (maxSignal > signalLevel && !clearMode) {
+		if (maxSignal > signalLevel && !queue.clearMode) {
 			signalLevel = maxSignal - 1;
 			if ((signalLevel & 0xFF) == 0 || (signalLevel & 0xFF) == 0xFF) {
 				signalLevel = 0;
@@ -226,11 +229,11 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		}
 
 		if (DEBUG) {
-			System.out.println("Switch: " + oldSignal + " -> " + signalLevel);
+			System.out.println("Switch: " + oldSignal + " -> " + signalLevel + " " + getContainer().pos() + " " + getContainer().world().getTotalWorldTime());
 		}
 
 		if (signalLevel == 0) {
-			clearMode = true;
+			PropagationQueue queueToAdd = queue.clearMode ? queue : new PropagationQueue(true);
 
 			// If we lost signal, propagate only to those which have a signal.
 			// This is an optimization.
@@ -238,7 +241,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 				if (connectsInternal(nLoc)) {
 					if (neighborLevel[nLoc.ordinal()] > 0) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos(), nLoc);
-						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(getColor(), clearMode);
+						if (wire instanceof PartWireSignalBase) queueToAdd.add((PartWireSignalBase) wire, color);
 					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
@@ -246,14 +249,18 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 					if (connectsExternal(facing)) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
 						if (!(wire instanceof PartWireSignalBase) || neighborLevel[facing.ordinal()] > 0) {
-							propagateNotify(facing, getColor(), clearMode);
+							propagateNotify(facing, queueToAdd, color);
 						}
 					} else if (connectsCorner(facing)) {
 						if (neighborLevel[nLoc.ordinal()] > 0) {
-							propagateNotifyCorner(getLocation().facing, facing, getColor(), clearMode);
+							propagateNotifyCorner(getLocation().facing, facing, queueToAdd, color);
 						}
 					}
 				}
+			}
+
+			if (queueToAdd != queue) {
+				queueToAdd.propagate();
 			}
 		} else {
 			for (WireFace nLoc : WireFace.VALUES) {
@@ -261,7 +268,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 				if (connectsInternal(nLoc)) {
 					if (nChanged) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos(), nLoc);
-						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(getColor(), clearMode);
+						if (wire instanceof PartWireSignalBase) queue.add((PartWireSignalBase) wire, color);
 					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
@@ -269,11 +276,11 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 					if (connectsExternal(facing)) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
 						if (!(wire instanceof PartWireSignalBase) || nChanged) {
-							propagateNotify(facing, getColor(), clearMode);
+							propagateNotify(facing, queue, color);
 						}
 					} else if (connectsCorner(facing)) {
 						if (nChanged) {
-							propagateNotifyCorner(getLocation().facing, facing, getColor(), clearMode);
+							propagateNotifyCorner(getLocation().facing, facing, queue, color);
 						}
 					}
 				}
@@ -317,13 +324,6 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 				neighborChanged(getContainer().pos().offset(getLocation().facing));
 			}
 		}
-
-		if (clearMode) {
-			propagate(color, false);
-		}
-
-		// Once we're done propagating, update emitters and receivers.
-		finishPropagation();
 	}
 
 	@Override

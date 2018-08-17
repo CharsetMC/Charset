@@ -28,6 +28,8 @@ import net.minecraft.util.math.Vec3d;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 
+import java.util.Objects;
+
 // TODO: Add locking
 public class GateLogicRepeater extends GateLogic {
 	private static final int[] signalValues = {
@@ -94,13 +96,11 @@ public class GateLogicRepeater extends GateLogic {
 
 	@Override
 	public boolean readFromNBT(NBTTagCompound tag, boolean isClient) {
-		byte oldTicks = ticks;
-		byte oldRepeatedSignal = repeatedSignal;
 		byte oldValueMode = valueMode;
 		ticks = tag.getByte("rtk");
 		repeatedSignal = tag.getByte("rrs");
 		valueMode = tag.getByte("rvm");
-	    return super.readFromNBT(tag, isClient) || (oldRepeatedSignal != repeatedSignal) || (oldValueMode != valueMode);
+	    return super.readFromNBT(tag, isClient) || (oldValueMode != valueMode);
 	}
 
 	@Override
@@ -167,5 +167,19 @@ public class GateLogicRepeater extends GateLogic {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public boolean renderEquals(GateLogic other) {
+		if (!super.renderEquals(other) || !(other instanceof GateLogicRepeater)) {
+			return false;
+		} else {
+			return ((GateLogicRepeater) other).valueMode == valueMode;
+		}
+	}
+
+	@Override
+	public int renderHashCode(int hash) {
+		return Objects.hash(super.renderHashCode(hash), valueMode);
 	}
 }

@@ -133,7 +133,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		return nbt;
 	}
 
-	private void propagate(int color, byte[][] nValues, boolean clearMode) {
+	private void propagate(int color, PropagationQueue queue, byte[][] nValues) {
 		boolean[] isWire = new boolean[7];
 		int[] neighborLevel = new int[7];
 
@@ -198,7 +198,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		}
 
 		int newSignal;
-		if (maxSignal > oldSignal && !clearMode) {
+		if (maxSignal > oldSignal && !queue.clearMode) {
 			newSignal = maxSignal - 1;
 			if ((newSignal & 0xFF) == 0 || (newSignal & 0xFF) == 0xFF) {
 				newSignal = 0;
@@ -220,7 +220,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 		}
 
 		if (newSignal == 0) {
-			clearMode = true;
+			PropagationQueue queueToAdd = queue.clearMode ? queue : new PropagationQueue(true);
 
 			// If we lost signal, propagate only to those which have a signal.
 			// This is an optimization.
@@ -228,7 +228,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 				if (connectsInternal(nLoc)) {
 					if (neighborLevel[nLoc.ordinal()] > 0) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos(), nLoc);
-						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(color, clearMode);
+						if (wire instanceof PartWireSignalBase) queueToAdd.add((PartWireSignalBase) wire, color);
 					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
@@ -236,28 +236,32 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 					if (connectsExternal(facing)) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
 						if (!(wire instanceof PartWireSignalBase) || neighborLevel[facing.ordinal()] > 0) {
-							propagateNotify(facing, color, clearMode);
+							propagateNotify(facing, queueToAdd, color);
 						}
 					} else if (connectsCorner(facing)) {
 						if (neighborLevel[facing.ordinal()] > 0) {
-							propagateNotifyCorner(getLocation().facing, facing, color, clearMode);
+							propagateNotifyCorner(getLocation().facing, facing, queueToAdd, color);
 						}
 					}
 				}
+			}
+
+			if (queueToAdd != queue) {
+				queueToAdd.propagate();
 			}
 		} else {
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (neighborLevel[nLoc.ordinal()] < newSignal - 1 || neighborLevel[nLoc.ordinal()] > (newSignal + 1)) {
 					if (connectsInternal(nLoc)) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos(), nLoc);
-						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(color, clearMode);
+						if (wire instanceof PartWireSignalBase) queue.add((PartWireSignalBase) wire, color);
 					} else if (nLoc != WireFace.CENTER) {
 						EnumFacing facing = nLoc.facing;
 
 						if (connectsExternal(facing)) {
-							propagateNotify(facing, color, clearMode);
+							propagateNotify(facing, queue, color);
 						} else if (connectsCorner(facing)) {
-							propagateNotifyCorner(getLocation().facing, facing, color, clearMode);
+							propagateNotifyCorner(getLocation().facing, facing, queue, color);
 						}
 					}
 				}
@@ -271,16 +275,17 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 				getContainer().requestRenderUpdate();
 			}
 		}
-
-		if (newSignal == 0) {
-			propagate(color, false);
-		}
-
-		finishPropagation();
 	}
 
 	@Override
-	public void propagate(int color, boolean clearMode) {
+	public void propagate(int color, PropagationQueue queue) {
+		if (color == -1) {
+			for (int i = 0; i < 16; i++) {
+				propagate(i, queue);
+			}
+			return;
+		}
+
 		if (DEBUG) {
 			System.out.println("--- B! PROPAGATE " + getContainer().pos().toString() + " " + getLocation().name() + " --- " + color);
 // TODO			System.out.println("ConnectionCache: " + Integer.toBinaryString(internalConnections) + " " + Integer.toBinaryString(externalConnections) + " " + Integer.toBinaryString(cornerConnections));
@@ -307,19 +312,15 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 			}
 		}
 
-		if (color < 0) {
-			for (int i = 0; i < 16; i++) {
-				propagate(i, nValues, clearMode);
-			}
-		} else {
-			propagate(color, nValues, clearMode);
-		}
+		propagate(color, queue, nValues);
 	}
 
 	@Override
 	protected void onSignalChanged(int color, boolean clearMode) {
 		if (getContainer().world() != null && getContainer().pos() != null && !getContainer().world().isRemote) {
-			propagate(color, clearMode);
+			PropagationQueue queue = new PropagationQueue(clearMode);
+			queue.add(this, color);
+			queue.propagate();
 		}
 	}
 

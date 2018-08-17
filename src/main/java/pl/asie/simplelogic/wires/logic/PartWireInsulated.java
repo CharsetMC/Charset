@@ -56,7 +56,9 @@ public class PartWireInsulated extends PartWireNormal implements IWireInsulated 
 	protected void onSignalChanged(int color, boolean clearMode) {
 		if (getContainer().world() != null && getContainer().pos() != null && !getContainer().world().isRemote) {
 			if (color == getColor() || color == -1) {
-				propagate(color, clearMode);
+				PropagationQueue queue = new PropagationQueue(clearMode);
+				queue.add(this, getColor());
+				queue.propagate();
 			}
 		}
 	}

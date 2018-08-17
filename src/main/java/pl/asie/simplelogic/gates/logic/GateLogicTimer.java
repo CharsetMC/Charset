@@ -104,7 +104,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		int oldT = ticks;
 		int oldTT = ticksTotal;
 		ticks = tag.getInteger("rt");
-		if (isClient && !isStopped()) {
+		if (isClient && !isLocked()) {
 			int tDiff = Math.abs(ticks - oldT);
 			if (tDiff == 1 || tDiff == (ticksTotal - 1)) {
 				ticks = oldT;
@@ -124,7 +124,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		return oldRead || (oldT != ticks) || (oldTT != ticksTotal);
 	}
 
-	private boolean isStopped() {
+	private boolean isLocked() {
 		return (getInputValueInside(EnumFacing.SOUTH) != 0);
 	}
 
@@ -134,7 +134,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 
 	@Override
 	public boolean canInvertSide(EnumFacing side) {
-		return side == EnumFacing.SOUTH;
+		return true;
 	}
 
 	@Override
@@ -148,11 +148,11 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 			case 0:
 				return GateRenderState.inputOrDisabled(this, EnumFacing.SOUTH, getInputValueInside(EnumFacing.SOUTH));
 			case 1:
-				return !isSideOpen(EnumFacing.WEST) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered());
+				return !isSideOpen(EnumFacing.WEST) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered() && !isLocked());
 			case 2:
-				return !isSideOpen(EnumFacing.NORTH) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered());
+				return !isSideOpen(EnumFacing.NORTH) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered() && !isLocked());
 			case 3:
-				return !isSideOpen(EnumFacing.EAST) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered());
+				return !isSideOpen(EnumFacing.EAST) ? GateRenderState.DISABLED : GateRenderState.bool(isPowered() && !isLocked());
 			default:
 				return GateRenderState.bool(isPowered());
 		}
@@ -163,7 +163,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 		switch (id) {
 			case 0:
 			default:
-				return GateRenderState.bool(isPowered());
+				return GateRenderState.bool(isPowered() && !isLocked());
 			case 1:
 				return GateRenderState.ON;
 		}
@@ -171,17 +171,17 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 
 	@Override
 	protected byte calculateOutputInside(EnumFacing side) {
-		return (byte) (isPowered() ? 15 : 0);
+		return (byte) ((isPowered() && !isLocked()) ? 15 : 0);
 	}
 
 	@Override
 	public float getArrowPosition() {
-		return isStopped() ? 0 : (ticks - 1f) / ticksTotal;
+		return isLocked() ? 0 : (ticks - 1f) / ticksTotal;
 	}
 
 	@Override
 	public float getArrowRotationDelta() {
-		if (isStopped()) {
+		if (isLocked()) {
 			return 0;
 		} else {
 			return (float) 1 / ticksTotal;
@@ -191,7 +191,7 @@ public class GateLogicTimer extends GateLogic implements IArrowGateLogic, IGateT
 	@Override
 	public void update(IGateContainer gate) {
 		int oldTicks = ticks;
-		if (isStopped()) {
+		if (isLocked()) {
 			ticks = 0;
 		} else {
 			ticks = (ticks + 1) % ticksTotal;

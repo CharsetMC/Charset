@@ -27,6 +27,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import pl.asie.charset.lib.notify.component.NotificationComponentString;
 
+import java.util.Objects;
+
 public class GateLogicComparator extends GateLogic {
 	private byte mode = 0;
 
@@ -123,5 +125,19 @@ public class GateLogicComparator extends GateLogic {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public boolean renderEquals(GateLogic other) {
+		if (!super.renderEquals(other) || !(other instanceof GateLogicComparator)) {
+			return false;
+		} else {
+			return ((GateLogicComparator) other).mode == mode;
+		}
+	}
+
+	@Override
+	public int renderHashCode(int hash) {
+		return Objects.hash(super.renderHashCode(hash), mode);
 	}
 }

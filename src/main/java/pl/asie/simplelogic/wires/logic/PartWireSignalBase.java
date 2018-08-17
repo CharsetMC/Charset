@@ -161,7 +161,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 		return false;
 	}
 
-	public abstract void propagate(int color, boolean clearMode);
+	public abstract void propagate(int color, PropagationQueue queue);
 
 	public abstract int getSignalLevel();
 
@@ -206,17 +206,17 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 		scheduleLogicUpdate();
 	}
 
-	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction, int color, boolean clearMode) {
+	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction, PropagationQueue queue, int color) {
 		Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(side).offset(direction), WireFace.get(direction.getOpposite()));
-		if (wire != null && wire instanceof PartWireSignalBase) {
-			((PartWireSignalBase) wire).onSignalChanged(color, clearMode);
+		if (wire instanceof PartWireSignalBase) {
+			queue.add((PartWireSignalBase) wire, color);
 		}
 	}
 
-	protected void propagateNotify(EnumFacing facing, int color, boolean clearMode) {
+	protected void propagateNotify(EnumFacing facing, PropagationQueue queue, int color) {
 		Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
-		if (wire != null && wire instanceof PartWireSignalBase) {
-			((PartWireSignalBase) wire).onSignalChanged(color, clearMode);
+		if (wire instanceof PartWireSignalBase) {
+			queue.add((PartWireSignalBase) wire, color);
 		} else {
 			propagationDirs.add(facing);
 		}

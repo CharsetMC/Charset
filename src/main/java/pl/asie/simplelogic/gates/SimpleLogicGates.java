@@ -226,7 +226,7 @@ public class SimpleLogicGates {
 	@SubscribeEvent
 	public void onRightClickGate(PlayerInteractEvent.RightClickBlock event) {
 		if (event.getEntityPlayer().isSneaking()) {
-			if (!event.getItemStack().isEmpty() && event.getItemStack().getItem().getToolClasses(event.getItemStack()).contains("wrench")) {
+			if (!event.getItemStack().isEmpty()) {
 				IBlockState state = event.getWorld().getBlockState(event.getPos());
 				if (state.getBlock() instanceof BlockGate) {
 					event.setUseBlock(Event.Result.ALLOW);
