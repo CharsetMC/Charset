@@ -30,3 +30,4 @@ Bugs fixed:
 * [simplelogic.wires] [GitHub/#319] Incorrect bundled cable overlay rendering in some situations
 * [simplelogic.wires] [GitHub/#307] Cables of certain lengths not updating properly on rare occasions
 * [simplelogic.wires] Flickering state on disabling of one of two sources facing each other
+* [simplelogic.wires] Wire connecting to vanilla repeater on unaffecting sides

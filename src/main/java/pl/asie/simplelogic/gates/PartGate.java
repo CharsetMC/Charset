@@ -33,16 +33,14 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import pl.asie.charset.api.lib.IDebuggable;
-import pl.asie.charset.api.wires.IBundledEmitter;
-import pl.asie.charset.api.wires.IBundledReceiver;
-import pl.asie.charset.api.wires.IRedstoneEmitter;
-import pl.asie.charset.api.wires.IRedstoneReceiver;
+import pl.asie.charset.api.wires.*;
 import pl.asie.charset.lib.block.TileBase;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.misc.ISimpleLogicSidedEmitter;
@@ -56,10 +54,9 @@ import pl.asie.charset.lib.utils.Orientation;
 import pl.asie.charset.lib.utils.Quaternion;
 import pl.asie.charset.lib.utils.RotationUtils;
 import pl.asie.charset.lib.utils.redstone.RedstoneUtils;
-import pl.asie.charset.lib.wires.SignalMeterDataBundledWire;
-import pl.asie.charset.lib.wires.SignalMeterDataWire;
-import pl.asie.charset.lib.wires.TileWire;
+import pl.asie.charset.lib.wires.*;
 import pl.asie.simplelogic.gates.logic.*;
+import pl.asie.simplelogic.wires.logic.PartWireInsulated;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -155,6 +152,7 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 			EnumFacing dir = realToGate(direction);
 			if (logic.isSideOpen(dir)) {
 				GateConnection conn = logic.getType(dir);
+
 				if (capability == Capabilities.BUNDLED_EMITTER && conn.isOutput() && conn.isBundled()) {
 					return true;
 				} else if (capability == Capabilities.BUNDLED_RECEIVER && conn.isInput() && conn.isBundled()) {
@@ -367,10 +365,12 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 					return mpValue;
 				} else {
 					TileEntity tile = w.getTileEntity(p);
-					if (tile != null && tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
-						IBundledEmitter emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite());
-						if (!(emitter instanceof ISimpleLogicSidedEmitter) || ((ISimpleLogicSidedEmitter) emitter).getEmitterFace() == getOrientation().facing.getOpposite()) {
-							return emitter.getBundledSignal();
+					if (tile != null) {
+						if (tile.hasCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite())) {
+							IBundledEmitter emitter = tile.getCapability(Capabilities.BUNDLED_EMITTER, real.getOpposite());
+							if (!(emitter instanceof ISimpleLogicSidedEmitter) || ((ISimpleLogicSidedEmitter) emitter).getEmitterFace() == getOrientation().facing.getOpposite()) {
+								return emitter.getBundledSignal();
+							}
 						}
 					}
 				}

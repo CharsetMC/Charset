@@ -116,6 +116,10 @@ public final class RedstoneUtils {
 			return false;
 		}
 
+		if (block instanceof BlockRedstoneRepeater && state.getValue(BlockRedstoneRepeater.FACING).getAxis() != side.getAxis()) {
+			return false;
+		}
+
 		if (block instanceof BlockLever && face != state.getValue(BlockLever.FACING).getFacing().getOpposite()) {
 			return false;
 		}
