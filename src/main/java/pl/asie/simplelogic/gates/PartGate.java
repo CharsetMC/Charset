@@ -596,6 +596,9 @@ public class PartGate extends TileBase implements IDebuggable, IGateContainer, I
 			Vec3d vec = realToGate(new Vec3d(hitX, hitY, hitZ));
 			orientation = orientation.pointTopTo(gateToReal(getClosestFace(vec, Objects::nonNull)));
 		}
+		if (logic != null) {
+			logic.updateOutputs(this);
+		}
 	}
 
 	@Override

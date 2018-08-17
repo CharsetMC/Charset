@@ -75,12 +75,12 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 		return (LogicWireProvider) getProvider();
 	}
 
-	protected abstract void onSignalChanged(int color);
+	protected abstract void onSignalChanged(int color, boolean clearMode);
 
 	protected void scheduleLogicUpdate() {
 		if (getContainer().world() != null && getContainer().pos() != null) {
 			if (!getContainer().world().isRemote) {
-				onSignalChanged(-1);
+				onSignalChanged(-1, false);
 			}
 		} else if (getContainer().world() != null) {
 			Scheduler.INSTANCE.in(getContainer().world(), 0, this::scheduleLogicUpdate);
@@ -161,7 +161,7 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 		return false;
 	}
 
-	public abstract void propagate(int color);
+	public abstract void propagate(int color, boolean clearMode);
 
 	public abstract int getSignalLevel();
 
@@ -206,17 +206,17 @@ public abstract class PartWireSignalBase extends Wire implements IWire, ISignalM
 		scheduleLogicUpdate();
 	}
 
-	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction, int color) {
+	protected void propagateNotifyCorner(EnumFacing side, EnumFacing direction, int color, boolean clearMode) {
 		Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(side).offset(direction), WireFace.get(direction.getOpposite()));
 		if (wire != null && wire instanceof PartWireSignalBase) {
-			((PartWireSignalBase) wire).onSignalChanged(color);
+			((PartWireSignalBase) wire).onSignalChanged(color, clearMode);
 		}
 	}
 
-	protected void propagateNotify(EnumFacing facing, int color) {
+	protected void propagateNotify(EnumFacing facing, int color, boolean clearMode) {
 		Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
 		if (wire != null && wire instanceof PartWireSignalBase) {
-			((PartWireSignalBase) wire).onSignalChanged(color);
+			((PartWireSignalBase) wire).onSignalChanged(color, clearMode);
 		} else {
 			propagationDirs.add(facing);
 		}

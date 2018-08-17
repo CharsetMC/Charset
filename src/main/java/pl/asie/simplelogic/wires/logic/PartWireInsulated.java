@@ -53,10 +53,10 @@ public class PartWireInsulated extends PartWireNormal implements IWireInsulated 
 	}
 
 	@Override
-	protected void onSignalChanged(int color) {
+	protected void onSignalChanged(int color, boolean clearMode) {
 		if (getContainer().world() != null && getContainer().pos() != null && !getContainer().world().isRemote) {
 			if (color == getColor() || color == -1) {
-				propagate(color);
+				propagate(color, clearMode);
 			}
 		}
 	}

@@ -100,7 +100,7 @@ public class GateLogicRepeater extends GateLogic {
 		ticks = tag.getByte("rtk");
 		repeatedSignal = tag.getByte("rrs");
 		valueMode = tag.getByte("rvm");
-		return super.readFromNBT(tag, isClient) || (oldRepeatedSignal != repeatedSignal) || (oldValueMode != valueMode);
+	    return super.readFromNBT(tag, isClient) || (oldRepeatedSignal != repeatedSignal) || (oldValueMode != valueMode);
 	}
 
 	@Override

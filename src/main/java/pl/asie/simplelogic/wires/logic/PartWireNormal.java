@@ -85,9 +85,9 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	}
 
 	@Override
-	protected void onSignalChanged(int color) {
+	protected void onSignalChanged(int color, boolean clearMode) {
 		if (getContainer().world() != null && getContainer().pos() != null && !getContainer().world().isRemote) {
-			propagate(color);
+			propagate(color, clearMode);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 	}
 
 	@Override
-	public void propagate(int color) {
+	public void propagate(int color, boolean clearMode) {
 		if (DEBUG) {
 			System.out.println("--- PROPAGATE " + getContainer().pos().toString() + " " + getLocation().name() + " (" + getContainer().world().getTotalWorldTime() + ") ---");
 		}
@@ -211,7 +211,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 			System.out.println("IsWire: " + Arrays.toString(isWire));
 		}
 
-		if (maxSignal > signalLevel) {
+		if (maxSignal > signalLevel && !clearMode) {
 			signalLevel = maxSignal - 1;
 			if ((signalLevel & 0xFF) == 0 || (signalLevel & 0xFF) == 0xFF) {
 				signalLevel = 0;
@@ -230,13 +230,15 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 		}
 
 		if (signalLevel == 0) {
+			clearMode = true;
+
 			// If we lost signal, propagate only to those which have a signal.
 			// This is an optimization.
 			for (WireFace nLoc : WireFace.VALUES) {
 				if (connectsInternal(nLoc)) {
 					if (neighborLevel[nLoc.ordinal()] > 0) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos(), nLoc);
-						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(getColor());
+						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(getColor(), clearMode);
 					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
@@ -244,11 +246,11 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 					if (connectsExternal(facing)) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
 						if (!(wire instanceof PartWireSignalBase) || neighborLevel[facing.ordinal()] > 0) {
-							propagateNotify(facing, getColor());
+							propagateNotify(facing, getColor(), clearMode);
 						}
 					} else if (connectsCorner(facing)) {
 						if (neighborLevel[nLoc.ordinal()] > 0) {
-							propagateNotifyCorner(getLocation().facing, facing, getColor());
+							propagateNotifyCorner(getLocation().facing, facing, getColor(), clearMode);
 						}
 					}
 				}
@@ -259,7 +261,7 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 				if (connectsInternal(nLoc)) {
 					if (nChanged) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos(), nLoc);
-						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(getColor());
+						if (wire instanceof PartWireSignalBase) ((PartWireSignalBase) wire).onSignalChanged(getColor(), clearMode);
 					}
 				} else if (nLoc != WireFace.CENTER) {
 					EnumFacing facing = nLoc.facing;
@@ -267,11 +269,11 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 					if (connectsExternal(facing)) {
 						Wire wire = WireUtils.getWire(getContainer().world(), getContainer().pos().offset(facing), getLocation());
 						if (!(wire instanceof PartWireSignalBase) || nChanged) {
-							propagateNotify(facing, getColor());
+							propagateNotify(facing, getColor(), clearMode);
 						}
 					} else if (connectsCorner(facing)) {
 						if (nChanged) {
-							propagateNotifyCorner(getLocation().facing, facing, getColor());
+							propagateNotifyCorner(getLocation().facing, facing, getColor(), clearMode);
 						}
 					}
 				}
@@ -316,8 +318,8 @@ public class PartWireNormal extends PartWireSignalBase implements IRedstoneEmitt
 			}
 		}
 
-		if (signalLevel == 0) {
-			propagate(color);
+		if (clearMode) {
+			propagate(color, false);
 		}
 
 		// Once we're done propagating, update emitters and receivers.
