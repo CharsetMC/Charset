@@ -4,5 +4,6 @@ The Tablet is the fancy object you're reading this text on now!
 
  \- Right-clicking the Tablet in the air leads you to a main screen where you can choose from all available books.
  \- Sneak-right-clicking the Tablet on a block, an item inside an Item Frame, or an entity will try to find the most accurate documentation for the given object.
+ \- Pressing Ctrl+T (or the key binding you have configured) while hovering over an item, if you have a Tablet in your inventory, will try to find information on said item!
 
 You may be surprised by just how much information it contains!

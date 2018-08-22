@@ -1,0 +1,7 @@
+Additions:
+
+* [tablet] [GitHub/#336] JEI support for Ctrl+T hotkey
+
+Bugs fixed:
+
+* [lib.wires] [GitHub/#340] Accidentally left debug log

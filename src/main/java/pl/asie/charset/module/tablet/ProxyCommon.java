@@ -27,8 +27,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.util.function.Supplier;
+
 public class ProxyCommon {
 	public void init() {
+
+	}
+
+	public void hookHoverSupplier(Supplier<ItemStack> supplier) {
 
 	}
 

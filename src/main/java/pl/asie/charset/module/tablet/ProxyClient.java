@@ -19,7 +19,6 @@
 
 package pl.asie.charset.module.tablet;
 
-import com.google.common.base.Charsets;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -40,22 +39,42 @@ import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import org.lwjgl.input.Keyboard;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ProxyClient extends ProxyCommon {
+	public static Function<GuiContainer, ItemStack> slotSupplier = (c) -> {
+		Slot s = c.getSlotUnderMouse();
+		if (s != null && s.getHasStack()) {
+			return s.getStack();
+		} else {
+			return ItemStack.EMPTY;
+		}
+	};
 	public static KeyBinding openInTablet;
 
 	public void init() {
 		super.init();
 		ClientRegistry.registerKeyBinding(openInTablet = new KeyBinding("key.charset.open_in_tablet.desc", KeyConflictContext.GUI, KeyModifier.CONTROL, Keyboard.KEY_T, "key.charset.category"));
+	}
+
+	public void hookHoverSupplier(Supplier<ItemStack> supplier) {
+		final Function<GuiContainer, ItemStack> oldSupplier = slotSupplier;
+
+		slotSupplier = (c) -> {
+			ItemStack stack = supplier.get();
+			if (stack.isEmpty()) {
+				return oldSupplier.apply(c);
+			} else {
+				return stack;
+			}
+		};
 	}
 
 	@SubscribeEvent
@@ -74,9 +93,9 @@ public class ProxyClient extends ProxyCommon {
 				}
 
 				if (found) {
-					Slot s = ((GuiContainer) event.getGui()).getSlotUnderMouse();
-					if (s != null && s.getHasStack()) {
-						openTabletItemStack(Minecraft.getMinecraft().world, player, s.getStack());
+					ItemStack stack = slotSupplier.apply((GuiContainer) event.getGui());
+					if (!stack.isEmpty()) {
+						openTabletItemStack(Minecraft.getMinecraft().world, player, stack);
 						event.setCanceled(true);
 					}
 				}

@@ -157,16 +157,11 @@ public final class WireUtils {
             return false;
         }
 
-        System.out.println(wire.getLocation() + " " + direction.getOpposite());
-        System.out.println(middlePos + " " + wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite()));
-
         AxisAlignedBB mask = wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
         if (MultipartUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos, (state -> !(state.getBlock() instanceof BlockWire)))) {
-            System.out.println("false");
             return false;
         }
 
-        System.out.println("true");
         return true;
     }
 
