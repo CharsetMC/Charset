@@ -59,12 +59,9 @@ public abstract class ContainerBase extends Container {
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
 		Slot slotObject = inventorySlots.get(slot);
 		if (slotObject != null && slotObject.getHasStack()) {
-			ItemStack stack = slotObject.getStack().copy();
 			tryTransferStackInSlot(player, slotObject, slotObject.inventory == player.inventory ? SLOTS_INVENTORY : SLOTS_PLAYER);
-			return stack;
-		} else {
-			return ItemStack.EMPTY;
 		}
+		return ItemStack.EMPTY;
 	}
 
 	private boolean tryInsertStackToSlot(EntityPlayer player, Slot from, Slot to) {

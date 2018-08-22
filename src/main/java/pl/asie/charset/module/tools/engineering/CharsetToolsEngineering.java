@@ -33,6 +33,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -46,6 +47,8 @@ import pl.asie.charset.api.tools.IStopwatchTracker;
 import pl.asie.charset.lib.capability.Capabilities;
 import pl.asie.charset.lib.capability.CapabilityProviderFactory;
 import pl.asie.charset.lib.capability.DummyCapabilityStorage;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
@@ -66,6 +69,9 @@ public class CharsetToolsEngineering {
 	@CharsetModule.PacketRegistry
 	public static PacketRegistry packet;
 
+	@CharsetModule.Configuration
+	public static Configuration config;
+
 	private static final ResourceLocation stopwatchTrackerLoc = new ResourceLocation("charset", "stopwatchTracker");
 	private static CapabilityProviderFactory<IStopwatchTracker> stopwatchTrackerProvider;
 
@@ -73,6 +79,15 @@ public class CharsetToolsEngineering {
 	static Capability<ISignalMeterTracker> meterTrackerCap;
 	private static final ResourceLocation meterTrackerLoc = new ResourceLocation("charset", "signal_meter_tracker");
 	private static CapabilityProviderFactory<ISignalMeterTracker> meterTrackerProvider;
+
+	public static double maxSendDistance, maxRenderDistanceSq;
+
+	@Mod.EventHandler
+	public void loadConfig(CharsetLoadConfigEvent event) {
+		double maxRenderDistance = ConfigUtils.getDouble(config, "signalMeter", "maxRenderDistance", 8, 0, 32, "The maximum render/synchronization distance for Signal Meter Data. Lower this value if the packet usage becomes too high.", false);
+		maxRenderDistanceSq = maxRenderDistance * maxRenderDistance;
+		maxSendDistance = maxRenderDistance >= 0.01 ? maxRenderDistance + 2 : 0;
+	}
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

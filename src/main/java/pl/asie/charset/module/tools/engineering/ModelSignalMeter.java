@@ -20,10 +20,12 @@
 package pl.asie.charset.module.tools.engineering;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -49,6 +51,12 @@ public class ModelSignalMeter extends WrappedBakedModel {
 		public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {
 			if (entity != null && entity.hasCapability(CharsetToolsEngineering.meterTrackerCap, null)
 				&& (stack == entity.getHeldItemMainhand() || stack == entity.getHeldItemOffhand())) {
+
+				Entity rve = Minecraft.getMinecraft().getRenderViewEntity();
+				if (rve != null && rve != entity && rve.getDistanceSq(entity) > CharsetToolsEngineering.maxRenderDistanceSq) {
+					return originalModel;
+				}
+
 				return new ModelSignalMeter(((ModelSignalMeter) originalModel).getParent(), entity.getCapability(CharsetToolsEngineering.meterTrackerCap, null).getClientData());
 			}
 

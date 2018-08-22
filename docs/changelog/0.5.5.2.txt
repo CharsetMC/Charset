@@ -1,0 +1,11 @@
+Additions:
+
+* [tablet] [GitHub/#336] Press Ctrl+T while hovering over an item to open it in the Tablet! You must have the Tablet in your Inventory!
+* [tablet] Ender IO GitHub wiki support
+* [tools.engineering] [GitHub/#306] Support for rendering signal meter status in other players' hands
+
+Bugs fixed:
+
+* [lib.wires] [GitHub/#334] Issues with corner wire occlusion
+* [storage.chests] [GitHub/#337] Freeze on shift-clicking an overfilled chest
+* [simplelogic.wires] [GitHub/#333] StackOverflowError in very complex circuits

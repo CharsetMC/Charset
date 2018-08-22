@@ -150,6 +150,8 @@ public class CharsetTablet {
 		}
 
 		TabletAPI.INSTANCE.registerPrinterText(TextPrinterFormat.HTML, WordText.class, (c, w) -> ((WordText) w).getText());
+
+		proxy.init();
 	}
 
 	@Mod.EventHandler
@@ -216,6 +218,10 @@ public class CharsetTablet {
 			if (ModCharset.INDEV || Loader.isModLoaded("toughasnails")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("Glitchfiend/ToughAsNails", "toughasnails"));
 				TabletAPI.INSTANCE.addBook("Tough As Nails Wiki", "wiki://toughasnails/_Sidebar");
+			}
+			if (ModCharset.INDEV || Loader.isModLoaded("enderio")) {
+				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("SleepyTrousers/EnderIO", "enderio"));
+				TabletAPI.INSTANCE.addBook("Ender IO Wiki", "wiki://enderio/_Sidebar");
 			}
 /*			if (ModCharset.INDEV || Loader.isModLoaded("vampirism")) {
 				TabletAPI.INSTANCE.registerRouter(new RouterGitHub("TeamLapen/Vampirism", "vampirism"));

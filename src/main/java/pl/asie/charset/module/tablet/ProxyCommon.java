@@ -21,12 +21,21 @@ package pl.asie.charset.module.tablet;
 
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ProxyCommon {
+	public void init() {
+
+	}
+
+	public void openTabletItemStack(World world, EntityPlayer player, ItemStack stack) {
+
+	}
+
 	public void onTabletRightClick(World world, EntityPlayer player, EnumHand hand) {
 
 	}

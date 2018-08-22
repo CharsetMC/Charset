@@ -52,7 +52,8 @@ public class CharsetCraftingPocket {
 	public static ItemPocketTable pocketTable;
 	public static String pocketActions = "xcbf";
 
-
+	@CharsetModule.SidedProxy(clientSide = "pl.asie.charset.module.crafting.pocket.ProxyClient", serverSide = "pl.asie.charset.module.crafting.pocket.ProxyCommon")
+	public static ProxyCommon proxy;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -73,6 +74,8 @@ public class CharsetCraftingPocket {
 	public void init(FMLInitializationEvent event) {
 		packet.registerPacket(0x01, PacketPTAction.class);
 		GuiHandlerCharset.INSTANCE.register(GuiHandlerCharset.POCKET_TABLE, Side.SERVER, (r) -> new ContainerPocketTable(r.player));
+
+		proxy.init();
 	}
 
 	@Mod.EventHandler

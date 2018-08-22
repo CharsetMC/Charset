@@ -19,10 +19,12 @@
 
 package pl.asie.charset.module.tablet.format.parsers;
 
+import org.apache.commons.lang3.tuple.Pair;
 import pl.asie.charset.lib.utils.ThreeState;
 import pl.asie.charset.module.tablet.TabletUtil;
 
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GitHubMarkdownParser extends MarkdownParser {
 	private final String prefix;
@@ -31,6 +33,12 @@ public class GitHubMarkdownParser extends MarkdownParser {
 	public GitHubMarkdownParser(String host, String name) {
 		this.prefix = "https://github.com/" + host + "/wiki";
 		this.name = name;
+		replacers.add(Pair.of(Pattern.compile("\\[\\[([^]|]*)\\|([^]|]*)]]", Pattern.DOTALL), (m) -> {
+			return "\\\\url{/" + TabletUtil.encode(m.group(2).replaceAll(" ", "-")) + "}{" + m.group(1) + "}\n\n";
+		}));
+		replacers.add(Pair.of(Pattern.compile("\\[\\[([^]]*)]]", Pattern.DOTALL), (m) -> {
+			return "\\\\url{/" + TabletUtil.encode(m.group(1).replaceAll(" ", "-")) + "}{" + m.group(1) + "}\n\n";
+		}));
 	}
 
 	@Override
@@ -47,9 +55,9 @@ public class GitHubMarkdownParser extends MarkdownParser {
 	protected String urlHandler(Matcher m) {
 		String url = m.group(2);
 		if (url.startsWith(prefix)) {
-			return "\\\\url{" + TabletUtil.encode(url.substring(prefix.length())) + "}{" + m.group(1) + "}";
+			return "\\\\url{" + TabletUtil.encode(url.substring(prefix.length()).replaceAll(" ", "-")) + "}{" + m.group(1) + "}";
 		} else if (!url.contains("/")) {
-			return "\\\\url{/" + TabletUtil.encode(url) + "}{" + m.group(1) + "}";
+			return "\\\\url{/" + TabletUtil.encode(url.replaceAll(" ", "-")) + "}{" + m.group(1) + "}";
 		} else {
 			return "\\\\urlmissing{" + m.group(1) + "}";
 		}

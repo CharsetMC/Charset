@@ -36,6 +36,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -308,9 +309,11 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
 
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        Wire wire = WireUtils.getAnyWire(worldIn, pos);
-        if (wire != null) {
-            wire.onChanged(true);
+        if (!(blockIn instanceof BlockWire)) {
+            Wire wire = WireUtils.getAnyWire(worldIn, pos);
+            if (wire != null) {
+                wire.onChanged(true);
+            }
         }
     }
 
@@ -367,11 +370,13 @@ public class BlockWire extends BlockBase implements IMultipartBase, ITileEntityP
             } else {
                 // TODO: Simplify the logic for non-wire-breakage scenarios
                 if (location.facing == facing || (connectionMask & ((1 << (facing.ordinal())) * 0x10101)) != 0) {
-                    world.neighborChanged(pos.offset(facing), this, pos);
+                    world.neighborChanged(pos.offset(facing),  Blocks.AIR, pos);
+                    world.neighborChanged(pos.offset(facing),  this, pos);
 
                     BlockPos basePos = pos.offset(facing);
                     for (EnumFacing facing2 : EnumFacing.VALUES) {
                         if (facing2 != facing.getOpposite()) {
+                            world.neighborChanged(basePos.offset(facing2), Blocks.AIR, pos);
                             world.neighborChanged(basePos.offset(facing2), this, pos);
                         }
                     }

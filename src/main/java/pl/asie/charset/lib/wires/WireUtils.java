@@ -146,14 +146,9 @@ public final class WireUtils {
         EnumFacing side = wire.getLocation().facing;
         BlockPos middlePos = wire.getContainer().pos().offset(direction);
 
-        if (wire.getContainer().world().isSideSolid(middlePos, direction.getOpposite()) || wire.getContainer().world().isSideSolid(middlePos, side.getOpposite())) {
+        /* if (wire.getContainer().world().isSideSolid(middlePos, direction.getOpposite()) || wire.getContainer().world().isSideSolid(middlePos, side.getOpposite())) {
             return false;
-        }
-
-        AxisAlignedBB mask = wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
-        if (MultipartUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos, (state -> !(state.getBlock() instanceof BlockWire)))) {
-            return false;
-        }
+        } */
 
         BlockPos cornerPos = middlePos.offset(side);
         Wire wire2 = getWire(wire.getContainer().world(), cornerPos, WireFace.get(direction.getOpposite()));
@@ -162,6 +157,16 @@ public final class WireUtils {
             return false;
         }
 
+        System.out.println(wire.getLocation() + " " + direction.getOpposite());
+        System.out.println(middlePos + " " + wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite()));
+
+        AxisAlignedBB mask = wire.getProvider().getCornerCollisionBox(wire.getLocation(), direction.getOpposite());
+        if (MultipartUtils.INSTANCE.intersects(Collections.singletonList(mask), wire.getContainer().world(), middlePos, (state -> !(state.getBlock() instanceof BlockWire)))) {
+            System.out.println("false");
+            return false;
+        }
+
+        System.out.println("true");
         return true;
     }
 

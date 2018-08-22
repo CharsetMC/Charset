@@ -42,13 +42,19 @@ public class SignalMeterTrackerEventHandler {
 							data = new SignalMeterDataDummy();
 						}
 
-//						if (data != null) {
-						try {
-							CharsetToolsEngineering.packet.sendTo(new PacketSignalMeterData(data), event.player);
-						} catch (Exception e) {
-							e.printStackTrace();
+						if (CharsetToolsEngineering.maxSendDistance >= 1) {
+							try {
+								CharsetToolsEngineering.packet.sendToAllAround(new PacketSignalMeterData(data), event.player, CharsetToolsEngineering.maxSendDistance);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						} else {
+							try {
+								CharsetToolsEngineering.packet.sendTo(new PacketSignalMeterData(data), event.player);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
-//						}
 					}
 				}
 			}

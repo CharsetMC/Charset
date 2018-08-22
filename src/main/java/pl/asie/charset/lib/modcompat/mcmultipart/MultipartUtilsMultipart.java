@@ -19,7 +19,9 @@
 
 package pl.asie.charset.lib.modcompat.mcmultipart;
 
+import mcmultipart.api.container.IMultipartContainer;
 import mcmultipart.api.container.IPartInfo;
+import mcmultipart.api.multipart.MultipartHelper;
 import mcmultipart.api.world.IMultipartBlockAccess;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -29,6 +31,7 @@ import net.minecraft.world.IBlockAccess;
 import pl.asie.charset.lib.utils.MultipartUtils;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class MultipartUtilsMultipart extends MultipartUtils {
@@ -63,9 +66,15 @@ public class MultipartUtilsMultipart extends MultipartUtils {
 
     @Override
     public boolean intersects(Collection<AxisAlignedBB> boxes1, IBlockAccess world, BlockPos pos, Predicate<IBlockState> checkPredicate) {
-        if (world instanceof IMultipartBlockAccess) {
-            IPartInfo info = ((IMultipartBlockAccess) world).getPartInfo();
-            for (IPartInfo info2 : info.getContainer().getParts().values()) {
+        Optional<IMultipartContainer> ctr = MultipartHelper.getContainer(world, pos);
+
+        if (ctr.isPresent()) {
+            IPartInfo info = null;
+            if (world instanceof IMultipartBlockAccess) {
+                info = ((IMultipartBlockAccess) world).getPartInfo();
+            }
+
+            for (IPartInfo info2 : ctr.get().getParts().values()) {
                 if (info2 != info && checkPredicate.test(info2.getState()) && intersects(boxes1, info2.getPart().getOcclusionBoxes(info2))) {
                     return true;
                 }

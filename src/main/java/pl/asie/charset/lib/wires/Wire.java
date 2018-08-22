@@ -20,6 +20,7 @@
 package pl.asie.charset.lib.wires;
 
 import mcmultipart.api.multipart.MultipartHelper;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
