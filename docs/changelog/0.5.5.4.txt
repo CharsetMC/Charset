@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* [GitHub/#341] Cables ignore Chisels&Bits structures on their own block space, and other weird cases

@@ -66,7 +66,7 @@ public class MultipartUtilsMultipart extends MultipartUtils {
 
     @Override
     public boolean intersects(Collection<AxisAlignedBB> boxes1, IBlockAccess world, BlockPos pos, Predicate<IBlockState> checkPredicate) {
-        Optional<IMultipartContainer> ctr = MultipartHelper.getContainer(world, pos);
+        Optional<IMultipartContainer> ctr = MultipartHelper.getContainer(world instanceof IMultipartBlockAccess ? ((IMultipartBlockAccess) world).getActualWorld() : world, pos);
 
         if (ctr.isPresent()) {
             IPartInfo info = null;
