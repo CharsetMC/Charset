@@ -138,7 +138,8 @@ public final class ModelTransformer {
                      case NORMAL:
                          Vector3f vec = new Vector3f(data[0], data[1], data[2]);
                          ForgeHooksClient.transform(vec, transformation.getMatrix());
-                         if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
+                         if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL
+                            && (vec.x != 0f || vec.y != 0f || vec.z != 0f)) {
                              vec.normalise();
                          }
                          return new float[] { vec.x, vec.y, vec.z, data[3] };

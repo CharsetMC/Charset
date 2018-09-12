@@ -68,7 +68,7 @@ public class CharsetCompatInfraRedstone {
 		if (cap != null && event.getObject() instanceof TileBase) {
 			if (cache.computeIfAbsent(event.getClass(),
 					(c) -> {
-						Method m = MethodHandleHelper.reflectMethodRecurse(event.getClass(), "getComparatorValue", "getComparatorValue", int.class);
+						Method m = MethodHandleHelper.reflectMethodRecurse(event.getClass(), true, "getComparatorValue", "getComparatorValue", int.class);
 						return m != null && m.getDeclaringClass() != TileBase.class;
 					})) {
 

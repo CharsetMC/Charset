@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.audio.storage;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Pair;

@@ -85,7 +85,7 @@ public class CharsetTweakDoubleDoors {
 
 					if (state == ThreeState.MAYBE && !(block.getRegistryName().getNamespace().equals("malisisdoors"))) {
 						Class c = block.getClass();
-						Method m = MethodHandleHelper.reflectMethodRecurse(c, "onBlockActivated", "func_180639_a",
+						Method m = MethodHandleHelper.reflectMethodRecurse(c, true, "onBlockActivated", "func_180639_a",
 								World.class, BlockPos.class, IBlockState.class, EntityPlayer.class,
 								EnumHand.class, EnumFacing.class,
 								float.class, float.class, float.class);

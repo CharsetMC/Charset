@@ -35,8 +35,16 @@ public final class MethodHandleHelper {
 
     }
 
-    public static Method reflectMethodRecurse(Class<?> c, String deobfName, String obfName, Class... parameterTypes) {
+    public static Method reflectMethodRecurse(Class<?> c, boolean isPublic, String deobfName, String obfName, Class... parameterTypes) {
         String nameToFind = ((Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")) ? deobfName : obfName;
+
+        if (isPublic) {
+            try {
+                return c.getMethod(nameToFind, parameterTypes);
+            } catch (NoSuchMethodException e) {
+                throw new ReflectionHelper.UnableToFindMethodException(e);
+            }
+        }
 
         while (c != null) {
             try {
