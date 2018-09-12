@@ -2,3 +2,4 @@ Bugs fixed:
 
 * [lib] [GitHub/#351] Zero-length vector crash with OptiFine shaders enabled
 * [lib] [GitHub/#347] Attempted to fix a collection of NoClassDefFoundError exceptions
+* [lib] [GitHub/#292] Improved handling of inner and outer corners in wire connections.

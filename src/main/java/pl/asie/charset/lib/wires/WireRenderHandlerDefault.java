@@ -37,6 +37,7 @@ public class WireRenderHandlerDefault extends WireRenderHandler {
 	@Nonnull private TextureAtlasSprite[] top;
 	@Nullable private TextureAtlasSprite side;
 	@Nullable private TextureAtlasSprite edge;
+	@Nullable private TextureAtlasSprite corner;
 
 	public WireRenderHandlerDefault(WireProvider provider) {
 		super(provider);
@@ -62,9 +63,11 @@ public class WireRenderHandlerDefault extends WireRenderHandler {
 		if (!provider.isFlat()) {
 			edge = map.registerSprite(new ResourceLocation(domain, path + "edge"));
 			side = map.registerSprite(new ResourceLocation(domain, path + "side"));
+			corner = map.registerSprite(new ResourceLocation(domain, path + "corner"));
 		} else {
 			edge = null;
 			side = null;
+			corner = null;
 		}
 	}
 
@@ -77,6 +80,8 @@ public class WireRenderHandlerDefault extends WireRenderHandler {
 				return side;
 			case EDGE:
 				return edge;
+			case CORNER:
+				return corner;
 			default:
 				return top[15];
 		}

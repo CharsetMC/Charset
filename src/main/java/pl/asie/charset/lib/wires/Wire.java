@@ -254,7 +254,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
             return null;
         }
 
-        if (getLocation() == WireFace.CENTER && connectsAnyInternal() && neighborWHCache == null) {
+        if (connectsAnyInternal() && neighborWHCache == null) {
             neighborWHCache = new WireNeighborWHCache(getContainer().world(), getContainer().pos(), this);
         }
 
@@ -482,17 +482,15 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
             return false;
         }
 
-        if (location == WireFace.CENTER) {
-            WireNeighborWHCache cache1 = getNeighborWHCache();
-            WireNeighborWHCache cache2 = other.getNeighborWHCache();
-            if (cache1 != null || cache2 != null) {
-                if (cache1 == null || cache2 == null) {
-                    return false;
-                }
+        WireNeighborWHCache cache1 = getNeighborWHCache();
+        WireNeighborWHCache cache2 = other.getNeighborWHCache();
+        if (cache1 != null || cache2 != null) {
+            if (cache1 == null || cache2 == null) {
+                return false;
+            }
 
-                if (!cache1.renderEquals(cache2)) {
-                    return false;
-                }
+            if (!cache1.renderEquals(cache2)) {
+                return false;
             }
         }
 
@@ -507,7 +505,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (connects(facing)) {
-            return capabilities != null ? capabilities.hasCapability(capability, facing) : false;
+            return capabilities != null && capabilities.hasCapability(capability, facing);
         } else {
             return false;
         }

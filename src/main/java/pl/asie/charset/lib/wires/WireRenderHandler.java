@@ -33,6 +33,7 @@ public abstract class WireRenderHandler {
 		TOP,
 		SIDE,
 		EDGE,
+		CORNER,
 		PARTICLE
 	}
 
