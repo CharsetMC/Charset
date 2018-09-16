@@ -21,19 +21,25 @@ package pl.asie.charset.module.transport.dyeableMinecarts;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelMinecart;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.utils.ColorUtils;
 
-public class ModelMinecartWrapped extends ModelBase {
+public class ModelMinecartWrapped extends ModelMinecart {
 	public static final ResourceLocation DYEABLE_MINECART = new ResourceLocation("charset_generated:textures/entity/minecart.png");
 	public static final ResourceLocation MINECART = new ResourceLocation("entity/minecart");
 	private final ModelBase parent;
 
 	public ModelMinecartWrapped(ModelBase parent) {
+		super();
 		this.parent = parent;
+
+		if (parent instanceof ModelMinecart) {
+			this.sideModels = ((ModelMinecart) parent).sideModels;
+		}
 	}
 
 	public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale) {

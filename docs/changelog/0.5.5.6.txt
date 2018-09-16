@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* [transport.dyeableMinecarts] [GitHub/#353] Incompatibility with other mods' expectations regarding model override
