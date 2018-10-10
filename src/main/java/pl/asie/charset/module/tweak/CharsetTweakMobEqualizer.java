@@ -82,7 +82,7 @@ public class CharsetTweakMobEqualizer {
 			}
 		}
 
-		List<ItemStack> carriedWeapons = new ArrayList<ItemStack>();
+		List<ItemStack> carriedWeapons = new ArrayList<>();
 		if (copyWeapon) {
 			ItemStack currentWeapon = ent.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
 			double currentWeaponDmg = ItemUtils.getAttributeValue(EntityEquipmentSlot.MAINHAND, currentWeapon, SharedMonsterAttributes.ATTACK_DAMAGE);
