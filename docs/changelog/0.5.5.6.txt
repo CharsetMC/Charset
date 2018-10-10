@@ -1,3 +1,17 @@
+Additions:
+
+* [lib] Reworked Charset developer commands.
+    * /ch at is now merged with /ch hand as follows:
+        * "/ch hand" is now an alias for "/ch at item".
+        * "/ch at block" is used to look up information on a block.
+        * "/ch at self" is used to look up information on the caller's entity.
+    * The command alone will print general information (ID, basic statistics, etc.)
+    * The "class" sub-command can be used to look up the class hierarchy of a given in-game object.
+    * Sub-commands for item-based options include "material" (Charset material registry) and "ore" (Forge ore dict).
+    * Where applicable, "tag" can be used to print the NBT tag.
+    * Tab completion support has been added.
+* [tweak.rightClickHarvest] [GitHub/#355] Nether Wart support.
+
 Bugs fixed:
 
 * [transport.dyeableMinecarts] [GitHub/#353] Incompatibility with other mods' expectations regarding model override

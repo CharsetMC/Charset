@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -55,6 +56,13 @@ public class TileEntityChestRendererCharset extends TileEntitySpecialRenderer<Ti
 
 	@Override
 	public void render(TileEntityChestCharset te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+		if (te == null) {
+			// GitHub/#352
+			ModCharset.logger.error("TileEntityChestCharset null in renderer! This should not happen! This is a bug!");
+			new Throwable().printStackTrace();
+			return;
+		}
+
 		EnumFacing facing = EnumFacing.SOUTH;
 
 		//noinspection ConstantConditions

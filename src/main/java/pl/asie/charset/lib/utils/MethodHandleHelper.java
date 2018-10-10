@@ -29,10 +29,43 @@ import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public final class MethodHandleHelper {
     private MethodHandleHelper() {
 
+    }
+
+    public static Iterable<Class> classes(Class c) {
+        return () -> {
+            final LinkedList<Class> classQueue = new LinkedList<>();
+            classQueue.add(c);
+
+            return new Iterator<Class>() {
+                @Override
+                public boolean hasNext() {
+                    return !classQueue.isEmpty();
+                }
+
+                @Override
+                public Class next() {
+                    Class out = classQueue.remove();
+                    if (out != Object.class) {
+                        if (out.getSuperclass() != null) {
+                            classQueue.add(out.getSuperclass());
+                        }
+
+                        for (Class in : out.getInterfaces()) {
+                            if (in != null) {
+                                classQueue.add(in);
+                            }
+                        }
+                    }
+                    return out;
+                }
+            };
+        };
     }
 
     public static Method reflectMethodRecurse(Class<?> c, boolean isPublic, String deobfName, String obfName, Class... parameterTypes) {

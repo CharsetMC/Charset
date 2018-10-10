@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.tweak;
 
+import net.minecraft.block.BlockNetherWart;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
@@ -59,6 +60,27 @@ public class CharsetTweakRightClickHarvest {
 		whitelistRequired = ConfigUtils.getBoolean(config, "general", "harvestingRequiresWhitelisting", false, "Does right-click-harvesting a crop require whitelisting?", true);
 	}
 
+	public boolean canHarvest(World world, BlockPos pos, IBlockState state) {
+		ThreeState rightClickHarvest = CharsetIMC.INSTANCE.allows("rightClickHarvest", state.getBlock().getRegistryName()).otherwise(whitelistRequired ? ThreeState.NO : ThreeState.YES);
+		if (rightClickHarvest == ThreeState.NO) {
+			return false;
+		}
+
+		if (state.getBlock() instanceof IGrowable
+				&& !((IGrowable) state.getBlock()).canGrow(world, pos, state, false)
+				&& !world.isAirBlock(pos.down())) {
+			return true;
+		}
+
+		if (state.getBlock() instanceof BlockNetherWart
+			&& state.getValue(BlockNetherWart.AGE) >= 3
+			&& !world.isAirBlock(pos.down())) {
+			return true;
+		}
+
+		return false;
+	}
+
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
 		World world = event.getWorld();
@@ -66,14 +88,7 @@ public class CharsetTweakRightClickHarvest {
 			BlockPos pos = event.getPos();
 			IBlockState state = world.getBlockState(pos);
 
-			if (state.getBlock() instanceof IGrowable
-					&& !((IGrowable) state.getBlock()).canGrow(world, pos, state, false)
-					&& !world.isAirBlock(pos.down())) {
-				ThreeState rightClickHarvest = CharsetIMC.INSTANCE.allows("rightClickHarvest", state.getBlock().getRegistryName()).otherwise(whitelistRequired ? ThreeState.NO : ThreeState.YES);
-				if (rightClickHarvest == ThreeState.NO) {
-					return;
-				}
-
+			if (canHarvest(world, pos, state)) {
 				// It can no longer grow, so let's try dropping it.
 				NonNullList<ItemStack> drops = NonNullList.create();
 				state.getBlock().getDrops(drops, world, pos, state, 0);
