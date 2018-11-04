@@ -238,7 +238,7 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 						stackRemoved = stackRemoved.copy();
 						stackRemoved.setCount(1);
 					}
-					spawnAsEntity(worldIn, pos, stackRemoved);
+					spawnAsEntity(worldIn, pos.up(), stackRemoved);
 				}
 				if (((TileEntityStacks) te).isEmpty()) {
 					worldIn.setBlockToAir(pos);
