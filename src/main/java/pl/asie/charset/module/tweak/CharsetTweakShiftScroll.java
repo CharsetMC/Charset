@@ -35,8 +35,7 @@ import pl.asie.charset.lib.handlers.ShiftScrollHandler;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 @CharsetModule(
 		name = "tweak.shiftScroll",
@@ -58,20 +57,15 @@ public class CharsetTweakShiftScroll {
 		/* ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.OreDictionaryGroup("plankWood"));
 		ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.OreDictionaryGroup("logWood")); */
 
-		Multimap<String, Block> glazedTerracottas = LinkedHashMultimap.create();
-		Collection<Block> rails = new ArrayList<>();
-		Collection<Item> records = new ArrayList<>();
+		Map<String, List<Block>> glazedTerracottas = new LinkedHashMap<>();
 
 		for (Block b : ForgeRegistries.BLOCKS) {
-			if (b instanceof BlockGlazedTerracotta) glazedTerracottas.put(b.getRegistryName().getNamespace(), b);
-			else if (b instanceof BlockRailBase) rails.add(b);
+			if (b instanceof BlockGlazedTerracotta) {
+				glazedTerracottas.computeIfAbsent(b.getRegistryName().getNamespace(), (z) -> new ArrayList<>(16)).add(b);
+			}
 		}
 
-		for (Item i : ForgeRegistries.ITEMS) {
-			if (i instanceof ItemRecord) records.add(i);
-		}
-
-		for (String domain : glazedTerracottas.keys()) {
+		for (String domain : glazedTerracottas.keySet()) {
 			ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(glazedTerracottas.get(domain)));
 		}
 		/* ShiftScrollHandler.INSTANCE.register(new ShiftScrollHandler.ItemGroup(rails));

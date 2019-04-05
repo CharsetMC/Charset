@@ -19,7 +19,6 @@
 
 package pl.asie.charset.module.storage.barrels;
 
-import com.elytradev.mirage.lighting.Light;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import gnu.trove.impl.Constants;
@@ -56,7 +55,6 @@ import pl.asie.charset.lib.render.DualTileEntitySpecialRenderer;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.charset.lib.utils.*;
-import pl.asie.charset.module.tweak.dynlights.CharsetTweakDynamicLights;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;

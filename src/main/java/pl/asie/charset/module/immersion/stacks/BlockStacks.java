@@ -49,6 +49,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.lib.block.BlockBase;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
+import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.RayTraceUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
@@ -238,7 +239,25 @@ public class BlockStacks extends BlockBase implements ITileEntityProvider {
 						stackRemoved = stackRemoved.copy();
 						stackRemoved.setCount(1);
 					}
-					spawnAsEntity(worldIn, pos, stackRemoved);
+
+					Vec3d loc = hitPos != null ? hitPos : new Vec3d(pos.getX() + 0.5, pos.getY() + 0.95, pos.getZ() + 0.5);
+					if (CharsetImmersionStacks.insertToPlayerInventory) {
+						ItemUtils.giveOrSpawnItemEntity(
+								player,
+								worldIn,
+								loc,
+								stackRemoved,
+								0, 0, 0,1.0f,
+								true
+						);
+					} else {
+						ItemUtils.spawnItemEntity(
+								worldIn,
+								loc,
+								stackRemoved,
+								0, 0, 0, 1.0f
+						);
+					}
 				}
 				if (((TileEntityStacks) te).isEmpty()) {
 					worldIn.setBlockToAir(pos);

@@ -140,17 +140,18 @@ public class StackShapes {
 			return true;
 		} */
 
+		boolean isFlat = false;
 		int[] ids = OreDictionary.getOreIDs(stack);
 		for (int id : ids) {
 			String name = OreDictionary.getOreName(id);
 			if (name.startsWith("gear") || name.startsWith("plate") || name.startsWith("coin")) {
-				return true;
+				isFlat = true;
 			} else if (name.startsWith("ingot")) {
 				return false;
 			}
 		}
 
-		return false;
+		return isFlat;
 	}
 
 	public static boolean isIngot(ItemStack stack) {

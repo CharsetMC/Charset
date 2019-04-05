@@ -36,6 +36,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -47,6 +48,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.ModCharset;
+import pl.asie.charset.lib.config.CharsetLoadConfigEvent;
+import pl.asie.charset.lib.config.ConfigUtils;
 import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.utils.MethodHandleHelper;
@@ -64,6 +67,16 @@ import java.util.Map;
 )
 public class CharsetImmersionStacks {
 	public BlockStacks blockStacks;
+
+	@CharsetModule.Configuration
+	public static Configuration config;
+
+	public static boolean insertToPlayerInventory;
+
+	@Mod.EventHandler
+	public void reloadReentrantConfig(CharsetLoadConfigEvent event) {
+		insertToPlayerInventory = ConfigUtils.getBoolean(config, "general", "insertToPlayerInventory", true, "Should left-clicked items be inserted to the player inventory automatically, if possible?", false);
+	}
 
 	@Mod.EventHandler
 	public void onPreInit(FMLPreInitializationEvent event) {

@@ -215,9 +215,8 @@ public class ShiftScrollHandler {
 					if (o instanceof Map) {
 						try {
 							Map m = (Map) o;
-							if (m.containsKey("items") || m.containsKey("item")) {
+							if (m.containsKey("items")) {
 								Object oo = m.get("items");
-								if (oo == null) oo = m.get("item");
 
 								if (oo instanceof Collection) {
 									List<Item> items = new ArrayList<>();
@@ -228,8 +227,6 @@ public class ShiftScrollHandler {
 										}
 									}
 									providers.add(new ItemGroup(items));
-								} else if (oo instanceof String) {
-
 								}
 							} else if (m.containsKey("item")) {
 								Item i = ForgeRegistries.ITEMS.getValue(new ResourceLocation((String) m.get("item")));

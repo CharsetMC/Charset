@@ -52,7 +52,9 @@ public class PacketSyncAttackValue extends PacketEntity {
 	@Override
 	public void apply(INetHandler handler) {
 		super.apply(handler);
-		((EntityLivingBase) entity).attackedAtYaw = attackedAtYaw;
+		if (entity != null) {
+			((EntityLivingBase) entity).attackedAtYaw = attackedAtYaw;
+		}
 	}
 
 	@Override

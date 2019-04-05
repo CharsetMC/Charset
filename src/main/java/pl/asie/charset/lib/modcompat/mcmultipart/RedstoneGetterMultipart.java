@@ -48,7 +48,7 @@ public class RedstoneGetterMultipart implements IRedstoneGetter {
 							return 0;
 						}
 
-						if (info.getTile().hasPartCapability(Capabilities.REDSTONE_EMITTER, face.getOpposite())) {
+						if (info.getTile() != null && info.getTile().hasPartCapability(Capabilities.REDSTONE_EMITTER, face.getOpposite())) {
 							return info.getTile().getPartCapability(Capabilities.REDSTONE_EMITTER, face.getOpposite()).getRedstoneSignal();
 						} else if (info.getState().canProvidePower()) {
 							return info.getPart().getWeakPower(info.getPartWorld(), info.getPartPos(), info, face);
@@ -73,7 +73,7 @@ public class RedstoneGetterMultipart implements IRedstoneGetter {
 							return new byte[16];
 						}
 
-						if (info.getTile().hasPartCapability(Capabilities.BUNDLED_EMITTER, face.getOpposite())) {
+						if (info.getTile() != null && info.getTile().hasPartCapability(Capabilities.BUNDLED_EMITTER, face.getOpposite())) {
 							return info.getTile().getPartCapability(Capabilities.BUNDLED_EMITTER, face.getOpposite()).getBundledSignal();
 						} else {
 							return null;

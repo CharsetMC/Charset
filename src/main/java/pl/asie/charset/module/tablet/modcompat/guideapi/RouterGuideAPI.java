@@ -78,7 +78,7 @@ public class RouterGuideAPI implements IRouterSearchable {
 		StringBuilder builder = new StringBuilder("\\title{" + entry.getLocalizedName() + "}\n\n");
 		for (IPage page : entry.pageList) {
 			if (page instanceof PageTextImage) {
-				builder.append(((PageTextImage) page).draw.replaceAll("\\\\n", "\n")).append("\n\n");
+				builder.append(((PageTextImage) page).pageText.draw.replaceAll("\\\\n", "\n")).append("\n\n");
 			} else if (page instanceof PageText) {
 				builder.append(((PageText) page).draw.replaceAll("\\\\n", "\n")).append("\n\n");
 			}

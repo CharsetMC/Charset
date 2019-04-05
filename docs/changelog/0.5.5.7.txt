@@ -1,0 +1,17 @@
+Additions:
+
+* [immersion.stacks] [GitHub/#382] Place collected items directly in inventory (asie)
+
+Removed:
+
+* [tweak.dynamicLights] The whole thing - Mirage seems to be long unmaintained. (asie)
+
+Bugs fixed:
+
+* [lib] [GitHub/#366] SimpleLogic crash on tile-less multiparts (asie)
+* [immersion.stacks] [GitHub/#358] Stop making items fly everywhere when removing them from a stack (asie)
+* [storage.chests] [GitHub/#368] Breaking animation colors are incorrect on some chests (asie)
+* [tablet] Update GuideAPI compatibility to 2.1.8 (asie)
+* [tweak.fix.playerdamageanimation] [GitHub/#365] Packet crash on entity missing client-side (asie)
+* [tweak.shiftScroll] [GitHub/#386] Duplicate glazed terracotta rules (asie)
+* [tweak.shiftScroll] Fixes in rule parsing code (asie)

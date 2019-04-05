@@ -239,9 +239,11 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 		harvesters.set(player);
 
 		if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) {
-			for (ItemStack item : items)
-				if (chance >= 1.0f || worldIn.rand.nextFloat() <= chance)
+			for (ItemStack item : items) {
+				if (chance >= 1.0f || worldIn.rand.nextFloat() <= chance) {
 					spawnAsEntity(worldIn, pos, item);
+				}
+			}
 		}
 
 		harvesters.set(null);
@@ -268,9 +270,11 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 			getDrops(items, world, pos, state, tile, 0, false);
 			float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / Utils.getExplosionSize(explosion), true, null);
 
-			for (ItemStack item : items)
-				if (world.rand.nextFloat() <= chance)
+			for (ItemStack item : items) {
+				if (world.rand.nextFloat() <= chance) {
 					spawnAsEntity(world, pos, item);
+				}
+			}
 		} else {
 			// The block seems to have been replaced with something.
 			// Don't do anything.

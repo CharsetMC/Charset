@@ -150,12 +150,14 @@ public class TileEntityChestRendererCharset extends TileEntitySpecialRenderer<Ti
 		model.chestKnob.rotateAngleX = model.chestLid.rotateAngleX;
 
 		ItemMaterial mat = te.material.getMaterial();
-		RenderUtils.glColor(
-				RenderUtils.getAverageColor(
-						RenderUtils.getItemSprite(mat.getStack(), te.getWorld(), null, null),
-						RenderUtils.AveragingMode.FULL
-				), alpha
-		);
+		if (destroyStage < 0) {
+			RenderUtils.glColor(
+					RenderUtils.getAverageColor(
+							RenderUtils.getItemSprite(mat.getStack(), te.getWorld(), null, null),
+							RenderUtils.AveragingMode.FULL
+					), alpha
+			);
+		}
 		model.chestLid.render(0.0625F);
 		model.chestBelow.render(0.0625F);
 
