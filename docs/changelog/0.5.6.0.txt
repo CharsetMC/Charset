@@ -1,0 +1,3 @@
+Additions:
+
+* [tweak.shiftScroll] "alwaysCreative" flag for always treating an entry as if it were creative mode (replace item based on list order) (asie)
