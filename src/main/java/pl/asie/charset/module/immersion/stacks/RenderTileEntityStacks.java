@@ -271,13 +271,17 @@ public class RenderTileEntityStacks implements IBakedModel, IStateParticleBakedM
 				// renderer the second
 				IBakedModel model = RenderUtils.getItemModel(stack, stacks.getWorld(), Minecraft.getMinecraft().player);
 				ModelTransformer.IVertexTransformer transformer = createTransformer(i, stack, rand);
-				for (BakedQuad quad : model.getQuads(state, null, 0)) {
-					list.add(ModelTransformer.transform(quad, transformer));
-				}
-				for (EnumFacing facing : EnumFacing.VALUES) {
-					for (BakedQuad quad : model.getQuads(state, facing, 0)) {
+				try {
+					for (BakedQuad quad : model.getQuads(state, null, 0)) {
 						list.add(ModelTransformer.transform(quad, transformer));
 					}
+					for (EnumFacing facing : EnumFacing.VALUES) {
+						for (BakedQuad quad : model.getQuads(state, facing, 0)) {
+							list.add(ModelTransformer.transform(quad, transformer));
+						}
+					}
+				} catch (ModelTransformer.TransformationFailedException e) {
+					throw new RuntimeException(e);
 				}
 			}
 		}

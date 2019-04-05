@@ -329,13 +329,17 @@ public class TileEntityDayBarrelRenderer extends TileEntitySpecialRenderer<TileE
             if (model.isGui3d()) {
                 RenderHelper.enableStandardItemLighting();
                 if (!model.isBuiltInRenderer()) {
-                    model = ModelTransformer.transform(model, null, 0, (quad, element, data) -> {
-                        if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
-                            data[0] /= 1.5f;
-                            data[2] *= 1.7f;
-                        }
-                        return data;
-                    });
+                    try {
+                        model = ModelTransformer.transform(model, null, 0, (quad, element, data) -> {
+                            if (element.getUsage() == VertexFormatElement.EnumUsage.NORMAL) {
+                                data[0] /= 1.5f;
+                                data[2] *= 1.7f;
+                            }
+                            return data;
+                        });
+                    } catch (ModelTransformer.TransformationFailedException e) {
+                        // ignore, could be worse
+                    }
                 }
             } else {
                 RenderHelper.enableStandardItemLighting();

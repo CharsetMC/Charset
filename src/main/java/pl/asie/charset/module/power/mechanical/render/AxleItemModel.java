@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ResourceLocation;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.render.model.IRenderComparable;
@@ -72,22 +73,27 @@ public class AxleItemModel extends ModelFactory<AxleItemModel.Key> {
 	public IBakedModel bake(Key object, boolean isItem, BlockRenderLayer layer) {
 		TextureAtlasSprite replacementSprite = RenderUtils.getItemSprite(object.material.getStack());
 
-		return ModelTransformer.transform(parent,
-				CharsetPowerMechanical.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
-					if (element.getUsage() == VertexFormatElement.EnumUsage.UV) {
-						float u = quad.getSprite().getUnInterpolatedU(data[0]);
-						float v = quad.getSprite().getUnInterpolatedV(data[1]);
+		try {
+			return ModelTransformer.transform(parent,
+					CharsetPowerMechanical.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
+						if (element.getUsage() == VertexFormatElement.EnumUsage.UV) {
+							float u = quad.getSprite().getUnInterpolatedU(data[0]);
+							float v = quad.getSprite().getUnInterpolatedV(data[1]);
 
-						return new float[] {
-								replacementSprite.getInterpolatedU(u),
-								replacementSprite.getInterpolatedV(v),
-								data[2],
-								data[3]
-						};
-					} else {
-						return data;
-					}
-				});
+							return new float[]{
+									replacementSprite.getInterpolatedU(u),
+									replacementSprite.getInterpolatedV(v),
+									data[2],
+									data[3]
+							};
+						} else {
+							return data;
+						}
+					});
+		} catch (ModelTransformer.TransformationFailedException e) {
+			ModCharset.logger.warn("Baking axle item model for sprite " + replacementSprite.getIconName() + " failed!", e);
+			return parent;
+		}
 	}
 
 	@Override

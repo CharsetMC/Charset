@@ -28,6 +28,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
 import pl.asie.charset.lib.render.model.ModelFactory;
+import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
 import pl.asie.simplelogic.gates.logic.GateLogicBundledTransposer;
 import pl.asie.simplelogic.gates.logic.IGateContainer;
@@ -148,7 +149,11 @@ public class GateCustomRendererTransposer extends GateCustomRenderer<GateLogicBu
 						rayModels[pos] = model;
 					}
 
-					modelConsumer.accept(getTransformedModel(rayModels[pos], gate));
+					try {
+						modelConsumer.accept(getTransformedModel(rayModels[pos], gate));
+					} catch (ModelTransformer.TransformationFailedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 				v >>= 1; i++;
 			}

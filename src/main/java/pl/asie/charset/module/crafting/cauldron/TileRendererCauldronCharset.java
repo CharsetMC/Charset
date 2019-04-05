@@ -112,7 +112,12 @@ public class TileRendererCauldronCharset extends FastTESR<TileCauldronCharset> {
 		if (color == -1) {
 			model = smodel;
 		} else {
-			model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
+			try {
+				model = ModelTransformer.transform(smodel, state, 0L, new FluidColorTransformer(color));
+			} catch (ModelTransformer.TransformationFailedException e) {
+				// ignore, could be worse
+				model = smodel;
+			}
 		}
 
 		int light = contents.getFluid().getLuminosity();

@@ -60,11 +60,11 @@ public abstract class GateCustomRenderer<T extends GateLogic> {
 
 	// Utility methods
 
-	protected final IBakedModel getTransformedModel(IBakedModel model, IGateContainer gate) {
+	protected final IBakedModel getTransformedModel(IBakedModel model, IGateContainer gate) throws ModelTransformer.TransformationFailedException {
 		return getTransformedModel(model, null, gate);
 	}
 
-	protected final IBakedModel getTransformedModel(IBakedModel model, @Nullable ModelTransformer.IVertexTransformer transformer, IGateContainer gate) {
+	protected final IBakedModel getTransformedModel(IBakedModel model, @Nullable ModelTransformer.IVertexTransformer transformer, IGateContainer gate) throws ModelTransformer.TransformationFailedException {
 		ModelTransformer.IVertexTransformer rotate = ModelTransformer.IVertexTransformer.transform(RendererGate.INSTANCE.getTransform(gate), null);
 
 		return ModelTransformer.transform(
@@ -80,7 +80,11 @@ public abstract class GateCustomRenderer<T extends GateLogic> {
 
 	@SuppressWarnings("SameParameterValue")
 	protected final void renderTransformedModel(IBakedModel model, @Nullable  ModelTransformer.IVertexTransformer transformer, IGateContainer gate, IBlockAccess world, double x, double y, double z, BufferBuilder buffer) {
-		model = getTransformedModel(model, transformer, gate);
+		try {
+			model = getTransformedModel(model, transformer, gate);
+		} catch (ModelTransformer.TransformationFailedException e) {
+			throw new RuntimeException(e);
+		}
 		BlockPos pos = gate.getGatePos();
 		buffer.setTranslation(x - pos.getX(), y - pos.getY(), z - pos.getZ());
 		renderer.renderModel(world, model, SimpleLogicGates.blockGate.getDefaultState(), pos, buffer, false);

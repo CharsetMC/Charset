@@ -34,6 +34,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.animation.FastTESR;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.utils.RenderUtils;
 import pl.asie.charset.module.power.steam.CharsetPowerSteam;
@@ -64,7 +65,12 @@ public class RenderWaterBoiler extends FastTESR<TileWaterBoiler> {
 		for (int i = 0; i < ACCURACY; i++) {
 			float a = (i + 1) * MAX_HEAT / ACCURACY;
 			int color = (((int) (a * 255)) << 24) | 0xFFFFFF;
-			heatOverlayBaked[i] = ModelTransformer.transform(heatOverlay, CharsetPowerSteam.blockWaterBoiler.getDefaultState(), 0L, ModelTransformer.IVertexTransformer.tint(color));
+			try {
+				heatOverlayBaked[i] = ModelTransformer.transform(heatOverlay, CharsetPowerSteam.blockWaterBoiler.getDefaultState(), 0L, ModelTransformer.IVertexTransformer.tint(color));
+			} catch (ModelTransformer.TransformationFailedException e) {
+				ModCharset.logger.warn("Failed to transform heat overlay model!", e);
+				heatOverlayBaked[i] = heatOverlay;
+			}
 		}
 	}
 

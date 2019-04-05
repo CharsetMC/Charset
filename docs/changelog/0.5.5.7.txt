@@ -8,6 +8,7 @@ Removed:
 
 Bugs fixed:
 
+* [GitHub/#385] Where possible, be more lenient with mods emitting broken quads to avoid crashes (asie)
 * [lib] [GitHub/#366] SimpleLogic crash on tile-less multiparts (asie)
 * [immersion.stacks] [GitHub/#358] Stop making items fly everywhere when removing them from a stack (asie)
 * [storage.chests] [GitHub/#368] Breaking animation colors are incorrect on some chests (asie)

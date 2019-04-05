@@ -41,6 +41,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.command.CommandCharset;
 import pl.asie.charset.lib.render.model.ModelTransformer;
@@ -128,18 +129,23 @@ public class ProxyClient extends ProxyCommon {
 							for (int i = 0; i <= 6; i++) {
 								EnumFacing facingIn = (i < 6) ? EnumFacing.byIndex(i) : null;
 								for (BakedQuad quadIn : model.getQuads(state, facingIn, 0)) {
-									result.addQuad(layer, facingIn, ModelTransformer.transform(quadIn, (quad, element, data) -> {
-										if (quad.getTintIndex() == 1 && element == DefaultVertexFormats.TEX_2S) {
-											return new float[]{15f * 0x20 / 0xFFFF, 0, 0, 0};
-										}
-										return data;
-									}, (bakedQuad -> {
-										if (bakedQuad.getTintIndex() == 1) {
-											return format;
-										} else {
-											return bakedQuad.getFormat();
-										}
-									})));
+									try {
+										result.addQuad(layer, facingIn, ModelTransformer.transform(quadIn, (quad, element, data) -> {
+											if (quad.getTintIndex() == 1 && element == DefaultVertexFormats.TEX_2S) {
+												return new float[]{15f * 0x20 / 0xFFFF, 0, 0, 0};
+											}
+											return data;
+										}, (bakedQuad -> {
+											if (bakedQuad.getTintIndex() == 1) {
+												return format;
+											} else {
+												return bakedQuad.getFormat();
+											}
+										})));
+									} catch (ModelTransformer.TransformationFailedException e) {
+										ModCharset.logger.warn("Failed to transform quad in charset:light_jar!", e);
+										result.addQuad(layer, facing, quadIn);
+									}
 								}
 							}
 						}

@@ -42,15 +42,29 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public final class ModelTransformer {
+     public static class TransformationFailedException extends Exception {
+         public TransformationFailedException(String s) {
+             super(s);
+         }
+
+         public TransformationFailedException(Throwable t) {
+             super(t);
+         }
+
+         public TransformationFailedException(String s, Throwable t) {
+             super(s, t);
+         }
+     }
+
      private ModelTransformer() {
 
      }
 
-     public static IBakedModel transform(IBakedModel model, IBlockState state, long rand, IVertexTransformer transformer) {
+     public static IBakedModel transform(IBakedModel model, IBlockState state, long rand, IVertexTransformer transformer) throws TransformationFailedException {
          return transform(model, state, rand, transformer, null);
      }
 
-     public static IBakedModel transform(IBakedModel model, IBlockState state, long rand, IVertexTransformer transformer, @Nullable Function<BakedQuad, VertexFormat> format) {
+     public static IBakedModel transform(IBakedModel model, IBlockState state, long rand, IVertexTransformer transformer, @Nullable Function<BakedQuad, VertexFormat> format) throws TransformationFailedException {
          SimpleBakedModel out = new SimpleBakedModel(model);
 
          for (int i = 0; i <= 6; i++) {
@@ -63,15 +77,19 @@ public final class ModelTransformer {
          return out;
      }
 
-    public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) {
+    public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer) throws TransformationFailedException {
          return transform(quad, transformer, null);
     }
 
-     public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer, @Nullable Function<BakedQuad, VertexFormat> format2) {
+     public static BakedQuad transform(BakedQuad quad, IVertexTransformer transformer, @Nullable Function<BakedQuad, VertexFormat> format2) throws TransformationFailedException {
          VertexFormat format = format2 != null ? format2.apply(quad) : quad.getFormat();
          UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
-         LightUtil.putBakedQuad(new VertexTransformerWrapper(builder, quad, transformer), quad);
-         return builder.build();
+         try {
+             LightUtil.putBakedQuad(new VertexTransformerWrapper(builder, quad, transformer), quad);
+             return builder.build();
+         } catch (Exception e) {
+             throw new TransformationFailedException(e);
+         }
      }
 
      private static final class VertexTransformerWrapper implements IVertexConsumer {

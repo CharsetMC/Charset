@@ -100,63 +100,66 @@ public class TileAxleRenderer extends FastTESR<TileAxle> {
 		TextureAtlasSprite replacementSprite = RenderUtils.getItemSprite(key.material.getStack());
 		float factor = (float) (key.position * Math.PI / (ACCURACY * 2));
 
-		return ModelTransformer.transform(bakedModels[key.axis],
-				CharsetPowerMechanical.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
-					float factorf = 0.0f;
+		try {
+			return ModelTransformer.transform(bakedModels[key.axis],
+					CharsetPowerMechanical.blockAxle.getDefaultState(), 0L, (quad, element, data) -> {
+						float factorf = 0.0f;
 
-					if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {
-						factorf = 0.5f;
-					} else if (element.getUsage() == VertexFormatElement.EnumUsage.UV) {
-						float u = quad.getSprite().getUnInterpolatedU(data[0]);
-						float v = (quad.getSprite().getUnInterpolatedV(data[1]) % 4) + (4 * (key.texturing & 3));
-						if (key.texturing >= 4) {
-							u = 16 - u;
-						}
+						if (element.getUsage() == VertexFormatElement.EnumUsage.POSITION) {
+							factorf = 0.5f;
+						} else if (element.getUsage() == VertexFormatElement.EnumUsage.UV) {
+							float u = quad.getSprite().getUnInterpolatedU(data[0]);
+							float v = (quad.getSprite().getUnInterpolatedV(data[1]) % 4) + (4 * (key.texturing & 3));
+							if (key.texturing >= 4) {
+								u = 16 - u;
+							}
 
-						return new float[] {
-								replacementSprite.getInterpolatedU(u),
-								replacementSprite.getInterpolatedV(v),
-								data[2],
-								data[3]
-						};
-					} else if (element.getUsage() != VertexFormatElement.EnumUsage.NORMAL) {
-						return data;
-					}
-
-					if (factor <= 1e-5f) {
-						return data;
-					}
-
-					float x = data[0] - factorf;
-					float y = data[1] - factorf;
-					float z = data[2] - factorf;
-
-					switch (key.rotation) {
-						case 0:
-							return new float[] {
-									data[0],
-									y * MathHelper.cos(factor) - z * MathHelper.sin(factor) + factorf,
-									y * MathHelper.sin(factor) + z * MathHelper.cos(factor) + factorf,
-									data[3]
-							};
-						case 1:
-						default:
-							return new float[] {
-									z * MathHelper.sin(factor) + x * MathHelper.cos(factor) + factorf,
-									data[1],
-									z * MathHelper.cos(factor) - x * MathHelper.sin(factor) + factorf,
-									data[3]
-							};
-						case 2:
-							return new float[] {
-									x * MathHelper.cos(factor) - y * MathHelper.sin(factor) + factorf,
-									x * MathHelper.sin(factor) + y * MathHelper.cos(factor) + factorf,
+							return new float[]{
+									replacementSprite.getInterpolatedU(u),
+									replacementSprite.getInterpolatedV(v),
 									data[2],
 									data[3]
 							};
-					}
-				});
+						} else if (element.getUsage() != VertexFormatElement.EnumUsage.NORMAL) {
+							return data;
+						}
 
+						if (factor <= 1e-5f) {
+							return data;
+						}
+
+						float x = data[0] - factorf;
+						float y = data[1] - factorf;
+						float z = data[2] - factorf;
+
+						switch (key.rotation) {
+							case 0:
+								return new float[]{
+										data[0],
+										y * MathHelper.cos(factor) - z * MathHelper.sin(factor) + factorf,
+										y * MathHelper.sin(factor) + z * MathHelper.cos(factor) + factorf,
+										data[3]
+								};
+							case 1:
+							default:
+								return new float[]{
+										z * MathHelper.sin(factor) + x * MathHelper.cos(factor) + factorf,
+										data[1],
+										z * MathHelper.cos(factor) - x * MathHelper.sin(factor) + factorf,
+										data[3]
+								};
+							case 2:
+								return new float[]{
+										x * MathHelper.cos(factor) - y * MathHelper.sin(factor) + factorf,
+										x * MathHelper.sin(factor) + y * MathHelper.cos(factor) + factorf,
+										data[2],
+										data[3]
+								};
+						}
+					});
+		} catch (ModelTransformer.TransformationFailedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@SubscribeEvent

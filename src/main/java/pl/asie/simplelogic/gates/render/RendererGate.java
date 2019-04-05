@@ -169,18 +169,22 @@ public class RendererGate extends ModelFactory<PartGate> {
 				int color = state == GateRenderState.ON ? base.colorMul.get("on") :
 						(state == GateRenderState.OFF ? base.colorMul.get("off") : base.colorMul.get("disabled"));
 
-				result.addModel(ModelTransformer.transform(bakedModel, SimpleLogicGates.blockGate.getDefaultState(), 0, ((quad, element, data) -> {
-					if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
-						return new float[] {
-								((color) & 0xFF) / 255.0f,
-								((color >> 8) & 0xFF) / 255.0f,
-								((color >> 16) & 0xFF) / 255.0f,
-								1
-						};
-					} else {
-						return data;
-					}
-				})));
+				try {
+					result.addModel(ModelTransformer.transform(bakedModel, SimpleLogicGates.blockGate.getDefaultState(), 0, ((quad, element, data) -> {
+						if (element.getUsage() == VertexFormatElement.EnumUsage.COLOR) {
+							return new float[]{
+									((color) & 0xFF) / 255.0f,
+									((color >> 8) & 0xFF) / 255.0f,
+									((color >> 16) & 0xFF) / 255.0f,
+									1
+							};
+						} else {
+							return data;
+						}
+					})));
+				} catch (ModelTransformer.TransformationFailedException e) {
+					throw new RuntimeException(e);
+				}
 			} else if ("map".equals(layer.type) && layer.textures != null) {
 				String texture = layer.textures.get(state.name().toLowerCase(Locale.ENGLISH));
 				if (texture == null) {
@@ -248,12 +252,16 @@ public class RendererGate extends ModelFactory<PartGate> {
 						torchColor |= 0xFF000000;
 					}
 
-					torchModel = ModelTransformer.transform(
-							torchModel,
-							SimpleLogicGates.blockGate.getDefaultState(),
-							0L,
-							ModelTransformer.IVertexTransformer.tint(torchColor)
-					);
+					try {
+						torchModel = ModelTransformer.transform(
+								torchModel,
+								SimpleLogicGates.blockGate.getDefaultState(),
+								0L,
+								ModelTransformer.IVertexTransformer.tint(torchColor)
+						);
+					} catch (ModelTransformer.TransformationFailedException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				result.addModel(torchModel);

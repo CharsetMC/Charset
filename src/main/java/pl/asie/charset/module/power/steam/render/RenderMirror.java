@@ -54,6 +54,7 @@ import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.material.ColorLookupHandler;
 import pl.asie.charset.lib.render.model.ModelTransformer;
 import pl.asie.charset.lib.render.model.SimpleBakedModel;
@@ -106,11 +107,16 @@ public class RenderMirror {
 			IBakedModel base = modelBase.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 			IBakedModel face = modelFace.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter());
 
-			face = ModelTransformer.transform(face, CharsetPowerSteam.blockMirror.getDefaultState(), 0L, ModelTransformer.IVertexTransformer.transform(faceState));
-
 			SimpleBakedModel bakedModel = new SimpleBakedModel(base);
 			bakedModel.addModel(base);
-			bakedModel.addModel(face);
+
+			try {
+				face = ModelTransformer.transform(face, CharsetPowerSteam.blockMirror.getDefaultState(), 0L, ModelTransformer.IVertexTransformer.transform(faceState));
+				bakedModel.addModel(face);
+			} catch (ModelTransformer.TransformationFailedException e) {
+				ModCharset.logger.warn("Could not transform solar mirror face!", e);
+			}
+
 			bakedModel.addDefaultBlockTransforms();
 			event.getModelRegistry().putObject(new ModelResourceLocation("charset:solar_mirror", "rotation=" + i), bakedModel);
 		}
