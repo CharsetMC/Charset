@@ -295,7 +295,18 @@ public final class ItemMaterialHeuristics {
 
         String prefix = "stone";
         String suffixU = oreName.substring(prefix.length());
-        String suffix = suffixU.length() > 0 ? suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1) : "";
+	String suffix;
+	switch (suffixU.length()) {
+		case 0:
+			suffix = "";
+			break;
+		case 1:
+			suffix = suffixU.substring(0, 1).toLowerCase();
+			break;
+		default:
+			suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
+			break;
+	}
 
         ItemMaterial stoneMat = reg.getOrCreateMaterial(stack);
         if (reg.registerTypes(stoneMat, "stone", suffix, "block")) {
