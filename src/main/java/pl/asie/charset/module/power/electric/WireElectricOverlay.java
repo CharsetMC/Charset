@@ -22,6 +22,7 @@ package pl.asie.charset.module.power.electric;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -45,6 +46,11 @@ public class WireElectricOverlay extends WireRenderHandler implements IWireRende
 	@Override
 	public boolean isTranslucent() {
 		return true;
+	}
+
+	@Override
+	public BlockRenderLayer getRenderLayer() {
+		return null;
 	}
 
 	@Override
