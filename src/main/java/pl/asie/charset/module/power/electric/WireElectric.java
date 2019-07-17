@@ -103,7 +103,7 @@ public class WireElectric extends Wire {
 						IEnergyStorage storage = (IEnergyStorage) path.storage;
 						int os = sent;
 						if (!simulate) {
-							sent += storage.receiveEnergy((int) (maxReceive * mrPer.get(storage) / mrCounted), false);
+							sent += storage.receiveEnergy((int) ((long)maxReceive * (long)mrPer.get(storage) / mrCounted), false);
 						} else {
 							sent += (int) (maxReceive * mrPer.get(storage) / mrCounted);
 						}
