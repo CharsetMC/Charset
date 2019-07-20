@@ -40,7 +40,7 @@ dependencies {
 }
 
 minecraft {
-	version = "1.12.2-14.23.5.2824"
+	version = "1.12.2-14.23.5.2838"
 
 	runDir = "run"
 	useDepAts = true
@@ -131,8 +131,8 @@ dependencies {
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12:api"
 	deobfCompile name: "infraredstone", version: "1.12.2-1.2.104-api"
 	deobfCompile name: "InventoryTweaks", version: "1.63-api"
-	deobfCompile "mezz.jei:jei_1.12.2:4.15.0.273"
-	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.5.1_66"
+	deobfCompile "mezz.jei:jei_1.12.2:4.15.0.287"
+	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.5.3_73"
 	deobfCompile "li.cil.oc:OpenComputers:MC1.12-1.7.+:api"
 	deobfCompile name: "theoneprobe", version: "1.12-1.4.19-api"
 	deobfCompile "li.cil.tis3d:TIS-3D:MC1.12-1.3.1.+:api"

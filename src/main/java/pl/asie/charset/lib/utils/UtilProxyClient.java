@@ -69,8 +69,6 @@ import java.util.List;
 import java.util.Random;
 
 public class UtilProxyClient extends UtilProxyCommon {
-	public static FontRenderer FONT_RENDERER_FANCY;
-
 	@Override
 	public boolean addRunningParticles(IBlockState state, World world, BlockPos pos, Entity entity) {
 		IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
@@ -113,18 +111,6 @@ public class UtilProxyClient extends UtilProxyCommon {
 		} catch (Throwable t) {
 			t.printStackTrace();
 			list.add("" + TextFormatting.RED + TextFormatting.BOLD + "ERROR");
-		}
-	}
-
-	@Override
-	public void init() {
-		super.init();
-
-		try {
-			FONT_RENDERER_FANCY = new FontRendererFancy(Minecraft.getMinecraft().fontRenderer);
-		} catch (Exception e) {
-			e.printStackTrace();
-			FONT_RENDERER_FANCY = Minecraft.getMinecraft().fontRenderer;
 		}
 	}
 

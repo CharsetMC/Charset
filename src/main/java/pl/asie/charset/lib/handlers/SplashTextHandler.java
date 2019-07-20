@@ -31,8 +31,10 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,14 +44,13 @@ public class SplashTextHandler {
 	private static final ResourceLocation EXTRA_SPLASH_TEXTS = new ResourceLocation("charset:texts/extra_splashes.txt");
 
 	public void addTexts(List<String> splashes, ResourceLocation loc) {
-		IResource resource = null;
-
-		try {
-			resource = Minecraft.getMinecraft().getResourceManager().getResource(loc);
-			BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(resource.getInputStream(), Charsets.UTF_8));
+		try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(loc);
+		     InputStream stream = resource.getInputStream();
+		     InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+		     BufferedReader bufferedReader = new BufferedReader(reader)) {
 			String s;
 
-			while ((s = bufferedreader.readLine()) != null) {
+			while ((s = bufferedReader.readLine()) != null) {
 				if (s.length() == 0 || s.charAt(0) == '#')
 					continue;
 
@@ -61,9 +62,6 @@ public class SplashTextHandler {
 			}
 		} catch (IOException e) {
 
-		}
-		finally {
-			IOUtils.closeQuietly(resource);
 		}
 	}
 

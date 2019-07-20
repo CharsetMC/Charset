@@ -35,13 +35,31 @@ public class FontRendererFancy extends FontRenderer {
             "locationFontTexture", "field_111273_g");
     private final FontRenderer parent;
 
-    public FontRendererFancy(FontRenderer parent) throws IllegalAccessException {
+    protected FontRendererFancy(FontRenderer parent) throws IllegalAccessException {
         super(Minecraft.getMinecraft().gameSettings, (ResourceLocation) LOCATION_FONT_TEXTURE.get(parent),
                 Minecraft.getMinecraft().getTextureManager(), parent.getUnicodeFlag());
         this.parent = parent;
     }
 
-    @Override
+    private static FontRendererFancy instance;
+    private static boolean instanceInitialized = false;
+
+	public static FontRendererFancy getInstance() {
+	    if (!instanceInitialized && Minecraft.getMinecraft().fontRenderer != null) {
+	        instanceInitialized = true;
+
+	        try {
+	            instance = new FontRendererFancy(Minecraft.getMinecraft().fontRenderer);
+            } catch (IllegalAccessException e) {
+	            e.printStackTrace();
+	            instance = null;
+            }
+        }
+
+	    return instance;
+	}
+
+	@Override
     public int drawString(String text, float x, float y, int color, boolean dropShadow) {
         Matcher matcher = FANCY_COLOR.matcher(text);
         int origColor = color;

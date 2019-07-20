@@ -22,6 +22,7 @@ package pl.asie.charset.module.tablet.format.routers;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -32,6 +33,7 @@ import pl.asie.charset.module.tablet.format.api.IRouterSearchable;
 
 import javax.annotation.Nullable;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Locale;
@@ -54,8 +56,8 @@ public class RouterModDocumentation implements IRouterSearchable {
 			loc = new ResourceLocation(modid, "doc/" + path.getScheme() + path.getPath() + ".txt");
 		}
 
-		try {
-			byte[] data = ByteStreams.toByteArray(Minecraft.getMinecraft().getResourceManager().getResource(loc).getInputStream());
+		try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(loc); InputStream stream = resource.getInputStream()) {
+			byte[] data = ByteStreams.toByteArray(stream);
 			return new String(data, Charsets.UTF_8);
 		} catch (FileNotFoundException e) {
 			return "\\title{Not found!}\n\nThe documentation you are looking for cannot be found.";
@@ -79,8 +81,7 @@ public class RouterModDocumentation implements IRouterSearchable {
 		for (Item i : Item.REGISTRY) {
 			if (modid.equals(i.getRegistryName().getNamespace())) {
 				ResourceLocation loc = new ResourceLocation(modid, "doc/item/" + i.getRegistryName().getPath() + ".txt");
-				try {
-					Minecraft.getMinecraft().getResourceManager().getResource(loc);
+				try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(loc)) {
 					String name = I18n.translateToLocal(i.getTranslationKey() + ".name");
 					if (query.toLowerCase().contains(name.toLowerCase())) {
 						results.add(new SearchResult(

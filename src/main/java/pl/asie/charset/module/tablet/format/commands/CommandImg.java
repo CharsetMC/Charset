@@ -37,9 +37,7 @@ public class CommandImg implements ICommand {
 		String heightS = tokenizer.getOptionalParameter();
 
 		ResourceLocation rl = new ResourceLocation(imgName);
-		try {
-			Minecraft mc = Minecraft.getMinecraft();
-			IResource r = mc.getResourceManager().getResource(rl);
+		try (IResource r = Minecraft.getMinecraft().getResourceManager().getResource(rl)) {
 			if (r == null) {
 				throw new TruthError("Not found: " + imgName);
 			}

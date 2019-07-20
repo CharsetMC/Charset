@@ -104,6 +104,6 @@ public class ItemBlockBase extends ItemBlock implements ISubItemProvider.Contain
 	@SideOnly(Side.CLIENT)
 	@Nullable
 	public FontRenderer getFontRenderer(ItemStack stack) {
-		return UtilProxyClient.FONT_RENDERER_FANCY;
+		return FontRendererFancy.getInstance();
 	}
 }

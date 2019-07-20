@@ -199,10 +199,8 @@ public class NotifyProxyClient extends NotifyProxy {
         int width = 0;
         String[] lines = m.msgRendered.split("\n");
 
-        FontRenderer fr;
-        try {
-            fr = new FontRendererFancy(Minecraft.getMinecraft().fontRenderer);
-        } catch (IllegalAccessException e) {
+        FontRenderer fr = FontRendererFancy.getInstance();
+        if (fr == null) {
             fr = Minecraft.getMinecraft().fontRenderer;
         }
 

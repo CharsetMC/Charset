@@ -26,7 +26,6 @@ import crafttweaker.annotations.ModOnly;
 import crafttweaker.annotations.ZenRegister;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
-import jdk.nashorn.internal.scripts.JO;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.CharsetIMC;

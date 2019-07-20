@@ -20,6 +20,7 @@
 package pl.asie.simplelogic.gates.render;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import com.google.gson.GsonBuilder;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.client.model.IModel;
@@ -163,10 +165,10 @@ public class GateRenderDefinitions {
 
 		bar.step("base");
 
-		try {
-			base = GSON.fromJson(new InputStreamReader(
-					Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(baseLoc)).getInputStream()
-			), BaseDefinition.class);
+		try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(new ResourceLocation(baseLoc));
+		     InputStream stream = resource.getInputStream();
+		     InputStreamReader reader = new InputStreamReader(stream)) {
+			base = GSON.fromJson(reader, BaseDefinition.class);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -180,18 +182,18 @@ public class GateRenderDefinitions {
 		for (ResourceLocation s : definitions.keySet()) {
 			bar.step(s.toString());
 
-			try {
-				if (base != null) {
-					Definition def = GSON.fromJson(new InputStreamReader(
-							Minecraft.getMinecraft().getResourceManager().getResource(definitions.get(s)).getInputStream()
-					), Definition.class);
+			if (base != null) {
+				try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(definitions.get(s));
+					 InputStream stream = resource.getInputStream();
+					 InputStreamReader reader = new InputStreamReader(stream)) {
+					Definition def = GSON.fromJson(reader, Definition.class);
 					def.init();
 					def.merge(base);
 					def.postInit();
 					definitionMap.put(s, def);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 

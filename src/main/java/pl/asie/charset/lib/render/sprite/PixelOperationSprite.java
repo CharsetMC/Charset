@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.utils.RenderUtils;
@@ -160,8 +161,8 @@ public class PixelOperationSprite extends TextureAtlasSpriteCustom {
 
         operator.apply(pixels, width, getter);
 
-        try {
-            this.addFrameTextureData(width, height, pixels, manager.getResource(RenderUtils.toTextureFilePath(location)));
+        try (IResource resource = manager.getResource(RenderUtils.toTextureFilePath(location))) {
+            this.addFrameTextureData(width, height, pixels, resource);
         } catch (IOException e) {
             e.printStackTrace();
             this.addFrameTextureData(width, height, pixels);

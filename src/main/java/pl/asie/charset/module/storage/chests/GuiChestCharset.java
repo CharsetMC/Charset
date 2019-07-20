@@ -20,6 +20,7 @@
 package pl.asie.charset.module.storage.chests;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.inventory.GuiContainerCharset;
 
@@ -35,13 +36,11 @@ public class GuiChestCharset extends GuiContainerCharset<ContainerChestCharset> 
 
 		String s = "textures/gui/container/generic_";
 		ResourceLocation first = new ResourceLocation(s + (container.inventoryRows * 9) + ".png");
-		try {
-			this.mc.getResourceManager().getResource(first);
+		try (IResource r1 = this.mc.getResourceManager().getResource(first)) {
 			texture = first;
 		} catch (IOException e) {
 			first = new ResourceLocation("charset", s + (container.inventoryRows * 9) + ".png");
-			try {
-				this.mc.getResourceManager().getResource(first);
+			try (IResource r2 = this.mc.getResourceManager().getResource(first)) {
 				texture = first;
 			} catch (IOException ee) {
 				texture = new ResourceLocation(s + "54.png");

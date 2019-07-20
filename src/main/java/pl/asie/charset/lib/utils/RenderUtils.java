@@ -57,6 +57,7 @@ import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 
@@ -191,9 +192,8 @@ public final class RenderUtils {
 			}
 		}
 
-		try {
-			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(toTextureFilePath(location));
-			return TextureUtil.readBufferedImage(resource.getInputStream());
+		try (IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(toTextureFilePath(location)); InputStream stream = resource.getInputStream()) {
+			return TextureUtil.readBufferedImage(stream);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

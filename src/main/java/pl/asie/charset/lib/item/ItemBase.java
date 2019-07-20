@@ -66,6 +66,6 @@ public class ItemBase extends Item implements ISubItemProvider.Container {
 	@SideOnly(Side.CLIENT)
 	@Nullable
 	public FontRenderer getFontRenderer(ItemStack stack) {
-		return UtilProxyClient.FONT_RENDERER_FANCY;
+		return FontRendererFancy.getInstance();
 	}
 }

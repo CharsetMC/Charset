@@ -68,9 +68,9 @@ public class WordImage extends Word {
         }
 
         IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-        try {
-            IResource iresource = resourceManager.getResource(resource);
-            BufferedImage bufferedimage = TextureUtil.readBufferedImage(iresource.getInputStream());
+        try (IResource iresource = resourceManager.getResource(resource); InputStream stream = iresource.getInputStream()) {
+
+            BufferedImage bufferedimage = TextureUtil.readBufferedImage(stream);
             this.width = bufferedimage.getWidth();
             this.height = bufferedimage.getHeight();
             size_cache.put(resource, Pair.of(width, height));
