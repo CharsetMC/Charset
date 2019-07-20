@@ -23,6 +23,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.IThreadListener;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.invoke.MethodHandle;
@@ -33,7 +34,7 @@ public final class Utils {
 
 	static {
 		try {
-			EXPLOSION_SIZE_GETTER = MethodHandles.lookup().unreflectGetter(ReflectionHelper.findField(Explosion.class, "size", "field_77280_f"));
+			EXPLOSION_SIZE_GETTER = MethodHandles.lookup().unreflectGetter(ObfuscationReflectionHelper.findField(Explosion.class, "field_77280_f"));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

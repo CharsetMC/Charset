@@ -1,3 +1,10 @@
 Additions:
 
 * [tweak.shiftScroll] "alwaysCreative" flag for always treating an entry as if it were creative mode (replace item based on list order) (asie)
+
+Bugs fixed:
+
+* [#406] Divide by zero crash when computing some models' color (asie; this doesn't actually make them supported, though...)
+* [#400] Incorrect minimum Forge version causing non-obvious crash (asie)
+* [#399] Resource leaks across the codebase (asie)
+* [#398] FPS drop in notification renderer (asie)

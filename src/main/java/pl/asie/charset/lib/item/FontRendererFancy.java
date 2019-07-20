@@ -22,6 +22,7 @@ package pl.asie.charset.lib.item;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
@@ -31,8 +32,7 @@ import java.util.regex.Pattern;
 
 public class FontRendererFancy extends FontRenderer {
     private static final Pattern FANCY_COLOR = Pattern.compile("\ue51a");
-    private static final Field LOCATION_FONT_TEXTURE = ReflectionHelper.findField(FontRenderer.class,
-            "locationFontTexture", "field_111273_g");
+    private static final Field LOCATION_FONT_TEXTURE = ObfuscationReflectionHelper.findField(FontRenderer.class, "field_111273_g");
     private final FontRenderer parent;
 
     protected FontRendererFancy(FontRenderer parent) throws IllegalAccessException {

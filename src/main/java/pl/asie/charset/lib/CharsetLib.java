@@ -30,8 +30,10 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -134,7 +136,7 @@ public class CharsetLib {
 	@SuppressWarnings("unchecked")
 	public void preInitClient(FMLPreInitializationEvent event) {
 		try {
-			Field field = ReflectionHelper.findField(Minecraft.class, "defaultResourcePacks", "field_110449_ao");
+			Field field = ObfuscationReflectionHelper.findField(Minecraft.class, "field_110449_ao");
 			((List) field.get(Minecraft.getMinecraft())).add(CharsetFakeResourcePack.INSTANCE);
 
 			IReloadableResourceManager rrm = ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager());
@@ -143,7 +145,7 @@ public class CharsetLib {
 			// TODO: Can we get rid of this to save a bit of loading time?
 			// (We can, but it involves loading Minecraft.<init> a bit early.
 			// Hmm.)
-			Minecraft.getMinecraft().refreshResources();
+			FMLClientHandler.instance().refreshResources(r -> false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

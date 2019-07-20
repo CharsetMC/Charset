@@ -41,6 +41,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.IModel;
@@ -60,6 +61,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class RenderUtils {
 	public enum AveragingMode {
@@ -102,16 +104,16 @@ public final class RenderUtils {
 
 		int pixelCount = 0;
 		int[] data = sprite.getFrameTextureData(0)[0];
-		long[] avgColor = new long[3];
+		long avgColorB = 0, avgColorG = 0, avgColorR = 0;
 		switch (mode) {
 			case FULL:
 				for (int j = 0; j < sprite.getIconHeight(); j++) {
 					for (int i = 0; i < sprite.getIconWidth(); i++) {
 						int c = data[j * sprite.getIconWidth() + i];
-						if (((c >> 24) & 0xFF) > 0x00) {
-							avgColor[0] += (c & 0xFF)*(c & 0xFF);
-							avgColor[1] += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
-							avgColor[2] += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
+						if (((c >> 24) & 0xFF) != 0x00) {
+							avgColorB += (c & 0xFF)*(c & 0xFF);
+							avgColorG += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
+							avgColorR += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
 							pixelCount++;
 						}
 					}
@@ -121,10 +123,10 @@ public final class RenderUtils {
 				for (int j = 0; j < 2; j++) {
 					for (int i = 0; i < sprite.getIconHeight(); i++) {
 						int c = data[i * sprite.getIconWidth() + (j > 0 ? sprite.getIconWidth() - 1 : 0)];
-						if (((c >> 24) & 0xFF) > 0x00) {
-							avgColor[0] += (c & 0xFF)*(c & 0xFF);
-							avgColor[1] += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
-							avgColor[2] += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
+						if (((c >> 24) & 0xFF) != 0x00) {
+							avgColorB += (c & 0xFF)*(c & 0xFF);
+							avgColorG += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
+							avgColorR += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
 							pixelCount++;
 						}
 					}
@@ -134,21 +136,24 @@ public final class RenderUtils {
 				for (int j = 0; j < 2; j++) {
 					for (int i = 0; i < sprite.getIconWidth(); i++) {
 						int c = data[j > 0 ? (data.length - 1 - i) : i];
-						if (((c >> 24) & 0xFF) > 0x00) {
-							avgColor[0] += (c & 0xFF)*(c & 0xFF);
-							avgColor[1] += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
-							avgColor[2] += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
+						if (((c >> 24) & 0xFF) != 0x00) {
+							avgColorB += (c & 0xFF)*(c & 0xFF);
+							avgColorG += ((c >> 8) & 0xFF)*((c >> 8) & 0xFF);
+							avgColorR += ((c >> 16) & 0xFF)*((c >> 16) & 0xFF);
 							pixelCount++;
 						}
 					}
 				}
 				break;
 		}
-		int col = 0xFF000000;
-		for (int i = 0; i < 3; i++) {
-			col |= ((int) Math.min(255, Math.round(Math.sqrt(avgColor[i] / pixelCount))) & 0xFF) << (i*8);
+		if (pixelCount > 0) {
+			return 0xFF000000
+				| ((Math.min(255, (int) (Math.sqrt(avgColorB / pixelCount))) & 0xFF))
+				| ((Math.min(255, (int) (Math.sqrt(avgColorG / pixelCount))) & 0xFF) << 8)
+				| ((Math.min(255, (int) (Math.sqrt(avgColorR / pixelCount))) & 0xFF) << 16);
+		} else {
+			return 0xFFFF00FF;
 		}
-		return col;
 	}
 
 	public static BufferedImage getTextureImage(TextureAtlasSprite sprite) {
@@ -210,6 +215,63 @@ public final class RenderUtils {
 		}
 
 		return renderItem.getItemModelWithOverrides(stack, world, entity);
+	}
+
+	public static TextureAtlasSprite[] getBlockSprites(ItemStack stack) {
+		return getBlockSprites(stack, null, null);
+	}
+
+	public static TextureAtlasSprite[] getBlockSprites(ItemStack stack, @Nullable World world, @Nullable EntityLivingBase entity) {
+		TextureAtlasSprite[] sprites = new TextureAtlasSprite[6];
+
+		try {
+			IBakedModel missingModel = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
+			IBakedModel model;
+			IBlockState state = null;
+			if (stack.getItem() instanceof ItemBlock) {
+				state = ItemUtils.getBlockState(stack);
+				model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+
+				if (model == missingModel) {
+					model = getItemModel(stack, world, entity);
+				}
+			} else {
+				model = getItemModel(stack, world, entity);
+			}
+
+			if (model != missingModel) {
+				List<BakedQuad> generalQuads = model.getQuads(state, null, 0L);
+
+				for (EnumFacing f : EnumFacing.VALUES) {
+					List<BakedQuad> quads = model.getQuads(state, f, 0L);
+					Set<TextureAtlasSprite> foundTextures;
+
+					foundTextures = quads.stream().map(BakedQuad::getSprite).collect(Collectors.toCollection(Sets::newIdentityHashSet));
+					if (foundTextures.size() != 1) {
+						foundTextures = quads.stream().filter(q -> q.getFace() == f || q.getFace() == null).map(BakedQuad::getSprite).collect(Collectors.toCollection(Sets::newIdentityHashSet));
+						if (foundTextures.size() != 1) {
+							foundTextures = quads.stream().filter(q -> q.getFace() == f).map(BakedQuad::getSprite).collect(Collectors.toCollection(Sets::newIdentityHashSet));
+							if (foundTextures.size() != 1) {
+								foundTextures = generalQuads.stream().map(BakedQuad::getSprite).collect(Collectors.toCollection(Sets::newIdentityHashSet));
+								if (foundTextures.size() != 1) {
+									foundTextures = generalQuads.stream().filter(q -> q.getFace() == f).map(BakedQuad::getSprite).collect(Collectors.toCollection(Sets::newIdentityHashSet));
+								}
+							}
+						}
+					}
+
+					if (foundTextures.size() == 1) {
+						sprites[f.ordinal()] = foundTextures.iterator().next();
+					} else {
+						sprites[f.ordinal()] = model.getParticleTexture();
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return sprites;
 	}
 
 	public static TextureAtlasSprite getItemSprite(ItemStack stack) {

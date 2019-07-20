@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.commons.io.Charsets;
@@ -84,7 +85,7 @@ public class SplashTextHandler {
 	public void customSplashes(GuiScreenEvent.InitGuiEvent.Pre event) {
 		if (event.getGui() instanceof GuiMainMenu) {
 			GuiMainMenu menu = (GuiMainMenu) event.getGui();
-			Field splashTextField = ReflectionHelper.findField(GuiMainMenu.class, "splashText", "field_73975_c");
+			Field splashTextField = ObfuscationReflectionHelper.findField(GuiMainMenu.class, "field_73975_c");
 			List<String> splashes = new ArrayList<>();
 			addTexts(splashes, SPLASH_TEXTS);
 			addTexts(splashes, EXTRA_SPLASH_TEXTS);

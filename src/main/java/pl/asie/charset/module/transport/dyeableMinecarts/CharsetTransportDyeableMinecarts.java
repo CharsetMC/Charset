@@ -39,6 +39,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -133,7 +134,7 @@ public class CharsetTransportDyeableMinecarts {
 		Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap = Minecraft.getMinecraft().getRenderManager().entityRenderMap;
 
 		try {
-			Field f = ReflectionHelper.findField(RenderMinecart.class, "modelMinecart", "field_77013_a");
+			Field f = ObfuscationReflectionHelper.findField(RenderMinecart.class, "field_77013_a");
 			for (Render<? extends Entity> e : entityRenderMap.values()) {
 				if (e instanceof RenderMinecart) {
 					f.set(e, new ModelMinecartWrapped((ModelBase) f.get(e)));
