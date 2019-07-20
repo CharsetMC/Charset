@@ -1,5 +1,7 @@
 Additions:
 
+* [materials.dyes, materials.shards] Published as part of the "Charset Tweaks" combo-module.
+* [tweak.coloredSlimeBlocks] New module! Inspired by a recent SethBling video.
 * [tweak.shiftScroll] "alwaysCreative" flag for always treating an entry as if it were creative mode (replace item based on list order) (asie)
 
 Bugs fixed:

@@ -106,8 +106,8 @@ public class TextureWhitener {
 			int alpha = ((value >> 24) & 0xFF);
 			if (newAlpha > 0 && alpha > 0) {
 				alpha = newAlpha;
-			} else {
-				alpha = (int) ((float) alpha * 255.0f / (float) a);
+//			} else {
+//				alpha = (int) ((float) alpha * 255.0f / (float) a);
 			}
 			return (alpha << 24) | (Colorspaces.convertToRGB(vals, Colorspace.YUV) & 0xFFFFFF);
 		}).apply(pixels, width, getter);

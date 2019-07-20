@@ -243,6 +243,11 @@ config.charset.tweak.carry.general.name=General
 
 chat.charset.shout=%1$s %2$s
 
+# tweak.coloredSlimeBlocks
+
+item.charset.slime_block.colored.name=%s Slime Block
+item.charset.slime_block.name=Slime Block
+
 # abandoned (but may be returned to)
 
 item.charset.clayBucket.filled.name=%s Clay Bucket

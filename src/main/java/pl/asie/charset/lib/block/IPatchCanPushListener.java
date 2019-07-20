@@ -17,20 +17,13 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.lib;
+package pl.asie.charset.lib.block;
 
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-public final class Properties {
-	public static final PropertyDirection FACING = PropertyDirection.create("facing");
-	public static final PropertyDirection FACING4 = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyDirection.create("axis", EnumFacing.Axis.class);
-	public static final PropertyInteger COLOR = PropertyInteger.create("color", 0, 15);
-
-	private Properties() {
-
-	}
+public interface IPatchCanPushListener {
+	boolean charsetCanPushByPiston(IBlockState blockStateIn, World worldIn, BlockPos pos, EnumFacing facing, boolean destroyBlocks, EnumFacing p_185646_5_);
 }

@@ -30,11 +30,11 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import java.util.Collection;
 import java.util.HashSet;
 
-@CharsetModule(
+/* @CharsetModule(
 		name = "materials",
 		description = "Base module for Charset's material submods.",
 		profile = ModuleProfile.STABLE
-)
+) */
 public class CharsetMaterials {
     protected static final Collection<String> metals = new HashSet<>();
     protected static final Collection<String> gems = new HashSet<>();
