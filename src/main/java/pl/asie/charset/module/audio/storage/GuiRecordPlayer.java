@@ -135,8 +135,12 @@ public class GuiRecordPlayer extends GuiContainerCharset<ContainerRecordPlayer> 
 					if (owner.getState() == TraitRecordPlayer.State.PLAYING || owner.getState() == TraitRecordPlayer.State.RECORDING) {
 						setState(TraitRecordPlayer.State.PAUSED);
 					}
+
 					if (Minecraft.getMinecraft().isFullScreen()) {
 						Minecraft.getMinecraft().toggleFullscreen();
+						if (Minecraft.getMinecraft().isFullScreen()) {
+							break;
+						}
 					}
 
 					fileDialog = new DialogThread();
