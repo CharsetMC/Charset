@@ -17,10 +17,8 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.charset.module.materials;
+package pl.asie.charset.module.materials.shards;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -46,9 +44,6 @@ import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.utils.ColorUtils;
 import pl.asie.charset.lib.utils.RegistryUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @CharsetModule(
 		name = "materials.shards",
