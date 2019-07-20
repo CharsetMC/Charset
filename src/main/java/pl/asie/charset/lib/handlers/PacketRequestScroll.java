@@ -53,9 +53,10 @@ public class PacketRequestScroll extends Packet {
 	public void apply(INetHandler handler) {
 		EntityPlayer player = getPlayer(handler);
 		ItemStack currStack = player.inventory.getStackInSlot(currPos);
-		ShiftScrollHandler.Provider provider = ShiftScrollHandler.INSTANCE.getMatchingProvider(currStack);
-		if (!currStack.isEmpty() && provider != null) {
-			if (player.isCreative()) {
+		ShiftScrollHandler.Entry entry = ShiftScrollHandler.INSTANCE.getMatchingProvider(currStack);
+		if (!currStack.isEmpty() && entry != null) {
+			ShiftScrollHandler.Provider provider = entry.getProvider();
+			if (entry.isAlwaysCreative() || player.isCreative()) {
 				NonNullList<ItemStack> stacks = NonNullList.create();
 				provider.addAllMatching(stacks);
 

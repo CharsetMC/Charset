@@ -50,6 +50,24 @@ import java.nio.file.Files;
 import java.util.*;
 
 public class ShiftScrollHandler {
+	public static final class Entry {
+		private final Provider provider;
+		private final boolean alwaysCreative;
+
+		public Entry(Provider provider, boolean alwaysCreative) {
+			this.provider = provider;
+			this.alwaysCreative = alwaysCreative;
+		}
+
+		public boolean isAlwaysCreative() {
+			return alwaysCreative;
+		}
+
+		public Provider getProvider() {
+			return provider;
+		}
+	}
+
 	public interface Provider {
 		boolean matches(ItemStack stack);
 		void addAllMatching(NonNullList<ItemStack> list);
@@ -151,7 +169,7 @@ public class ShiftScrollHandler {
 
 	public static ShiftScrollHandler INSTANCE = new ShiftScrollHandler();
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	private final List<Provider> providers = new ArrayList<>();
+	private final List<Entry> providers = new ArrayList<>();
 
 	private ShiftScrollHandler() {
 
@@ -167,7 +185,9 @@ public class ShiftScrollHandler {
 
 		File defaultRulesFile = new File(rulesDir, "rules.json.default");
 		List<Object> defaultRules = new ArrayList<>();
-		for (Provider p : providers) {
+		for (Entry e : providers) {
+			Provider p = e.provider;
+
 			Map<String, Object> providerMap = new HashMap<>();
 			if (p instanceof ItemGroup) {
 				List<String> itemNames = new ArrayList<>();
@@ -189,6 +209,11 @@ public class ShiftScrollHandler {
 				ModCharset.logger.warn("Could not JSONify " + p.getClass().getName() + "!");
 				continue;
 			}
+
+			if (e.alwaysCreative) {
+				providerMap.put("alwaysCreative", true);
+			}
+
 			defaultRules.add(providerMap);
 		}
 
@@ -215,6 +240,9 @@ public class ShiftScrollHandler {
 					if (o instanceof Map) {
 						try {
 							Map m = (Map) o;
+							Provider provider = null;
+							boolean alwaysCreative = (boolean) m.getOrDefault("alwaysCreative", false);
+
 							if (m.containsKey("items")) {
 								Object oo = m.get("items");
 
@@ -226,19 +254,23 @@ public class ShiftScrollHandler {
 											items.add(i);
 										}
 									}
-									providers.add(new ItemGroup(items));
+									provider = new ItemGroup(items);
 								}
 							} else if (m.containsKey("item")) {
 								Item i = ForgeRegistries.ITEMS.getValue(new ResourceLocation((String) m.get("item")));
 								if (i != Item.getItemFromBlock(Blocks.AIR)) {
 									if (m.containsKey("minMeta")) {
-										providers.add(new ItemGroupMetadataLimited(i, (Integer) m.get("minMeta"), (Integer) m.get("maxMeta")));
+										provider = (new ItemGroupMetadataLimited(i, (Integer) m.get("minMeta"), (Integer) m.get("maxMeta")));
 									} else {
-										providers.add(new ItemGroup(i));
+										provider = (new ItemGroup(i));
 									}
 								}
 							} else if (m.containsKey("oreName")) {
-								providers.add(new OreDictionaryGroup((String) m.get("oreName")));
+								provider = (new OreDictionaryGroup((String) m.get("oreName")));
+							}
+
+							if (provider != null) {
+								providers.add(new Entry(provider, alwaysCreative));
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -251,16 +283,20 @@ public class ShiftScrollHandler {
 		}
 	}
 
-	public @Nullable Provider getMatchingProvider(ItemStack stack) {
+	public @Nullable Entry getMatchingProvider(ItemStack stack) {
 		if (stack.isEmpty()) return null;
-		for (Provider p : providers) {
-			if (p.matches(stack))
+		for (Entry p : providers) {
+			if (p.getProvider().matches(stack))
 				return p;
 		}
 		return null;
 	}
 
 	public void register(Provider provider) {
+		providers.add(new Entry(provider, false));
+	}
+
+	public void register(Entry provider) {
 		providers.add(provider);
 	}
 
