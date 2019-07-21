@@ -1,0 +1,4 @@
+Bugs fixed:
+
+* [storage.barrels] [#407] Texture crab rave (asie)
+* [#399] Resource leaks across the codebase - missed one! (asie)

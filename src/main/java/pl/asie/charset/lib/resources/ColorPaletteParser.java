@@ -27,9 +27,11 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.commons.io.IOUtils;
 import pl.asie.charset.ModCharset;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,9 +83,20 @@ public final class ColorPaletteParser {
 
 		try {
 			for (IResource resource : Minecraft.getMinecraft().getResourceManager().getAllResources(COLOR_PALETTE_LOC)) {
-				Data data = gson.fromJson(new InputStreamReader(resource.getInputStream()), Data.class);
-				if (data.version != 1) {
-					ModCharset.logger.warn("Unsupported version of color_palette.json found in " + resource.getResourcePackName() + " - not loaded.");
+				Data data;
+				String resourcePackName = resource.getResourcePackName();
+
+				try (InputStream stream = resource.getInputStream(); InputStreamReader reader = new InputStreamReader(stream)) {
+					data = gson.fromJson(reader, Data.class);
+				} finally {
+					IOUtils.closeQuietly(resource);
+				}
+
+				if (data == null) {
+					ModCharset.logger.warn("Could not parse color_palette.json found in " + resourcePackName + " - not loaded.");
+					continue;
+				} else if (data.version != 1) {
+					ModCharset.logger.warn("Unsupported version of color_palette.json found in " + resourcePackName + " - not loaded.");
 					continue;
 				}
 
