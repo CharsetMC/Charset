@@ -629,7 +629,7 @@ public class RendererWire extends ModelFactory<Wire> {
     }
 
 	protected IBakedModel bakeWire(Wire wire, boolean isDynamic, boolean isItem, BlockRenderLayer blockLayer) {
-    	boolean hasDynamic = false;
+    	boolean hasQuads = false;
 
 		SimpleBakedModel model = new SimpleBakedModel(this);
 		if (wire != null) {
@@ -640,15 +640,26 @@ public class RendererWire extends ModelFactory<Wire> {
 					if (i == 0) {
 						model.setParticle(handler.getTexture(WireRenderHandler.TextureType.PARTICLE, wire,null, 15));
 					}
-					if (isItem || ((handler.isDynamic() == isDynamic) && blockLayer == handler.getRenderLayer())) {
-						hasDynamic = true;
+
+                    boolean shouldRender = isItem;
+                    if (!shouldRender) {
+                        boolean handlerIsDynamic = handler.isDynamic();
+                        if (handlerIsDynamic) {
+                            shouldRender = isDynamic;
+                        } else {
+                            shouldRender = !isDynamic && blockLayer == handler.getRenderLayer();
+                        }
+                    }
+
+                    if (shouldRender) {
+						hasQuads = true;
 						addWire(handler, wire, model.getQuads(null, null, 0));
 					}
 				}
 			}
 		}
 
-		return (!isItem && isDynamic && !hasDynamic) ? null : model;
+		return (!isItem && isDynamic && !hasQuads) ? null : model;
 	}
 
     @Override

@@ -130,7 +130,7 @@ public abstract class Wire implements ICapabilityProvider, IRenderComparable<Wir
                             WireFace face = WireFace.VALUES[i - 1];
                             if (face != loc && connectsInternal(face)) {
                                 result = getCapabilityProviderRemote(pos, face, false);
-                                resultFace = getLocation().facing;
+                                resultFace = getLocation().facing.getOpposite();
                             }
                         } break;
                         case 8:

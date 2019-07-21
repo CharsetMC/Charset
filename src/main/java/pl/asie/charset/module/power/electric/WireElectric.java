@@ -21,6 +21,8 @@ package pl.asie.charset.module.power.electric;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -86,7 +88,7 @@ public class WireElectric extends Wire {
 		private int send(boolean simulate) {
 			long mrCounted = 0;
 
-			TObjectIntMap<IEnergyStorage> mrPer = new TObjectIntHashMap<>();
+			Object2IntMap<IEnergyStorage> mrPer = new Object2IntOpenHashMap<>();
 			for (EnergyPath path : destinations) {
 				if (path.storage instanceof IEnergyStorage) {
 					IEnergyStorage storage = (IEnergyStorage) path.storage;
