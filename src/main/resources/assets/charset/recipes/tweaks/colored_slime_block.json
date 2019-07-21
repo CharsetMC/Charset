@@ -1,0 +1,25 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "tweak.coloredSlimeBlocks"
+    }
+  ],
+  "type": "charset:shapeless",
+  "group": "charset:slime_block_colored",
+  "ingredients": [
+    {
+      "item": "minecraft:slime"
+    },
+    {
+      "type": "charset:group",
+      "group": "dye",
+      "modifyMeta": true
+    }
+  ],
+  "result": {
+    "item": "charset:slime_block_colored",
+    "data": 0,
+    "count": 1
+  }
+}

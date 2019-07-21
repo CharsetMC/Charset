@@ -1,0 +1,4 @@
+Additions:
+
+* [tweak.coloredSlimeBlocks] Colored slime blocks can now be washed in a cauldron!
+* [tweak.coloredSlimeBlocks] I forgot a recipe... eh, heh... my modding is kind of rusty.

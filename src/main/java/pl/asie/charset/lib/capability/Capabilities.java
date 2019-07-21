@@ -98,6 +98,8 @@ public class Capabilities {
 
 	@CapabilityInject(IDyeableItem.class)
 	public static Capability<IDyeableItem> DYEABLE_ITEM;
+	@CapabilityInject(IWashableItem.class)
+	public static Capability<IWashableItem> WASHABLE_ITEM;
 
 	@CapabilityInject(IItemInsertionHandler.class)
 	public static Capability<IItemInsertionHandler> ITEM_INSERTION_HANDLER;
@@ -166,6 +168,7 @@ public class Capabilities {
 		CapabilityManager.INSTANCE.register(IMovable.class, DummyCapabilityStorage.get(), DefaultMovable::new);
 
 		CapabilityManager.INSTANCE.register(IDyeableItem.class, new DyeableItemStorage(), DyeableItem::new);
+		CapabilityManager.INSTANCE.register(IWashableItem.class, DummyCapabilityStorage.get(), WashableItem::new);
 
 		CapabilityManager.INSTANCE.register(IItemInsertionHandler.class, DummyCapabilityStorage.get(), DefaultItemInsertionHandler::new);
 		CapabilityManager.INSTANCE.register(IPipeView.class, DummyCapabilityStorage.get(), DefaultPipeView::new);
