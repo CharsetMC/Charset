@@ -39,7 +39,7 @@ import pl.asie.charset.lib.wires.WireProvider;
 		name = "power.electric",
 		dependencies = {"lib.wires"},
 		description = "Electric, FE-compatible power system",
-		profile = ModuleProfile.INDEV
+		profile = ModuleProfile.EXPERIMENTAL
 )
 public class CharsetPowerElectric {
 	private WireProviderElectric wireElectric;

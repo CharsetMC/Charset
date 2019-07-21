@@ -1,0 +1,33 @@
+{
+  "conditions": [
+    {
+      "type": "charset:module_loaded",
+      "module": "power.electric"
+    }
+  ],
+  "type": "charset:shaped",
+  "group": "charset:electric_wire",
+  "pattern": [
+    "srs",
+    "iii"
+  ],
+  "key": {
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stone"
+    },
+    "r": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    },
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    }
+  },
+  "result": {
+    "item": "charset:electric_wire",
+    "data": 0,
+    "count": 4
+  }
+}

@@ -90,8 +90,31 @@ public class WireElectricOverlay extends WireRenderHandler implements IWireRende
 			}
 		}
 
-		return lit ? 0xFFFFFF1F : 0xFF6C6C22;
+		return lit ? 0xFF6FEDFF : 0xFF3D5159;
 	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getLightLevel(TextureType type, Wire wire, @Nullable EnumFacing direction) {
+		boolean lit = false;
+		WireElectric we = (WireElectric) wire;
+
+		if (direction != null) {
+			lit = we.STORAGE[direction.ordinal()] != null && we.STORAGE[direction.ordinal()].isLit();
+		} else {
+			for (EnumFacing d : EnumFacing.VALUES) {
+				if (we.STORAGE[d.ordinal()] != null) {
+					lit = we.STORAGE[d.ordinal()] != null && we.STORAGE[d.ordinal()].isLit();
+				}
+				if (lit) {
+					break;
+				}
+			}
+		}
+
+		return lit ? 15 : 0;
+	}
+
 
 	@Override
 	@SideOnly(Side.CLIENT)

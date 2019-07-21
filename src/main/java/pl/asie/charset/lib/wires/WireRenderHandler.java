@@ -79,4 +79,10 @@ public abstract class WireRenderHandler {
 	public boolean isDynamic() {
 		return false;
 	}
+
+	// TODO: not implemented
+	@SideOnly(Side.CLIENT)
+	public int getLightLevel(TextureType type, Wire wire, @Nullable EnumFacing direction) {
+		return 0;
+	}
 }
