@@ -19,6 +19,8 @@
 
 package pl.asie.charset.lib.misc;
 
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemSnow;
@@ -45,10 +47,10 @@ public final class Todokete {
 	public Todokete() {
 
 	}
-	private final Map<Integer, Integer> map = new HashMap<>();
+	private final Int2IntMap map = new Int2IntOpenHashMap();
 	private final ThreadLocal<Integer> currentPlayer = new ThreadLocal<>();
 
-	private float halate(Integer player) {
+	private float halate(int player) {
 		int v = map.getOrDefault(player, 0);
 		NoteBlockEvent.Note note = n[v];
 		map.put(player, (v+1)%n.length);

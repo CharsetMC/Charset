@@ -26,7 +26,10 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.utils.RenderUtils;
+
+import java.util.Objects;
 
 public class GuiContainerCharset<T extends ContainerBase> extends GuiContainer {
 	protected int xBase, yBase;
@@ -49,7 +52,13 @@ public class GuiContainerCharset<T extends ContainerBase> extends GuiContainer {
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		this.drawDefaultBackground();
+		try {
+			this.drawDefaultBackground();
+		} catch (Exception e) {
+			ModCharset.logger.warn("Caught an undesired exception - see bug #354! This GUI: " + Objects.toString(this, "null") + ", current GUI: " + Objects.toString(Minecraft.getMinecraft().currentScreen, "null"));
+			e.printStackTrace();
+		}
+
 		super.drawScreen(mouseX, mouseY, partialTicks);
 		this.renderHoveredToolTip(mouseX, mouseY);
 	}

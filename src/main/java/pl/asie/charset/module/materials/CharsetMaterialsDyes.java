@@ -23,6 +23,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import pl.asie.charset.lib.loader.CharsetModule;
@@ -32,7 +34,6 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 @CharsetModule(
 		name = "materials.dyes",
 		description= "Adds alternate ways to gather dyes, such as graphite created from charcoal.",
-        dependencies = {"materials"},
         profile = ModuleProfile.STABLE
 )
 public class CharsetMaterialsDyes {
@@ -41,7 +42,10 @@ public class CharsetMaterialsDyes {
 	@SubscribeEvent
 	public void registerItems(RegistryEvent.Register<Item> event) {
 		RegistryUtils.register(event.getRegistry(), graphite, "graphite");
+	}
 
+	@Mod.EventHandler
+	public void onInit(FMLInitializationEvent event) {
 		ItemStack stack = new ItemStack(graphite, 1, 0);
 		OreDictionary.registerOre("dye", stack);
 		OreDictionary.registerOre("dyeBlack", stack);

@@ -24,8 +24,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import pl.asie.charset.lib.inventory.GuiContainerCharset;
-import pl.asie.charset.module.audio.storage.GuiRecordPlayer;
-import pl.asie.simplelogic.gates.PacketTimerChangeTT;
+import pl.asie.simplelogic.gates.network.PacketTimerChangeTT;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
 import pl.asie.simplelogic.gates.logic.GateLogicTimer;
 

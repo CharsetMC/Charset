@@ -1,4 +1,6 @@
 Bugs fixed:
 
+* [lib] [#399] Resource leaks across the codebase - missed one! (asie)
+* [materials.dyes, materials.shards] No longer working at all, apparently! (asie)
 * [storage.barrels] [#407] Texture crab rave (asie)
-* [#399] Resource leaks across the codebase - missed one! (asie)
+* [#354] Crash when opening timer GUI (asie; actually just added a workaround)

@@ -17,9 +17,11 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates;
+package pl.asie.simplelogic.gates.network;
 
 import net.minecraft.entity.player.EntityPlayer;
+import pl.asie.simplelogic.gates.PartGate;
+import pl.asie.simplelogic.gates.SimpleLogicGates;
 
 public class PacketGateOpenGUI extends PacketGate {
 	public PacketGateOpenGUI() {

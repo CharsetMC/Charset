@@ -48,7 +48,6 @@ import pl.asie.charset.lib.utils.RegistryUtils;
 @CharsetModule(
 		name = "materials.shards",
 		description = "Adds shards to glass.",
-		dependencies = {"materials"},
 		profile = ModuleProfile.STABLE
 )
 public class CharsetMaterialsShards {
@@ -74,10 +73,11 @@ public class CharsetMaterialsShards {
 
 	@SubscribeEvent
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
-		event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(glassShardItem, 1, 0)).setRegistryName(new ResourceLocation("charset:glassShard")));
+		ResourceLocation group = new ResourceLocation("charset:glassShard");
 
+		event.getRegistry().register(new ShapedOreRecipe(group, new ItemStack(Blocks.GLASS), "gg", "gg", 'g', new ItemStack(glassShardItem, 1, 0)).setRegistryName(new ResourceLocation("charset:glassShard")));
 		for (int i = 0; i < 16; i++) {
-			event.getRegistry().register(new ShapedOreRecipe(new ResourceLocation("charset:glassShard"), new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(glassShardItem, 1, i + 1)).setRegistryName(new ResourceLocation("charset:glassShard_" + i)));
+			event.getRegistry().register(new ShapedOreRecipe(group, new ItemStack(Blocks.STAINED_GLASS, 1, i), "gg", "gg", 'g', new ItemStack(glassShardItem, 1, i + 1)).setRegistryName(new ResourceLocation("charset:glassShard_" + i)));
 		}
 	}
 

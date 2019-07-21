@@ -30,12 +30,9 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import pl.asie.charset.lib.inventory.GuiContainerCharset;
-import pl.asie.simplelogic.gates.PacketTimerChangeTT;
-import pl.asie.simplelogic.gates.PacketTransposerConnection;
+import pl.asie.simplelogic.gates.network.PacketTransposerConnection;
 import pl.asie.simplelogic.gates.SimpleLogicGates;
-import pl.asie.simplelogic.gates.logic.GateLogic;
 import pl.asie.simplelogic.gates.logic.GateLogicBundledTransposer;
-import pl.asie.simplelogic.gates.logic.GateLogicTimer;
 
 import java.io.IOException;
 import java.util.ArrayList;

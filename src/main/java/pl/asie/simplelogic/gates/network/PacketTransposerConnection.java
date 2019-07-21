@@ -17,13 +17,13 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates;
+package pl.asie.simplelogic.gates.network;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
+import pl.asie.simplelogic.gates.PartGate;
 import pl.asie.simplelogic.gates.logic.GateLogicBundledTransposer;
-import pl.asie.simplelogic.gates.logic.GateLogicTimer;
 
 public class PacketTransposerConnection extends PacketGate {
 	private int from, to;

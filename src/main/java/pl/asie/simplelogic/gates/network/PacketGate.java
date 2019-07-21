@@ -17,7 +17,7 @@
  * along with Charset.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pl.asie.simplelogic.gates;
+package pl.asie.simplelogic.gates.network;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
@@ -25,6 +25,8 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import pl.asie.charset.lib.network.PacketTile;
+import pl.asie.simplelogic.gates.PartGate;
+import pl.asie.simplelogic.gates.SimpleLogicGates;
 
 public abstract class PacketGate extends PacketTile {
 	private EnumFacing facing;

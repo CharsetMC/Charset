@@ -20,6 +20,7 @@
 package pl.asie.simplelogic.gates;
 
 import net.minecraft.entity.player.EntityPlayer;
+import pl.asie.simplelogic.gates.network.PacketGateOpenGUI;
 
 public class ProxyCommon {
 	public void init() {
