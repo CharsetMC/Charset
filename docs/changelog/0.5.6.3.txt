@@ -1,0 +1,3 @@
+Bugs fixed:
+
+* [#411] Config GUI not saving changes (asie)

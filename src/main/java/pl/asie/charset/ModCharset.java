@@ -261,6 +261,24 @@ public class ModCharset {
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
 		if (ModCharset.MODID.equals(event.getModID())) {
+			if (configGeneral.hasChanged()) {
+				configGeneral.save();
+			}
+
+			if (configIds.hasChanged()) {
+				configIds.save();
+			}
+
+			if (configModules.hasChanged()) {
+				configModules.save();
+			}
+
+			for (Configuration c : ModuleLoader.moduleConfigs.values()) {
+				if (c.hasChanged()) {
+					c.save();
+				}
+			}
+
 			ModuleLoader.INSTANCE.passEvent(new CharsetLoadConfigEvent(false));
 		}
 	}

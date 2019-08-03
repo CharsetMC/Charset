@@ -525,7 +525,6 @@ public class ModuleLoader {
 			MinecraftForge.EVENT_BUS.register(loadedModules.get(s));
 		}
 
-
 		for (ASMDataTable.ASMData data : table.getAll(CharsetCompatAnnotation.class.getName())) {
 			String id = (String) data.getAnnotationInfo().get("value");
 			try {
