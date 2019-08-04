@@ -27,6 +27,8 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.Locale;
+
 public class SubCommandHelp extends SubCommand {
     public SubCommandHelp(Side side) {
         super("help", side);
@@ -45,7 +47,7 @@ public class SubCommandHelp extends SubCommand {
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
         if (args.length >= 1) {
-            SubCommand command = (getSide() == Side.CLIENT ? CommandCharset.CLIENT : CommandCharset.SERVER).SUB_COMMAND_MAP.get(args[0].toLowerCase());
+            SubCommand command = (getSide() == Side.CLIENT ? CommandCharset.CLIENT : CommandCharset.SERVER).SUB_COMMAND_MAP.get(args[0].toLowerCase(Locale.ROOT));
             if (command != null && sender.canUseCommand(getPermissionLevel(), "charset")
                     && (command.getSide() == Side.SERVER || (sender.getEntityWorld() != null && sender.getEntityWorld().isRemote))) {
                 String[] usage = command.getUsage().split("\n");

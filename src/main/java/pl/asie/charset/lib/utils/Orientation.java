@@ -32,6 +32,7 @@ import javax.annotation.Nonnull;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import java.util.Locale;
 import java.util.Optional;
 
 public enum Orientation implements IModelState, IStringSerializable, ITransformation {
@@ -74,7 +75,8 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
      * This is what various RedPower-style machines add. It can only point in 4 directions. It can not point in the facing direction, nor in the opposite direction.
      */
     public final EnumFacing top;
-    
+
+    private final String nameLowercase;
     private final Orientation[] rotations = new Orientation[EnumFacing.VALUES.length];
     private final Orientation[] mirrors = new Orientation[2];
     private int rotation;
@@ -86,6 +88,7 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
     Orientation(EnumFacing facing, EnumFacing top) {
         this.facing = facing;
         this.top = top;
+        this.nameLowercase = name().toLowerCase(Locale.ROOT);
     }
 
     static {
@@ -182,7 +185,7 @@ public enum Orientation implements IModelState, IStringSerializable, ITransforma
 
     @Override
     public String getName() {
-        return name().toLowerCase();
+        return nameLowercase;
     }
     
     public Orientation rotateOnFace(int count) {

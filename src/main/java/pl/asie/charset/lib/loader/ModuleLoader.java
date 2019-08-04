@@ -164,7 +164,7 @@ public class ModuleLoader {
 	}
 
 	private ModuleProfile getProfileFromString(String s) {
-		s = s.toUpperCase();
+		s = s.toUpperCase(Locale.ROOT);
 		if ("STABLE".equals(s)) {
 			return ModuleProfile.STABLE;
 		} else if ("TESTING".equals(s)) {
@@ -206,7 +206,7 @@ public class ModuleLoader {
 
 		baseProfileProp.setComment("Set the base profile for Charset.\nThis will give you a default set of modules based on stability.\nAllowed values: DEFAULT, STABLE, TESTING, EXPERIMENTAL (DEFAULT means " + defaultProfile.name() + ")\nFor fine-grained configuration, check modules.cfg!");
 
-		if ("DEFAULT".equals(baseProfileProp.getString().toUpperCase())) {
+		if ("DEFAULT".equals(baseProfileProp.getString().toUpperCase(Locale.ROOT))) {
 			profile = defaultProfile;
 		} else {
 			profile = getProfileFromString(baseProfileProp.getString());
@@ -273,7 +273,7 @@ public class ModuleLoader {
 						prop.setRequiresMcRestart(true);
 
 						if (desc.length() > 0) desc += " ";
-						desc += "[Profile: " + modProfile.name().toUpperCase() + "";
+						desc += "[Profile: " + modProfile.name().toUpperCase(Locale.ROOT) + "";
 						if (!isDefault) {
 							desc += ", off by default!";
 						}
@@ -284,11 +284,11 @@ public class ModuleLoader {
 							configDirty = true;
 						}
 
-						if (prop.getString().toUpperCase().startsWith("ENABLE")) {
+						if (prop.getString().toUpperCase(Locale.ROOT).startsWith("ENABLE")) {
 							override = ThreeState.YES;
-						} else if (prop.getString().toUpperCase().startsWith("DISABLE")) {
+						} else if (prop.getString().toUpperCase(Locale.ROOT).startsWith("DISABLE")) {
 							override = ThreeState.NO;
-						} else if (!"DEFAULT".equals(prop.getString().toUpperCase())) {
+						} else if (!"DEFAULT".equals(prop.getString().toUpperCase(Locale.ROOT))) {
 							ModCharset.logger.warn("Invalid value for '" + name + "' override: '" + prop.getString() + ";");
 						}
 					}

@@ -51,9 +51,9 @@ public class CommandCharset extends CommandBase {
 
     private void registerInternal(SubCommand command) {
         if (SUB_COMMANDS.add(command)) {
-            SUB_COMMAND_MAP.put(command.getName().toLowerCase(), command);
+            SUB_COMMAND_MAP.put(command.getName().toLowerCase(Locale.ROOT), command);
             for (String s : command.getAliases())
-                SUB_COMMAND_MAP.put(s.toLowerCase(), command);
+                SUB_COMMAND_MAP.put(s.toLowerCase(Locale.ROOT), command);
         }
     }
 
@@ -81,7 +81,7 @@ public class CommandCharset extends CommandBase {
 
             return getListOfStringsMatchingLastWord(args, cmds);
         } else if (args.length > 1) {
-            SubCommand command = SUB_COMMAND_MAP.get(args[0].toLowerCase());
+            SubCommand command = SUB_COMMAND_MAP.get(args[0].toLowerCase(Locale.ROOT));
             if (command != null) {
                 String[] args2 = new String[args.length - 1];
                 System.arraycopy(args, 1, args2, 0, args.length - 1);
@@ -125,7 +125,7 @@ public class CommandCharset extends CommandBase {
             String[] args2 = new String[args.length - 1];
             System.arraycopy(args, 1, args2, 0, args.length - 1);
 
-            SubCommand command = SUB_COMMAND_MAP.get(args[0].toLowerCase());
+            SubCommand command = SUB_COMMAND_MAP.get(args[0].toLowerCase(Locale.ROOT));
             if (command != null) {
                 if (sender.canUseCommand(command.getPermissionLevel(), getName())) {
                     command.execute(server, sender, args2);

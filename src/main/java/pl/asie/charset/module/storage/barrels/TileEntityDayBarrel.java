@@ -242,7 +242,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                 }
             }
         } else if (compound.hasKey("type", Constants.NBT.TAG_STRING)) {
-            String s = compound.getString("type").toUpperCase();
+            String s = compound.getString("type").toUpperCase(Locale.ROOT);
             BarrelUpgrade type = null;
             try {
                 type = BarrelUpgrade.valueOf(s);

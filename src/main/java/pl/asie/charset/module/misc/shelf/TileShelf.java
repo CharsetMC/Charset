@@ -41,6 +41,7 @@ import pl.asie.charset.lib.utils.ItemUtils;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 
 public class TileShelf extends TileBase {
 	public static final UnlistedPropertyGeneric<ShelfCacheInfo> PROPERTY = new UnlistedPropertyGeneric<>("tile", ShelfCacheInfo.class);
@@ -55,7 +56,7 @@ public class TileShelf extends TileBase {
 	}
 
 	protected boolean isBook(ItemStack stack) {
-		return stack.getItem().getTranslationKey().toLowerCase().contains("book");
+		return stack.getItem().getTranslationKey().toLowerCase(Locale.ROOT).contains("book");
 	}
 
 	private int toNonBookSlotId(int id) {

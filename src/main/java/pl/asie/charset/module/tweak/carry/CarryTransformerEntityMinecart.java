@@ -19,6 +19,7 @@
 
 package pl.asie.charset.module.tweak.carry;
 
+import net.minecraft.block.BlockJukebox;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -30,7 +31,9 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityCommandBlock;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.lang3.tuple.Pair;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.module.tweak.carry.ICarryTransformer;
 
 import javax.annotation.Nonnull;
@@ -46,18 +49,44 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 			return true;
 		}
 
-		if (object instanceof EntityMinecart && ((EntityMinecart) object).getType() == EntityMinecart.Type.RIDEABLE) {
-			IBlockState displayState = ((EntityMinecart) object).getDisplayTile();
-			return displayState.getBlock().getMaterial(displayState) == Material.AIR;
+		if (object instanceof EntityMinecart) {
+			boolean allowed;
+			try {
+				allowed = ((EntityMinecart) object).getType() == EntityMinecart.Type.RIDEABLE;
+			} catch (Exception e) /* Railcraft throws for custom carts... */ {
+				allowed = false;
+			}
+
+			if (allowed) {
+				IBlockState displayState = ((EntityMinecart) object).getDisplayTile();
+				return displayState.getBlock().getMaterial(displayState) == Material.AIR;
+			}
 		}
 
 		return false;
 	}
 
-	protected Entity transform(Entity object, Class<? extends Entity> target, boolean simulate) {
+	protected Entity transform(Entity object, String target, boolean simulate) {
 		return transform(object, target, null, simulate);
 	}
 
+	protected Entity transform(Entity object, String target, NBTTagCompound patchTag, boolean simulate) {
+		try {
+			Class targetClass = Class.forName(target);
+			if (targetClass != null && Entity.class.isAssignableFrom(targetClass)) {
+				//noinspection unchecked
+				return transform(object, targetClass, patchTag, simulate);
+			} else {
+				return null;
+			}
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+	}
+
+	protected Entity transform(Entity object, Class<? extends Entity> target, boolean simulate) {
+		return transform(object, target, null, simulate);
+	}
 
 	protected Entity transform(Entity object, Class<? extends Entity> target, NBTTagCompound patchTag, boolean simulate) {
 		if (isEmptyMinecart(object) == (target == EntityMinecartEmpty.class)) {
@@ -105,7 +134,9 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 		NBTTagCompound compound = container.writeToNBT(new NBTTagCompound());
 		NBTTagCompound targetCompound = new NBTTagCompound();
 		for (String tag : tags) {
-			targetCompound.setTag(tag, compound.getTag(tag));
+			if (compound.hasKey(tag)) {
+				targetCompound.setTag(tag, compound.getTag(tag));
+			}
 		}
 		target.readFromNBT(targetCompound);
 		return container;
@@ -163,14 +194,17 @@ public class CarryTransformerEntityMinecart implements ICarryTransformer<Entity>
 		if (state.getBlock() == Blocks.TNT) {
 			return transform(object, EntityMinecartTNT.class, simulate) != null;
 		} else if (state.getBlock() == Blocks.COMMAND_BLOCK) {
+			if (tile == null || !(tile instanceof TileEntityCommandBlock)) return false;
 			return transform(object, EntityMinecartCommandBlock.class,
 					((TileEntityCommandBlock) tile).getCommandBlockLogic().writeToNBT(new NBTTagCompound()),
 					simulate) != null;
 		} else if (state.getBlock() == Blocks.CHEST) {
+			if (tile == null) return false;
 			return transform(object, EntityMinecartChest.class,
 					filter(tile.writeToNBT(new NBTTagCompound()), "Items"),
 					simulate) != null;
 		} else if (state.getBlock() == Blocks.HOPPER) {
+			if (tile == null) return false;
 			return transform(object, EntityMinecartHopper.class,
 					filter(tile.writeToNBT(new NBTTagCompound()), "Items"),
 					simulate) != null;

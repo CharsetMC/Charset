@@ -24,6 +24,8 @@ package pl.asie.charset.api.laser;
 
 import net.minecraft.util.IStringSerializable;
 
+import java.util.Locale;
+
 public enum LaserColor implements IStringSerializable {
 	NONE,
 	BLUE,
@@ -42,7 +44,7 @@ public enum LaserColor implements IStringSerializable {
 		blue = (this.ordinal() & 1) != 0;
 		green = (this.ordinal() & 2) != 0;
 		red = (this.ordinal() & 4) != 0;
-		nameLowercase = name().toLowerCase();
+		nameLowercase = name().toLowerCase(Locale.ROOT);
 	}
 
 	public LaserColor union(LaserColor other) {

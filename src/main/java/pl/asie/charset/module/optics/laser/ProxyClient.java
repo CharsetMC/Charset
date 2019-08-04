@@ -55,6 +55,8 @@ import pl.asie.charset.module.optics.laser.blocks.LaserTintHandler;
 import pl.asie.charset.module.optics.laser.system.LaserRenderer;
 import pl.asie.charset.module.optics.laser.system.SubCommandDebugLasersClient;
 
+import java.util.Locale;
+
 public class ProxyClient extends ProxyCommon {
 	private static IModel prismModel;
 
@@ -102,7 +104,7 @@ public class ProxyClient extends ProxyCommon {
 	public void bakeModels(ModelBakeEvent event) {
 		if (prismModel != null) {
 			for (Orientation o : Orientation.values()) {
-				ModelResourceLocation location = new ModelResourceLocation("charset:laser_prism", "orientation=" + o.name().toLowerCase());
+				ModelResourceLocation location = new ModelResourceLocation("charset:laser_prism", "orientation=" + o.name().toLowerCase(Locale.ROOT));
 				IBakedModel model = prismModel.bake(o, DefaultVertexFormats.BLOCK, ModelLoader.defaultTextureGetter());
 				event.getModelRegistry().putObject(location, model);
 			}

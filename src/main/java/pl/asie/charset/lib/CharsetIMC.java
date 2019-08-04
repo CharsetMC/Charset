@@ -197,7 +197,7 @@ public final class CharsetIMC {
 
     private String toEntryKey(String entryKey, String prefix) {
         entryKey = entryKey.trim();
-        return prefix + entryKey.substring(0, 1).toLowerCase() + entryKey.substring(1);
+        return prefix + entryKey.substring(0, 1).toLowerCase(Locale.ROOT) + entryKey.substring(1);
     }
 
     private List<String> toList(String entryKey, String prefix) {

@@ -1,3 +1,10 @@
+Additions:
+
+* [tweak.carry] Support for Railcraft's Jukebox Carts (asie)
+
 Bugs fixed:
 
 * [#411] Config GUI not saving changes (asie)
+* [tweak.carry] [#410] Railcraft bug (asie)
+* [tweak.carry] Crash upon trying to pick up some Railcraft carts (asie)
+* Potential system locale-related issues (asie)

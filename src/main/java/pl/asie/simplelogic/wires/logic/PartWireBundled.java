@@ -19,10 +19,7 @@
 
 package pl.asie.simplelogic.wires.logic;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
@@ -408,7 +405,7 @@ public class PartWireBundled extends PartWireSignalBase implements IBundledRecei
 			int v = signalValue[i];
 
 			builder.append(ColorUtils.getNearestTextFormatting(c));
-			builder.append(v <= 0 ? '_' : Integer.toHexString(signalValue[i]).toUpperCase());
+			builder.append(v <= 0 ? '_' : Integer.toHexString(signalValue[i]).toUpperCase(Locale.ROOT));
 
 			if (v > 0) {
 				extraString.add(ColorUtils.getNearestTextFormatting(c) + I18n.translateToLocal(ColorUtils.getLangEntry("charset.color.", c)) + " R:" + v + " S:" + (signalLevel[i] & 0xFF));

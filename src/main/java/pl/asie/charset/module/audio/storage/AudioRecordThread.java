@@ -34,6 +34,7 @@ import javax.sound.sampled.AudioFormat;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class AudioRecordThread implements Runnable {
 	public static String[] getSupportedExtensions() {
@@ -132,7 +133,7 @@ public class AudioRecordThread implements Runnable {
 				return;
 			}
 
-			String ext = FilenameUtils.getExtension(file.getName()).toLowerCase();
+			String ext = FilenameUtils.getExtension(file.getName()).toLowerCase(Locale.ROOT);
 			SoundBuffer buffer;
 
 			statusBar = "Loading...";

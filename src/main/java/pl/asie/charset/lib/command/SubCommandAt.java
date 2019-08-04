@@ -44,6 +44,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
+import pl.asie.charset.ModCharset;
 import pl.asie.charset.lib.CharsetLib;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
@@ -197,24 +198,26 @@ public class SubCommandAt extends SubCommand {
 		    return ctx.sender.getEntityWorld().getTileEntity(pos);
 	    });
 
-	    transformationTable.put(ItemStack.class, "tag", (ctx, a) -> ((ItemStack) a).hasTagCompound() ? ((ItemStack) a).getTagCompound() : new NBTTagCompound());
+	    if (CharsetLib.showHandTags || ModCharset.INDEV) {
+            transformationTable.put(ItemStack.class, "tag", (ctx, a) -> ((ItemStack) a).hasTagCompound() ? ((ItemStack) a).getTagCompound() : new NBTTagCompound());
 
-        transformationTable.put(Entity.class, "tag", (ctx, a) -> {
-            NBTTagCompound tag = new NBTTagCompound();
-            ((Entity) a).writeToNBT(tag);
-            return tag;
-        });
+            transformationTable.put(Entity.class, "tag", (ctx, a) -> {
+                NBTTagCompound tag = new NBTTagCompound();
+                ((Entity) a).writeToNBT(tag);
+                return tag;
+            });
 
-	    transformationTable.put(TileEntity.class, "tag", (ctx, a) -> {
-		    NBTTagCompound tag = new NBTTagCompound();
-		    ((TileEntity) a).writeToNBT(tag);
-		    return tag;
-	    });
+            transformationTable.put(TileEntity.class, "tag", (ctx, a) -> {
+                NBTTagCompound tag = new NBTTagCompound();
+                ((TileEntity) a).writeToNBT(tag);
+                return tag;
+            });
 
-	    transformationTable.put(NBTBase.class, END_KEY, (ctx, a) -> {
-		    ctx.sender.sendMessage(new TextComponentString("Tag: " + a));
-		    return null;
-	    });
+            transformationTable.put(NBTBase.class, END_KEY, (ctx, a) -> {
+                ctx.sender.sendMessage(new TextComponentString("Tag: " + a));
+                return null;
+            });
+        }
 
 	    transformationTable.put(BlockPos.class, END_KEY, (ctx, a) -> {
 	    	BlockPos pos = (BlockPos) a;
@@ -262,7 +265,7 @@ public class SubCommandAt extends SubCommand {
             return null;
         });
 
-        if (CharsetLib.showHandClasses) {
+        if (CharsetLib.showHandClasses || ModCharset.INDEV) {
             transformationTable.put(ItemStack.class, "class", (ctx, a) -> printClasses(ctx, ((ItemStack) a).getItem()));
             transformationTable.put(BlockPos.class, "class", (ctx, a) -> printClasses(ctx, ctx.sender.getEntityWorld().getBlockState((BlockPos) a).getBlock()));
             transformationTable.put(Entity.class, "class", SubCommandAt::printClasses);
@@ -301,12 +304,12 @@ public class SubCommandAt extends SubCommand {
             return Collections.emptyList();
         }
 
-        String prefix = args[args.length - 1].toLowerCase();
+        String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
         Set<String> strs = new TreeSet<>();
 
         for (Class cl : MethodHandleHelper.classes(o.getClass())) {
             for (String s : transformationTable.row(cl).keySet()) {
-                if (!s.equals(END_KEY) && s.toLowerCase().startsWith(prefix)) {
+                if (!s.equals(END_KEY) && s.toLowerCase(Locale.ROOT).startsWith(prefix)) {
                     strs.add(s);
                 }
             }

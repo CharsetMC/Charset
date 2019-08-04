@@ -31,6 +31,7 @@ import pl.asie.charset.module.storage.barrels.CharsetStorageBarrels;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 public class ItemCharsetTool extends ItemBase {
     public ItemCharsetTool() {
@@ -86,7 +87,7 @@ public class ItemCharsetTool extends ItemBase {
         public final String nbtKey;
 
         MaterialSlot() {
-            this.nbtKey = "m" + name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase();
+            this.nbtKey = "m" + name().substring(0, 1).toUpperCase(Locale.ROOT) + name().substring(1).toLowerCase(Locale.ROOT);
         }
     }
 }

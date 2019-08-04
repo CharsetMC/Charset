@@ -22,6 +22,7 @@ package pl.asie.charset.module.tweak.carry;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
@@ -40,6 +41,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -55,6 +57,7 @@ import pl.asie.charset.lib.loader.CharsetModule;
 import pl.asie.charset.lib.loader.ModuleProfile;
 import pl.asie.charset.lib.network.PacketRegistry;
 import pl.asie.charset.lib.utils.ThreeState;
+import pl.asie.charset.module.tweak.carry.compat.railcraft.CarryTransformerEntityMinecartRailcraft;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -93,6 +96,10 @@ public class CharsetTweakBlockCarrying {
         packet.registerPacket(0x01, PacketCarryGrab.class);
         packet.registerPacket(0x02, PacketCarrySync.class);
 
+        if (Loader.isModLoaded("railcraft")) {
+            // has to load before normal cart handler + fixes dupe bugs, so not configurable
+            CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecartRailcraft());
+        }
         CarryTransformerRegistry.INSTANCE.registerEntityTransformer(new CarryTransformerEntityMinecart());
 
         /* if (enabledSharing) {
@@ -113,6 +120,10 @@ public class CharsetTweakBlockCarrying {
     protected static boolean canCarry(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
+
+        if (block.isAir(state, world, pos)) {
+            return false;
+        }
 
         boolean hasTileEntity = state.getBlock().hasTileEntity(state);
         boolean isVanilla = "minecraft".equals(block.getRegistryName().getNamespace());
@@ -166,6 +177,10 @@ public class CharsetTweakBlockCarrying {
     }
 
     protected static boolean canCarry(Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+
         Class<? extends Entity> entityClass = entity.getClass();
         EntityEntry entry = EntityRegistry.getEntry(entityClass);
         if (entry == null) {
@@ -265,6 +280,14 @@ public class CharsetTweakBlockCarrying {
                         syncCarryWithAllClients(player);
                         return;
                     }
+                }
+
+                if (ModCharset.INDEV) {
+                    NBTTagCompound tag = new NBTTagCompound();
+                    entity.writeToNBT(tag);
+
+                    ModCharset.logger.info("Unsupported Minecart found: " + entity.getClass().getName());
+                    ModCharset.logger.info(tag.toString());
                 }
             } else {
                 // Sync in case the client said "yes", and revert the block's changes.

@@ -76,7 +76,7 @@ public class ModCharset {
 	public static final String DEP_LIB = "after:forge@[14.23.5.2838,);before:jei@[4.7.8,);before:betterwithmods;before:mcmultipart";
 	public static final int DATA_FIXER_VER = 5;
 
-	public static final boolean INDEV = ("@version@".equals(VERSION.toLowerCase()));
+	public static final boolean INDEV = ("@version@".equals(VERSION.toLowerCase(Locale.ROOT)));
 
 	@Mod.Instance(value = ModCharset.MODID)
 	public static ModCharset instance;
@@ -124,7 +124,7 @@ public class ModCharset {
 					String[] parts = s.split("=", 2);
 					parts[0] = parts[0].trim();
 					parts[1] = parts[1].trim();
-					defaultOptions.put(parts[0].toLowerCase(), parts[1].toLowerCase());
+					defaultOptions.put(parts[0].toLowerCase(Locale.ROOT), parts[1].toLowerCase(Locale.ROOT));
 				}
 			}
 		} catch (Exception e) {

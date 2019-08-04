@@ -116,6 +116,7 @@ public class CharsetLib {
 	public static boolean showAllItemTypes;
 	public static boolean showAllItemTypesJEI;
 	public static boolean showHandClasses;
+	public static boolean showHandTags;
 
 	// TODO public static boolean showAllItemTypesSeparateTabs;
 	public static int doubleClickDuration;
@@ -158,6 +159,7 @@ public class CharsetLib {
 		alwaysDropDroppablesGivenToPlayer = ConfigUtils.getBoolean(config, "general", "alwaysDropDroppablesGivenToPlayer", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).", true);
 		enableDebugInfo = ConfigUtils.getBoolean(config, "expert","enableDebugInfo", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.", false);
 		showHandClasses = ConfigUtils.getBoolean(config, "expert", "commandsShowClasses", true, "Enable the '/ch hand class' and '/ch at class' commands.", false);
+		showHandTags = ConfigUtils.getBoolean(config, "expert", "commandsShowTags", false, "Enable the '/ch hand tag' and '/ch at tag' commands.", false);
 		FastRecipeLookup.ENABLED = !ConfigUtils.getBoolean(config, "general", "disableRecipeOptimizations", false, "Set to true to disable recipe optimizations. Use only if weird behaviour exhibited, and always contact the developer first!", false);
 
 		doubleClickDuration = ConfigUtils.getInt(config, "general", "doubleClickDuration", 10, 0, 60*20, "The duration of ticks that can pass between two clicks to be registered as a double-click.", false);

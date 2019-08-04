@@ -66,6 +66,7 @@ import pl.asie.charset.lib.resources.CharsetFakeResourcePack;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class UtilProxyClient extends UtilProxyCommon {
@@ -116,7 +117,7 @@ public class UtilProxyClient extends UtilProxyCommon {
 
 	@Override
 	public String getLanguageCode() {
-		return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode().toLowerCase();
+		return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode().toLowerCase(Locale.ROOT);
 	}
 
 	@Override

@@ -32,6 +32,8 @@ import pl.asie.charset.lib.modcompat.opencomputers.TraitOCEnvironment;
 import pl.asie.charset.module.audio.storage.TileRecordPlayer;
 import pl.asie.charset.module.audio.storage.TraitRecordPlayer;
 
+import java.util.Locale;
+
 public class TraitRecordPlayerOC extends TraitOCEnvironment {
 	public TraitRecordPlayerOC(TileEntity tile) {
 		super(tile, Visibility.Network, "record_player");
@@ -126,7 +128,7 @@ public class TraitRecordPlayerOC extends TraitOCEnvironment {
 
 	@Callback(doc = "function():string -- Returns the current state of the player: \"playing\", \"paused\", \"stopped\" or \"recording\".", direct = true)
 	public Object[] getState(Context context, Arguments args) {
-		return new Object[] { getTile().getState().name().toLowerCase() };
+		return new Object[] { getTile().getState().name().toLowerCase(Locale.ROOT) };
 	}
 
 	@Callback(doc = "function():boolean -- Sets the record player to play. Returns true if successful.")

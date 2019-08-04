@@ -151,7 +151,10 @@ public class TweakCarryEventHandler {
         CarryHandler carryHandler = player.getCapability(CharsetTweakBlockCarrying.CAPABILITY, null);
         if (!player.isCreative()) {
             result = true;
-        } else if (!allowCreative || !CharsetTweakBlockCarrying.enabledCreative) {
+        } else if (!CharsetTweakBlockCarrying.enabledCreative) {
+            return false;
+        } else if (!allowCreative) {
+            Minecraft.getMinecraft().addScheduledTask(() -> startCarry(true));
             return false;
         }
 

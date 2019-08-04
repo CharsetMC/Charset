@@ -29,6 +29,8 @@ import pl.asie.charset.lib.wires.Wire;
 import pl.asie.charset.lib.wires.WireProvider;
 import pl.asie.simplelogic.wires.LogicWireUtils;
 
+import java.util.Locale;
+
 public class LogicWireProvider extends WireProvider {
     public final WireType type;
     public final int color;
@@ -82,6 +84,6 @@ public class LogicWireProvider extends WireProvider {
 
     @Override
     public ResourceLocation getTexturePrefix() {
-        return new ResourceLocation("simplelogic:blocks/wire/wire_" + type.name().toLowerCase());
+        return new ResourceLocation("simplelogic:blocks/wire/wire_" + type.name().toLowerCase(Locale.ROOT));
     }
 }

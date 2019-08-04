@@ -51,10 +51,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class ItemMaterialHeuristics {
@@ -211,7 +208,7 @@ public final class ItemMaterialHeuristics {
 
         String prefix = oreName.substring(0, splitPoint);
         String suffixU = oreName.substring(splitPoint);
-        String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
+        String suffix = suffixU.substring(0, 1).toLowerCase(Locale.ROOT) + suffixU.substring(1);
         ItemMaterial ingotMat = reg.getOrCreateMaterial(stack);
 
         if (prefix.equals("ingot") && suffix.startsWith("brick")) {
@@ -219,7 +216,7 @@ public final class ItemMaterialHeuristics {
                 int splitPoint2 = indexOfUpper(suffix, 1);
                 if (splitPoint2 >= 0) {
                     String suffixU2 = suffix.substring(splitPoint2);
-                    String suffix2 = suffixU2.substring(0, 1).toLowerCase() + suffixU2.substring(1);
+                    String suffix2 = suffixU2.substring(0, 1).toLowerCase(Locale.ROOT) + suffixU2.substring(1);
                     reg.registerType(ingotMat, suffix2);
                 }
 
@@ -279,7 +276,7 @@ public final class ItemMaterialHeuristics {
     private static void initOreMaterial(String oreName) {
         String prefix = "ore";
         String suffixU = oreName.substring(prefix.length());
-        String suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
+        String suffix = suffixU.substring(0, 1).toLowerCase(Locale.ROOT) + suffixU.substring(1);
 
         // Create ore materials for each ore
         supplyExpandedStacks(OreDictionary.getOres(oreName, false), (stack -> {
@@ -301,10 +298,10 @@ public final class ItemMaterialHeuristics {
 			suffix = "";
 			break;
 		case 1:
-			suffix = suffixU.substring(0, 1).toLowerCase();
+			suffix = suffixU.substring(0, 1).toLowerCase(Locale.ROOT);
 			break;
 		default:
-			suffix = suffixU.substring(0, 1).toLowerCase() + suffixU.substring(1);
+			suffix = suffixU.substring(0, 1).toLowerCase(Locale.ROOT) + suffixU.substring(1);
 			break;
 	}
 
