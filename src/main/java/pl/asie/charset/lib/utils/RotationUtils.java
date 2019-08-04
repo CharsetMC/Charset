@@ -21,6 +21,7 @@ package pl.asie.charset.lib.utils;
 
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
@@ -97,15 +98,34 @@ public final class RotationUtils {
 			}
 
 			IBlockState state = world.getBlockState(pos);
-			if (overridesWithRotation(state) && rotation != Rotation.NONE) {
+
+			if (state.getBlock().hasTileEntity(state)) {
+				TileEntity tile = world.getTileEntity(pos);
+				if (tile != null) {
+					try {
+						IBlockState oldState = state;
+						NBTTagCompound oldNbt = new NBTTagCompound();
+						tile.writeToNBT(oldNbt);
+
+						tile.rotate(rotation);
+
+						state = world.getBlockState(pos);
+						NBTTagCompound newNbt = new NBTTagCompound();
+						tile.writeToNBT(newNbt);
+
+						if (oldState != state || !oldNbt.equals(newNbt)) {
+							rotatedPreviously = true;
+						}
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
+				}
+			}
+
+			if (!rotatedPreviously && overridesWithRotation(state) && rotation != Rotation.NONE) {
 				world.setBlockState(pos, state.withRotation(rotation));
 				rotatedPreviously = true;
 			}
-
-			// TODO: Add TileEntity.rotate
-			/* if (state.getBlock().hasTileEntity(state)) {
-				TileEntity tile = world.getTileEntity(pos);
-			} */
 
 			if (!rotatedPreviously) {
 				for (IProperty<?> prop : state.getProperties().keySet()) {
