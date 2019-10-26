@@ -51,7 +51,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class NotifyProxyClient extends NotifyProxy {
-    static final List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<ClientMessage>());
+    static final List<ClientMessage> messages = Collections.synchronizedList(new ArrayList<>());
+    private static final Vec3d BOUNDING_BOX_MIDDLE = new Vec3d(0.5, 0.5, 0.5);
 
     @Override
     public void init() {
@@ -244,7 +245,7 @@ public class NotifyProxyClient extends NotifyProxy {
             BlockPos pos = co.getPos();
             IBlockState bs = co.getWorld().getBlockState(pos);
             AxisAlignedBB bb = bs.getCollisionBoundingBox(co.getWorld(), pos);
-            if (bb != null && (bb.maxY < 0.5f || bb.contains(new Vec3d(pos).add(0.5, 0.5, 0.5)))) {
+            if (bb != null && (bb.maxY < 0.5f || bb.contains(BOUNDING_BOX_MIDDLE))) {
                 y = (float) Math.max(y, pos.getY() + bb.maxY);
             } else {
                 y = (float) Math.max(y, pos.getY() + 0.5f);

@@ -45,6 +45,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pl.asie.charset.api.lib.EntityGatherItemsEvent;
 import pl.asie.charset.api.lib.IMultiblockStructure;
+import pl.asie.charset.api.locks.ILockingEntity;
 import pl.asie.charset.api.locks.Lockable;
 import pl.asie.charset.api.storage.IKeyItem;
 import pl.asie.charset.lib.CharsetIMC;
@@ -66,6 +67,15 @@ import java.util.Iterator;
 public class LockEventHandler {
     public static CapabilityProviderFactory<Lockable> PROVIDER;
 
+    private static boolean isValidAndLocked(TileEntity tile, Lockable lock) {
+        if (lock != null && lock.hasLock()) {
+            ILockingEntity entity = lock.getLock();
+            return entity != null && entity.isLockValid(tile) && entity.isLocked();
+        }
+
+        return false;
+    }
+
     // ENSURE LocksCapabilityHandler has all of the capabilities used here whitelisted!
     public static Lockable getLock(TileEntity tile) {
         if (tile != null) {
@@ -76,14 +86,14 @@ public class LockEventHandler {
                     TileEntity tile2 = tile.getWorld().getTileEntity(iterator.next());
                     if (tile2 != null && tile2.hasCapability(Capabilities.LOCKABLE, null)) {
                         Lockable lock = tile2.getCapability(Capabilities.LOCKABLE, null);
-                        if (lock.hasLock() && lock.getLock().isLockValid(tile2) && lock.getLock().isLocked()) {
+                        if (isValidAndLocked(tile2, lock)) {
                             return lock;
                         }
                     }
                 }
             } else if (tile.hasCapability(Capabilities.LOCKABLE, null)) {
                 Lockable lock = tile.getCapability(Capabilities.LOCKABLE, null);
-                if (lock.hasLock() && lock.getLock().isLockValid(tile) && lock.getLock().isLocked()) {
+                if (isValidAndLocked(tile, lock)) {
                     return lock;
                 }
             }

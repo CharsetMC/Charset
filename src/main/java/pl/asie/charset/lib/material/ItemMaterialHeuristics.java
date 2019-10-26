@@ -275,6 +275,10 @@ public final class ItemMaterialHeuristics {
 
     private static void initOreMaterial(String oreName) {
         String prefix = "ore";
+        if (oreName.length() <= prefix.length()) {
+            return;
+        }
+
         String suffixU = oreName.substring(prefix.length());
         String suffix = suffixU.substring(0, 1).toLowerCase(Locale.ROOT) + suffixU.substring(1);
 

@@ -50,12 +50,12 @@ public class ModelMinecartWrapped extends ModelMinecart {
 				Minecraft.getMinecraft().renderEngine.bindTexture(DYEABLE_MINECART);
 				float[] color = dyeable.getColor().getColorComponentValues();
 
-				GlStateManager.color(color[0], color[1], color[2]);
+				GlStateManager.color(color[0], color[1], color[2], 1.0f);
 			}
 		}
 
 		parent.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
 
-		GlStateManager.color(1.0f, 1.0f, 1.0f);
+		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 }

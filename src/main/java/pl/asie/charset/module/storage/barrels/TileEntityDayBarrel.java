@@ -420,6 +420,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         boolean itemChanged = false;
+        boolean itemTypeChanged = false;
 
         if (helperTop == null) {
             helperTop = new CapabilityCache.Single<>(world, getPos().offset(orientation.top), false, true, true, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, orientation.top.getOpposite());
@@ -436,6 +437,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
                         got = handler.extractItem(i, 1, false);
                         insertionView.insertItem(0, got, false);
                         itemChanged = true;
+                        itemTypeChanged |= getItemCount() == 1;
                     }
                 }
             }
@@ -461,7 +463,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
         }
 
         if (itemChanged) {
-            markChunkDirty();
+            onItemChange(itemTypeChanged);
         }
     }
 

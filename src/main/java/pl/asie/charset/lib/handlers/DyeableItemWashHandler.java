@@ -68,29 +68,31 @@ public class DyeableItemWashHandler {
 			} else if (stack.hasCapability(Capabilities.WASHABLE_ITEM, null)) {
 				IBlockState state = event.getWorld().getBlockState(event.getPos());
 				IWashableItem item = stack.getCapability(Capabilities.WASHABLE_ITEM, null);
-				int level = state.getValue(BlockCauldron.LEVEL);
 
-				if (level > 0 && item != null && state.getBlock() instanceof BlockCauldron
+				if (item != null && state.getBlock() instanceof BlockCauldron
 						&& state.getPropertyKeys().contains(BlockCauldron.LEVEL)) {
-					event.setCanceled(true);
-					Optional<ItemStack> result = item.wash(stack);
+					int level = state.getValue(BlockCauldron.LEVEL);
+					if (level > 0) {
+						event.setCanceled(true);
+						Optional<ItemStack> result = item.wash(stack);
 
-					if (result.isPresent()) {
-						ItemStack held = event.getEntityPlayer().getHeldItem(event.getHand());
-						if (ItemUtils.canMerge(held, result.get()) && (held.getCount() + result.get().getCount()) <= result.get().getMaxStackSize()) {
-							result.get().grow(held.getCount());
-							event.getEntityPlayer().setHeldItem(event.getHand(), result.get());
-						} else {
-							ItemUtils.giveOrSpawnItemEntity(
-									event.getEntityPlayer(),
-									event.getWorld(),
-									new Vec3d(event.getPos()).add(0.5, 1, 0.5),
-									result.get(), 0, 0, 0, 0, true
-							);
+						if (result.isPresent()) {
+							ItemStack held = event.getEntityPlayer().getHeldItem(event.getHand());
+							if (ItemUtils.canMerge(held, result.get()) && (held.getCount() + result.get().getCount()) <= result.get().getMaxStackSize()) {
+								result.get().grow(held.getCount());
+								event.getEntityPlayer().setHeldItem(event.getHand(), result.get());
+							} else {
+								ItemUtils.giveOrSpawnItemEntity(
+										event.getEntityPlayer(),
+										event.getWorld(),
+										new Vec3d(event.getPos()).add(0.5, 1, 0.5),
+										result.get(), 0, 0, 0, 0, true
+								);
+							}
+
+							event.getWorld().setBlockState(event.getPos(), state.withProperty(BlockCauldron.LEVEL, level - 1));
+							event.getEntityPlayer().addStat(StatList.ARMOR_CLEANED);
 						}
-
-						event.getWorld().setBlockState(event.getPos(), state.withProperty(BlockCauldron.LEVEL, level - 1));
-						event.getEntityPlayer().addStat(StatList.ARMOR_CLEANED);
 					}
 				}
 			}
