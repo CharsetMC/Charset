@@ -1,10 +1,7 @@
-Additions:
-
-* [tweak.carry] Support for Railcraft's Jukebox Carts (asie)
-
 Bugs fixed:
 
-* [#411] Config GUI not saving changes (asie)
-* [tweak.carry] [#410] Railcraft bug (asie)
-* [tweak.carry] Crash upon trying to pick up some Railcraft carts (asie)
-* Potential system locale-related issues (asie)
+* [#433] Charset Storage Locks crash with Atum (asie)
+* [#428, #432] Charset Lib crash on sneak-clicking washable items on non-cauldrons (asie)
+* [#426] Text from hopping barrels not updating when sending (asie)
+* [#414, #415, #417] Crash when an ore dictonary entry of "ore" is present (asie)
+* Incorrect notification message rendering location (asie)
