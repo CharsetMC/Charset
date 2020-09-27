@@ -730,7 +730,7 @@ public class TileEntityDayBarrel extends TileBase implements IBarrel, ICacheable
     void sync() {
         int c = getItemCount();
         if (c != lastMentionedCount) {
-            if (lastMentionedCount*c <= 0) {
+            if (lastMentionedCount * c <= 0) {
                 //One of them was 0
                 markBlockForUpdate();
             } else {

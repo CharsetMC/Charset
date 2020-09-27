@@ -60,7 +60,7 @@ public final class RedstoneUtils {
 		for (int i = 0; i < handler.getSlots(); i++) {
 			ItemStack stack = handler.getStackInSlot(i);
 			if (!stack.isEmpty()) {
-				value += stack.getCount() / Math.min(stack.getMaxStackSize(), handler.getSlotLimit(i));
+				value += stack.getCount() / (float) Math.min(stack.getMaxStackSize(), handler.getSlotLimit(i));
 				count++;
 			}
 		}

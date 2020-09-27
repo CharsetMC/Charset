@@ -66,31 +66,27 @@ public class AudioRecordThread implements Runnable {
 	private static IAudioDataDumper getCodec(String ext) {
 		try {
 			IAudioDataDumper dumper = null;
+			ICodec codec = null;
 
-			if (0 == 1) {
-				// TODO
-			} else {
-				ICodec codec = null;
+			if ("ogg".equals(ext)) {
+				codec = new CodecJOrbis();
+			} else if ("wav".equals(ext)) {
+				codec = new CodecWav();
+			} else if ("mod".equals(ext) || "s3m".equals(ext) || "xm".equals(ext)) {
+				// In the end, Forge had the last laugh.
+				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("paulscode.sound.codecs.CodecIBXM").newInstance();
+			} else if ("mp3".equals(ext)) {
+				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
+			} else if ("mp4".equals(ext) || "m4a".equals(ext)) {
+				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
+			} else if ("aac".equals(ext)) {
+				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecADTS").newInstance();
+			} else if ("flac".equals(ext)) {
+				codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecFLAC").newInstance();
+			}
 
-				if ("ogg".equals(ext)) {
-					codec = new CodecJOrbis();
-				} else if ("wav".equals(ext)) {
-					codec = new CodecWav();
-				} else if ("mod".equals(ext) || "s3m".equals(ext) || "xm".equals(ext)) {
-					codec = new CodecIBXM();
-				} else if ("mp3".equals(ext)) {
-					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP3").newInstance();
-				} else if ("mp4".equals(ext) || "m4a".equals(ext)) {
-					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecMP4").newInstance();
-				} else if ("aac".equals(ext)) {
-					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecADTS").newInstance();
-				} else if ("flac".equals(ext)) {
-					codec = (ICodec) AudioRecordThread.class.getClassLoader().loadClass("openmods.codecs.adapters.CodecFLAC").newInstance();
-				}
-
-				if (codec != null) {
-					dumper = new AudioDataDumperPaul(codec);
-				}
+			if (codec != null) {
+				dumper = new AudioDataDumperPaul(codec);
 			}
 
 			return dumper;

@@ -1,0 +1,4 @@
+Bugs fixed:
+
+* [#444, #450] Crash upon trying to load sound files in Forge 2851+.
+* [#446] Chests not outputing correct comparator values.

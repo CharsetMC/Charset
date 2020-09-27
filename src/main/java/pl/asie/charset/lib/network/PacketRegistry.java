@@ -81,14 +81,18 @@ public class PacketRegistry {
 	}
 
 	public void sendToWatching(Packet message, World world, BlockPos pos, Entity except) {
-		WorldServer worldServer = (WorldServer) world;
-		PlayerChunkMap map = worldServer.getPlayerChunkMap();
-		for (EntityPlayer player : worldServer.playerEntities) {
-			if (player != except) {
-				if (map.isPlayerWatchingChunk((EntityPlayerMP) player, pos.getX() >> 4, pos.getZ() >> 4)) {
-					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
-					channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-					channels.get(Side.SERVER).writeOutbound(message);
+		if (!(world instanceof WorldServer)) {
+			throw new RuntimeException("Attempted to send S->C packet " + message.getClass().getName() + " without a server-side world instance (" + world.getClass().getName() + "); this is a bug!");
+		} else {
+			WorldServer worldServer = (WorldServer) world;
+			PlayerChunkMap map = worldServer.getPlayerChunkMap();
+			for (EntityPlayer player : worldServer.playerEntities) {
+				if (player != except) {
+					if (map.isPlayerWatchingChunk((EntityPlayerMP) player, pos.getX() >> 4, pos.getZ() >> 4)) {
+						channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
+						channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
+						channels.get(Side.SERVER).writeOutbound(message);
+					}
 				}
 			}
 		}
