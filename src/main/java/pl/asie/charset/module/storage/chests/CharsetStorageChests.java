@@ -192,6 +192,8 @@ public class CharsetStorageChests {
 		overrideChestModel(event, "facing=east");
 		overrideChestModel(event, "facing=north");
 		overrideChestModel(event, "facing=south");
+		// TODO: this shouldn't be here...
+		TileEntityChestRendererCharset.onResourceManagerReload();
 	}
 
 	@SubscribeEvent

@@ -20,11 +20,13 @@
 package pl.asie.charset.module.storage.chests;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelChest;
 import net.minecraft.client.model.ModelLargeChest;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -33,12 +35,22 @@ import pl.asie.charset.lib.Properties;
 import pl.asie.charset.lib.material.ItemMaterial;
 import pl.asie.charset.lib.utils.RenderUtils;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 public class TileEntityChestRendererCharset extends TileEntitySpecialRenderer<TileEntityChestCharset> {
 	protected static final TileEntityChestRendererCharset INSTANCE = new TileEntityChestRendererCharset();
 	protected static final ResourceLocation TEXTURE_NORMAL_DOUBLE = new ResourceLocation("charset_generated:textures/entity/chest/normal_double.png");
 	protected static final ResourceLocation TEXTURE_NORMAL = new ResourceLocation("charset_generated:textures/entity/chest/normal.png");
+	private static final ResourceLocation[] NORMAL_LOCS = new ResourceLocation[] { TEXTURE_NORMAL, TEXTURE_NORMAL_DOUBLE };
+	private static final Map<ItemMaterial, ResourceLocation[]> textureLocMap = new HashMap<>();
 	private final ModelChest singleChest = new ModelChest();
 	private final ModelLargeChest doubleChest = new ModelLargeChest();
+
+	public static void onResourceManagerReload() {
+		textureLocMap.clear();
+	}
 
 	public static class Stack extends TileEntityItemStackRenderer {
 		@Override
@@ -98,6 +110,7 @@ public class TileEntityChestRendererCharset extends TileEntitySpecialRenderer<Ti
 		GlStateManager.enableDepth();
 		GlStateManager.depthFunc(515);
 		GlStateManager.depthMask(true);
+		boolean applyColor = false;
 
 		if (destroyStage >= 0) {
 			this.bindTexture(DESTROY_STAGES[destroyStage]);
@@ -107,7 +120,42 @@ public class TileEntityChestRendererCharset extends TileEntitySpecialRenderer<Ti
 			GlStateManager.translate(0.5/16F, 0.5/16F, 0.5/16F);
 			GlStateManager.matrixMode(5888);
 		} else {
-			this.bindTexture(isDouble ? TEXTURE_NORMAL_DOUBLE : TEXTURE_NORMAL);
+			ItemMaterial mat = te.material.getMaterial();
+			ResourceLocation[] locs = textureLocMap.get(mat);
+			if (locs == null) {
+				ResourceLocation locDouble = TEXTURE_NORMAL_DOUBLE;
+				ResourceLocation locNormal = TEXTURE_NORMAL;
+				IResourceManager manager = Minecraft.getMinecraft().getResourceManager();
+				boolean found = false;
+				try {
+					ResourceLocation locOverride = new ResourceLocation("charset", "textures/entity/chest/" + mat.getIdForTexture() + "_double.png");
+					if (manager.getResource(locOverride) != null) {
+						locDouble = locOverride;
+						found = true;
+					}
+				} catch (IOException e) {
+					// pass
+				}
+				try {
+					ResourceLocation locOverride = new ResourceLocation("charset", "textures/entity/chest/" + mat.getIdForTexture() + ".png");
+					if (manager.getResource(locOverride) != null) {
+						locNormal = locOverride;
+						found = true;
+					}
+				} catch (IOException e) {
+					// pass
+				}
+				if (found) {
+					locs = new ResourceLocation[] { locNormal, locDouble };
+				} else {
+					locs = NORMAL_LOCS;
+				}
+				textureLocMap.put(mat, locs);
+			}
+			if (locs == NORMAL_LOCS) {
+				applyColor = true;
+			}
+			this.bindTexture(isDouble ? locs[1] : locs[0]);
 		}
 
 		GlStateManager.pushMatrix();
@@ -150,7 +198,7 @@ public class TileEntityChestRendererCharset extends TileEntitySpecialRenderer<Ti
 		model.chestKnob.rotateAngleX = model.chestLid.rotateAngleX;
 
 		ItemMaterial mat = te.material.getMaterial();
-		if (destroyStage < 0) {
+		if (applyColor) {
 			RenderUtils.glColor(
 					RenderUtils.getAverageColor(
 							RenderUtils.getItemSprite(mat.getStack(), te.getWorld(), null, null),

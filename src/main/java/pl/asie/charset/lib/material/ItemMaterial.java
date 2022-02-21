@@ -28,12 +28,14 @@ public final class ItemMaterial {
 	private final ItemStack stack;
 
 	private final transient String id;
+	private final transient String idForTexture;
 	private final transient Set<String> types;
 	private final transient Map<String, ItemMaterial> relations;
 
 	protected ItemMaterial(ItemStack stack) {
 		this.stack = stack;
 		this.id = ItemMaterialRegistry.createId(stack);
+		this.idForTexture = this.id.replaceAll("[^0-9a-zA-Z]+", "_");
 		this.types = new HashSet<>();
 		this.relations = new HashMap<>();
 	}
@@ -52,6 +54,10 @@ public final class ItemMaterial {
 
 	public String getId() {
 		return id;
+	}
+
+	public String getIdForTexture() {
+		return this.idForTexture;
 	}
 
 	public ItemStack getStack() {
