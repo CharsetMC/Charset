@@ -52,6 +52,7 @@ import pl.asie.charset.lib.block.TraitLockable;
 import pl.asie.charset.lib.block.TraitMaterial;
 import pl.asie.charset.lib.block.TraitNameable;
 import pl.asie.charset.lib.capability.Capabilities;
+import pl.asie.charset.lib.inventory.LootTableHandler;
 import pl.asie.charset.lib.material.ItemMaterialRegistry;
 import pl.asie.charset.lib.inventory.GuiHandlerCharset;
 import pl.asie.charset.lib.inventory.IContainerHandler;
@@ -76,6 +77,7 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 			TileEntityChestCharset.this.updateComparators();
 		}
 	};
+	private final LootTableHandler lootTableHandler = new LootTableHandler(stacks);
 	private TileEntityChestCharset neighbor;
 	private EnumFacing neighborFace;
 	private float lidAngle, prevLidAngle;
@@ -162,8 +164,11 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	public void readNBTData(NBTTagCompound compound, boolean isClient) {
 		super.readNBTData(compound, isClient);
 
-		if (!isClient && compound.hasKey("inv")) {
-			stacks.deserializeNBT(compound.getCompoundTag("inv"));
+		if (!isClient) {
+			if (compound.hasKey("inv")) {
+				stacks.deserializeNBT(compound.getCompoundTag("inv"));
+			}
+			this.lootTableHandler.readFromNBT(compound);
 		}
 
 		EnumFacing oldNF = neighborFace;
@@ -180,6 +185,7 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 		if (!isClient) {
 			NBTTagCompound invTag = stacks.serializeNBT();
 			compound.setTag("inv", invTag);
+			this.lootTableHandler.writeToNBT(compound);
 		}
 
 		if (neighborFace != null) {
@@ -212,6 +218,7 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			this.lootTableHandler.applyFrom(this.world, null);
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this);
 		}
 
@@ -452,6 +459,8 @@ public class TileEntityChestCharset extends TileBase implements IContainerHandle
 
 	protected void onOpenedByInner(EntityPlayer player) {
 		if (!player.isSpectator()) {
+			this.lootTableHandler.applyFrom(this.world, player);
+
 			if (!playerIds.add(player.getEntityId())) {
 				return;
 			}
