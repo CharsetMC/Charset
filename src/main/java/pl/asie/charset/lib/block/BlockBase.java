@@ -225,6 +225,10 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 		}
 	}
 
+	protected boolean isProtectedDroppable(ItemStack stack) {
+		return false;
+	}
+
 	@Override
 	public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
 		player.addStat(StatList.getBlockStats(this));
@@ -240,7 +244,7 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 
 		if (!worldIn.isRemote && !worldIn.restoringBlockSnapshots) {
 			for (ItemStack item : items) {
-				if (chance >= 1.0f || worldIn.rand.nextFloat() <= chance) {
+				if (chance >= 1.0f || worldIn.rand.nextFloat() <= chance || (isProtectedDroppable(item) && !CharsetLib.dropHardMode)) {
 					spawnAsEntity(worldIn, pos, item);
 				}
 			}
@@ -271,7 +275,7 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 			float chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0f / Utils.getExplosionSize(explosion), true, null);
 
 			for (ItemStack item : items) {
-				if (world.rand.nextFloat() <= chance) {
+				if (world.rand.nextFloat() <= chance || (isProtectedDroppable(item) && !CharsetLib.dropHardMode)) {
 					spawnAsEntity(world, pos, item);
 				}
 			}
@@ -302,7 +306,7 @@ public abstract class BlockBase extends Block implements ISubItemProvider.Contai
 			chance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(drops, worldIn, pos, state, fortune, chance, false, harvesters.get());
 
 			for (ItemStack drop : drops) {
-				if (worldIn.rand.nextFloat() <= chance) {
+				if (worldIn.rand.nextFloat() <= chance || (isProtectedDroppable(drop) && !CharsetLib.dropHardMode)) {
 					spawnAsEntity(worldIn, pos, drop);
 				}
 			}

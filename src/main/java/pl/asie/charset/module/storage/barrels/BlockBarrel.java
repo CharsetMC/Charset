@@ -47,6 +47,7 @@ import pl.asie.charset.lib.item.SubItemProviderCache;
 import pl.asie.charset.lib.item.SubItemProviderRecipes;
 import pl.asie.charset.lib.item.SubItemSetHelper;
 import pl.asie.charset.lib.utils.UnlistedPropertyGeneric;
+import pl.asie.charset.module.storage.chests.CharsetStorageChests;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -253,5 +254,10 @@ public class BlockBarrel extends BlockBase implements ITileEntityProvider {
         } else {
             return SoundType.WOOD;
         }
+    }
+
+    @Override
+    protected boolean isProtectedDroppable(ItemStack stack) {
+        return stack.getItem() != CharsetStorageBarrels.barrelItem;
     }
 }

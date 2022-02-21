@@ -193,4 +193,9 @@ public class BlockChestCharset extends BlockBase implements ITileEntityProvider 
 		world.setBlockState(pos, state.withProperty(Properties.FACING4, newFacing));
 		return true;
 	}
+
+	@Override
+	protected boolean isProtectedDroppable(ItemStack stack) {
+		return stack.getItem() != CharsetStorageChests.itemChest;
+	}
 }

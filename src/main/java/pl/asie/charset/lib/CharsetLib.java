@@ -112,6 +112,7 @@ public class CharsetLib {
 	public static PlayerDeathHandler deathHandler = new PlayerDeathHandler();
 
 	public static boolean alwaysDropDroppablesGivenToPlayer;
+	public static boolean dropHardMode;
 	public static boolean enableDebugInfo;
 	public static boolean showAllItemTypes;
 	public static boolean showAllItemTypesJEI;
@@ -157,6 +158,7 @@ public class CharsetLib {
 	@Mod.EventHandler
 	public void loadConfig(CharsetLoadConfigEvent event) {
 		alwaysDropDroppablesGivenToPlayer = ConfigUtils.getBoolean(config, "general", "alwaysDropDroppablesGivenToPlayer", false, "Setting this option to true will stop Charset from giving players items directly into the player inventory when the alternative is dropping it (for instance, taking item out of barrels).", true);
+		dropHardMode = ConfigUtils.getBoolean(config, "general", "hardModeStorageDrops", false, "If true, chests and other storage blocks will not drop all items upon exploding, but instead drop them proportionally to the explosion size.", false);
 		enableDebugInfo = ConfigUtils.getBoolean(config, "expert","enableDebugInfo", ModCharset.INDEV, "Enable developer debugging information. Don't enable this unless asked/you know what you're doing.", false);
 		showHandClasses = ConfigUtils.getBoolean(config, "expert", "commandsShowClasses", true, "Enable the '/ch hand class' and '/ch at class' commands.", false);
 		showHandTags = ConfigUtils.getBoolean(config, "expert", "commandsShowTags", false, "Enable the '/ch hand tag' and '/ch at tag' commands.", false);
