@@ -70,10 +70,6 @@ repositories {
 		url "http://maven.cil.li"
 	}
 	maven {
-		name "Cyclops Repo"
-		url "https://oss.jfrog.org/artifactory/simple/libs-release/"
-	}
-	maven {
 		url "http://repo.elytradev.com"
 	}
 	maven {
@@ -121,11 +117,12 @@ dependencies {
 //	shadow name: "ibxm", version: "a73"
 
 	// APIs
-	deobfCompile "appeng:appliedenergistics2:rv6-stable-7:api"
+	deobfCompile name: "appliedenergistics2", version: "rv6-stable-7"
 	deobfCompile name: "Baubles", version: "1.12-1.5.2"
 	deobfCompile "com.mod-buildcraft:buildcraft-api:7.99.24.6"
 	deobfCompile name: "chiselsandbits", version: "14.33"
-	deobfCompile "org.cyclops.commoncapabilities:CommonCapabilities:1.12.2-2.4.8-362"
+	deobfCompile name: "CommonCapabilities", version: "1.12.2-2.4.8"
+	deobfCompile name: "CyclopsCore", version: "1.12.2-1.6.7"
 	deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.592"
 	deobfCompile name: "Guide-API", version: "1.12-2.1.8-63"
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2:api"
