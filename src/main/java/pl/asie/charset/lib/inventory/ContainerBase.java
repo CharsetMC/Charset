@@ -54,7 +54,9 @@ public abstract class ContainerBase extends Container {
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
 		return isOwnerPresent() && (containerHandler != null ? containerHandler.isUsableByPlayer(player) : (owner == player)) 
-			&& (containerHandler instanceof TileEntity ? ((TileEntity) listener).world.getTileEntity(((TileEntity) containerHandler).getPos()) == ((TileEntity) containerHandler) : true);
+			&& (containerHandler instanceof TileEntity ? 
+			    	((TileEntity) containerHandler).world.getTileEntity(((TileEntity) containerHandler).getPos()) == ((TileEntity) containerHandler) 
+				: true);
 	}
 
 	@Override
