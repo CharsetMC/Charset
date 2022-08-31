@@ -300,10 +300,15 @@ public class ContainerPocketTable extends ContainerBase {
                 }
             }
         }
-        if (nonEmptyAmount > maxSize || nonEmptyAmount == 0 && hasEmpty) {
+        if (nonEmptyAmount > maxSize) {
             nonEmptyAmount = maxSize;
         }
-        return nonEmptyAmount / res.getCount();
+        int maxCraftingAttempts = nonEmptyAmount / res.getCount();
+        if (maxCraftingAttempts == 0 && hasEmpty) {
+            return maxSize / res.getCount();
+        } else {
+            return maxCraftingAttempts;
+        }
     }
 
     void craftClear() {
